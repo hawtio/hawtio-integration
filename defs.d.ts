@@ -31,8 +31,6 @@
 /// <reference path="d.ts/camel/ts/trace.d.ts"/>
 /// <reference path="d.ts/camel/ts/tree.d.ts"/>
 /// <reference path="d.ts/camel/ts/typeConverter.d.ts"/>
-/// <reference path="d.ts/git/ts/gitHelpers.d.ts"/>
-/// <reference path="d.ts/git/ts/git.d.ts"/>
 /// <reference path="d.ts/karaf/ts/karafHelpers.d.ts"/>
 /// <reference path="d.ts/karaf/ts/karafPlugin.d.ts"/>
 /// <reference path="d.ts/karaf/ts/feature.d.ts"/>
