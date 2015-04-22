@@ -8,7 +8,6 @@ module Karaf {
 
   _module.controller("Karaf.FeaturesController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace, jolokia) => {
 
-    $scope.hasFabric = Fabric.hasFabric(workspace);
     $scope.responseJson = '';
     $scope.filter = '';
 
@@ -124,9 +123,6 @@ module Karaf {
     };
 
     $scope.install = (feature) => {
-      if ($scope.hasFabric) {
-        return;
-      }
       //$('.popover').remove();
       Core.notification('info', 'Installing feature ' + feature.Name);
       installFeature(workspace, jolokia, feature.Name, feature.Version, () => {
@@ -143,9 +139,6 @@ module Karaf {
     };
 
     $scope.uninstall = (feature) => {
-      if ($scope.hasFabric) {
-        return;
-      }
       //$('.popover').remove();
       Core.notification('info', 'Uninstalling feature ' + feature.Name);
       uninstallFeature(workspace, jolokia, feature.Name, feature.Version, () => {

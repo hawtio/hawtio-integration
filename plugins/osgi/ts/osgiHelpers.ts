@@ -389,58 +389,6 @@ module Osgi {
     }
   }
 
-  /**
-   * A helper method which initialises a scope's jolokia to refer to a profile's jolokia if used in a Fabric
-   * or use a local jolokia
-   */
-  export function initProfileScope($scope, $routeParams, $location, localStorage, jolokia, workspace, initFn = null) {
-    Wiki.initScope($scope, $routeParams, $location);
-    $scope.versionId = $routeParams.versionId || $scope.branch;
-    $scope.profileId = $routeParams.profileId || Fabric.pagePathToProfileId($scope.pageId);
-    if (!$scope.pageId) {
-      $scope.pageId = Fabric.fabricTopLevel + Fabric.profilePath($scope.profileId)
-    }
-
-    if (!initFn) {
-      initFn = () => null;
-    }
-    var versionId = $scope.versionId;
-    var profileId = $scope.profileId;
-    $scope.profileNotRunning = false;
-    $scope.profileMetadataMBean = null;
-    if (versionId && profileId) {
-      $scope.inFabricProfile = true;
-      $scope.configurationsLink = "/wiki/branch/" + versionId + "/configurations/" + $scope.pageId;
-      $scope.profileMetadataMBean = getProfileMetadataMBean(workspace);
-      if ($scope.profileMetadataMBean) {
-        $scope.profileNotRunning = true;
-        $scope.jolokia = jolokia;
-        $scope.workspace = workspace;
-        initFn();
-      } else {
-        Fabric.profileJolokia(jolokia, profileId, versionId, (profileJolokia) => {
-          if (profileJolokia) {
-            $scope.jolokia = profileJolokia;
-            $scope.workspace = Core.createRemoteWorkspace(profileJolokia, $location, localStorage);
-          } else {
-            // lets deal with the case we have no profile running right now so we have to have a plan B
-            // for fetching the profile configuration metadata
-            $scope.jolokia = jolokia;
-            $scope.workspace = workspace;
-            $scope.profileNotRunning = true;
-            $scope.profileMetadataMBean = getProfileMetadataMBean(workspace);
-          }
-          initFn();
-        });
-      }
-    } else {
-      $scope.configurationsLink = "/osgi/configurations";
-      $scope.jolokia = jolokia;
-      $scope.workspace = workspace;
-      initFn();
-    }
-  }
-
   export function getConfigurationProperties(workspace, jolokia, pid, onDataFn) {
     var mbean = getSelectionConfigAdminMBean(workspace);
     var answer = null;

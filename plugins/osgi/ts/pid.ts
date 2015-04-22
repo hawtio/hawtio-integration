@@ -52,10 +52,6 @@ module Osgi {
       }
     });
 
-    initProfileScope($scope, $routeParams, $location, localStorage, jolokia, workspace, () => {
-      updateTableContents();
-    });
-
     function updatePid(mbean, pid, data) {
       var completeFn = (response) => {
         Core.notification("success", "Successfully updated pid: " + pid);
@@ -71,12 +67,8 @@ module Osgi {
         }
       };
       var callback = Core.onSuccess(completeFn, errorHandler("Failed to update: " + pid));
-      if ($scope.inFabricProfile) {
-        Fabric.setProfileProperties($scope.versionId, $scope.profileId, pid, data, callback);
-      } else {
-        var json = JSON.stringify(data);
-        $scope.jolokia.execute(mbean, "configAdminUpdate", pid, json, callback);
-      }
+      var json = JSON.stringify(data);
+      $scope.jolokia.execute(mbean, "configAdminUpdate", pid, json, callback);
     }
 
     $scope.pidSave = () => {
@@ -175,24 +167,17 @@ module Osgi {
         $location.path($scope.configurationsLink);
       }
 
-      if ($scope.inFabricProfile) {
-        if ($scope.pid) {
-          var configFile = $scope.pid + ".properties";
-          Fabric.deleteConfigurationFile($scope.versionId, $scope.profileId, configFile, successFn, errorFn);
-        }
-      } else {
-        var mbean = getSelectionConfigAdminMBean($scope.workspace);
-        if (mbean) {
-          $scope.jolokia.request({
-            type: "exec",
-            mbean: mbean,
-            operation: 'delete',
-            arguments: [$scope.pid]
-          }, {
-            error: errorFn,
-            success: successFn
-          });
-        }
+      var mbean = getSelectionConfigAdminMBean($scope.workspace);
+      if (mbean) {
+        $scope.jolokia.request({
+          type: "exec",
+          mbean: mbean,
+          operation: 'delete',
+          arguments: [$scope.pid]
+        }, {
+          error: errorFn,
+          success: successFn
+        });
       }
     };
 
@@ -217,7 +202,6 @@ module Osgi {
           updateSchemaAndLoadMetaType();
           Core.$apply($scope);
         }
-        Fabric.getProfileProperties($scope.versionId, $scope.profileId, $scope.zkPid, onProfileProperties);
       } else {
         updateSchemaAndLoadMetaType();
       }
@@ -496,14 +480,13 @@ module Osgi {
       Core.$apply($scope);
     }
 
-
     function updateTableContents() {
       $scope.modelLoaded = false;
-      if ($scope.inFabricProfile || $scope.profileNotRunning) {
-        Fabric.getOverlayProfileProperties($scope.versionId, $scope.profileId, $scope.pid, onProfilePropertiesLoaded);
-      } else {
-        Osgi.getConfigurationProperties($scope.workspace, $scope.jolokia, $scope.pid, populateTable);
-      }
+      Osgi.getConfigurationProperties($scope.workspace, $scope.jolokia, $scope.pid, populateTable);
     }
+
+    // load initial data
+    updateTableContents();
+
   }]);
 }

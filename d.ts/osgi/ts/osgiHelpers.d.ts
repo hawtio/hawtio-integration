@@ -52,11 +52,6 @@ declare module Osgi {
      * Creates a path to the given configuration pid and/or factoryPid
      */
     function createConfigPidPath($scope: any, pid: any, isFactory?: boolean): string;
-    /**
-     * A helper method which initialises a scope's jolokia to refer to a profile's jolokia if used in a Fabric
-     * or use a local jolokia
-     */
-    function initProfileScope($scope: any, $routeParams: any, $location: any, localStorage: any, jolokia: any, workspace: any, initFn?: any): void;
     function getConfigurationProperties(workspace: any, jolokia: any, pid: any, onDataFn: any): any;
     /**
      * For a pid of the form "foo.generatedId" for a pid "foo" or "foo.bar" remove the "foo." prefix

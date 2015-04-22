@@ -787,12 +787,6 @@ module Camel {
               return mbean.objectName;
             }
           }
-          // look for the fuse camel fabric mbean
-          var fabricResult = tree.navigate(domain, contextId, "fabric");
-          if (fabricResult && fabricResult.children) {
-            var mbean = fabricResult.children.first();
-            return mbean.objectName;
-          }
         }
       }
     }

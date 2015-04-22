@@ -50,14 +50,6 @@ module Osgi {
 
     $scope.addPidDialog = new UI.Dialog();
 
-    initProfileScope($scope, $routeParams, $location, localStorage, jolokia, workspace, () => {
-      $scope.$watch('workspace.selection', function () {
-        updateTableContents();
-      });
-
-      updateTableContents();
-    });
-
     $scope.addPid = (newPid) => {
       if ($scope.configurations.any((c) => c['pid'] == newPid)) {
         Core.notification("error", "pid \"" + newPid + "\" already exists.");
@@ -367,5 +359,9 @@ module Osgi {
         }
       };
     }
+
+    // load the data
+    updateTableContents();
+
   }]);
 }
