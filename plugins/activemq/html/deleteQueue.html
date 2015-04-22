@@ -1,0 +1,57 @@
+<div ng-controller="ActiveMQ.DestinationController">
+  <div class="row">
+
+    <div class="control-group">
+
+      <div class="alert alert-warning">
+        <span class="pficon-layered">
+          <span class="pficon pficon-warning-triangle"></span>
+          <span class="pficon pficon-warning-exclamation"></span>
+        </span>
+        <strong>Warning:</strong> these operations cannot be undone. Please be careful!
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="control-group">
+        <button type="submit" class="btn btn-warning" ng-click="deleteDialog = true">Delete queue
+          '{{name().unescapeHTML()}}'
+        </button>
+        <label>This will remove the queue completely.</label>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="control-group">
+        <button type="submit" class="btn btn-warning" ng-click="purgeDialog = true">Purge queue
+          '{{name().unescapeHTML()}}'
+        </button>
+        <label>Purges all the current messages on the queue.</label>
+      </div>
+    </div>
+  </div>
+
+  <div hawtio-confirm-dialog="deleteDialog"
+       title="Confirm delete queue"
+       ok-button-text="Delete"
+       cancel-button-text="Cancel"
+       on-ok="deleteDestination()">
+    <div class="dialog-body">
+      <p>You are about to delete the <b>{{name().unescapeHTML()}}</b> queue</p>
+      <p>This operation cannot be undone so please be careful.</p>
+    </div>
+  </div>
+
+  <div hawtio-confirm-dialog="purgeDialog"
+       title="Confirm purge queue"
+       ok-button-text="Purge"
+       cancel-button-text="Cancel"
+       on-ok="purgeDestination()">
+    <div class="dialog-body">
+      <p>You are about to purge the <b>{{name().unescapeHTML()}}</b> queue</p>
+      <p>This operation cannot be undone so please be careful.</p>
+    </div>
+  </div>
+
+</div>

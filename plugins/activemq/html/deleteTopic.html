@@ -1,0 +1,38 @@
+<div ng-controller="ActiveMQ.DestinationController">
+  <div class="row">
+
+    <div class="control-group">
+
+      <div class="alert alert-warning">
+        <span class="pficon-layered">
+          <span class="pficon pficon-warning-triangle"></span>
+          <span class="pficon pficon-warning-exclamation"></span>
+        </span>
+        <strong>Warning:</strong> this operation cannot be undone. Please be careful!
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="control-group">
+        <button type="submit" class="btn btn-warning" ng-click="deleteDialog = true">Delete topic
+          '{{name().unescapeHTML()}}'
+        </button>
+        <label>This will remove the topic completely.</label>
+      </div>
+    </div>
+  </div>
+
+  <div hawtio-confirm-dialog="deleteDialog"
+       title="Confirm delete topic"
+       ok-button-text="Delete"
+       cancel-button-text="Cancel"
+       on-ok="deleteDestination()">
+    <div class="dialog-body">
+      <p>You are about to delete the <b>{{name().unescapeHTML()}}</b> topic</p>
+      <p>This operation cannot be undone so please be careful.</p>
+    </div>
+  </div>
+
+</div>

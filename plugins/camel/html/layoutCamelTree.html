@@ -1,0 +1,44 @@
+
+<script type="text/ng-template" id="camelTreeHeader.html">
+  <div class="tree-header" ng-controller="Jmx.TreeHeaderController">
+    <!--
+  <div class="camel tree-header" ng-controller="Camel.TreeHeaderController">
+    TODO - changes to the tree made this filter not work
+    <div class="left">
+      <div class="section-filter">
+        <input id="camelContextIdFilter"
+               class="search-query"
+               type="text"
+               ng-model="contextFilterText"
+               title="filter camel context IDs"
+               placeholder="Filter...">
+        <i class="fa fa-remove clickable"
+           title="Clear filter"
+           ng-click="contextFilterText = ''"></i>
+      </div>
+    </div>
+    -->
+    <div class="right">
+      <i class="fa fa-chevron-down clickable"
+         title="Expand all nodes"
+         ng-click="expandAll()"></i>
+      <i class="fa fa-chevron-up clickable"
+         title="Unexpand all nodes"
+         ng-click="contractAll()"></i>
+    </div>
+  </div>
+</script>
+
+<hawtio-pane position="left" width="300" header="camelTreeHeader.html">
+  <div id="tree-container" ng-controller="Jmx.MBeansController">
+    <div class="camel-tree" ng-controller="Camel.TreeController">
+      <div id="cameltree"></div>
+    </div>
+  </div>
+</hawtio-pane>
+<div class="row">
+  <!--
+  <ng-include src="'plugins/jmx/html/subLevelTabs.html'"></ng-include>
+  -->
+  <div id="properties" ng-view></div>
+</div>

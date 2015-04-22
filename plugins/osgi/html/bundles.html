@@ -1,0 +1,63 @@
+<div class="controller-section" ng-controller="Osgi.BundlesController">
+  <div class="row">
+    <div class="pull-left">
+
+      <form class="form-inline no-bottom-margin">
+        <fieldset>
+
+          <div class="btn-group inline-block">
+            <a ng-href="#/osgi/bundle-list?p=container"
+                    type="button"
+                    class="btn"
+                    title="List view">
+              <i class="fa fa-list"></i>
+            </a>
+            <a ng-href="#/osgi/bundles?p=container"
+                    type="button"
+                    class="btn active"
+                    title="Table view">
+              <i class="fa fa-table"></i>
+            </a>
+          </div>
+
+          <div class="controls control-group inline-block controls-row">
+            <div class="btn-group">
+              <button ng-disabled="selected.length == 0" class="btn" ng-click="stop()" title="Stop"><i class="fa fa-off"></i></button>
+              <button ng-disabled="selected.length == 0" class="btn" ng-click="start()" title="Start"><i class="fa fa-play-circle"></i></button>
+              <button ng-disabled="selected.length == 0" class="btn" ng-click="refresh()" title="Refresh"><i class="fa fa-refresh"></i></button>
+              <button ng-disabled="selected.length == 0" class="btn" ng-click="update()" title="Update"><i class="fa fa-cloud-download"></i></button>
+              <button ng-disabled="selected.length == 0" class="btn" ng-click="uninstall()" title="Uninstall"><i class="fa fa-eject"></i></button>
+            </div>
+            <div class="input-group">
+              <input class="input-xlarge" type="text" placeholder="Install Bundle..." ng-model="bundleUrl">
+              <button ng-disabled="installDisabled()" class="btn" ng-click="install()" title="Install"><i class="fa fa-ok"></i></button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+      
+    </div>
+
+    <div class="pull-right">
+      <form class="form-inline no-bottom-margin">
+        <fieldset>
+          <div class="control-group inline-block">
+            <input type="text"
+                   class="input-lg search-query"
+                   placeholder="Filter..."
+                   ng-model="gridOptions.filterOptions.filterText">
+          </div>
+        </fieldset>
+      </form>
+
+    </div>
+  </div>
+  
+  
+  <div class="row">
+    <div ng-hide="loading" class="gridStyle" ng-grid="gridOptions"></div>
+    <div ng-show="loading">
+      Please wait, loading...
+    </div>
+  </div>
+</div>

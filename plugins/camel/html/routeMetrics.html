@@ -1,0 +1,31 @@
+<div class="row" ng-controller="Camel.RouteMetricsController">
+
+  <div class="row">
+    <div class="pull-right">
+      <form class="form-inline no-bottom-margin">
+        <fieldset>
+          <div class="control-group inline-block">
+            <input type="text" class="search-query" placeholder="Filter..." ng-model="filterText">
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+
+  <div class="row" ng-show="!initDone">
+    <p class="text-center"><i class="fa fa-spinner fa-spin"></i></p>
+  </div>
+
+  <div class="col-md-8 centered well" ng-show="initDone && metricDivs.length === 0">
+    <form>
+      This Camel context has no route metrics data.
+    </form>
+  </div>
+
+  <!-- div to contain the graphs -->
+  <div class="metricsWatcher container mainContent">
+    <div id="{{metric.id}}" class="row" ng-repeat="metric in metricDivs track by $index" style="{{filterByRoute(metric)}}"></div>
+  </div>
+
+</div>
+
