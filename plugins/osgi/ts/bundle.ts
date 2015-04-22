@@ -160,15 +160,6 @@ module Osgi {
       }
     };
 
-
-    $scope.mavenLink = (row) => {
-      if (angular.isObject(row)) {
-        return Maven.mavenLink(row.Location);
-      }
-      // TODO try using the LogQuery mbean to find the mvn coords for a bundle id?
-      return "";
-    };
-
     $scope.startBundle = (bundleId) => {
       jolokia.request([
         {type: 'exec', mbean: getSelectionFrameworkMBean(workspace), operation: 'startBundle', arguments: [bundleId]}

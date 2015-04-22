@@ -41,15 +41,6 @@
 /// <reference path="d.ts/karaf/ts/scr-component.d.ts"/>
 /// <reference path="d.ts/karaf/ts/scr-components.d.ts"/>
 /// <reference path="d.ts/karaf/ts/server.d.ts"/>
-/// <reference path="d.ts/maven/ts/mavenHelpers.d.ts"/>
-/// <reference path="d.ts/maven/ts/mavenPlugin.d.ts"/>
-/// <reference path="d.ts/maven/ts/artifact.d.ts"/>
-/// <reference path="d.ts/maven/ts/dependencies.d.ts"/>
-/// <reference path="d.ts/maven/ts/pom.d.ts"/>
-/// <reference path="d.ts/maven/ts/search.d.ts"/>
-/// <reference path="d.ts/maven/ts/test.d.ts"/>
-/// <reference path="d.ts/maven/ts/versions.d.ts"/>
-/// <reference path="d.ts/maven/ts/view.d.ts"/>
 /// <reference path="d.ts/osgi/ts/osgiHelpers.d.ts"/>
 /// <reference path="d.ts/osgi/ts/osgiData.d.ts"/>
 /// <reference path="d.ts/osgi/ts/osgiPlugin.d.ts"/>
