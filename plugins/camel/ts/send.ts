@@ -8,17 +8,10 @@ module Camel {
   _module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", ($route, $scope, $element, $timeout, workspace:Workspace, jolokia, localStorage, $location, activeMQMessage) => {
     var log:Logging.Logger = Logger.get("Camel");
 
-    log.info("Loaded page!");
-
     $scope.noCredentials = false;
-    $scope.showChoose = false;
-    $scope.profileFileNames = [];
-    $scope.profileFileNameToProfileId = {};
-    $scope.selectedFiles = {};
     $scope.container = {};
     $scope.message = "\n\n\n\n";
     $scope.headers = [];
-
 
     // bind model values to search params...
     Core.bindModelToSearchParam($scope, $location, "tab", "subtab", "compose");
@@ -29,7 +22,7 @@ module Camel {
 
     $scope.checkCredentials = () => {
       $scope.noCredentials = (Core.isBlank(localStorage['activemqUserName']) || Core.isBlank(localStorage['activemqPassword']));
-    }
+    };
 
     if ($location.path().has('activemq')) {
       $scope.localStorage = localStorage;
@@ -52,7 +45,7 @@ module Camel {
     $scope.openPrefs = () => {
       $location.search('pref', 'ActiveMQ');
       $scope.$emit("hawtioOpenPrefs");
-    }
+    };
 
     var LANGUAGE_FORMAT_PREFERENCE = "defaultLanguageFormat";
     var sourceFormat = workspace.getLocalStorage(LANGUAGE_FORMAT_PREFERENCE) || "javascript";
@@ -110,8 +103,6 @@ module Camel {
     $scope.$watch('workspace.selection', function () {
       // if the current JMX selection does not support sending messages then lets redirect the page
       workspace.moveIfViewInvalid();
-
-      loadProfileConfigurationFiles();
     });
 
     /* save the sourceFormat in preferences for later
@@ -162,7 +153,7 @@ module Camel {
             mbean = target['mbean'];
             if (mbean && uri) {
 
-              // if we are running Camel 2.14 we can check if its posible to send to the endppoint
+              // if we are running Camel 2.14 we can check if its possible to send to the endpoint
               var ok = true;
               if (Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)) {
                 var reply = jolokia.execute(mbean, "canSendToEndpoint(java.lang.String)", uri);
@@ -205,49 +196,6 @@ module Camel {
       }
     }
 
-    $scope.fileSelection = () => {
-      var answer = [];
-      angular.forEach($scope.selectedFiles, (value, key) => {
-        if (value) {
-          answer.push(key);
-        }
-      });
-      return answer;
-    };
-
-    $scope.sendSelectedFiles = () => {
-      var filesToSend = $scope.fileSelection();
-      var fileCount = filesToSend.length;
-      var version = $scope.container.versionId || "1.0";
-
-      function onSendFileCompleted(response) {
-        if (filesToSend.length) {
-          var fileName = filesToSend.pop();
-          if (fileName) {
-            // lets load the file data...
-            var profile = $scope.profileFileNameToProfileId[fileName];
-            if (profile) {
-              /**
-               TODO
-              var body = Fabric.getConfigFile(jolokia, version, profile, fileName);
-              if (!body) {
-                log.warn("No body for message " + fileName);
-                body = "";
-              }
-              doSendMessage(body, onSendFileCompleted);
-              */
-            }
-          }
-        } else {
-          var text = Core.maybePlural(fileCount, "Message") + " sent!";
-          Core.notification("success", text);
-        }
-      }
-
-      // now lets start sending
-      onSendFileCompleted(null);
-    };
-
     function isCamelEndpoint() {
       // TODO check for the camel or if its an activemq endpoint
       return true;
@@ -258,25 +206,5 @@ module Camel {
       return true;
     }
 
-    function loadProfileConfigurationFiles() {
-/*
-      TODO
-      if (Fabric.fabricCreated(workspace)) {
-        $scope.container = Fabric.getCurrentContainer(jolokia, ['versionId', 'profileIds']);
-        jolokia.execute(Fabric.managerMBean, "currentContainerConfigurationFiles", Core.onSuccess(onFabricConfigFiles));
-      }
-*/
-    }
-
-    function onFabricConfigFiles(response) {
-      $scope.profileFileNameToProfileId = response;
-      // we only want files from the data dir
-      $scope.profileFileNames = Object.keys(response).filter(key => {
-        return key.toLowerCase().startsWith('data/');
-      }).sort();
-       $scope.showChoose = $scope.profileFileNames.length ? true : false;
-      $scope.selectedFiles = {};
-      Core.$apply($scope);
-    }
   }]);
 }
