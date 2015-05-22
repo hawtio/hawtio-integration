@@ -27,7 +27,6 @@
     "hawtio-ui": "~2.0.0",
     "hawtio-utilities": "~2.0.0",
     "angular-resource": "~1.3.9",
-    "font-awesome": "~4.3.0",
     "hawtio-template-cache": "*"
   },
   "devDependencies": {
