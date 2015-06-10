@@ -364,14 +364,12 @@ var ActiveMQ;
 /// <reference path="activemqPlugin.ts"/>
 var ActiveMQ;
 (function (ActiveMQ) {
-    ActiveMQ.BrowseQueueController = ActiveMQ._module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", function ($scope, workspace, jolokia, localStorage, location, activeMQMessage, $timeout) {
+    ActiveMQ.BrowseQueueController = ActiveMQ._module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$dialog", "$templateCache", function ($scope, workspace, jolokia, localStorage, location, activeMQMessage, $timeout, $dialog, $templateCache) {
         $scope.searchText = '';
         $scope.allMessages = [];
         $scope.messages = [];
         $scope.headers = {};
         $scope.mode = 'text';
-        $scope.deleteDialog = false;
-        $scope.moveDialog = false;
         $scope.gridOptions = {
             selectedItems: [],
             data: 'messages',
@@ -453,18 +451,39 @@ var ActiveMQ;
         $scope.moveMessages = function () {
             var selection = workspace.selection;
             var mbean = selection.objectName;
-            if (mbean && selection) {
-                var selectedItems = $scope.gridOptions.selectedItems;
-                $scope.message = "Moved " + Core.maybePlural(selectedItems.length, "message" + " to " + $scope.queueName);
-                var operation = "moveMessageTo(java.lang.String, java.lang.String)";
-                angular.forEach(selectedItems, function (item, idx) {
-                    var id = item.JMSMessageID;
-                    if (id) {
-                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
-                        jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
-                    }
-                });
+            if (!mbean || !selection) {
+                return;
             }
+            var selectedItems = $scope.gridOptions.selectedItems;
+            $dialog.dialog({
+                resolve: {
+                    selectedItems: function () { return selectedItems; },
+                    gridOptions: function () { return $scope.gridOptions; },
+                    queueNames: function () { return $scope.queueNames; },
+                    parent: function () { return $scope; }
+                },
+                template: $templateCache.get("activemqMoveMessageDialog.html"),
+                controller: ["$scope", "dialog", "selectedItems", "gridOptions", "queueNames", "parent", function ($scope, dialog, selectedItems, gridOptions, queueNames, parent) {
+                    $scope.selectedItems = selectedItems;
+                    $scope.gridOptions = gridOptions;
+                    $scope.queueNames = queueNames;
+                    $scope.queueName = '';
+                    $scope.close = function (result) {
+                        dialog.close();
+                        if (result) {
+                            parent.message = "Moved " + Core.maybePlural(selectedItems.length, "message") + " to " + $scope.queueName;
+                            var operation = "moveMessageTo(java.lang.String, java.lang.String)";
+                            angular.forEach(selectedItems, function (item, idx) {
+                                var id = item.JMSMessageID;
+                                if (id) {
+                                    var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
+                                    jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
+                                }
+                            });
+                        }
+                    };
+                }]
+            }).open();
         };
         $scope.resendMessage = function () {
             var selection = workspace.selection;
@@ -479,18 +498,36 @@ var ActiveMQ;
         $scope.deleteMessages = function () {
             var selection = workspace.selection;
             var mbean = selection.objectName;
-            if (mbean && selection) {
-                var selectedItems = $scope.gridOptions.selectedItems;
-                $scope.message = "Deleted " + Core.maybePlural(selectedItems.length, "message");
-                var operation = "removeMessage(java.lang.String)";
-                angular.forEach(selectedItems, function (item, idx) {
-                    var id = item.JMSMessageID;
-                    if (id) {
-                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
-                        jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
-                    }
-                });
+            if (!mbean || !selection) {
+                return;
             }
+            var selected = $scope.gridOptions.selectedItems;
+            if (!selected || selected.length === 0) {
+                return;
+            }
+            UI.multiItemConfirmActionDialog({
+                collection: selected,
+                index: 'JMSMessageID',
+                onClose: function (result) {
+                    if (result) {
+                        $scope.message = "Deleted " + Core.maybePlural(selected.length, "message");
+                        var operation = "removeMessage(java.lang.String)";
+                        _.forEach(selected, function (item, idx) {
+                            var id = item.JMSMessageID;
+                            if (id) {
+                                var callback = (idx + 1 < selected.length) ? intermediateResult : operationSuccess;
+                                jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
+                            }
+                        });
+                    }
+                },
+                title: 'Delete messages?',
+                action: 'The following messages will be deleted:',
+                okText: 'Delete',
+                okClass: 'btn-danger',
+                custom: "This operation is permanent once completed!",
+                customClass: "alert alert-warning"
+            }).open();
         };
         $scope.retryMessages = function () {
             var selection = workspace.selection;
@@ -677,7 +714,6 @@ var ActiveMQ;
         function intermediateResult() {
         }
         function operationSuccess() {
-            $scope.messageDialog = false;
             $scope.gridOptions.selectedItems.splice(0);
             Core.notification("success", $scope.message);
             setTimeout(loadTable, 50);
@@ -6158,7 +6194,7 @@ var Camel;
 var Camel;
 (function (Camel) {
     var DELIVERY_PERSISTENT = "2";
-    Camel._module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", function ($route, $scope, $element, $timeout, workspace, jolokia, localStorage, $location, activeMQMessage) {
+    Camel._module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", "PreferencesLastPath", function ($route, $scope, $element, $timeout, workspace, jolokia, localStorage, $location, activeMQMessage, PreferencesLastPath) {
         var log = Logger.get("Camel");
         $scope.noCredentials = false;
         $scope.container = {};
@@ -6189,8 +6225,9 @@ var Camel;
             activeMQMessage.message = null;
         }
         $scope.openPrefs = function () {
-            $location.search('pref', 'ActiveMQ');
-            $scope.$emit("hawtioOpenPrefs");
+            PreferencesLastPath.lastPath = $location.path();
+            PreferencesLastPath.lastSearch = $location.search();
+            $location.path('/preferences').search({ 'pref': 'ActiveMQ' });
         };
         var LANGUAGE_FORMAT_PREFERENCE = "defaultLanguageFormat";
         var sourceFormat = workspace.getLocalStorage(LANGUAGE_FORMAT_PREFERENCE) || "javascript";
@@ -10590,7 +10627,7 @@ var Osgi;
     }]);
 })(Osgi || (Osgi = {}));
 
-angular.module("hawtio-integration-templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("plugins/activemq/html/browseQueue.html","<div ng-controller=\"ActiveMQ.BrowseQueueController\">\n  <div class=\"row\">\n    <div class=\"col-md-6\">\n      <input class=\"search-query col-md-12\" type=\"text\" ng-model=\"gridOptions.filterOptions.filterText\"\n             placeholder=\"Filter messages\">\n    </div>\n    <div class=\"col-md-6\">\n      <div class=\"pull-right\">\n        <form class=\"form-inline\">\n          <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\" ng-show=\"dlq\" ng-click=\"retryMessages()\"\n                  title=\"Moves the dead letter queue message back to its original destination so it can be retried\" data-placement=\"bottom\">\n            <i class=\"fa fa-reply\"></i> Retry\n          </button>\n          <button class=\"btn\" ng-disabled=\"gridOptions.selectedItems.length !== 1\" ng-click=\"resendMessage()\"\n                    title=\"Edit the message to resend it\" data-placement=\"bottom\">\n           <i class=\"fa fa-share-alt\"></i> Resend\n          </button>\n\n          <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\" ng-click=\"moveDialog = true\"\n                  title=\"Move the selected messages to another destination\" data-placement=\"bottom\">\n            <i class=\"fa fa-share-alt\"></i> Move\n          </button>\n          <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\"\n                  ng-click=\"deleteDialog = true\"\n                  title=\"Delete the selected messages\">\n            <i class=\"fa fa-remove\"></i> Delete\n          </button>\n          <button class=\"btn\" ng-click=\"refresh()\"\n                  title=\"Refreshes the list of messages\">\n            <i class=\"fa fa-refresh\"></i>\n          </button>\n        </form>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <table class=\"table table-striped\" hawtio-simple-table=\"gridOptions\"></table>\n  </div>\n\n  <div hawtio-slideout=\"showMessageDetails\" title=\"{{row.JMSMessageID}}\">\n    <div class=\"dialog-body\">\n\n      <div class=\"row\">\n        <div class=\"pull-right\">\n          <form class=\"form-horizontal no-bottom-margin\">\n\n            <div class=\"btn-group\"\n                 hawtio-pager=\"messages\"\n                 on-index-change=\"selectRowIndex\"\n                 row-index=\"rowIndex\"></div>\n\n            <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\" ng-click=\"moveDialog = true\"\n                    title=\"Move the selected messages to another destination\" data-placement=\"bottom\">\n              <i class=\"fa fa-share-alt\"></i> Move\n            </button>\n\n            <button class=\"btn btn-danger\" ng-disabled=\"!gridOptions.selectedItems.length\"\n                    ng-click=\"deleteDialog = true\"\n                    title=\"Delete the selected messages\">\n              <i class=\"fa fa-remove\"></i> Delete\n            </button>\n\n            <button class=\"btn\" ng-click=\"showMessageDetails = !showMessageDetails\" title=\"Close this dialog\">\n              <i class=\"fa fa-remove\"></i> Close\n            </button>\n\n          </form>\n        </div>\n      </div>\n\n      <div class=\"row\">\n        <div class=\"expandable closed\">\n          <div title=\"Headers\" class=\"title\">\n            <i class=\"expandable-indicator\"></i> Headers & Properties\n          </div>\n          <div class=\"expandable-body well\">\n            <table class=\"table table-condensed table-striped\">\n              <thead>\n              <tr>\n                <th>Header</th>\n                <th>Value</th>\n              </tr>\n              </thead>\n              <tbody ng-bind-html=\"row.headerHtml\">\n              </tbody>\n              <!--\n                            <tr ng-repeat=\"(key, value) in row.headers\">\n                              <td class=\"property-name\">{{key}}</td>\n                              <td class=\"property-value\">{{value}}</td>\n                            </tr>\n              -->\n            </table>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"row\">\n        <div>Displaying body as <span ng-bind=\"row.textMode\"></span></div>\n        <div hawtio-editor=\"row.bodyText\" read-only=\"true\" mode=\'mode\'></div>\n      </div>\n\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog=\"deleteDialog\"\n       ok-button-text=\"Delete\"\n       on-ok=\"deleteMessages()\">\n    <div class=\"dialog-body\">\n      <p>You are about to delete\n        <ng-pluralize count=\"gridOptions.selectedItems.length\"\n                      when=\"{\'1\': \'a message!\', \'other\': \'{} messages!\'}\">\n        </ng-pluralize>\n      </p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog=\"moveDialog\"\n       ok-button-text=\"Move\"\n       on-ok=\"moveMessages()\">\n    <div class=\"dialog-body\">\n      <p>Move\n        <ng-pluralize count=\"gridOptions.selectedItems.length\"\n                      when=\"{\'1\': \'message\', \'other\': \'{} messages\'}\"></ng-pluralize>\n        to: <input type=\"text\" ng-model=\"queueName\" placeholder=\"Queue name\"\n                   typeahead=\"title.unescapeHTML() for title in queueNames($viewValue) | filter:$viewValue\" typeahead-editable=\'true\'></p>\n      <p>\n        You cannot undo this operation.<br>\n        Though after the move you can always move the\n        <ng-pluralize count=\"gridOptions.selectedItems.length\"\n                      when=\"{\'1\': \'message\', \'other\': \'messages\'}\"></ng-pluralize>\n        back again.\n      </p>\n    </div>\n  </div>\n\n</div>\n\n");
+angular.module("hawtio-integration-templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("plugins/activemq/html/browseQueue.html","<div ng-controller=\"ActiveMQ.BrowseQueueController\">\n  <div class=\"row\">\n    <div class=\"col-md-6\">\n      <input class=\"search-query col-md-12\" type=\"text\" ng-model=\"gridOptions.filterOptions.filterText\"\n             placeholder=\"Filter messages\">\n    </div>\n    <div class=\"col-md-6\">\n      <div class=\"pull-right\">\n        <form class=\"form-inline\">\n          <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\" ng-show=\"dlq\" ng-click=\"retryMessages()\"\n                  title=\"Moves the dead letter queue message back to its original destination so it can be retried\" data-placement=\"bottom\">\n            <i class=\"fa fa-reply\"></i> Retry\n          </button>\n          <button class=\"btn\" ng-disabled=\"gridOptions.selectedItems.length !== 1\" ng-click=\"resendMessage()\"\n                    title=\"Edit the message to resend it\" data-placement=\"bottom\">\n           <i class=\"fa fa-share-alt\"></i> Resend\n          </button>\n\n          <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\" ng-click=\"moveMessages()\"\n                  title=\"Move the selected messages to another destination\" data-placement=\"bottom\">\n            <i class=\"fa fa-share-alt\"></i> Move\n          </button>\n          <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\"\n                  ng-click=\"deleteMessages()\"\n                  title=\"Delete the selected messages\">\n            <i class=\"fa fa-remove\"></i> Delete\n          </button>\n          <button class=\"btn\" ng-click=\"refresh()\"\n                  title=\"Refreshes the list of messages\">\n            <i class=\"fa fa-refresh\"></i>\n          </button>\n        </form>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <table class=\"table table-striped\" hawtio-simple-table=\"gridOptions\"></table>\n  </div>\n\n  <div hawtio-slideout=\"showMessageDetails\" title=\"{{row.JMSMessageID}}\">\n    <div class=\"dialog-body\">\n\n      <div class=\"row\">\n        <div class=\"pull-right\">\n          <form class=\"form-horizontal no-bottom-margin\">\n\n            <div class=\"btn-group\"\n                 hawtio-pager=\"messages\"\n                 on-index-change=\"selectRowIndex\"\n                 row-index=\"rowIndex\"></div>\n\n            <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\" ng-click=\"moveMessages()\"\n                    title=\"Move the selected messages to another destination\" data-placement=\"bottom\">\n              <i class=\"fa fa-share-alt\"></i> Move\n            </button>\n\n            <button class=\"btn btn-danger\" ng-disabled=\"!gridOptions.selectedItems.length\"\n                    ng-click=\"deleteMessages()\"\n                    title=\"Delete the selected messages\">\n              <i class=\"fa fa-remove\"></i> Delete\n            </button>\n\n            <button class=\"btn\" ng-click=\"showMessageDetails = !showMessageDetails\" title=\"Close this dialog\">\n              <i class=\"fa fa-remove\"></i> Close\n            </button>\n\n          </form>\n        </div>\n      </div>\n\n      <div class=\"row\">\n        <div class=\"expandable closed\">\n          <div title=\"Headers\" class=\"title\">\n            <i class=\"expandable-indicator\"></i> Headers & Properties\n          </div>\n          <div class=\"expandable-body well\">\n            <table class=\"table table-condensed table-striped\">\n              <thead>\n              <tr>\n                <th>Header</th>\n                <th>Value</th>\n              </tr>\n              </thead>\n              <tbody ng-bind-html=\"row.headerHtml\">\n              </tbody>\n              <!--\n                            <tr ng-repeat=\"(key, value) in row.headers\">\n                              <td class=\"property-name\">{{key}}</td>\n                              <td class=\"property-value\">{{value}}</td>\n                            </tr>\n              -->\n            </table>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"row\">\n        <div>Displaying body as <span ng-bind=\"row.textMode\"></span></div>\n        <div hawtio-editor=\"row.bodyText\" read-only=\"true\" mode=\'mode\'></div>\n      </div>\n\n    </div>\n  </div>\n\n  <script type=\"text/ng-template\" id=\"activemqMoveMessageDialog.html\">\n    <div class=\"modal-header\">\n      <span>Move messages?</span>\n    </div>\n    <div class=\"modal-body\">\n      <p>Move\n        <ng-pluralize count=\"gridOptions.selectedItems.length\"\n                      when=\"{\'1\': \'message\', \'other\': \'{} messages\'}\"></ng-pluralize>\n        to: <input type=\"text\" ng-model=\"queueName\" placeholder=\"Queue name\"\n                   typeahead=\"title.unescapeHTML() for title in queueNames($viewValue) | filter:$viewValue\" typeahead-editable=\'true\'></p>\n      <p>\n        You cannot undo this operation.<br>\n        Though after the move you can always move the\n        <ng-pluralize count=\"gridOptions.selectedItems.length\"\n                      when=\"{\'1\': \'message\', \'other\': \'messages\'}\"></ng-pluralize>\n        back again.\n      </p>\n    </div>\n    <div class=\"modal-footer\">\n      <button class=\"btn btn-info\" \n              ng-click=\"close(true)\">Move</button>\n      <button class=\"btn\" \n              ng-click=\"close(false)\">Cancel</button>\n    </div>\n  </script>\n\n</div>\n\n");
 $templateCache.put("plugins/activemq/html/createDestination.html","<form class=\"form-horizontal\" ng-controller=\"ActiveMQ.DestinationController\">\n\n  <div class=\"alert alert-info\">\n    <span class=\"pficon pficon-info\"></span>The JMS API does not define a standard address syntax. <p></p> Although a\n    standard address syntax was considered, it was decided that the differences in address semantics between existing\n    message-oriented middleware (MOM) products were too wide to bridge with a single syntax.\n  </div>\n\n  <div class=\"form-group\">\n    <label class=\"col-sm-2 control-label\" for=\"name-markup\">{{destinationTypeName}} name</label>\n\n    <div class=\"col-sm-10\">\n      <input id=\"name-markup\" class=\"form-control\" type=\"text\" size=\"60\" style=\"margin-left:15px;\" maxlength=\"300\"\n             name=\"destinationName\" ng-model=\"destinationName\" placeholder=\"{{destinationTypeName}} name\"/>\n    </div>\n  </div>\n  <div class=\"form-group\">\n    <label class=\"col-sm-2 control-label\">Destination type</label>\n\n    <div class=\"col-sm-10\">\n      <label class=\"checkbox\">\n        <input type=\"radio\" ng-model=\"queueType\" value=\"true\"> Queue\n      </label>\n      <label class=\"checkbox\">\n        <input type=\"radio\" ng-model=\"queueType\" value=\"false\"> Topic\n      </label>\n    </div>\n  </div>\n\n  <div class=\"control-group col-md-12\">\n    <button type=\"submit\" class=\"btn btn-primary\" ng-click=\"createDestination(destinationName, queueType)\"\n            ng-disabled=\"!destinationName\">Create {{destinationTypeName}}\n    </button>\n  </div>\n\n</form>\n");
 $templateCache.put("plugins/activemq/html/deleteQueue.html","<div ng-controller=\"ActiveMQ.DestinationController\">\n  <div class=\"row\">\n\n    <div class=\"control-group\">\n\n      <div class=\"alert alert-warning\">\n        <span class=\"pficon-layered\">\n          <span class=\"pficon pficon-warning-triangle\"></span>\n          <span class=\"pficon pficon-warning-exclamation\"></span>\n        </span>\n        <strong>Warning:</strong> these operations cannot be undone. Please be careful!\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div class=\"col-md-4\">\n      <div class=\"control-group\">\n        <button type=\"submit\" class=\"btn btn-warning\" ng-click=\"deleteDialog = true\">Delete queue\n          \'{{name().unescapeHTML()}}\'\n        </button>\n        <label>This will remove the queue completely.</label>\n      </div>\n    </div>\n    <div class=\"col-md-4\">\n      <div class=\"control-group\">\n        <button type=\"submit\" class=\"btn btn-warning\" ng-click=\"purgeDialog = true\">Purge queue\n          \'{{name().unescapeHTML()}}\'\n        </button>\n        <label>Purges all the current messages on the queue.</label>\n      </div>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog=\"deleteDialog\"\n       title=\"Confirm delete queue\"\n       ok-button-text=\"Delete\"\n       cancel-button-text=\"Cancel\"\n       on-ok=\"deleteDestination()\">\n    <div class=\"dialog-body\">\n      <p>You are about to delete the <b>{{name().unescapeHTML()}}</b> queue</p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog=\"purgeDialog\"\n       title=\"Confirm purge queue\"\n       ok-button-text=\"Purge\"\n       cancel-button-text=\"Cancel\"\n       on-ok=\"purgeDestination()\">\n    <div class=\"dialog-body\">\n      <p>You are about to purge the <b>{{name().unescapeHTML()}}</b> queue</p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n</div>\n");
 $templateCache.put("plugins/activemq/html/deleteTopic.html","<div ng-controller=\"ActiveMQ.DestinationController\">\n  <div class=\"row\">\n\n    <div class=\"control-group\">\n\n      <div class=\"alert alert-warning\">\n        <span class=\"pficon-layered\">\n          <span class=\"pficon pficon-warning-triangle\"></span>\n          <span class=\"pficon pficon-warning-exclamation\"></span>\n        </span>\n        <strong>Warning:</strong> this operation cannot be undone. Please be careful!\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div class=\"col-md-4\">\n      <div class=\"control-group\">\n        <button type=\"submit\" class=\"btn btn-warning\" ng-click=\"deleteDialog = true\">Delete topic\n          \'{{name().unescapeHTML()}}\'\n        </button>\n        <label>This will remove the topic completely.</label>\n      </div>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog=\"deleteDialog\"\n       title=\"Confirm delete topic\"\n       ok-button-text=\"Delete\"\n       cancel-button-text=\"Cancel\"\n       on-ok=\"deleteDestination()\">\n    <div class=\"dialog-body\">\n      <p>You are about to delete the <b>{{name().unescapeHTML()}}</b> topic</p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n</div>\n");

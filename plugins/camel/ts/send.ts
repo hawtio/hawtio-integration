@@ -5,7 +5,7 @@ module Camel {
 
    var DELIVERY_PERSISTENT = "2";
 
-  _module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", ($route, $scope, $element, $timeout, workspace:Workspace, jolokia, localStorage, $location, activeMQMessage) => {
+  _module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", "PreferencesLastPath", ($route, $scope, $element, $timeout, workspace:Workspace, jolokia, localStorage, $location, activeMQMessage, PreferencesLastPath) => {
     var log:Logging.Logger = Logger.get("Camel");
 
     $scope.noCredentials = false;
@@ -43,8 +43,9 @@ module Camel {
     }
 
     $scope.openPrefs = () => {
-      $location.search('pref', 'ActiveMQ');
-      $scope.$emit("hawtioOpenPrefs");
+      PreferencesLastPath.lastPath = $location.path();
+      PreferencesLastPath.lastSearch = $location.search();
+      $location.path('/preferences').search({'pref': 'ActiveMQ'});
     };
 
     var LANGUAGE_FORMAT_PREFERENCE = "defaultLanguageFormat";

@@ -3,7 +3,7 @@
 /// <reference path="activemqPlugin.ts"/>
 
 module ActiveMQ {
-  export var BrowseQueueController = _module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", ($scope, workspace:Workspace, jolokia, localStorage, location, activeMQMessage, $timeout) => {
+  export var BrowseQueueController = _module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$dialog", "$templateCache", ($scope, workspace:Workspace, jolokia, localStorage, location, activeMQMessage, $timeout, $dialog, $templateCache) => {
 
     $scope.searchText = '';
 
@@ -11,9 +11,6 @@ module ActiveMQ {
     $scope.messages = [];
     $scope.headers = {};
     $scope.mode = 'text';
-
-    $scope.deleteDialog = false;
-    $scope.moveDialog = false;
 
     $scope.gridOptions = {
       selectedItems: [],
@@ -108,18 +105,40 @@ module ActiveMQ {
     $scope.moveMessages = () => {
         var selection = workspace.selection;
         var mbean = selection.objectName;
-        if (mbean && selection) {
-            var selectedItems = $scope.gridOptions.selectedItems;
-            $scope.message = "Moved " + Core.maybePlural(selectedItems.length, "message" + " to " + $scope.queueName);
-            var operation = "moveMessageTo(java.lang.String, java.lang.String)";
-            angular.forEach(selectedItems, (item, idx) => {
-                var id = item.JMSMessageID;
-                if (id) {
+        if (!mbean || !selection) {
+          return;
+        }
+        var selectedItems = $scope.gridOptions.selectedItems;
+        $dialog.dialog({
+          resolve: {
+            selectedItems: () => selectedItems,
+            gridOptions: () => $scope.gridOptions,
+            queueNames: () => $scope.queueNames,
+            parent: () => $scope
+          },
+          template: $templateCache.get("activemqMoveMessageDialog.html"),
+          controller: ["$scope", "dialog", "selectedItems", "gridOptions", "queueNames", "parent", ($scope, dialog, selectedItems, gridOptions, queueNames, parent) => {
+            $scope.selectedItems = selectedItems;
+            $scope.gridOptions = gridOptions;
+            $scope.queueNames = queueNames;
+            $scope.queueName = '';
+            $scope.close = (result) => {
+              dialog.close();
+              if (result) {
+                parent.message = "Moved " + Core.maybePlural(selectedItems.length, "message") + " to " + $scope.queueName;
+                var operation = "moveMessageTo(java.lang.String, java.lang.String)";
+                angular.forEach(selectedItems, (item, idx) => {
+                  var id = item.JMSMessageID;
+                  if (id) {
                     var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
                     jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
-                }
-            });
-        }
+                  }
+                });
+              }
+            }
+          }]
+        }).open();
+
     };
 
     $scope.resendMessage = () => {
@@ -136,18 +155,36 @@ module ActiveMQ {
     $scope.deleteMessages = () => {
       var selection = workspace.selection;
       var mbean = selection.objectName;
-      if (mbean && selection) {
-        var selectedItems = $scope.gridOptions.selectedItems;
-        $scope.message = "Deleted " + Core.maybePlural(selectedItems.length, "message");
-        var operation = "removeMessage(java.lang.String)";
-        angular.forEach(selectedItems, (item, idx) => {
-          var id = item.JMSMessageID;
-          if (id) {
-            var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
-            jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
-          }
-        });
+      if (!mbean || !selection) {
+        return;
       }
+      var selected = $scope.gridOptions.selectedItems;
+      if (!selected || selected.length === 0) {
+        return;
+      }
+      UI.multiItemConfirmActionDialog(<UI.MultiItemConfirmActionOptions> {
+        collection: selected,
+        index: 'JMSMessageID',
+        onClose: (result:boolean) => {
+          if (result) {
+            $scope.message = "Deleted " + Core.maybePlural(selected.length, "message");
+            var operation = "removeMessage(java.lang.String)";
+            _.forEach(selected, (item:any, idx) => {
+              var id = item.JMSMessageID;
+              if (id) {
+                var callback = (idx + 1 < selected.length) ? intermediateResult : operationSuccess;
+                jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
+              }
+            });
+          }
+        },
+        title: 'Delete messages?',
+        action: 'The following messages will be deleted:',
+        okText: 'Delete',
+        okClass: 'btn-danger',
+        custom: "This operation is permanent once completed!",
+        customClass: "alert alert-warning"
+      }).open();
     };
 
     $scope.retryMessages = () => {
@@ -365,7 +402,6 @@ module ActiveMQ {
     }
 
     function operationSuccess() {
-      $scope.messageDialog = false;
       $scope.gridOptions.selectedItems.splice(0);
       Core.notification("success", $scope.message);
       setTimeout(loadTable, 50);

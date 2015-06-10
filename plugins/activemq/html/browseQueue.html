@@ -16,12 +16,12 @@
            <i class="fa fa-share-alt"></i> Resend
           </button>
 
-          <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveDialog = true"
+          <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
                   title="Move the selected messages to another destination" data-placement="bottom">
             <i class="fa fa-share-alt"></i> Move
           </button>
           <button class="btn" ng-disabled="!gridOptions.selectedItems.length"
-                  ng-click="deleteDialog = true"
+                  ng-click="deleteMessages()"
                   title="Delete the selected messages">
             <i class="fa fa-remove"></i> Delete
           </button>
@@ -50,13 +50,13 @@
                  on-index-change="selectRowIndex"
                  row-index="rowIndex"></div>
 
-            <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveDialog = true"
+            <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
                     title="Move the selected messages to another destination" data-placement="bottom">
               <i class="fa fa-share-alt"></i> Move
             </button>
 
             <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length"
-                    ng-click="deleteDialog = true"
+                    ng-click="deleteMessages()"
                     title="Delete the selected messages">
               <i class="fa fa-remove"></i> Delete
             </button>
@@ -103,23 +103,11 @@
     </div>
   </div>
 
-  <div hawtio-confirm-dialog="deleteDialog"
-       ok-button-text="Delete"
-       on-ok="deleteMessages()">
-    <div class="dialog-body">
-      <p>You are about to delete
-        <ng-pluralize count="gridOptions.selectedItems.length"
-                      when="{'1': 'a message!', 'other': '{} messages!'}">
-        </ng-pluralize>
-      </p>
-      <p>This operation cannot be undone so please be careful.</p>
+  <script type="text/ng-template" id="activemqMoveMessageDialog.html">
+    <div class="modal-header">
+      <span>Move messages?</span>
     </div>
-  </div>
-
-  <div hawtio-confirm-dialog="moveDialog"
-       ok-button-text="Move"
-       on-ok="moveMessages()">
-    <div class="dialog-body">
+    <div class="modal-body">
       <p>Move
         <ng-pluralize count="gridOptions.selectedItems.length"
                       when="{'1': 'message', 'other': '{} messages'}"></ng-pluralize>
@@ -133,7 +121,13 @@
         back again.
       </p>
     </div>
-  </div>
+    <div class="modal-footer">
+      <button class="btn btn-info" 
+              ng-click="close(true)">Move</button>
+      <button class="btn" 
+              ng-click="close(false)">Cancel</button>
+    </div>
+  </script>
 
 </div>
 
