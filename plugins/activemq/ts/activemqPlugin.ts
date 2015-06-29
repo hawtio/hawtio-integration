@@ -19,7 +19,7 @@ module ActiveMQ {
             when('/activemq/jobs', {templateUrl: 'plugins/activemq/html/jobs.html'})
   }]);
 
-  _module.run(["HawtioNav", "$location", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "$templateCache", (nav:HawtioMainNav.Registry, $location:ng.ILocationService, workspace:Workspace, viewRegistry, helpRegistry, preferencesRegistry, $templateCache:ng.ITemplateCacheService) => {
+  _module.run(["HawtioNav", "$location", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "$templateCache", "documentBase", (nav:HawtioMainNav.Registry, $location:ng.ILocationService, workspace:Workspace, viewRegistry, helpRegistry, preferencesRegistry, $templateCache:ng.ITemplateCacheService, documentBase) => {
 
     viewRegistry['{ "main-tab": "activemq" }'] = 'plugins/activemq/html/layoutActiveMQTree.html';
     helpRegistry.addUserDoc('activemq', 'plugins/activemq/doc/help.md', () => {
@@ -199,7 +199,7 @@ module ActiveMQ {
           var connectorName = entries["connectorName"];
           if (connectorName && !node.icon) {
             // lets default a connector icon
-            node.icon = Core.url("/img/icons/activemq/connector.png");
+            node.icon = UrlHelpers.join(documentBase, "/img/icons/activemq/connector.png");
           }
         }
         angular.forEach(node.children, (child) => setConsumerType(child));
