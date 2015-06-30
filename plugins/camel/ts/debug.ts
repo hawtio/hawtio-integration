@@ -6,6 +6,8 @@ module Camel {
     // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
     $scope.ignoreRouteXmlNode = true;
 
+    $scope.showMessageDetails = false;
+
     $scope.startDebugging = () => {
       setDebugging(true);
     };
@@ -101,12 +103,12 @@ module Camel {
     });
 
     $scope.openMessageDialog = (message) => {
-      var idx = Core.pathGet(message, ["rowIndex"]);
+      var idx = Core.pathGet(message, ["index"]);
       $scope.selectRowIndex(idx);
       if ($scope.row) {
         var body = $scope.row.body;
         $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
-        $scope.messageDialog.open();
+        $scope.showMessageDetails = true;
       }
     };
 
@@ -206,11 +208,13 @@ module Camel {
           }
 
           allMessages.each((idx, message) => {
-            var messageData = Camel.createMessageFromXml(message);
+            var messageData:any = Camel.createMessageFromXml(message);
             var toNode = $(message).find("toNode").text();
             if (toNode) {
               messageData["toNode"] = toNode;
             }
+            // attach the open dialog to make it work
+            messageData.openMessageDialog = $scope.openMessageDialog;
             $scope.messages.push(messageData);
           });
         }

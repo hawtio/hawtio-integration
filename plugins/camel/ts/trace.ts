@@ -13,6 +13,7 @@ module Camel {
     $scope.mode = 'text';
 
     $scope.messageDialog = new UI.Dialog();
+    $scope.showMessageDetails = false;
 
     $scope.gridOptions = Camel.createBrowseGridOptions();
     $scope.gridOptions.selectWithCheckboxOnly = false;
@@ -52,11 +53,11 @@ module Camel {
 
     // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
     $scope.openMessageDialog = (message) => {
-      var idx = Core.pathGet(message, ["rowIndex"]);
+      var idx = Core.pathGet(message, ["index"]);
       $scope.selectRowIndex(idx);
       if ($scope.row) {
         $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
-        $scope.messageDialog.open();
+        $scope.showMessageDetails = true;
       }
     };
 
@@ -134,11 +135,13 @@ module Camel {
         allMessages.each((idx, message) => {
           var routeId = $(message).find("routeId").text();
           if (routeId === selectedRouteId) {
-            var messageData = Camel.createMessageFromXml(message);
+            var messageData:any = Camel.createMessageFromXml(message);
             var toNode = $(message).find("toNode").text();
             if (toNode) {
               messageData["toNode"] = toNode;
             }
+            // attach the open dialog to make it work
+            messageData.openMessageDialog = $scope.openMessageDialog;
             log.debug("Adding new message to trace table with id " + messageData["id"]);
             $scope.messages.push(messageData);
           }

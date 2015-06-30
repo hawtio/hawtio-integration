@@ -3765,6 +3765,7 @@ var Camel;
                 var allMessages = $(doc).find("message");
                 allMessages.each(function (idx, message) {
                     var messageData = Camel.createMessageFromXml(message);
+                    // attach the open dialog to make it work
                     messageData.openMessageDialog = $scope.openMessageDialog;
                     data.push(messageData);
                 });
@@ -4122,6 +4123,7 @@ var Camel;
     Camel._module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", function ($scope, $element, workspace, jolokia, localStorage, documentBase) {
         // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
         $scope.ignoreRouteXmlNode = true;
+        $scope.showMessageDetails = false;
         $scope.startDebugging = function () {
             setDebugging(true);
         };
@@ -4201,12 +4203,12 @@ var Camel;
             displayName: 'To Node'
         });
         $scope.openMessageDialog = function (message) {
-            var idx = Core.pathGet(message, ["rowIndex"]);
+            var idx = Core.pathGet(message, ["index"]);
             $scope.selectRowIndex(idx);
             if ($scope.row) {
                 var body = $scope.row.body;
                 $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
-                $scope.messageDialog.open();
+                $scope.showMessageDetails = true;
             }
         };
         $scope.selectRowIndex = function (idx) {
@@ -4305,6 +4307,8 @@ var Camel;
                         if (toNode) {
                             messageData["toNode"] = toNode;
                         }
+                        // attach the open dialog to make it work
+                        messageData.openMessageDialog = $scope.openMessageDialog;
                         $scope.messages.push(messageData);
                     });
                 }
@@ -6514,6 +6518,7 @@ var Camel;
         $scope.tableView = null;
         $scope.mode = 'text';
         $scope.messageDialog = new UI.Dialog();
+        $scope.showMessageDetails = false;
         $scope.gridOptions = Camel.createBrowseGridOptions();
         $scope.gridOptions.selectWithCheckboxOnly = false;
         $scope.gridOptions.showSelectionCheckbox = false;
@@ -6546,11 +6551,11 @@ var Camel;
         });
         // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
         $scope.openMessageDialog = function (message) {
-            var idx = Core.pathGet(message, ["rowIndex"]);
+            var idx = Core.pathGet(message, ["index"]);
             $scope.selectRowIndex(idx);
             if ($scope.row) {
                 $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
-                $scope.messageDialog.open();
+                $scope.showMessageDetails = true;
             }
         };
         $scope.selectRowIndex = function (idx) {
@@ -6627,6 +6632,8 @@ var Camel;
                         if (toNode) {
                             messageData["toNode"] = toNode;
                         }
+                        // attach the open dialog to make it work
+                        messageData.openMessageDialog = $scope.openMessageDialog;
                         log.debug("Adding new message to trace table with id " + messageData["id"]);
                         $scope.messages.push(messageData);
                     }

@@ -105,6 +105,7 @@ module Camel {
 
         allMessages.each((idx, message) => {
           var messageData:any = Camel.createMessageFromXml(message);
+          // attach the open dialog to make it work
           messageData.openMessageDialog = $scope.openMessageDialog;
           data.push(messageData);
         });
