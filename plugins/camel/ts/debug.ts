@@ -303,8 +303,8 @@ module Camel {
       return svg.selectAll("g .node");
     }
 
-    var breakpointImage = UrlHelpers.join(documentBase, "/img/debug/breakpoint.gif");
-    var suspendedBreakpointImage = UrlHelpers.join(documentBase, "/img/debug/breakpoint-suspended.gif");
+    var breakpointImage = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint.gif");
+    var suspendedBreakpointImage = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint-suspended.gif");
 
     function updateBreakpointIcons(nodes = getDiagramNodes()) {
       nodes.each(function (object) {
