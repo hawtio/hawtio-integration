@@ -3,7 +3,7 @@
 
 module Camel {
 
-  _module.controller("Camel.PropertiesComponentController", ["$scope", "workspace", "localStorage", "jolokia", ($scope, workspace:Workspace, localStorage:WindowLocalStorage, jolokia) => {
+  _module.controller("Camel.PropertiesComponentController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", ($scope, workspace:Workspace, localStorage:WindowLocalStorage, jolokia, documentBase) => {
     var log:Logging.Logger = Logger.get("Camel");
 
     $scope.hideHelp = Camel.hideOptionDocumentation(localStorage);
@@ -125,7 +125,7 @@ module Camel {
         $scope.model.title = $scope.componentName;
         $scope.model.description = $scope.model.component.description;
         // TODO: look for specific component icon,
-        $scope.icon = Core.url("/img/icons/camel/endpoint24.png");
+        $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
 
         // grab all values form the model as they are the current data we need to add to node data (not all properties has a value)
         $scope.nodeData = {};
