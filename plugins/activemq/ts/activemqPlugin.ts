@@ -36,32 +36,32 @@ module ActiveMQ {
     var attributes = workspace.attributeColumnDefs;
     attributes[jmxDomain + "/Broker/folder"] = [
       {field: 'BrokerName', displayName: 'Name', width: "**"},
-      {field: 'TotalProducerCount', displayName: 'Producer #'},
-      {field: 'TotalConsumerCount', displayName: 'Consumer #'},
+      {field: 'TotalProducerCount', displayName: 'Producer'},
+      {field: 'TotalConsumerCount', displayName: 'Consumer'},
       {field: 'StorePercentUsage', displayName: 'Store %'},
       {field: 'TempPercentUsage', displayName: 'Temp %'},
       {field: 'MemoryPercentUsage', displayName: 'Memory %'},
-      {field: 'TotalEnqueueCount', displayName: 'Enqueue #'},
-      {field: 'TotalDequeueCount', displayName: 'Dequeue #'}
+      {field: 'TotalEnqueueCount', displayName: 'Enqueue'},
+      {field: 'TotalDequeueCount', displayName: 'Dequeue'}
     ];
     attributes[jmxDomain + "/Queue/folder"] = [
       {field: 'Name', displayName: 'Name', width: "***"},
       {field: 'QueueSize', displayName: 'Queue Size'},
-      {field: 'ProducerCount', displayName: 'Producer #'},
-      {field: 'ConsumerCount', displayName: 'Consumer #'},
-      {field: 'EnqueueCount', displayName: 'Enqueue #'},
-      {field: 'DequeueCount', displayName: 'Dequeue #'},
+      {field: 'ProducerCount', displayName: 'Producer'},
+      {field: 'ConsumerCount', displayName: 'Consumer'},
+      {field: 'EnqueueCount', displayName: 'Enqueue'},
+      {field: 'DequeueCount', displayName: 'Dequeue'},
       {field: 'MemoryPercentUsage', displayName: 'Memory %'},
-      {field: 'DispatchCount', displayName: 'Dispatch #', visible: false}
+      {field: 'DispatchCount', displayName: 'Dispatch', visible: false}
     ];
     attributes[jmxDomain + "/Topic/folder"] = [
       {field: 'Name', displayName: 'Name', width: "****"},
-      {field: 'ProducerCount', displayName: 'Producer #'},
-      {field: 'ConsumerCount', displayName: 'Consumer #'},
-      {field: 'EnqueueCount', displayName: 'Enqueue #'},
-      {field: 'DequeueCount', displayName: 'Dequeue #'},
+      {field: 'ProducerCount', displayName: 'Producer'},
+      {field: 'ConsumerCount', displayName: 'Consumer'},
+      {field: 'EnqueueCount', displayName: 'Enqueue'},
+      {field: 'DequeueCount', displayName: 'Dequeue'},
       {field: 'MemoryPercentUsage', displayName: 'Memory %'},
-      {field: 'DispatchCount', displayName: 'Dispatch #', visible: false}
+      {field: 'DispatchCount', displayName: 'Dispatch', visible: false}
     ];
     attributes[jmxDomain + "/Consumer/folder"] = [
       {field: 'ConnectionId', displayName: 'Name', width: "**"},

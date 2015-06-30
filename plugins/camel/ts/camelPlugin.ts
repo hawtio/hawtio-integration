@@ -111,12 +111,12 @@ module Camel {
       {field: 'CamelId', displayName: 'Context'},
       {field: 'Uptime', displayName: 'Uptime', visible: false},
       {field: 'CamelVersion', displayName: 'Version', visible: false},
-      {field: 'ExchangesCompleted', displayName: 'Completed #'},
-      {field: 'ExchangesFailed', displayName: 'Failed #'},
-      {field: 'FailuresHandled', displayName: 'Failed Handled #', visible: false},
-      {field: 'ExchangesTotal', displayName: 'Total #', visible: false},
-      {field: 'Redeliveries', displayName: 'Redelivery #', visible: false},
-      {field: 'ExchangesInflight', displayName: 'Inflight #'},
+      {field: 'ExchangesCompleted', displayName: 'Completed'},
+      {field: 'ExchangesFailed', displayName: 'Failed'},
+      {field: 'FailuresHandled', displayName: 'Failed Handled', visible: false},
+      {field: 'ExchangesTotal', displayName: 'Total', visible: false},
+      {field: 'Redeliveries', displayName: 'Redelivery', visible: false},
+      {field: 'ExchangesInflight', displayName: 'Inflight'},
       {field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false},
       {field: 'MeanProcessingTime', displayName: 'Mean Time'},
       {field: 'MinProcessingTime', displayName: 'Min Time'},
@@ -126,20 +126,20 @@ module Camel {
       {field: 'LastProcessingTime', displayName: 'Last Time', visible: false},
       {field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false},
       {field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false},
-      {field: 'ExternalRedeliveries', displayName: 'External Redelivery #', visible: false},
-      {field: 'StartedRoutes', displayName: 'Started Routes #'},
-      {field: 'TotalRoutes', displayName: 'Total Routes #'}
+      {field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false},
+      {field: 'StartedRoutes', displayName: 'Started Routes'},
+      {field: 'TotalRoutes', displayName: 'Total Routes'}
     ];
     attributes[jmxDomain + "/routes/folder"] = [
       stateColumn,
       {field: 'CamelId', displayName: 'Context'},
       {field: 'RouteId', displayName: 'Route'},
-      {field: 'ExchangesCompleted', displayName: 'Completed #'},
-      {field: 'ExchangesFailed', displayName: 'Failed #'},
-      {field: 'FailuresHandled', displayName: 'Failed Handled #', visible: false},
-      {field: 'Redeliveries', displayName: 'Redelivery #', visible: false},
-      {field: 'ExchangesTotal', displayName: 'Total #', visible: false},
-      {field: 'ExchangesInflight', displayName: 'Inflight #'},
+      {field: 'ExchangesCompleted', displayName: 'Completed'},
+      {field: 'ExchangesFailed', displayName: 'Failed'},
+      {field: 'FailuresHandled', displayName: 'Failed Handled', visible: false},
+      {field: 'Redeliveries', displayName: 'Redelivery', visible: false},
+      {field: 'ExchangesTotal', displayName: 'Total', visible: false},
+      {field: 'ExchangesInflight', displayName: 'Inflight'},
       {field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false},
       {field: 'MeanProcessingTime', displayName: 'Mean Time'},
       {field: 'MinProcessingTime', displayName: 'Min Time'},
@@ -149,30 +149,30 @@ module Camel {
       {field: 'LastProcessingTime', displayName: 'Last Time', visible: false},
       {field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false},
       {field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false},
-      {field: 'Redeliveries', displayName: 'Redelivery #', visible: false},
-      {field: 'ExternalRedeliveries', displayName: 'External Redelivery #', visible: false}
+      {field: 'Redeliveries', displayName: 'Redelivery', visible: false},
+      {field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false}
     ];
     attributes[jmxDomain + "/processors/folder"] = [
       stateColumn,
       {field: 'CamelId', displayName: 'Context'},
       {field: 'RouteId', displayName: 'Route'},
       {field: 'ProcessorId', displayName: 'Processor'},
-      {field: 'ExchangesCompleted', displayName: 'Completed #'},
-      {field: 'ExchangesFailed', displayName: 'Failed #'},
-      {field: 'FailuresHandled', displayName: 'Failed Handled #', visible: false},
-      {field: 'Redeliveries', displayName: 'Redelivery #', visible: false},
-      {field: 'ExchangesTotal', displayName: 'Total #', visible: false},
-      {field: 'ExchangesInflight', displayName: 'Inflight #'},
+      {field: 'ExchangesCompleted', displayName: 'Completed'},
+      {field: 'ExchangesFailed', displayName: 'Failed'},
+      {field: 'FailuresHandled', displayName: 'Failed Handled', visible: false},
+      {field: 'Redeliveries', displayName: 'Redelivery', visible: false},
+      {field: 'ExchangesTotal', displayName: 'Total', visible: false},
+      {field: 'ExchangesInflight', displayName: 'Inflight'},
       {field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false},
       {field: 'MeanProcessingTime', displayName: 'Mean Time'},
       {field: 'MinProcessingTime', displayName: 'Min Time'},
       {field: 'MaxProcessingTime', displayName: 'Max Time'},
       {field: 'TotalProcessingTime', displayName: 'Total Time', visible: false},
-      {field: 'DeltaProcessingTime', displayName: 'Delta Time'},
+      {field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false},
       {field: 'LastProcessingTime', displayName: 'Last Time', visible: false},
       {field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false},
       {field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false},
-      {field: 'ExternalRedeliveries', displayName: 'External Redelivery #', visible: false}
+      {field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false}
     ];
     attributes[jmxDomain + "/components/folder"] = [
       stateColumn,
@@ -185,7 +185,7 @@ module Camel {
       {field: 'RouteId', displayName: 'Route'},
       {field: 'EndpointUri', displayName: 'Endpoint URI', width: "**"},
       {field: 'Suspended', displayName: 'Suspended', resizable: false},
-      {field: 'InflightExchanges', displayName: 'Inflight #'}
+      {field: 'InflightExchanges', displayName: 'Inflight'}
     ];
     attributes[jmxDomain + "/producers/folder"] = [
       stateColumn,
@@ -209,12 +209,12 @@ module Camel {
     ];
     attributes[jmxDomain + "/threadpools/folder"] = [
       {field: 'Id', displayName: 'Id', width: "**"},
-      {field: 'ActiveCount', displayName: 'Active #'},
+      {field: 'ActiveCount', displayName: 'Active'},
       {field: 'PoolSize', displayName: 'Pool Size'},
       {field: 'CorePoolSize', displayName: 'Core Pool Size'},
       {field: 'TaskQueueSize', displayName: 'Task Queue Size'},
-      {field: 'TaskCount', displayName: 'Task #'},
-      {field: 'CompletedTaskCount', displayName: 'Completed Task #'}
+      {field: 'TaskCount', displayName: 'Task'},
+      {field: 'CompletedTaskCount', displayName: 'Completed Task'}
     ];
     attributes[jmxDomain + "/errorhandlers/folder"] = [
       {field: 'CamelId', displayName: 'Context'},

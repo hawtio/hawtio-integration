@@ -146,32 +146,32 @@ var ActiveMQ;
         var attributes = workspace.attributeColumnDefs;
         attributes[ActiveMQ.jmxDomain + "/Broker/folder"] = [
             { field: 'BrokerName', displayName: 'Name', width: "**" },
-            { field: 'TotalProducerCount', displayName: 'Producer #' },
-            { field: 'TotalConsumerCount', displayName: 'Consumer #' },
+            { field: 'TotalProducerCount', displayName: 'Producer' },
+            { field: 'TotalConsumerCount', displayName: 'Consumer' },
             { field: 'StorePercentUsage', displayName: 'Store %' },
             { field: 'TempPercentUsage', displayName: 'Temp %' },
             { field: 'MemoryPercentUsage', displayName: 'Memory %' },
-            { field: 'TotalEnqueueCount', displayName: 'Enqueue #' },
-            { field: 'TotalDequeueCount', displayName: 'Dequeue #' }
+            { field: 'TotalEnqueueCount', displayName: 'Enqueue' },
+            { field: 'TotalDequeueCount', displayName: 'Dequeue' }
         ];
         attributes[ActiveMQ.jmxDomain + "/Queue/folder"] = [
             { field: 'Name', displayName: 'Name', width: "***" },
             { field: 'QueueSize', displayName: 'Queue Size' },
-            { field: 'ProducerCount', displayName: 'Producer #' },
-            { field: 'ConsumerCount', displayName: 'Consumer #' },
-            { field: 'EnqueueCount', displayName: 'Enqueue #' },
-            { field: 'DequeueCount', displayName: 'Dequeue #' },
+            { field: 'ProducerCount', displayName: 'Producer' },
+            { field: 'ConsumerCount', displayName: 'Consumer' },
+            { field: 'EnqueueCount', displayName: 'Enqueue' },
+            { field: 'DequeueCount', displayName: 'Dequeue' },
             { field: 'MemoryPercentUsage', displayName: 'Memory %' },
-            { field: 'DispatchCount', displayName: 'Dispatch #', visible: false }
+            { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
         ];
         attributes[ActiveMQ.jmxDomain + "/Topic/folder"] = [
             { field: 'Name', displayName: 'Name', width: "****" },
-            { field: 'ProducerCount', displayName: 'Producer #' },
-            { field: 'ConsumerCount', displayName: 'Consumer #' },
-            { field: 'EnqueueCount', displayName: 'Enqueue #' },
-            { field: 'DequeueCount', displayName: 'Dequeue #' },
+            { field: 'ProducerCount', displayName: 'Producer' },
+            { field: 'ConsumerCount', displayName: 'Consumer' },
+            { field: 'EnqueueCount', displayName: 'Enqueue' },
+            { field: 'DequeueCount', displayName: 'Dequeue' },
             { field: 'MemoryPercentUsage', displayName: 'Memory %' },
-            { field: 'DispatchCount', displayName: 'Dispatch #', visible: false }
+            { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
         ];
         attributes[ActiveMQ.jmxDomain + "/Consumer/folder"] = [
             { field: 'ConnectionId', displayName: 'Name', width: "**" },
@@ -3069,12 +3069,12 @@ var Camel;
             { field: 'CamelId', displayName: 'Context' },
             { field: 'Uptime', displayName: 'Uptime', visible: false },
             { field: 'CamelVersion', displayName: 'Version', visible: false },
-            { field: 'ExchangesCompleted', displayName: 'Completed #' },
-            { field: 'ExchangesFailed', displayName: 'Failed #' },
-            { field: 'FailuresHandled', displayName: 'Failed Handled #', visible: false },
-            { field: 'ExchangesTotal', displayName: 'Total #', visible: false },
-            { field: 'Redeliveries', displayName: 'Redelivery #', visible: false },
-            { field: 'ExchangesInflight', displayName: 'Inflight #' },
+            { field: 'ExchangesCompleted', displayName: 'Completed' },
+            { field: 'ExchangesFailed', displayName: 'Failed' },
+            { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
+            { field: 'ExchangesTotal', displayName: 'Total', visible: false },
+            { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+            { field: 'ExchangesInflight', displayName: 'Inflight' },
             { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
             { field: 'MeanProcessingTime', displayName: 'Mean Time' },
             { field: 'MinProcessingTime', displayName: 'Min Time' },
@@ -3084,20 +3084,20 @@ var Camel;
             { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
             { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
             { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
-            { field: 'ExternalRedeliveries', displayName: 'External Redelivery #', visible: false },
-            { field: 'StartedRoutes', displayName: 'Started Routes #' },
-            { field: 'TotalRoutes', displayName: 'Total Routes #' }
+            { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false },
+            { field: 'StartedRoutes', displayName: 'Started Routes' },
+            { field: 'TotalRoutes', displayName: 'Total Routes' }
         ];
         attributes[Camel.jmxDomain + "/routes/folder"] = [
             stateColumn,
             { field: 'CamelId', displayName: 'Context' },
             { field: 'RouteId', displayName: 'Route' },
-            { field: 'ExchangesCompleted', displayName: 'Completed #' },
-            { field: 'ExchangesFailed', displayName: 'Failed #' },
-            { field: 'FailuresHandled', displayName: 'Failed Handled #', visible: false },
-            { field: 'Redeliveries', displayName: 'Redelivery #', visible: false },
-            { field: 'ExchangesTotal', displayName: 'Total #', visible: false },
-            { field: 'ExchangesInflight', displayName: 'Inflight #' },
+            { field: 'ExchangesCompleted', displayName: 'Completed' },
+            { field: 'ExchangesFailed', displayName: 'Failed' },
+            { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
+            { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+            { field: 'ExchangesTotal', displayName: 'Total', visible: false },
+            { field: 'ExchangesInflight', displayName: 'Inflight' },
             { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
             { field: 'MeanProcessingTime', displayName: 'Mean Time' },
             { field: 'MinProcessingTime', displayName: 'Min Time' },
@@ -3107,30 +3107,30 @@ var Camel;
             { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
             { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
             { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
-            { field: 'Redeliveries', displayName: 'Redelivery #', visible: false },
-            { field: 'ExternalRedeliveries', displayName: 'External Redelivery #', visible: false }
+            { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+            { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false }
         ];
         attributes[Camel.jmxDomain + "/processors/folder"] = [
             stateColumn,
             { field: 'CamelId', displayName: 'Context' },
             { field: 'RouteId', displayName: 'Route' },
             { field: 'ProcessorId', displayName: 'Processor' },
-            { field: 'ExchangesCompleted', displayName: 'Completed #' },
-            { field: 'ExchangesFailed', displayName: 'Failed #' },
-            { field: 'FailuresHandled', displayName: 'Failed Handled #', visible: false },
-            { field: 'Redeliveries', displayName: 'Redelivery #', visible: false },
-            { field: 'ExchangesTotal', displayName: 'Total #', visible: false },
-            { field: 'ExchangesInflight', displayName: 'Inflight #' },
+            { field: 'ExchangesCompleted', displayName: 'Completed' },
+            { field: 'ExchangesFailed', displayName: 'Failed' },
+            { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
+            { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+            { field: 'ExchangesTotal', displayName: 'Total', visible: false },
+            { field: 'ExchangesInflight', displayName: 'Inflight' },
             { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
             { field: 'MeanProcessingTime', displayName: 'Mean Time' },
             { field: 'MinProcessingTime', displayName: 'Min Time' },
             { field: 'MaxProcessingTime', displayName: 'Max Time' },
             { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
-            { field: 'DeltaProcessingTime', displayName: 'Delta Time' },
+            { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
             { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
             { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
             { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
-            { field: 'ExternalRedeliveries', displayName: 'External Redelivery #', visible: false }
+            { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false }
         ];
         attributes[Camel.jmxDomain + "/components/folder"] = [
             stateColumn,
@@ -3143,7 +3143,7 @@ var Camel;
             { field: 'RouteId', displayName: 'Route' },
             { field: 'EndpointUri', displayName: 'Endpoint URI', width: "**" },
             { field: 'Suspended', displayName: 'Suspended', resizable: false },
-            { field: 'InflightExchanges', displayName: 'Inflight #' }
+            { field: 'InflightExchanges', displayName: 'Inflight' }
         ];
         attributes[Camel.jmxDomain + "/producers/folder"] = [
             stateColumn,
@@ -3167,12 +3167,12 @@ var Camel;
         ];
         attributes[Camel.jmxDomain + "/threadpools/folder"] = [
             { field: 'Id', displayName: 'Id', width: "**" },
-            { field: 'ActiveCount', displayName: 'Active #' },
+            { field: 'ActiveCount', displayName: 'Active' },
             { field: 'PoolSize', displayName: 'Pool Size' },
             { field: 'CorePoolSize', displayName: 'Core Pool Size' },
             { field: 'TaskQueueSize', displayName: 'Task Queue Size' },
-            { field: 'TaskCount', displayName: 'Task #' },
-            { field: 'CompletedTaskCount', displayName: 'Completed Task #' }
+            { field: 'TaskCount', displayName: 'Task' },
+            { field: 'CompletedTaskCount', displayName: 'Completed Task' }
         ];
         attributes[Camel.jmxDomain + "/errorhandlers/folder"] = [
             { field: 'CamelId', displayName: 'Context' },
