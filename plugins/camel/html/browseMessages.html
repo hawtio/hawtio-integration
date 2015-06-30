@@ -1,4 +1,4 @@
-<div ng-switch="messageDialog.show">
+<div ng-switch="showMessageDetails">
   <div ng-switch-when="false">
     <div class="row">
       <table class="table table-striped" hawtio-simple-table="gridOptions"></table>
@@ -12,7 +12,7 @@
       <div class="pull-right">
         <form class="form-horizontal no-bottom-margin">
           <div class="btn-group" hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>
-          <button class="btn" ng-click="messageDialog.close()" title="Closes the message detail view">
+          <button class="btn" ng-click="showMessageDetails = !showMessageDetails" title="Closes the message detail view">
             <i class="fa fa-eject"></i></button>
         </form>
       </div>
@@ -43,7 +43,6 @@
         </div>
         <div hawtio-editor="row.body" read-only="true" mode="mode" text-title="row.bodyType"></div>
       </div>
-
     </div>
   </div>
 </div>
