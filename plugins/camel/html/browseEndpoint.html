@@ -60,11 +60,11 @@
                 <thead>
                 <tr>
                   <th>Header</th>
+                  <th>Type</th>
                   <th>Value</th>
                 </tr>
                 </thead>
-                <tbody ng-bind-html-unsafe="row.headerHtml">
-                </tbody>
+                <tbody compile="row.headerHtml"></tbody>
               </table>
             </div>
           </div>

@@ -22,7 +22,7 @@
             </div>
 
             <button class="btn" ng-click="showMessageDetails = false" title="Close this dialog">
-              <i class="icon-eject"></i></button>
+              <i class="icon-eject"></i>
             </button>
 
           </form>
@@ -43,8 +43,7 @@
                 <th>Value</th>
               </tr>
               </thead>
-              <tbody ng-bind-html-unsafe="row.headerHtml">
-              </tbody>
+              <tbody compile="row.headerHtml"></tbody>
             </table>
           </div>
         </div>
