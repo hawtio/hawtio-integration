@@ -90,8 +90,6 @@ module Camel {
     $scope.messages = [];
     $scope.mode = 'text';
 
-    $scope.messageDialog = new UI.Dialog();
-
     $scope.gridOptions = Camel.createBrowseGridOptions();
     $scope.gridOptions.selectWithCheckboxOnly = false;
     $scope.gridOptions.showSelectionCheckbox = false;
@@ -250,7 +248,6 @@ module Camel {
       updateBreakpointIcons();
     }
 
-
     /*
      * Return the current node id we are stopped at
      */
@@ -301,7 +298,6 @@ module Camel {
       return nodeId && breakpoints && breakpoints.some(nodeId);
     }
 
-
     function getDiagramNodes() {
       var svg = d3.select("svg");
       return svg.selectAll("g .node");
@@ -341,7 +337,6 @@ module Camel {
         }
       });
     }
-
 
     function breakpointsChanged(response) {
       reloadData();

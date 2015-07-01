@@ -11,8 +11,6 @@ module Camel {
     $scope.graphView = null;
     $scope.tableView = null;
     $scope.mode = 'text';
-
-    $scope.messageDialog = new UI.Dialog();
     $scope.showMessageDetails = false;
 
     $scope.gridOptions = Camel.createBrowseGridOptions();
@@ -25,7 +23,6 @@ module Camel {
       displayName: 'To Node'
     });
 
-
     $scope.startTracing = () => {
       log.info("Start tracing");
       setTracing(true);
@@ -37,7 +34,7 @@ module Camel {
     };
 
     $scope.clear = () => {
-      log.debug("Clear messages")
+      log.debug("Clear messages");
       tracerStatus.messages = [];
       $scope.messages = [];
       Core.$apply($scope);
@@ -58,7 +55,10 @@ module Camel {
       if ($scope.row) {
         $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
         $scope.showMessageDetails = true;
+      } else {
+        $scope.showMessageDetails = false;
       }
+      Core.$apply($scope);
     };
 
     $scope.selectRowIndex = (idx) => {
@@ -76,13 +76,12 @@ module Camel {
       onSelectionChanged();
     };
 
-
     function reloadTracingFlag() {
       $scope.tracing = false;
       // clear any previous polls
       if (tracerStatus.jhandle != null) {
-        log.debug("Unregistering jolokia handle")
-        jolokia.unregister(tracerStatus.jhandle)
+        log.debug("Unregistering jolokia handle");
+        jolokia.unregister(tracerStatus.jhandle);
         tracerStatus.jhandle = null;
       }
 
@@ -95,7 +94,7 @@ module Camel {
           if (traceMBean) {
             // register callback for doing live update of tracing
             if (tracerStatus.jhandle === null) {
-              log.debug("Registering jolokia handle")
+              log.debug("Registering jolokia handle");
               tracerStatus.jhandle = jolokia.register(populateRouteMessages, {
                 type: 'exec', mbean: traceMBean,
                 operation: 'dumpAllTracedMessagesAsXml()',
