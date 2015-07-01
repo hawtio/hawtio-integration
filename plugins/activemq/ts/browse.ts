@@ -73,7 +73,8 @@ module ActiveMQ {
 
     $scope.showMessageDetails = false;
 
-    var ignoreColumns = ["PropertiesText", "BodyPreview", "Text"];
+    // openMessageDialog is for the dialog itself so we should skip that guy
+    var ignoreColumns = ["PropertiesText", "BodyPreview", "Text", "openMessageDialog"];
     var flattenColumns = ["BooleanProperties", "ByteProperties", "ShortProperties", "IntProperties", "LongProperties", "FloatProperties",
       "DoubleProperties", "StringProperties"];
 
