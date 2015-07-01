@@ -27,14 +27,14 @@ var config = {
 };
 
 gulp.task('bower', function() {
-  gulp.src('index.html')
+  return gulp.src('index.html')
     .pipe(wiredep({}))
     .pipe(gulp.dest('.'));
 });
 
 /** Adjust the reference path of any typescript-built plugin this project depends on */
 gulp.task('path-adjust', function() {
-  gulp.src('libs/**/includes.d.ts')
+  return gulp.src('libs/**/includes.d.ts')
     .pipe(map(function(buf, filename) {
       var textContent = buf.toString();
       var newTextContent = textContent.replace(/"\.\.\/libs/gm, '"../../../libs');
