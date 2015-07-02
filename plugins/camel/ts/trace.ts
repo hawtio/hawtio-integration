@@ -2,14 +2,13 @@
 /// <reference path="camelPlugin.ts"/>
 
 module Camel {
-  _module.controller("Camel.TraceRouteController", ["$scope", "workspace", "jolokia", "localStorage", "tracerStatus", ($scope, workspace:Workspace, jolokia, localStorage, tracerStatus) => {
+  export var TraceRouteController = _module.controller("Camel.TraceRouteController", ["$scope", "workspace", "jolokia", "localStorage", "tracerStatus", ($scope, workspace:Workspace, jolokia, localStorage, tracerStatus) => {
 
     var log:Logging.Logger = Logger.get("CamelTracer");
 
     $scope.tracing = false;
     $scope.messages = [];
     $scope.graphView = null;
-    $scope.tableView = null;
     $scope.mode = 'text';
     $scope.showMessageDetails = false;
 
@@ -50,31 +49,25 @@ module Camel {
 
     // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
     $scope.openMessageDialog = (message) => {
-      var idx = Core.pathGet(message, ["index"]);
-      $scope.selectRowIndex(idx);
+      log.info("openMessageDialog -> " + message);
+      ActiveMQ.selectCurrentMessage(message, "id", $scope);
       if ($scope.row) {
-        $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
+        var body = $scope.row.body;
+        $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
+        // it may detect wrong as javascript, so use text instead
+        if ("javascript" == $scope.mode) {
+          $scope.mode = "text";
+        }
+        log.info("show in mode -> " + $scope.mode);
         $scope.showMessageDetails = true;
       } else {
+        log.info("do not show");
         $scope.showMessageDetails = false;
       }
       Core.$apply($scope);
     };
 
-    $scope.selectRowIndex = (idx) => {
-      $scope.rowIndex = idx;
-      var selected = $scope.gridOptions.selectedItems;
-      selected.splice(0, selected.length);
-      if (idx >= 0 && idx < $scope.messages.length) {
-        $scope.row = $scope.messages[idx];
-        if ($scope.row) {
-          selected.push($scope.row);
-        }
-      } else {
-        $scope.row = null;
-      }
-      onSelectionChanged();
-    };
+    ActiveMQ.decorate($scope, onSelectionChanged);
 
     function reloadTracingFlag() {
       $scope.tracing = false;
@@ -104,12 +97,12 @@ module Camel {
             }
           }
           $scope.graphView = "plugins/camel/html/routes.html";
-          $scope.tableView = "plugins/camel/html/browseMessages.html";
+          // must include the tableView directly to have it working with the slider
         } else {
           tracerStatus.messages = [];
           $scope.messages = [];
           $scope.graphView = null;
-          $scope.tableView = null;
+          $scope.showMessageDetails = false;
         }
       }
     }

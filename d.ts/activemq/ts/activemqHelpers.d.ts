@@ -24,6 +24,7 @@ declare module ActiveMQ {
      * TODO: export these functions too?
      *
      * @param $scope
+     * @param fn optional function to call if the selected row was changed
      */
-    function decorate($scope: any): void;
+    function decorate($scope: any, fn?: any): void;
 }

@@ -106,7 +106,13 @@ module Camel {
       if ($scope.row) {
         var body = $scope.row.body;
         $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
+        // it may detect wrong as javascript, so use text instead
+        if ("javascript" == $scope.mode) {
+          $scope.mode = "text";
+        }
         $scope.showMessageDetails = true;
+      } else {
+        $scope.showMessageDetails = false;
       }
     };
 

@@ -94,8 +94,9 @@ module ActiveMQ {
    * TODO: export these functions too?
    *
    * @param $scope
+   * @param fn optional function to call if the selected row was changed
    */
-  export function decorate($scope) {
+  export function decorate($scope, fn = null) {
     $scope.selectRowIndex = (idx) => {
       $scope.rowIndex = idx;
       var selected = $scope.gridOptions.selectedItems;
@@ -107,6 +108,9 @@ module ActiveMQ {
         }
       } else {
         $scope.row = null;
+      }
+      if (fn) {
+        fn.apply()
       }
     };
 

@@ -7,7 +7,8 @@
       <p>Once you start tracing, you can send messages to the input endpoints, then come back to this page and see the
         flow of messages through your route.</p>
 
-      <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up and down in the message table lets you see the flow of the message through the diagram.</p>
+      <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up
+        and down in the message table lets you see the flow of the message through the diagram.</p>
 
       <button class="btn btn-info" type="submit" ng-click="startTracing()">Start tracing</button>
     </form>
@@ -24,8 +25,55 @@
       <button class="btn btn-info pull-right" type="submit" ng-click="clear()">Clear messages</button>
     </form>
     <div>&nbsp;</div>
-    <div ng-include src="tableView">
+
+    <!-- table and slider to show the traced messages -->
+    <div class="row">
+      <table class="table table-striped" hawtio-simple-table="gridOptions"></table>
+    </div>
+
+    <div hawtio-slideout="showMessageDetails" title="{{row.id}}">
+      <div class="dialog-body">
+
+        <div class="row">
+          <div class="pull-right">
+            <form class="form-horizontal no-bottom-margin">
+              <div class="btn-group" hawtio-pager="messages" on-index-change="selectRowIndex"
+                   row-index="rowIndex"></div>
+
+              <!-- no need for close button as the hawtio-slideout already have that -->
+
+            </form>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="expandable closed">
+            <div title="Headers" class="title">
+              <i class="expandable-indicator"></i> Headers
+            </div>
+            <div class="expandable-body well">
+              <table class="table table-condensed table-striped">
+                <thead>
+                <tr>
+                  <th>Header</th>
+                  <th>Type</th>
+                  <th>Value</th>
+                </tr>
+                </thead>
+                <tbody compile="row.headerHtml"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="row">
+            <div hawtio-editor="row.body" read-only="true" mode="mode"></div>
+          </div>
+
+        </div>
+
+      </div>
     </div>
 
   </div>
+
 </div>
