@@ -4129,8 +4129,21 @@ var Camel;
     Camel._module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", function ($scope, $element, workspace, jolokia, localStorage, documentBase) {
         var log = Logger.get("CamelDebugger");
         // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
+        $scope.debugging = false;
+        $scope.stopped = false;
         $scope.ignoreRouteXmlNode = true;
+        $scope.messages = [];
+        $scope.mode = 'text';
         $scope.showMessageDetails = false;
+        $scope.gridOptions = Camel.createBrowseGridOptions();
+        $scope.gridOptions.selectWithCheckboxOnly = false;
+        $scope.gridOptions.showSelectionCheckbox = false;
+        $scope.gridOptions.multiSelect = false;
+        $scope.gridOptions.afterSelectionChange = onSelectionChanged;
+        $scope.gridOptions.columnDefs.push({
+            field: 'toNode',
+            displayName: 'To Node'
+        });
         $scope.startDebugging = function () {
             log.info("Start debugging");
             setDebugging(true);
@@ -4155,8 +4168,9 @@ var Camel;
             });
         });
         $scope.$watch('workspace.selection', function () {
-            if (workspace.moveIfViewInvalid())
+            if (workspace.moveIfViewInvalid()) {
                 return;
+            }
             reloadData();
         });
         $scope.toggleBreakpoint = function (id) {
@@ -4203,19 +4217,6 @@ var Camel;
                 jolokia.execute(mbean, "stepBreakpoint(java.lang.String)", stepNode, Core.onSuccess(clearStoppedAndResume));
             }
         };
-        // TODO refactor into common code with trace.ts?
-        // START
-        $scope.messages = [];
-        $scope.mode = 'text';
-        $scope.gridOptions = Camel.createBrowseGridOptions();
-        $scope.gridOptions.selectWithCheckboxOnly = false;
-        $scope.gridOptions.showSelectionCheckbox = false;
-        $scope.gridOptions.multiSelect = false;
-        $scope.gridOptions.afterSelectionChange = onSelectionChanged;
-        $scope.gridOptions.columnDefs.push({
-            field: 'toNode',
-            displayName: 'To Node'
-        });
         // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
         $scope.openMessageDialog = function (message) {
             ActiveMQ.selectCurrentMessage(message, "id", $scope);
@@ -4291,10 +4292,8 @@ var Camel;
                 // lets update the diagram selection to the newly stopped node
                 $scope.selectedDiagramNodeId = stopNodeId;
             }
-            updateBreakpointIcons();
-            Core.$apply($scope);
         }
-        function onMessages(response) {
+        function onMessages(response, stopNodeId) {
             log.debug("onMessage -> " + response);
             $scope.messages = [];
             if (response) {
@@ -4324,18 +4323,19 @@ var Camel;
             }
             // lets update the selection and selected row for the message detail view
             updateMessageSelection();
+            updateBreakpointIcons();
             log.debug("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
             Core.$apply($scope);
-            updateBreakpointIcons();
         }
         function updateMessageSelection() {
             $scope.selectRowIndex($scope.rowIndex);
-            if (!$scope.row && $scope.messageDialog.show) {
+            if (!$scope.row && $scope.showMessageDetails) {
                 // lets make a dummy empty row
                 // so we can keep the detail view while resuming
                 $scope.row = {
                     headers: {},
-                    body: ""
+                    body: "",
+                    bodyType: ""
                 };
             }
         }

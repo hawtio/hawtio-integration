@@ -7,9 +7,22 @@ module Camel {
     var log:Logging.Logger = Logger.get("CamelDebugger");
 
     // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
+    $scope.debugging = false;
+    $scope.stopped = false;
     $scope.ignoreRouteXmlNode = true;
-
+    $scope.messages = [];
+    $scope.mode = 'text';
     $scope.showMessageDetails = false;
+
+    $scope.gridOptions = Camel.createBrowseGridOptions();
+    $scope.gridOptions.selectWithCheckboxOnly = false;
+    $scope.gridOptions.showSelectionCheckbox = false;
+    $scope.gridOptions.multiSelect = false;
+    $scope.gridOptions.afterSelectionChange = onSelectionChanged;
+    $scope.gridOptions.columnDefs.push({
+      field: 'toNode',
+      displayName: 'To Node'
+    });
 
     $scope.startDebugging = () => {
       log.info("Start debugging");
@@ -41,7 +54,9 @@ module Camel {
     });
 
     $scope.$watch('workspace.selection', function () {
-      if (workspace.moveIfViewInvalid()) return;
+      if (workspace.moveIfViewInvalid()) {
+        return;
+      }
       reloadData();
     });
 
@@ -94,22 +109,6 @@ module Camel {
         jolokia.execute(mbean, "stepBreakpoint(java.lang.String)", stepNode, Core.onSuccess(clearStoppedAndResume));
       }
     };
-
-
-    // TODO refactor into common code with trace.ts?
-    // START
-    $scope.messages = [];
-    $scope.mode = 'text';
-
-    $scope.gridOptions = Camel.createBrowseGridOptions();
-    $scope.gridOptions.selectWithCheckboxOnly = false;
-    $scope.gridOptions.showSelectionCheckbox = false;
-    $scope.gridOptions.multiSelect = false;
-    $scope.gridOptions.afterSelectionChange = onSelectionChanged;
-    $scope.gridOptions.columnDefs.push({
-      field: 'toNode',
-      displayName: 'To Node'
-    });
 
     // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
     $scope.openMessageDialog = (message) => {
@@ -186,15 +185,12 @@ module Camel {
       var stopNodeId = getStoppedBreakpointId();
       if (mbean && stopNodeId) {
         jolokia.execute(mbean, 'dumpTracedMessagesAsXml', stopNodeId, Core.onSuccess(onMessages));
-
         // lets update the diagram selection to the newly stopped node
         $scope.selectedDiagramNodeId = stopNodeId;
       }
-      updateBreakpointIcons();
-      Core.$apply($scope);
     }
 
-    function onMessages(response) {
+    function onMessages(response, stopNodeId) {
       log.debug("onMessage -> " + response);
       $scope.messages = [];
       if (response) {
@@ -225,19 +221,20 @@ module Camel {
 
       // lets update the selection and selected row for the message detail view
       updateMessageSelection();
+      updateBreakpointIcons();
       log.debug("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
       Core.$apply($scope);
-      updateBreakpointIcons();
     }
 
     function updateMessageSelection() {
       $scope.selectRowIndex($scope.rowIndex);
-      if (!$scope.row && $scope.messageDialog.show) {
+      if (!$scope.row && $scope.showMessageDetails) {
         // lets make a dummy empty row
         // so we can keep the detail view while resuming
         $scope.row = {
           headers: {},
-          body: ""
+          body: "",
+          bodyType: ""
         }
       }
     }
