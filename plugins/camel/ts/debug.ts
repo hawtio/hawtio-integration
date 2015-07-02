@@ -3,16 +3,21 @@
 
 module Camel {
   _module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", ($scope, $element, workspace:Workspace, jolokia, localStorage, documentBase) => {
+
+    var log:Logging.Logger = Logger.get("CamelDebugger");
+
     // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
     $scope.ignoreRouteXmlNode = true;
 
     $scope.showMessageDetails = false;
 
     $scope.startDebugging = () => {
+      log.info("Start debugging");
       setDebugging(true);
     };
 
     $scope.stopDebugging = () => {
+      log.info("Stop debugging");
       setDebugging(false);
     };
 
@@ -41,6 +46,7 @@ module Camel {
     });
 
     $scope.toggleBreakpoint = (id) => {
+      log.info("Toggle breakpoint");
       var mbean = getSelectionCamelDebugMBean(workspace);
       if (mbean && id) {
         var method = isBreakpointSet(id) ? "removeBreakpoint" : "addBreakpoint";
@@ -49,6 +55,7 @@ module Camel {
     };
 
     $scope.addBreakpoint = () => {
+      log.info("Add breakpoint");
       var mbean = getSelectionCamelDebugMBean(workspace);
       if (mbean && $scope.selectedDiagramNodeId) {
         jolokia.execute(mbean, "addBreakpoint", $scope.selectedDiagramNodeId, Core.onSuccess(breakpointsChanged));
@@ -56,6 +63,7 @@ module Camel {
     };
 
     $scope.removeBreakpoint = () => {
+      log.info("Remove breakpoint");
       var mbean = getSelectionCamelDebugMBean(workspace);
       if (mbean && $scope.selectedDiagramNodeId) {
         jolokia.execute(mbean, "removeBreakpoint", $scope.selectedDiagramNodeId, Core.onSuccess(breakpointsChanged));
@@ -63,6 +71,7 @@ module Camel {
     };
 
     $scope.resume = () => {
+      log.info("Resume");
       var mbean = getSelectionCamelDebugMBean(workspace);
       if (mbean) {
         jolokia.execute(mbean, "resumeAll", Core.onSuccess(clearStoppedAndResume));
@@ -70,6 +79,7 @@ module Camel {
     };
 
     $scope.suspend = () => {
+      log.info("Suspend");
       var mbean = getSelectionCamelDebugMBean(workspace);
       if (mbean) {
         jolokia.execute(mbean, "suspendAll", Core.onSuccess(clearStoppedAndResume));
@@ -77,6 +87,7 @@ module Camel {
     };
 
     $scope.step = () => {
+      log.info("Step");
       var mbean = getSelectionCamelDebugMBean(workspace);
       var stepNode = getStoppedBreakpointId();
       if (mbean && stepNode) {
@@ -100,9 +111,9 @@ module Camel {
       displayName: 'To Node'
     });
 
+    // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
     $scope.openMessageDialog = (message) => {
-      var idx = Core.pathGet(message, ["index"]);
-      $scope.selectRowIndex(idx);
+      ActiveMQ.selectCurrentMessage(message, "id", $scope);
       if ($scope.row) {
         var body = $scope.row.body;
         $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
@@ -114,22 +125,10 @@ module Camel {
       } else {
         $scope.showMessageDetails = false;
       }
+      Core.$apply($scope);
     };
 
-    $scope.selectRowIndex = (idx) => {
-      $scope.rowIndex = idx;
-      var selected = $scope.gridOptions.selectedItems;
-      selected.splice(0, selected.length);
-      if (idx >= 0 && idx < $scope.messages.length) {
-        $scope.row = $scope.messages[idx];
-        if ($scope.row) {
-          selected.push($scope.row);
-        }
-      } else {
-        $scope.row = null;
-      }
-      onSelectionChanged();
-    };
+    ActiveMQ.decorate($scope, onSelectionChanged);
     // END
 
     function onSelectionChanged() {
@@ -150,14 +149,12 @@ module Camel {
           jolokia.execute(mbean, "getBreakpoints", Core.onSuccess(onBreakpoints));
           // get the breakpoints...
           $scope.graphView = "plugins/camel/html/routes.html";
-          $scope.tableView = "plugins/camel/html/browseMessages.html";
 
           Core.register(jolokia, $scope, {
             type: 'exec', mbean: mbean,
             operation: 'getDebugCounter'}, Core.onSuccess(onBreakpointCounter));
         } else {
           $scope.graphView = null;
-          $scope.tableView = null;
         }
       }
     }
@@ -198,7 +195,7 @@ module Camel {
     }
 
     function onMessages(response) {
-      console.log("onMessage! ");
+      log.debug("onMessage -> " + response);
       $scope.messages = [];
       if (response) {
         var xml = response;
@@ -223,12 +220,12 @@ module Camel {
           });
         }
       } else {
-        console.log("WARNING: dumpTracedMessagesAsXml() returned no results!");
+        log.warn("WARNING: dumpTracedMessagesAsXml() returned no results!")
       }
 
       // lets update the selection and selected row for the message detail view
       updateMessageSelection();
-      console.log("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
+      log.debug("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
       Core.$apply($scope);
       updateBreakpointIcons();
     }
@@ -250,8 +247,8 @@ module Camel {
       $scope.suspendedBreakpoints = [];
       $scope.stopped = false;
       updateMessageSelection();
-      Core.$apply($scope);
       updateBreakpointIcons();
+      Core.$apply($scope);
     }
 
     /*

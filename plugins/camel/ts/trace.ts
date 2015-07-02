@@ -2,7 +2,7 @@
 /// <reference path="camelPlugin.ts"/>
 
 module Camel {
-  export var TraceRouteController = _module.controller("Camel.TraceRouteController", ["$scope", "workspace", "jolokia", "localStorage", "tracerStatus", ($scope, workspace:Workspace, jolokia, localStorage, tracerStatus) => {
+  _module.controller("Camel.TraceRouteController", ["$scope", "workspace", "jolokia", "localStorage", "tracerStatus", ($scope, workspace:Workspace, jolokia, localStorage, tracerStatus) => {
 
     var log:Logging.Logger = Logger.get("CamelTracer");
 
@@ -49,7 +49,6 @@ module Camel {
 
     // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
     $scope.openMessageDialog = (message) => {
-      log.info("openMessageDialog -> " + message);
       ActiveMQ.selectCurrentMessage(message, "id", $scope);
       if ($scope.row) {
         var body = $scope.row.body;
@@ -58,10 +57,8 @@ module Camel {
         if ("javascript" == $scope.mode) {
           $scope.mode = "text";
         }
-        log.info("show in mode -> " + $scope.mode);
         $scope.showMessageDetails = true;
       } else {
-        log.info("do not show");
         $scope.showMessageDetails = false;
       }
       Core.$apply($scope);
