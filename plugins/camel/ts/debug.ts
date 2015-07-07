@@ -12,17 +12,8 @@ module Camel {
     $scope.ignoreRouteXmlNode = true;
     $scope.messages = [];
     $scope.mode = 'text';
-    $scope.showMessageDetails = false;
-
-    $scope.gridOptions = Camel.createBrowseGridOptions();
-    $scope.gridOptions.selectWithCheckboxOnly = false;
-    $scope.gridOptions.showSelectionCheckbox = false;
-    $scope.gridOptions.multiSelect = false;
-    $scope.gridOptions.afterSelectionChange = onSelectionChanged;
-    $scope.gridOptions.columnDefs.push({
-      field: 'toNode',
-      displayName: 'To Node'
-    });
+    // always show the message details
+    $scope.showMessageDetails = true;
 
     $scope.startDebugging = () => {
       log.info("Start debugging");
@@ -110,32 +101,15 @@ module Camel {
       }
     };
 
-    // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
-    $scope.openMessageDialog = (message) => {
-      ActiveMQ.selectCurrentMessage(message, "id", $scope);
-      if ($scope.row) {
-        var body = $scope.row.body;
-        $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
-        // it may detect wrong as javascript, so use text instead
-        if ("javascript" == $scope.mode) {
-          $scope.mode = "text";
-        }
-        $scope.showMessageDetails = true;
-      } else {
-        $scope.showMessageDetails = false;
-      }
-      Core.$apply($scope);
-    };
-
-    ActiveMQ.decorate($scope, onSelectionChanged);
-    // END
-
     function onSelectionChanged() {
       var toNode = getStoppedBreakpointId();
       if (toNode) {
         // lets highlight the node in the diagram
         var nodes = getDiagramNodes();
         Camel.highlightSelectedNode(nodes, toNode);
+      } else {
+        // clear highlight
+        Camel.highlightSelectedNode(nodes, null);
       }
     }
 
@@ -222,20 +196,28 @@ module Camel {
       // lets update the selection and selected row for the message detail view
       updateMessageSelection();
       updateBreakpointIcons();
+      onSelectionChanged();
       log.debug("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
       Core.$apply($scope);
     }
 
     function updateMessageSelection() {
-      $scope.selectRowIndex($scope.rowIndex);
-      if (!$scope.row && $scope.showMessageDetails) {
-        // lets make a dummy empty row
-        // so we can keep the detail view while resuming
+      if ($scope.messages.length > 0) {
+        $scope.row = $scope.messages[0];
+        var body = $scope.row.body;
+        $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
+        // it may detect wrong as javascript, so use text instead
+        if ("javascript" == $scope.mode) {
+          $scope.mode = "text";
+        }
+      } else {
+        // lets make a dummy empty row so we can keep the detail view while resuming
         $scope.row = {
           headers: {},
           body: "",
           bodyType: ""
-        }
+        };
+        $scope.mode = "text";
       }
     }
 
@@ -245,6 +227,7 @@ module Camel {
       $scope.stopped = false;
       updateMessageSelection();
       updateBreakpointIcons();
+      onSelectionChanged();
       Core.$apply($scope);
     }
 

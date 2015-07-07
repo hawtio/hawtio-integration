@@ -52,12 +52,8 @@
       </div>
     </div>
 
-    <!-- table and slider to show the traced messages -->
-    <div class="row">
-      <table class="table table-striped" hawtio-simple-table="gridOptions"></table>
-    </div>
-
-    <div hawtio-slideout="showMessageDetails" title="{{row.id}}">
+    <!-- slider to always show the current debugged message -->
+    <div hawtio-slideout="true" title="{{row.id}}" top="60%" height="40%">
       <div class="dialog-body">
 
         <div class="row">
