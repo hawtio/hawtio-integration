@@ -53,19 +53,11 @@
     </div>
 
     <!-- slider to always show the current debugged message -->
-    <div hawtio-slideout="true" title="{{row.id}}" top="60%" height="40%">
+    <div hawtio-slideout="true" title="Breakpoint suspended at {{row.toNode}}" top="60%" height="40%">
       <div class="dialog-body">
 
-        <div class="row">
-          <div class="pull-right">
-            <form class="form-horizontal no-bottom-margin">
-              <div class="btn-group" hawtio-pager="messages" on-index-change="selectRowIndex"
-                   row-index="rowIndex"></div>
-
-              <!-- no need for close button as the hawtio-slideout already have that -->
-
-            </form>
-          </div>
+        <div title="ID" class="title">
+          {{row.id}}
         </div>
 
         <div class="row">
@@ -87,7 +79,7 @@
             </div>
           </div>
 
-          <div class="row">
+          <div title="Body" class="row">
             <div>Body type: <span ng-bind="row.bodyType"></span></div>
             <div hawtio-editor="row.body" read-only="true" mode="mode"></div>
           </div>
