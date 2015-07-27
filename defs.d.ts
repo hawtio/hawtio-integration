@@ -16,6 +16,7 @@
 /// <reference path="d.ts/camel/ts/debug.d.ts"/>
 /// <reference path="d.ts/camel/ts/endpoint.d.ts"/>
 /// <reference path="d.ts/camel/ts/endpointChooser.d.ts"/>
+/// <reference path="d.ts/camel/ts/endpointRuntimeRegistry.d.ts"/>
 /// <reference path="d.ts/camel/ts/inflight.d.ts"/>
 /// <reference path="d.ts/camel/ts/jmsHeaderSchema.d.ts"/>
 /// <reference path="d.ts/camel/ts/preferences.d.ts"/>
