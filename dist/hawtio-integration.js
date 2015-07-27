@@ -3291,7 +3291,7 @@ var Camel;
         });
         tab.tabs.push({
             id: 'camel-endpoint-runtime-registry',
-            title: function () { return '<i class="fa fa-list"></i> Endpoint Registry'; },
+            title: function () { return '<i class="fa fa-list"></i> Endpoints (in/out)'; },
             tooltip: function () { return "List all the incoming and outgoing endpoints in the context"; },
             show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint() && !workspace.isComponentsFolder() && !workspace.isComponent() && (workspace.isCamelContext() || workspace.isRoutesFolder()) && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia) && Camel.getSelectionCamelEndpointRuntimeRegistry(workspace) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelEndpointRuntimeRegistry(workspace), "endpointStatistics"); },
             href: function () { return "/camel/endpointRuntimeRegistry" + workspace.hash(); }

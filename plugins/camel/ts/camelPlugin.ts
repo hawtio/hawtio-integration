@@ -343,7 +343,7 @@ module Camel {
     });
     tab.tabs.push({
       id: 'camel-endpoint-runtime-registry',
-      title: () =>'<i class="fa fa-list"></i> Endpoint Registry',
+      title: () =>'<i class="fa fa-list"></i> Endpoints (in/out)',
       tooltip: () => "List all the incoming and outgoing endpoints in the context",
       show: () =>
         !workspace.isEndpointsFolder() && !workspace.isEndpoint()
