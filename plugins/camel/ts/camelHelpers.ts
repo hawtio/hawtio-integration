@@ -260,11 +260,11 @@ module Camel {
       if (injector) {
         var documentBase = injector.get("documentBase");
         if (documentBase) {
-          return UrlHelpers.join(documentBase, "/img/icons/camel/" + imageName);
+          return UrlHelpers.join(documentBase, "/img/icons/camel/", imageName);
         }
       } else {
         // fallback if no injector
-        return Core.url("/img/icons/camel/" + imageName);
+        return UrlHelpers.join("img/icons/camel/", imageName);
       }
     } else {
       return null;

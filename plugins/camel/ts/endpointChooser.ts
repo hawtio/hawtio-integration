@@ -15,12 +15,12 @@ module Camel {
     bigdata: {
       label: "Big Data",
       endpoints: ["hdfs", "hbase", "lucene", "solr"],
-      endpointIcon: "/img/icons/camel/endpointRepository24.png"
+      endpointIcon: "img/icons/camel/endpointRepository24.png"
     },
     database: {
       label: "Database",
       endpoints: ["couchdb", "elasticsearch", "hbase", "jdbc", "jpa", "hibernate", "mongodb", "mybatis", "sql"],
-      endpointIcon: "/img/icons/camel/endpointRepository24.png"
+      endpointIcon: "img/icons/camel/endpointRepository24.png"
     },
     cloud: {
       label: "Cloud",
@@ -36,7 +36,7 @@ module Camel {
     messaging: {
       label: "Messaging",
       endpoints: ["jms", "activemq", "amqp", "cometd", "cometds", "mqtt", "netty", "vertx", "websocket"],
-      endpointIcon: "/img/icons/camel/endpointQueue24.png"
+      endpointIcon: "img/icons/camel/endpointQueue24.png"
     },
     mobile: {
       label: "Mobile",
@@ -52,7 +52,7 @@ module Camel {
     },
     storage: {
       label: "Storage",
-      endpointIcon: "/img/icons/camel/endpointFolder24.png",
+      endpointIcon: "img/icons/camel/endpointFolder24.png",
       endpoints: ["file", "ftp", "sftp", "scp", "jsch"]
     },
     template: {
@@ -69,7 +69,7 @@ module Camel {
    */
   export var endpointToCategory = {};
 
-  export var endpointIcon = "/img/icons/camel/endpoint24.png";
+  export var endpointIcon = "img/icons/camel/endpoint24.png";
   /**
    *  specify custom label & icon properties for endpoint names
    * @property
@@ -78,31 +78,31 @@ module Camel {
    */
   export var endpointConfigurations = {
     drools: {
-      icon: "/img/icons/camel/endpointQueue24.png"
+      icon: "img/icons/camel/endpointQueue24.png"
     },
     quartz: {
-      icon: "/img/icons/camel/endpointTimer24.png"
+      icon: "img/icons/camel/endpointTimer24.png"
     },
     facebook: {
-      icon: "/img/icons/camel/endpoints/facebook24.jpg"
+      icon: "img/icons/camel/endpoints/facebook24.jpg"
     },
     salesforce: {
-      icon: "/img/icons/camel/endpoints/salesForce24.png"
+      icon: "img/icons/camel/endpoints/salesForce24.png"
     },
     sap: {
-      icon: "/img/icons/camel/endpoints/SAPe24.png"
+      icon: "img/icons/camel/endpoints/SAPe24.png"
     },
     "sap-netweaver": {
-      icon: "/img/icons/camel/endpoints/SAPNetweaver24.jpg"
+      icon: "img/icons/camel/endpoints/SAPNetweaver24.jpg"
     },
     timer: {
-      icon: "/img/icons/camel/endpointTimer24.png"
+      icon: "img/icons/camel/endpointTimer24.png"
     },
     twitter: {
-      icon: "/img/icons/camel/endpoints/twitter24.png"
+      icon: "img/icons/camel/endpoints/twitter24.png"
     },
     weather: {
-      icon: "/img/icons/camel/endpoints/weather24.jpg"
+      icon: "img/icons/camel/endpoints/weather24.jpg"
     }
   };
 
@@ -159,7 +159,12 @@ module Camel {
       var category = getEndpointCategory(endpointName);
       answer = Core.pathGet(category, ["endpointIcon"]);
     }
-    return answer || endpointIcon;
+    answer = answer || endpointIcon;
+    if (HawtioCore.injector) {
+      var documentBase = HawtioCore.injector.get('documentBase');
+      answer = UrlHelpers.join(documentBase, answer);
+    }
+    return answer;
   }
 
   export function getEndpointConfig(endpointName, category) {
