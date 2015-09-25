@@ -5835,7 +5835,7 @@ var Camel;
                 // the model is json object from the string data
                 $scope.model = JSON.parse(data);
                 // set title and description
-                $scope.model.title = $scope.model.dataformat.title;
+                $scope.model.title = $scope.model.dataformat.title + " (" + $scope.model.dataformat.name + ")";
                 $scope.model.description = $scope.model.dataformat.description;
                 // TODO: look for specific component icon,
                 $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/marshal24.png");
@@ -5844,14 +5844,15 @@ var Camel;
                 angular.forEach($scope.model.properties, function (property, key) {
                     // does it have a value or fallback to use a default value
                     var value = property["value"] || property["defaultValue"];
-                    // skip id, as it causes the page to indicate a required field
-                    if (key !== "id" && angular.isDefined(value) && value !== null) {
+                    if (angular.isDefined(value) && value !== null) {
                         $scope.nodeData[key] = value;
                     }
                     // remove label as that causes the UI to render the label instead of the key as title
                     // we should later group the table into labels (eg consumer vs producer)
                     delete property["label"];
                 });
+                // remove id, as it causes the page to indicate a required field
+                delete $scope.model.properties["id"];
                 var labels = [];
                 if ($scope.model.dataformat.label) {
                     labels = $scope.model.dataformat.label.split(",");
