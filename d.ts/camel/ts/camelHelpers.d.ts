@@ -179,6 +179,7 @@ declare module Camel {
     function getSelectionCamelRestRegistry(workspace: any): string;
     function getSelectionCamelEndpointRuntimeRegistry(workspace: any): string;
     function getSelectionCamelInflightRepository(workspace: any): string;
+    function getSelectionCamelBlockedExchanges(workspace: any): string;
     function getSelectionCamelRouteMetrics(workspace: any): string;
     function getContextId(workspace: Workspace): any;
     /**

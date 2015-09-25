@@ -10,6 +10,7 @@
 /// <reference path="d.ts/camel/ts/camelHelpers.d.ts"/>
 /// <reference path="d.ts/camel/ts/camelPlugin.d.ts"/>
 /// <reference path="d.ts/camel/ts/attributesToolBar.d.ts"/>
+/// <reference path="d.ts/camel/ts/blocked.d.ts"/>
 /// <reference path="d.ts/camel/ts/breadcrumbBar.d.ts"/>
 /// <reference path="d.ts/camel/ts/browseEndpoint.d.ts"/>
 /// <reference path="d.ts/camel/ts/camelHeaderSchema.d.ts"/>

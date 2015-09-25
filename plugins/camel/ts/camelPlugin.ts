@@ -28,6 +28,7 @@ module Camel {
             .when('/camel/endpointRuntimeRegistry', {templateUrl: 'plugins/camel/html/endpointRuntimeRegistry.html', reloadOnSearch: false})
             .when('/camel/routeMetrics', {templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false})
             .when('/camel/inflight', {templateUrl: 'plugins/camel/html/inflight.html', reloadOnSearch: false})
+            .when('/camel/blocked', {templateUrl: 'plugins/camel/html/blocked.html', reloadOnSearch: false})
             .when('/camel/sendMessage', {templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false})
             .when('/camel/source', {templateUrl: 'plugins/camel/html/source.html'})
             .when('/camel/traceRoute', {templateUrl: 'plugins/camel/html/traceRoute.html'})
@@ -316,7 +317,7 @@ module Camel {
     });
     tab.tabs.push({
       id: 'camel-inflight-exchanges',
-      title: () => '<i class="fa fa-bar-chart"></i> Inflight Exchanges',
+      title: () => '<i class="fa fa-bar-chart"></i> Inflight',
       tooltip: () => "View the entire JVMs Camel inflight exchanges",
       show: () =>
         !workspace.isEndpointsFolder() && !workspace.isEndpoint()
@@ -325,6 +326,17 @@ module Camel {
         && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
         && workspace.hasInvokeRightsForName(getSelectionCamelInflightRepository(workspace), "browse"),
       href: () => "/camel/inflight" + workspace.hash()
+    });
+    tab.tabs.push({
+      id: 'camel-blocked-exchanges',
+      title: () => '<i class="fa fa-bar-chart"></i> Blocked',
+      tooltip: () => "View the entire JVMs Camel blocked exchanges",
+      show: () =>
+        !workspace.isEndpointsFolder()
+        && (workspace.isRoute() || workspace.isRoutesFolder())
+        && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
+        && workspace.hasInvokeRightsForName(getSelectionCamelBlockedExchanges(workspace), "browse"),
+      href: () => "/camel/blocked" + workspace.hash()
     });
     tab.tabs.push({
       id: 'camel-route-metrics',
