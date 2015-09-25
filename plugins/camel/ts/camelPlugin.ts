@@ -35,6 +35,7 @@ module Camel {
             .when('/camel/profileRoute', {templateUrl: 'plugins/camel/html/profileRoute.html'})
             .when('/camel/properties', {templateUrl: 'plugins/camel/html/properties.html'})
             .when('/camel/propertiesComponent', {templateUrl: 'plugins/camel/html/propertiesComponent.html'})
+            .when('/camel/propertiesDataFormat', {templateUrl: 'plugins/camel/html/propertiesDataFormat.html'})
             .when('/camel/propertiesEndpoint', {templateUrl: 'plugins/camel/html/propertiesEndpoint.html'});
   }]);
 
@@ -304,6 +305,16 @@ module Camel {
       href: () => "/camel/propertiesComponent" + workspace.hash()
     });
     tab.tabs.push({
+      id: 'camel-dataformat-properties',
+      title: () => '<i class="fa fa-list"></i> Properties',
+      tooltip: () => "Show the dataformat properties",
+      show: () =>
+      workspace.isDataformat()
+      && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
+      && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson"),
+      href: () => "/camel/propertiesDataFormat" + workspace.hash()
+    });
+    tab.tabs.push({
       id: 'camel-inflight-exchanges',
       title: () => '<i class="fa fa-bar-chart"></i> Inflight Exchanges',
       tooltip: () => "View the entire JVMs Camel inflight exchanges",
@@ -445,6 +456,7 @@ module Camel {
               var routesNode = entries["routes"];
               var endpointsNode = entries["endpoints"];
               var componentsNode = entries["components"];
+              var dataFormatsNode = entries["dataformats"];
               if (contextsFolder) {
                 var contextNode = contextsFolder.children[0];
                 if (contextNode) {
@@ -504,12 +516,29 @@ module Camel {
                       componentsFolder.key = componentsNode.key;
                       componentsFolder.domain = componentsNode.domain;
                     }
+                    if (dataFormatsNode) {
+                      var dataFormatsFolder = new Folder("Dataformats");
+                      dataFormatsFolder.addClass = "org-apache-camel-dataformats-folder";
+                      dataFormatsFolder.parent = contextsFolder;
+                      dataFormatsFolder.children = dataFormatsNode.children;
+                      angular.forEach(dataFormatsFolder.children, (n) => {
+                        n.addClass = "org-apache-camel-dataformats";
+                        if (!getContextId(n)) {
+                          n.entries["context"] = contextNode.entries["context"];
+                        }
+                      });
+                      folder.children.push(dataFormatsFolder);
+                      dataFormatsFolder.entries = contextNode.entries;
+                      dataFormatsFolder.typeName = "dataformats";
+                      dataFormatsFolder.key = dataFormatsNode.key;
+                      dataFormatsFolder.domain = dataFormatsNode.domain;
+                    }
 
                     var jmxNode = new Folder("MBeans");
 
-                    // lets add all the entries which are not one context/routes/endpoints/components as MBeans
+                    // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
                     angular.forEach(entries, (jmxChild, name) => {
-                      if (name !== "context" && name !== "routes" && name !== "endpoints" && name !== "components") {
+                      if (name !== "context" && name !== "routes" && name !== "endpoints" && name !== "components" && name !== "dataformats") {
                         jmxNode.children.push(jmxChild);
                       }
                     });

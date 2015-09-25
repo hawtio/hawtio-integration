@@ -136,194 +136,182 @@ var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ._module = angular.module(ActiveMQ.pluginName, []);
     ActiveMQ._module.config(["$routeProvider", function ($routeProvider) {
-            $routeProvider.
-                when('/activemq/browseQueue', { templateUrl: 'plugins/activemq/html/browseQueue.html' }).
-                when('/activemq/createDestination', { templateUrl: 'plugins/activemq/html/createDestination.html' }).
-                when('/activemq/deleteQueue', { templateUrl: 'plugins/activemq/html/deleteQueue.html' }).
-                when('/activemq/deleteTopic', { templateUrl: 'plugins/activemq/html/deleteTopic.html' }).
-                when('/activemq/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html' }).
-                when('/activemq/durableSubscribers', { templateUrl: 'plugins/activemq/html/durableSubscribers.html' }).
-                when('/activemq/jobs', { templateUrl: 'plugins/activemq/html/jobs.html' });
-        }]);
+        $routeProvider.when('/activemq/browseQueue', { templateUrl: 'plugins/activemq/html/browseQueue.html' }).when('/activemq/createDestination', { templateUrl: 'plugins/activemq/html/createDestination.html' }).when('/activemq/deleteQueue', { templateUrl: 'plugins/activemq/html/deleteQueue.html' }).when('/activemq/deleteTopic', { templateUrl: 'plugins/activemq/html/deleteTopic.html' }).when('/activemq/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html' }).when('/activemq/durableSubscribers', { templateUrl: 'plugins/activemq/html/durableSubscribers.html' }).when('/activemq/jobs', { templateUrl: 'plugins/activemq/html/jobs.html' });
+    }]);
     ActiveMQ._module.run(["HawtioNav", "$location", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "$templateCache", "documentBase", function (nav, $location, workspace, viewRegistry, helpRegistry, preferencesRegistry, $templateCache, documentBase) {
-            viewRegistry['{ "main-tab": "activemq" }'] = 'plugins/activemq/html/layoutActiveMQTree.html';
-            helpRegistry.addUserDoc('activemq', 'plugins/activemq/doc/help.md', function () {
-                return workspace.treeContainsDomainAndProperties("org.apache.activemq");
-            });
-            preferencesRegistry.addTab("ActiveMQ", "plugins/activemq/html/preferences.html", function () {
-                return workspace.treeContainsDomainAndProperties("org.apache.activemq");
-            });
-            workspace.addTreePostProcessor(postProcessTree);
-            // register default attribute views
-            var attributes = workspace.attributeColumnDefs;
-            attributes[ActiveMQ.jmxDomain + "/Broker/folder"] = [
-                { field: 'BrokerName', displayName: 'Name', width: "**" },
-                { field: 'TotalProducerCount', displayName: 'Producer' },
-                { field: 'TotalConsumerCount', displayName: 'Consumer' },
-                { field: 'StorePercentUsage', displayName: 'Store %' },
-                { field: 'TempPercentUsage', displayName: 'Temp %' },
-                { field: 'MemoryPercentUsage', displayName: 'Memory %' },
-                { field: 'TotalEnqueueCount', displayName: 'Enqueue' },
-                { field: 'TotalDequeueCount', displayName: 'Dequeue' }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/Queue/folder"] = [
-                { field: 'Name', displayName: 'Name', width: "***" },
-                { field: 'QueueSize', displayName: 'Queue Size' },
-                { field: 'ProducerCount', displayName: 'Producer' },
-                { field: 'ConsumerCount', displayName: 'Consumer' },
-                { field: 'EnqueueCount', displayName: 'Enqueue' },
-                { field: 'DequeueCount', displayName: 'Dequeue' },
-                { field: 'MemoryPercentUsage', displayName: 'Memory %' },
-                { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/Topic/folder"] = [
-                { field: 'Name', displayName: 'Name', width: "****" },
-                { field: 'ProducerCount', displayName: 'Producer' },
-                { field: 'ConsumerCount', displayName: 'Consumer' },
-                { field: 'EnqueueCount', displayName: 'Enqueue' },
-                { field: 'DequeueCount', displayName: 'Dequeue' },
-                { field: 'MemoryPercentUsage', displayName: 'Memory %' },
-                { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/Consumer/folder"] = [
-                { field: 'ConnectionId', displayName: 'Name', width: "**" },
-                { field: 'PrefetchSize', displayName: 'Prefetch Size' },
-                { field: 'Priority', displayName: 'Priority' },
-                { field: 'DispatchedQueueSize', displayName: 'Dispatched Queue #' },
-                { field: 'SlowConsumer', displayName: 'Slow ?' },
-                { field: 'Retroactive', displayName: 'Retroactive' },
-                { field: 'Selector', displayName: 'Selector' }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/networkConnectors/folder"] = [
-                { field: 'Name', displayName: 'Name', width: "**" },
-                { field: 'UserName', displayName: 'User Name' },
-                { field: 'PrefetchSize', displayName: 'Prefetch Size' },
-                { field: 'ConduitSubscriptions', displayName: 'Conduit Subscriptions?' },
-                { field: 'Duplex', displayName: 'Duplex' },
-                { field: 'DynamicOnly', displayName: 'Dynamic Only' }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/PersistenceAdapter/folder"] = [
-                { field: 'IndexDirectory', displayName: 'Index Directory', width: "**" },
-                { field: 'LogDirectory', displayName: 'Log Directory', width: "**" }
-            ];
-            var myUrl = '/jmx/attributes';
-            var builder = nav.builder();
-            var tab = builder.id('activemq')
-                .title(function () { return 'ActiveMQ'; })
-                .defaultPage({
-                rank: 15,
-                isValid: function (yes, no) {
-                    var name = 'ActiveMQDefaultPage';
-                    workspace.addNamedTreePostProcessor(name, function (tree) {
-                        workspace.removeNamedTreePostProcessor(name);
-                        if (workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain)) {
-                            yes();
-                        }
-                        else {
-                            no();
-                        }
-                    });
-                }
-            })
-                .href(function () { return myUrl; })
-                .isValid(function () { return workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain); })
-                .build();
-            tab.tabs = Jmx.getNavItems(builder, workspace, $templateCache, 'activemq');
-            // add sub level tabs
-            tab.tabs.push({
-                id: 'activemq-browse',
-                title: function () { return '<i class="fa fa-envelope"></i> Browse'; },
-                tooltip: function () { return "Browse the messages on the queue"; },
-                show: function () { return isQueue(workspace) && workspace.hasInvokeRights(workspace.selection, "browse()"); },
-                href: function () { return "/activemq/browseQueue" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'activemq-send',
-                title: function () { return '<i class="fa fa-pencil"></i> Send'; },
-                tooltip: function () { return "Send a message to this destination"; },
-                show: function () { return (isQueue(workspace) || isTopic(workspace)) && workspace.hasInvokeRights(workspace.selection, "sendTextMessage(java.util.Map,java.lang.String,java.lang.String,java.lang.String)"); },
-                href: function () { return "/activemq/sendMessage" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'activemq-durable-subscribers',
-                title: function () { return '<i class="fa fa-list"></i> Durable Subscribers'; },
-                tooltip: function () { return "Manage durable subscribers"; },
-                show: function () { return isBroker(workspace); },
-                href: function () { return "/activemq/durableSubscribers" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'activemq-jobs',
-                title: function () { return '<i class="fa fa-list"></i> Jobs'; },
-                tooltip: function () { return "Manage jobs"; },
-                show: function () { return isJobScheduler(workspace); },
-                href: function () { return "/activemq/jobs" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'activemq-create-destination',
-                title: function () { return '<i class="fa fa-plus"></i> Create'; },
-                tooltip: function () { return "Create a new destination"; },
-                show: function () { return (isBroker(workspace) || isQueuesFolder(workspace) || isTopicsFolder(workspace) || isQueue(workspace) || isTopic(workspace)) && workspace.hasInvokeRights(getBroker(workspace), "addQueue", "addTopic"); },
-                href: function () { return "/activemq/createDestination" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'activemq-delete-topic',
-                title: function () { return '<i class="fa fa-remove"></i> Delete'; },
-                tooltip: function () { return "Delete this topic"; },
-                show: function () { return isTopic(workspace) && workspace.hasInvokeRights(getBroker(workspace), "removeTopic"); },
-                href: function () { return "/activemq/deleteTopic" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'activemq-delete-queue',
-                title: function () { return '<i class="fa fa-remove"></i> Delete'; },
-                tooltip: function () { return "Delete or purge this queue"; },
-                show: function () { return isQueue(workspace) && workspace.hasInvokeRights(getBroker(workspace), "removeQueue"); },
-                href: function () { return "/activemq/deleteQueue" + workspace.hash(); }
-            });
-            nav.add(tab);
-            function postProcessTree(tree) {
-                var activemq = tree.get("org.apache.activemq");
-                setConsumerType(activemq);
-                // lets move queue and topic as first children within brokers
-                if (activemq) {
-                    angular.forEach(activemq.children, function (broker) {
-                        angular.forEach(broker.children, function (child) {
-                            // lets move Topic/Queue to the front.
-                            var grandChildren = child.children;
-                            if (grandChildren) {
-                                var names = ["Topic", "Queue"];
-                                angular.forEach(names, function (name) {
-                                    var idx = grandChildren.findIndex(function (n) { return n.title === name; });
-                                    if (idx > 0) {
-                                        var old = grandChildren[idx];
-                                        grandChildren.splice(idx, 1);
-                                        grandChildren.splice(0, 0, old);
-                                    }
-                                });
-                            }
-                        });
-                    });
-                }
-            }
-            function setConsumerType(node) {
-                if (node) {
-                    var parent = node.parent;
-                    var entries = node.entries;
-                    if (parent && !parent.typeName && entries) {
-                        var endpoint = entries["endpoint"];
-                        if (endpoint === "Consumer" || endpoint === "Producer") {
-                            //console.log("Setting the typeName on " + parent.title + " to " + endpoint);
-                            parent.typeName = endpoint;
-                        }
-                        var connectorName = entries["connectorName"];
-                        if (connectorName && !node.icon) {
-                            // lets default a connector icon
-                            node.icon = UrlHelpers.join(documentBase, "/img/icons/activemq/connector.png");
-                        }
+        viewRegistry['{ "main-tab": "activemq" }'] = 'plugins/activemq/html/layoutActiveMQTree.html';
+        helpRegistry.addUserDoc('activemq', 'plugins/activemq/doc/help.md', function () {
+            return workspace.treeContainsDomainAndProperties("org.apache.activemq");
+        });
+        preferencesRegistry.addTab("ActiveMQ", "plugins/activemq/html/preferences.html", function () {
+            return workspace.treeContainsDomainAndProperties("org.apache.activemq");
+        });
+        workspace.addTreePostProcessor(postProcessTree);
+        // register default attribute views
+        var attributes = workspace.attributeColumnDefs;
+        attributes[ActiveMQ.jmxDomain + "/Broker/folder"] = [
+            { field: 'BrokerName', displayName: 'Name', width: "**" },
+            { field: 'TotalProducerCount', displayName: 'Producer' },
+            { field: 'TotalConsumerCount', displayName: 'Consumer' },
+            { field: 'StorePercentUsage', displayName: 'Store %' },
+            { field: 'TempPercentUsage', displayName: 'Temp %' },
+            { field: 'MemoryPercentUsage', displayName: 'Memory %' },
+            { field: 'TotalEnqueueCount', displayName: 'Enqueue' },
+            { field: 'TotalDequeueCount', displayName: 'Dequeue' }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/Queue/folder"] = [
+            { field: 'Name', displayName: 'Name', width: "***" },
+            { field: 'QueueSize', displayName: 'Queue Size' },
+            { field: 'ProducerCount', displayName: 'Producer' },
+            { field: 'ConsumerCount', displayName: 'Consumer' },
+            { field: 'EnqueueCount', displayName: 'Enqueue' },
+            { field: 'DequeueCount', displayName: 'Dequeue' },
+            { field: 'MemoryPercentUsage', displayName: 'Memory %' },
+            { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/Topic/folder"] = [
+            { field: 'Name', displayName: 'Name', width: "****" },
+            { field: 'ProducerCount', displayName: 'Producer' },
+            { field: 'ConsumerCount', displayName: 'Consumer' },
+            { field: 'EnqueueCount', displayName: 'Enqueue' },
+            { field: 'DequeueCount', displayName: 'Dequeue' },
+            { field: 'MemoryPercentUsage', displayName: 'Memory %' },
+            { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/Consumer/folder"] = [
+            { field: 'ConnectionId', displayName: 'Name', width: "**" },
+            { field: 'PrefetchSize', displayName: 'Prefetch Size' },
+            { field: 'Priority', displayName: 'Priority' },
+            { field: 'DispatchedQueueSize', displayName: 'Dispatched Queue #' },
+            { field: 'SlowConsumer', displayName: 'Slow ?' },
+            { field: 'Retroactive', displayName: 'Retroactive' },
+            { field: 'Selector', displayName: 'Selector' }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/networkConnectors/folder"] = [
+            { field: 'Name', displayName: 'Name', width: "**" },
+            { field: 'UserName', displayName: 'User Name' },
+            { field: 'PrefetchSize', displayName: 'Prefetch Size' },
+            { field: 'ConduitSubscriptions', displayName: 'Conduit Subscriptions?' },
+            { field: 'Duplex', displayName: 'Duplex' },
+            { field: 'DynamicOnly', displayName: 'Dynamic Only' }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/PersistenceAdapter/folder"] = [
+            { field: 'IndexDirectory', displayName: 'Index Directory', width: "**" },
+            { field: 'LogDirectory', displayName: 'Log Directory', width: "**" }
+        ];
+        var myUrl = '/jmx/attributes';
+        var builder = nav.builder();
+        var tab = builder.id('activemq').title(function () { return 'ActiveMQ'; }).defaultPage({
+            rank: 15,
+            isValid: function (yes, no) {
+                var name = 'ActiveMQDefaultPage';
+                workspace.addNamedTreePostProcessor(name, function (tree) {
+                    workspace.removeNamedTreePostProcessor(name);
+                    if (workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain)) {
+                        yes();
                     }
-                    angular.forEach(node.children, function (child) { return setConsumerType(child); });
-                }
+                    else {
+                        no();
+                    }
+                });
             }
-        }]);
+        }).href(function () { return myUrl; }).isValid(function () { return workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain); }).build();
+        tab.tabs = Jmx.getNavItems(builder, workspace, $templateCache, 'activemq');
+        // add sub level tabs
+        tab.tabs.push({
+            id: 'activemq-browse',
+            title: function () { return '<i class="fa fa-envelope"></i> Browse'; },
+            tooltip: function () { return "Browse the messages on the queue"; },
+            show: function () { return isQueue(workspace) && workspace.hasInvokeRights(workspace.selection, "browse()"); },
+            href: function () { return "/activemq/browseQueue" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'activemq-send',
+            title: function () { return '<i class="fa fa-pencil"></i> Send'; },
+            tooltip: function () { return "Send a message to this destination"; },
+            show: function () { return (isQueue(workspace) || isTopic(workspace)) && workspace.hasInvokeRights(workspace.selection, "sendTextMessage(java.util.Map,java.lang.String,java.lang.String,java.lang.String)"); },
+            href: function () { return "/activemq/sendMessage" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'activemq-durable-subscribers',
+            title: function () { return '<i class="fa fa-list"></i> Durable Subscribers'; },
+            tooltip: function () { return "Manage durable subscribers"; },
+            show: function () { return isBroker(workspace); },
+            href: function () { return "/activemq/durableSubscribers" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'activemq-jobs',
+            title: function () { return '<i class="fa fa-list"></i> Jobs'; },
+            tooltip: function () { return "Manage jobs"; },
+            show: function () { return isJobScheduler(workspace); },
+            href: function () { return "/activemq/jobs" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'activemq-create-destination',
+            title: function () { return '<i class="fa fa-plus"></i> Create'; },
+            tooltip: function () { return "Create a new destination"; },
+            show: function () { return (isBroker(workspace) || isQueuesFolder(workspace) || isTopicsFolder(workspace) || isQueue(workspace) || isTopic(workspace)) && workspace.hasInvokeRights(getBroker(workspace), "addQueue", "addTopic"); },
+            href: function () { return "/activemq/createDestination" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'activemq-delete-topic',
+            title: function () { return '<i class="fa fa-remove"></i> Delete'; },
+            tooltip: function () { return "Delete this topic"; },
+            show: function () { return isTopic(workspace) && workspace.hasInvokeRights(getBroker(workspace), "removeTopic"); },
+            href: function () { return "/activemq/deleteTopic" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'activemq-delete-queue',
+            title: function () { return '<i class="fa fa-remove"></i> Delete'; },
+            tooltip: function () { return "Delete or purge this queue"; },
+            show: function () { return isQueue(workspace) && workspace.hasInvokeRights(getBroker(workspace), "removeQueue"); },
+            href: function () { return "/activemq/deleteQueue" + workspace.hash(); }
+        });
+        nav.add(tab);
+        function postProcessTree(tree) {
+            var activemq = tree.get("org.apache.activemq");
+            setConsumerType(activemq);
+            // lets move queue and topic as first children within brokers
+            if (activemq) {
+                angular.forEach(activemq.children, function (broker) {
+                    angular.forEach(broker.children, function (child) {
+                        // lets move Topic/Queue to the front.
+                        var grandChildren = child.children;
+                        if (grandChildren) {
+                            var names = ["Topic", "Queue"];
+                            angular.forEach(names, function (name) {
+                                var idx = grandChildren.findIndex(function (n) { return n.title === name; });
+                                if (idx > 0) {
+                                    var old = grandChildren[idx];
+                                    grandChildren.splice(idx, 1);
+                                    grandChildren.splice(0, 0, old);
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        }
+        function setConsumerType(node) {
+            if (node) {
+                var parent = node.parent;
+                var entries = node.entries;
+                if (parent && !parent.typeName && entries) {
+                    var endpoint = entries["endpoint"];
+                    if (endpoint === "Consumer" || endpoint === "Producer") {
+                        //console.log("Setting the typeName on " + parent.title + " to " + endpoint);
+                        parent.typeName = endpoint;
+                    }
+                    var connectorName = entries["connectorName"];
+                    if (connectorName && !node.icon) {
+                        // lets default a connector icon
+                        node.icon = UrlHelpers.join(documentBase, "/img/icons/activemq/connector.png");
+                    }
+                }
+                angular.forEach(node.children, function (child) { return setConsumerType(child); });
+            }
+        }
+    }]);
     hawtioPluginLoader.addModule(ActiveMQ.pluginName);
     function getBroker(workspace) {
         var answer = null;
@@ -382,461 +370,450 @@ var ActiveMQ;
 var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ.BrowseQueueController = ActiveMQ._module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$dialog", "$templateCache", function ($scope, workspace, jolokia, localStorage, location, activeMQMessage, $timeout, $dialog, $templateCache) {
-            $scope.searchText = '';
-            $scope.allMessages = [];
-            $scope.messages = [];
-            $scope.headers = {};
-            $scope.mode = 'text';
-            $scope.gridOptions = {
-                selectedItems: [],
-                data: 'messages',
-                displayFooter: false,
-                showFilter: false,
-                showColumnMenu: true,
-                enableColumnResize: true,
-                enableColumnReordering: true,
-                enableHighlighting: true,
-                filterOptions: {
-                    filterText: '',
-                    useExternalFilter: true
+        $scope.searchText = '';
+        $scope.allMessages = [];
+        $scope.messages = [];
+        $scope.headers = {};
+        $scope.mode = 'text';
+        $scope.gridOptions = {
+            selectedItems: [],
+            data: 'messages',
+            displayFooter: false,
+            showFilter: false,
+            showColumnMenu: true,
+            enableColumnResize: true,
+            enableColumnReordering: true,
+            enableHighlighting: true,
+            filterOptions: {
+                filterText: '',
+                useExternalFilter: true
+            },
+            selectWithCheckboxOnly: true,
+            showSelectionCheckbox: true,
+            maintainColumnRatios: false,
+            columnDefs: [
+                {
+                    field: 'JMSMessageID',
+                    displayName: 'Message ID',
+                    cellTemplate: '<div class="ngCellText"><a href="" ng-click="row.entity.openMessageDialog(row)">{{row.entity.JMSMessageID}}</a></div>',
+                    // for ng-grid
+                    width: '34%'
                 },
-                selectWithCheckboxOnly: true,
-                showSelectionCheckbox: true,
-                maintainColumnRatios: false,
-                columnDefs: [
-                    {
-                        field: 'JMSMessageID',
-                        displayName: 'Message ID',
-                        cellTemplate: '<div class="ngCellText"><a href="" ng-click="row.entity.openMessageDialog(row)">{{row.entity.JMSMessageID}}</a></div>',
-                        // for ng-grid
-                        width: '34%'
-                    },
-                    {
-                        field: 'JMSType',
-                        displayName: 'Type',
-                        width: '10%'
-                    },
-                    {
-                        field: 'JMSPriority',
-                        displayName: 'Priority',
-                        width: '7%'
-                    },
-                    {
-                        field: 'JMSTimestamp',
-                        displayName: 'Timestamp',
-                        width: '19%'
-                    },
-                    {
-                        field: 'JMSExpiration',
-                        displayName: 'Expires',
-                        width: '10%'
-                    },
-                    {
-                        field: 'JMSReplyTo',
-                        displayName: 'Reply To',
-                        width: '10%'
-                    },
-                    {
-                        field: 'JMSCorrelationID',
-                        displayName: 'Correlation ID',
-                        width: '10%'
-                    }
-                ]
-            };
-            $scope.showMessageDetails = false;
-            // openMessageDialog is for the dialog itself so we should skip that guy
-            var ignoreColumns = ["PropertiesText", "BodyPreview", "Text", "openMessageDialog"];
-            var flattenColumns = ["BooleanProperties", "ByteProperties", "ShortProperties", "IntProperties", "LongProperties", "FloatProperties",
-                "DoubleProperties", "StringProperties"];
-            $scope.$watch('workspace.selection', function () {
-                if (workspace.moveIfViewInvalid()) {
-                    return;
+                {
+                    field: 'JMSType',
+                    displayName: 'Type',
+                    width: '10%'
+                },
+                {
+                    field: 'JMSPriority',
+                    displayName: 'Priority',
+                    width: '7%'
+                },
+                {
+                    field: 'JMSTimestamp',
+                    displayName: 'Timestamp',
+                    width: '19%'
+                },
+                {
+                    field: 'JMSExpiration',
+                    displayName: 'Expires',
+                    width: '10%'
+                },
+                {
+                    field: 'JMSReplyTo',
+                    displayName: 'Reply To',
+                    width: '10%'
+                },
+                {
+                    field: 'JMSCorrelationID',
+                    displayName: 'Correlation ID',
+                    width: '10%'
                 }
-                // lets defer execution as we may not have the selection just yet
-                setTimeout(loadTable, 50);
-            });
-            $scope.$watch('gridOptions.filterOptions.filterText', function (filterText) {
-                filterMessages(filterText);
-            });
-            $scope.openMessageDialog = function (message) {
-                ActiveMQ.selectCurrentMessage(message, "JMSMessageID", $scope);
-                if ($scope.row) {
-                    $scope.mode = CodeEditor.detectTextFormat($scope.row.Text);
-                    $scope.showMessageDetails = true;
-                }
-            };
-            $scope.refresh = loadTable;
-            ActiveMQ.decorate($scope);
-            $scope.moveMessages = function () {
-                var selection = workspace.selection;
-                var mbean = selection.objectName;
-                if (!mbean || !selection) {
-                    return;
-                }
-                var selectedItems = $scope.gridOptions.selectedItems;
-                $dialog.dialog({
-                    resolve: {
-                        selectedItems: function () { return selectedItems; },
-                        gridOptions: function () { return $scope.gridOptions; },
-                        queueNames: function () { return $scope.queueNames; },
-                        parent: function () { return $scope; }
-                    },
-                    template: $templateCache.get("activemqMoveMessageDialog.html"),
-                    controller: ["$scope", "dialog", "selectedItems", "gridOptions", "queueNames", "parent", function ($scope, dialog, selectedItems, gridOptions, queueNames, parent) {
-                            $scope.selectedItems = selectedItems;
-                            $scope.gridOptions = gridOptions;
-                            $scope.queueNames = queueNames;
-                            $scope.queueName = '';
-                            $scope.close = function (result) {
-                                dialog.close();
-                                if (result) {
-                                    parent.message = "Moved " + Core.maybePlural(selectedItems.length, "message") + " to " + $scope.queueName;
-                                    var operation = "moveMessageTo(java.lang.String, java.lang.String)";
-                                    angular.forEach(selectedItems, function (item, idx) {
-                                        var id = item.JMSMessageID;
-                                        if (id) {
-                                            var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
-                                            jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
-                                        }
-                                    });
-                                }
-                            };
-                        }]
-                }).open();
-            };
-            $scope.resendMessage = function () {
-                var selection = workspace.selection;
-                var mbean = selection.objectName;
-                if (mbean && selection) {
-                    var selectedItems = $scope.gridOptions.selectedItems;
-                    //always assume a single message
-                    activeMQMessage.message = selectedItems[0];
-                    location.path('activemq/sendMessage');
-                }
-            };
-            $scope.deleteMessages = function () {
-                var selection = workspace.selection;
-                var mbean = selection.objectName;
-                if (!mbean || !selection) {
-                    return;
-                }
-                var selected = $scope.gridOptions.selectedItems;
-                if (!selected || selected.length === 0) {
-                    return;
-                }
-                UI.multiItemConfirmActionDialog({
-                    collection: selected,
-                    index: 'JMSMessageID',
-                    onClose: function (result) {
+            ]
+        };
+        $scope.showMessageDetails = false;
+        // openMessageDialog is for the dialog itself so we should skip that guy
+        var ignoreColumns = ["PropertiesText", "BodyPreview", "Text", "openMessageDialog"];
+        var flattenColumns = ["BooleanProperties", "ByteProperties", "ShortProperties", "IntProperties", "LongProperties", "FloatProperties", "DoubleProperties", "StringProperties"];
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid()) {
+                return;
+            }
+            // lets defer execution as we may not have the selection just yet
+            setTimeout(loadTable, 50);
+        });
+        $scope.$watch('gridOptions.filterOptions.filterText', function (filterText) {
+            filterMessages(filterText);
+        });
+        $scope.openMessageDialog = function (message) {
+            ActiveMQ.selectCurrentMessage(message, "JMSMessageID", $scope);
+            if ($scope.row) {
+                $scope.mode = CodeEditor.detectTextFormat($scope.row.Text);
+                $scope.showMessageDetails = true;
+            }
+        };
+        $scope.refresh = loadTable;
+        ActiveMQ.decorate($scope);
+        $scope.moveMessages = function () {
+            var selection = workspace.selection;
+            var mbean = selection.objectName;
+            if (!mbean || !selection) {
+                return;
+            }
+            var selectedItems = $scope.gridOptions.selectedItems;
+            $dialog.dialog({
+                resolve: {
+                    selectedItems: function () { return selectedItems; },
+                    gridOptions: function () { return $scope.gridOptions; },
+                    queueNames: function () { return $scope.queueNames; },
+                    parent: function () { return $scope; }
+                },
+                template: $templateCache.get("activemqMoveMessageDialog.html"),
+                controller: ["$scope", "dialog", "selectedItems", "gridOptions", "queueNames", "parent", function ($scope, dialog, selectedItems, gridOptions, queueNames, parent) {
+                    $scope.selectedItems = selectedItems;
+                    $scope.gridOptions = gridOptions;
+                    $scope.queueNames = queueNames;
+                    $scope.queueName = '';
+                    $scope.close = function (result) {
+                        dialog.close();
                         if (result) {
-                            $scope.message = "Deleted " + Core.maybePlural(selected.length, "message");
-                            var operation = "removeMessage(java.lang.String)";
-                            _.forEach(selected, function (item, idx) {
+                            parent.message = "Moved " + Core.maybePlural(selectedItems.length, "message") + " to " + $scope.queueName;
+                            var operation = "moveMessageTo(java.lang.String, java.lang.String)";
+                            angular.forEach(selectedItems, function (item, idx) {
                                 var id = item.JMSMessageID;
                                 if (id) {
-                                    var callback = (idx + 1 < selected.length) ? intermediateResult : operationSuccess;
-                                    jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
+                                    var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
+                                    jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
                                 }
                             });
                         }
-                    },
-                    title: 'Delete messages?',
-                    action: 'The following messages will be deleted:',
-                    okText: 'Delete',
-                    okClass: 'btn-danger',
-                    custom: "This operation is permanent once completed!",
-                    customClass: "alert alert-warning"
-                }).open();
-            };
-            $scope.retryMessages = function () {
-                var selection = workspace.selection;
-                var mbean = selection.objectName;
-                if (mbean && selection) {
-                    var selectedItems = $scope.gridOptions.selectedItems;
-                    $scope.message = "Retry " + Core.maybePlural(selectedItems.length, "message");
-                    var operation = "retryMessage(java.lang.String)";
-                    angular.forEach(selectedItems, function (item, idx) {
-                        var id = item.JMSMessageID;
-                        if (id) {
-                            var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
-                            jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
-                        }
-                    });
-                }
-            };
-            $scope.queueNames = function (completionText) {
-                var queuesFolder = ActiveMQ.getSelectionQueuesFolder(workspace);
-                return (queuesFolder) ? queuesFolder.children.map(function (n) { return n.title; }) : [];
-            };
-            function populateTable(response) {
-                var data = response.value;
-                if (!angular.isArray(data)) {
-                    $scope.allMessages = [];
-                    angular.forEach(data, function (value, idx) {
-                        $scope.allMessages.push(value);
-                    });
-                }
-                else {
-                    $scope.allMessages = data;
-                }
-                angular.forEach($scope.allMessages, function (message) {
-                    message.openMessageDialog = $scope.openMessageDialog;
-                    message.headerHtml = createHeaderHtml(message);
-                    message.bodyText = createBodyText(message);
-                });
-                filterMessages($scope.gridOptions.filterOptions.filterText);
-                Core.$apply($scope);
+                    };
+                }]
+            }).open();
+        };
+        $scope.resendMessage = function () {
+            var selection = workspace.selection;
+            var mbean = selection.objectName;
+            if (mbean && selection) {
+                var selectedItems = $scope.gridOptions.selectedItems;
+                //always assume a single message
+                activeMQMessage.message = selectedItems[0];
+                location.path('activemq/sendMessage');
             }
-            /*
-             * For some reason using ng-repeat in the modal dialog doesn't work so lets
-             * just create the HTML in code :)
-             */
-            function createBodyText(message) {
-                if (message.Text) {
-                    var body = message.Text;
-                    var lenTxt = "" + body.length;
-                    message.textMode = "text (" + lenTxt + " chars)";
-                    return body;
-                }
-                else if (message.BodyPreview) {
-                    var code = Core.parseIntValue(localStorage["activemqBrowseBytesMessages"] || "1", "browse bytes messages");
-                    var body;
-                    message.textMode = "bytes (turned off)";
-                    if (code != 99) {
-                        var bytesArr = [];
-                        var textArr = [];
-                        message.BodyPreview.forEach(function (b) {
-                            if (code === 1 || code === 2) {
-                                // text
-                                textArr.push(String.fromCharCode(b));
-                            }
-                            if (code === 1 || code === 4) {
-                                // hex and must be 2 digit so they space out evenly
-                                var s = b.toString(16);
-                                if (s.length === 1) {
-                                    s = "0" + s;
-                                }
-                                bytesArr.push(s);
-                            }
-                            else {
-                                // just show as is without spacing out, as that is usually more used for hex than decimal
-                                var s = b.toString(10);
-                                bytesArr.push(s);
+        };
+        $scope.deleteMessages = function () {
+            var selection = workspace.selection;
+            var mbean = selection.objectName;
+            if (!mbean || !selection) {
+                return;
+            }
+            var selected = $scope.gridOptions.selectedItems;
+            if (!selected || selected.length === 0) {
+                return;
+            }
+            UI.multiItemConfirmActionDialog({
+                collection: selected,
+                index: 'JMSMessageID',
+                onClose: function (result) {
+                    if (result) {
+                        $scope.message = "Deleted " + Core.maybePlural(selected.length, "message");
+                        var operation = "removeMessage(java.lang.String)";
+                        _.forEach(selected, function (item, idx) {
+                            var id = item.JMSMessageID;
+                            if (id) {
+                                var callback = (idx + 1 < selected.length) ? intermediateResult : operationSuccess;
+                                jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
                             }
                         });
-                        var bytesData = bytesArr.join(" ");
-                        var textData = textArr.join("");
+                    }
+                },
+                title: 'Delete messages?',
+                action: 'The following messages will be deleted:',
+                okText: 'Delete',
+                okClass: 'btn-danger',
+                custom: "This operation is permanent once completed!",
+                customClass: "alert alert-warning"
+            }).open();
+        };
+        $scope.retryMessages = function () {
+            var selection = workspace.selection;
+            var mbean = selection.objectName;
+            if (mbean && selection) {
+                var selectedItems = $scope.gridOptions.selectedItems;
+                $scope.message = "Retry " + Core.maybePlural(selectedItems.length, "message");
+                var operation = "retryMessage(java.lang.String)";
+                angular.forEach(selectedItems, function (item, idx) {
+                    var id = item.JMSMessageID;
+                    if (id) {
+                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
+                        jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
+                    }
+                });
+            }
+        };
+        $scope.queueNames = function (completionText) {
+            var queuesFolder = ActiveMQ.getSelectionQueuesFolder(workspace);
+            return (queuesFolder) ? queuesFolder.children.map(function (n) { return n.title; }) : [];
+        };
+        function populateTable(response) {
+            var data = response.value;
+            if (!angular.isArray(data)) {
+                $scope.allMessages = [];
+                angular.forEach(data, function (value, idx) {
+                    $scope.allMessages.push(value);
+                });
+            }
+            else {
+                $scope.allMessages = data;
+            }
+            angular.forEach($scope.allMessages, function (message) {
+                message.openMessageDialog = $scope.openMessageDialog;
+                message.headerHtml = createHeaderHtml(message);
+                message.bodyText = createBodyText(message);
+            });
+            filterMessages($scope.gridOptions.filterOptions.filterText);
+            Core.$apply($scope);
+        }
+        /*
+         * For some reason using ng-repeat in the modal dialog doesn't work so lets
+         * just create the HTML in code :)
+         */
+        function createBodyText(message) {
+            if (message.Text) {
+                var body = message.Text;
+                var lenTxt = "" + body.length;
+                message.textMode = "text (" + lenTxt + " chars)";
+                return body;
+            }
+            else if (message.BodyPreview) {
+                var code = Core.parseIntValue(localStorage["activemqBrowseBytesMessages"] || "1", "browse bytes messages");
+                var body;
+                message.textMode = "bytes (turned off)";
+                if (code != 99) {
+                    var bytesArr = [];
+                    var textArr = [];
+                    message.BodyPreview.forEach(function (b) {
                         if (code === 1 || code === 2) {
-                            // bytes and text
-                            var len = message.BodyPreview.length;
-                            var lenTxt = "" + textArr.length;
-                            body = "bytes:\n" + bytesData + "\n\ntext:\n" + textData;
-                            message.textMode = "bytes (" + len + " bytes) and text (" + lenTxt + " chars)";
+                            // text
+                            textArr.push(String.fromCharCode(b));
+                        }
+                        if (code === 1 || code === 4) {
+                            // hex and must be 2 digit so they space out evenly
+                            var s = b.toString(16);
+                            if (s.length === 1) {
+                                s = "0" + s;
+                            }
+                            bytesArr.push(s);
                         }
                         else {
-                            // bytes only
-                            var len = message.BodyPreview.length;
-                            body = bytesData;
-                            message.textMode = "bytes (" + len + " bytes)";
+                            // just show as is without spacing out, as that is usually more used for hex than decimal
+                            var s = b.toString(10);
+                            bytesArr.push(s);
                         }
+                    });
+                    var bytesData = bytesArr.join(" ");
+                    var textData = textArr.join("");
+                    if (code === 1 || code === 2) {
+                        // bytes and text
+                        var len = message.BodyPreview.length;
+                        var lenTxt = "" + textArr.length;
+                        body = "bytes:\n" + bytesData + "\n\ntext:\n" + textData;
+                        message.textMode = "bytes (" + len + " bytes) and text (" + lenTxt + " chars)";
                     }
-                    return body;
-                }
-                else {
-                    message.textMode = "unsupported";
-                    return "Unsupported message body type which cannot be displayed by hawtio";
-                }
-            }
-            /*
-             * For some reason using ng-repeat in the modal dialog doesn't work so lets
-             * just create the HTML in code :)
-             */
-            function createHeaderHtml(message) {
-                var headers = createHeaders(message);
-                var properties = createProperties(message);
-                var headerKeys = _.keys(headers);
-                function sort(a, b) {
-                    if (a > b)
-                        return 1;
-                    if (a < b)
-                        return -1;
-                    return 0;
-                }
-                var propertiesKeys = _.keys(properties).sort(sort);
-                var jmsHeaders = headerKeys.filter(function (key) {
-                    return key.startsWith("JMS");
-                }).sort(sort);
-                var remaining = headerKeys.subtract(jmsHeaders.concat(propertiesKeys)).sort(sort);
-                var buffer = [];
-                function appendHeader(key) {
-                    var value = headers[key];
-                    if (value === null) {
-                        value = '';
+                    else {
+                        // bytes only
+                        var len = message.BodyPreview.length;
+                        body = bytesData;
+                        message.textMode = "bytes (" + len + " bytes)";
                     }
-                    buffer.push('<tr><td class="propertyName"><span class="green">Header</span> - ' +
-                        key +
-                        '</td><td class="property-value">' +
-                        value +
-                        '</td></tr>');
                 }
-                function appendProperty(key) {
-                    var value = properties[key];
-                    if (value === null) {
-                        value = '';
-                    }
-                    buffer.push('<tr><td class="propertyName">' +
-                        key +
-                        '</td><td class="property-value">' +
-                        value +
-                        '</td></tr>');
+                return body;
+            }
+            else {
+                message.textMode = "unsupported";
+                return "Unsupported message body type which cannot be displayed by hawtio";
+            }
+        }
+        /*
+         * For some reason using ng-repeat in the modal dialog doesn't work so lets
+         * just create the HTML in code :)
+         */
+        function createHeaderHtml(message) {
+            var headers = createHeaders(message);
+            var properties = createProperties(message);
+            var headerKeys = _.keys(headers);
+            function sort(a, b) {
+                if (a > b)
+                    return 1;
+                if (a < b)
+                    return -1;
+                return 0;
+            }
+            var propertiesKeys = _.keys(properties).sort(sort);
+            var jmsHeaders = headerKeys.filter(function (key) {
+                return key.startsWith("JMS");
+            }).sort(sort);
+            var remaining = headerKeys.subtract(jmsHeaders.concat(propertiesKeys)).sort(sort);
+            var buffer = [];
+            function appendHeader(key) {
+                var value = headers[key];
+                if (value === null) {
+                    value = '';
                 }
-                jmsHeaders.forEach(appendHeader);
-                remaining.forEach(appendHeader);
-                propertiesKeys.forEach(appendProperty);
-                return buffer.join("\n");
+                buffer.push('<tr><td class="propertyName"><span class="green">Header</span> - ' + key + '</td><td class="property-value">' + value + '</td></tr>');
             }
-            function createHeaders(row) {
-                //log.debug("headers: ", row);
-                var answer = {};
-                angular.forEach(row, function (value, key) {
-                    if (!ignoreColumns.any(key) && !flattenColumns.any(key)) {
-                        answer[Core.escapeHtml(key)] = Core.escapeHtml(value);
-                    }
-                });
-                return answer;
-            }
-            function createProperties(row) {
-                //log.debug("properties: ", row);
-                var answer = {};
-                angular.forEach(row, function (value, key) {
-                    if (!ignoreColumns.any(key) && flattenColumns.any(key)) {
-                        angular.forEach(value, function (v2, k2) {
-                            answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + Core.escapeHtml(k2)] = Core.escapeHtml(v2);
-                        });
-                    }
-                });
-                return answer;
-            }
-            function loadTable() {
-                var objName;
-                if (workspace.selection) {
-                    objName = workspace.selection.objectName;
+            function appendProperty(key) {
+                var value = properties[key];
+                if (value === null) {
+                    value = '';
                 }
-                else {
-                    // in case of refresh
-                    var key = location.search()['nid'];
-                    var node = workspace.keyToNodeMap[key];
-                    objName = node.objectName;
+                buffer.push('<tr><td class="propertyName">' + key + '</td><td class="property-value">' + value + '</td></tr>');
+            }
+            jmsHeaders.forEach(appendHeader);
+            remaining.forEach(appendHeader);
+            propertiesKeys.forEach(appendProperty);
+            return buffer.join("\n");
+        }
+        function createHeaders(row) {
+            //log.debug("headers: ", row);
+            var answer = {};
+            angular.forEach(row, function (value, key) {
+                if (!ignoreColumns.any(key) && !flattenColumns.any(key)) {
+                    answer[Core.escapeHtml(key)] = Core.escapeHtml(value);
                 }
-                if (objName) {
-                    $scope.dlq = false;
-                    jolokia.getAttribute(objName, "DLQ", Core.onSuccess(onDlq, { silent: true }));
-                    jolokia.request({ type: 'exec', mbean: objName, operation: 'browse()' }, Core.onSuccess(populateTable));
-                }
-            }
-            function onDlq(response) {
-                $scope.dlq = response;
-                Core.$apply($scope);
-            }
-            function intermediateResult() {
-            }
-            function operationSuccess() {
-                $scope.gridOptions.selectedItems.splice(0);
-                Core.notification("success", $scope.message);
-                setTimeout(loadTable, 50);
-            }
-            function moveSuccess() {
-                operationSuccess();
-                workspace.loadTree();
-            }
-            function filterMessages(filter) {
-                var searchConditions = buildSearchConditions(filter);
-                evalFilter(searchConditions);
-            }
-            function evalFilter(searchConditions) {
-                if (!searchConditions || searchConditions.length === 0) {
-                    $scope.messages = $scope.allMessages;
-                }
-                else {
-                    ActiveMQ.log.debug("Filtering conditions:", searchConditions);
-                    $scope.messages = $scope.allMessages.filter(function (message) {
-                        ActiveMQ.log.debug("Message:", message);
-                        var matched = true;
-                        $.each(searchConditions, function (index, condition) {
-                            if (!condition.column) {
-                                matched = matched && evalMessage(message, condition.regex);
-                            }
-                            else {
-                                matched = matched &&
-                                    (message[condition.column] && condition.regex.test(message[condition.column])) ||
-                                    (message.StringProperties && message.StringProperties[condition.column] && condition.regex.test(message.StringProperties[condition.column]));
-                            }
-                        });
-                        return matched;
+            });
+            return answer;
+        }
+        function createProperties(row) {
+            //log.debug("properties: ", row);
+            var answer = {};
+            angular.forEach(row, function (value, key) {
+                if (!ignoreColumns.any(key) && flattenColumns.any(key)) {
+                    angular.forEach(value, function (v2, k2) {
+                        answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + Core.escapeHtml(k2)] = Core.escapeHtml(v2);
                     });
                 }
+            });
+            return answer;
+        }
+        function loadTable() {
+            var objName;
+            if (workspace.selection) {
+                objName = workspace.selection.objectName;
             }
-            function evalMessage(message, regex) {
-                var jmsHeaders = ['JMSDestination', 'JMSDeliveryMode', 'JMSExpiration', 'JMSPriority', 'JMSMessageID', 'JMSTimestamp', 'JMSCorrelationID', 'JMSReplyTo', 'JMSType', 'JMSRedelivered'];
-                for (var i = 0; i < jmsHeaders.length; i++) {
-                    var header = jmsHeaders[i];
-                    if (message[header] && regex.test(message[header])) {
+            else {
+                // in case of refresh
+                var key = location.search()['nid'];
+                var node = workspace.keyToNodeMap[key];
+                objName = node.objectName;
+            }
+            if (objName) {
+                $scope.dlq = false;
+                jolokia.getAttribute(objName, "DLQ", Core.onSuccess(onDlq, { silent: true }));
+                jolokia.request({ type: 'exec', mbean: objName, operation: 'browse()' }, Core.onSuccess(populateTable));
+            }
+        }
+        function onDlq(response) {
+            $scope.dlq = response;
+            Core.$apply($scope);
+        }
+        function intermediateResult() {
+        }
+        function operationSuccess() {
+            $scope.gridOptions.selectedItems.splice(0);
+            Core.notification("success", $scope.message);
+            setTimeout(loadTable, 50);
+        }
+        function moveSuccess() {
+            operationSuccess();
+            workspace.loadTree();
+        }
+        function filterMessages(filter) {
+            var searchConditions = buildSearchConditions(filter);
+            evalFilter(searchConditions);
+        }
+        function evalFilter(searchConditions) {
+            if (!searchConditions || searchConditions.length === 0) {
+                $scope.messages = $scope.allMessages;
+            }
+            else {
+                ActiveMQ.log.debug("Filtering conditions:", searchConditions);
+                $scope.messages = $scope.allMessages.filter(function (message) {
+                    ActiveMQ.log.debug("Message:", message);
+                    var matched = true;
+                    $.each(searchConditions, function (index, condition) {
+                        if (!condition.column) {
+                            matched = matched && evalMessage(message, condition.regex);
+                        }
+                        else {
+                            matched = matched && (message[condition.column] && condition.regex.test(message[condition.column])) || (message.StringProperties && message.StringProperties[condition.column] && condition.regex.test(message.StringProperties[condition.column]));
+                        }
+                    });
+                    return matched;
+                });
+            }
+        }
+        function evalMessage(message, regex) {
+            var jmsHeaders = ['JMSDestination', 'JMSDeliveryMode', 'JMSExpiration', 'JMSPriority', 'JMSMessageID', 'JMSTimestamp', 'JMSCorrelationID', 'JMSReplyTo', 'JMSType', 'JMSRedelivered'];
+            for (var i = 0; i < jmsHeaders.length; i++) {
+                var header = jmsHeaders[i];
+                if (message[header] && regex.test(message[header])) {
+                    return true;
+                }
+            }
+            if (message.StringProperties) {
+                for (var property in message.StringProperties) {
+                    if (regex.test(message.StringProperties[property])) {
                         return true;
                     }
                 }
-                if (message.StringProperties) {
-                    for (var property in message.StringProperties) {
-                        if (regex.test(message.StringProperties[property])) {
-                            return true;
-                        }
+            }
+            if (message.bodyText && regex.test(message.bodyText)) {
+                return true;
+            }
+            return false;
+        }
+        function getRegExp(str, modifiers) {
+            try {
+                return new RegExp(str, modifiers);
+            }
+            catch (err) {
+                return new RegExp(str.replace(/(\^|\$|\(|\)|<|>|\[|\]|\{|\}|\\|\||\.|\*|\+|\?)/g, '\\$1'));
+            }
+        }
+        function buildSearchConditions(filterText) {
+            var searchConditions = [];
+            var qStr;
+            if (!(qStr = $.trim(filterText))) {
+                return;
+            }
+            var columnFilters = qStr.split(";");
+            for (var i = 0; i < columnFilters.length; i++) {
+                var args = columnFilters[i].split(':');
+                if (args.length > 1) {
+                    var columnName = $.trim(args[0]);
+                    var columnValue = $.trim(args[1]);
+                    if (columnName && columnValue) {
+                        searchConditions.push({
+                            column: columnName,
+                            columnDisplay: columnName.replace(/\s+/g, '').toLowerCase(),
+                            regex: getRegExp(columnValue, 'i')
+                        });
                     }
                 }
-                if (message.bodyText && regex.test(message.bodyText)) {
-                    return true;
-                }
-                return false;
-            }
-            function getRegExp(str, modifiers) {
-                try {
-                    return new RegExp(str, modifiers);
-                }
-                catch (err) {
-                    return new RegExp(str.replace(/(\^|\$|\(|\)|<|>|\[|\]|\{|\}|\\|\||\.|\*|\+|\?)/g, '\\$1'));
-                }
-            }
-            function buildSearchConditions(filterText) {
-                var searchConditions = [];
-                var qStr;
-                if (!(qStr = $.trim(filterText))) {
-                    return;
-                }
-                var columnFilters = qStr.split(";");
-                for (var i = 0; i < columnFilters.length; i++) {
-                    var args = columnFilters[i].split(':');
-                    if (args.length > 1) {
-                        var columnName = $.trim(args[0]);
-                        var columnValue = $.trim(args[1]);
-                        if (columnName && columnValue) {
-                            searchConditions.push({
-                                column: columnName,
-                                columnDisplay: columnName.replace(/\s+/g, '').toLowerCase(),
-                                regex: getRegExp(columnValue, 'i')
-                            });
-                        }
-                    }
-                    else {
-                        var val = $.trim(args[0]);
-                        if (val) {
-                            searchConditions.push({
-                                column: '',
-                                regex: getRegExp(val, 'i')
-                            });
-                        }
+                else {
+                    var val = $.trim(args[0]);
+                    if (val) {
+                        searchConditions.push({
+                            column: '',
+                            regex: getRegExp(val, 'i')
+                        });
                     }
                 }
-                return searchConditions;
             }
-        }]);
+            return searchConditions;
+        }
+    }]);
 })(ActiveMQ || (ActiveMQ = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -845,121 +822,121 @@ var ActiveMQ;
 var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ._module.controller("ActiveMQ.DestinationController", ["$scope", "workspace", "$location", "jolokia", function ($scope, workspace, $location, jolokia) {
-            $scope.workspace = workspace;
-            $scope.message = "";
-            $scope.destinationName = "";
-            $scope.queueType = (ActiveMQ.isTopicsFolder(workspace) || ActiveMQ.isTopic(workspace)) ? "false" : "true";
-            $scope.destinationTypeName = $scope.queueType ? "Queue" : "Topic";
-            $scope.deleteDialog = false;
-            $scope.purgeDialog = false;
+        $scope.workspace = workspace;
+        $scope.message = "";
+        $scope.destinationName = "";
+        $scope.queueType = (ActiveMQ.isTopicsFolder(workspace) || ActiveMQ.isTopic(workspace)) ? "false" : "true";
+        $scope.destinationTypeName = $scope.queueType ? "Queue" : "Topic";
+        $scope.deleteDialog = false;
+        $scope.purgeDialog = false;
+        updateQueueType();
+        function updateQueueType() {
+            $scope.destinationTypeName = $scope.queueType === "true" ? "Queue" : "Topic";
+        }
+        $scope.$watch('queueType', function () {
             updateQueueType();
-            function updateQueueType() {
-                $scope.destinationTypeName = $scope.queueType === "true" ? "Queue" : "Topic";
+        });
+        $scope.$watch('workspace.selection', function () {
+            workspace.moveIfViewInvalid();
+        });
+        function operationSuccess() {
+            $scope.destinationName = "";
+            $scope.workspace.operationCounter += 1;
+            Core.notification("success", $scope.message);
+            $scope.workspace.loadTree();
+            Core.$apply($scope);
+        }
+        function deleteSuccess() {
+            // lets set the selection to the parent
+            workspace.removeAndSelectParentNode();
+            $scope.workspace.operationCounter += 1;
+            Core.notification("success", $scope.message);
+            // and switch to show the attributes (table view)
+            $location.path('/jmx/attributes').search({ "main-tab": "activemq", "sub-tab": "activemq-attributes" });
+            Core.$apply($scope);
+        }
+        function getBrokerMBean(jolokia) {
+            var mbean = null;
+            var selection = workspace.selection;
+            if (selection && ActiveMQ.isBroker(workspace) && selection.objectName) {
+                return selection.objectName;
             }
-            $scope.$watch('queueType', function () {
-                updateQueueType();
-            });
-            $scope.$watch('workspace.selection', function () {
-                workspace.moveIfViewInvalid();
-            });
-            function operationSuccess() {
-                $scope.destinationName = "";
-                $scope.workspace.operationCounter += 1;
-                Core.notification("success", $scope.message);
-                $scope.workspace.loadTree();
-                Core.$apply($scope);
-            }
-            function deleteSuccess() {
-                // lets set the selection to the parent
-                workspace.removeAndSelectParentNode();
-                $scope.workspace.operationCounter += 1;
-                Core.notification("success", $scope.message);
-                // and switch to show the attributes (table view)
-                $location.path('/jmx/attributes').search({ "main-tab": "activemq", "sub-tab": "activemq-attributes" });
-                Core.$apply($scope);
-            }
-            function getBrokerMBean(jolokia) {
-                var mbean = null;
-                var selection = workspace.selection;
-                if (selection && ActiveMQ.isBroker(workspace) && selection.objectName) {
-                    return selection.objectName;
+            var folderNames = selection.folderNames;
+            //if (selection && jolokia && folderNames && folderNames.length > 1) {
+            var parent = selection ? selection.parent : null;
+            if (selection && parent && jolokia && folderNames && folderNames.length > 1) {
+                mbean = parent.objectName;
+                // we might be a destination, so lets try one more parent
+                if (!mbean && parent) {
+                    mbean = parent.parent.objectName;
                 }
-                var folderNames = selection.folderNames;
-                //if (selection && jolokia && folderNames && folderNames.length > 1) {
-                var parent = selection ? selection.parent : null;
-                if (selection && parent && jolokia && folderNames && folderNames.length > 1) {
-                    mbean = parent.objectName;
-                    // we might be a destination, so lets try one more parent
-                    if (!mbean && parent) {
-                        mbean = parent.parent.objectName;
-                    }
-                    if (!mbean) {
-                        mbean = "" + folderNames[0] + ":BrokerName=" + folderNames[1] + ",Type=Broker";
-                    }
+                if (!mbean) {
+                    mbean = "" + folderNames[0] + ":BrokerName=" + folderNames[1] + ",Type=Broker";
                 }
-                return mbean;
             }
-            $scope.createDestination = function (name, isQueue) {
-                var mbean = getBrokerMBean(jolokia);
+            return mbean;
+        }
+        $scope.createDestination = function (name, isQueue) {
+            var mbean = getBrokerMBean(jolokia);
+            if (mbean) {
+                var operation;
+                if (isQueue === "true") {
+                    operation = "addQueue(java.lang.String)";
+                    $scope.message = "Created queue " + name;
+                }
+                else {
+                    operation = "addTopic(java.lang.String)";
+                    $scope.message = "Created topic " + name;
+                }
                 if (mbean) {
-                    var operation;
-                    if (isQueue === "true") {
-                        operation = "addQueue(java.lang.String)";
-                        $scope.message = "Created queue " + name;
-                    }
-                    else {
-                        operation = "addTopic(java.lang.String)";
-                        $scope.message = "Created topic " + name;
-                    }
-                    if (mbean) {
-                        jolokia.execute(mbean, operation, name, Core.onSuccess(operationSuccess));
-                    }
-                    else {
-                        Core.notification("error", "Could not find the Broker MBean!");
-                    }
+                    jolokia.execute(mbean, operation, name, Core.onSuccess(operationSuccess));
                 }
-            };
-            $scope.deleteDestination = function () {
-                var mbean = getBrokerMBean(jolokia);
-                var selection = workspace.selection;
-                var entries = selection.entries;
-                if (mbean && selection && jolokia && entries) {
-                    var domain = selection.domain;
-                    var name = entries["Destination"] || entries["destinationName"] || selection.title;
-                    name = name.unescapeHTML();
-                    var isQueue = "Topic" !== (entries["Type"] || entries["destinationType"]);
-                    var operation;
-                    if (isQueue) {
-                        operation = "removeQueue(java.lang.String)";
-                        $scope.message = "Deleted queue " + name;
-                    }
-                    else {
-                        operation = "removeTopic(java.lang.String)";
-                        $scope.message = "Deleted topic " + name;
-                    }
-                    jolokia.execute(mbean, operation, name, Core.onSuccess(deleteSuccess));
+                else {
+                    Core.notification("error", "Could not find the Broker MBean!");
                 }
-            };
-            $scope.purgeDestination = function () {
-                var mbean = workspace.getSelectedMBeanName();
-                var selection = workspace.selection;
-                var entries = selection.entries;
-                if (mbean && selection && jolokia && entries) {
-                    var name = entries["Destination"] || entries["destinationName"] || selection.title;
-                    name = name.unescapeHTML();
-                    var operation = "purge()";
-                    $scope.message = "Purged queue " + name;
-                    jolokia.execute(mbean, operation, Core.onSuccess(operationSuccess));
+            }
+        };
+        $scope.deleteDestination = function () {
+            var mbean = getBrokerMBean(jolokia);
+            var selection = workspace.selection;
+            var entries = selection.entries;
+            if (mbean && selection && jolokia && entries) {
+                var domain = selection.domain;
+                var name = entries["Destination"] || entries["destinationName"] || selection.title;
+                name = name.unescapeHTML();
+                var isQueue = "Topic" !== (entries["Type"] || entries["destinationType"]);
+                var operation;
+                if (isQueue) {
+                    operation = "removeQueue(java.lang.String)";
+                    $scope.message = "Deleted queue " + name;
                 }
-            };
-            $scope.name = function () {
-                var selection = workspace.selection;
-                if (selection) {
-                    return selection.title;
+                else {
+                    operation = "removeTopic(java.lang.String)";
+                    $scope.message = "Deleted topic " + name;
                 }
-                return null;
-            };
-        }]);
+                jolokia.execute(mbean, operation, name, Core.onSuccess(deleteSuccess));
+            }
+        };
+        $scope.purgeDestination = function () {
+            var mbean = workspace.getSelectedMBeanName();
+            var selection = workspace.selection;
+            var entries = selection.entries;
+            if (mbean && selection && jolokia && entries) {
+                var name = entries["Destination"] || entries["destinationName"] || selection.title;
+                name = name.unescapeHTML();
+                var operation = "purge()";
+                $scope.message = "Purged queue " + name;
+                jolokia.execute(mbean, operation, Core.onSuccess(operationSuccess));
+            }
+        };
+        $scope.name = function () {
+            var selection = workspace.selection;
+            if (selection) {
+                return selection.title;
+            }
+            return null;
+        };
+    }]);
 })(ActiveMQ || (ActiveMQ = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -968,161 +945,161 @@ var ActiveMQ;
 var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ._module.controller("ActiveMQ.DurableSubscriberController", ["$scope", "workspace", "jolokia", function ($scope, workspace, jolokia) {
-            $scope.refresh = loadTable;
-            $scope.durableSubscribers = [];
-            $scope.tempData = [];
-            $scope.createSubscriberDialog = new UI.Dialog();
-            $scope.deleteSubscriberDialog = new UI.Dialog();
-            $scope.showSubscriberDialog = new UI.Dialog();
-            $scope.topicName = '';
-            $scope.clientId = '';
-            $scope.subscriberName = '';
-            $scope.subSelector = '';
-            $scope.gridOptions = {
-                selectedItems: [],
-                data: 'durableSubscribers',
-                displayFooter: false,
-                showFilter: false,
-                showColumnMenu: true,
-                enableCellSelection: false,
-                enableColumnResize: true,
-                enableColumnReordering: true,
-                selectWithCheckboxOnly: false,
-                showSelectionCheckbox: false,
-                multiSelect: false,
-                displaySelectionCheckbox: false,
-                filterOptions: {
-                    filterText: ''
+        $scope.refresh = loadTable;
+        $scope.durableSubscribers = [];
+        $scope.tempData = [];
+        $scope.createSubscriberDialog = new UI.Dialog();
+        $scope.deleteSubscriberDialog = new UI.Dialog();
+        $scope.showSubscriberDialog = new UI.Dialog();
+        $scope.topicName = '';
+        $scope.clientId = '';
+        $scope.subscriberName = '';
+        $scope.subSelector = '';
+        $scope.gridOptions = {
+            selectedItems: [],
+            data: 'durableSubscribers',
+            displayFooter: false,
+            showFilter: false,
+            showColumnMenu: true,
+            enableCellSelection: false,
+            enableColumnResize: true,
+            enableColumnReordering: true,
+            selectWithCheckboxOnly: false,
+            showSelectionCheckbox: false,
+            multiSelect: false,
+            displaySelectionCheckbox: false,
+            filterOptions: {
+                filterText: ''
+            },
+            maintainColumnRatios: false,
+            columnDefs: [
+                {
+                    field: 'destinationName',
+                    displayName: 'Topic',
+                    width: '30%'
                 },
-                maintainColumnRatios: false,
-                columnDefs: [
-                    {
-                        field: 'destinationName',
-                        displayName: 'Topic',
-                        width: '30%'
-                    },
-                    {
-                        field: 'clientId',
-                        displayName: 'Client ID',
-                        width: '30%'
-                    },
-                    {
-                        field: 'consumerId',
-                        displayName: 'Consumer ID',
-                        cellTemplate: '<div class="ngCellText"><span ng-hide="row.entity.status != \'Offline\'">{{row.entity.consumerId}}</span><a ng-show="row.entity.status != \'Offline\'" ng-click="openSubscriberDialog(row)">{{row.entity.consumerId}}</a></div>',
-                        width: '30%'
-                    },
-                    {
-                        field: 'status',
-                        displayName: 'Status',
-                        width: '10%'
-                    }
-                ]
-            };
-            $scope.doCreateSubscriber = function (clientId, subscriberName, topicName, subSelector) {
-                $scope.createSubscriberDialog.close();
-                $scope.clientId = clientId;
-                $scope.subscriberName = subscriberName;
-                $scope.topicName = topicName;
-                $scope.subSelector = subSelector;
-                if (Core.isBlank($scope.subSelector)) {
-                    $scope.subSelector = null;
+                {
+                    field: 'clientId',
+                    displayName: 'Client ID',
+                    width: '30%'
+                },
+                {
+                    field: 'consumerId',
+                    displayName: 'Consumer ID',
+                    cellTemplate: '<div class="ngCellText"><span ng-hide="row.entity.status != \'Offline\'">{{row.entity.consumerId}}</span><a ng-show="row.entity.status != \'Offline\'" ng-click="openSubscriberDialog(row)">{{row.entity.consumerId}}</a></div>',
+                    width: '30%'
+                },
+                {
+                    field: 'status',
+                    displayName: 'Status',
+                    width: '10%'
                 }
-                var mbean = getBrokerMBean(jolokia);
-                if (mbean) {
-                    jolokia.execute(mbean, "createDurableSubscriber(java.lang.String, java.lang.String, java.lang.String, java.lang.String)", $scope.clientId, $scope.subscriberName, $scope.topicName, $scope.subSelector, Core.onSuccess(function () {
-                        Core.notification('success', "Created durable subscriber " + clientId);
-                        $scope.clientId = '';
-                        $scope.subscriberName = '';
-                        $scope.topicName = '';
-                        $scope.subSelector = '';
-                        loadTable();
-                    }));
-                }
-                else {
-                    Core.notification("error", "Could not find the Broker MBean!");
-                }
-            };
-            $scope.deleteSubscribers = function () {
-                var mbean = $scope.gridOptions.selectedItems[0]._id;
-                jolokia.execute(mbean, "destroy()", Core.onSuccess(function () {
-                    $scope.showSubscriberDialog.close();
-                    Core.notification('success', "Deleted durable subscriber");
+            ]
+        };
+        $scope.doCreateSubscriber = function (clientId, subscriberName, topicName, subSelector) {
+            $scope.createSubscriberDialog.close();
+            $scope.clientId = clientId;
+            $scope.subscriberName = subscriberName;
+            $scope.topicName = topicName;
+            $scope.subSelector = subSelector;
+            if (Core.isBlank($scope.subSelector)) {
+                $scope.subSelector = null;
+            }
+            var mbean = getBrokerMBean(jolokia);
+            if (mbean) {
+                jolokia.execute(mbean, "createDurableSubscriber(java.lang.String, java.lang.String, java.lang.String, java.lang.String)", $scope.clientId, $scope.subscriberName, $scope.topicName, $scope.subSelector, Core.onSuccess(function () {
+                    Core.notification('success', "Created durable subscriber " + clientId);
+                    $scope.clientId = '';
+                    $scope.subscriberName = '';
+                    $scope.topicName = '';
+                    $scope.subSelector = '';
                     loadTable();
-                    $scope.gridOptions.selectedItems.splice(0, $scope.gridOptions.selectedItems.length);
                 }));
-            };
-            $scope.openSubscriberDialog = function (subscriber) {
-                jolokia.request({ type: "read", mbean: subscriber.entity._id }, Core.onSuccess(function (response) {
-                    $scope.showSubscriberDialog.subscriber = response.value;
-                    $scope.showSubscriberDialog.subscriber.Status = subscriber.entity.status;
-                    console.log("Subscriber is now " + $scope.showSubscriberDialog.subscriber);
-                    Core.$apply($scope);
-                    // now lets start opening the dialog
-                    setTimeout(function () {
-                        $scope.showSubscriberDialog.open();
-                        Core.$apply($scope);
-                    }, 100);
-                }));
-            };
-            $scope.topicNames = function (completionText) {
-                var topicsFolder = ActiveMQ.getSelectionTopicsFolder(workspace);
-                return (topicsFolder) ? topicsFolder.children.map(function (n) { return n.title; }) : [];
-            };
-            $scope.$watch('workspace.selection', function () {
-                if (workspace.moveIfViewInvalid())
-                    return;
-                // lets defer execution as we may not have the selection just yet
-                setTimeout(loadTable, 50);
-            });
-            function loadTable() {
-                var mbean = getBrokerMBean(jolokia);
-                if (mbean) {
-                    $scope.durableSubscribers = [];
-                    jolokia.request({ type: "read", mbean: mbean, attribute: ["DurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "DurableTopicSubscribers", "Active"); }));
-                    jolokia.request({ type: "read", mbean: mbean, attribute: ["InactiveDurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "InactiveDurableTopicSubscribers", "Offline"); }));
-                }
             }
-            function populateTable(response, attr, status) {
-                var data = response.value;
-                ActiveMQ.log.debug("Got data: ", data);
-                $scope.durableSubscribers.push.apply($scope.durableSubscribers, data[attr].map(function (o) {
-                    var objectName = o["objectName"];
-                    var entries = Core.objectNameProperties(objectName);
-                    if (!('objectName' in o)) {
-                        if ('canonicalName' in o) {
-                            objectName = o['canonicalName'];
-                        }
-                        entries = _.cloneDeep(o['keyPropertyList']);
-                    }
-                    entries["_id"] = objectName;
-                    entries["status"] = status;
-                    return entries;
-                }));
+            else {
+                Core.notification("error", "Could not find the Broker MBean!");
+            }
+        };
+        $scope.deleteSubscribers = function () {
+            var mbean = $scope.gridOptions.selectedItems[0]._id;
+            jolokia.execute(mbean, "destroy()", Core.onSuccess(function () {
+                $scope.showSubscriberDialog.close();
+                Core.notification('success', "Deleted durable subscriber");
+                loadTable();
+                $scope.gridOptions.selectedItems.splice(0, $scope.gridOptions.selectedItems.length);
+            }));
+        };
+        $scope.openSubscriberDialog = function (subscriber) {
+            jolokia.request({ type: "read", mbean: subscriber.entity._id }, Core.onSuccess(function (response) {
+                $scope.showSubscriberDialog.subscriber = response.value;
+                $scope.showSubscriberDialog.subscriber.Status = subscriber.entity.status;
+                console.log("Subscriber is now " + $scope.showSubscriberDialog.subscriber);
                 Core.$apply($scope);
+                // now lets start opening the dialog
+                setTimeout(function () {
+                    $scope.showSubscriberDialog.open();
+                    Core.$apply($scope);
+                }, 100);
+            }));
+        };
+        $scope.topicNames = function (completionText) {
+            var topicsFolder = ActiveMQ.getSelectionTopicsFolder(workspace);
+            return (topicsFolder) ? topicsFolder.children.map(function (n) { return n.title; }) : [];
+        };
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid())
+                return;
+            // lets defer execution as we may not have the selection just yet
+            setTimeout(loadTable, 50);
+        });
+        function loadTable() {
+            var mbean = getBrokerMBean(jolokia);
+            if (mbean) {
+                $scope.durableSubscribers = [];
+                jolokia.request({ type: "read", mbean: mbean, attribute: ["DurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "DurableTopicSubscribers", "Active"); }));
+                jolokia.request({ type: "read", mbean: mbean, attribute: ["InactiveDurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "InactiveDurableTopicSubscribers", "Offline"); }));
             }
-            function getBrokerMBean(jolokia) {
-                var mbean = null;
-                var selection = workspace.selection;
-                if (selection && ActiveMQ.isBroker(workspace) && selection.objectName) {
-                    return selection.objectName;
-                }
-                var folderNames = selection.folderNames;
-                //if (selection && jolokia && folderNames && folderNames.length > 1) {
-                var parent = selection ? selection.parent : null;
-                if (selection && parent && jolokia && folderNames && folderNames.length > 1) {
-                    mbean = parent.objectName;
-                    // we might be a destination, so lets try one more parent
-                    if (!mbean && parent) {
-                        mbean = parent.parent.objectName;
+        }
+        function populateTable(response, attr, status) {
+            var data = response.value;
+            ActiveMQ.log.debug("Got data: ", data);
+            $scope.durableSubscribers.push.apply($scope.durableSubscribers, data[attr].map(function (o) {
+                var objectName = o["objectName"];
+                var entries = Core.objectNameProperties(objectName);
+                if (!('objectName' in o)) {
+                    if ('canonicalName' in o) {
+                        objectName = o['canonicalName'];
                     }
-                    if (!mbean) {
-                        mbean = "" + folderNames[0] + ":BrokerName=" + folderNames[1] + ",Type=Broker";
-                    }
+                    entries = _.cloneDeep(o['keyPropertyList']);
                 }
-                return mbean;
+                entries["_id"] = objectName;
+                entries["status"] = status;
+                return entries;
+            }));
+            Core.$apply($scope);
+        }
+        function getBrokerMBean(jolokia) {
+            var mbean = null;
+            var selection = workspace.selection;
+            if (selection && ActiveMQ.isBroker(workspace) && selection.objectName) {
+                return selection.objectName;
             }
-        }]);
+            var folderNames = selection.folderNames;
+            //if (selection && jolokia && folderNames && folderNames.length > 1) {
+            var parent = selection ? selection.parent : null;
+            if (selection && parent && jolokia && folderNames && folderNames.length > 1) {
+                mbean = parent.objectName;
+                // we might be a destination, so lets try one more parent
+                if (!mbean && parent) {
+                    mbean = parent.parent.objectName;
+                }
+                if (!mbean) {
+                    mbean = "" + folderNames[0] + ":BrokerName=" + folderNames[1] + ",Type=Broker";
+                }
+            }
+            return mbean;
+        }
+    }]);
 })(ActiveMQ || (ActiveMQ = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -1131,114 +1108,114 @@ var ActiveMQ;
 var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ._module.controller("ActiveMQ.JobSchedulerController", ["$scope", "workspace", "jolokia", function ($scope, workspace, jolokia) {
-            $scope.refresh = loadTable;
-            $scope.jobs = [];
-            $scope.deleteJobsDialog = new UI.Dialog();
-            $scope.gridOptions = {
-                selectedItems: [],
-                data: 'jobs',
-                displayFooter: false,
-                showFilter: false,
-                showColumnMenu: true,
-                enableColumnResize: true,
-                enableColumnReordering: true,
-                filterOptions: {
-                    filterText: ''
+        $scope.refresh = loadTable;
+        $scope.jobs = [];
+        $scope.deleteJobsDialog = new UI.Dialog();
+        $scope.gridOptions = {
+            selectedItems: [],
+            data: 'jobs',
+            displayFooter: false,
+            showFilter: false,
+            showColumnMenu: true,
+            enableColumnResize: true,
+            enableColumnReordering: true,
+            filterOptions: {
+                filterText: ''
+            },
+            selectWithCheckboxOnly: true,
+            showSelectionCheckbox: true,
+            maintainColumnRatios: false,
+            columnDefs: [
+                {
+                    field: 'jobId',
+                    displayName: 'Job ID',
+                    width: '25%'
                 },
-                selectWithCheckboxOnly: true,
-                showSelectionCheckbox: true,
-                maintainColumnRatios: false,
-                columnDefs: [
-                    {
-                        field: 'jobId',
-                        displayName: 'Job ID',
-                        width: '25%'
-                    },
-                    {
-                        field: 'cronEntry',
-                        displayName: 'Cron Entry',
-                        width: '10%'
-                    },
-                    {
-                        field: 'delay',
-                        displayName: 'Delay',
-                        width: '5%'
-                    },
-                    {
-                        field: 'repeat',
-                        displayName: 'repeat',
-                        width: '5%'
-                    },
-                    {
-                        field: 'period',
-                        displayName: 'period',
-                        width: '5%'
-                    },
-                    {
-                        field: 'start',
-                        displayName: 'Start',
-                        width: '25%'
-                    },
-                    {
-                        field: 'next',
-                        displayName: 'Next',
-                        width: '25%'
-                    }
-                ]
-            };
-            $scope.$watch('workspace.selection', function () {
-                if (workspace.moveIfViewInvalid())
-                    return;
-                // lets defer execution as we may not have the selection just yet
-                setTimeout(loadTable, 50);
-            });
-            function loadTable() {
-                var selection = workspace.selection;
-                if (selection) {
-                    var mbean = selection.objectName;
-                    if (mbean) {
-                        jolokia.request({ type: 'read', mbean: mbean, attribute: "AllJobs" }, Core.onSuccess(populateTable));
-                    }
+                {
+                    field: 'cronEntry',
+                    displayName: 'Cron Entry',
+                    width: '10%'
+                },
+                {
+                    field: 'delay',
+                    displayName: 'Delay',
+                    width: '5%'
+                },
+                {
+                    field: 'repeat',
+                    displayName: 'repeat',
+                    width: '5%'
+                },
+                {
+                    field: 'period',
+                    displayName: 'period',
+                    width: '5%'
+                },
+                {
+                    field: 'start',
+                    displayName: 'Start',
+                    width: '25%'
+                },
+                {
+                    field: 'next',
+                    displayName: 'Next',
+                    width: '25%'
                 }
-                Core.$apply($scope);
-            }
-            function populateTable(response) {
-                var data = response.value;
-                if (!angular.isArray(data)) {
-                    $scope.jobs = [];
-                    angular.forEach(data, function (value, idx) {
-                        $scope.jobs.push(value);
-                    });
-                }
-                else {
-                    $scope.jobs = data;
-                }
-                Core.$apply($scope);
-            }
-            $scope.deleteJobs = function () {
-                var selection = workspace.selection;
+            ]
+        };
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid())
+                return;
+            // lets defer execution as we may not have the selection just yet
+            setTimeout(loadTable, 50);
+        });
+        function loadTable() {
+            var selection = workspace.selection;
+            if (selection) {
                 var mbean = selection.objectName;
-                if (mbean && selection) {
-                    var selectedItems = $scope.gridOptions.selectedItems;
-                    $scope.message = "Deleted " + Core.maybePlural(selectedItems.length, "job");
-                    var operation = "removeJob(java.lang.String)";
-                    angular.forEach(selectedItems, function (item, idx) {
-                        var id = item.jobId;
-                        if (id) {
-                            var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
-                            jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
-                        }
-                    });
+                if (mbean) {
+                    jolokia.request({ type: 'read', mbean: mbean, attribute: "AllJobs" }, Core.onSuccess(populateTable));
                 }
-            };
-            function intermediateResult() {
             }
-            function operationSuccess() {
-                $scope.gridOptions.selectedItems.splice(0);
-                Core.notification("success", $scope.message);
-                setTimeout(loadTable, 50);
+            Core.$apply($scope);
+        }
+        function populateTable(response) {
+            var data = response.value;
+            if (!angular.isArray(data)) {
+                $scope.jobs = [];
+                angular.forEach(data, function (value, idx) {
+                    $scope.jobs.push(value);
+                });
             }
-        }]);
+            else {
+                $scope.jobs = data;
+            }
+            Core.$apply($scope);
+        }
+        $scope.deleteJobs = function () {
+            var selection = workspace.selection;
+            var mbean = selection.objectName;
+            if (mbean && selection) {
+                var selectedItems = $scope.gridOptions.selectedItems;
+                $scope.message = "Deleted " + Core.maybePlural(selectedItems.length, "job");
+                var operation = "removeJob(java.lang.String)";
+                angular.forEach(selectedItems, function (item, idx) {
+                    var id = item.jobId;
+                    if (id) {
+                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
+                        jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
+                    }
+                });
+            }
+        };
+        function intermediateResult() {
+        }
+        function operationSuccess() {
+            $scope.gridOptions.selectedItems.splice(0);
+            Core.notification("success", $scope.message);
+            setTimeout(loadTable, 50);
+        }
+    }]);
 })(ActiveMQ || (ActiveMQ = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -1250,56 +1227,56 @@ var ActiveMQ;
 var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ._module.controller("ActiveMQ.PreferencesController", ["$scope", "localStorage", "userDetails", "$rootScope", function ($scope, localStorage, userDetails, $rootScope) {
-            var config = {
-                properties: {
-                    activemqUserName: {
-                        type: 'string',
-                        description: 'The user name to be used when connecting to the broker'
+        var config = {
+            properties: {
+                activemqUserName: {
+                    type: 'string',
+                    description: 'The user name to be used when connecting to the broker'
+                },
+                activemqPassword: {
+                    type: 'string',
+                    description: 'Password to be used when connecting to the broker'
+                },
+                activemqFilterAdvisoryTopics: {
+                    type: 'boolean',
+                    default: 'false',
+                    description: 'Whether to exclude advisory topics in tree/table'
+                },
+                activemqBrowseBytesMessages: {
+                    type: 'number',
+                    enum: {
+                        'Hex and text': 1,
+                        'Decimal and text': 2,
+                        'Hex': 4,
+                        'Decimal': 8,
+                        'Off': 99
                     },
-                    activemqPassword: {
-                        type: 'string',
-                        description: 'Password to be used when connecting to the broker'
-                    },
-                    activemqFilterAdvisoryTopics: {
-                        type: 'boolean',
-                        default: 'false',
-                        description: 'Whether to exclude advisory topics in tree/table'
-                    },
-                    activemqBrowseBytesMessages: {
-                        type: 'number',
-                        enum: {
-                            'Hex and text': 1,
-                            'Decimal and text': 2,
-                            'Hex': 4,
-                            'Decimal': 8,
-                            'Off': 99
-                        },
-                        description: 'Browsing byte messages should display the message body as'
-                    }
+                    description: 'Browsing byte messages should display the message body as'
                 }
-            };
-            $scope.entity = $scope;
-            $scope.config = config;
-            Core.initPreferenceScope($scope, localStorage, {
-                'activemqUserName': {
-                    'value': userDetails.username ? userDetails.username : ""
-                },
-                'activemqPassword': {
-                    'value': userDetails.password ? userDetails.password : ""
-                },
-                'activemqBrowseBytesMessages': {
-                    'value': 1,
-                    'converter': parseInt
-                },
-                'activemqFilterAdvisoryTopics': {
-                    'value': false,
-                    'converter': Core.parseBooleanValue,
-                    'post': function (newValue) {
-                        $rootScope.$broadcast('jmxTreeUpdated');
-                    }
+            }
+        };
+        $scope.entity = $scope;
+        $scope.config = config;
+        Core.initPreferenceScope($scope, localStorage, {
+            'activemqUserName': {
+                'value': userDetails.username ? userDetails.username : ""
+            },
+            'activemqPassword': {
+                'value': userDetails.password ? userDetails.password : ""
+            },
+            'activemqBrowseBytesMessages': {
+                'value': 1,
+                'converter': parseInt
+            },
+            'activemqFilterAdvisoryTopics': {
+                'value': false,
+                'converter': Core.parseBooleanValue,
+                'post': function (newValue) {
+                    $rootScope.$broadcast('jmxTreeUpdated');
                 }
-            });
-        }]);
+            }
+        });
+    }]);
 })(ActiveMQ || (ActiveMQ = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -1308,92 +1285,92 @@ var ActiveMQ;
 var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ._module.controller("ActiveMQ.TreeHeaderController", ["$scope", function ($scope) {
-            $scope.expandAll = function () {
-                Tree.expandAll("#activemqtree");
-            };
-            $scope.contractAll = function () {
-                Tree.contractAll("#activemqtree");
-            };
-        }]);
+        $scope.expandAll = function () {
+            Tree.expandAll("#activemqtree");
+        };
+        $scope.contractAll = function () {
+            Tree.contractAll("#activemqtree");
+        };
+    }]);
     ActiveMQ._module.controller("ActiveMQ.TreeController", ["$scope", "$location", "workspace", "localStorage", function ($scope, $location, workspace, localStorage) {
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                setTimeout(updateSelectionFromURL, 50);
-            });
-            $scope.$watch('workspace.tree', function () {
-                reloadTree();
-            });
-            $scope.$on('jmxTreeUpdated', function () {
-                reloadTree();
-            });
-            function reloadTree() {
-                ActiveMQ.log.debug("workspace tree has changed, lets reload the activemq tree");
-                var children = [];
-                var tree = workspace.tree;
-                if (tree) {
-                    var domainName = "org.apache.activemq";
-                    var folder = tree.get(domainName);
-                    if (folder) {
-                        children = folder.children;
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            setTimeout(updateSelectionFromURL, 50);
+        });
+        $scope.$watch('workspace.tree', function () {
+            reloadTree();
+        });
+        $scope.$on('jmxTreeUpdated', function () {
+            reloadTree();
+        });
+        function reloadTree() {
+            ActiveMQ.log.debug("workspace tree has changed, lets reload the activemq tree");
+            var children = [];
+            var tree = workspace.tree;
+            if (tree) {
+                var domainName = "org.apache.activemq";
+                var folder = tree.get(domainName);
+                if (folder) {
+                    children = folder.children;
+                }
+                if (children.length) {
+                    var firstChild = children[0];
+                    // the children could be AMQ 5.7 style broker name folder with the actual MBean in the children
+                    // along with folders for the Queues etc...
+                    if (!firstChild.typeName && firstChild.children.length < 4) {
+                        // lets avoid the top level folder
+                        var answer = [];
+                        angular.forEach(children, function (child) {
+                            answer = answer.concat(child.children);
+                        });
+                        children = answer;
                     }
-                    if (children.length) {
-                        var firstChild = children[0];
-                        // the children could be AMQ 5.7 style broker name folder with the actual MBean in the children
-                        // along with folders for the Queues etc...
-                        if (!firstChild.typeName && firstChild.children.length < 4) {
-                            // lets avoid the top level folder
-                            var answer = [];
-                            angular.forEach(children, function (child) {
-                                answer = answer.concat(child.children);
-                            });
-                            children = answer;
-                        }
-                    }
-                    // filter out advisory topics
-                    children.forEach(function (broker) {
-                        var grandChildren = broker.children;
-                        if (grandChildren) {
-                            Tree.sanitize(grandChildren);
-                            var idx = grandChildren.findIndex(function (n) { return n.title === "Topic"; });
-                            if (idx > 0) {
-                                var old = grandChildren[idx];
-                                // we need to store all topics the first time on the workspace
-                                // so we have access to them later if the user changes the filter in the preferences
-                                var key = "ActiveMQ-allTopics-" + broker.title;
-                                var allTopics = old.children.clone();
-                                workspace.mapData[key] = allTopics;
-                                var filter = Core.parseBooleanValue(localStorage["activemqFilterAdvisoryTopics"]);
-                                if (filter) {
-                                    if (old && old.children) {
-                                        var filteredTopics = old.children.filter(function (c) { return !c.title.startsWith("ActiveMQ.Advisory"); });
-                                        old.children = filteredTopics;
-                                    }
-                                }
-                                else if (allTopics) {
-                                    old.children = allTopics;
+                }
+                // filter out advisory topics
+                children.forEach(function (broker) {
+                    var grandChildren = broker.children;
+                    if (grandChildren) {
+                        Tree.sanitize(grandChildren);
+                        var idx = grandChildren.findIndex(function (n) { return n.title === "Topic"; });
+                        if (idx > 0) {
+                            var old = grandChildren[idx];
+                            // we need to store all topics the first time on the workspace
+                            // so we have access to them later if the user changes the filter in the preferences
+                            var key = "ActiveMQ-allTopics-" + broker.title;
+                            var allTopics = old.children.clone();
+                            workspace.mapData[key] = allTopics;
+                            var filter = Core.parseBooleanValue(localStorage["activemqFilterAdvisoryTopics"]);
+                            if (filter) {
+                                if (old && old.children) {
+                                    var filteredTopics = old.children.filter(function (c) { return !c.title.startsWith("ActiveMQ.Advisory"); });
+                                    old.children = filteredTopics;
                                 }
                             }
+                            else if (allTopics) {
+                                old.children = allTopics;
+                            }
                         }
-                    });
-                    var treeElement = $("#activemqtree");
-                    Jmx.enableTree($scope, $location, workspace, treeElement, children, true);
-                    // lets do this asynchronously to avoid Error: $digest already in progress
-                    setTimeout(updateSelectionFromURL, 50);
-                }
-            }
-            function updateSelectionFromURL() {
-                Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $("#activemqtree"), function (first) {
-                    // use function to auto select the queue folder on the 1st broker
-                    var queues = first.getChildren()[0];
-                    if (queues && queues.data.title === 'Queue') {
-                        first = queues;
-                        first.expand(true);
-                        return first;
                     }
-                    return null;
-                }, true);
+                });
+                var treeElement = $("#activemqtree");
+                Jmx.enableTree($scope, $location, workspace, treeElement, children, true);
+                // lets do this asynchronously to avoid Error: $digest already in progress
+                setTimeout(updateSelectionFromURL, 50);
             }
-        }]);
+        }
+        function updateSelectionFromURL() {
+            Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $("#activemqtree"), function (first) {
+                // use function to auto select the queue folder on the 1st broker
+                var queues = first.getChildren()[0];
+                if (queues && queues.data.title === 'Queue') {
+                    first = queues;
+                    first.expand(true);
+                    return first;
+                }
+                return null;
+            }, true);
+        }
+    }]);
 })(ActiveMQ || (ActiveMQ = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -2469,9 +2446,7 @@ var Camel;
                     messageData.headers[key] = value;
                 if (typeName)
                     messageData.headerTypes[key] = typeName;
-                headerHtml += "<tr><td class='property-name'>" + key + "</td>" +
-                    "<td class='property-value'>" + (humanizeJavaType(typeName)) + "</td>" +
-                    "<td class='property-value'>" + (value || "") + "</td></tr>";
+                headerHtml += "<tr><td class='property-name'>" + key + "</td>" + "<td class='property-value'>" + (humanizeJavaType(typeName)) + "</td>" + "<td class='property-value'>" + (value || "") + "</td></tr>";
             }
         });
         messageData.headerHtml = headerHtml;
@@ -2630,8 +2605,7 @@ var Camel;
                 }
                 //console.log("Image URL is " + imageUrl);
                 var cid = route.getAttribute("_cid") || route.getAttribute("id");
-                node = { "name": name, "label": label, "labelSummary": labelSummary, "group": 1, "id": id, "elementId": elementID,
-                    "x": x, "y:": y, "imageUrl": imageUrl, "cid": cid, "tooltip": tooltip, "type": nodeId };
+                node = { "name": name, "label": label, "labelSummary": labelSummary, "group": 1, "id": id, "elementId": elementID, "x": x, "y:": y, "imageUrl": imageUrl, "cid": cid, "tooltip": tooltip, "type": nodeId };
                 if (rid) {
                     node["rid"] = rid;
                     if (!$scope.routeNodes)
@@ -2748,7 +2722,6 @@ var Camel;
                     routeIndices.push(i);
                 }
             }
-            // lets go backwards removing all the text nodes on either side of each route along with the route
             while (routeIndices.length) {
                 var idx = routeIndices.pop();
                 var nextIndex = idx + 1;
@@ -3061,26 +3034,8 @@ var Camel;
     var contextToolBar = "plugins/camel/html/attributeToolBarContext.html";
     Camel._module = angular.module(Camel.pluginName, []);
     Camel._module.config(["$routeProvider", function ($routeProvider) {
-            $routeProvider
-                .when('/camel/browseEndpoint', { templateUrl: 'plugins/camel/html/browseEndpoint.html' })
-                .when('/camel/endpoint/browse/:contextId/*endpointPath', { templateUrl: 'plugins/camel/html/browseEndpoint.html' })
-                .when('/camel/createEndpoint', { templateUrl: 'plugins/camel/html/createEndpoint.html' })
-                .when('/camel/route/diagram/:contextId/:routeId', { templateUrl: 'plugins/camel/html/routes.html' })
-                .when('/camel/routes', { templateUrl: 'plugins/camel/html/routes.html' })
-                .when('/camel/typeConverter', { templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false })
-                .when('/camel/restRegistry', { templateUrl: 'plugins/camel/html/restRegistry.html', reloadOnSearch: false })
-                .when('/camel/endpointRuntimeRegistry', { templateUrl: 'plugins/camel/html/endpointRuntimeRegistry.html', reloadOnSearch: false })
-                .when('/camel/routeMetrics', { templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false })
-                .when('/camel/inflight', { templateUrl: 'plugins/camel/html/inflight.html', reloadOnSearch: false })
-                .when('/camel/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false })
-                .when('/camel/source', { templateUrl: 'plugins/camel/html/source.html' })
-                .when('/camel/traceRoute', { templateUrl: 'plugins/camel/html/traceRoute.html' })
-                .when('/camel/debugRoute', { templateUrl: 'plugins/camel/html/debug.html' })
-                .when('/camel/profileRoute', { templateUrl: 'plugins/camel/html/profileRoute.html' })
-                .when('/camel/properties', { templateUrl: 'plugins/camel/html/properties.html' })
-                .when('/camel/propertiesComponent', { templateUrl: 'plugins/camel/html/propertiesComponent.html' })
-                .when('/camel/propertiesEndpoint', { templateUrl: 'plugins/camel/html/propertiesEndpoint.html' });
-        }]);
+        $routeProvider.when('/camel/browseEndpoint', { templateUrl: 'plugins/camel/html/browseEndpoint.html' }).when('/camel/endpoint/browse/:contextId/*endpointPath', { templateUrl: 'plugins/camel/html/browseEndpoint.html' }).when('/camel/createEndpoint', { templateUrl: 'plugins/camel/html/createEndpoint.html' }).when('/camel/route/diagram/:contextId/:routeId', { templateUrl: 'plugins/camel/html/routes.html' }).when('/camel/routes', { templateUrl: 'plugins/camel/html/routes.html' }).when('/camel/typeConverter', { templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false }).when('/camel/restRegistry', { templateUrl: 'plugins/camel/html/restRegistry.html', reloadOnSearch: false }).when('/camel/endpointRuntimeRegistry', { templateUrl: 'plugins/camel/html/endpointRuntimeRegistry.html', reloadOnSearch: false }).when('/camel/routeMetrics', { templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false }).when('/camel/inflight', { templateUrl: 'plugins/camel/html/inflight.html', reloadOnSearch: false }).when('/camel/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false }).when('/camel/source', { templateUrl: 'plugins/camel/html/source.html' }).when('/camel/traceRoute', { templateUrl: 'plugins/camel/html/traceRoute.html' }).when('/camel/debugRoute', { templateUrl: 'plugins/camel/html/debug.html' }).when('/camel/profileRoute', { templateUrl: 'plugins/camel/html/profileRoute.html' }).when('/camel/properties', { templateUrl: 'plugins/camel/html/properties.html' }).when('/camel/propertiesComponent', { templateUrl: 'plugins/camel/html/propertiesComponent.html' }).when('/camel/propertiesDataFormat', { templateUrl: 'plugins/camel/html/propertiesDataFormat.html' }).when('/camel/propertiesEndpoint', { templateUrl: 'plugins/camel/html/propertiesEndpoint.html' });
+    }]);
     Camel._module.factory('tracerStatus', function () {
         return {
             jhandle: null,
@@ -3093,479 +3048,435 @@ var Camel;
     });
     // service for the codehale metrics
     Camel._module.factory('metricsWatcher', ["$window", function ($window) {
-            var answer = $window.metricsWatcher;
-            if (!answer) {
-                // lets avoid any NPEs
-                answer = {};
-                $window.metricsWatcher = answer;
-            }
-            return answer;
-        }]);
+        var answer = $window.metricsWatcher;
+        if (!answer) {
+            // lets avoid any NPEs
+            answer = {};
+            $window.metricsWatcher = answer;
+        }
+        return answer;
+    }]);
     Camel._module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", function (nav, workspace, jolokia, viewRegistry, layoutFull, helpRegistry, preferencesRegistry, $templateCache, $location) {
-            viewRegistry['camel/endpoint/'] = layoutFull;
-            viewRegistry['camel/route/'] = layoutFull;
-            viewRegistry['{ "main-tab": "camel" }'] = 'plugins/camel/html/layoutCamelTree.html';
-            helpRegistry.addUserDoc('camel', 'plugins/camel/doc/help.md', function () {
-                return workspace.treeContainsDomainAndProperties(Camel.jmxDomain);
-            });
-            preferencesRegistry.addTab('Camel', 'plugins/camel/html/preferences.html', function () {
-                return workspace.treeContainsDomainAndProperties(Camel.jmxDomain);
-            });
-            // TODO should really do this via a service that the JMX plugin exposes
-            Jmx.addAttributeToolBar(Camel.pluginName, Camel.jmxDomain, function (selection) {
-                // TODO there should be a nicer way to do this!
-                var typeName = selection.typeName;
-                if (typeName) {
-                    if (typeName.startsWith("context"))
-                        return contextToolBar;
-                    if (typeName.startsWith("route"))
-                        return routeToolBar;
-                }
-                var folderNames = selection.folderNames;
-                if (folderNames && selection.domain === Camel.jmxDomain) {
-                    var last = folderNames.last();
-                    if ("routes" === last)
-                        return routeToolBar;
-                    if ("context" === last)
-                        return contextToolBar;
-                }
-                return null;
-            });
-            // register default attribute views
-            var stateField = 'State';
-            var stateTemplate = '<div class="ngCellText pagination-centered" title="{{row.getProperty(col.field)}}"><i class="{{row.getProperty(\'' + stateField + '\') | camelIconClass}}"></i></div>';
-            var stateColumn = { field: stateField, displayName: stateField,
-                cellTemplate: stateTemplate,
-                width: 56,
-                minWidth: 56,
-                maxWidth: 56,
-                resizable: false,
-                defaultSort: false
-            };
-            var attributes = workspace.attributeColumnDefs;
-            attributes[Camel.jmxDomain + "/context/folder"] = [
-                stateColumn,
-                { field: 'CamelId', displayName: 'Context' },
-                { field: 'Uptime', displayName: 'Uptime', visible: false },
-                { field: 'CamelVersion', displayName: 'Version', visible: false },
-                { field: 'ExchangesCompleted', displayName: 'Completed' },
-                { field: 'ExchangesFailed', displayName: 'Failed' },
-                { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
-                { field: 'ExchangesTotal', displayName: 'Total', visible: false },
-                { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
-                { field: 'ExchangesInflight', displayName: 'Inflight' },
-                { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
-                { field: 'MeanProcessingTime', displayName: 'Mean Time' },
-                { field: 'MinProcessingTime', displayName: 'Min Time' },
-                { field: 'MaxProcessingTime', displayName: 'Max Time' },
-                { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
-                { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
-                { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
-                { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
-                { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
-                { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false },
-                { field: 'StartedRoutes', displayName: 'Started Routes' },
-                { field: 'TotalRoutes', displayName: 'Total Routes' }
-            ];
-            attributes[Camel.jmxDomain + "/routes/folder"] = [
-                stateColumn,
-                { field: 'CamelId', displayName: 'Context' },
-                { field: 'RouteId', displayName: 'Route' },
-                { field: 'ExchangesCompleted', displayName: 'Completed' },
-                { field: 'ExchangesFailed', displayName: 'Failed' },
-                { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
-                { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
-                { field: 'ExchangesTotal', displayName: 'Total', visible: false },
-                { field: 'ExchangesInflight', displayName: 'Inflight' },
-                { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
-                { field: 'MeanProcessingTime', displayName: 'Mean Time' },
-                { field: 'MinProcessingTime', displayName: 'Min Time' },
-                { field: 'MaxProcessingTime', displayName: 'Max Time' },
-                { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
-                { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
-                { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
-                { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
-                { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
-                { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
-                { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false }
-            ];
-            attributes[Camel.jmxDomain + "/processors/folder"] = [
-                stateColumn,
-                { field: 'CamelId', displayName: 'Context' },
-                { field: 'RouteId', displayName: 'Route' },
-                { field: 'ProcessorId', displayName: 'Processor' },
-                { field: 'ExchangesCompleted', displayName: 'Completed' },
-                { field: 'ExchangesFailed', displayName: 'Failed' },
-                { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
-                { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
-                { field: 'ExchangesTotal', displayName: 'Total', visible: false },
-                { field: 'ExchangesInflight', displayName: 'Inflight' },
-                { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
-                { field: 'MeanProcessingTime', displayName: 'Mean Time' },
-                { field: 'MinProcessingTime', displayName: 'Min Time' },
-                { field: 'MaxProcessingTime', displayName: 'Max Time' },
-                { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
-                { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
-                { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
-                { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
-                { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
-                { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false }
-            ];
-            attributes[Camel.jmxDomain + "/components/folder"] = [
-                stateColumn,
-                { field: 'CamelId', displayName: 'Context' },
-                { field: 'ComponentName', displayName: 'Name' }
-            ];
-            attributes[Camel.jmxDomain + "/consumers/folder"] = [
-                stateColumn,
-                { field: 'CamelId', displayName: 'Context' },
-                { field: 'RouteId', displayName: 'Route' },
-                { field: 'EndpointUri', displayName: 'Endpoint URI', width: "**" },
-                { field: 'Suspended', displayName: 'Suspended', resizable: false },
-                { field: 'InflightExchanges', displayName: 'Inflight' }
-            ];
-            attributes[Camel.jmxDomain + "/producers/folder"] = [
-                stateColumn,
-                { field: 'CamelId', displayName: 'Context' },
-                { field: 'RouteId', displayName: 'Route' },
-                { field: 'EndpointUri', displayName: 'Endpoint URI', width: "**" },
-                { field: 'Suspended', displayName: 'Suspended', resizable: false }
-            ];
-            attributes[Camel.jmxDomain + "/services/folder"] = [
-                stateColumn,
-                { field: 'CamelId', displayName: 'Context' },
-                { field: 'RouteId', displayName: 'Route' },
-                { field: 'Suspended', displayName: 'Suspended', resizable: false },
-                { field: 'SupportsSuspended', displayName: 'Can Suspend', resizable: false }
-            ];
-            attributes[Camel.jmxDomain + "/endpoints/folder"] = [
-                stateColumn,
-                { field: 'CamelId', displayName: 'Context' },
-                { field: 'EndpointUri', displayName: 'Endpoint URI', width: "***" },
-                { field: 'Singleton', displayName: 'Singleton', resizable: false }
-            ];
-            attributes[Camel.jmxDomain + "/threadpools/folder"] = [
-                { field: 'Id', displayName: 'Id', width: "**" },
-                { field: 'ActiveCount', displayName: 'Active' },
-                { field: 'PoolSize', displayName: 'Pool Size' },
-                { field: 'CorePoolSize', displayName: 'Core Pool Size' },
-                { field: 'TaskQueueSize', displayName: 'Task Queue Size' },
-                { field: 'TaskCount', displayName: 'Task' },
-                { field: 'CompletedTaskCount', displayName: 'Completed Task' }
-            ];
-            attributes[Camel.jmxDomain + "/errorhandlers/folder"] = [
-                { field: 'CamelId', displayName: 'Context' },
-                { field: 'DeadLetterChannel', displayName: 'Dead Letter' },
-                { field: 'DeadLetterChannelEndpointUri', displayName: 'Endpoint URI', width: "**", resizable: true },
-                { field: 'MaximumRedeliveries', displayName: 'Max Redeliveries' },
-                { field: 'RedeliveryDelay', displayName: 'Redelivery Delay' },
-                { field: 'MaximumRedeliveryDelay', displayName: 'Max Redeliveries Delay' }
-            ];
-            var myUrl = '/jmx/attributes?main-tab=camel&sub-tab=camel-attributes';
-            var builder = nav.builder();
-            var tab = builder.id('camel')
-                .title(function () { return 'Camel'; })
-                .defaultPage({
-                rank: 20,
-                isValid: function (yes, no) {
-                    var name = 'CamelDefaultPage';
-                    workspace.addNamedTreePostProcessor(name, function (tree) {
-                        workspace.removeNamedTreePostProcessor(name);
-                        if (workspace.treeContainsDomainAndProperties(Camel.jmxDomain)) {
-                            yes();
-                        }
-                        else {
-                            no();
-                        }
-                    });
-                }
-            })
-                .href(function () { return myUrl; })
-                .isValid(function () { return workspace.treeContainsDomainAndProperties(Camel.jmxDomain); })
-                .build();
-            // add sub level tabs
-            tab.tabs = Jmx.getNavItems(builder, workspace, $templateCache, 'camel');
-            // special for route diagram as we want this to be the 1st
-            tab.tabs.push({
-                id: 'camel-route-diagram',
-                title: function () { return '<i class="fa fa-sitemap"></i> Route Diagram'; },
-                tooltip: function () { return "View a diagram of the Camel routes"; },
-                show: function () {
-                    return (workspace.isRoute() || workspace.isRoutesFolder())
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml");
-                },
-                isSelected: function () { return workspace.isLinkActive('camel/routes'); },
-                href: function () { return "/camel/routes" + workspace.hash(); },
-                // make sure we have route diagram shown first
-                index: -2
-            });
-            tab.tabs.push({
-                id: 'camel-route-source',
-                title: function () { return '<i class=" fa fa-file-code-o"></i> Source'; },
-                tooltip: function () { return "View the source of the Camel routes"; },
-                show: function () {
-                    return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && (workspace.isRoute() || workspace.isRoutesFolder())
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml");
-                },
-                isSelected: function () { return workspace.isLinkActive('camel/source'); },
-                href: function () { return "/camel/source" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-route-properties',
-                title: function () { return '<i class=" fa fa-edit"></i> Properties'; },
-                tooltip: function () { return "View the pattern properties"; },
-                show: function () { return Camel.getSelectedRouteNode(workspace); },
-                href: function () { return "/camel/properties" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-endpoint-properties',
-                title: function () { return '<i class="fa fa-list"></i> Properties'; },
-                tooltip: function () { return "Show the endpoint properties"; },
-                show: function () {
-                    return workspace.isEndpoint()
-                        && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-                        && workspace.hasInvokeRights(workspace.selection, "explainEndpointJson");
-                },
-                href: function () { return "/camel/propertiesEndpoint" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-component-properties',
-                title: function () { return '<i class="fa fa-list"></i> Properties'; },
-                tooltip: function () { return "Show the component properties"; },
-                show: function () {
-                    return workspace.isComponent()
-                        && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-                        && workspace.hasInvokeRights(workspace.selection, "explainComponentJson");
-                },
-                href: function () { return "/camel/propertiesComponent" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-inflight-exchanges',
-                title: function () { return '<i class="fa fa-bar-chart"></i> Inflight Exchanges'; },
-                tooltip: function () { return "View the entire JVMs Camel inflight exchanges"; },
-                show: function () {
-                    return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && !workspace.isComponentsFolder() && !workspace.isComponent()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder() || workspace.isRoute())
-                        && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelInflightRepository(workspace), "browse");
-                },
-                href: function () { return "/camel/inflight" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-route-metrics',
-                title: function () { return '<i class="fa fa-bar-chart"></i> Route Metrics'; },
-                tooltip: function () { return "View the entire JVMs Camel route metrics"; },
-                show: function () {
-                    return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder())
-                        && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
-                        && Camel.getSelectionCamelRouteMetrics(workspace)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelRouteMetrics(workspace), "dumpStatisticsAsJson");
-                },
-                href: function () { return "/camel/routeMetrics" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-rest-services',
-                title: function () { return '<i class="fa fa-list"></i> Rest Services'; },
-                tooltip: function () { return "List all the REST services registered in the context"; },
-                show: function () {
-                    return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && !workspace.isComponentsFolder() && !workspace.isComponent()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder())
-                        && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
-                        && Camel.getSelectionCamelRestRegistry(workspace)
-                        && Camel.hasRestServices(workspace, jolokia) // TODO: optimize this so we only invoke it one time until reload
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelRestRegistry(workspace), "listRestServices");
-                },
-                href: function () { return "/camel/restRegistry" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-endpoint-runtime-registry',
-                title: function () { return '<i class="fa fa-list"></i> Endpoints (in/out)'; },
-                tooltip: function () { return "List all the incoming and outgoing endpoints in the context"; },
-                show: function () {
-                    return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && !workspace.isComponentsFolder() && !workspace.isComponent()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder())
-                        && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
-                        && Camel.getSelectionCamelEndpointRuntimeRegistry(workspace)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelEndpointRuntimeRegistry(workspace), "endpointStatistics");
-                },
-                href: function () { return "/camel/endpointRuntimeRegistry" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-type-converters',
-                title: function () { return '<i class="fa fa-list"></i> Type Converters'; },
-                tooltip: function () { return "List all the type converters registered in the context"; },
-                show: function () {
-                    return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && !workspace.isComponentsFolder() && !workspace.isComponent()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder())
-                        && Camel.isCamelVersionEQGT(2, 13, workspace, jolokia)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTypeConverter(workspace), "listTypeConverters");
-                },
-                href: function () { return "/camel/typeConverter" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-route-profile',
-                title: function () { return '<i class="fa fa-bar-chart"></i> Profile'; },
-                tooltip: function () { return "Profile the messages flowing through the Camel route"; },
-                show: function () { return workspace.isRoute()
-                    && Camel.getSelectionCamelTraceMBean(workspace)
-                    && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"); },
-                href: function () { return "/camel/profileRoute" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-route-debug',
-                title: function () { return '<i class="fa fa-stethoscope"></i> Debug'; },
-                tooltip: function () { return "Debug the Camel route"; },
-                show: function () { return workspace.isRoute()
-                    && Camel.getSelectionCamelDebugMBean(workspace)
-                    && workspace.hasInvokeRightsForName(Camel.getSelectionCamelDebugMBean(workspace), "getBreakpoints"); },
-                href: function () { return "/camel/debugRoute" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-route-trace',
-                title: function () { return '<i class="fa fa-envelope"></i> Trace'; },
-                tooltip: function () { return "Trace the messages flowing through the Camel route"; },
-                show: function () { return workspace.isRoute()
-                    && Camel.getSelectionCamelTraceMBean(workspace)
-                    && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"); },
-                href: function () { return "/camel/traceRoute" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-endpoint-browser',
-                title: function () { return '<i class="fa fa-envelope"></i> Browse'; },
-                tooltip: function () { return "Browse the messages on the endpoint"; },
-                show: function () { return workspace.isEndpoint()
-                    && workspace.hasInvokeRights(workspace.selection, "browseAllMessagesAsXml"); },
-                href: function () { return "/camel/browseEndpoint" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-endpoint-send',
-                title: function () { return '<i class="fa fa-pencil"></i> Send'; },
-                //title: "Send a message to this endpoint",
-                show: function () { return workspace.isEndpoint()
-                    && workspace.hasInvokeRights(workspace.selection, workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage"); },
-                href: function () { return "/camel/sendMessage" + workspace.hash(); }
-            });
-            tab.tabs.push({
-                id: 'camel-endpoint-create',
-                title: function () { return '<i class="fa fa-plus"></i> Endpoint'; },
-                tooltip: function () { return "Create a new endpoint"; },
-                show: function () { return workspace.isEndpointsFolder()
-                    && workspace.hasInvokeRights(workspace.selection, "createEndpoint"); },
-                href: function () { return "/camel/createEndpoint" + workspace.hash(); }
-            });
-            nav.add(tab);
-            workspace.addNamedTreePostProcessor('camel', function (tree) {
-                var children = [];
-                var domainName = Camel.jmxDomain;
-                if (tree) {
-                    var rootFolder = new Folder("Camel Contexts");
-                    rootFolder.addClass = "org-apache-camel-context-folder";
-                    rootFolder.children = children;
-                    rootFolder.typeName = "context";
-                    rootFolder.key = "camelContexts";
-                    rootFolder.domain = domainName;
-                    /*
-                    var contextFilterText = $scope.contextFilterText;
-                    $scope.lastContextFilterText = contextFilterText;
-                    log.debug("Reloading the tree for filter: " + contextFilterText);
-                    */
-                    var folder = tree.get(domainName);
-                    if (folder) {
-                        angular.forEach(folder.children, function (value, key) {
-                            var entries = value.map;
-                            if (entries) {
-                                var contextsFolder = entries["context"];
-                                var routesNode = entries["routes"];
-                                var endpointsNode = entries["endpoints"];
-                                var componentsNode = entries["components"];
-                                if (contextsFolder) {
-                                    var contextNode = contextsFolder.children[0];
-                                    if (contextNode) {
-                                        var title = contextNode.title;
-                                        var match = true;
-                                        if (match) {
-                                            var folder = new Folder(title);
-                                            folder.addClass = "org-apache-camel-context";
-                                            folder.domain = domainName;
-                                            folder.objectName = contextNode.objectName;
-                                            folder.entries = contextNode.entries;
-                                            folder.typeName = contextNode.typeName;
-                                            folder.key = contextNode.key;
-                                            folder.version = contextNode.version;
-                                            if (routesNode) {
-                                                var routesFolder = new Folder("Routes");
-                                                routesFolder.addClass = "org-apache-camel-routes-folder";
-                                                routesFolder.parent = contextsFolder;
-                                                routesFolder.children = routesNode.children;
-                                                angular.forEach(routesFolder.children, function (n) { return n.addClass = "org-apache-camel-routes"; });
-                                                folder.children.push(routesFolder);
-                                                routesFolder.typeName = "routes";
-                                                routesFolder.key = routesNode.key;
-                                                routesFolder.domain = routesNode.domain;
-                                            }
-                                            if (endpointsNode) {
-                                                var endpointsFolder = new Folder("Endpoints");
-                                                endpointsFolder.addClass = "org-apache-camel-endpoints-folder";
-                                                endpointsFolder.parent = contextsFolder;
-                                                endpointsFolder.children = endpointsNode.children;
-                                                angular.forEach(endpointsFolder.children, function (n) {
-                                                    n.addClass = "org-apache-camel-endpoints";
-                                                    if (!Camel.getContextId(n)) {
-                                                        n.entries["context"] = contextNode.entries["context"];
-                                                    }
-                                                });
-                                                folder.children.push(endpointsFolder);
-                                                endpointsFolder.entries = contextNode.entries;
-                                                endpointsFolder.typeName = "endpoints";
-                                                endpointsFolder.key = endpointsNode.key;
-                                                endpointsFolder.domain = endpointsNode.domain;
-                                            }
-                                            if (componentsNode) {
-                                                var componentsFolder = new Folder("Components");
-                                                componentsFolder.addClass = "org-apache-camel-components-folder";
-                                                componentsFolder.parent = contextsFolder;
-                                                componentsFolder.children = componentsNode.children;
-                                                angular.forEach(componentsFolder.children, function (n) {
-                                                    n.addClass = "org-apache-camel-components";
-                                                    if (!Camel.getContextId(n)) {
-                                                        n.entries["context"] = contextNode.entries["context"];
-                                                    }
-                                                });
-                                                folder.children.push(componentsFolder);
-                                                componentsFolder.entries = contextNode.entries;
-                                                componentsFolder.typeName = "components";
-                                                componentsFolder.key = componentsNode.key;
-                                                componentsFolder.domain = componentsNode.domain;
-                                            }
-                                            var jmxNode = new Folder("MBeans");
-                                            // lets add all the entries which are not one context/routes/endpoints/components as MBeans
-                                            angular.forEach(entries, function (jmxChild, name) {
-                                                if (name !== "context" && name !== "routes" && name !== "endpoints" && name !== "components") {
-                                                    jmxNode.children.push(jmxChild);
+        viewRegistry['camel/endpoint/'] = layoutFull;
+        viewRegistry['camel/route/'] = layoutFull;
+        viewRegistry['{ "main-tab": "camel" }'] = 'plugins/camel/html/layoutCamelTree.html';
+        helpRegistry.addUserDoc('camel', 'plugins/camel/doc/help.md', function () {
+            return workspace.treeContainsDomainAndProperties(Camel.jmxDomain);
+        });
+        preferencesRegistry.addTab('Camel', 'plugins/camel/html/preferences.html', function () {
+            return workspace.treeContainsDomainAndProperties(Camel.jmxDomain);
+        });
+        // TODO should really do this via a service that the JMX plugin exposes
+        Jmx.addAttributeToolBar(Camel.pluginName, Camel.jmxDomain, function (selection) {
+            // TODO there should be a nicer way to do this!
+            var typeName = selection.typeName;
+            if (typeName) {
+                if (typeName.startsWith("context"))
+                    return contextToolBar;
+                if (typeName.startsWith("route"))
+                    return routeToolBar;
+            }
+            var folderNames = selection.folderNames;
+            if (folderNames && selection.domain === Camel.jmxDomain) {
+                var last = folderNames.last();
+                if ("routes" === last)
+                    return routeToolBar;
+                if ("context" === last)
+                    return contextToolBar;
+            }
+            return null;
+        });
+        // register default attribute views
+        var stateField = 'State';
+        var stateTemplate = '<div class="ngCellText pagination-centered" title="{{row.getProperty(col.field)}}"><i class="{{row.getProperty(\'' + stateField + '\') | camelIconClass}}"></i></div>';
+        var stateColumn = { field: stateField, displayName: stateField, cellTemplate: stateTemplate, width: 56, minWidth: 56, maxWidth: 56, resizable: false, defaultSort: false };
+        var attributes = workspace.attributeColumnDefs;
+        attributes[Camel.jmxDomain + "/context/folder"] = [
+            stateColumn,
+            { field: 'CamelId', displayName: 'Context' },
+            { field: 'Uptime', displayName: 'Uptime', visible: false },
+            { field: 'CamelVersion', displayName: 'Version', visible: false },
+            { field: 'ExchangesCompleted', displayName: 'Completed' },
+            { field: 'ExchangesFailed', displayName: 'Failed' },
+            { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
+            { field: 'ExchangesTotal', displayName: 'Total', visible: false },
+            { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+            { field: 'ExchangesInflight', displayName: 'Inflight' },
+            { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
+            { field: 'MeanProcessingTime', displayName: 'Mean Time' },
+            { field: 'MinProcessingTime', displayName: 'Min Time' },
+            { field: 'MaxProcessingTime', displayName: 'Max Time' },
+            { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
+            { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
+            { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
+            { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
+            { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
+            { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false },
+            { field: 'StartedRoutes', displayName: 'Started Routes' },
+            { field: 'TotalRoutes', displayName: 'Total Routes' }
+        ];
+        attributes[Camel.jmxDomain + "/routes/folder"] = [
+            stateColumn,
+            { field: 'CamelId', displayName: 'Context' },
+            { field: 'RouteId', displayName: 'Route' },
+            { field: 'ExchangesCompleted', displayName: 'Completed' },
+            { field: 'ExchangesFailed', displayName: 'Failed' },
+            { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
+            { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+            { field: 'ExchangesTotal', displayName: 'Total', visible: false },
+            { field: 'ExchangesInflight', displayName: 'Inflight' },
+            { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
+            { field: 'MeanProcessingTime', displayName: 'Mean Time' },
+            { field: 'MinProcessingTime', displayName: 'Min Time' },
+            { field: 'MaxProcessingTime', displayName: 'Max Time' },
+            { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
+            { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
+            { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
+            { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
+            { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
+            { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+            { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false }
+        ];
+        attributes[Camel.jmxDomain + "/processors/folder"] = [
+            stateColumn,
+            { field: 'CamelId', displayName: 'Context' },
+            { field: 'RouteId', displayName: 'Route' },
+            { field: 'ProcessorId', displayName: 'Processor' },
+            { field: 'ExchangesCompleted', displayName: 'Completed' },
+            { field: 'ExchangesFailed', displayName: 'Failed' },
+            { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
+            { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+            { field: 'ExchangesTotal', displayName: 'Total', visible: false },
+            { field: 'ExchangesInflight', displayName: 'Inflight' },
+            { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
+            { field: 'MeanProcessingTime', displayName: 'Mean Time' },
+            { field: 'MinProcessingTime', displayName: 'Min Time' },
+            { field: 'MaxProcessingTime', displayName: 'Max Time' },
+            { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
+            { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
+            { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
+            { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
+            { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
+            { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false }
+        ];
+        attributes[Camel.jmxDomain + "/components/folder"] = [
+            stateColumn,
+            { field: 'CamelId', displayName: 'Context' },
+            { field: 'ComponentName', displayName: 'Name' }
+        ];
+        attributes[Camel.jmxDomain + "/consumers/folder"] = [
+            stateColumn,
+            { field: 'CamelId', displayName: 'Context' },
+            { field: 'RouteId', displayName: 'Route' },
+            { field: 'EndpointUri', displayName: 'Endpoint URI', width: "**" },
+            { field: 'Suspended', displayName: 'Suspended', resizable: false },
+            { field: 'InflightExchanges', displayName: 'Inflight' }
+        ];
+        attributes[Camel.jmxDomain + "/producers/folder"] = [
+            stateColumn,
+            { field: 'CamelId', displayName: 'Context' },
+            { field: 'RouteId', displayName: 'Route' },
+            { field: 'EndpointUri', displayName: 'Endpoint URI', width: "**" },
+            { field: 'Suspended', displayName: 'Suspended', resizable: false }
+        ];
+        attributes[Camel.jmxDomain + "/services/folder"] = [
+            stateColumn,
+            { field: 'CamelId', displayName: 'Context' },
+            { field: 'RouteId', displayName: 'Route' },
+            { field: 'Suspended', displayName: 'Suspended', resizable: false },
+            { field: 'SupportsSuspended', displayName: 'Can Suspend', resizable: false }
+        ];
+        attributes[Camel.jmxDomain + "/endpoints/folder"] = [
+            stateColumn,
+            { field: 'CamelId', displayName: 'Context' },
+            { field: 'EndpointUri', displayName: 'Endpoint URI', width: "***" },
+            { field: 'Singleton', displayName: 'Singleton', resizable: false }
+        ];
+        attributes[Camel.jmxDomain + "/threadpools/folder"] = [
+            { field: 'Id', displayName: 'Id', width: "**" },
+            { field: 'ActiveCount', displayName: 'Active' },
+            { field: 'PoolSize', displayName: 'Pool Size' },
+            { field: 'CorePoolSize', displayName: 'Core Pool Size' },
+            { field: 'TaskQueueSize', displayName: 'Task Queue Size' },
+            { field: 'TaskCount', displayName: 'Task' },
+            { field: 'CompletedTaskCount', displayName: 'Completed Task' }
+        ];
+        attributes[Camel.jmxDomain + "/errorhandlers/folder"] = [
+            { field: 'CamelId', displayName: 'Context' },
+            { field: 'DeadLetterChannel', displayName: 'Dead Letter' },
+            { field: 'DeadLetterChannelEndpointUri', displayName: 'Endpoint URI', width: "**", resizable: true },
+            { field: 'MaximumRedeliveries', displayName: 'Max Redeliveries' },
+            { field: 'RedeliveryDelay', displayName: 'Redelivery Delay' },
+            { field: 'MaximumRedeliveryDelay', displayName: 'Max Redeliveries Delay' }
+        ];
+        var myUrl = '/jmx/attributes?main-tab=camel&sub-tab=camel-attributes';
+        var builder = nav.builder();
+        var tab = builder.id('camel').title(function () { return 'Camel'; }).defaultPage({
+            rank: 20,
+            isValid: function (yes, no) {
+                var name = 'CamelDefaultPage';
+                workspace.addNamedTreePostProcessor(name, function (tree) {
+                    workspace.removeNamedTreePostProcessor(name);
+                    if (workspace.treeContainsDomainAndProperties(Camel.jmxDomain)) {
+                        yes();
+                    }
+                    else {
+                        no();
+                    }
+                });
+            }
+        }).href(function () { return myUrl; }).isValid(function () { return workspace.treeContainsDomainAndProperties(Camel.jmxDomain); }).build();
+        // add sub level tabs
+        tab.tabs = Jmx.getNavItems(builder, workspace, $templateCache, 'camel');
+        // special for route diagram as we want this to be the 1st
+        tab.tabs.push({
+            id: 'camel-route-diagram',
+            title: function () { return '<i class="fa fa-sitemap"></i> Route Diagram'; },
+            tooltip: function () { return "View a diagram of the Camel routes"; },
+            show: function () { return (workspace.isRoute() || workspace.isRoutesFolder()) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"); },
+            isSelected: function () { return workspace.isLinkActive('camel/routes'); },
+            href: function () { return "/camel/routes" + workspace.hash(); },
+            // make sure we have route diagram shown first
+            index: -2
+        });
+        tab.tabs.push({
+            id: 'camel-route-source',
+            title: function () { return '<i class=" fa fa-file-code-o"></i> Source'; },
+            tooltip: function () { return "View the source of the Camel routes"; },
+            show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint() && (workspace.isRoute() || workspace.isRoutesFolder()) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"); },
+            isSelected: function () { return workspace.isLinkActive('camel/source'); },
+            href: function () { return "/camel/source" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-route-properties',
+            title: function () { return '<i class=" fa fa-edit"></i> Properties'; },
+            tooltip: function () { return "View the pattern properties"; },
+            show: function () { return Camel.getSelectedRouteNode(workspace); },
+            href: function () { return "/camel/properties" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-endpoint-properties',
+            title: function () { return '<i class="fa fa-list"></i> Properties'; },
+            tooltip: function () { return "Show the endpoint properties"; },
+            show: function () { return workspace.isEndpoint() && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia) && workspace.hasInvokeRights(workspace.selection, "explainEndpointJson"); },
+            href: function () { return "/camel/propertiesEndpoint" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-component-properties',
+            title: function () { return '<i class="fa fa-list"></i> Properties'; },
+            tooltip: function () { return "Show the component properties"; },
+            show: function () { return workspace.isComponent() && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia) && workspace.hasInvokeRights(workspace.selection, "explainComponentJson"); },
+            href: function () { return "/camel/propertiesComponent" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-dataformat-properties',
+            title: function () { return '<i class="fa fa-list"></i> Properties'; },
+            tooltip: function () { return "Show the dataformat properties"; },
+            show: function () { return workspace.isDataformat() && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia) && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson"); },
+            href: function () { return "/camel/propertiesDataFormat" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-inflight-exchanges',
+            title: function () { return '<i class="fa fa-bar-chart"></i> Inflight Exchanges'; },
+            tooltip: function () { return "View the entire JVMs Camel inflight exchanges"; },
+            show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint() && !workspace.isComponentsFolder() && !workspace.isComponent() && (workspace.isCamelContext() || workspace.isRoutesFolder() || workspace.isRoute()) && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelInflightRepository(workspace), "browse"); },
+            href: function () { return "/camel/inflight" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-route-metrics',
+            title: function () { return '<i class="fa fa-bar-chart"></i> Route Metrics'; },
+            tooltip: function () { return "View the entire JVMs Camel route metrics"; },
+            show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint() && (workspace.isCamelContext() || workspace.isRoutesFolder()) && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia) && Camel.getSelectionCamelRouteMetrics(workspace) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelRouteMetrics(workspace), "dumpStatisticsAsJson"); },
+            href: function () { return "/camel/routeMetrics" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-rest-services',
+            title: function () { return '<i class="fa fa-list"></i> Rest Services'; },
+            tooltip: function () { return "List all the REST services registered in the context"; },
+            show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint() && !workspace.isComponentsFolder() && !workspace.isComponent() && (workspace.isCamelContext() || workspace.isRoutesFolder()) && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia) && Camel.getSelectionCamelRestRegistry(workspace) && Camel.hasRestServices(workspace, jolokia) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelRestRegistry(workspace), "listRestServices"); },
+            href: function () { return "/camel/restRegistry" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-endpoint-runtime-registry',
+            title: function () { return '<i class="fa fa-list"></i> Endpoints (in/out)'; },
+            tooltip: function () { return "List all the incoming and outgoing endpoints in the context"; },
+            show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint() && !workspace.isComponentsFolder() && !workspace.isComponent() && (workspace.isCamelContext() || workspace.isRoutesFolder()) && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia) && Camel.getSelectionCamelEndpointRuntimeRegistry(workspace) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelEndpointRuntimeRegistry(workspace), "endpointStatistics"); },
+            href: function () { return "/camel/endpointRuntimeRegistry" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-type-converters',
+            title: function () { return '<i class="fa fa-list"></i> Type Converters'; },
+            tooltip: function () { return "List all the type converters registered in the context"; },
+            show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint() && !workspace.isComponentsFolder() && !workspace.isComponent() && (workspace.isCamelContext() || workspace.isRoutesFolder()) && Camel.isCamelVersionEQGT(2, 13, workspace, jolokia) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTypeConverter(workspace), "listTypeConverters"); },
+            href: function () { return "/camel/typeConverter" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-route-profile',
+            title: function () { return '<i class="fa fa-bar-chart"></i> Profile'; },
+            tooltip: function () { return "Profile the messages flowing through the Camel route"; },
+            show: function () { return workspace.isRoute() && Camel.getSelectionCamelTraceMBean(workspace) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"); },
+            href: function () { return "/camel/profileRoute" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-route-debug',
+            title: function () { return '<i class="fa fa-stethoscope"></i> Debug'; },
+            tooltip: function () { return "Debug the Camel route"; },
+            show: function () { return workspace.isRoute() && Camel.getSelectionCamelDebugMBean(workspace) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelDebugMBean(workspace), "getBreakpoints"); },
+            href: function () { return "/camel/debugRoute" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-route-trace',
+            title: function () { return '<i class="fa fa-envelope"></i> Trace'; },
+            tooltip: function () { return "Trace the messages flowing through the Camel route"; },
+            show: function () { return workspace.isRoute() && Camel.getSelectionCamelTraceMBean(workspace) && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"); },
+            href: function () { return "/camel/traceRoute" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-endpoint-browser',
+            title: function () { return '<i class="fa fa-envelope"></i> Browse'; },
+            tooltip: function () { return "Browse the messages on the endpoint"; },
+            show: function () { return workspace.isEndpoint() && workspace.hasInvokeRights(workspace.selection, "browseAllMessagesAsXml"); },
+            href: function () { return "/camel/browseEndpoint" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-endpoint-send',
+            title: function () { return '<i class="fa fa-pencil"></i> Send'; },
+            //title: "Send a message to this endpoint",
+            show: function () { return workspace.isEndpoint() && workspace.hasInvokeRights(workspace.selection, workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage"); },
+            href: function () { return "/camel/sendMessage" + workspace.hash(); }
+        });
+        tab.tabs.push({
+            id: 'camel-endpoint-create',
+            title: function () { return '<i class="fa fa-plus"></i> Endpoint'; },
+            tooltip: function () { return "Create a new endpoint"; },
+            show: function () { return workspace.isEndpointsFolder() && workspace.hasInvokeRights(workspace.selection, "createEndpoint"); },
+            href: function () { return "/camel/createEndpoint" + workspace.hash(); }
+        });
+        nav.add(tab);
+        workspace.addNamedTreePostProcessor('camel', function (tree) {
+            var children = [];
+            var domainName = Camel.jmxDomain;
+            if (tree) {
+                var rootFolder = new Folder("Camel Contexts");
+                rootFolder.addClass = "org-apache-camel-context-folder";
+                rootFolder.children = children;
+                rootFolder.typeName = "context";
+                rootFolder.key = "camelContexts";
+                rootFolder.domain = domainName;
+                /*
+                var contextFilterText = $scope.contextFilterText;
+                $scope.lastContextFilterText = contextFilterText;
+                log.debug("Reloading the tree for filter: " + contextFilterText);
+                */
+                var folder = tree.get(domainName);
+                if (folder) {
+                    angular.forEach(folder.children, function (value, key) {
+                        var entries = value.map;
+                        if (entries) {
+                            var contextsFolder = entries["context"];
+                            var routesNode = entries["routes"];
+                            var endpointsNode = entries["endpoints"];
+                            var componentsNode = entries["components"];
+                            var dataFormatsNode = entries["dataformats"];
+                            if (contextsFolder) {
+                                var contextNode = contextsFolder.children[0];
+                                if (contextNode) {
+                                    var title = contextNode.title;
+                                    var match = true;
+                                    if (match) {
+                                        var folder = new Folder(title);
+                                        folder.addClass = "org-apache-camel-context";
+                                        folder.domain = domainName;
+                                        folder.objectName = contextNode.objectName;
+                                        folder.entries = contextNode.entries;
+                                        folder.typeName = contextNode.typeName;
+                                        folder.key = contextNode.key;
+                                        folder.version = contextNode.version;
+                                        if (routesNode) {
+                                            var routesFolder = new Folder("Routes");
+                                            routesFolder.addClass = "org-apache-camel-routes-folder";
+                                            routesFolder.parent = contextsFolder;
+                                            routesFolder.children = routesNode.children;
+                                            angular.forEach(routesFolder.children, function (n) { return n.addClass = "org-apache-camel-routes"; });
+                                            folder.children.push(routesFolder);
+                                            routesFolder.typeName = "routes";
+                                            routesFolder.key = routesNode.key;
+                                            routesFolder.domain = routesNode.domain;
+                                        }
+                                        if (endpointsNode) {
+                                            var endpointsFolder = new Folder("Endpoints");
+                                            endpointsFolder.addClass = "org-apache-camel-endpoints-folder";
+                                            endpointsFolder.parent = contextsFolder;
+                                            endpointsFolder.children = endpointsNode.children;
+                                            angular.forEach(endpointsFolder.children, function (n) {
+                                                n.addClass = "org-apache-camel-endpoints";
+                                                if (!Camel.getContextId(n)) {
+                                                    n.entries["context"] = contextNode.entries["context"];
                                                 }
                                             });
-                                            if (jmxNode.children.length > 0) {
-                                                jmxNode.sortChildren(false);
-                                                folder.children.push(jmxNode);
-                                            }
-                                            folder.parent = rootFolder;
-                                            children.push(folder);
+                                            folder.children.push(endpointsFolder);
+                                            endpointsFolder.entries = contextNode.entries;
+                                            endpointsFolder.typeName = "endpoints";
+                                            endpointsFolder.key = endpointsNode.key;
+                                            endpointsFolder.domain = endpointsNode.domain;
                                         }
+                                        if (componentsNode) {
+                                            var componentsFolder = new Folder("Components");
+                                            componentsFolder.addClass = "org-apache-camel-components-folder";
+                                            componentsFolder.parent = contextsFolder;
+                                            componentsFolder.children = componentsNode.children;
+                                            angular.forEach(componentsFolder.children, function (n) {
+                                                n.addClass = "org-apache-camel-components";
+                                                if (!Camel.getContextId(n)) {
+                                                    n.entries["context"] = contextNode.entries["context"];
+                                                }
+                                            });
+                                            folder.children.push(componentsFolder);
+                                            componentsFolder.entries = contextNode.entries;
+                                            componentsFolder.typeName = "components";
+                                            componentsFolder.key = componentsNode.key;
+                                            componentsFolder.domain = componentsNode.domain;
+                                        }
+                                        if (dataFormatsNode) {
+                                            var dataFormatsFolder = new Folder("Dataformats");
+                                            dataFormatsFolder.addClass = "org-apache-camel-dataformats-folder";
+                                            dataFormatsFolder.parent = contextsFolder;
+                                            dataFormatsFolder.children = dataFormatsNode.children;
+                                            angular.forEach(dataFormatsFolder.children, function (n) {
+                                                n.addClass = "org-apache-camel-dataformats";
+                                                if (!Camel.getContextId(n)) {
+                                                    n.entries["context"] = contextNode.entries["context"];
+                                                }
+                                            });
+                                            folder.children.push(dataFormatsFolder);
+                                            dataFormatsFolder.entries = contextNode.entries;
+                                            dataFormatsFolder.typeName = "dataformats";
+                                            dataFormatsFolder.key = dataFormatsNode.key;
+                                            dataFormatsFolder.domain = dataFormatsNode.domain;
+                                        }
+                                        var jmxNode = new Folder("MBeans");
+                                        // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
+                                        angular.forEach(entries, function (jmxChild, name) {
+                                            if (name !== "context" && name !== "routes" && name !== "endpoints" && name !== "components" && name !== "dataformats") {
+                                                jmxNode.children.push(jmxChild);
+                                            }
+                                        });
+                                        if (jmxNode.children.length > 0) {
+                                            jmxNode.sortChildren(false);
+                                            folder.children.push(jmxNode);
+                                        }
+                                        folder.parent = rootFolder;
+                                        children.push(folder);
                                     }
                                 }
                             }
-                        });
-                        folder.children.splice(0, 0, rootFolder);
-                    }
+                        }
+                    });
+                    folder.children.splice(0, 0, rootFolder);
                 }
-            });
-        }]);
+            }
+        });
+    }]);
     hawtioPluginLoader.addModule(Camel.pluginName);
     // register the jmx lazy loader here as it won't have been invoked in the run method
     hawtioPluginLoader.registerPreBootstrapTask(function (task) {
@@ -3596,41 +3507,41 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.AttributesToolBarController", ["$scope", "workspace", "jolokia", function ($scope, workspace, jolokia) {
-            $scope.deleteDialog = false;
-            $scope.start = function () {
-                $scope.invokeSelectedMBeans(function (item) {
-                    return Camel.isState(item, "suspend") ? "resume()" : "start()";
-                });
-            };
-            $scope.pause = function () {
-                $scope.invokeSelectedMBeans("suspend()");
-            };
-            $scope.stop = function () {
-                $scope.invokeSelectedMBeans("stop()", function () {
-                    // lets navigate to the parent folder!
-                    // as this will be going way
-                    workspace.removeAndSelectParentNode();
-                });
-            };
-            /*
-             * Only for routes!
-             */
-            $scope.delete = function () {
-                $scope.invokeSelectedMBeans("remove()", function () {
-                    // force a reload of the tree
-                    $scope.workspace.operationCounter += 1;
-                    Core.$apply($scope);
-                });
-            };
-            $scope.anySelectionHasState = function (state) {
-                var selected = $scope.selectedItems || [];
-                return selected.length && selected.any(function (s) { return Camel.isState(s, state); });
-            };
-            $scope.everySelectionHasState = function (state) {
-                var selected = $scope.selectedItems || [];
-                return selected.length && selected.every(function (s) { return Camel.isState(s, state); });
-            };
-        }]);
+        $scope.deleteDialog = false;
+        $scope.start = function () {
+            $scope.invokeSelectedMBeans(function (item) {
+                return Camel.isState(item, "suspend") ? "resume()" : "start()";
+            });
+        };
+        $scope.pause = function () {
+            $scope.invokeSelectedMBeans("suspend()");
+        };
+        $scope.stop = function () {
+            $scope.invokeSelectedMBeans("stop()", function () {
+                // lets navigate to the parent folder!
+                // as this will be going way
+                workspace.removeAndSelectParentNode();
+            });
+        };
+        /*
+         * Only for routes!
+         */
+        $scope.delete = function () {
+            $scope.invokeSelectedMBeans("remove()", function () {
+                // force a reload of the tree
+                $scope.workspace.operationCounter += 1;
+                Core.$apply($scope);
+            });
+        };
+        $scope.anySelectionHasState = function (state) {
+            var selected = $scope.selectedItems || [];
+            return selected.length && selected.any(function (s) { return Camel.isState(s, state); });
+        };
+        $scope.everySelectionHasState = function (state) {
+            var selected = $scope.selectedItems || [];
+            return selected.length && selected.every(function (s) { return Camel.isState(s, state); });
+        };
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -3638,189 +3549,189 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.BreadcrumbBarController", ["$scope", "$routeParams", "workspace", "jolokia", function ($scope, $routeParams, workspace, jolokia) {
-            $scope.workspace = workspace;
-            // if we are in dashboard then $routeParams may be null
-            if ($routeParams != null) {
-                $scope.contextId = $routeParams["contextId"];
-                $scope.endpointPath = $routeParams["endpointPath"];
-                $scope.endpointName = tidyJmxName($scope.endpointPath);
-                $scope.routeId = $routeParams["routeId"];
+        $scope.workspace = workspace;
+        // if we are in dashboard then $routeParams may be null
+        if ($routeParams != null) {
+            $scope.contextId = $routeParams["contextId"];
+            $scope.endpointPath = $routeParams["endpointPath"];
+            $scope.endpointName = tidyJmxName($scope.endpointPath);
+            $scope.routeId = $routeParams["routeId"];
+        }
+        $scope.treeViewLink = linkToTreeView();
+        var defaultChildEntity = $scope.endpointPath ? "endpoints" : "routes";
+        var childEntityToolTips = {
+            "endpoints": "Camel Endpoint",
+            "routes": "Camel Route"
+        };
+        /**
+         * The array of breadcrumbs so that each item in the list of bookmarks can be switched for fast navigation and
+         * we can easily render the navigation path
+         */
+        $scope.breadcrumbs = [
+            {
+                name: $scope.contextId,
+                items: findContexts(),
+                tooltip: "Camel Context"
+            },
+            {
+                name: defaultChildEntity,
+                items: findChildEntityTypes($scope.contextId),
+                tooltip: "Entity inside a Camel Context"
+            },
+            {
+                name: $scope.endpointName || tidyJmxName($scope.routeId),
+                items: findChildEntityLinks($scope.contextId, currentChildEntity()),
+                tooltip: childEntityToolTips[defaultChildEntity]
             }
-            $scope.treeViewLink = linkToTreeView();
-            var defaultChildEntity = $scope.endpointPath ? "endpoints" : "routes";
-            var childEntityToolTips = {
-                "endpoints": "Camel Endpoint",
-                "routes": "Camel Route"
-            };
-            /**
-             * The array of breadcrumbs so that each item in the list of bookmarks can be switched for fast navigation and
-             * we can easily render the navigation path
-             */
-            $scope.breadcrumbs = [
-                {
-                    name: $scope.contextId,
-                    items: findContexts(),
-                    tooltip: "Camel Context"
-                },
-                {
-                    name: defaultChildEntity,
-                    items: findChildEntityTypes($scope.contextId),
-                    tooltip: "Entity inside a Camel Context"
-                },
-                {
-                    name: $scope.endpointName || tidyJmxName($scope.routeId),
-                    items: findChildEntityLinks($scope.contextId, currentChildEntity()),
-                    tooltip: childEntityToolTips[defaultChildEntity]
-                }
-            ];
-            // lets find all the camel contexts
-            function findContexts() {
-                var answer = [];
-                var rootFolder = Camel.getRootCamelFolder(workspace);
-                if (rootFolder) {
-                    angular.forEach(rootFolder.children, function (contextFolder) {
-                        var id = contextFolder.title;
-                        if (id && id !== $scope.contextId) {
-                            var name = id;
-                            var link = createLinkToFirstChildEntity(id, currentChildEntity());
-                            answer.push({
-                                name: name,
-                                tooltip: "Camel Context",
-                                link: link
-                            });
-                        }
-                    });
-                }
-                return answer;
-            }
-            // lets find all the the child entities of a camel context
-            function findChildEntityTypes(contextId) {
-                var answer = [];
-                angular.forEach(["endpoints", "routes"], function (childEntityName) {
-                    if (childEntityName && childEntityName !== currentChildEntity()) {
-                        var link = createLinkToFirstChildEntity(contextId, childEntityName);
+        ];
+        // lets find all the camel contexts
+        function findContexts() {
+            var answer = [];
+            var rootFolder = Camel.getRootCamelFolder(workspace);
+            if (rootFolder) {
+                angular.forEach(rootFolder.children, function (contextFolder) {
+                    var id = contextFolder.title;
+                    if (id && id !== $scope.contextId) {
+                        var name = id;
+                        var link = createLinkToFirstChildEntity(id, currentChildEntity());
                         answer.push({
-                            name: childEntityName,
-                            tooltip: "Entity inside a Camel Context",
+                            name: name,
+                            tooltip: "Camel Context",
                             link: link
                         });
                     }
                 });
-                return answer;
             }
-            function currentChildEntity() {
-                var answer = Core.pathGet($scope, ["breadcrumbs", "childEntity"]);
-                return answer || defaultChildEntity;
-            }
-            /**
-             * Based on the current child entity type, find the child links for the given context id and
-             * generate a link to the first child; used when changing context or child entity type
-             */
-            function createLinkToFirstChildEntity(id, childEntityValue) {
-                var links = findChildEntityLinks(id, childEntityValue);
-                // TODO here we should switch to a default context view if there's no endpoints available...
-                var link = links.length > 0 ? links[0].link : Camel.linkToBrowseEndpointFullScreen(id, "noEndpoints");
-                return link;
-            }
-            function findChildEntityLinks(contextId, childEntityValue) {
-                if ("endpoints" === childEntityValue) {
-                    return findEndpoints(contextId);
+            return answer;
+        }
+        // lets find all the the child entities of a camel context
+        function findChildEntityTypes(contextId) {
+            var answer = [];
+            angular.forEach(["endpoints", "routes"], function (childEntityName) {
+                if (childEntityName && childEntityName !== currentChildEntity()) {
+                    var link = createLinkToFirstChildEntity(contextId, childEntityName);
+                    answer.push({
+                        name: childEntityName,
+                        tooltip: "Entity inside a Camel Context",
+                        link: link
+                    });
                 }
-                else {
-                    return findRoutes(contextId);
-                }
+            });
+            return answer;
+        }
+        function currentChildEntity() {
+            var answer = Core.pathGet($scope, ["breadcrumbs", "childEntity"]);
+            return answer || defaultChildEntity;
+        }
+        /**
+         * Based on the current child entity type, find the child links for the given context id and
+         * generate a link to the first child; used when changing context or child entity type
+         */
+        function createLinkToFirstChildEntity(id, childEntityValue) {
+            var links = findChildEntityLinks(id, childEntityValue);
+            // TODO here we should switch to a default context view if there's no endpoints available...
+            var link = links.length > 0 ? links[0].link : Camel.linkToBrowseEndpointFullScreen(id, "noEndpoints");
+            return link;
+        }
+        function findChildEntityLinks(contextId, childEntityValue) {
+            if ("endpoints" === childEntityValue) {
+                return findEndpoints(contextId);
             }
-            // lets find all the endpoints for the given context id
-            function findEndpoints(contextId) {
-                var answer = [];
-                var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
-                if (contextFolder) {
-                    var endpoints = (contextFolder["children"] || []).find(function (n) { return "endpoints" === n.title; });
-                    if (endpoints) {
-                        angular.forEach(endpoints.children, function (endpointFolder) {
-                            var entries = endpointFolder ? endpointFolder.entries : null;
-                            if (entries) {
-                                var endpointPath = entries["name"];
-                                if (endpointPath) {
-                                    var name = tidyJmxName(endpointPath);
-                                    var link = Camel.linkToBrowseEndpointFullScreen(contextId, endpointPath);
-                                    answer.push({
-                                        contextId: contextId,
-                                        path: endpointPath,
-                                        name: name,
-                                        tooltip: "Endpoint",
-                                        link: link
-                                    });
-                                }
+            else {
+                return findRoutes(contextId);
+            }
+        }
+        // lets find all the endpoints for the given context id
+        function findEndpoints(contextId) {
+            var answer = [];
+            var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
+            if (contextFolder) {
+                var endpoints = (contextFolder["children"] || []).find(function (n) { return "endpoints" === n.title; });
+                if (endpoints) {
+                    angular.forEach(endpoints.children, function (endpointFolder) {
+                        var entries = endpointFolder ? endpointFolder.entries : null;
+                        if (entries) {
+                            var endpointPath = entries["name"];
+                            if (endpointPath) {
+                                var name = tidyJmxName(endpointPath);
+                                var link = Camel.linkToBrowseEndpointFullScreen(contextId, endpointPath);
+                                answer.push({
+                                    contextId: contextId,
+                                    path: endpointPath,
+                                    name: name,
+                                    tooltip: "Endpoint",
+                                    link: link
+                                });
                             }
-                        });
-                    }
+                        }
+                    });
                 }
-                return answer;
             }
-            // lets find all the routes for the given context id
-            function findRoutes(contextId) {
-                var answer = [];
-                var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
-                if (contextFolder) {
-                    var folders = (contextFolder["children"] || []).find(function (n) { return "routes" === n.title; });
-                    if (folders) {
-                        angular.forEach(folders.children, function (folder) {
-                            var entries = folder ? folder.entries : null;
-                            if (entries) {
-                                var routeId = entries["name"];
-                                if (routeId) {
-                                    var name = tidyJmxName(routeId);
-                                    var link = Camel.linkToRouteDiagramFullScreen(contextId, routeId);
-                                    answer.push({
-                                        contextId: contextId,
-                                        path: routeId,
-                                        name: name,
-                                        tooltip: "Camel Route",
-                                        link: link
-                                    });
-                                }
+            return answer;
+        }
+        // lets find all the routes for the given context id
+        function findRoutes(contextId) {
+            var answer = [];
+            var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
+            if (contextFolder) {
+                var folders = (contextFolder["children"] || []).find(function (n) { return "routes" === n.title; });
+                if (folders) {
+                    angular.forEach(folders.children, function (folder) {
+                        var entries = folder ? folder.entries : null;
+                        if (entries) {
+                            var routeId = entries["name"];
+                            if (routeId) {
+                                var name = tidyJmxName(routeId);
+                                var link = Camel.linkToRouteDiagramFullScreen(contextId, routeId);
+                                answer.push({
+                                    contextId: contextId,
+                                    path: routeId,
+                                    name: name,
+                                    tooltip: "Camel Route",
+                                    link: link
+                                });
                             }
-                        });
-                    }
+                        }
+                    });
                 }
-                return answer;
             }
-            /**
-             * Creates a link to the tree view version of this view
-             */
-            function linkToTreeView() {
-                var answer = null;
-                if ($scope.contextId) {
-                    var node = null;
-                    var tab = null;
-                    if ($scope.endpointPath) {
-                        tab = "browseEndpoint";
-                        node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
-                            context: $scope.contextId,
-                            type: "endpoints",
-                            name: $scope.endpointPath
-                        });
-                    }
-                    else if ($scope.routeId) {
-                        tab = "routes";
-                        node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
-                            context: $scope.contextId,
-                            type: "routes",
-                            name: $scope.routeId
-                        });
-                    }
-                    var key = node ? node["key"] : null;
-                    if (key && tab) {
-                        answer = "#/camel/" + tab + "?tab=camel&nid=" + key;
-                    }
+            return answer;
+        }
+        /**
+         * Creates a link to the tree view version of this view
+         */
+        function linkToTreeView() {
+            var answer = null;
+            if ($scope.contextId) {
+                var node = null;
+                var tab = null;
+                if ($scope.endpointPath) {
+                    tab = "browseEndpoint";
+                    node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
+                        context: $scope.contextId,
+                        type: "endpoints",
+                        name: $scope.endpointPath
+                    });
                 }
-                return answer;
+                else if ($scope.routeId) {
+                    tab = "routes";
+                    node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
+                        context: $scope.contextId,
+                        type: "routes",
+                        name: $scope.routeId
+                    });
+                }
+                var key = node ? node["key"] : null;
+                if (key && tab) {
+                    answer = "#/camel/" + tab + "?tab=camel&nid=" + key;
+                }
             }
-            function tidyJmxName(jmxName) {
-                return jmxName ? Core.trimQuotes(jmxName) : jmxName;
-            }
-        }]);
+            return answer;
+        }
+        function tidyJmxName(jmxName) {
+            return jmxName ? Core.trimQuotes(jmxName) : jmxName;
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -3829,99 +3740,99 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel.BrowseEndpointController = Camel._module.controller("Camel.BrowseEndpointController", ["$scope", "$routeParams", "workspace", "jolokia", function ($scope, $routeParams, workspace, jolokia) {
-            $scope.workspace = workspace;
-            $scope.forwardDialog = new UI.Dialog();
-            $scope.showMessageDetails = false;
-            $scope.mode = 'text';
-            $scope.gridOptions = Camel.createBrowseGridOptions();
-            $scope.contextId = $routeParams["contextId"];
-            $scope.endpointPath = $routeParams["endpointPath"];
-            $scope.isJmxTab = !$routeParams["contextId"] || !$routeParams["endpointPath"];
-            $scope.$watch('workspace.selection', function () {
-                if ($scope.isJmxTab && workspace.moveIfViewInvalid())
-                    return;
-                loadData();
-            });
-            // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
-            $scope.openMessageDialog = function (message) {
-                ActiveMQ.selectCurrentMessage(message, "id", $scope);
-                if ($scope.row) {
-                    $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
-                    $scope.showMessageDetails = true;
-                }
-            };
-            ActiveMQ.decorate($scope);
-            $scope.forwardMessagesAndCloseForwardDialog = function () {
-                var mbean = Camel.getSelectionCamelContextMBean(workspace);
-                var selectedItems = $scope.gridOptions.selectedItems;
-                var uri = $scope.endpointUri;
-                if (mbean && uri && selectedItems && selectedItems.length) {
-                    //console.log("Creating a new endpoint called: " + uri + " just in case!");
-                    jolokia.execute(mbean, "createEndpoint(java.lang.String)", uri, Core.onSuccess(intermediateResult));
-                    $scope.message = "Forwarded " + Core.maybePlural(selectedItems.length, "message" + " to " + uri);
-                    angular.forEach(selectedItems, function (item, idx) {
-                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
-                        var body = item.body;
-                        var headers = item.headers;
-                        //console.log("sending to uri " + uri + " headers: " + JSON.stringify(headers) + " body: " + body);
-                        jolokia.execute(mbean, "sendBodyAndHeaders(java.lang.String, java.lang.Object, java.util.Map)", uri, body, headers, Core.onSuccess(callback));
-                    });
-                }
-                $scope.forwardDialog.close();
-            };
-            $scope.endpointUris = function () {
-                var endpointFolder = Camel.getSelectionCamelContextEndpoints(workspace);
-                return (endpointFolder) ? endpointFolder.children.map(function (n) { return n.title; }) : [];
-            };
-            $scope.refresh = loadData;
-            function intermediateResult() {
+        $scope.workspace = workspace;
+        $scope.forwardDialog = new UI.Dialog();
+        $scope.showMessageDetails = false;
+        $scope.mode = 'text';
+        $scope.gridOptions = Camel.createBrowseGridOptions();
+        $scope.contextId = $routeParams["contextId"];
+        $scope.endpointPath = $routeParams["endpointPath"];
+        $scope.isJmxTab = !$routeParams["contextId"] || !$routeParams["endpointPath"];
+        $scope.$watch('workspace.selection', function () {
+            if ($scope.isJmxTab && workspace.moveIfViewInvalid())
+                return;
+            loadData();
+        });
+        // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
+        $scope.openMessageDialog = function (message) {
+            ActiveMQ.selectCurrentMessage(message, "id", $scope);
+            if ($scope.row) {
+                $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
+                $scope.showMessageDetails = true;
             }
-            function operationSuccess() {
-                if ($scope.messageDialog) {
-                    $scope.messageDialog.close();
-                }
-                $scope.gridOptions.selectedItems.splice(0);
-                Core.notification("success", $scope.message);
-                setTimeout(loadData, 50);
+        };
+        ActiveMQ.decorate($scope);
+        $scope.forwardMessagesAndCloseForwardDialog = function () {
+            var mbean = Camel.getSelectionCamelContextMBean(workspace);
+            var selectedItems = $scope.gridOptions.selectedItems;
+            var uri = $scope.endpointUri;
+            if (mbean && uri && selectedItems && selectedItems.length) {
+                //console.log("Creating a new endpoint called: " + uri + " just in case!");
+                jolokia.execute(mbean, "createEndpoint(java.lang.String)", uri, Core.onSuccess(intermediateResult));
+                $scope.message = "Forwarded " + Core.maybePlural(selectedItems.length, "message" + " to " + uri);
+                angular.forEach(selectedItems, function (item, idx) {
+                    var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
+                    var body = item.body;
+                    var headers = item.headers;
+                    //console.log("sending to uri " + uri + " headers: " + JSON.stringify(headers) + " body: " + body);
+                    jolokia.execute(mbean, "sendBodyAndHeaders(java.lang.String, java.lang.Object, java.util.Map)", uri, body, headers, Core.onSuccess(callback));
+                });
             }
-            function loadData() {
-                var mbean = null;
-                if ($scope.contextId && $scope.endpointPath) {
-                    var node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
-                        context: $scope.contextId,
-                        type: "endpoints",
-                        name: $scope.endpointPath
-                    });
-                    if (node) {
-                        mbean = node.objectName;
-                    }
-                }
-                if (!mbean) {
-                    mbean = workspace.getSelectedMBeanName();
-                }
-                if (mbean) {
-                    Camel.log.info("MBean: " + mbean);
-                    var options = Core.onSuccess(populateTable);
-                    jolokia.execute(mbean, 'browseAllMessagesAsXml(java.lang.Boolean)', true, options);
+            $scope.forwardDialog.close();
+        };
+        $scope.endpointUris = function () {
+            var endpointFolder = Camel.getSelectionCamelContextEndpoints(workspace);
+            return (endpointFolder) ? endpointFolder.children.map(function (n) { return n.title; }) : [];
+        };
+        $scope.refresh = loadData;
+        function intermediateResult() {
+        }
+        function operationSuccess() {
+            if ($scope.messageDialog) {
+                $scope.messageDialog.close();
+            }
+            $scope.gridOptions.selectedItems.splice(0);
+            Core.notification("success", $scope.message);
+            setTimeout(loadData, 50);
+        }
+        function loadData() {
+            var mbean = null;
+            if ($scope.contextId && $scope.endpointPath) {
+                var node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
+                    context: $scope.contextId,
+                    type: "endpoints",
+                    name: $scope.endpointPath
+                });
+                if (node) {
+                    mbean = node.objectName;
                 }
             }
-            function populateTable(response) {
-                var data = [];
-                if (angular.isString(response)) {
-                    // lets parse the XML DOM here...
-                    var doc = $.parseXML(response);
-                    var allMessages = $(doc).find("message");
-                    allMessages.each(function (idx, message) {
-                        var messageData = Camel.createMessageFromXml(message);
-                        // attach the open dialog to make it work
-                        messageData.openMessageDialog = $scope.openMessageDialog;
-                        data.push(messageData);
-                    });
-                }
-                $scope.messages = data;
-                Core.$apply($scope);
+            if (!mbean) {
+                mbean = workspace.getSelectedMBeanName();
             }
-        }]);
+            if (mbean) {
+                Camel.log.info("MBean: " + mbean);
+                var options = Core.onSuccess(populateTable);
+                jolokia.execute(mbean, 'browseAllMessagesAsXml(java.lang.Boolean)', true, options);
+            }
+        }
+        function populateTable(response) {
+            var data = [];
+            if (angular.isString(response)) {
+                // lets parse the XML DOM here...
+                var doc = $.parseXML(response);
+                var allMessages = $(doc).find("message");
+                allMessages.each(function (idx, message) {
+                    var messageData = Camel.createMessageFromXml(message);
+                    // attach the open dialog to make it work
+                    messageData.openMessageDialog = $scope.openMessageDialog;
+                    data.push(messageData);
+                });
+            }
+            $scope.messages = data;
+            Core.$apply($scope);
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 var Camel;
@@ -4269,311 +4180,307 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", function ($scope, $element, workspace, jolokia, localStorage, documentBase) {
-            var log = Logger.get("CamelDebugger");
-            // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
+        var log = Logger.get("CamelDebugger");
+        // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
+        $scope.debugging = false;
+        $scope.stopped = false;
+        $scope.ignoreRouteXmlNode = true;
+        $scope.messages = [];
+        $scope.mode = 'text';
+        // always show the message details
+        $scope.showMessageDetails = true;
+        $scope.startDebugging = function () {
+            log.info("Start debugging");
+            setDebugging(true);
+        };
+        $scope.stopDebugging = function () {
+            log.info("Stop debugging");
+            setDebugging(false);
+        };
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            setTimeout(reloadData, 50);
+        });
+        $scope.$on("camel.diagram.selectedNodeId", function (event, value) {
+            $scope.selectedDiagramNodeId = value;
+            updateBreakpointFlag();
+        });
+        $scope.$on("camel.diagram.layoutComplete", function (event, value) {
+            updateBreakpointIcons();
+            $($element).find("g.node").dblclick(function (n) {
+                var id = this.getAttribute("data-cid");
+                $scope.toggleBreakpoint(id);
+            });
+        });
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid()) {
+                return;
+            }
+            reloadData();
+        });
+        $scope.toggleBreakpoint = function (id) {
+            log.info("Toggle breakpoint");
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            if (mbean && id) {
+                var method = isBreakpointSet(id) ? "removeBreakpoint" : "addBreakpoint";
+                jolokia.execute(mbean, method, id, Core.onSuccess(breakpointsChanged));
+            }
+        };
+        $scope.addBreakpoint = function () {
+            log.info("Add breakpoint");
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            if (mbean && $scope.selectedDiagramNodeId) {
+                jolokia.execute(mbean, "addBreakpoint", $scope.selectedDiagramNodeId, Core.onSuccess(breakpointsChanged));
+            }
+        };
+        $scope.removeBreakpoint = function () {
+            log.info("Remove breakpoint");
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            if (mbean && $scope.selectedDiagramNodeId) {
+                jolokia.execute(mbean, "removeBreakpoint", $scope.selectedDiagramNodeId, Core.onSuccess(breakpointsChanged));
+            }
+        };
+        $scope.resume = function () {
+            log.info("Resume");
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            if (mbean) {
+                jolokia.execute(mbean, "resumeAll", Core.onSuccess(clearStoppedAndResume));
+            }
+        };
+        $scope.suspend = function () {
+            log.info("Suspend");
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            if (mbean) {
+                jolokia.execute(mbean, "suspendAll", Core.onSuccess(clearStoppedAndResume));
+            }
+        };
+        $scope.step = function () {
+            log.info("Step");
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            var stepNode = getStoppedBreakpointId();
+            if (mbean && stepNode) {
+                jolokia.execute(mbean, "stepBreakpoint(java.lang.String)", stepNode, Core.onSuccess(clearStoppedAndResume));
+            }
+        };
+        function onSelectionChanged() {
+            var toNode = getStoppedBreakpointId();
+            if (toNode) {
+                // lets highlight the node in the diagram
+                var nodes = getDiagramNodes();
+                Camel.highlightSelectedNode(nodes, toNode);
+            }
+            else {
+                // clear highlight
+                Camel.highlightSelectedNode(nodes, null);
+            }
+        }
+        function reloadData() {
             $scope.debugging = false;
-            $scope.stopped = false;
-            $scope.ignoreRouteXmlNode = true;
-            $scope.messages = [];
-            $scope.mode = 'text';
-            // always show the message details
-            $scope.showMessageDetails = true;
-            $scope.startDebugging = function () {
-                log.info("Start debugging");
-                setDebugging(true);
-            };
-            $scope.stopDebugging = function () {
-                log.info("Stop debugging");
-                setDebugging(false);
-            };
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                setTimeout(reloadData, 50);
-            });
-            $scope.$on("camel.diagram.selectedNodeId", function (event, value) {
-                $scope.selectedDiagramNodeId = value;
-                updateBreakpointFlag();
-            });
-            $scope.$on("camel.diagram.layoutComplete", function (event, value) {
-                updateBreakpointIcons();
-                $($element).find("g.node").dblclick(function (n) {
-                    var id = this.getAttribute("data-cid");
-                    $scope.toggleBreakpoint(id);
-                });
-            });
-            $scope.$watch('workspace.selection', function () {
-                if (workspace.moveIfViewInvalid()) {
-                    return;
-                }
-                reloadData();
-            });
-            $scope.toggleBreakpoint = function (id) {
-                log.info("Toggle breakpoint");
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                if (mbean && id) {
-                    var method = isBreakpointSet(id) ? "removeBreakpoint" : "addBreakpoint";
-                    jolokia.execute(mbean, method, id, Core.onSuccess(breakpointsChanged));
-                }
-            };
-            $scope.addBreakpoint = function () {
-                log.info("Add breakpoint");
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                if (mbean && $scope.selectedDiagramNodeId) {
-                    jolokia.execute(mbean, "addBreakpoint", $scope.selectedDiagramNodeId, Core.onSuccess(breakpointsChanged));
-                }
-            };
-            $scope.removeBreakpoint = function () {
-                log.info("Remove breakpoint");
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                if (mbean && $scope.selectedDiagramNodeId) {
-                    jolokia.execute(mbean, "removeBreakpoint", $scope.selectedDiagramNodeId, Core.onSuccess(breakpointsChanged));
-                }
-            };
-            $scope.resume = function () {
-                log.info("Resume");
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                if (mbean) {
-                    jolokia.execute(mbean, "resumeAll", Core.onSuccess(clearStoppedAndResume));
-                }
-            };
-            $scope.suspend = function () {
-                log.info("Suspend");
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                if (mbean) {
-                    jolokia.execute(mbean, "suspendAll", Core.onSuccess(clearStoppedAndResume));
-                }
-            };
-            $scope.step = function () {
-                log.info("Step");
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                var stepNode = getStoppedBreakpointId();
-                if (mbean && stepNode) {
-                    jolokia.execute(mbean, "stepBreakpoint(java.lang.String)", stepNode, Core.onSuccess(clearStoppedAndResume));
-                }
-            };
-            function onSelectionChanged() {
-                var toNode = getStoppedBreakpointId();
-                if (toNode) {
-                    // lets highlight the node in the diagram
-                    var nodes = getDiagramNodes();
-                    Camel.highlightSelectedNode(nodes, toNode);
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            if (mbean) {
+                $scope.debugging = jolokia.getAttribute(mbean, "Enabled", Core.onSuccess(null));
+                if ($scope.debugging) {
+                    jolokia.execute(mbean, "getBreakpoints", Core.onSuccess(onBreakpoints));
+                    // get the breakpoints...
+                    $scope.graphView = "plugins/camel/html/routes.html";
+                    Core.register(jolokia, $scope, {
+                        type: 'exec',
+                        mbean: mbean,
+                        operation: 'getDebugCounter'
+                    }, Core.onSuccess(onBreakpointCounter));
                 }
                 else {
-                    // clear highlight
-                    Camel.highlightSelectedNode(nodes, null);
+                    $scope.graphView = null;
                 }
             }
-            function reloadData() {
-                $scope.debugging = false;
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                if (mbean) {
-                    $scope.debugging = jolokia.getAttribute(mbean, "Enabled", Core.onSuccess(null));
-                    if ($scope.debugging) {
-                        jolokia.execute(mbean, "getBreakpoints", Core.onSuccess(onBreakpoints));
-                        // get the breakpoints...
-                        $scope.graphView = "plugins/camel/html/routes.html";
-                        Core.register(jolokia, $scope, {
-                            type: 'exec', mbean: mbean,
-                            operation: 'getDebugCounter' }, Core.onSuccess(onBreakpointCounter));
+        }
+        function onBreakpointCounter(response) {
+            var counter = response.value;
+            if (counter && counter !== $scope.breakpointCounter) {
+                $scope.breakpointCounter = counter;
+                loadCurrentStack();
+            }
+        }
+        /*
+         * lets load current 'stack' of which breakpoints are active
+         * and what is the current message content
+         */
+        function loadCurrentStack() {
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            if (mbean) {
+                console.log("getting suspended breakpoints!");
+                jolokia.execute(mbean, "getSuspendedBreakpointNodeIds", Core.onSuccess(onSuspendedBreakpointNodeIds));
+            }
+        }
+        function onSuspendedBreakpointNodeIds(response) {
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            $scope.suspendedBreakpoints = response;
+            $scope.stopped = response && response.length;
+            var stopNodeId = getStoppedBreakpointId();
+            if (mbean && stopNodeId) {
+                jolokia.execute(mbean, 'dumpTracedMessagesAsXml', stopNodeId, Core.onSuccess(onMessages));
+                // lets update the diagram selection to the newly stopped node
+                $scope.selectedDiagramNodeId = stopNodeId;
+            }
+        }
+        function onMessages(response, stopNodeId) {
+            log.debug("onMessage -> " + response);
+            $scope.messages = [];
+            if (response) {
+                var xml = response;
+                if (angular.isString(xml)) {
+                    // lets parse the XML DOM here...
+                    var doc = $.parseXML(xml);
+                    var allMessages = $(doc).find("fabricTracerEventMessage");
+                    if (!allMessages || !allMessages.length) {
+                        // lets try find another element name
+                        allMessages = $(doc).find("backlogTracerEventMessage");
+                    }
+                    allMessages.each(function (idx, message) {
+                        var messageData = Camel.createMessageFromXml(message);
+                        var toNode = $(message).find("toNode").text();
+                        if (toNode) {
+                            messageData["toNode"] = toNode;
+                        }
+                        // attach the open dialog to make it work
+                        messageData.openMessageDialog = $scope.openMessageDialog;
+                        $scope.messages.push(messageData);
+                    });
+                }
+            }
+            else {
+                log.warn("WARNING: dumpTracedMessagesAsXml() returned no results!");
+            }
+            // lets update the selection and selected row for the message detail view
+            updateMessageSelection();
+            updateBreakpointIcons();
+            onSelectionChanged();
+            log.debug("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
+            Core.$apply($scope);
+        }
+        function updateMessageSelection() {
+            if ($scope.messages.length > 0) {
+                $scope.row = $scope.messages[0];
+                var body = $scope.row.body;
+                $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
+                // it may detect wrong as javascript, so use text instead
+                if ("javascript" == $scope.mode) {
+                    $scope.mode = "text";
+                }
+            }
+            else {
+                // lets make a dummy empty row so we can keep the detail view while resuming
+                $scope.row = {
+                    headers: {},
+                    body: "",
+                    bodyType: ""
+                };
+                $scope.mode = "text";
+            }
+        }
+        function clearStoppedAndResume() {
+            $scope.messages = [];
+            $scope.suspendedBreakpoints = [];
+            $scope.stopped = false;
+            updateMessageSelection();
+            updateBreakpointIcons();
+            onSelectionChanged();
+            Core.$apply($scope);
+        }
+        /*
+         * Return the current node id we are stopped at
+         */
+        function getStoppedBreakpointId() {
+            var stepNode = null;
+            var stepNodes = $scope.suspendedBreakpoints;
+            if (stepNodes && stepNodes.length) {
+                stepNode = stepNodes[0];
+                if (stepNodes.length > 1 && isSuspendedAt($scope.selectedDiagramNodeId)) {
+                    // TODO should consider we stepping from different nodes based on the call thread or selection?
+                    stepNode = $scope.selectedDiagramNodeId;
+                }
+            }
+            return stepNode;
+        }
+        /*
+         * Returns true if the execution is currently suspended at the given node
+         */
+        function isSuspendedAt(nodeId) {
+            return containsNodeId($scope.suspendedBreakpoints, nodeId);
+        }
+        function onBreakpoints(response) {
+            $scope.breakpoints = response;
+            updateBreakpointFlag();
+            // update the breakpoint icons...
+            var nodes = getDiagramNodes();
+            if (nodes.length) {
+                updateBreakpointIcons(nodes);
+            }
+            Core.$apply($scope);
+        }
+        /*
+         * Returns true if there is a breakpoint set at the given node id
+         */
+        function isBreakpointSet(nodeId) {
+            return containsNodeId($scope.breakpoints, nodeId);
+        }
+        function updateBreakpointFlag() {
+            $scope.hasBreakpoint = isBreakpointSet($scope.selectedDiagramNodeId);
+        }
+        function containsNodeId(breakpoints, nodeId) {
+            return nodeId && breakpoints && breakpoints.some(nodeId);
+        }
+        function getDiagramNodes() {
+            var svg = d3.select("svg");
+            return svg.selectAll("g .node");
+        }
+        var breakpointImage = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint.gif");
+        var suspendedBreakpointImage = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint-suspended.gif");
+        function updateBreakpointIcons(nodes) {
+            if (nodes === void 0) { nodes = getDiagramNodes(); }
+            nodes.each(function (object) {
+                // add breakpoint icon
+                var nodeId = object.cid;
+                var thisNode = d3.select(this);
+                var icons = thisNode.selectAll("image.breakpoint");
+                var isSuspended = isSuspendedAt(nodeId);
+                var isBreakpoint = isBreakpointSet(nodeId);
+                if (isBreakpoint || isSuspended) {
+                    var imageUrl = isSuspended ? suspendedBreakpointImage : breakpointImage;
+                    // lets add an icon image if we don't already have one
+                    if (!icons.length || !icons[0].length) {
+                        thisNode.append("image").attr("xlink:href", function (d) {
+                            return imageUrl;
+                        }).attr("class", "breakpoint").attr("x", -12).attr("y", -20).attr("height", 24).attr("width", 24);
                     }
                     else {
-                        $scope.graphView = null;
-                    }
-                }
-            }
-            function onBreakpointCounter(response) {
-                var counter = response.value;
-                if (counter && counter !== $scope.breakpointCounter) {
-                    $scope.breakpointCounter = counter;
-                    loadCurrentStack();
-                }
-            }
-            /*
-             * lets load current 'stack' of which breakpoints are active
-             * and what is the current message content
-             */
-            function loadCurrentStack() {
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                if (mbean) {
-                    console.log("getting suspended breakpoints!");
-                    jolokia.execute(mbean, "getSuspendedBreakpointNodeIds", Core.onSuccess(onSuspendedBreakpointNodeIds));
-                }
-            }
-            function onSuspendedBreakpointNodeIds(response) {
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                $scope.suspendedBreakpoints = response;
-                $scope.stopped = response && response.length;
-                var stopNodeId = getStoppedBreakpointId();
-                if (mbean && stopNodeId) {
-                    jolokia.execute(mbean, 'dumpTracedMessagesAsXml', stopNodeId, Core.onSuccess(onMessages));
-                    // lets update the diagram selection to the newly stopped node
-                    $scope.selectedDiagramNodeId = stopNodeId;
-                }
-            }
-            function onMessages(response, stopNodeId) {
-                log.debug("onMessage -> " + response);
-                $scope.messages = [];
-                if (response) {
-                    var xml = response;
-                    if (angular.isString(xml)) {
-                        // lets parse the XML DOM here...
-                        var doc = $.parseXML(xml);
-                        var allMessages = $(doc).find("fabricTracerEventMessage");
-                        if (!allMessages || !allMessages.length) {
-                            // lets try find another element name
-                            allMessages = $(doc).find("backlogTracerEventMessage");
-                        }
-                        allMessages.each(function (idx, message) {
-                            var messageData = Camel.createMessageFromXml(message);
-                            var toNode = $(message).find("toNode").text();
-                            if (toNode) {
-                                messageData["toNode"] = toNode;
-                            }
-                            // attach the open dialog to make it work
-                            messageData.openMessageDialog = $scope.openMessageDialog;
-                            $scope.messages.push(messageData);
+                        icons.attr("xlink:href", function (d) {
+                            return imageUrl;
                         });
                     }
                 }
                 else {
-                    log.warn("WARNING: dumpTracedMessagesAsXml() returned no results!");
+                    icons.remove();
                 }
-                // lets update the selection and selected row for the message detail view
-                updateMessageSelection();
-                updateBreakpointIcons();
-                onSelectionChanged();
-                log.debug("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
-                Core.$apply($scope);
+            });
+        }
+        function breakpointsChanged(response) {
+            reloadData();
+            Core.$apply($scope);
+        }
+        function setDebugging(flag) {
+            var mbean = Camel.getSelectionCamelDebugMBean(workspace);
+            if (mbean) {
+                var method = flag ? "enableDebugger" : "disableDebugger";
+                var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
+                var streams = Camel.traceOrDebugIncludeStreams(localStorage);
+                jolokia.setAttribute(mbean, "BodyMaxChars", max);
+                jolokia.setAttribute(mbean, "BodyIncludeStreams", streams);
+                jolokia.setAttribute(mbean, "BodyIncludeFiles", streams);
+                jolokia.execute(mbean, method, Core.onSuccess(breakpointsChanged));
             }
-            function updateMessageSelection() {
-                if ($scope.messages.length > 0) {
-                    $scope.row = $scope.messages[0];
-                    var body = $scope.row.body;
-                    $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
-                    // it may detect wrong as javascript, so use text instead
-                    if ("javascript" == $scope.mode) {
-                        $scope.mode = "text";
-                    }
-                }
-                else {
-                    // lets make a dummy empty row so we can keep the detail view while resuming
-                    $scope.row = {
-                        headers: {},
-                        body: "",
-                        bodyType: ""
-                    };
-                    $scope.mode = "text";
-                }
-            }
-            function clearStoppedAndResume() {
-                $scope.messages = [];
-                $scope.suspendedBreakpoints = [];
-                $scope.stopped = false;
-                updateMessageSelection();
-                updateBreakpointIcons();
-                onSelectionChanged();
-                Core.$apply($scope);
-            }
-            /*
-             * Return the current node id we are stopped at
-             */
-            function getStoppedBreakpointId() {
-                var stepNode = null;
-                var stepNodes = $scope.suspendedBreakpoints;
-                if (stepNodes && stepNodes.length) {
-                    stepNode = stepNodes[0];
-                    if (stepNodes.length > 1 && isSuspendedAt($scope.selectedDiagramNodeId)) {
-                        // TODO should consider we stepping from different nodes based on the call thread or selection?
-                        stepNode = $scope.selectedDiagramNodeId;
-                    }
-                }
-                return stepNode;
-            }
-            /*
-             * Returns true if the execution is currently suspended at the given node
-             */
-            function isSuspendedAt(nodeId) {
-                return containsNodeId($scope.suspendedBreakpoints, nodeId);
-            }
-            function onBreakpoints(response) {
-                $scope.breakpoints = response;
-                updateBreakpointFlag();
-                // update the breakpoint icons...
-                var nodes = getDiagramNodes();
-                if (nodes.length) {
-                    updateBreakpointIcons(nodes);
-                }
-                Core.$apply($scope);
-            }
-            /*
-             * Returns true if there is a breakpoint set at the given node id
-             */
-            function isBreakpointSet(nodeId) {
-                return containsNodeId($scope.breakpoints, nodeId);
-            }
-            function updateBreakpointFlag() {
-                $scope.hasBreakpoint = isBreakpointSet($scope.selectedDiagramNodeId);
-            }
-            function containsNodeId(breakpoints, nodeId) {
-                return nodeId && breakpoints && breakpoints.some(nodeId);
-            }
-            function getDiagramNodes() {
-                var svg = d3.select("svg");
-                return svg.selectAll("g .node");
-            }
-            var breakpointImage = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint.gif");
-            var suspendedBreakpointImage = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint-suspended.gif");
-            function updateBreakpointIcons(nodes) {
-                if (nodes === void 0) { nodes = getDiagramNodes(); }
-                nodes.each(function (object) {
-                    // add breakpoint icon
-                    var nodeId = object.cid;
-                    var thisNode = d3.select(this);
-                    var icons = thisNode.selectAll("image.breakpoint");
-                    var isSuspended = isSuspendedAt(nodeId);
-                    var isBreakpoint = isBreakpointSet(nodeId);
-                    if (isBreakpoint || isSuspended) {
-                        var imageUrl = isSuspended ? suspendedBreakpointImage : breakpointImage;
-                        // lets add an icon image if we don't already have one
-                        if (!icons.length || !icons[0].length) {
-                            thisNode.append("image")
-                                .attr("xlink:href", function (d) {
-                                return imageUrl;
-                            })
-                                .attr("class", "breakpoint")
-                                .attr("x", -12)
-                                .attr("y", -20)
-                                .attr("height", 24)
-                                .attr("width", 24);
-                        }
-                        else {
-                            icons.attr("xlink:href", function (d) {
-                                return imageUrl;
-                            });
-                        }
-                    }
-                    else {
-                        icons.remove();
-                    }
-                });
-            }
-            function breakpointsChanged(response) {
-                reloadData();
-                Core.$apply($scope);
-            }
-            function setDebugging(flag) {
-                var mbean = Camel.getSelectionCamelDebugMBean(workspace);
-                if (mbean) {
-                    var method = flag ? "enableDebugger" : "disableDebugger";
-                    var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
-                    var streams = Camel.traceOrDebugIncludeStreams(localStorage);
-                    jolokia.setAttribute(mbean, "BodyMaxChars", max);
-                    jolokia.setAttribute(mbean, "BodyIncludeStreams", streams);
-                    jolokia.setAttribute(mbean, "BodyIncludeFiles", streams);
-                    jolokia.execute(mbean, method, Core.onSuccess(breakpointsChanged));
-                }
-            }
-        }]);
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -4581,75 +4488,75 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.EndpointController", ["$scope", "$location", "localStorage", "workspace", "jolokia", function ($scope, $location, localStorage, workspace, jolokia) {
-            Camel.initEndpointChooserScope($scope, $location, localStorage, workspace, jolokia);
-            $scope.workspace = workspace;
-            $scope.message = "";
-            $scope.createEndpoint = function (name) {
-                var jolokia = workspace.jolokia;
-                if (jolokia) {
-                    var mbean = Camel.getSelectionCamelContextMBean(workspace);
-                    if (mbean) {
-                        $scope.message = "Creating endpoint " + name;
-                        var operation = "createEndpoint(java.lang.String)";
-                        jolokia.execute(mbean, operation, name, Core.onSuccess(operationSuccess));
-                    }
-                    else {
-                        Core.notification("error", "Could not find the CamelContext MBean!");
-                    }
+        Camel.initEndpointChooserScope($scope, $location, localStorage, workspace, jolokia);
+        $scope.workspace = workspace;
+        $scope.message = "";
+        $scope.createEndpoint = function (name) {
+            var jolokia = workspace.jolokia;
+            if (jolokia) {
+                var mbean = Camel.getSelectionCamelContextMBean(workspace);
+                if (mbean) {
+                    $scope.message = "Creating endpoint " + name;
+                    var operation = "createEndpoint(java.lang.String)";
+                    jolokia.execute(mbean, operation, name, Core.onSuccess(operationSuccess));
                 }
-            };
-            $scope.createEndpointFromData = function () {
-                if ($scope.selectedComponentName && $scope.endpointPath) {
-                    var name = $scope.selectedComponentName + "://" + $scope.endpointPath;
-                    console.log("Have endpoint data " + JSON.stringify($scope.endpointParameters));
-                    var params = "";
-                    angular.forEach($scope.endpointParameters, function (value, key) {
-                        var prefix = params ? "&" : "";
-                        params += prefix + key + "=" + value;
-                    });
-                    if (params) {
-                        name += "?" + params;
-                    }
-                    // TODO use form data too for URIs parameters...
-                    $scope.createEndpoint(name);
+                else {
+                    Core.notification("error", "Could not find the CamelContext MBean!");
                 }
-            };
-            $scope.deleteEndpoint = function () {
-                var jolokia = workspace.jolokia;
-                var selection = workspace.selection;
-                var entries = selection.entries;
-                if (selection && jolokia && entries) {
-                    var domain = selection.domain;
-                    var brokerName = entries["BrokerName"];
-                    var name = entries["Destination"];
-                    var isQueue = "Topic" !== entries["Type"];
-                    if (domain && brokerName) {
-                        var mbean = "" + domain + ":BrokerName=" + brokerName + ",Type=Broker";
-                        $scope.message = "Deleting " + (isQueue ? "queue" : "topic") + " " + name;
-                        var operation = "removeEndpoint(java.lang.String)";
-                        jolokia.execute(mbean, operation, name, Core.onSuccess(deleteSuccess));
-                    }
-                }
-            };
-            function operationSuccess() {
-                $scope.endpointName = "";
-                $scope.workspace.operationCounter += 1;
-                Core.$apply($scope);
-                Core.notification("success", $scope.message);
             }
-            function deleteSuccess() {
-                // lets set the selection to the parent
-                if (workspace.selection) {
-                    var parent = Core.pathGet(workspace, ["selection", "parent"]);
-                    if (parent) {
-                        $scope.workspace.updateSelectionNode(parent);
-                    }
+        };
+        $scope.createEndpointFromData = function () {
+            if ($scope.selectedComponentName && $scope.endpointPath) {
+                var name = $scope.selectedComponentName + "://" + $scope.endpointPath;
+                console.log("Have endpoint data " + JSON.stringify($scope.endpointParameters));
+                var params = "";
+                angular.forEach($scope.endpointParameters, function (value, key) {
+                    var prefix = params ? "&" : "";
+                    params += prefix + key + "=" + value;
+                });
+                if (params) {
+                    name += "?" + params;
                 }
-                $scope.workspace.operationCounter += 1;
-                Core.$apply($scope);
-                Core.notification("success", $scope.message);
+                // TODO use form data too for URIs parameters...
+                $scope.createEndpoint(name);
             }
-        }]);
+        };
+        $scope.deleteEndpoint = function () {
+            var jolokia = workspace.jolokia;
+            var selection = workspace.selection;
+            var entries = selection.entries;
+            if (selection && jolokia && entries) {
+                var domain = selection.domain;
+                var brokerName = entries["BrokerName"];
+                var name = entries["Destination"];
+                var isQueue = "Topic" !== entries["Type"];
+                if (domain && brokerName) {
+                    var mbean = "" + domain + ":BrokerName=" + brokerName + ",Type=Broker";
+                    $scope.message = "Deleting " + (isQueue ? "queue" : "topic") + " " + name;
+                    var operation = "removeEndpoint(java.lang.String)";
+                    jolokia.execute(mbean, operation, name, Core.onSuccess(deleteSuccess));
+                }
+            }
+        };
+        function operationSuccess() {
+            $scope.endpointName = "";
+            $scope.workspace.operationCounter += 1;
+            Core.$apply($scope);
+            Core.notification("success", $scope.message);
+        }
+        function deleteSuccess() {
+            // lets set the selection to the parent
+            if (workspace.selection) {
+                var parent = Core.pathGet(workspace, ["selection", "parent"]);
+                if (parent) {
+                    $scope.workspace.updateSelectionNode(parent);
+                }
+            }
+            $scope.workspace.operationCounter += 1;
+            Core.$apply($scope);
+            Core.notification("success", $scope.message);
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -4678,9 +4585,19 @@ var Camel;
         cloud: {
             label: "Cloud",
             endpoints: [
-                "aws-cw", "aws-ddb", "aws-sdb", "aws-ses", "aws-sns", "aws-sqs", "aws-s3",
-                "gauth", "ghhtp", "glogin", "gtask",
-                "jclouds"]
+                "aws-cw",
+                "aws-ddb",
+                "aws-sdb",
+                "aws-ses",
+                "aws-sns",
+                "aws-sqs",
+                "aws-s3",
+                "gauth",
+                "ghhtp",
+                "glogin",
+                "gtask",
+                "jclouds"
+            ]
         },
         core: {
             label: "Core",
@@ -4951,9 +4868,7 @@ var Camel;
                 selectedCamelContextId = $scope.camelSelectionDetails.selectedCamelContextId;
                 selectedRouteId = $scope.camelSelectionDetails.selectedRouteId;
             }
-            console.log("==== componentName " + componentName +
-                " selectedCamelContextId: " + selectedCamelContextId +
-                " selectedRouteId: " + selectedRouteId);
+            console.log("==== componentName " + componentName + " selectedCamelContextId: " + selectedCamelContextId + " selectedRouteId: " + selectedRouteId);
             var contextsById = Camel.camelContextMBeansById(profileWorkspace);
             if (selectedCamelContextId) {
                 var mbean = Core.pathGet(contextsById, [selectedCamelContextId, "mbean"]);
@@ -5010,106 +4925,106 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.EndpointRuntimeRegistryController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = [];
-            $scope.selectedMBean = null;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'url',
-                    displayName: 'Url',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'routeId',
-                    displayName: 'Route Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'direction',
-                    displayName: 'Direction',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'static',
-                    displayName: 'Static',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'dynamic',
-                    displayName: 'Dynamic',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'hits',
-                    displayName: 'Hits',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: false,
-                canSelectRows: false,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                }
-            };
-            function onRestRegistry(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var entry = obj[key];
-                        arr.push({
-                            url: entry.url,
-                            routeId: entry.routeId,
-                            direction: entry.direction,
-                            static: entry.static,
-                            dynamic: entry.dynamic,
-                            hits: entry.hits
-                        });
-                    }
-                    arr = arr.sortBy("url");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
-                }
-                else {
-                    // set the mbean to a value so the ui can get updated
-                    $scope.selectedMBean = "true";
-                }
-                // ensure web page is updated
-                Core.$apply($scope);
+        $scope.data = [];
+        $scope.selectedMBean = null;
+        $scope.mbeanAttributes = {};
+        var columnDefs = [
+            {
+                field: 'url',
+                displayName: 'Url',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'routeId',
+                displayName: 'Route Id',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'direction',
+                displayName: 'Direction',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'static',
+                displayName: 'Static',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'dynamic',
+                displayName: 'Dynamic',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'hits',
+                displayName: 'Hits',
+                cellFilter: null,
+                width: "*",
+                resizable: true
             }
-            $scope.renderIcon = function (state) {
-                return Camel.iconClass(state);
-            };
-            function loadEndpointRegistry() {
-                console.log("Loading EndpointRuntimeRegistry data...");
-                var mbean = Camel.getSelectionCamelEndpointRuntimeRegistry(workspace);
-                if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'endpointStatistics' }, Core.onSuccess(onRestRegistry));
-                }
+        ];
+        $scope.gridOptions = {
+            data: 'data',
+            displayFooter: true,
+            displaySelectionCheckbox: false,
+            canSelectRows: false,
+            enableSorting: true,
+            columnDefs: columnDefs,
+            selectedItems: [],
+            filterOptions: {
+                filterText: ''
             }
-            // load data
-            loadEndpointRegistry();
-        }]);
+        };
+        function onRestRegistry(response) {
+            var obj = response.value;
+            if (obj) {
+                // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
+                var arr = [];
+                for (var key in obj) {
+                    var entry = obj[key];
+                    arr.push({
+                        url: entry.url,
+                        routeId: entry.routeId,
+                        direction: entry.direction,
+                        static: entry.static,
+                        dynamic: entry.dynamic,
+                        hits: entry.hits
+                    });
+                }
+                arr = arr.sortBy("url");
+                $scope.data = arr;
+                // okay we have the data then set the selected mbean which allows UI to display data
+                $scope.selectedMBean = response.request.mbean;
+            }
+            else {
+                // set the mbean to a value so the ui can get updated
+                $scope.selectedMBean = "true";
+            }
+            // ensure web page is updated
+            Core.$apply($scope);
+        }
+        $scope.renderIcon = function (state) {
+            return Camel.iconClass(state);
+        };
+        function loadEndpointRegistry() {
+            console.log("Loading EndpointRuntimeRegistry data...");
+            var mbean = Camel.getSelectionCamelEndpointRuntimeRegistry(workspace);
+            if (mbean) {
+                jolokia.request({ type: 'exec', mbean: mbean, operation: 'endpointStatistics' }, Core.onSuccess(onRestRegistry));
+            }
+        }
+        // load data
+        loadEndpointRegistry();
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -5117,106 +5032,106 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.InflightController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = [];
-            $scope.initDone = false;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'exchangeId',
-                    displayName: 'Exchange Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'routeId',
-                    displayName: 'Route Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'nodeId',
-                    displayName: 'Node Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'duration',
-                    displayName: 'Duration (ms)',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'elapsed',
-                    displayName: 'Elapsed (ms)',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: false,
-                canSelectRows: false,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                }
-            };
-            function onInflight(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var entry = obj[key];
-                        arr.push({
-                            exchangeId: entry.exchangeId,
-                            routeId: entry.routeId,
-                            nodeId: entry.nodeId,
-                            duration: entry.duration,
-                            elapsed: entry.elapsed
-                        });
-                    }
-                    arr = arr.sortBy("exchangeId");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
-                }
-                else {
-                    // clear data
-                    $scope.data = [];
-                }
-                $scope.initDone = "true";
-                // ensure web page is updated
-                Core.$apply($scope);
+        $scope.data = [];
+        $scope.initDone = false;
+        $scope.mbeanAttributes = {};
+        var columnDefs = [
+            {
+                field: 'exchangeId',
+                displayName: 'Exchange Id',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'routeId',
+                displayName: 'Route Id',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'nodeId',
+                displayName: 'Node Id',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'duration',
+                displayName: 'Duration (ms)',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'elapsed',
+                displayName: 'Elapsed (ms)',
+                cellFilter: null,
+                width: "*",
+                resizable: true
             }
-            $scope.renderIcon = function (state) {
-                return Camel.iconClass(state);
-            };
-            function loadData() {
-                console.log("Loading inflight data...");
-                // pre-select filter if we have selected a route
-                var routeId = Camel.getSelectedRouteId(workspace);
-                if (routeId != null) {
-                    $scope.gridOptions.filterOptions.filterText = routeId;
-                }
-                var mbean = Camel.getSelectionCamelInflightRepository(workspace);
-                if (mbean) {
-                    // grab inflight in real time
-                    var query = { type: "exec", mbean: mbean, operation: 'browse()' };
-                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onInflight, query));
-                }
+        ];
+        $scope.gridOptions = {
+            data: 'data',
+            displayFooter: true,
+            displaySelectionCheckbox: false,
+            canSelectRows: false,
+            enableSorting: true,
+            columnDefs: columnDefs,
+            selectedItems: [],
+            filterOptions: {
+                filterText: ''
             }
-            // load data
-            loadData();
-        }]);
+        };
+        function onInflight(response) {
+            var obj = response.value;
+            if (obj) {
+                // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
+                var arr = [];
+                for (var key in obj) {
+                    var entry = obj[key];
+                    arr.push({
+                        exchangeId: entry.exchangeId,
+                        routeId: entry.routeId,
+                        nodeId: entry.nodeId,
+                        duration: entry.duration,
+                        elapsed: entry.elapsed
+                    });
+                }
+                arr = arr.sortBy("exchangeId");
+                $scope.data = arr;
+                // okay we have the data then set the selected mbean which allows UI to display data
+                $scope.selectedMBean = response.request.mbean;
+            }
+            else {
+                // clear data
+                $scope.data = [];
+            }
+            $scope.initDone = "true";
+            // ensure web page is updated
+            Core.$apply($scope);
+        }
+        $scope.renderIcon = function (state) {
+            return Camel.iconClass(state);
+        };
+        function loadData() {
+            console.log("Loading inflight data...");
+            // pre-select filter if we have selected a route
+            var routeId = Camel.getSelectedRouteId(workspace);
+            if (routeId != null) {
+                $scope.gridOptions.filterOptions.filterText = routeId;
+            }
+            var mbean = Camel.getSelectionCamelInflightRepository(workspace);
+            if (mbean) {
+                // grab inflight in real time
+                var query = { type: "exec", mbean: mbean, operation: 'browse()' };
+                Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onInflight, query));
+            }
+        }
+        // load data
+        loadData();
+    }]);
 })(Camel || (Camel = {}));
 
 var Camel;
@@ -5282,96 +5197,96 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.PreferencesController", ["$scope", "localStorage", function ($scope, localStorage) {
-            var config = {
-                properties: {
-                    camelHideOptionDocumentation: {
-                        type: 'boolean',
-                        default: Camel.defaultHideOptionDocumentation,
-                        description: 'Whether to hide documentation in the properties view and Camel route editor'
-                    },
-                    camelHideOptionDefaultValue: {
-                        type: 'boolean',
-                        default: Camel.defaultHideOptionDefaultValue,
-                        description: 'Whether to hide options that are using a default value in the properties view'
-                    },
-                    camelHideOptionUnusedValue: {
-                        type: 'boolean',
-                        default: Camel.defaultHideOptionUnusedValue,
-                        description: 'Whether to hide unused/empty options in the properties view'
-                    },
-                    camelTraceOrDebugIncludeStreams: {
-                        type: 'boolean',
-                        default: Camel.defaultCamelTraceOrDebugIncludeStreams,
-                        description: 'Whether to include stream based message body when using the tracer and debugger'
-                    },
-                    camelMaximumTraceOrDebugBodyLength: {
-                        type: 'number',
-                        default: Camel.defaultCamelMaximumTraceOrDebugBodyLength,
-                        description: 'The maximum length of the body before its clipped when using the tracer and debugger'
-                    },
-                    camelMaximumLabelWidth: {
-                        type: 'number',
-                        description: 'The maximum length of a label in Camel diagrams before it is clipped'
-                    },
-                    camelIgnoreIdForLabel: {
-                        type: 'boolean',
-                        default: false,
-                        description: 'If enabled then we will ignore the ID value when viewing a pattern in a Camel diagram; otherwise we will use the ID value as the label (the tooltip will show the actual detail)'
-                    },
-                    camelShowInflightCounter: {
-                        type: 'boolean',
-                        default: true,
-                        description: 'Whether to show inflight counter in route diagram'
-                    },
-                    camelRouteMetricMaxSeconds: {
-                        type: 'number',
-                        min: '1',
-                        max: '100',
-                        description: 'The maximum value in seconds used by the route metrics duration and histogram charts'
-                    }
+        var config = {
+            properties: {
+                camelHideOptionDocumentation: {
+                    type: 'boolean',
+                    default: Camel.defaultHideOptionDocumentation,
+                    description: 'Whether to hide documentation in the properties view and Camel route editor'
+                },
+                camelHideOptionDefaultValue: {
+                    type: 'boolean',
+                    default: Camel.defaultHideOptionDefaultValue,
+                    description: 'Whether to hide options that are using a default value in the properties view'
+                },
+                camelHideOptionUnusedValue: {
+                    type: 'boolean',
+                    default: Camel.defaultHideOptionUnusedValue,
+                    description: 'Whether to hide unused/empty options in the properties view'
+                },
+                camelTraceOrDebugIncludeStreams: {
+                    type: 'boolean',
+                    default: Camel.defaultCamelTraceOrDebugIncludeStreams,
+                    description: 'Whether to include stream based message body when using the tracer and debugger'
+                },
+                camelMaximumTraceOrDebugBodyLength: {
+                    type: 'number',
+                    default: Camel.defaultCamelMaximumTraceOrDebugBodyLength,
+                    description: 'The maximum length of the body before its clipped when using the tracer and debugger'
+                },
+                camelMaximumLabelWidth: {
+                    type: 'number',
+                    description: 'The maximum length of a label in Camel diagrams before it is clipped'
+                },
+                camelIgnoreIdForLabel: {
+                    type: 'boolean',
+                    default: false,
+                    description: 'If enabled then we will ignore the ID value when viewing a pattern in a Camel diagram; otherwise we will use the ID value as the label (the tooltip will show the actual detail)'
+                },
+                camelShowInflightCounter: {
+                    type: 'boolean',
+                    default: true,
+                    description: 'Whether to show inflight counter in route diagram'
+                },
+                camelRouteMetricMaxSeconds: {
+                    type: 'number',
+                    min: '1',
+                    max: '100',
+                    description: 'The maximum value in seconds used by the route metrics duration and histogram charts'
                 }
-            };
-            $scope.entity = $scope;
-            $scope.config = config;
-            Core.initPreferenceScope($scope, localStorage, {
-                'camelIgnoreIdForLabel': {
-                    'value': false,
-                    'converter': Core.parseBooleanValue
-                },
-                'camelShowInflightCounter': {
-                    'value': true,
-                    'converter': Core.parseBooleanValue
-                },
-                'camelMaximumLabelWidth': {
-                    'value': Camel.defaultMaximumLabelWidth,
-                    'converter': parseInt
-                },
-                'camelMaximumTraceOrDebugBodyLength': {
-                    'value': Camel.defaultCamelMaximumTraceOrDebugBodyLength,
-                    'converter': parseInt
-                },
-                'camelTraceOrDebugIncludeStreams': {
-                    'value': Camel.defaultCamelTraceOrDebugIncludeStreams,
-                    'converter': Core.parseBooleanValue
-                },
-                'camelRouteMetricMaxSeconds': {
-                    'value': Camel.defaultCamelRouteMetricMaxSeconds,
-                    'converter': parseInt
-                },
-                'camelHideOptionDocumentation': {
-                    'value': Camel.defaultHideOptionDocumentation,
-                    'converter': Core.parseBooleanValue
-                },
-                'camelHideOptionDefaultValue': {
-                    'value': Camel.defaultHideOptionDefaultValue,
-                    'converter': Core.parseBooleanValue
-                },
-                'camelHideOptionUnusedValue': {
-                    'value': Camel.defaultHideOptionUnusedValue,
-                    'converter': Core.parseBooleanValue
-                }
-            });
-        }]);
+            }
+        };
+        $scope.entity = $scope;
+        $scope.config = config;
+        Core.initPreferenceScope($scope, localStorage, {
+            'camelIgnoreIdForLabel': {
+                'value': false,
+                'converter': Core.parseBooleanValue
+            },
+            'camelShowInflightCounter': {
+                'value': true,
+                'converter': Core.parseBooleanValue
+            },
+            'camelMaximumLabelWidth': {
+                'value': Camel.defaultMaximumLabelWidth,
+                'converter': parseInt
+            },
+            'camelMaximumTraceOrDebugBodyLength': {
+                'value': Camel.defaultCamelMaximumTraceOrDebugBodyLength,
+                'converter': parseInt
+            },
+            'camelTraceOrDebugIncludeStreams': {
+                'value': Camel.defaultCamelTraceOrDebugIncludeStreams,
+                'converter': Core.parseBooleanValue
+            },
+            'camelRouteMetricMaxSeconds': {
+                'value': Camel.defaultCamelRouteMetricMaxSeconds,
+                'converter': parseInt
+            },
+            'camelHideOptionDocumentation': {
+                'value': Camel.defaultHideOptionDocumentation,
+                'converter': Core.parseBooleanValue
+            },
+            'camelHideOptionDefaultValue': {
+                'value': Camel.defaultHideOptionDefaultValue,
+                'converter': Core.parseBooleanValue
+            },
+            'camelHideOptionUnusedValue': {
+                'value': Camel.defaultHideOptionUnusedValue,
+                'converter': Core.parseBooleanValue
+            }
+        });
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -5379,204 +5294,204 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.ProfileRouteController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.initDone = false;
-            $scope.data = [];
-            var columnDefs = [
-                {
-                    field: 'id',
-                    displayName: 'Id',
-                    cellFilter: null,
-                    width: "**",
-                    resizable: true
-                },
-                {
-                    field: 'count',
-                    displayName: 'Count',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'last',
-                    displayName: 'Last',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'delta',
-                    displayName: 'Delta',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'mean',
-                    displayName: 'Mean',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'min',
-                    displayName: 'Min',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'max',
-                    displayName: 'Max',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'total',
-                    displayName: 'Total',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'self',
-                    displayName: 'Self',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.rowIcon = function (id) {
-                var entry = $scope.icons[id];
-                if (entry) {
-                    return entry.img + " " + id;
-                }
-                else {
-                    return id;
-                }
-            };
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: false,
-                canSelectRows: false,
-                enableSorting: false,
-                columnDefs: columnDefs,
-                filterOptions: {
-                    filterText: ''
-                }
-            };
-            function onProfile(response) {
-                var updatedData = [];
-                // its xml structure so we need to parse it
-                var xml = response.value;
-                if (angular.isString(xml)) {
-                    // lets parse the XML DOM here...
-                    var doc = $.parseXML(xml);
-                    var routeMessages = $(doc).find("routeStat");
-                    routeMessages.each(function (idx, message) {
-                        var messageData = {
-                            id: {},
-                            count: {},
-                            last: {},
-                            delta: {},
-                            mean: {},
-                            min: {},
-                            max: {},
-                            total: {},
-                            self: {}
-                        };
-                        // compare counters, as we only update if we have new data
-                        messageData.id = message.getAttribute("id");
-                        var total = 0;
-                        total += +message.getAttribute("exchangesCompleted");
-                        total += +message.getAttribute("exchangesFailed");
-                        messageData.count = total;
-                        messageData.last = message.getAttribute("lastProcessingTime");
-                        // delta is only avail from Camel 2.11 onwards
-                        var delta = message.getAttribute("deltaProcessingTime");
-                        if (delta) {
-                            messageData.delta = delta;
-                        }
-                        else {
-                            messageData.delta = 0;
-                        }
-                        messageData.mean = message.getAttribute("meanProcessingTime");
-                        messageData.min = message.getAttribute("minProcessingTime");
-                        messageData.max = message.getAttribute("maxProcessingTime");
-                        messageData.total = message.getAttribute("totalProcessingTime");
-                        messageData.self = message.getAttribute("selfProcessingTime");
-                        updatedData.push(messageData);
-                    });
-                    var processorMessages = $(doc).find("processorStat");
-                    processorMessages.each(function (idx, message) {
-                        var messageData = {
-                            id: {},
-                            count: {},
-                            last: {},
-                            delta: {},
-                            mean: {},
-                            min: {},
-                            max: {},
-                            total: {},
-                            self: {}
-                        };
-                        messageData.id = message.getAttribute("id");
-                        var total = 0;
-                        total += +message.getAttribute("exchangesCompleted");
-                        total += +message.getAttribute("exchangesFailed");
-                        messageData.count = total;
-                        messageData.last = message.getAttribute("lastProcessingTime");
-                        // delta is only avail from Camel 2.11 onwards
-                        var delta = message.getAttribute("deltaProcessingTime");
-                        if (delta) {
-                            messageData.delta = delta;
-                        }
-                        else {
-                            messageData.delta = 0;
-                        }
-                        messageData.mean = message.getAttribute("meanProcessingTime");
-                        messageData.min = message.getAttribute("minProcessingTime");
-                        messageData.max = message.getAttribute("maxProcessingTime");
-                        // total time for processors is pre calculated as accumulated from Camel 2.11 onwards
-                        var apt = message.getAttribute("accumulatedProcessingTime");
-                        if (apt) {
-                            messageData.total = apt;
-                        }
-                        else {
-                            messageData.total = "0";
-                        }
-                        // self time for processors is their total time
-                        messageData.self = message.getAttribute("totalProcessingTime");
-                        updatedData.push(messageData);
-                    });
-                }
-                // if we do as below with the forEach then the data does not update
-                // replace data with updated data
-                $scope.data = updatedData;
-                $scope.initDone = true;
-                // ensure web page is updated
-                Core.$apply($scope);
+        $scope.initDone = false;
+        $scope.data = [];
+        var columnDefs = [
+            {
+                field: 'id',
+                displayName: 'Id',
+                cellFilter: null,
+                width: "**",
+                resizable: true
+            },
+            {
+                field: 'count',
+                displayName: 'Count',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'last',
+                displayName: 'Last',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'delta',
+                displayName: 'Delta',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'mean',
+                displayName: 'Mean',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'min',
+                displayName: 'Min',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'max',
+                displayName: 'Max',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'total',
+                displayName: 'Total',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'self',
+                displayName: 'Self',
+                cellFilter: null,
+                width: "*",
+                resizable: true
             }
-            ;
-            function loadData() {
-                console.log("Loading Camel route profile data...");
-                var selectedRouteId = Camel.getSelectedRouteId(workspace);
-                var routeMBean = Camel.getSelectionRouteMBean(workspace, selectedRouteId);
-                // schedule update the profile data, based on the configured interval
-                if (routeMBean) {
-                    var query = {
-                        type: 'exec',
-                        mbean: routeMBean,
-                        operation: 'dumpRouteStatsAsXml(boolean,boolean)',
-                        arguments: [false, true]
+        ];
+        $scope.rowIcon = function (id) {
+            var entry = $scope.icons[id];
+            if (entry) {
+                return entry.img + " " + id;
+            }
+            else {
+                return id;
+            }
+        };
+        $scope.gridOptions = {
+            data: 'data',
+            displayFooter: true,
+            displaySelectionCheckbox: false,
+            canSelectRows: false,
+            enableSorting: false,
+            columnDefs: columnDefs,
+            filterOptions: {
+                filterText: ''
+            }
+        };
+        function onProfile(response) {
+            var updatedData = [];
+            // its xml structure so we need to parse it
+            var xml = response.value;
+            if (angular.isString(xml)) {
+                // lets parse the XML DOM here...
+                var doc = $.parseXML(xml);
+                var routeMessages = $(doc).find("routeStat");
+                routeMessages.each(function (idx, message) {
+                    var messageData = {
+                        id: {},
+                        count: {},
+                        last: {},
+                        delta: {},
+                        mean: {},
+                        min: {},
+                        max: {},
+                        total: {},
+                        self: {}
                     };
-                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onProfile, query));
-                }
+                    // compare counters, as we only update if we have new data
+                    messageData.id = message.getAttribute("id");
+                    var total = 0;
+                    total += +message.getAttribute("exchangesCompleted");
+                    total += +message.getAttribute("exchangesFailed");
+                    messageData.count = total;
+                    messageData.last = message.getAttribute("lastProcessingTime");
+                    // delta is only avail from Camel 2.11 onwards
+                    var delta = message.getAttribute("deltaProcessingTime");
+                    if (delta) {
+                        messageData.delta = delta;
+                    }
+                    else {
+                        messageData.delta = 0;
+                    }
+                    messageData.mean = message.getAttribute("meanProcessingTime");
+                    messageData.min = message.getAttribute("minProcessingTime");
+                    messageData.max = message.getAttribute("maxProcessingTime");
+                    messageData.total = message.getAttribute("totalProcessingTime");
+                    messageData.self = message.getAttribute("selfProcessingTime");
+                    updatedData.push(messageData);
+                });
+                var processorMessages = $(doc).find("processorStat");
+                processorMessages.each(function (idx, message) {
+                    var messageData = {
+                        id: {},
+                        count: {},
+                        last: {},
+                        delta: {},
+                        mean: {},
+                        min: {},
+                        max: {},
+                        total: {},
+                        self: {}
+                    };
+                    messageData.id = message.getAttribute("id");
+                    var total = 0;
+                    total += +message.getAttribute("exchangesCompleted");
+                    total += +message.getAttribute("exchangesFailed");
+                    messageData.count = total;
+                    messageData.last = message.getAttribute("lastProcessingTime");
+                    // delta is only avail from Camel 2.11 onwards
+                    var delta = message.getAttribute("deltaProcessingTime");
+                    if (delta) {
+                        messageData.delta = delta;
+                    }
+                    else {
+                        messageData.delta = 0;
+                    }
+                    messageData.mean = message.getAttribute("meanProcessingTime");
+                    messageData.min = message.getAttribute("minProcessingTime");
+                    messageData.max = message.getAttribute("maxProcessingTime");
+                    // total time for processors is pre calculated as accumulated from Camel 2.11 onwards
+                    var apt = message.getAttribute("accumulatedProcessingTime");
+                    if (apt) {
+                        messageData.total = apt;
+                    }
+                    else {
+                        messageData.total = "0";
+                    }
+                    // self time for processors is their total time
+                    messageData.self = message.getAttribute("totalProcessingTime");
+                    updatedData.push(messageData);
+                });
             }
-            // load data
-            loadData();
-        }]);
+            // if we do as below with the forEach then the data does not update
+            // replace data with updated data
+            $scope.data = updatedData;
+            $scope.initDone = true;
+            // ensure web page is updated
+            Core.$apply($scope);
+        }
+        ;
+        function loadData() {
+            console.log("Loading Camel route profile data...");
+            var selectedRouteId = Camel.getSelectedRouteId(workspace);
+            var routeMBean = Camel.getSelectionRouteMBean(workspace, selectedRouteId);
+            // schedule update the profile data, based on the configured interval
+            if (routeMBean) {
+                var query = {
+                    type: 'exec',
+                    mbean: routeMBean,
+                    operation: 'dumpRouteStatsAsXml(boolean,boolean)',
+                    arguments: [false, true]
+                };
+                Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onProfile, query));
+            }
+        }
+        // load data
+        loadData();
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -5584,102 +5499,102 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.PropertiesController", ["$scope", "workspace", "localStorage", "jolokia", function ($scope, workspace, localStorage, jolokia) {
-            var log = Logger.get("Camel");
-            $scope.hideHelp = Camel.hideOptionDocumentation(localStorage);
-            $scope.hideUnused = Camel.hideOptionUnusedValue(localStorage);
-            $scope.hideDefault = Camel.hideOptionDefaultValue(localStorage);
-            $scope.viewTemplate = null;
-            $scope.schema = Camel._apacheCamelModel;
-            $scope.model = null;
-            $scope.labels = [];
-            $scope.nodeData = null;
-            $scope.icon = null;
-            $scope.$watch('hideHelp', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    updateData();
-                }
-            });
-            $scope.$watch('hideUnused', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    updateData();
-                }
-            });
-            $scope.$watch('hideDefault', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    updateData();
-                }
-            });
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                setTimeout(updateData, 50);
-            });
-            $scope.$watch('workspace.selection', function () {
-                if (workspace.moveIfViewInvalid())
-                    return;
+        var log = Logger.get("Camel");
+        $scope.hideHelp = Camel.hideOptionDocumentation(localStorage);
+        $scope.hideUnused = Camel.hideOptionUnusedValue(localStorage);
+        $scope.hideDefault = Camel.hideOptionDefaultValue(localStorage);
+        $scope.viewTemplate = null;
+        $scope.schema = Camel._apacheCamelModel;
+        $scope.model = null;
+        $scope.labels = [];
+        $scope.nodeData = null;
+        $scope.icon = null;
+        $scope.$watch('hideHelp', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
                 updateData();
-            });
-            $scope.showEntity = function (id) {
-                if ($scope.hideDefault) {
-                    if (isDefaultValue(id)) {
-                        return false;
-                    }
-                }
-                if ($scope.hideUnused) {
-                    if (!hasValue(id)) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            function isDefaultValue(id) {
-                var defaultValue = Core.pathGet($scope.model, ["properties", id, "defaultValue"]);
-                if (angular.isDefined(defaultValue)) {
-                    // get the value
-                    var value = Core.pathGet($scope.nodeData, id);
-                    if (angular.isDefined(value)) {
-                        // default value is always a String type, so try to convert value to a String
-                        var str = value.toString();
-                        // is it a default value
-                        return str.localeCompare(defaultValue) === 0;
-                    }
-                }
-                return false;
             }
-            function hasValue(id) {
-                var value = Core.pathGet($scope.nodeData, id);
-                if (angular.isUndefined(value) || Core.isBlank(value)) {
+        });
+        $scope.$watch('hideUnused', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                updateData();
+            }
+        });
+        $scope.$watch('hideDefault', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                updateData();
+            }
+        });
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            setTimeout(updateData, 50);
+        });
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid())
+                return;
+            updateData();
+        });
+        $scope.showEntity = function (id) {
+            if ($scope.hideDefault) {
+                if (isDefaultValue(id)) {
                     return false;
                 }
-                if (angular.isString(value)) {
-                    // to show then must not be blank
-                    return !Core.isBlank(value);
-                }
-                return true;
             }
-            function updateData() {
-                var routeXmlNode = Camel.getSelectedRouteNode(workspace);
-                $scope.nodeData = Camel.getRouteNodeJSON(routeXmlNode);
-                if (routeXmlNode) {
-                    $scope.model = Camel.getCamelSchema(routeXmlNode.nodeName);
-                    if ($scope.model) {
-                        if (log.enabledFor(Logger.DEBUG)) {
-                            log.debug("Properties - data: " + JSON.stringify($scope.nodeData, null, "  "));
-                            log.debug("Properties - schema: " + JSON.stringify($scope.model, null, "  "));
-                        }
-                        // labels is named group in camelModel.js
-                        var labels = [];
-                        if ($scope.model.group) {
-                            labels = $scope.model.group.split(",");
-                        }
-                        $scope.labels = labels;
-                        $scope.nodeData = Camel.getRouteNodeJSON(routeXmlNode);
-                        $scope.icon = Camel.getRouteNodeIcon(routeXmlNode);
-                        $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
-                        Core.$apply($scope);
+            if ($scope.hideUnused) {
+                if (!hasValue(id)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        function isDefaultValue(id) {
+            var defaultValue = Core.pathGet($scope.model, ["properties", id, "defaultValue"]);
+            if (angular.isDefined(defaultValue)) {
+                // get the value
+                var value = Core.pathGet($scope.nodeData, id);
+                if (angular.isDefined(value)) {
+                    // default value is always a String type, so try to convert value to a String
+                    var str = value.toString();
+                    // is it a default value
+                    return str.localeCompare(defaultValue) === 0;
+                }
+            }
+            return false;
+        }
+        function hasValue(id) {
+            var value = Core.pathGet($scope.nodeData, id);
+            if (angular.isUndefined(value) || Core.isBlank(value)) {
+                return false;
+            }
+            if (angular.isString(value)) {
+                // to show then must not be blank
+                return !Core.isBlank(value);
+            }
+            return true;
+        }
+        function updateData() {
+            var routeXmlNode = Camel.getSelectedRouteNode(workspace);
+            $scope.nodeData = Camel.getRouteNodeJSON(routeXmlNode);
+            if (routeXmlNode) {
+                $scope.model = Camel.getCamelSchema(routeXmlNode.nodeName);
+                if ($scope.model) {
+                    if (log.enabledFor(Logger.DEBUG)) {
+                        log.debug("Properties - data: " + JSON.stringify($scope.nodeData, null, "  "));
+                        log.debug("Properties - schema: " + JSON.stringify($scope.model, null, "  "));
                     }
+                    // labels is named group in camelModel.js
+                    var labels = [];
+                    if ($scope.model.group) {
+                        labels = $scope.model.group.split(",");
+                    }
+                    $scope.labels = labels;
+                    $scope.nodeData = Camel.getRouteNodeJSON(routeXmlNode);
+                    $scope.icon = Camel.getRouteNodeIcon(routeXmlNode);
+                    $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
+                    Core.$apply($scope);
                 }
             }
-        }]);
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -5687,137 +5602,272 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.PropertiesComponentController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", function ($scope, workspace, localStorage, jolokia, documentBase) {
-            var log = Logger.get("Camel");
-            $scope.hideHelp = Camel.hideOptionDocumentation(localStorage);
-            $scope.hideUnused = Camel.hideOptionUnusedValue(localStorage);
-            $scope.hideDefault = Camel.hideOptionDefaultValue(localStorage);
-            $scope.viewTemplate = null;
-            $scope.schema = null;
-            $scope.model = null;
-            $scope.labels = [];
-            $scope.nodeData = null;
-            $scope.icon = null;
-            $scope.componentName = null;
-            $scope.$watch('hideHelp', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    updateData();
-                }
-            });
-            $scope.$watch('hideUnused', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    updateData();
-                }
-            });
-            $scope.$watch('hideDefault', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    updateData();
-                }
-            });
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                setTimeout(updateData, 50);
-            });
-            $scope.$watch('workspace.selection', function () {
-                if (workspace.moveIfViewInvalid())
-                    return;
+        var log = Logger.get("Camel");
+        $scope.hideHelp = Camel.hideOptionDocumentation(localStorage);
+        $scope.hideUnused = Camel.hideOptionUnusedValue(localStorage);
+        $scope.hideDefault = Camel.hideOptionDefaultValue(localStorage);
+        $scope.viewTemplate = null;
+        $scope.schema = null;
+        $scope.model = null;
+        $scope.labels = [];
+        $scope.nodeData = null;
+        $scope.icon = null;
+        $scope.componentName = null;
+        $scope.$watch('hideHelp', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
                 updateData();
-            });
-            $scope.showEntity = function (id) {
-                if ($scope.hideDefault) {
-                    if (isDefaultValue(id)) {
-                        return false;
-                    }
-                }
-                if ($scope.hideUnused) {
-                    if (!hasValue(id)) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            function isDefaultValue(id) {
-                var defaultValue = Core.pathGet($scope.model, ["properties", id, "defaultValue"]);
-                if (angular.isDefined(defaultValue)) {
-                    // get the value
-                    var value = Core.pathGet($scope.nodeData, id);
-                    if (angular.isDefined(value)) {
-                        // default value is always a String type, so try to convert value to a String
-                        var str = value.toString();
-                        // is it a default value
-                        return str.localeCompare(defaultValue) === 0;
-                    }
-                }
-                return false;
             }
-            function hasValue(id) {
-                var value = Core.pathGet($scope.nodeData, id);
-                if (angular.isUndefined(value) || Core.isBlank(value)) {
+        });
+        $scope.$watch('hideUnused', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                updateData();
+            }
+        });
+        $scope.$watch('hideDefault', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                updateData();
+            }
+        });
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            setTimeout(updateData, 50);
+        });
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid())
+                return;
+            updateData();
+        });
+        $scope.showEntity = function (id) {
+            if ($scope.hideDefault) {
+                if (isDefaultValue(id)) {
                     return false;
                 }
-                if (angular.isString(value)) {
-                    // to show then must not be blank
-                    return !Core.isBlank(value);
-                }
-                return true;
             }
-            function updateData() {
-                var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
-                var componentMBeanName = null;
-                if (!componentMBeanName) {
-                    componentMBeanName = workspace.getSelectedMBeanName();
+            if ($scope.hideUnused) {
+                if (!hasValue(id)) {
+                    return false;
                 }
-                if (componentMBeanName && contextMBean) {
-                    // TODO: grab name from tree instead? avoids a JMX call
-                    var reply = jolokia.request({ type: "read", mbean: componentMBeanName, attribute: ["ComponentName"] });
-                    var name = reply.value["ComponentName"];
-                    if (name) {
-                        $scope.componentName = name;
-                        log.info("Calling explainComponentJson for name: " + name);
-                        var query = {
-                            type: 'exec',
-                            mbean: contextMBean,
-                            operation: 'explainComponentJson(java.lang.String,boolean)',
-                            arguments: [name, true]
-                        };
-                        jolokia.request(query, Core.onSuccess(populateData));
+            }
+            return true;
+        };
+        function isDefaultValue(id) {
+            var defaultValue = Core.pathGet($scope.model, ["properties", id, "defaultValue"]);
+            if (angular.isDefined(defaultValue)) {
+                // get the value
+                var value = Core.pathGet($scope.nodeData, id);
+                if (angular.isDefined(value)) {
+                    // default value is always a String type, so try to convert value to a String
+                    var str = value.toString();
+                    // is it a default value
+                    return str.localeCompare(defaultValue) === 0;
+                }
+            }
+            return false;
+        }
+        function hasValue(id) {
+            var value = Core.pathGet($scope.nodeData, id);
+            if (angular.isUndefined(value) || Core.isBlank(value)) {
+                return false;
+            }
+            if (angular.isString(value)) {
+                // to show then must not be blank
+                return !Core.isBlank(value);
+            }
+            return true;
+        }
+        function updateData() {
+            var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
+            var componentMBeanName = null;
+            if (!componentMBeanName) {
+                componentMBeanName = workspace.getSelectedMBeanName();
+            }
+            if (componentMBeanName && contextMBean) {
+                // TODO: grab name from tree instead? avoids a JMX call
+                var reply = jolokia.request({ type: "read", mbean: componentMBeanName, attribute: ["ComponentName"] });
+                var name = reply.value["ComponentName"];
+                if (name) {
+                    $scope.componentName = name;
+                    log.info("Calling explainComponentJson for name: " + name);
+                    var query = {
+                        type: 'exec',
+                        mbean: contextMBean,
+                        operation: 'explainComponentJson(java.lang.String,boolean)',
+                        arguments: [name, true]
+                    };
+                    jolokia.request(query, Core.onSuccess(populateData));
+                }
+            }
+        }
+        function populateData(response) {
+            log.debug("Populate data " + response);
+            var data = response.value;
+            if (data) {
+                // the model is json object from the string data
+                $scope.model = JSON.parse(data);
+                // set title and description
+                $scope.model.title = $scope.componentName;
+                $scope.model.description = $scope.model.component.description;
+                // TODO: look for specific component icon,
+                $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
+                // grab all values form the model as they are the current data we need to add to node data (not all properties has a value)
+                $scope.nodeData = {};
+                // must be named properties as that is what the form expects
+                $scope.model.properties = $scope.model.componentProperties;
+                angular.forEach($scope.model.componentProperties, function (property, key) {
+                    // does it have a value or fallback to use a default value
+                    var value = property["value"] || property["defaultValue"];
+                    if (angular.isDefined(value) && value !== null) {
+                        $scope.nodeData[key] = value;
                     }
+                    // remove label as that causes the UI to render the label instead of the key as title
+                    // we should later group the table into labels (eg consumer vs producer)
+                    delete property["label"];
+                });
+                var labels = [];
+                if ($scope.model.component.label) {
+                    labels = $scope.model.component.label.split(",");
+                }
+                $scope.labels = labels;
+                $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
+                Core.$apply($scope);
+            }
+        }
+    }]);
+})(Camel || (Camel = {}));
+
+/// <reference path="../../includes.ts"/>
+/// <reference path="camelPlugin.ts"/>
+var Camel;
+(function (Camel) {
+    Camel._module.controller("Camel.PropertiesDataFormatController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", function ($scope, workspace, localStorage, jolokia, documentBase) {
+        var log = Logger.get("Camel");
+        $scope.hideHelp = Camel.hideOptionDocumentation(localStorage);
+        $scope.hideUnused = Camel.hideOptionUnusedValue(localStorage);
+        $scope.hideDefault = Camel.hideOptionDefaultValue(localStorage);
+        $scope.viewTemplate = null;
+        $scope.schema = null;
+        $scope.model = null;
+        $scope.labels = [];
+        $scope.nodeData = null;
+        $scope.icon = null;
+        $scope.dataFormatName = null;
+        $scope.$watch('hideHelp', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                updateData();
+            }
+        });
+        $scope.$watch('hideUnused', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                updateData();
+            }
+        });
+        $scope.$watch('hideDefault', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                updateData();
+            }
+        });
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            setTimeout(updateData, 50);
+        });
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid())
+                return;
+            updateData();
+        });
+        $scope.showEntity = function (id) {
+            if ($scope.hideDefault) {
+                if (isDefaultValue(id)) {
+                    return false;
                 }
             }
-            function populateData(response) {
-                log.debug("Populate data " + response);
-                var data = response.value;
-                if (data) {
-                    // the model is json object from the string data
-                    $scope.model = JSON.parse(data);
-                    // set title and description
-                    $scope.model.title = $scope.componentName;
-                    $scope.model.description = $scope.model.component.description;
-                    // TODO: look for specific component icon,
-                    $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
-                    // grab all values form the model as they are the current data we need to add to node data (not all properties has a value)
-                    $scope.nodeData = {};
-                    // must be named properties as that is what the form expects
-                    $scope.model.properties = $scope.model.componentProperties;
-                    angular.forEach($scope.model.componentProperties, function (property, key) {
-                        // does it have a value or fallback to use a default value
-                        var value = property["value"] || property["defaultValue"];
-                        if (angular.isDefined(value) && value !== null) {
-                            $scope.nodeData[key] = value;
-                        }
-                        // remove label as that causes the UI to render the label instead of the key as title
-                        // we should later group the table into labels (eg consumer vs producer)
-                        delete property["label"];
-                    });
-                    var labels = [];
-                    if ($scope.model.component.label) {
-                        labels = $scope.model.component.label.split(",");
+            if ($scope.hideUnused) {
+                if (!hasValue(id)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        function isDefaultValue(id) {
+            var defaultValue = Core.pathGet($scope.model, ["properties", id, "defaultValue"]);
+            if (angular.isDefined(defaultValue)) {
+                // get the value
+                var value = Core.pathGet($scope.nodeData, id);
+                if (angular.isDefined(value)) {
+                    // default value is always a String type, so try to convert value to a String
+                    var str = value.toString();
+                    // is it a default value
+                    return str.localeCompare(defaultValue) === 0;
+                }
+            }
+            return false;
+        }
+        function hasValue(id) {
+            var value = Core.pathGet($scope.nodeData, id);
+            if (angular.isUndefined(value) || Core.isBlank(value)) {
+                return false;
+            }
+            if (angular.isString(value)) {
+                // to show then must not be blank
+                return !Core.isBlank(value);
+            }
+            return true;
+        }
+        function updateData() {
+            var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
+            var componentMBeanName = null;
+            if (!componentMBeanName) {
+                componentMBeanName = workspace.getSelectedMBeanName();
+            }
+            if (componentMBeanName && contextMBean) {
+                // TODO: grab name from tree instead? avoids a JMX call
+                var reply = jolokia.request({ type: "read", mbean: componentMBeanName, attribute: ["DataFormatName"] });
+                var name = reply.value["DataFormatName"];
+                if (name) {
+                    $scope.dataFormatName = name;
+                    log.info("Calling explainDataFormatJson for name: " + name);
+                    var query = {
+                        type: 'exec',
+                        mbean: contextMBean,
+                        operation: 'explainDataFormatJson(java.lang.String,boolean)',
+                        arguments: [name, true]
+                    };
+                    jolokia.request(query, Core.onSuccess(populateData));
+                }
+            }
+        }
+        function populateData(response) {
+            log.debug("Populate data " + response);
+            var data = response.value;
+            if (data) {
+                // the model is json object from the string data
+                $scope.model = JSON.parse(data);
+                // set title and description
+                $scope.model.title = $scope.dataFormatName;
+                // TODO: look for specific component icon,
+                $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/marshal24.png");
+                // grab all values form the model as they are the current data we need to add to node data (not all properties has a value)
+                $scope.nodeData = {};
+                angular.forEach($scope.model.properties, function (property, key) {
+                    // does it have a value or fallback to use a default value
+                    var value = property["value"] || property["defaultValue"];
+                    if (angular.isDefined(value) && value !== null) {
+                        $scope.nodeData[key] = value;
                     }
-                    $scope.labels = labels;
-                    $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
-                    Core.$apply($scope);
+                    // remove label as that causes the UI to render the label instead of the key as title
+                    // we should later group the table into labels (eg consumer vs producer)
+                    delete property["label"];
+                });
+                var labels = [];
+                if ($scope.model.label) {
+                    labels = $scope.model.label.split(",");
                 }
+                $scope.labels = labels;
+                $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
+                Core.$apply($scope);
             }
-        }]);
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -5825,145 +5875,145 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.PropertiesEndpointController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", function ($scope, workspace, localStorage, jolokia, documentBase) {
-            var log = Logger.get("Camel");
-            $scope.hideHelp = Camel.hideOptionDocumentation(localStorage);
-            $scope.hideUnused = Camel.hideOptionUnusedValue(localStorage);
-            $scope.hideDefault = Camel.hideOptionDefaultValue(localStorage);
-            $scope.viewTemplate = null;
-            $scope.schema = null;
-            $scope.model = null;
-            $scope.labels = [];
-            $scope.nodeData = null;
-            $scope.icon = null;
-            $scope.endpointUrl = null;
-            $scope.$watch('hideHelp', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    updateData();
-                }
-            });
-            $scope.$watch('hideUnused', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    updateData();
-                }
-            });
-            $scope.$watch('hideDefault', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    updateData();
-                }
-            });
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                setTimeout(updateData, 50);
-            });
-            $scope.$watch('workspace.selection', function () {
-                if (workspace.moveIfViewInvalid())
-                    return;
+        var log = Logger.get("Camel");
+        $scope.hideHelp = Camel.hideOptionDocumentation(localStorage);
+        $scope.hideUnused = Camel.hideOptionUnusedValue(localStorage);
+        $scope.hideDefault = Camel.hideOptionDefaultValue(localStorage);
+        $scope.viewTemplate = null;
+        $scope.schema = null;
+        $scope.model = null;
+        $scope.labels = [];
+        $scope.nodeData = null;
+        $scope.icon = null;
+        $scope.endpointUrl = null;
+        $scope.$watch('hideHelp', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
                 updateData();
-            });
-            $scope.showEntity = function (id) {
-                if ($scope.hideDefault) {
-                    if (isDefaultValue(id)) {
-                        return false;
-                    }
-                }
-                if ($scope.hideUnused) {
-                    if (!hasValue(id)) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            function isDefaultValue(id) {
-                var defaultValue = Core.pathGet($scope.model, ["properties", id, "defaultValue"]);
-                if (angular.isDefined(defaultValue)) {
-                    // get the value
-                    var value = Core.pathGet($scope.nodeData, id);
-                    if (angular.isDefined(value)) {
-                        // default value is always a String type, so try to convert value to a String
-                        var str = value.toString();
-                        // is it a default value
-                        return str.localeCompare(defaultValue) === 0;
-                    }
-                }
-                return false;
             }
-            function hasValue(id) {
-                var value = Core.pathGet($scope.nodeData, id);
-                if (angular.isUndefined(value) || Core.isBlank(value)) {
+        });
+        $scope.$watch('hideUnused', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                updateData();
+            }
+        });
+        $scope.$watch('hideDefault', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                updateData();
+            }
+        });
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            setTimeout(updateData, 50);
+        });
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid())
+                return;
+            updateData();
+        });
+        $scope.showEntity = function (id) {
+            if ($scope.hideDefault) {
+                if (isDefaultValue(id)) {
                     return false;
                 }
-                if (angular.isString(value)) {
-                    // to show then must not be blank
-                    return !Core.isBlank(value);
-                }
-                return true;
             }
-            function updateData() {
-                var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
-                var endpointMBean = null;
-                if ($scope.contextId && $scope.endpointPath) {
-                    var node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
-                        context: $scope.contextId,
-                        type: "endpoints",
-                        name: $scope.endpointPath
-                    });
-                    if (node) {
-                        endpointMBean = node.objectName;
-                    }
-                }
-                if (!endpointMBean) {
-                    endpointMBean = workspace.getSelectedMBeanName();
-                }
-                if (endpointMBean && contextMBean) {
-                    // TODO: grab url from tree instead? avoids a JMX call
-                    var reply = jolokia.request({ type: "read", mbean: endpointMBean, attribute: ["EndpointUri"] });
-                    var url = reply.value["EndpointUri"];
-                    if (url) {
-                        $scope.endpointUrl = url;
-                        log.info("Calling explainEndpointJson for url: " + url);
-                        var query = {
-                            type: 'exec',
-                            mbean: contextMBean,
-                            operation: 'explainEndpointJson(java.lang.String,boolean)',
-                            arguments: [url, true]
-                        };
-                        jolokia.request(query, Core.onSuccess(populateData));
-                    }
+            if ($scope.hideUnused) {
+                if (!hasValue(id)) {
+                    return false;
                 }
             }
-            function populateData(response) {
-                log.debug("Populate data " + response);
-                var data = response.value;
-                if (data) {
-                    // the model is json object from the string data
-                    $scope.model = JSON.parse(data);
-                    // set title and description
-                    $scope.model.title = $scope.endpointUrl;
-                    $scope.model.description = $scope.model.component.description;
-                    // TODO: look for specific endpoint icon,
-                    $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
-                    // grab all values form the model as they are the current data we need to add to node data (not all properties has a value)
-                    $scope.nodeData = {};
-                    angular.forEach($scope.model.properties, function (property, key) {
-                        // does it have a value or fallback to use a default value
-                        var value = property["value"] || property["defaultValue"];
-                        if (angular.isDefined(value) && value !== null) {
-                            $scope.nodeData[key] = value;
-                        }
-                        // remove label as that causes the UI to render the label instead of the key as title
-                        // we should later group the table into labels (eg consumer vs producer)
-                        delete property["label"];
-                    });
-                    var labels = [];
-                    if ($scope.model.component.label) {
-                        labels = $scope.model.component.label.split(",");
-                    }
-                    $scope.labels = labels;
-                    $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
-                    Core.$apply($scope);
+            return true;
+        };
+        function isDefaultValue(id) {
+            var defaultValue = Core.pathGet($scope.model, ["properties", id, "defaultValue"]);
+            if (angular.isDefined(defaultValue)) {
+                // get the value
+                var value = Core.pathGet($scope.nodeData, id);
+                if (angular.isDefined(value)) {
+                    // default value is always a String type, so try to convert value to a String
+                    var str = value.toString();
+                    // is it a default value
+                    return str.localeCompare(defaultValue) === 0;
                 }
             }
-        }]);
+            return false;
+        }
+        function hasValue(id) {
+            var value = Core.pathGet($scope.nodeData, id);
+            if (angular.isUndefined(value) || Core.isBlank(value)) {
+                return false;
+            }
+            if (angular.isString(value)) {
+                // to show then must not be blank
+                return !Core.isBlank(value);
+            }
+            return true;
+        }
+        function updateData() {
+            var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
+            var endpointMBean = null;
+            if ($scope.contextId && $scope.endpointPath) {
+                var node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
+                    context: $scope.contextId,
+                    type: "endpoints",
+                    name: $scope.endpointPath
+                });
+                if (node) {
+                    endpointMBean = node.objectName;
+                }
+            }
+            if (!endpointMBean) {
+                endpointMBean = workspace.getSelectedMBeanName();
+            }
+            if (endpointMBean && contextMBean) {
+                // TODO: grab url from tree instead? avoids a JMX call
+                var reply = jolokia.request({ type: "read", mbean: endpointMBean, attribute: ["EndpointUri"] });
+                var url = reply.value["EndpointUri"];
+                if (url) {
+                    $scope.endpointUrl = url;
+                    log.info("Calling explainEndpointJson for url: " + url);
+                    var query = {
+                        type: 'exec',
+                        mbean: contextMBean,
+                        operation: 'explainEndpointJson(java.lang.String,boolean)',
+                        arguments: [url, true]
+                    };
+                    jolokia.request(query, Core.onSuccess(populateData));
+                }
+            }
+        }
+        function populateData(response) {
+            log.debug("Populate data " + response);
+            var data = response.value;
+            if (data) {
+                // the model is json object from the string data
+                $scope.model = JSON.parse(data);
+                // set title and description
+                $scope.model.title = $scope.endpointUrl;
+                $scope.model.description = $scope.model.component.description;
+                // TODO: look for specific endpoint icon,
+                $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
+                // grab all values form the model as they are the current data we need to add to node data (not all properties has a value)
+                $scope.nodeData = {};
+                angular.forEach($scope.model.properties, function (property, key) {
+                    // does it have a value or fallback to use a default value
+                    var value = property["value"] || property["defaultValue"];
+                    if (angular.isDefined(value) && value !== null) {
+                        $scope.nodeData[key] = value;
+                    }
+                    // remove label as that causes the UI to render the label instead of the key as title
+                    // we should later group the table into labels (eg consumer vs producer)
+                    delete property["label"];
+                });
+                var labels = [];
+                if ($scope.model.component.label) {
+                    labels = $scope.model.component.label.split(",");
+                }
+                $scope.labels = labels;
+                $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
+                Core.$apply($scope);
+            }
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -5971,157 +6021,157 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.RestServiceController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = [];
-            $scope.selectedMBean = null;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'url',
-                    displayName: 'Absolute Url',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'baseUrl',
-                    displayName: 'Base Url',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'basePath',
-                    displayName: 'Base Path',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'uriTemplate',
-                    displayName: 'Uri Template',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'method',
-                    displayName: 'Method',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'consumes',
-                    displayName: 'Consumes',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'produces',
-                    displayName: 'Produces',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'inType',
-                    displayName: 'Input Type',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'outType',
-                    displayName: 'Output Type',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'state',
-                    displayName: 'State',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'routeId',
-                    displayName: 'Route Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'description',
-                    displayName: 'Description',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: false,
-                canSelectRows: false,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                }
-            };
-            function onRestRegistry(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var values = obj[key];
-                        for (var v in values) {
-                            var entry = values[v];
-                            arr.push({
-                                url: entry.url,
-                                baseUrl: entry.baseUrl,
-                                basePath: entry.basePath,
-                                uriTemplate: entry.uriTemplate,
-                                method: entry.method,
-                                consumes: entry.consumes,
-                                produces: entry.produces,
-                                inType: entry.inType,
-                                outType: entry.outType,
-                                state: entry.state,
-                                routeId: entry.routeId,
-                                description: entry.description
-                            });
-                        }
+        $scope.data = [];
+        $scope.selectedMBean = null;
+        $scope.mbeanAttributes = {};
+        var columnDefs = [
+            {
+                field: 'url',
+                displayName: 'Absolute Url',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'baseUrl',
+                displayName: 'Base Url',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'basePath',
+                displayName: 'Base Path',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'uriTemplate',
+                displayName: 'Uri Template',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'method',
+                displayName: 'Method',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'consumes',
+                displayName: 'Consumes',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'produces',
+                displayName: 'Produces',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'inType',
+                displayName: 'Input Type',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'outType',
+                displayName: 'Output Type',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'state',
+                displayName: 'State',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'routeId',
+                displayName: 'Route Id',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'description',
+                displayName: 'Description',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            }
+        ];
+        $scope.gridOptions = {
+            data: 'data',
+            displayFooter: true,
+            displaySelectionCheckbox: false,
+            canSelectRows: false,
+            enableSorting: true,
+            columnDefs: columnDefs,
+            selectedItems: [],
+            filterOptions: {
+                filterText: ''
+            }
+        };
+        function onRestRegistry(response) {
+            var obj = response.value;
+            if (obj) {
+                // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
+                var arr = [];
+                for (var key in obj) {
+                    var values = obj[key];
+                    for (var v in values) {
+                        var entry = values[v];
+                        arr.push({
+                            url: entry.url,
+                            baseUrl: entry.baseUrl,
+                            basePath: entry.basePath,
+                            uriTemplate: entry.uriTemplate,
+                            method: entry.method,
+                            consumes: entry.consumes,
+                            produces: entry.produces,
+                            inType: entry.inType,
+                            outType: entry.outType,
+                            state: entry.state,
+                            routeId: entry.routeId,
+                            description: entry.description
+                        });
                     }
-                    arr = arr.sortBy("url");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
                 }
-                else {
-                    // set the mbean to a value so the ui can get updated
-                    $scope.selectedMBean = "true";
-                }
-                // ensure web page is updated
-                Core.$apply($scope);
+                arr = arr.sortBy("url");
+                $scope.data = arr;
+                // okay we have the data then set the selected mbean which allows UI to display data
+                $scope.selectedMBean = response.request.mbean;
             }
-            $scope.renderIcon = function (state) {
-                return Camel.iconClass(state);
-            };
-            function loadRestRegistry() {
-                console.log("Loading RestRegistry data...");
-                var mbean = Camel.getSelectionCamelRestRegistry(workspace);
-                if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'listRestServices' }, Core.onSuccess(onRestRegistry));
-                }
+            else {
+                // set the mbean to a value so the ui can get updated
+                $scope.selectedMBean = "true";
             }
-            // load data
-            loadRestRegistry();
-        }]);
+            // ensure web page is updated
+            Core.$apply($scope);
+        }
+        $scope.renderIcon = function (state) {
+            return Camel.iconClass(state);
+        };
+        function loadRestRegistry() {
+            console.log("Loading RestRegistry data...");
+            var mbean = Camel.getSelectionCamelRestRegistry(workspace);
+            if (mbean) {
+                jolokia.request({ type: 'exec', mbean: mbean, operation: 'listRestServices' }, Core.onSuccess(onRestRegistry));
+            }
+        }
+        // load data
+        loadRestRegistry();
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -6129,98 +6179,98 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.RouteMetricsController", ["$scope", "$location", "workspace", "jolokia", "metricsWatcher", function ($scope, $location, workspace, jolokia, metricsWatcher) {
-            var log = Logger.get("Camel");
-            $scope.maxSeconds = Camel.routeMetricMaxSeconds(localStorage);
-            $scope.filterText = null;
-            $scope.initDone = false;
-            $scope.metricDivs = [];
-            $scope.filterByRoute = function (div) {
-                log.debug("Filter by route " + div);
-                var match = Core.matchFilterIgnoreCase(div.routeId, $scope.filterText);
-                if (!match) {
-                    // hide using CSS style
-                    return "display: none;";
-                }
-                else {
-                    return "";
-                }
-            };
-            function populateRouteStatistics(response) {
-                var obj = response.value;
-                if (obj) {
-                    // turn into json javascript object which metrics watcher requires
-                    var json = JSON.parse(obj);
-                    if (!$scope.initDone) {
-                        // figure out which routes we have
-                        var meters = json['timers'];
-                        var counter = 0;
-                        if (meters != null) {
-                            for (var v in meters) {
-                                var key = v;
-                                var lastDot = key.lastIndexOf(".");
-                                var className = key.substr(0, lastDot);
-                                var metricsName = key.substr(lastDot + 1);
-                                var firstColon = key.indexOf(":");
-                                // compute route id from the key, which is text after the 1st colon, and the last dot
-                                var routeId = key.substr(firstColon + 1);
-                                lastDot = routeId.lastIndexOf(".");
-                                if (lastDot > 0) {
-                                    routeId = routeId.substr(0, lastDot);
-                                }
-                                var entry = meters[v];
-                                var div = "timer-" + counter;
-                                $scope.metricDivs.push({
-                                    id: div,
-                                    routeId: routeId
-                                });
-                                counter++;
-                                log.info("Added timer: " + div + " (" + className + "." + metricsName + ") for route: " + routeId + " with max seconds: " + $scope.maxSeconds);
-                                metricsWatcher.addTimer(div, className, metricsName, $scope.maxSeconds, routeId, "Histogram", $scope.maxSeconds * 1000);
+        var log = Logger.get("Camel");
+        $scope.maxSeconds = Camel.routeMetricMaxSeconds(localStorage);
+        $scope.filterText = null;
+        $scope.initDone = false;
+        $scope.metricDivs = [];
+        $scope.filterByRoute = function (div) {
+            log.debug("Filter by route " + div);
+            var match = Core.matchFilterIgnoreCase(div.routeId, $scope.filterText);
+            if (!match) {
+                // hide using CSS style
+                return "display: none;";
+            }
+            else {
+                return "";
+            }
+        };
+        function populateRouteStatistics(response) {
+            var obj = response.value;
+            if (obj) {
+                // turn into json javascript object which metrics watcher requires
+                var json = JSON.parse(obj);
+                if (!$scope.initDone) {
+                    // figure out which routes we have
+                    var meters = json['timers'];
+                    var counter = 0;
+                    if (meters != null) {
+                        for (var v in meters) {
+                            var key = v;
+                            var lastDot = key.lastIndexOf(".");
+                            var className = key.substr(0, lastDot);
+                            var metricsName = key.substr(lastDot + 1);
+                            var firstColon = key.indexOf(":");
+                            // compute route id from the key, which is text after the 1st colon, and the last dot
+                            var routeId = key.substr(firstColon + 1);
+                            lastDot = routeId.lastIndexOf(".");
+                            if (lastDot > 0) {
+                                routeId = routeId.substr(0, lastDot);
                             }
-                            // ensure web page is updated at this point, as we need the metricDivs in the HTML before we call init graphs later
-                            log.info("Pre-init graphs");
-                            Core.$apply($scope);
+                            var entry = meters[v];
+                            var div = "timer-" + counter;
+                            $scope.metricDivs.push({
+                                id: div,
+                                routeId: routeId
+                            });
+                            counter++;
+                            log.info("Added timer: " + div + " (" + className + "." + metricsName + ") for route: " + routeId + " with max seconds: " + $scope.maxSeconds);
+                            metricsWatcher.addTimer(div, className, metricsName, $scope.maxSeconds, routeId, "Histogram", $scope.maxSeconds * 1000);
                         }
-                        log.info("Init graphs");
-                        metricsWatcher.initGraphs();
+                        // ensure web page is updated at this point, as we need the metricDivs in the HTML before we call init graphs later
+                        log.info("Pre-init graphs");
+                        Core.$apply($scope);
                     }
-                    $scope.initDone = true;
-                    // update graphs
-                    log.debug("Updating graphs: " + json);
-                    metricsWatcher.updateGraphs(json);
+                    log.info("Init graphs");
+                    metricsWatcher.initGraphs();
                 }
+                $scope.initDone = true;
+                // update graphs
+                log.debug("Updating graphs: " + json);
+                metricsWatcher.updateGraphs(json);
+            }
+            $scope.initDone = true;
+            // ensure web page is updated
+            Core.$apply($scope);
+        }
+        // function to trigger reloading page
+        $scope.onResponse = function (response) {
+            loadData();
+        };
+        $scope.$watch('workspace.tree', function () {
+            // if the JMX tree is reloaded its probably because a new MBean has been added or removed
+            // so lets reload, asynchronously just in case
+            setTimeout(loadData, 50);
+        });
+        function loadData() {
+            log.info("Loading RouteMetrics data...");
+            // pre-select filter if we have selected a route
+            var routeId = Camel.getSelectedRouteId(workspace);
+            if (routeId != null) {
+                $scope.filterText = routeId;
+            }
+            var mbean = Camel.getSelectionCamelRouteMetrics(workspace);
+            if (mbean) {
+                var query = { type: 'exec', mbean: mbean, operation: 'dumpStatisticsAsJson' };
+                Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(populateRouteStatistics, query));
+            }
+            else {
                 $scope.initDone = true;
                 // ensure web page is updated
                 Core.$apply($scope);
             }
-            // function to trigger reloading page
-            $scope.onResponse = function (response) {
-                loadData();
-            };
-            $scope.$watch('workspace.tree', function () {
-                // if the JMX tree is reloaded its probably because a new MBean has been added or removed
-                // so lets reload, asynchronously just in case
-                setTimeout(loadData, 50);
-            });
-            function loadData() {
-                log.info("Loading RouteMetrics data...");
-                // pre-select filter if we have selected a route
-                var routeId = Camel.getSelectedRouteId(workspace);
-                if (routeId != null) {
-                    $scope.filterText = routeId;
-                }
-                var mbean = Camel.getSelectionCamelRouteMetrics(workspace);
-                if (mbean) {
-                    var query = { type: 'exec', mbean: mbean, operation: 'dumpStatisticsAsJson' };
-                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(populateRouteStatistics, query));
-                }
-                else {
-                    $scope.initDone = true;
-                    // ensure web page is updated
-                    Core.$apply($scope);
-                }
-            }
-        }]);
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -6228,239 +6278,240 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.RouteController", ["$scope", "$routeParams", "$element", "$timeout", "workspace", "$location", "jolokia", "localStorage", function ($scope, $routeParams, $element, $timeout, workspace, $location, jolokia, localStorage) {
-            var log = Logger.get("Camel");
-            $scope.routes = [];
-            $scope.routeNodes = {};
-            // if we are in dashboard then $routeParams may be null
-            if ($routeParams != null) {
-                $scope.contextId = $routeParams["contextId"];
-                $scope.routeId = Core.trimQuotes($routeParams["routeId"]);
-                $scope.isJmxTab = !$routeParams["contextId"] || !$routeParams["routeId"];
-            }
-            $scope.camelIgnoreIdForLabel = Camel.ignoreIdForLabel(localStorage);
-            $scope.camelMaximumLabelWidth = Camel.maximumLabelWidth(localStorage);
-            $scope.camelShowInflightCounter = Camel.showInflightCounter(localStorage);
-            var updateRoutes = _.debounce(doUpdateRoutes, 300, { trailing: true });
-            // lets delay a little updating the routes to avoid timing issues where we've not yet
-            // fully loaded the workspace and/or the XML model
-            var delayUpdatingRoutes = 300;
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                updateRoutes();
-                //$timeout(updateRoutes, delayUpdatingRoutes, false);
-            });
-            $scope.$watch('workspace.selection', function () {
-                if ($scope.isJmxTab && workspace.moveIfViewInvalid())
-                    return;
-                updateRoutes();
-                //$timeout(updateRoutes, delayUpdatingRoutes, false);
-            });
-            $scope.$on('jmxTreeUpdated', function () {
-                updateRoutes();
-                //$timeout(updateRoutes, delayUpdatingRoutes, false);
-            });
-            $scope.$watch('nodeXmlNode', function () {
-                if ($scope.isJmxTab && workspace.moveIfViewInvalid())
-                    return;
-                updateRoutes();
-                //$timeout(updateRoutes, delayUpdatingRoutes, false);
-            });
-            function doUpdateRoutes() {
-                var routeXmlNode = null;
-                if (!$scope.ignoreRouteXmlNode) {
-                    routeXmlNode = Camel.getSelectedRouteNode(workspace);
-                    if (!routeXmlNode) {
-                        routeXmlNode = $scope.nodeXmlNode;
-                    }
-                    if (routeXmlNode && routeXmlNode.localName !== "route") {
-                        var wrapper = document.createElement("route");
-                        wrapper.appendChild(routeXmlNode.cloneNode(true));
-                        routeXmlNode = wrapper;
-                    }
+        var log = Logger.get("Camel");
+        $scope.routes = [];
+        $scope.routeNodes = {};
+        // if we are in dashboard then $routeParams may be null
+        if ($routeParams != null) {
+            $scope.contextId = $routeParams["contextId"];
+            $scope.routeId = Core.trimQuotes($routeParams["routeId"]);
+            $scope.isJmxTab = !$routeParams["contextId"] || !$routeParams["routeId"];
+        }
+        $scope.camelIgnoreIdForLabel = Camel.ignoreIdForLabel(localStorage);
+        $scope.camelMaximumLabelWidth = Camel.maximumLabelWidth(localStorage);
+        $scope.camelShowInflightCounter = Camel.showInflightCounter(localStorage);
+        var updateRoutes = _.debounce(doUpdateRoutes, 300, { trailing: true });
+        // lets delay a little updating the routes to avoid timing issues where we've not yet
+        // fully loaded the workspace and/or the XML model
+        var delayUpdatingRoutes = 300;
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            updateRoutes();
+            //$timeout(updateRoutes, delayUpdatingRoutes, false);
+        });
+        $scope.$watch('workspace.selection', function () {
+            if ($scope.isJmxTab && workspace.moveIfViewInvalid())
+                return;
+            updateRoutes();
+            //$timeout(updateRoutes, delayUpdatingRoutes, false);
+        });
+        $scope.$on('jmxTreeUpdated', function () {
+            updateRoutes();
+            //$timeout(updateRoutes, delayUpdatingRoutes, false);
+        });
+        $scope.$watch('nodeXmlNode', function () {
+            if ($scope.isJmxTab && workspace.moveIfViewInvalid())
+                return;
+            updateRoutes();
+            //$timeout(updateRoutes, delayUpdatingRoutes, false);
+        });
+        function doUpdateRoutes() {
+            var routeXmlNode = null;
+            if (!$scope.ignoreRouteXmlNode) {
+                routeXmlNode = Camel.getSelectedRouteNode(workspace);
+                if (!routeXmlNode) {
+                    routeXmlNode = $scope.nodeXmlNode;
                 }
-                $scope.mbean = Camel.getSelectionCamelContextMBean(workspace);
-                if (!$scope.mbean && $scope.contextId) {
-                    $scope.mbean = Camel.getCamelContextMBean(workspace, $scope.contextId);
-                }
-                if (routeXmlNode) {
-                    // lets show the remaining parts of the diagram of this route node
-                    $scope.nodes = {};
-                    var nodes = [];
-                    var links = [];
-                    $scope.processorTree = Camel.camelProcessorMBeansById(workspace);
-                    Camel.addRouteXmlChildren($scope, routeXmlNode, nodes, links, null, 0, 0);
-                    showGraph(nodes, links);
-                }
-                else if ($scope.mbean) {
-                    jolokia.request({ type: 'exec', mbean: $scope.mbean, operation: 'dumpRoutesAsXml()' }, Core.onSuccess(populateTable));
-                }
-                else {
-                    log.info("No camel context bean! Selection: " + workspace.selection);
+                if (routeXmlNode && routeXmlNode.localName !== "route") {
+                    var wrapper = document.createElement("route");
+                    wrapper.appendChild(routeXmlNode.cloneNode(true));
+                    routeXmlNode = wrapper;
                 }
             }
-            var populateTable = function (response) {
-                var data = response.value;
-                // routes is the xml data of the routes
-                $scope.routes = data;
-                // nodes and routeNodes is the GUI nodes for the processors and routes shown in the diagram
+            $scope.mbean = Camel.getSelectionCamelContextMBean(workspace);
+            if (!$scope.mbean && $scope.contextId) {
+                $scope.mbean = Camel.getCamelContextMBean(workspace, $scope.contextId);
+            }
+            if (routeXmlNode) {
+                // lets show the remaining parts of the diagram of this route node
                 $scope.nodes = {};
-                $scope.routeNodes = {};
                 var nodes = [];
                 var links = [];
-                var selectedRouteId = $scope.routeId;
-                if (!selectedRouteId) {
-                    selectedRouteId = Camel.getSelectedRouteId(workspace);
-                }
-                if (data) {
-                    var doc = $.parseXML(data);
-                    $scope.processorTree = Camel.camelProcessorMBeansById(workspace);
-                    Camel.loadRouteXmlNodes($scope, doc, selectedRouteId, nodes, links, getWidth());
-                    showGraph(nodes, links);
+                $scope.processorTree = Camel.camelProcessorMBeansById(workspace);
+                Camel.addRouteXmlChildren($scope, routeXmlNode, nodes, links, null, 0, 0);
+                showGraph(nodes, links);
+            }
+            else if ($scope.mbean) {
+                jolokia.request({ type: 'exec', mbean: $scope.mbean, operation: 'dumpRoutesAsXml()' }, Core.onSuccess(populateTable));
+            }
+            else {
+                log.info("No camel context bean! Selection: " + workspace.selection);
+            }
+        }
+        var populateTable = function (response) {
+            var data = response.value;
+            // routes is the xml data of the routes
+            $scope.routes = data;
+            // nodes and routeNodes is the GUI nodes for the processors and routes shown in the diagram
+            $scope.nodes = {};
+            $scope.routeNodes = {};
+            var nodes = [];
+            var links = [];
+            var selectedRouteId = $scope.routeId;
+            if (!selectedRouteId) {
+                selectedRouteId = Camel.getSelectedRouteId(workspace);
+            }
+            if (data) {
+                var doc = $.parseXML(data);
+                $scope.processorTree = Camel.camelProcessorMBeansById(workspace);
+                Camel.loadRouteXmlNodes($scope, doc, selectedRouteId, nodes, links, getWidth());
+                showGraph(nodes, links);
+            }
+            else {
+                console.log("No data from route XML!");
+            }
+            Core.$apply($scope);
+        };
+        var postfix = " selected";
+        function isSelected(node) {
+            if (node) {
+                var className = node.getAttribute("class");
+                return className && className.endsWith(postfix);
+            }
+            return false;
+        }
+        function setSelected(node, flag) {
+            var answer = false;
+            if (node) {
+                var className = node.getAttribute("class");
+                var selected = className && className.endsWith(postfix);
+                if (selected) {
+                    className = className.substring(0, className.length - postfix.length);
                 }
                 else {
-                    console.log("No data from route XML!");
+                    if (!flag) {
+                        // no need to change!
+                        return answer;
+                    }
+                    className = className + postfix;
+                    answer = true;
                 }
-                Core.$apply($scope);
-            };
-            var postfix = " selected";
-            function isSelected(node) {
-                if (node) {
-                    var className = node.getAttribute("class");
-                    return className && className.endsWith(postfix);
-                }
-                return false;
+                node.setAttribute("class", className);
             }
-            function setSelected(node, flag) {
-                var answer = false;
-                if (node) {
-                    var className = node.getAttribute("class");
-                    var selected = className && className.endsWith(postfix);
-                    if (selected) {
-                        className = className.substring(0, className.length - postfix.length);
+            return answer;
+        }
+        var onClickGraphNode = function (node) {
+            // stop marking the node as selected which it does by default
+            log.debug("Clicked on Camel Route Diagram node: " + node.cid);
+            $location.path('/camel/properties').search({ "main-tab": "camel", "sub-tab": "camel-route-properties", "nid": node.cid });
+        };
+        function showGraph(nodes, links) {
+            var canvasDiv = $element;
+            var width = getWidth();
+            var height = getHeight();
+            var svg = canvasDiv.children("svg")[0];
+            // do not allow clicking on node to show properties if debugging or tracing as that is for selecting the node instead
+            var onClick;
+            var path = $location.path();
+            if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
+                onClick = null;
+            }
+            else {
+                onClick = onClickGraphNode;
+            }
+            $scope.graphData = Core.dagreLayoutGraph(nodes, links, width, height, svg, false, onClick);
+            var gNodes = canvasDiv.find("g.node");
+            gNodes.click(function () {
+                var selected = isSelected(this);
+                // lets clear all selected flags
+                gNodes.each(function (idx, element) {
+                    setSelected(element, false);
+                });
+                var cid = null;
+                if (!selected) {
+                    cid = this.getAttribute("data-cid");
+                    setSelected(this, true);
+                }
+                $scope.$emit("camel.diagram.selectedNodeId", cid);
+                Core.$apply($scope);
+            });
+            if ($scope.mbean) {
+                Core.register(jolokia, $scope, {
+                    type: 'exec',
+                    mbean: $scope.mbean,
+                    operation: 'dumpRoutesStatsAsXml',
+                    arguments: [true, true]
+                }, Core.onSuccess(statsCallback, { silent: true, error: false }));
+            }
+            $scope.$emit("camel.diagram.layoutComplete");
+            return width;
+        }
+        function getWidth() {
+            var canvasDiv = $element;
+            return canvasDiv.width();
+        }
+        function getHeight() {
+            var canvasDiv = $element;
+            return Camel.getCanvasHeight(canvasDiv);
+        }
+        function statsCallback(response) {
+            var data = response.value;
+            if (data) {
+                var doc = $.parseXML(data);
+                var allStats = $(doc).find("routeStat");
+                allStats.each(function (idx, stat) {
+                    addTooltipToNode(true, stat);
+                });
+                var allStats = $(doc).find("processorStat");
+                allStats.each(function (idx, stat) {
+                    addTooltipToNode(false, stat);
+                });
+                // now lets try update the graph
+                Core.dagreUpdateGraphData($scope.graphData);
+            }
+            function addTooltipToNode(isRoute, stat) {
+                // we could have used a function instead of the boolean isRoute parameter (but sometimes that is easier)
+                var id = stat.getAttribute("id");
+                var completed = stat.getAttribute("exchangesCompleted");
+                var inflight = stat.hasAttribute("exchangesInflight") ? stat.getAttribute("exchangesInflight") : 0;
+                var tooltip = "";
+                if (id && completed) {
+                    var container = isRoute ? $scope.routeNodes : $scope.nodes;
+                    var node = container[id];
+                    if (!node) {
+                        angular.forEach(container, function (value, key) {
+                            if (!node && id === value.elementId) {
+                                node = value;
+                            }
+                        });
+                    }
+                    if (node) {
+                        var total = 0 + parseInt(completed);
+                        var failed = stat.getAttribute("exchangesFailed");
+                        if (failed) {
+                            total += parseInt(failed);
+                        }
+                        var last = stat.getAttribute("lastProcessingTime");
+                        var mean = stat.getAttribute("meanProcessingTime");
+                        var min = stat.getAttribute("minProcessingTime");
+                        var max = stat.getAttribute("maxProcessingTime");
+                        tooltip = "totoal: " + total + "\ninflight:" + inflight + "\nlast: " + last + " (ms)\nmean: " + mean + " (ms)\nmin: " + min + " (ms)\nmax: " + max + " (ms)";
+                        node["counter"] = total;
+                        if ($scope.camelShowInflightCounter) {
+                            node["inflight"] = inflight;
+                        }
+                        var labelSummary = node["labelSummary"];
+                        if (labelSummary) {
+                            tooltip = labelSummary + "\n\n" + tooltip;
+                        }
+                        node["tooltip"] = tooltip;
                     }
                     else {
-                        if (!flag) {
-                            // no need to change!
-                            return answer;
-                        }
-                        className = className + postfix;
-                        answer = true;
-                    }
-                    node.setAttribute("class", className);
-                }
-                return answer;
-            }
-            var onClickGraphNode = function (node) {
-                // stop marking the node as selected which it does by default
-                log.debug("Clicked on Camel Route Diagram node: " + node.cid);
-                $location.path('/camel/properties').search({ "main-tab": "camel", "sub-tab": "camel-route-properties", "nid": node.cid });
-            };
-            function showGraph(nodes, links) {
-                var canvasDiv = $element;
-                var width = getWidth();
-                var height = getHeight();
-                var svg = canvasDiv.children("svg")[0];
-                // do not allow clicking on node to show properties if debugging or tracing as that is for selecting the node instead
-                var onClick;
-                var path = $location.path();
-                if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
-                    onClick = null;
-                }
-                else {
-                    onClick = onClickGraphNode;
-                }
-                $scope.graphData = Core.dagreLayoutGraph(nodes, links, width, height, svg, false, onClick);
-                var gNodes = canvasDiv.find("g.node");
-                gNodes.click(function () {
-                    var selected = isSelected(this);
-                    // lets clear all selected flags
-                    gNodes.each(function (idx, element) {
-                        setSelected(element, false);
-                    });
-                    var cid = null;
-                    if (!selected) {
-                        cid = this.getAttribute("data-cid");
-                        setSelected(this, true);
-                    }
-                    $scope.$emit("camel.diagram.selectedNodeId", cid);
-                    Core.$apply($scope);
-                });
-                if ($scope.mbean) {
-                    Core.register(jolokia, $scope, {
-                        type: 'exec', mbean: $scope.mbean,
-                        operation: 'dumpRoutesStatsAsXml',
-                        arguments: [true, true]
-                    }, Core.onSuccess(statsCallback, { silent: true, error: false }));
-                }
-                $scope.$emit("camel.diagram.layoutComplete");
-                return width;
-            }
-            function getWidth() {
-                var canvasDiv = $element;
-                return canvasDiv.width();
-            }
-            function getHeight() {
-                var canvasDiv = $element;
-                return Camel.getCanvasHeight(canvasDiv);
-            }
-            function statsCallback(response) {
-                var data = response.value;
-                if (data) {
-                    var doc = $.parseXML(data);
-                    var allStats = $(doc).find("routeStat");
-                    allStats.each(function (idx, stat) {
-                        addTooltipToNode(true, stat);
-                    });
-                    var allStats = $(doc).find("processorStat");
-                    allStats.each(function (idx, stat) {
-                        addTooltipToNode(false, stat);
-                    });
-                    // now lets try update the graph
-                    Core.dagreUpdateGraphData($scope.graphData);
-                }
-                function addTooltipToNode(isRoute, stat) {
-                    // we could have used a function instead of the boolean isRoute parameter (but sometimes that is easier)
-                    var id = stat.getAttribute("id");
-                    var completed = stat.getAttribute("exchangesCompleted");
-                    var inflight = stat.hasAttribute("exchangesInflight") ? stat.getAttribute("exchangesInflight") : 0;
-                    var tooltip = "";
-                    if (id && completed) {
-                        var container = isRoute ? $scope.routeNodes : $scope.nodes;
-                        var node = container[id];
-                        if (!node) {
-                            angular.forEach(container, function (value, key) {
-                                if (!node && id === value.elementId) {
-                                    node = value;
-                                }
-                            });
-                        }
-                        if (node) {
-                            var total = 0 + parseInt(completed);
-                            var failed = stat.getAttribute("exchangesFailed");
-                            if (failed) {
-                                total += parseInt(failed);
-                            }
-                            var last = stat.getAttribute("lastProcessingTime");
-                            var mean = stat.getAttribute("meanProcessingTime");
-                            var min = stat.getAttribute("minProcessingTime");
-                            var max = stat.getAttribute("maxProcessingTime");
-                            tooltip = "totoal: " + total + "\ninflight:" + inflight + "\nlast: " + last + " (ms)\nmean: " + mean + " (ms)\nmin: " + min + " (ms)\nmax: " + max + " (ms)";
-                            node["counter"] = total;
-                            if ($scope.camelShowInflightCounter) {
-                                node["inflight"] = inflight;
-                            }
-                            var labelSummary = node["labelSummary"];
-                            if (labelSummary) {
-                                tooltip = labelSummary + "\n\n" + tooltip;
-                            }
-                            node["tooltip"] = tooltip;
-                        }
-                        else {
-                        }
                     }
                 }
             }
-        }]);
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -6469,181 +6520,181 @@ var Camel;
 (function (Camel) {
     var DELIVERY_PERSISTENT = "2";
     Camel._module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", "PreferencesLastPath", function ($route, $scope, $element, $timeout, workspace, jolokia, localStorage, $location, activeMQMessage, PreferencesLastPath) {
-            var log = Logger.get("Camel");
-            $scope.noCredentials = false;
-            $scope.container = {};
-            $scope.message = "\n\n\n\n";
-            $scope.headers = [];
-            // bind model values to search params...
-            Core.bindModelToSearchParam($scope, $location, "tab", "subtab", "compose");
-            Core.bindModelToSearchParam($scope, $location, "searchText", "q", "");
-            // only reload the page if certain search parameters change
-            Core.reloadWhenParametersChange($route, $scope, $location);
-            $scope.checkCredentials = function () {
-                $scope.noCredentials = (Core.isBlank(localStorage['activemqUserName']) || Core.isBlank(localStorage['activemqPassword']));
-            };
-            if ($location.path().has('activemq')) {
-                $scope.localStorage = localStorage;
-                $scope.$watch('localStorage.activemqUserName', $scope.checkCredentials);
-                $scope.$watch('localStorage.activemqPassword', $scope.checkCredentials);
-                //prefill if it's a resent
-                if (activeMQMessage.message !== null) {
-                    $scope.message = activeMQMessage.message.bodyText;
-                    if (activeMQMessage.message.PropertiesText !== null) {
-                        for (var p in activeMQMessage.message.StringProperties) {
-                            $scope.headers.push({ name: p, value: activeMQMessage.message.StringProperties[p] });
-                        }
+        var log = Logger.get("Camel");
+        $scope.noCredentials = false;
+        $scope.container = {};
+        $scope.message = "\n\n\n\n";
+        $scope.headers = [];
+        // bind model values to search params...
+        Core.bindModelToSearchParam($scope, $location, "tab", "subtab", "compose");
+        Core.bindModelToSearchParam($scope, $location, "searchText", "q", "");
+        // only reload the page if certain search parameters change
+        Core.reloadWhenParametersChange($route, $scope, $location);
+        $scope.checkCredentials = function () {
+            $scope.noCredentials = (Core.isBlank(localStorage['activemqUserName']) || Core.isBlank(localStorage['activemqPassword']));
+        };
+        if ($location.path().has('activemq')) {
+            $scope.localStorage = localStorage;
+            $scope.$watch('localStorage.activemqUserName', $scope.checkCredentials);
+            $scope.$watch('localStorage.activemqPassword', $scope.checkCredentials);
+            //prefill if it's a resent
+            if (activeMQMessage.message !== null) {
+                $scope.message = activeMQMessage.message.bodyText;
+                if (activeMQMessage.message.PropertiesText !== null) {
+                    for (var p in activeMQMessage.message.StringProperties) {
+                        $scope.headers.push({ name: p, value: activeMQMessage.message.StringProperties[p] });
                     }
                 }
-                // always reset at the end
-                activeMQMessage.message = null;
             }
-            $scope.openPrefs = function () {
-                PreferencesLastPath.lastPath = $location.path();
-                PreferencesLastPath.lastSearch = $location.search();
-                $location.path('/preferences').search({ 'pref': 'ActiveMQ' });
-            };
-            var LANGUAGE_FORMAT_PREFERENCE = "defaultLanguageFormat";
-            var sourceFormat = workspace.getLocalStorage(LANGUAGE_FORMAT_PREFERENCE) || "javascript";
-            // TODO Remove this if possible
-            $scope.codeMirror = undefined;
-            var options = {
-                mode: {
-                    name: sourceFormat
-                },
-                // Quick hack to get the codeMirror instance.
-                onChange: function (codeMirror) {
-                    if (!$scope.codeMirror) {
-                        $scope.codeMirror = codeMirror;
+            // always reset at the end
+            activeMQMessage.message = null;
+        }
+        $scope.openPrefs = function () {
+            PreferencesLastPath.lastPath = $location.path();
+            PreferencesLastPath.lastSearch = $location.search();
+            $location.path('/preferences').search({ 'pref': 'ActiveMQ' });
+        };
+        var LANGUAGE_FORMAT_PREFERENCE = "defaultLanguageFormat";
+        var sourceFormat = workspace.getLocalStorage(LANGUAGE_FORMAT_PREFERENCE) || "javascript";
+        // TODO Remove this if possible
+        $scope.codeMirror = undefined;
+        var options = {
+            mode: {
+                name: sourceFormat
+            },
+            // Quick hack to get the codeMirror instance.
+            onChange: function (codeMirror) {
+                if (!$scope.codeMirror) {
+                    $scope.codeMirror = codeMirror;
+                }
+            }
+        };
+        $scope.codeMirrorOptions = CodeEditor.createEditorSettings(options);
+        $scope.addHeader = function () {
+            $scope.headers.push({ name: "", value: "" });
+            // lets set the focus to the last header
+            if ($element) {
+                $timeout(function () {
+                    var lastHeader = $element.find("input.headerName").last();
+                    lastHeader.focus();
+                }, 100);
+            }
+        };
+        $scope.removeHeader = function (header) {
+            $scope.headers = $scope.headers.remove(header);
+        };
+        $scope.defaultHeaderNames = function () {
+            var answer = [];
+            function addHeaderSchema(schema) {
+                angular.forEach(schema.definitions.headers.properties, function (value, name) {
+                    answer.push(name);
+                });
+            }
+            if (isJmsEndpoint()) {
+                addHeaderSchema(Camel.jmsHeaderSchema);
+            }
+            if (isCamelEndpoint()) {
+                addHeaderSchema(Camel.camelHeaderSchema);
+            }
+            return answer;
+        };
+        $scope.$watch('workspace.selection', function () {
+            // if the current JMX selection does not support sending messages then lets redirect the page
+            workspace.moveIfViewInvalid();
+        });
+        /* save the sourceFormat in preferences for later
+         * Note, this would be controller specific preferences and not the global, overriding, preferences */
+        // TODO Use ng-selected="changeSourceFormat()" - Although it seemed to fire multiple times..
+        $scope.$watch('codeMirrorOptions.mode.name', function (newValue, oldValue) {
+            workspace.setLocalStorage(LANGUAGE_FORMAT_PREFERENCE, newValue);
+        });
+        var sendWorked = function () {
+            $scope.message = "";
+            Core.notification("success", "Message sent!");
+        };
+        $scope.autoFormat = function () {
+            setTimeout(function () {
+                CodeEditor.autoFormatEditor($scope.codeMirror);
+            }, 50);
+        };
+        $scope.sendMessage = function () {
+            var body = $scope.message;
+            doSendMessage(body, sendWorked);
+        };
+        function doSendMessage(body, onSendCompleteFn) {
+            var selection = workspace.selection;
+            if (selection) {
+                var mbean = selection.objectName;
+                if (mbean) {
+                    var headers = null;
+                    if ($scope.headers.length) {
+                        headers = {};
+                        angular.forEach($scope.headers, function (object) {
+                            var key = object.name;
+                            if (key) {
+                                headers[key] = object.value;
+                            }
+                        });
+                        log.info("About to send headers: " + JSON.stringify(headers));
                     }
-                }
-            };
-            $scope.codeMirrorOptions = CodeEditor.createEditorSettings(options);
-            $scope.addHeader = function () {
-                $scope.headers.push({ name: "", value: "" });
-                // lets set the focus to the last header
-                if ($element) {
-                    $timeout(function () {
-                        var lastHeader = $element.find("input.headerName").last();
-                        lastHeader.focus();
-                    }, 100);
-                }
-            };
-            $scope.removeHeader = function (header) {
-                $scope.headers = $scope.headers.remove(header);
-            };
-            $scope.defaultHeaderNames = function () {
-                var answer = [];
-                function addHeaderSchema(schema) {
-                    angular.forEach(schema.definitions.headers.properties, function (value, name) {
-                        answer.push(name);
-                    });
-                }
-                if (isJmsEndpoint()) {
-                    addHeaderSchema(Camel.jmsHeaderSchema);
-                }
-                if (isCamelEndpoint()) {
-                    addHeaderSchema(Camel.camelHeaderSchema);
-                }
-                return answer;
-            };
-            $scope.$watch('workspace.selection', function () {
-                // if the current JMX selection does not support sending messages then lets redirect the page
-                workspace.moveIfViewInvalid();
-            });
-            /* save the sourceFormat in preferences for later
-             * Note, this would be controller specific preferences and not the global, overriding, preferences */
-            // TODO Use ng-selected="changeSourceFormat()" - Although it seemed to fire multiple times..
-            $scope.$watch('codeMirrorOptions.mode.name', function (newValue, oldValue) {
-                workspace.setLocalStorage(LANGUAGE_FORMAT_PREFERENCE, newValue);
-            });
-            var sendWorked = function () {
-                $scope.message = "";
-                Core.notification("success", "Message sent!");
-            };
-            $scope.autoFormat = function () {
-                setTimeout(function () {
-                    CodeEditor.autoFormatEditor($scope.codeMirror);
-                }, 50);
-            };
-            $scope.sendMessage = function () {
-                var body = $scope.message;
-                doSendMessage(body, sendWorked);
-            };
-            function doSendMessage(body, onSendCompleteFn) {
-                var selection = workspace.selection;
-                if (selection) {
-                    var mbean = selection.objectName;
-                    if (mbean) {
-                        var headers = null;
-                        if ($scope.headers.length) {
-                            headers = {};
-                            angular.forEach($scope.headers, function (object) {
-                                var key = object.name;
-                                if (key) {
-                                    headers[key] = object.value;
-                                }
-                            });
-                            log.info("About to send headers: " + JSON.stringify(headers));
-                        }
-                        var callback = Core.onSuccess(onSendCompleteFn);
-                        if (selection.domain === "org.apache.camel") {
-                            var target = Camel.getContextAndTargetEndpoint(workspace);
-                            var uri = target['uri'];
-                            mbean = target['mbean'];
-                            if (mbean && uri) {
-                                // if we are running Camel 2.14 we can check if its possible to send to the endpoint
-                                var ok = true;
-                                if (Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)) {
-                                    var reply = jolokia.execute(mbean, "canSendToEndpoint(java.lang.String)", uri);
-                                    if (!reply) {
-                                        Core.notification("warning", "Camel does not support sending to this endpoint.");
-                                        ok = false;
-                                    }
-                                }
-                                if (ok) {
-                                    if (headers) {
-                                        jolokia.execute(mbean, "sendBodyAndHeaders(java.lang.String, java.lang.Object, java.util.Map)", uri, body, headers, callback);
-                                    }
-                                    else {
-                                        jolokia.execute(mbean, "sendStringBody(java.lang.String, java.lang.String)", uri, body, callback);
-                                    }
+                    var callback = Core.onSuccess(onSendCompleteFn);
+                    if (selection.domain === "org.apache.camel") {
+                        var target = Camel.getContextAndTargetEndpoint(workspace);
+                        var uri = target['uri'];
+                        mbean = target['mbean'];
+                        if (mbean && uri) {
+                            // if we are running Camel 2.14 we can check if its possible to send to the endpoint
+                            var ok = true;
+                            if (Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)) {
+                                var reply = jolokia.execute(mbean, "canSendToEndpoint(java.lang.String)", uri);
+                                if (!reply) {
+                                    Core.notification("warning", "Camel does not support sending to this endpoint.");
+                                    ok = false;
                                 }
                             }
-                            else {
-                                if (!mbean) {
-                                    Core.notification("error", "Could not find CamelContext MBean!");
+                            if (ok) {
+                                if (headers) {
+                                    jolokia.execute(mbean, "sendBodyAndHeaders(java.lang.String, java.lang.Object, java.util.Map)", uri, body, headers, callback);
                                 }
                                 else {
-                                    Core.notification("error", "Failed to determine endpoint name!");
+                                    jolokia.execute(mbean, "sendStringBody(java.lang.String, java.lang.String)", uri, body, callback);
                                 }
-                                log.debug("Parsed context and endpoint: ", target);
                             }
                         }
                         else {
-                            var user = localStorage["activemqUserName"];
-                            var pwd = localStorage["activemqPassword"];
-                            // AMQ is sending non persistent by default, so make sure we tell to sent persistent by default
-                            if (!headers) {
-                                headers = {};
+                            if (!mbean) {
+                                Core.notification("error", "Could not find CamelContext MBean!");
                             }
-                            if (!headers["JMSDeliveryMode"]) {
-                                headers["JMSDeliveryMode"] = DELIVERY_PERSISTENT;
+                            else {
+                                Core.notification("error", "Failed to determine endpoint name!");
                             }
-                            jolokia.execute(mbean, "sendTextMessage(java.util.Map, java.lang.String, java.lang.String, java.lang.String)", headers, body, user, pwd, callback);
+                            log.debug("Parsed context and endpoint: ", target);
                         }
+                    }
+                    else {
+                        var user = localStorage["activemqUserName"];
+                        var pwd = localStorage["activemqPassword"];
+                        // AMQ is sending non persistent by default, so make sure we tell to sent persistent by default
+                        if (!headers) {
+                            headers = {};
+                        }
+                        if (!headers["JMSDeliveryMode"]) {
+                            headers["JMSDeliveryMode"] = DELIVERY_PERSISTENT;
+                        }
+                        jolokia.execute(mbean, "sendTextMessage(java.util.Map, java.lang.String, java.lang.String, java.lang.String)", headers, body, user, pwd, callback);
                     }
                 }
             }
-            function isCamelEndpoint() {
-                // TODO check for the camel or if its an activemq endpoint
-                return true;
-            }
-            function isJmsEndpoint() {
-                // TODO check for the jms/activemq endpoint in camel or if its an activemq endpoint
-                return true;
-            }
-        }]);
+        }
+        function isCamelEndpoint() {
+            // TODO check for the camel or if its an activemq endpoint
+            return true;
+        }
+        function isJmsEndpoint() {
+            // TODO check for the jms/activemq endpoint in camel or if its an activemq endpoint
+            return true;
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -6651,101 +6702,101 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.SourceController", ["$scope", "workspace", function ($scope, workspace) {
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                setTimeout(updateRoutes, 50);
-            });
-            $scope.$watch('workspace.selection', function () {
-                if (workspace.moveIfViewInvalid())
-                    return;
-                updateRoutes();
-            });
-            $scope.mode = 'xml';
-            function getSource(routeXmlNode) {
-                function removeCrappyHeaders(idx, e) {
-                    var answer = e.getAttribute("customId");
-                    if (e.nodeName === 'route') {
-                        // always keep id on <route> element
-                        answer = "true";
-                    }
-                    if (!answer || answer !== "true") {
-                        e.removeAttribute("id");
-                    }
-                    // just always remove customId, _cid, and group
-                    e.removeAttribute("customId");
-                    e.removeAttribute("_cid");
-                    e.removeAttribute("group");
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            setTimeout(updateRoutes, 50);
+        });
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid())
+                return;
+            updateRoutes();
+        });
+        $scope.mode = 'xml';
+        function getSource(routeXmlNode) {
+            function removeCrappyHeaders(idx, e) {
+                var answer = e.getAttribute("customId");
+                if (e.nodeName === 'route') {
+                    // always keep id on <route> element
+                    answer = "true";
                 }
-                var copy = $(routeXmlNode).clone();
-                copy.each(removeCrappyHeaders);
-                copy.find("*").each(removeCrappyHeaders);
-                var newNode = (copy && copy.length) ? copy[0] : routeXmlNode;
-                return Core.xmlNodeToString(newNode);
+                if (!answer || answer !== "true") {
+                    e.removeAttribute("id");
+                }
+                // just always remove customId, _cid, and group
+                e.removeAttribute("customId");
+                e.removeAttribute("_cid");
+                e.removeAttribute("group");
             }
-            function updateRoutes() {
-                // did we select a single route
-                var routeXmlNode = Camel.getSelectedRouteNode(workspace);
-                if (routeXmlNode) {
-                    $scope.source = getSource(routeXmlNode);
-                    Core.$apply($scope);
+            var copy = $(routeXmlNode).clone();
+            copy.each(removeCrappyHeaders);
+            copy.find("*").each(removeCrappyHeaders);
+            var newNode = (copy && copy.length) ? copy[0] : routeXmlNode;
+            return Core.xmlNodeToString(newNode);
+        }
+        function updateRoutes() {
+            // did we select a single route
+            var routeXmlNode = Camel.getSelectedRouteNode(workspace);
+            if (routeXmlNode) {
+                $scope.source = getSource(routeXmlNode);
+                Core.$apply($scope);
+            }
+            else {
+                // no then try to find the camel context and get all the routes code
+                $scope.mbean = Camel.getSelectionCamelContextMBean(workspace);
+                if (!$scope.mbean) {
+                    // maybe the parent is the camel context folder (when we have selected the routes folder),
+                    // then grab the object name from parent
+                    var parent = Core.pathGet(workspace, ["selection", "parent"]);
+                    if (parent && parent.title === "context") {
+                        $scope.mbean = parent.children[0].objectName;
+                    }
+                }
+                if ($scope.mbean) {
+                    var jolokia = workspace.jolokia;
+                    jolokia.request({ type: 'exec', mbean: $scope.mbean, operation: 'dumpRoutesAsXml()' }, Core.onSuccess(populateTable));
+                }
+            }
+        }
+        var populateTable = function (response) {
+            var data = response.value;
+            var selectedRouteId = Camel.getSelectedRouteId(workspace);
+            if (data && selectedRouteId) {
+                var doc = $.parseXML(data);
+                var routes = $(doc).find('route[id="' + selectedRouteId + '"]');
+                if (routes && routes.length) {
+                    var selectedRoute = routes[0];
+                    // TODO turn into XML?
+                    var routeXml = getSource(selectedRoute);
+                    if (routeXml) {
+                        data = routeXml;
+                    }
+                }
+            }
+            $scope.source = data;
+            Core.$apply($scope);
+        };
+        var saveWorked = function () {
+            Core.notification("success", "Route updated!");
+            // lets clear the cached route XML so we reload the new value
+            Camel.clearSelectedRouteNode(workspace);
+            updateRoutes();
+        };
+        $scope.saveRouteXml = function () {
+            var routeXml = $scope.source;
+            if (routeXml) {
+                var decoded = decodeURIComponent(routeXml);
+                Camel.log.debug("addOrUpdateRoutesFromXml xml decoded: " + decoded);
+                var jolokia = workspace.jolokia;
+                var mbean = Camel.getSelectionCamelContextMBean(workspace);
+                if (mbean) {
+                    jolokia.execute(mbean, "addOrUpdateRoutesFromXml(java.lang.String)", decoded, Core.onSuccess(saveWorked));
                 }
                 else {
-                    // no then try to find the camel context and get all the routes code
-                    $scope.mbean = Camel.getSelectionCamelContextMBean(workspace);
-                    if (!$scope.mbean) {
-                        // maybe the parent is the camel context folder (when we have selected the routes folder),
-                        // then grab the object name from parent
-                        var parent = Core.pathGet(workspace, ["selection", "parent"]);
-                        if (parent && parent.title === "context") {
-                            $scope.mbean = parent.children[0].objectName;
-                        }
-                    }
-                    if ($scope.mbean) {
-                        var jolokia = workspace.jolokia;
-                        jolokia.request({ type: 'exec', mbean: $scope.mbean, operation: 'dumpRoutesAsXml()' }, Core.onSuccess(populateTable));
-                    }
+                    Core.notification("error", "Could not find CamelContext MBean!");
                 }
             }
-            var populateTable = function (response) {
-                var data = response.value;
-                var selectedRouteId = Camel.getSelectedRouteId(workspace);
-                if (data && selectedRouteId) {
-                    var doc = $.parseXML(data);
-                    var routes = $(doc).find('route[id="' + selectedRouteId + '"]');
-                    if (routes && routes.length) {
-                        var selectedRoute = routes[0];
-                        // TODO turn into XML?
-                        var routeXml = getSource(selectedRoute);
-                        if (routeXml) {
-                            data = routeXml;
-                        }
-                    }
-                }
-                $scope.source = data;
-                Core.$apply($scope);
-            };
-            var saveWorked = function () {
-                Core.notification("success", "Route updated!");
-                // lets clear the cached route XML so we reload the new value
-                Camel.clearSelectedRouteNode(workspace);
-                updateRoutes();
-            };
-            $scope.saveRouteXml = function () {
-                var routeXml = $scope.source;
-                if (routeXml) {
-                    var decoded = decodeURIComponent(routeXml);
-                    Camel.log.debug("addOrUpdateRoutesFromXml xml decoded: " + decoded);
-                    var jolokia = workspace.jolokia;
-                    var mbean = Camel.getSelectionCamelContextMBean(workspace);
-                    if (mbean) {
-                        jolokia.execute(mbean, "addOrUpdateRoutesFromXml(java.lang.String)", decoded, Core.onSuccess(saveWorked));
-                    }
-                    else {
-                        Core.notification("error", "Could not find CamelContext MBean!");
-                    }
-                }
-            };
-        }]);
+        };
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -6753,163 +6804,164 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.TraceRouteController", ["$scope", "workspace", "jolokia", "localStorage", "tracerStatus", function ($scope, workspace, jolokia, localStorage, tracerStatus) {
-            var log = Logger.get("CamelTracer");
-            $scope.tracing = false;
+        var log = Logger.get("CamelTracer");
+        $scope.tracing = false;
+        $scope.messages = [];
+        $scope.graphView = null;
+        $scope.mode = 'text';
+        $scope.showMessageDetails = false;
+        $scope.gridOptions = Camel.createBrowseGridOptions();
+        $scope.gridOptions.selectWithCheckboxOnly = false;
+        $scope.gridOptions.showSelectionCheckbox = false;
+        $scope.gridOptions.multiSelect = false;
+        $scope.gridOptions.afterSelectionChange = onSelectionChanged;
+        $scope.gridOptions.columnDefs.push({
+            field: 'toNode',
+            displayName: 'To Node'
+        });
+        $scope.startTracing = function () {
+            log.info("Start tracing");
+            setTracing(true);
+        };
+        $scope.stopTracing = function () {
+            log.info("Stop tracing");
+            setTracing(false);
+        };
+        $scope.clear = function () {
+            log.debug("Clear messages");
+            tracerStatus.messages = [];
             $scope.messages = [];
-            $scope.graphView = null;
-            $scope.mode = 'text';
-            $scope.showMessageDetails = false;
-            $scope.gridOptions = Camel.createBrowseGridOptions();
-            $scope.gridOptions.selectWithCheckboxOnly = false;
-            $scope.gridOptions.showSelectionCheckbox = false;
-            $scope.gridOptions.multiSelect = false;
-            $scope.gridOptions.afterSelectionChange = onSelectionChanged;
-            $scope.gridOptions.columnDefs.push({
-                field: 'toNode',
-                displayName: 'To Node'
-            });
-            $scope.startTracing = function () {
-                log.info("Start tracing");
-                setTracing(true);
-            };
-            $scope.stopTracing = function () {
-                log.info("Stop tracing");
-                setTracing(false);
-            };
-            $scope.clear = function () {
-                log.debug("Clear messages");
-                tracerStatus.messages = [];
-                $scope.messages = [];
-                Core.$apply($scope);
-            };
-            $scope.$watch('workspace.selection', function () {
-                if (workspace.moveIfViewInvalid()) {
-                    return;
+            Core.$apply($scope);
+        };
+        $scope.$watch('workspace.selection', function () {
+            if (workspace.moveIfViewInvalid()) {
+                return;
+            }
+            $scope.messages = tracerStatus.messages;
+            reloadTracingFlag();
+        });
+        // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
+        $scope.openMessageDialog = function (message) {
+            ActiveMQ.selectCurrentMessage(message, "id", $scope);
+            if ($scope.row) {
+                var body = $scope.row.body;
+                $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
+                // it may detect wrong as javascript, so use text instead
+                if ("javascript" == $scope.mode) {
+                    $scope.mode = "text";
                 }
-                $scope.messages = tracerStatus.messages;
-                reloadTracingFlag();
-            });
-            // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
-            $scope.openMessageDialog = function (message) {
-                ActiveMQ.selectCurrentMessage(message, "id", $scope);
-                if ($scope.row) {
-                    var body = $scope.row.body;
-                    $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
-                    // it may detect wrong as javascript, so use text instead
-                    if ("javascript" == $scope.mode) {
-                        $scope.mode = "text";
+                $scope.showMessageDetails = true;
+            }
+            else {
+                $scope.showMessageDetails = false;
+            }
+            Core.$apply($scope);
+        };
+        ActiveMQ.decorate($scope, onSelectionChanged);
+        function reloadTracingFlag() {
+            $scope.tracing = false;
+            // clear any previous polls
+            if (tracerStatus.jhandle != null) {
+                log.debug("Unregistering jolokia handle");
+                jolokia.unregister(tracerStatus.jhandle);
+                tracerStatus.jhandle = null;
+            }
+            var mbean = Camel.getSelectionCamelTraceMBean(workspace);
+            if (mbean) {
+                $scope.tracing = jolokia.getAttribute(mbean, "Enabled", Core.onSuccess(null));
+                if ($scope.tracing) {
+                    var traceMBean = mbean;
+                    if (traceMBean) {
+                        // register callback for doing live update of tracing
+                        if (tracerStatus.jhandle === null) {
+                            log.debug("Registering jolokia handle");
+                            tracerStatus.jhandle = jolokia.register(populateRouteMessages, {
+                                type: 'exec',
+                                mbean: traceMBean,
+                                operation: 'dumpAllTracedMessagesAsXml()',
+                                ignoreErrors: true,
+                                arguments: []
+                            });
+                        }
                     }
-                    $scope.showMessageDetails = true;
+                    $scope.graphView = "plugins/camel/html/routes.html";
                 }
                 else {
+                    tracerStatus.messages = [];
+                    $scope.messages = [];
+                    $scope.graphView = null;
                     $scope.showMessageDetails = false;
                 }
-                Core.$apply($scope);
-            };
-            ActiveMQ.decorate($scope, onSelectionChanged);
-            function reloadTracingFlag() {
-                $scope.tracing = false;
-                // clear any previous polls
-                if (tracerStatus.jhandle != null) {
-                    log.debug("Unregistering jolokia handle");
-                    jolokia.unregister(tracerStatus.jhandle);
-                    tracerStatus.jhandle = null;
-                }
-                var mbean = Camel.getSelectionCamelTraceMBean(workspace);
-                if (mbean) {
-                    $scope.tracing = jolokia.getAttribute(mbean, "Enabled", Core.onSuccess(null));
-                    if ($scope.tracing) {
-                        var traceMBean = mbean;
-                        if (traceMBean) {
-                            // register callback for doing live update of tracing
-                            if (tracerStatus.jhandle === null) {
-                                log.debug("Registering jolokia handle");
-                                tracerStatus.jhandle = jolokia.register(populateRouteMessages, {
-                                    type: 'exec', mbean: traceMBean,
-                                    operation: 'dumpAllTracedMessagesAsXml()',
-                                    ignoreErrors: true,
-                                    arguments: []
-                                });
-                            }
-                        }
-                        $scope.graphView = "plugins/camel/html/routes.html";
-                    }
-                    else {
-                        tracerStatus.messages = [];
-                        $scope.messages = [];
-                        $scope.graphView = null;
-                        $scope.showMessageDetails = false;
-                    }
-                }
             }
-            function populateRouteMessages(response) {
-                log.debug("Populating response " + response);
-                // filter messages due CAMEL-7045 but in camel-core
-                // see https://github.com/hawtio/hawtio/issues/292
-                var selectedRouteId = Camel.getSelectedRouteId(workspace);
-                var xml = response.value;
-                if (angular.isString(xml)) {
-                    // lets parse the XML DOM here...
-                    var doc = $.parseXML(xml);
-                    var allMessages = $(doc).find("fabricTracerEventMessage");
-                    if (!allMessages || !allMessages.length) {
-                        // lets try find another element name
-                        allMessages = $(doc).find("backlogTracerEventMessage");
-                    }
-                    allMessages.each(function (idx, message) {
-                        var routeId = $(message).find("routeId").text();
-                        if (routeId === selectedRouteId) {
-                            var messageData = Camel.createMessageFromXml(message);
-                            var toNode = $(message).find("toNode").text();
-                            if (toNode) {
-                                messageData["toNode"] = toNode;
-                            }
-                            // attach the open dialog to make it work
-                            messageData.openMessageDialog = $scope.openMessageDialog;
-                            log.debug("Adding new message to trace table with id " + messageData["id"]);
-                            $scope.messages.push(messageData);
-                        }
-                    });
-                    // keep state of the traced messages on tracerStatus
-                    tracerStatus.messages = $scope.messages;
-                    Core.$apply($scope);
+        }
+        function populateRouteMessages(response) {
+            log.debug("Populating response " + response);
+            // filter messages due CAMEL-7045 but in camel-core
+            // see https://github.com/hawtio/hawtio/issues/292
+            var selectedRouteId = Camel.getSelectedRouteId(workspace);
+            var xml = response.value;
+            if (angular.isString(xml)) {
+                // lets parse the XML DOM here...
+                var doc = $.parseXML(xml);
+                var allMessages = $(doc).find("fabricTracerEventMessage");
+                if (!allMessages || !allMessages.length) {
+                    // lets try find another element name
+                    allMessages = $(doc).find("backlogTracerEventMessage");
                 }
-            }
-            function onSelectionChanged() {
-                angular.forEach($scope.gridOptions.selectedItems, function (selected) {
-                    if (selected) {
-                        var toNode = selected["toNode"];
+                allMessages.each(function (idx, message) {
+                    var routeId = $(message).find("routeId").text();
+                    if (routeId === selectedRouteId) {
+                        var messageData = Camel.createMessageFromXml(message);
+                        var toNode = $(message).find("toNode").text();
                         if (toNode) {
-                            // lets highlight the node in the diagram
-                            var nodes = d3.select("svg").selectAll("g .node");
-                            Camel.highlightSelectedNode(nodes, toNode);
+                            messageData["toNode"] = toNode;
                         }
+                        // attach the open dialog to make it work
+                        messageData.openMessageDialog = $scope.openMessageDialog;
+                        log.debug("Adding new message to trace table with id " + messageData["id"]);
+                        $scope.messages.push(messageData);
                     }
                 });
-            }
-            function tracingChanged(response) {
-                reloadTracingFlag();
+                // keep state of the traced messages on tracerStatus
+                tracerStatus.messages = $scope.messages;
                 Core.$apply($scope);
             }
-            function setTracing(flag) {
-                var mbean = Camel.getSelectionCamelTraceMBean(workspace);
-                if (mbean) {
-                    // set max only supported on BacklogTracer
-                    // (the old fabric tracer does not support max length)
-                    if (mbean.toString().endsWith("BacklogTracer")) {
-                        var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
-                        var streams = Camel.traceOrDebugIncludeStreams(localStorage);
-                        jolokia.setAttribute(mbean, "BodyMaxChars", max);
-                        jolokia.setAttribute(mbean, "BodyIncludeStreams", streams);
-                        jolokia.setAttribute(mbean, "BodyIncludeFiles", streams);
+        }
+        function onSelectionChanged() {
+            angular.forEach($scope.gridOptions.selectedItems, function (selected) {
+                if (selected) {
+                    var toNode = selected["toNode"];
+                    if (toNode) {
+                        // lets highlight the node in the diagram
+                        var nodes = d3.select("svg").selectAll("g .node");
+                        Camel.highlightSelectedNode(nodes, toNode);
                     }
-                    jolokia.setAttribute(mbean, "Enabled", flag, Core.onSuccess(tracingChanged));
                 }
+            });
+        }
+        function tracingChanged(response) {
+            reloadTracingFlag();
+            Core.$apply($scope);
+        }
+        function setTracing(flag) {
+            var mbean = Camel.getSelectionCamelTraceMBean(workspace);
+            if (mbean) {
+                // set max only supported on BacklogTracer
+                // (the old fabric tracer does not support max length)
+                if (mbean.toString().endsWith("BacklogTracer")) {
+                    var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
+                    var streams = Camel.traceOrDebugIncludeStreams(localStorage);
+                    jolokia.setAttribute(mbean, "BodyMaxChars", max);
+                    jolokia.setAttribute(mbean, "BodyIncludeStreams", streams);
+                    jolokia.setAttribute(mbean, "BodyIncludeFiles", streams);
+                }
+                jolokia.setAttribute(mbean, "Enabled", flag, Core.onSuccess(tracingChanged));
             }
-            log.info("Re-activating tracer with " + tracerStatus.messages.length + " existing messages");
-            $scope.messages = tracerStatus.messages;
-            $scope.tracing = tracerStatus.jhandle != null;
-        }]);
+        }
+        log.info("Re-activating tracer with " + tracerStatus.messages.length + " existing messages");
+        $scope.messages = tracerStatus.messages;
+        $scope.tracing = tracerStatus.jhandle != null;
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -6917,98 +6969,98 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.TreeHeaderController", ["$scope", "$location", function ($scope, $location) {
-            $scope.contextFilterText = '';
-            $scope.$watch('contextFilterText', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    $scope.$emit("camel-contextFilterText", newValue);
-                }
-            });
-            $scope.expandAll = function () {
-                Tree.expandAll("#cameltree");
-            };
-            $scope.contractAll = function () {
-                Tree.contractAll("#cameltree");
-            };
-        }]);
+        $scope.contextFilterText = '';
+        $scope.$watch('contextFilterText', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                $scope.$emit("camel-contextFilterText", newValue);
+            }
+        });
+        $scope.expandAll = function () {
+            Tree.expandAll("#cameltree");
+        };
+        $scope.contractAll = function () {
+            Tree.contractAll("#cameltree");
+        };
+    }]);
     Camel._module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", "$rootScope", function ($scope, $location, $timeout, workspace, $rootScope) {
-            $scope.contextFilterText = $location.search()["cq"];
+        $scope.contextFilterText = $location.search()["cq"];
+        $scope.fullScreenViewLink = Camel.linkToFullScreenView(workspace);
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            $timeout(updateSelectionFromURL, 50, false);
+        });
+        $scope.$watch('workspace.tree', function () {
+            reloadFunction();
+        });
+        // TODO - how the tree is initialized is different, how this filter works needs to be revisited
+        /*
+        var reloadOnContextFilterThrottled = _.debounce(() => {
+          reloadFunction(() => {
+            $("#camelContextIdFilter").focus();
+            Core.$apply($scope);
+          });
+        }, 100, { trailing: true } );
+    
+        $scope.$watch('contextFilterText', function () {
+          if ($scope.contextFilterText != $scope.lastContextFilterText) {
+            $timeout(reloadOnContextFilterThrottled, 250, false);
+          }
+        });
+    
+        $rootScope.$on('camel-contextFilterText', (event, value) => {
+          $scope.contextFilterText = value;
+        });
+        */
+        $scope.$on('jmxTreeUpdated', function () {
+            reloadFunction();
+        });
+        function reloadFunction(afterSelectionFn) {
+            if (afterSelectionFn === void 0) { afterSelectionFn = null; }
             $scope.fullScreenViewLink = Camel.linkToFullScreenView(workspace);
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                $timeout(updateSelectionFromURL, 50, false);
-            });
-            $scope.$watch('workspace.tree', function () {
-                reloadFunction();
-            });
-            // TODO - how the tree is initialized is different, how this filter works needs to be revisited
-            /*
-            var reloadOnContextFilterThrottled = _.debounce(() => {
-              reloadFunction(() => {
-                $("#camelContextIdFilter").focus();
-                Core.$apply($scope);
-              });
-            }, 100, { trailing: true } );
-        
-            $scope.$watch('contextFilterText', function () {
-              if ($scope.contextFilterText != $scope.lastContextFilterText) {
-                $timeout(reloadOnContextFilterThrottled, 250, false);
-              }
-            });
-        
-            $rootScope.$on('camel-contextFilterText', (event, value) => {
-              $scope.contextFilterText = value;
-            });
-            */
-            $scope.$on('jmxTreeUpdated', function () {
-                reloadFunction();
-            });
-            function reloadFunction(afterSelectionFn) {
-                if (afterSelectionFn === void 0) { afterSelectionFn = null; }
-                $scope.fullScreenViewLink = Camel.linkToFullScreenView(workspace);
-                var children = [];
-                var domainName = Camel.jmxDomain;
-                // lets pull out each context
-                var tree = workspace.tree;
-                if (tree) {
-                    var rootFolder = tree.findDescendant(function (node) {
-                        return node.id === 'camelContexts';
-                    });
-                    if (rootFolder) {
-                        $timeout(function () {
-                            var treeElement = $("#cameltree");
-                            Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder], true);
-                            // lets do this asynchronously to avoid Error: $digest already in progress
-                            updateSelectionFromURL();
-                            if (angular.isFunction(afterSelectionFn)) {
-                                afterSelectionFn();
-                            }
-                        }, 10);
-                    }
+            var children = [];
+            var domainName = Camel.jmxDomain;
+            // lets pull out each context
+            var tree = workspace.tree;
+            if (tree) {
+                var rootFolder = tree.findDescendant(function (node) {
+                    return node.id === 'camelContexts';
+                });
+                if (rootFolder) {
+                    $timeout(function () {
+                        var treeElement = $("#cameltree");
+                        Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder], true);
+                        // lets do this asynchronously to avoid Error: $digest already in progress
+                        updateSelectionFromURL();
+                        if (angular.isFunction(afterSelectionFn)) {
+                            afterSelectionFn();
+                        }
+                    }, 10);
                 }
             }
-            function updateSelectionFromURL() {
-                Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $("#cameltree"), function (first) {
-                    // use function to auto select first Camel context routes if there is only one Camel context
-                    var contexts = first.getChildren();
-                    if (contexts && contexts.length === 1) {
-                        first = contexts[0];
-                        first.expand(true);
-                        var children = first.getChildren();
-                        if (children && children.length) {
-                            var routes = children[0];
-                            if (routes.data.typeName === 'routes') {
-                                first = routes;
-                                //Core.$apply($scope);
-                                return first;
-                            }
+        }
+        function updateSelectionFromURL() {
+            Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $("#cameltree"), function (first) {
+                // use function to auto select first Camel context routes if there is only one Camel context
+                var contexts = first.getChildren();
+                if (contexts && contexts.length === 1) {
+                    first = contexts[0];
+                    first.expand(true);
+                    var children = first.getChildren();
+                    if (children && children.length) {
+                        var routes = children[0];
+                        if (routes.data.typeName === 'routes') {
+                            first = routes;
+                            //Core.$apply($scope);
+                            return first;
                         }
                     }
-                    //Core.$apply($scope);
-                    return null;
-                }, true);
-                $scope.fullScreenViewLink = Camel.linkToFullScreenView(workspace);
-            }
-        }]);
+                }
+                //Core.$apply($scope);
+                return null;
+            }, true);
+            $scope.fullScreenViewLink = Camel.linkToFullScreenView(workspace);
+        }
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -7016,98 +7068,97 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.TypeConverterController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = [];
-            $scope.selectedMBean = null;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'from',
-                    displayName: 'From',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'to',
-                    displayName: 'To',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: false,
-                canSelectRows: false,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                }
-            };
-            function onAttributes(response) {
-                var obj = response.value;
-                if (obj) {
-                    $scope.mbeanAttributes = obj;
-                    // ensure web page is updated
-                    Core.$apply($scope);
-                }
+        $scope.data = [];
+        $scope.selectedMBean = null;
+        $scope.mbeanAttributes = {};
+        var columnDefs = [
+            {
+                field: 'from',
+                displayName: 'From',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'to',
+                displayName: 'To',
+                cellFilter: null,
+                width: "*",
+                resizable: true
             }
-            function onConverters(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var values = obj[key];
-                        for (var v in values) {
-                            arr.push({ from: key, to: v });
-                        }
+        ];
+        $scope.gridOptions = {
+            data: 'data',
+            displayFooter: true,
+            displaySelectionCheckbox: false,
+            canSelectRows: false,
+            enableSorting: true,
+            columnDefs: columnDefs,
+            selectedItems: [],
+            filterOptions: {
+                filterText: ''
+            }
+        };
+        function onAttributes(response) {
+            var obj = response.value;
+            if (obj) {
+                $scope.mbeanAttributes = obj;
+                // ensure web page is updated
+                Core.$apply($scope);
+            }
+        }
+        function onConverters(response) {
+            var obj = response.value;
+            if (obj) {
+                // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
+                var arr = [];
+                for (var key in obj) {
+                    var values = obj[key];
+                    for (var v in values) {
+                        arr.push({ from: key, to: v });
                     }
-                    arr = arr.sortBy("from");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
-                    // ensure web page is updated
-                    Core.$apply($scope);
                 }
+                arr = arr.sortBy("from");
+                $scope.data = arr;
+                // okay we have the data then set the selected mbean which allows UI to display data
+                $scope.selectedMBean = response.request.mbean;
+                // ensure web page is updated
+                Core.$apply($scope);
             }
-            $scope.renderIcon = function (state) {
-                return Camel.iconClass(state);
-            };
-            $scope.disableStatistics = function () {
-                if ($scope.selectedMBean) {
-                    jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", false);
-                }
-            };
-            $scope.enableStatistics = function () {
-                if ($scope.selectedMBean) {
-                    jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", true);
-                }
-            };
-            $scope.resetStatistics = function () {
-                if ($scope.selectedMBean) {
-                    jolokia.request({ type: 'exec', mbean: $scope.selectedMBean, operation: 'resetTypeConversionCounters' }, Core.onSuccess(null, { silent: true }));
-                }
-            };
-            function loadConverters() {
-                console.log("Loading TypeConverter data...");
-                var mbean = Camel.getSelectionCamelTypeConverter(workspace);
-                if (mbean) {
-                    // grab attributes in real time
-                    var query = { type: "read", mbean: mbean,
-                        attribute: ["AttemptCounter", "FailedCounter", "HitCounter", "MissCounter", "NumberOfTypeConverters", "StatisticsEnabled"] };
-                    jolokia.request(query, Core.onSuccess(onAttributes));
-                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onAttributes, query));
-                    // and list of converters
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'listTypeConverters' }, Core.onSuccess(onConverters));
-                }
+        }
+        $scope.renderIcon = function (state) {
+            return Camel.iconClass(state);
+        };
+        $scope.disableStatistics = function () {
+            if ($scope.selectedMBean) {
+                jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", false);
             }
-            // load converters
-            loadConverters();
-        }]);
+        };
+        $scope.enableStatistics = function () {
+            if ($scope.selectedMBean) {
+                jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", true);
+            }
+        };
+        $scope.resetStatistics = function () {
+            if ($scope.selectedMBean) {
+                jolokia.request({ type: 'exec', mbean: $scope.selectedMBean, operation: 'resetTypeConversionCounters' }, Core.onSuccess(null, { silent: true }));
+            }
+        };
+        function loadConverters() {
+            console.log("Loading TypeConverter data...");
+            var mbean = Camel.getSelectionCamelTypeConverter(workspace);
+            if (mbean) {
+                // grab attributes in real time
+                var query = { type: "read", mbean: mbean, attribute: ["AttemptCounter", "FailedCounter", "HitCounter", "MissCounter", "NumberOfTypeConverters", "StatisticsEnabled"] };
+                jolokia.request(query, Core.onSuccess(onAttributes));
+                Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onAttributes, query));
+                // and list of converters
+                jolokia.request({ type: 'exec', mbean: mbean, operation: 'listTypeConverters' }, Core.onSuccess(onConverters));
+            }
+        }
+        // load converters
+        loadConverters();
+    }]);
 })(Camel || (Camel = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -7135,7 +7186,8 @@ var Karaf;
     function installRepository(workspace, jolokia, uri, success, error) {
         Karaf.log.info("installing URI: ", uri);
         jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            type: 'exec',
+            mbean: getSelectionFeaturesMBean(workspace),
             operation: 'addRepository(java.lang.String)',
             arguments: [uri]
         }, Core.onSuccess(success, { error: error }));
@@ -7144,7 +7196,8 @@ var Karaf;
     function uninstallRepository(workspace, jolokia, uri, success, error) {
         Karaf.log.info("uninstalling URI: ", uri);
         jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            type: 'exec',
+            mbean: getSelectionFeaturesMBean(workspace),
             operation: 'removeRepository(java.lang.String)',
             arguments: [uri]
         }, Core.onSuccess(success, { error: error }));
@@ -7152,7 +7205,8 @@ var Karaf;
     Karaf.uninstallRepository = uninstallRepository;
     function installFeature(workspace, jolokia, feature, version, success, error) {
         jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            type: 'exec',
+            mbean: getSelectionFeaturesMBean(workspace),
             operation: 'installFeature(java.lang.String, java.lang.String)',
             arguments: [feature, version]
         }, Core.onSuccess(success, { error: error }));
@@ -7160,7 +7214,8 @@ var Karaf;
     Karaf.installFeature = installFeature;
     function uninstallFeature(workspace, jolokia, feature, version, success, error) {
         jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            type: 'exec',
+            mbean: getSelectionFeaturesMBean(workspace),
             operation: 'uninstallFeature(java.lang.String, java.lang.String)',
             arguments: [feature, version]
         }, Core.onSuccess(success, { error: error }));
@@ -7351,13 +7406,16 @@ var Karaf;
     function getAllComponents(workspace, jolokia) {
         var scrMBean = getSelectionScrMBean(workspace);
         var response = jolokia.request({
-            type: 'read', mbean: scrMBean,
+            type: 'read',
+            mbean: scrMBean,
             arguments: []
         });
         //Check if the MBean provides the Components attribute.
         if (!('Components' in response.value)) {
             response = jolokia.request({
-                type: 'exec', mbean: scrMBean, operation: 'listComponents()'
+                type: 'exec',
+                mbean: scrMBean,
+                operation: 'listComponents()'
             });
             return createScrComponentsView(workspace, jolokia, response.value);
         }
@@ -7373,7 +7431,8 @@ var Karaf;
     Karaf.getComponentByName = getComponentByName;
     function isComponentActive(workspace, jolokia, component) {
         var response = jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            type: 'exec',
+            mbean: getSelectionScrMBean(workspace),
             operation: 'isComponentActive(java.lang.String)',
             arguments: [component]
         });
@@ -7382,7 +7441,8 @@ var Karaf;
     Karaf.isComponentActive = isComponentActive;
     function getComponentState(workspace, jolokia, component) {
         var response = jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            type: 'exec',
+            mbean: getSelectionScrMBean(workspace),
             operation: 'componentState(java.lang.String)',
             arguments: [component]
         });
@@ -7391,7 +7451,8 @@ var Karaf;
     Karaf.getComponentState = getComponentState;
     function activateComponent(workspace, jolokia, component, success, error) {
         jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            type: 'exec',
+            mbean: getSelectionScrMBean(workspace),
             operation: 'activateComponent(java.lang.String)',
             arguments: [component]
         }, Core.onSuccess(success, { error: error }));
@@ -7399,7 +7460,8 @@ var Karaf;
     Karaf.activateComponent = activateComponent;
     function deactivateComponent(workspace, jolokia, component, success, error) {
         jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            type: 'exec',
+            mbean: getSelectionScrMBean(workspace),
             operation: 'deactiveateComponent(java.lang.String)',
             arguments: [component]
         }, Core.onSuccess(success, { error: error }));
@@ -7504,18 +7566,13 @@ var Karaf;
     //export var _module = angular.module(pluginName, ['bootstrap', 'ngResource', 'hawtio-core']);
     Karaf._module = angular.module(pluginName, ['ngResource', 'hawtio-core']);
     Karaf._module.config(["$routeProvider", function ($routeProvider) {
-            $routeProvider.
-                when('/osgi/server', { templateUrl: 'plugins/karaf/html/server.html' }).
-                when('/osgi/features', { templateUrl: 'plugins/karaf/html/features.html', reloadOnSearch: false }).
-                when('/osgi/scr-components', { templateUrl: 'plugins/karaf/html/scr-components.html' }).
-                when('/osgi/scr-component/:name', { templateUrl: 'plugins/karaf/html/scr-component.html' }).
-                when('/osgi/feature/:name/:version', { templateUrl: 'plugins/karaf/html/feature.html' });
-        }]);
+        $routeProvider.when('/osgi/server', { templateUrl: 'plugins/karaf/html/server.html' }).when('/osgi/features', { templateUrl: 'plugins/karaf/html/features.html', reloadOnSearch: false }).when('/osgi/scr-components', { templateUrl: 'plugins/karaf/html/scr-components.html' }).when('/osgi/scr-component/:name', { templateUrl: 'plugins/karaf/html/scr-component.html' }).when('/osgi/feature/:name/:version', { templateUrl: 'plugins/karaf/html/feature.html' });
+    }]);
     Karaf._module.run(["workspace", "viewRegistry", "helpRegistry", function (workspace, viewRegistry, helpRegistry) {
-            helpRegistry.addUserDoc('karaf', 'plugins/karaf/doc/help.md', function () {
-                return workspace.treeContainsDomainAndProperties('org.apache.karaf');
-            });
-        }]);
+        helpRegistry.addUserDoc('karaf', 'plugins/karaf/doc/help.md', function () {
+            return workspace.treeContainsDomainAndProperties('org.apache.karaf');
+        });
+    }]);
     hawtioPluginLoader.addModule(pluginName);
 })(Karaf || (Karaf = {}));
 
@@ -7527,87 +7584,87 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     Karaf._module.controller("Karaf.FeatureController", ["$scope", "jolokia", "workspace", "$routeParams", function ($scope, jolokia, workspace, $routeParams) {
-            $scope.name = $routeParams.name;
-            $scope.version = $routeParams.version;
-            $scope.bundlesByLocation = {};
-            $scope.props = "properties";
-            updateTableContents();
-            $scope.install = function () {
-                Karaf.installFeature(workspace, jolokia, $scope.name, $scope.version, function () {
-                    Core.notification('success', 'Installed feature ' + $scope.name);
-                }, function (response) {
-                    Core.notification('error', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
-                });
-            };
-            $scope.uninstall = function () {
-                Karaf.uninstallFeature(workspace, jolokia, $scope.name, $scope.version, function () {
-                    Core.notification('success', 'Uninstalled feature ' + $scope.name);
-                }, function (response) {
-                    Core.notification('error', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
-                });
-            };
-            $scope.toProperties = function (elements) {
-                var answer = '';
-                angular.forEach(elements, function (value, name) {
-                    answer += value['Key'] + " = " + value['Value'] + "\n";
-                });
-                return answer.trim();
-            };
-            function populateTable(response) {
-                $scope.row = Karaf.extractFeature(response.value, $scope.name, $scope.version);
-                if ($scope.row) {
-                    addBundleDetails($scope.row);
-                    var dependencies = [];
-                    //TODO - if the version isn't set or is 0.0.0 then maybe we show the highest available?
-                    angular.forEach($scope.row.Dependencies, function (version, name) {
-                        angular.forEach(version, function (data, version) {
-                            dependencies.push({
-                                Name: name,
-                                Version: version
-                            });
+        $scope.name = $routeParams.name;
+        $scope.version = $routeParams.version;
+        $scope.bundlesByLocation = {};
+        $scope.props = "properties";
+        updateTableContents();
+        $scope.install = function () {
+            Karaf.installFeature(workspace, jolokia, $scope.name, $scope.version, function () {
+                Core.notification('success', 'Installed feature ' + $scope.name);
+            }, function (response) {
+                Core.notification('error', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
+            });
+        };
+        $scope.uninstall = function () {
+            Karaf.uninstallFeature(workspace, jolokia, $scope.name, $scope.version, function () {
+                Core.notification('success', 'Uninstalled feature ' + $scope.name);
+            }, function (response) {
+                Core.notification('error', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
+            });
+        };
+        $scope.toProperties = function (elements) {
+            var answer = '';
+            angular.forEach(elements, function (value, name) {
+                answer += value['Key'] + " = " + value['Value'] + "\n";
+            });
+            return answer.trim();
+        };
+        function populateTable(response) {
+            $scope.row = Karaf.extractFeature(response.value, $scope.name, $scope.version);
+            if ($scope.row) {
+                addBundleDetails($scope.row);
+                var dependencies = [];
+                //TODO - if the version isn't set or is 0.0.0 then maybe we show the highest available?
+                angular.forEach($scope.row.Dependencies, function (version, name) {
+                    angular.forEach(version, function (data, version) {
+                        dependencies.push({
+                            Name: name,
+                            Version: version
                         });
                     });
-                    $scope.row.Dependencies = dependencies;
-                }
-                Core.$apply($scope);
-            }
-            function setBundles(response) {
-                var bundleMap = {};
-                Osgi.defaultBundleValues(workspace, $scope, response.values);
-                angular.forEach(response.value, function (bundle) {
-                    var location = bundle["Location"];
-                    $scope.bundlesByLocation[location] = bundle;
                 });
+                $scope.row.Dependencies = dependencies;
             }
-            function updateTableContents() {
-                var featureMbean = Karaf.getSelectionFeaturesMBean(workspace);
-                var bundleMbean = Osgi.getSelectionBundleMBean(workspace);
-                var jolokia = workspace.jolokia;
-                if (bundleMbean) {
-                    setBundles(jolokia.request({ type: 'exec', mbean: bundleMbean, operation: 'listBundles()' }));
+            Core.$apply($scope);
+        }
+        function setBundles(response) {
+            var bundleMap = {};
+            Osgi.defaultBundleValues(workspace, $scope, response.values);
+            angular.forEach(response.value, function (bundle) {
+                var location = bundle["Location"];
+                $scope.bundlesByLocation[location] = bundle;
+            });
+        }
+        function updateTableContents() {
+            var featureMbean = Karaf.getSelectionFeaturesMBean(workspace);
+            var bundleMbean = Osgi.getSelectionBundleMBean(workspace);
+            var jolokia = workspace.jolokia;
+            if (bundleMbean) {
+                setBundles(jolokia.request({ type: 'exec', mbean: bundleMbean, operation: 'listBundles()' }));
+            }
+            if (featureMbean) {
+                jolokia.request({ type: 'read', mbean: featureMbean }, Core.onSuccess(populateTable));
+            }
+        }
+        function addBundleDetails(feature) {
+            var bundleDetails = [];
+            angular.forEach(feature["Bundles"], function (bundleLocation) {
+                var bundle = $scope.bundlesByLocation[bundleLocation];
+                if (bundle) {
+                    bundle["Installed"] = true;
+                    bundleDetails.push(bundle);
                 }
-                if (featureMbean) {
-                    jolokia.request({ type: 'read', mbean: featureMbean }, Core.onSuccess(populateTable));
+                else {
+                    bundleDetails.push({
+                        "Location": bundleLocation,
+                        "Installed": false
+                    });
                 }
-            }
-            function addBundleDetails(feature) {
-                var bundleDetails = [];
-                angular.forEach(feature["Bundles"], function (bundleLocation) {
-                    var bundle = $scope.bundlesByLocation[bundleLocation];
-                    if (bundle) {
-                        bundle["Installed"] = true;
-                        bundleDetails.push(bundle);
-                    }
-                    else {
-                        bundleDetails.push({
-                            "Location": bundleLocation,
-                            "Installed": false
-                        });
-                    }
-                });
-                feature["BundleDetails"] = bundleDetails;
-            }
-        }]);
+            });
+            feature["BundleDetails"] = bundleDetails;
+        }
+    }]);
 })(Karaf || (Karaf = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -7618,238 +7675,255 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     Karaf._module.controller("Karaf.FeaturesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.responseJson = '';
-            $scope.filter = '';
-            $scope.installedFeatures = [];
-            $scope.features = [];
-            $scope.repositories = [];
-            $scope.selectedRepositoryId = '';
-            $scope.selectedRepository = {};
-            $scope.newRepositoryURI = '';
-            $scope.init = function () {
-                var selectedRepositoryId = $location.search()['repositoryId'];
-                if (selectedRepositoryId) {
-                    $scope.selectedRepositoryId = selectedRepositoryId;
-                }
-                var filter = $location.search()['filter'];
-                if (filter) {
-                    $scope.filter = filter;
-                }
-            };
-            $scope.init();
-            $scope.$watch('selectedRepository', function (newValue, oldValue) {
-                //log.debug("selectedRepository: ", $scope.selectedRepository);
-                if (newValue !== oldValue) {
-                    if (!newValue) {
-                        $scope.selectedRepositoryId = '';
-                    }
-                    else {
-                        $scope.selectedRepositoryId = newValue['repository'];
-                    }
-                    $location.search('repositoryId', $scope.selectedRepositoryId);
-                }
-            }, true);
-            $scope.$watch('filter', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    $location.search('filter', newValue);
-                }
-            });
-            var featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
-            Karaf.log.debug("Features mbean: ", featuresMBean);
-            if (featuresMBean) {
-                Core.register(jolokia, $scope, {
-                    type: 'read', mbean: featuresMBean
-                }, Core.onSuccess(render));
+        $scope.responseJson = '';
+        $scope.filter = '';
+        $scope.installedFeatures = [];
+        $scope.features = [];
+        $scope.repositories = [];
+        $scope.selectedRepositoryId = '';
+        $scope.selectedRepository = {};
+        $scope.newRepositoryURI = '';
+        $scope.init = function () {
+            var selectedRepositoryId = $location.search()['repositoryId'];
+            if (selectedRepositoryId) {
+                $scope.selectedRepositoryId = selectedRepositoryId;
             }
-            $scope.inSelectedRepository = function (feature) {
-                if (!$scope.selectedRepository || !('repository' in $scope.selectedRepository)) {
-                    return "";
+            var filter = $location.search()['filter'];
+            if (filter) {
+                $scope.filter = filter;
+            }
+        };
+        $scope.init();
+        $scope.$watch('selectedRepository', function (newValue, oldValue) {
+            //log.debug("selectedRepository: ", $scope.selectedRepository);
+            if (newValue !== oldValue) {
+                if (!newValue) {
+                    $scope.selectedRepositoryId = '';
                 }
-                if (!feature || !('RepositoryName' in feature)) {
-                    return "";
+                else {
+                    $scope.selectedRepositoryId = newValue['repository'];
                 }
-                if (feature['RepositoryName'] === $scope.selectedRepository['repository']) {
-                    return "in-selected-repository";
-                }
+                $location.search('repositoryId', $scope.selectedRepositoryId);
+            }
+        }, true);
+        $scope.$watch('filter', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                $location.search('filter', newValue);
+            }
+        });
+        var featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
+        Karaf.log.debug("Features mbean: ", featuresMBean);
+        if (featuresMBean) {
+            Core.register(jolokia, $scope, {
+                type: 'read',
+                mbean: featuresMBean
+            }, Core.onSuccess(render));
+        }
+        $scope.inSelectedRepository = function (feature) {
+            if (!$scope.selectedRepository || !('repository' in $scope.selectedRepository)) {
                 return "";
-            };
-            $scope.isValidRepository = function () {
-                return Core.isBlank($scope.newRepositoryURI);
-            };
-            $scope.installRepository = function () {
-                var repoURL = $scope.newRepositoryURI;
-                Core.notification('info', 'Adding feature repository URL');
-                Karaf.installRepository(workspace, jolokia, repoURL, function () {
-                    Core.notification('success', 'Added feature repository URL');
-                    $scope.selectedRepository = {};
-                    $scope.selectedRepositoryId = '';
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                }, function (response) {
-                    Karaf.log.error('Failed to add feature repository URL ', repoURL, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.uninstallRepository = function () {
-                var repoURI = $scope.selectedRepository['uri'];
-                Core.notification('info', 'Removing feature repository ' + repoURI);
-                Karaf.uninstallRepository(workspace, jolokia, repoURI, function () {
-                    Core.notification('success', 'Removed feature repository ' + repoURI);
-                    $scope.responseJson = null;
-                    $scope.selectedRepositoryId = '';
-                    $scope.selectedRepository = {};
-                    $scope.triggerRefresh();
-                }, function (response) {
-                    Karaf.log.error('Failed to remove feature repository ', repoURI, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.triggerRefresh = function () {
-                jolokia.request({
-                    type: 'read',
-                    method: 'POST',
-                    mbean: featuresMBean
-                }, Core.onSuccess(render));
-            };
-            $scope.install = function (feature) {
-                //$('.popover').remove();
-                Core.notification('info', 'Installing feature ' + feature.Name);
-                Karaf.installFeature(workspace, jolokia, feature.Name, feature.Version, function () {
-                    Core.notification('success', 'Installed feature ' + feature.Name);
-                    $scope.installedFeatures.add(feature);
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                    //Core.$apply($scope);
-                }, function (response) {
-                    Karaf.log.error('Failed to install feature ', feature.Name, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.uninstall = function (feature) {
-                //$('.popover').remove();
-                Core.notification('info', 'Uninstalling feature ' + feature.Name);
-                Karaf.uninstallFeature(workspace, jolokia, feature.Name, feature.Version, function () {
-                    Core.notification('success', 'Uninstalled feature ' + feature.Name);
-                    $scope.installedFeatures.remove(feature);
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                    //Core.$apply($scope);
-                }, function (response) {
-                    Karaf.log.error('Failed to uninstall feature ', feature.Name, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.filteredRows = ['Bundles', 'Configurations', 'Configuration Files', 'Dependencies'];
-            $scope.showRow = function (key, value) {
-                if ($scope.filteredRows.any(key)) {
+            }
+            if (!feature || !('RepositoryName' in feature)) {
+                return "";
+            }
+            if (feature['RepositoryName'] === $scope.selectedRepository['repository']) {
+                return "in-selected-repository";
+            }
+            return "";
+        };
+        $scope.isValidRepository = function () {
+            return Core.isBlank($scope.newRepositoryURI);
+        };
+        $scope.installRepository = function () {
+            var repoURL = $scope.newRepositoryURI;
+            Core.notification('info', 'Adding feature repository URL');
+            Karaf.installRepository(workspace, jolokia, repoURL, function () {
+                Core.notification('success', 'Added feature repository URL');
+                $scope.selectedRepository = {};
+                $scope.selectedRepositoryId = '';
+                $scope.responseJson = null;
+                $scope.triggerRefresh();
+            }, function (response) {
+                Karaf.log.error('Failed to add feature repository URL ', repoURL, ' due to ', response.error);
+                Karaf.log.info('stack trace: ', response.stacktrace);
+                Core.$apply($scope);
+            });
+        };
+        $scope.uninstallRepository = function () {
+            var repoURI = $scope.selectedRepository['uri'];
+            Core.notification('info', 'Removing feature repository ' + repoURI);
+            Karaf.uninstallRepository(workspace, jolokia, repoURI, function () {
+                Core.notification('success', 'Removed feature repository ' + repoURI);
+                $scope.responseJson = null;
+                $scope.selectedRepositoryId = '';
+                $scope.selectedRepository = {};
+                $scope.triggerRefresh();
+            }, function (response) {
+                Karaf.log.error('Failed to remove feature repository ', repoURI, ' due to ', response.error);
+                Karaf.log.info('stack trace: ', response.stacktrace);
+                Core.$apply($scope);
+            });
+        };
+        $scope.triggerRefresh = function () {
+            jolokia.request({
+                type: 'read',
+                method: 'POST',
+                mbean: featuresMBean
+            }, Core.onSuccess(render));
+        };
+        $scope.install = function (feature) {
+            //$('.popover').remove();
+            Core.notification('info', 'Installing feature ' + feature.Name);
+            Karaf.installFeature(workspace, jolokia, feature.Name, feature.Version, function () {
+                Core.notification('success', 'Installed feature ' + feature.Name);
+                $scope.installedFeatures.add(feature);
+                $scope.responseJson = null;
+                $scope.triggerRefresh();
+                //Core.$apply($scope);
+            }, function (response) {
+                Karaf.log.error('Failed to install feature ', feature.Name, ' due to ', response.error);
+                Karaf.log.info('stack trace: ', response.stacktrace);
+                Core.$apply($scope);
+            });
+        };
+        $scope.uninstall = function (feature) {
+            //$('.popover').remove();
+            Core.notification('info', 'Uninstalling feature ' + feature.Name);
+            Karaf.uninstallFeature(workspace, jolokia, feature.Name, feature.Version, function () {
+                Core.notification('success', 'Uninstalled feature ' + feature.Name);
+                $scope.installedFeatures.remove(feature);
+                $scope.responseJson = null;
+                $scope.triggerRefresh();
+                //Core.$apply($scope);
+            }, function (response) {
+                Karaf.log.error('Failed to uninstall feature ', feature.Name, ' due to ', response.error);
+                Karaf.log.info('stack trace: ', response.stacktrace);
+                Core.$apply($scope);
+            });
+        };
+        $scope.filteredRows = ['Bundles', 'Configurations', 'Configuration Files', 'Dependencies'];
+        $scope.showRow = function (key, value) {
+            if ($scope.filteredRows.any(key)) {
+                return false;
+            }
+            if (angular.isArray(value)) {
+                if (value.length === 0) {
                     return false;
                 }
-                if (angular.isArray(value)) {
-                    if (value.length === 0) {
-                        return false;
-                    }
-                }
-                if (angular.isString(value)) {
-                    if (Core.isBlank(value)) {
-                        return false;
-                    }
-                }
-                if (angular.isObject(value)) {
-                    if (!value || angular.equals(value, {})) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            $scope.installed = function (installed) {
-                var answer = Core.parseBooleanValue(installed);
-                return answer;
-            };
-            $scope.showValue = function (value) {
-                if (angular.isArray(value)) {
-                    var answer = ['<ul class="zebra-list">'];
-                    value.forEach(function (v) { answer.push('<li>' + v + '</li>'); });
-                    answer.push('</ul>');
-                    return answer.join('\n');
-                }
-                if (angular.isObject(value)) {
-                    var answer = ['<table class="table">', '<tbody>'];
-                    angular.forEach(value, function (value, key) {
-                        answer.push('<tr>');
-                        answer.push('<td>' + key + '</td>');
-                        answer.push('<td>' + value + '</td>');
-                        answer.push('</tr>');
-                    });
-                    answer.push('</tbody>');
-                    answer.push('</table>');
-                    return answer.join('\n');
-                }
-                return "" + value;
-            };
-            $scope.getStateStyle = function (feature) {
-                if (Core.parseBooleanValue(feature.Installed)) {
-                    return "badge badge-success";
-                }
-                return "badge";
-            };
-            $scope.filterFeature = function (feature) {
-                if (Core.isBlank($scope.filter)) {
-                    return true;
-                }
-                if (feature.Id.has($scope.filter)) {
-                    return true;
-                }
-                return false;
-            };
-            function render(response) {
-                var responseJson = angular.toJson(response.value);
-                if ($scope.responseJson !== responseJson) {
-                    $scope.responseJson = responseJson;
-                    //log.debug("Got response: ", response.value);
-                    if (response['value']['Features'] === null) {
-                        $scope.featuresError = true;
-                    }
-                    else {
-                        $scope.featuresError = false;
-                    }
-                    $scope.features = [];
-                    $scope.repositories = [];
-                    var features = [];
-                    var repositories = [];
-                    Karaf.populateFeaturesAndRepos(response.value, features, repositories);
-                    var installedFeatures = features.filter(function (f) { return Core.parseBooleanValue(f.Installed); });
-                    var uninstalledFeatures = features.filter(function (f) { return !Core.parseBooleanValue(f.Installed); });
-                    //log.debug("repositories: ", repositories);
-                    $scope.installedFeatures = installedFeatures.sortBy(function (f) { return f['Name']; });
-                    uninstalledFeatures = uninstalledFeatures.sortBy(function (f) { return f['Name']; });
-                    repositories.sortBy('id').forEach(function (repo) {
-                        $scope.repositories.push({
-                            repository: repo['id'],
-                            uri: repo['uri'],
-                            features: uninstalledFeatures.filter(function (f) { return f['RepositoryName'] === repo['id']; })
-                        });
-                    });
-                    if (!Core.isBlank($scope.newRepositoryURI)) {
-                        var selectedRepo = repositories.find(function (r) { return r['uri'] === $scope.newRepositoryURI; });
-                        if (selectedRepo) {
-                            $scope.selectedRepositoryId = selectedRepo['id'];
-                        }
-                        $scope.newRepositoryURI = '';
-                    }
-                    if (Core.isBlank($scope.selectedRepositoryId)) {
-                        $scope.selectedRepository = $scope.repositories.first();
-                    }
-                    else {
-                        $scope.selectedRepository = $scope.repositories.find(function (r) { return r.repository === $scope.selectedRepositoryId; });
-                    }
-                    Core.$apply($scope);
+            }
+            if (angular.isString(value)) {
+                if (Core.isBlank(value)) {
+                    return false;
                 }
             }
-        }]);
+            if (angular.isObject(value)) {
+                if (!value || angular.equals(value, {})) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        $scope.installed = function (installed) {
+            var answer = Core.parseBooleanValue(installed);
+            return answer;
+        };
+        $scope.showValue = function (value) {
+            if (angular.isArray(value)) {
+                var answer = ['<ul class="zebra-list">'];
+                value.forEach(function (v) {
+                    answer.push('<li>' + v + '</li>');
+                });
+                answer.push('</ul>');
+                return answer.join('\n');
+            }
+            if (angular.isObject(value)) {
+                var answer = ['<table class="table">', '<tbody>'];
+                angular.forEach(value, function (value, key) {
+                    answer.push('<tr>');
+                    answer.push('<td>' + key + '</td>');
+                    answer.push('<td>' + value + '</td>');
+                    answer.push('</tr>');
+                });
+                answer.push('</tbody>');
+                answer.push('</table>');
+                return answer.join('\n');
+            }
+            return "" + value;
+        };
+        $scope.getStateStyle = function (feature) {
+            if (Core.parseBooleanValue(feature.Installed)) {
+                return "badge badge-success";
+            }
+            return "badge";
+        };
+        $scope.filterFeature = function (feature) {
+            if (Core.isBlank($scope.filter)) {
+                return true;
+            }
+            if (feature.Id.has($scope.filter)) {
+                return true;
+            }
+            return false;
+        };
+        function render(response) {
+            var responseJson = angular.toJson(response.value);
+            if ($scope.responseJson !== responseJson) {
+                $scope.responseJson = responseJson;
+                //log.debug("Got response: ", response.value);
+                if (response['value']['Features'] === null) {
+                    $scope.featuresError = true;
+                }
+                else {
+                    $scope.featuresError = false;
+                }
+                $scope.features = [];
+                $scope.repositories = [];
+                var features = [];
+                var repositories = [];
+                Karaf.populateFeaturesAndRepos(response.value, features, repositories);
+                var installedFeatures = features.filter(function (f) {
+                    return Core.parseBooleanValue(f.Installed);
+                });
+                var uninstalledFeatures = features.filter(function (f) {
+                    return !Core.parseBooleanValue(f.Installed);
+                });
+                //log.debug("repositories: ", repositories);
+                $scope.installedFeatures = installedFeatures.sortBy(function (f) {
+                    return f['Name'];
+                });
+                uninstalledFeatures = uninstalledFeatures.sortBy(function (f) {
+                    return f['Name'];
+                });
+                repositories.sortBy('id').forEach(function (repo) {
+                    $scope.repositories.push({
+                        repository: repo['id'],
+                        uri: repo['uri'],
+                        features: uninstalledFeatures.filter(function (f) {
+                            return f['RepositoryName'] === repo['id'];
+                        })
+                    });
+                });
+                if (!Core.isBlank($scope.newRepositoryURI)) {
+                    var selectedRepo = repositories.find(function (r) {
+                        return r['uri'] === $scope.newRepositoryURI;
+                    });
+                    if (selectedRepo) {
+                        $scope.selectedRepositoryId = selectedRepo['id'];
+                    }
+                    $scope.newRepositoryURI = '';
+                }
+                if (Core.isBlank($scope.selectedRepositoryId)) {
+                    $scope.selectedRepository = $scope.repositories.first();
+                }
+                else {
+                    $scope.selectedRepository = $scope.repositories.find(function (r) {
+                        return r.repository === $scope.selectedRepositoryId;
+                    });
+                }
+                Core.$apply($scope);
+            }
+        }
+    }]);
 })(Karaf || (Karaf = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -7861,20 +7935,20 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     Karaf._module.controller("Karaf.NavBarController", ["$scope", "workspace", function ($scope, workspace) {
+        $scope.hash = workspace.hash();
+        $scope.isKarafEnabled = workspace.treeContainsDomainAndProperties("org.apache.karaf");
+        $scope.isFeaturesEnabled = Karaf.getSelectionFeaturesMBean(workspace);
+        $scope.isScrEnabled = Karaf.getSelectionScrMBean(workspace);
+        $scope.$on('$routeChangeSuccess', function () {
             $scope.hash = workspace.hash();
-            $scope.isKarafEnabled = workspace.treeContainsDomainAndProperties("org.apache.karaf");
-            $scope.isFeaturesEnabled = Karaf.getSelectionFeaturesMBean(workspace);
-            $scope.isScrEnabled = Karaf.getSelectionScrMBean(workspace);
-            $scope.$on('$routeChangeSuccess', function () {
-                $scope.hash = workspace.hash();
-            });
-            $scope.isActive = function (nav) {
-                return workspace.isLinkActive(nav);
-            };
-            $scope.isPrefixActive = function (nav) {
-                return workspace.isLinkPrefixActive(nav);
-            };
-        }]);
+        });
+        $scope.isActive = function (nav) {
+            return workspace.isLinkActive(nav);
+        };
+        $scope.isPrefixActive = function (nav) {
+            return workspace.isLinkPrefixActive(nav);
+        };
+    }]);
 })(Karaf || (Karaf = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -7886,27 +7960,27 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     Karaf._module.controller("Karaf.ScrComponentController", ["$scope", "$location", "workspace", "jolokia", "$routeParams", function ($scope, $location, workspace, jolokia, $routeParams) {
-            $scope.name = $routeParams.name;
-            populateTable();
-            function populateTable() {
-                $scope.row = Karaf.getComponentByName(workspace, jolokia, $scope.name);
-                Core.$apply($scope);
-            }
-            $scope.activate = function () {
-                Karaf.activateComponent(workspace, jolokia, $scope.row['Name'], function () {
-                    console.log("Activated!");
-                }, function () {
-                    console.log("Failed to activate!");
-                });
-            };
-            $scope.deactivate = function () {
-                Karaf.deactivateComponent(workspace, jolokia, $scope.row['Name'], function () {
-                    console.log("Deactivated!");
-                }, function () {
-                    console.log("Failed to deactivate!");
-                });
-            };
-        }]);
+        $scope.name = $routeParams.name;
+        populateTable();
+        function populateTable() {
+            $scope.row = Karaf.getComponentByName(workspace, jolokia, $scope.name);
+            Core.$apply($scope);
+        }
+        $scope.activate = function () {
+            Karaf.activateComponent(workspace, jolokia, $scope.row['Name'], function () {
+                console.log("Activated!");
+            }, function () {
+                console.log("Failed to activate!");
+            });
+        };
+        $scope.deactivate = function () {
+            Karaf.deactivateComponent(workspace, jolokia, $scope.row['Name'], function () {
+                console.log("Deactivated!");
+            }, function () {
+                console.log("Failed to deactivate!");
+            });
+        };
+    }]);
 })(Karaf || (Karaf = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -7918,76 +7992,75 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     Karaf._module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.component = empty();
-            // caches last jolokia result
-            $scope.result = [];
-            // rows in components table
-            $scope.components = [];
-            // selected components
-            $scope.selectedComponents = [];
-            $scope.scrOptions = {
-                //plugins: [searchProvider],
-                data: 'components',
-                showFilter: false,
-                showColumnMenu: false,
-                filterOptions: {
-                    useExternalFilter: false
+        $scope.component = empty();
+        // caches last jolokia result
+        $scope.result = [];
+        // rows in components table
+        $scope.components = [];
+        // selected components
+        $scope.selectedComponents = [];
+        $scope.scrOptions = {
+            //plugins: [searchProvider],
+            data: 'components',
+            showFilter: false,
+            showColumnMenu: false,
+            filterOptions: {
+                useExternalFilter: false
+            },
+            sortInfo: { fields: ['Name'], directions: ['asc'] },
+            selectedItems: $scope.selectedComponents,
+            rowHeight: 32,
+            selectWithCheckboxOnly: true,
+            columnDefs: [
+                {
+                    field: 'Name',
+                    displayName: 'Name',
+                    cellTemplate: '<div class="ngCellText"><a href="#/osgi/scr-component/{{row.entity.Name}}?p=container">{{row.getProperty(col.field)}}</a></div>',
+                    width: 400
                 },
-                sortInfo: { fields: ['Name'], directions: ['asc'] },
-                selectedItems: $scope.selectedComponents,
-                rowHeight: 32,
-                selectWithCheckboxOnly: true,
-                columnDefs: [
-                    {
-                        field: 'Name',
-                        displayName: 'Name',
-                        cellTemplate: '<div class="ngCellText"><a href="#/osgi/scr-component/{{row.entity.Name}}?p=container">{{row.getProperty(col.field)}}</a></div>',
-                        width: 400
-                    },
-                    {
-                        field: 'State',
-                        displayName: 'State',
-                        cellTemplate: '<div class="ngCellText">{{row.getProperty(col.field)}}</div>',
-                        width: 200
-                    }
-                ]
-            };
-            var scrMBean = Karaf.getSelectionScrMBean(workspace);
-            if (scrMBean) {
-                render(Karaf.getAllComponents(workspace, jolokia));
-            }
-            $scope.activate = function () {
-                $scope.selectedComponents.forEach(function (component) {
-                    Karaf.activateComponent(workspace, jolokia, component.Name, function () {
-                        console.log("Activated!");
-                    }, function () {
-                        console.log("Failed to activate!");
-                    });
-                });
-            };
-            $scope.deactivate = function () {
-                $scope.selectedComponents.forEach(function (component) {
-                    Karaf.deactivateComponent(workspace, jolokia, component.Name, function () {
-                        console.log("Deactivated!");
-                    }, function () {
-                        console.log("Failed to deactivate!");
-                    });
-                });
-            };
-            function empty() {
-                return [
-                    { Name: "",
-                        Status: false }
-                ];
-            }
-            function render(components) {
-                if (!angular.equals($scope.result, components)) {
-                    $scope.components = components;
-                    $scope.result = $scope.components;
-                    Core.$apply($scope);
+                {
+                    field: 'State',
+                    displayName: 'State',
+                    cellTemplate: '<div class="ngCellText">{{row.getProperty(col.field)}}</div>',
+                    width: 200
                 }
+            ]
+        };
+        var scrMBean = Karaf.getSelectionScrMBean(workspace);
+        if (scrMBean) {
+            render(Karaf.getAllComponents(workspace, jolokia));
+        }
+        $scope.activate = function () {
+            $scope.selectedComponents.forEach(function (component) {
+                Karaf.activateComponent(workspace, jolokia, component.Name, function () {
+                    console.log("Activated!");
+                }, function () {
+                    console.log("Failed to activate!");
+                });
+            });
+        };
+        $scope.deactivate = function () {
+            $scope.selectedComponents.forEach(function (component) {
+                Karaf.deactivateComponent(workspace, jolokia, component.Name, function () {
+                    console.log("Deactivated!");
+                }, function () {
+                    console.log("Failed to deactivate!");
+                });
+            });
+        };
+        function empty() {
+            return [
+                { Name: "", Status: false }
+            ];
+        }
+        function render(components) {
+            if (!angular.equals($scope.result, components)) {
+                $scope.components = components;
+                $scope.result = $scope.components;
+                Core.$apply($scope);
             }
-        }]);
+        }
+    }]);
 })(Karaf || (Karaf = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -7999,95 +8072,95 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     Karaf._module.controller("Karaf.ServerController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = {
-                name: "",
-                version: "",
-                state: "",
-                root: "",
-                startLevel: "",
-                framework: "",
-                frameworkVersion: "",
-                location: "",
-                sshPort: "",
-                rmiRegistryPort: "",
-                rmiServerPort: "",
-                pid: "" };
-            $scope.$on('jmxTreeUpdated', reloadFunction);
-            $scope.$watch('workspace.tree', reloadFunction);
-            function reloadFunction() {
-                // if the JMX tree is reloaded its probably because a new MBean has been added or removed
-                // so lets reload, asynchronously just in case
-                setTimeout(loadData, 50);
+        $scope.data = {
+            name: "",
+            version: "",
+            state: "",
+            root: "",
+            startLevel: "",
+            framework: "",
+            frameworkVersion: "",
+            location: "",
+            sshPort: "",
+            rmiRegistryPort: "",
+            rmiServerPort: "",
+            pid: ""
+        };
+        $scope.$on('jmxTreeUpdated', reloadFunction);
+        $scope.$watch('workspace.tree', reloadFunction);
+        function reloadFunction() {
+            // if the JMX tree is reloaded its probably because a new MBean has been added or removed
+            // so lets reload, asynchronously just in case
+            setTimeout(loadData, 50);
+        }
+        function loadData() {
+            console.log("Loading Karaf data...");
+            jolokia.search("org.apache.karaf:type=admin,*", Core.onSuccess(render));
+        }
+        function render(response) {
+            // grab the first mbean as there should ideally only be one karaf in the JVM
+            if (angular.isArray(response)) {
+                var mbean = response[0];
+                if (mbean) {
+                    jolokia.getAttribute(mbean, "Instances", Core.onSuccess(function (response) {
+                        onInstances(response, mbean);
+                    }));
+                }
             }
-            function loadData() {
-                console.log("Loading Karaf data...");
-                jolokia.search("org.apache.karaf:type=admin,*", Core.onSuccess(render));
-            }
-            function render(response) {
-                // grab the first mbean as there should ideally only be one karaf in the JVM
-                if (angular.isArray(response)) {
-                    var mbean = response[0];
+        }
+        function onInstances(instances, mbean) {
+            if (instances) {
+                var parsedMBean = Core.parseMBean(mbean);
+                var instanceName = 'root';
+                if ('attributes' in parsedMBean) {
+                    if ('name' in parsedMBean['attributes']) {
+                        instanceName = parsedMBean['attributes']['name'];
+                    }
+                }
+                //log.debug("mbean: ", Core.parseMBean(mbean));
+                //log.debug("Instances: ", instances);
+                // the name is the first child
+                var rootInstance = instances[instanceName];
+                $scope.data.name = rootInstance.Name;
+                $scope.data.state = rootInstance.State;
+                $scope.data.root = rootInstance["Is Root"];
+                $scope.data.location = rootInstance.Location;
+                $scope.data.sshPort = rootInstance["SSH Port"];
+                $scope.data.rmiRegistryPort = rootInstance["RMI Registry Port"];
+                $scope.data.rmiServerPort = rootInstance["RMI Server Port"];
+                $scope.data.pid = rootInstance.Pid;
+                // we need to get these data from the system mbean
+                $scope.data.version = "?";
+                $scope.data.startLevel = "?";
+                $scope.data.framework = "?";
+                $scope.data.frameworkVersion = "?";
+                var systemMbean = "org.apache.karaf:type=system,name=" + rootInstance.Name;
+                // get more data, and its okay to do this synchronously
+                var response = jolokia.request({ type: "read", mbean: systemMbean, attribute: ["StartLevel", "Framework", "Version"] }, Core.onSuccess(null));
+                var obj = response.value;
+                if (obj) {
+                    $scope.data.version = obj.Version;
+                    $scope.data.startLevel = obj.StartLevel;
+                    $scope.data.framework = obj.Framework;
+                }
+                // and the osgi framework version is the bundle version
+                var response2 = jolokia.search("osgi.core:type=bundleState,*", Core.onSuccess(null));
+                if (angular.isArray(response2)) {
+                    var mbean = response2[0];
                     if (mbean) {
-                        jolokia.getAttribute(mbean, "Instances", Core.onSuccess(function (response) {
-                            onInstances(response, mbean);
-                        }));
-                    }
-                }
-            }
-            function onInstances(instances, mbean) {
-                if (instances) {
-                    var parsedMBean = Core.parseMBean(mbean);
-                    var instanceName = 'root';
-                    if ('attributes' in parsedMBean) {
-                        if ('name' in parsedMBean['attributes']) {
-                            instanceName = parsedMBean['attributes']['name'];
-                        }
-                    }
-                    //log.debug("mbean: ", Core.parseMBean(mbean));
-                    //log.debug("Instances: ", instances);
-                    // the name is the first child
-                    var rootInstance = instances[instanceName];
-                    $scope.data.name = rootInstance.Name;
-                    $scope.data.state = rootInstance.State;
-                    $scope.data.root = rootInstance["Is Root"];
-                    $scope.data.location = rootInstance.Location;
-                    $scope.data.sshPort = rootInstance["SSH Port"];
-                    $scope.data.rmiRegistryPort = rootInstance["RMI Registry Port"];
-                    $scope.data.rmiServerPort = rootInstance["RMI Server Port"];
-                    $scope.data.pid = rootInstance.Pid;
-                    // we need to get these data from the system mbean
-                    $scope.data.version = "?";
-                    $scope.data.startLevel = "?";
-                    $scope.data.framework = "?";
-                    $scope.data.frameworkVersion = "?";
-                    var systemMbean = "org.apache.karaf:type=system,name=" + rootInstance.Name;
-                    // get more data, and its okay to do this synchronously
-                    var response = jolokia.request({ type: "read", mbean: systemMbean,
-                        attribute: ["StartLevel", "Framework", "Version"] }, Core.onSuccess(null));
-                    var obj = response.value;
-                    if (obj) {
-                        $scope.data.version = obj.Version;
-                        $scope.data.startLevel = obj.StartLevel;
-                        $scope.data.framework = obj.Framework;
-                    }
-                    // and the osgi framework version is the bundle version
-                    var response2 = jolokia.search("osgi.core:type=bundleState,*", Core.onSuccess(null));
-                    if (angular.isArray(response2)) {
-                        var mbean = response2[0];
-                        if (mbean) {
-                            // get more data, and its okay to do this synchronously
-                            var response3 = jolokia.request({ type: 'exec', mbean: mbean, operation: 'getVersion(long)', arguments: [0] }, Core.onSuccess(null));
-                            var obj3 = response3.value;
-                            if (obj3) {
-                                $scope.data.frameworkVersion = obj3;
-                            }
+                        // get more data, and its okay to do this synchronously
+                        var response3 = jolokia.request({ type: 'exec', mbean: mbean, operation: 'getVersion(long)', arguments: [0] }, Core.onSuccess(null));
+                        var obj3 = response3.value;
+                        if (obj3) {
+                            $scope.data.frameworkVersion = obj3;
                         }
                     }
                 }
-                // ensure web page is updated
-                Core.$apply($scope);
             }
-        }]);
+            // ensure web page is updated
+            Core.$apply($scope);
+        }
+    }]);
 })(Karaf || (Karaf = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -8125,7 +8198,7 @@ var Osgi;
             case "STOPPING":
                 return prefix + "-info";
             case "UNINSTALLED":
-                return ""; // the default color, which is grey
+                return "";
             default:
                 return prefix + "-important";
         }
@@ -8279,7 +8352,9 @@ var Osgi;
     Osgi.toCollection = toCollection;
     function labelBundleLinks(workspace, values, allValues) {
         var answer = "";
-        var sorted = toCollection(values).sort(function (a, b) { return a - b; });
+        var sorted = toCollection(values).sort(function (a, b) {
+            return a - b;
+        });
         angular.forEach(sorted, function (value, key) {
             var prefix = "";
             if (answer.length > 0) {
@@ -8294,7 +8369,9 @@ var Osgi;
     Osgi.labelBundleLinks = labelBundleLinks;
     function bundleLinks(workspace, values) {
         var answer = "";
-        var sorted = toCollection(values).sort(function (a, b) { return a - b; });
+        var sorted = toCollection(values).sort(function (a, b) {
+            return a - b;
+        });
         angular.forEach(sorted, function (value, key) {
             var prefix = "";
             if (answer.length > 0) {
@@ -8587,96 +8664,39 @@ var Osgi;
     Osgi.pluginName = 'osgi';
     Osgi._module = angular.module(Osgi.pluginName, []);
     Osgi._module.config(["$routeProvider", function ($routeProvider) {
-            $routeProvider
-                .when('/osgi', { redirectTo: '/osgi/bundle-list' })
-                .when('/osgi/bundle-list', { templateUrl: 'plugins/osgi/html/bundle-list.html' })
-                .when('/osgi/bundles', { templateUrl: 'plugins/osgi/html/bundles.html' })
-                .when('/osgi/bundle/:bundleId', { templateUrl: 'plugins/osgi/html/bundle.html' })
-                .when('/osgi/services', { templateUrl: 'plugins/osgi/html/services.html' })
-                .when('/osgi/packages', { templateUrl: 'plugins/osgi/html/packages.html' })
-                .when('/osgi/package/:package/:version', { templateUrl: 'plugins/osgi/html/package.html' })
-                .when('/osgi/configurations', { templateUrl: 'plugins/osgi/html/configurations.html' })
-                .when('/osgi/pid/:pid/:factoryPid', { templateUrl: 'plugins/osgi/html/pid.html' })
-                .when('/osgi/pid/:pid', { templateUrl: 'plugins/osgi/html/pid.html' })
-                .when('/osgi/fwk', { templateUrl: 'plugins/osgi/html/framework.html' })
-                .when('/osgi/dependencies', { templateUrl: 'plugins/osgi/html/svc-dependencies.html', reloadOnSearch: false });
-        }]);
+        $routeProvider.when('/osgi', { redirectTo: '/osgi/bundle-list' }).when('/osgi/bundle-list', { templateUrl: 'plugins/osgi/html/bundle-list.html' }).when('/osgi/bundles', { templateUrl: 'plugins/osgi/html/bundles.html' }).when('/osgi/bundle/:bundleId', { templateUrl: 'plugins/osgi/html/bundle.html' }).when('/osgi/services', { templateUrl: 'plugins/osgi/html/services.html' }).when('/osgi/packages', { templateUrl: 'plugins/osgi/html/packages.html' }).when('/osgi/package/:package/:version', { templateUrl: 'plugins/osgi/html/package.html' }).when('/osgi/configurations', { templateUrl: 'plugins/osgi/html/configurations.html' }).when('/osgi/pid/:pid/:factoryPid', { templateUrl: 'plugins/osgi/html/pid.html' }).when('/osgi/pid/:pid', { templateUrl: 'plugins/osgi/html/pid.html' }).when('/osgi/fwk', { templateUrl: 'plugins/osgi/html/framework.html' }).when('/osgi/dependencies', { templateUrl: 'plugins/osgi/html/svc-dependencies.html', reloadOnSearch: false });
+    }]);
     Osgi._module.run(["HawtioNav", "workspace", "viewRegistry", "helpRegistry", function (nav, workspace, viewRegistry, helpRegistry) {
-            //viewRegistry['osgi'] = "plugins/osgi/html/layoutOsgi.html";
-            helpRegistry.addUserDoc('osgi', 'plugins/osgi/doc/help.md', function () {
-                return workspace.treeContainsDomainAndProperties("osgi.core");
-            });
-            var builder = nav.builder();
-            var configuration = builder.id('osgi-configuration')
-                .href(function () { return '/osgi/configurations' + workspace.hash(); })
-                .title(function () { return 'Configuration'; })
-                .isSelected(function () { return workspace.isLinkPrefixActive('/osgi/configuration')
-                || workspace.isLinkPrefixActive('/osgi/pid'); })
-                .build();
-            var bundles = builder.id('osgi-bundles')
-                .href(function () { return '/osgi/bundle-list' + workspace.hash(); })
-                .title(function () { return 'Bundles'; })
-                .isSelected(function () { return workspace.isLinkPrefixActive('/osgi/bundle'); })
-                .build();
-            var features = builder.id('osgi-features')
-                .href(function () { return '/osgi/features' + workspace.hash(); })
-                .title(function () { return 'Features'; })
-                .show(function () { return !Core.isBlank(Karaf.getSelectionFeaturesMBean(workspace)); })
-                .isSelected(function () { return workspace.isLinkPrefixActive('/osgi/feature'); })
-                .build();
-            var packages = builder.id('osgi-packages')
-                .href(function () { return '/osgi/packages' + workspace.hash(); })
-                .title(function () { return 'Packages'; })
-                .isSelected(function () { return workspace.isLinkPrefixActive('/osgi/package'); })
-                .build();
-            var services = builder.id('osgi-services')
-                .href(function () { return '/osgi/services' + workspace.hash(); })
-                .title(function () { return 'Services'; })
-                .isSelected(function () { return workspace.isLinkPrefixActive('/osgi/service'); })
-                .build();
-            var scrComponents = builder.id('osgi-scr-components')
-                .href(function () { return '/osgi/scr-components' + workspace.hash(); })
-                .title(function () { return 'Declarative Services'; })
-                .show(function () { return !Core.isBlank(Karaf.getSelectionScrMBean(workspace)); })
-                .isSelected(function () { return workspace.isLinkPrefixActive('/osgi/scr-component'); })
-                .build();
-            var server = builder.id('osgi-server')
-                .href(function () { return '/osgi/server' + workspace.hash(); })
-                .title(function () { return 'Server'; })
-                .isSelected(function () { return workspace.isLinkPrefixActive('/osgi/server'); })
-                .build();
-            var fwk = builder.id('osgi-fwk')
-                .href(function () { return '/osgi/fwk' + workspace.hash(); })
-                .title(function () { return 'Framework'; })
-                .isSelected(function () { return workspace.isLinkPrefixActive('/osgi/fwk'); })
-                .build();
-            var dependencies = builder.id('osgi-dependencies')
-                .href(function () { return '/osgi/dependencies' + workspace.hash(); })
-                .title(function () { return 'Dependencies'; })
-                .isSelected(function () { return workspace.isLinkPrefixActive('/osgi/dependencies'); })
-                .build();
-            var tab = builder.id('osgi')
-                .title(function () { return 'OSGi'; })
-                .href(function () { return '/osgi'; })
-                .isValid(function () { return workspace.treeContainsDomainAndProperties("osgi.core"); })
-                .isSelected(function () { return workspace.isLinkActive('osgi'); })
-                .tabs(configuration, bundles, features, packages, services, scrComponents, server, fwk, dependencies)
-                .build();
-            nav.add(tab);
-            /*
-            workspace.topLevelTabs.push({
-              id: "osgi",
-              content: "OSGi",
-              title: "Visualise and manage the bundles and services in this OSGi container",
-              isValid: (workspace: Workspace) => workspace.treeContainsDomainAndProperties("osgi.core"),
-              href: () => "#/osgi/bundle-list",
-              isActive: (workspace: Workspace) => workspace.isLinkActive("osgi")
-            });
-            */
-        }]);
+        //viewRegistry['osgi'] = "plugins/osgi/html/layoutOsgi.html";
+        helpRegistry.addUserDoc('osgi', 'plugins/osgi/doc/help.md', function () {
+            return workspace.treeContainsDomainAndProperties("osgi.core");
+        });
+        var builder = nav.builder();
+        var configuration = builder.id('osgi-configuration').href(function () { return '/osgi/configurations' + workspace.hash(); }).title(function () { return 'Configuration'; }).isSelected(function () { return workspace.isLinkPrefixActive('/osgi/configuration') || workspace.isLinkPrefixActive('/osgi/pid'); }).build();
+        var bundles = builder.id('osgi-bundles').href(function () { return '/osgi/bundle-list' + workspace.hash(); }).title(function () { return 'Bundles'; }).isSelected(function () { return workspace.isLinkPrefixActive('/osgi/bundle'); }).build();
+        var features = builder.id('osgi-features').href(function () { return '/osgi/features' + workspace.hash(); }).title(function () { return 'Features'; }).show(function () { return !Core.isBlank(Karaf.getSelectionFeaturesMBean(workspace)); }).isSelected(function () { return workspace.isLinkPrefixActive('/osgi/feature'); }).build();
+        var packages = builder.id('osgi-packages').href(function () { return '/osgi/packages' + workspace.hash(); }).title(function () { return 'Packages'; }).isSelected(function () { return workspace.isLinkPrefixActive('/osgi/package'); }).build();
+        var services = builder.id('osgi-services').href(function () { return '/osgi/services' + workspace.hash(); }).title(function () { return 'Services'; }).isSelected(function () { return workspace.isLinkPrefixActive('/osgi/service'); }).build();
+        var scrComponents = builder.id('osgi-scr-components').href(function () { return '/osgi/scr-components' + workspace.hash(); }).title(function () { return 'Declarative Services'; }).show(function () { return !Core.isBlank(Karaf.getSelectionScrMBean(workspace)); }).isSelected(function () { return workspace.isLinkPrefixActive('/osgi/scr-component'); }).build();
+        var server = builder.id('osgi-server').href(function () { return '/osgi/server' + workspace.hash(); }).title(function () { return 'Server'; }).isSelected(function () { return workspace.isLinkPrefixActive('/osgi/server'); }).build();
+        var fwk = builder.id('osgi-fwk').href(function () { return '/osgi/fwk' + workspace.hash(); }).title(function () { return 'Framework'; }).isSelected(function () { return workspace.isLinkPrefixActive('/osgi/fwk'); }).build();
+        var dependencies = builder.id('osgi-dependencies').href(function () { return '/osgi/dependencies' + workspace.hash(); }).title(function () { return 'Dependencies'; }).isSelected(function () { return workspace.isLinkPrefixActive('/osgi/dependencies'); }).build();
+        var tab = builder.id('osgi').title(function () { return 'OSGi'; }).href(function () { return '/osgi'; }).isValid(function () { return workspace.treeContainsDomainAndProperties("osgi.core"); }).isSelected(function () { return workspace.isLinkActive('osgi'); }).tabs(configuration, bundles, features, packages, services, scrComponents, server, fwk, dependencies).build();
+        nav.add(tab);
+        /*
+        workspace.topLevelTabs.push({
+          id: "osgi",
+          content: "OSGi",
+          title: "Visualise and manage the bundles and services in this OSGi container",
+          isValid: (workspace: Workspace) => workspace.treeContainsDomainAndProperties("osgi.core"),
+          href: () => "#/osgi/bundle-list",
+          isActive: (workspace: Workspace) => workspace.isLinkActive("osgi")
+        });
+        */
+    }]);
     Osgi._module.factory('osgiDataService', ["workspace", "jolokia", function (workspace, jolokia) {
-            return new Osgi.OsgiDataService(workspace, jolokia);
-        }]);
+        return new Osgi.OsgiDataService(workspace, jolokia);
+    }]);
     hawtioPluginLoader.addModule(Osgi.pluginName);
 })(Osgi || (Osgi = {}));
 
@@ -8689,183 +8709,182 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi._module.controller("Osgi.BundleListController", ["$scope", "workspace", "jolokia", "localStorage", function ($scope, workspace, jolokia, localStorage) {
-            $scope.result = {};
-            $scope.bundles = [];
-            $scope.bundleUrl = "";
-            $scope.display = {
-                bundleField: "Name",
-                sortField: "Identifier",
-                bundleFilter: "",
-                startLevelFilter: 0,
-                showActiveMQBundles: false,
-                showCamelBundles: false,
-                showCxfBundles: false,
-                showPlatformBundles: false
-            };
-            if ('bundleList' in localStorage) {
-                $scope.display = angular.fromJson(localStorage['bundleList']);
+        $scope.result = {};
+        $scope.bundles = [];
+        $scope.bundleUrl = "";
+        $scope.display = {
+            bundleField: "Name",
+            sortField: "Identifier",
+            bundleFilter: "",
+            startLevelFilter: 0,
+            showActiveMQBundles: false,
+            showCamelBundles: false,
+            showCxfBundles: false,
+            showPlatformBundles: false
+        };
+        if ('bundleList' in localStorage) {
+            $scope.display = angular.fromJson(localStorage['bundleList']);
+        }
+        $scope.$watch('display', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                localStorage['bundleList'] = angular.toJson(newValue);
             }
-            $scope.$watch('display', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    localStorage['bundleList'] = angular.toJson(newValue);
-                }
-            }, true);
-            $scope.installDisabled = function () {
-                return $scope.bundleUrl === "";
-            };
-            $scope.install = function () {
-                jolokia.request({
-                    type: 'exec',
-                    mbean: Osgi.getSelectionFrameworkMBean(workspace),
-                    operation: "installBundle(java.lang.String)",
-                    arguments: [$scope.bundleUrl]
-                }, {
-                    success: function (response) {
-                        var bundleID = response.value;
-                        jolokia.request({
-                            type: 'exec',
-                            mbean: Osgi.getSelectionBundleMBean(workspace),
-                            operation: "isFragment(long)",
-                            arguments: [bundleID]
-                        }, {
-                            success: function (response) {
-                                var isFragment = response.value;
-                                if (isFragment) {
-                                    Core.notification("success", "Fragment installed successfully.");
-                                    $scope.bundleUrl = "";
-                                    Core.$apply($scope);
-                                }
-                                else {
-                                    jolokia.request({
-                                        type: 'exec',
-                                        mbean: Osgi.getSelectionFrameworkMBean(workspace),
-                                        operation: "startBundle(long)",
-                                        arguments: [bundleID]
-                                    }, {
-                                        success: function (response) {
-                                            Core.notification("success", "Bundle installed and started successfully.");
-                                            $scope.bundleUrl = "";
-                                            Core.$apply($scope);
-                                        },
-                                        error: function (response) {
-                                            Core.notification("error", response.error);
-                                        }
-                                    });
-                                }
-                            },
-                            error: function (response) {
-                                Core.notification("error", response.error);
-                            }
-                        });
-                    },
-                    error: function (response) {
-                        Core.notification("error", response.error);
-                    }
-                });
-            };
-            $scope.$watch('display.sortField', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    $scope.bundles = $scope.bundles.sortBy(newValue);
-                }
-            });
-            $scope.getStateStyle = function (state) {
-                return Osgi.getStateStyle("badge", state);
-            };
-            $scope.getLabel = function (bundleObject) {
-                var labelText;
-                if ($scope.display.bundleField === "Name") {
-                    labelText = bundleObject.Name;
-                    if (labelText === "") {
-                        labelText = bundleObject.SymbolicName;
-                    }
-                }
-                else {
-                    labelText = bundleObject.SymbolicName;
-                }
-                return labelText;
-            };
-            $scope.filterBundle = function (bundle) {
-                if ($scope.display.startLevelFilter > 0 && bundle.StartLevel < $scope.display.startLevelFilter) {
-                    return false;
-                }
-                var labelText = $scope.getLabel(bundle);
-                if ($scope.display.bundleFilter && !labelText.toLowerCase().has($scope.display.bundleFilter.toLowerCase())) {
-                    return false;
-                }
-                if (Core.isBlank($scope.display.bundleFilter)) {
-                    if (($scope.display.showPlatformBundles && Karaf.isPlatformBundle(bundle['SymbolicName'])) ||
-                        ($scope.display.showActiveMQBundles && Karaf.isActiveMQBundle(bundle['SymbolicName'])) ||
-                        ($scope.display.showCxfBundles && Karaf.isCxfBundle(bundle['SymbolicName'])) ||
-                        ($scope.display.showCamelBundles && Karaf.isCamelBundle(bundle['SymbolicName']))) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            function processResponse(response) {
-                var value = response['value'];
-                var responseJson = angular.toJson(value);
-                if ($scope.responseJson !== responseJson) {
-                    $scope.responseJson = responseJson;
-                    $scope.bundles = [];
-                    angular.forEach(value, function (value, key) {
-                        var obj = {
-                            Identifier: value.Identifier,
-                            Name: "",
-                            SymbolicName: value.SymbolicName,
-                            Fragment: value.Fragment,
-                            State: value.State,
-                            Version: value.Version,
-                            LastModified: new Date(Number(value.LastModified)),
-                            Location: value.Location,
-                            StartLevel: undefined
-                        };
-                        if (value.Headers['Bundle-Name']) {
-                            obj.Name = value.Headers['Bundle-Name']['Value'];
-                        }
-                        $scope.bundles.push(obj);
-                    });
-                    $scope.bundles = $scope.bundles.sortBy($scope.display.sortField);
-                    Core.$apply($scope);
-                    // Obtain start level information for all the bundles, let's do this async though
-                    setTimeout(function () {
-                        var requests = [];
-                        for (var i = 0; i < $scope.bundles.length; i++) {
-                            var b = $scope.bundles[i];
-                            requests.push({
-                                type: 'exec', mbean: Osgi.getSelectionBundleMBean(workspace),
-                                operation: 'getStartLevel(long)',
-                                arguments: [b.Identifier]
-                            });
-                        }
-                        var outstanding = requests.length;
-                        jolokia.request(requests, Core.onSuccess(function (response) {
-                            var id = response['request']['arguments'].first();
-                            if (angular.isDefined(id)) {
-                                var bundle = $scope.bundles[id];
-                                if (bundle) {
-                                    Osgi.log.debug("Setting bundle: ", bundle['Identifier'], " start level to: ", response['value']);
-                                    bundle['StartLevel'] = response['value'];
-                                }
-                            }
-                            outstanding = outstanding - 1;
-                            Osgi.log.debug("oustanding responses: ", outstanding);
-                            if (outstanding === 0) {
-                                Osgi.log.debug("Updating page...");
+        }, true);
+        $scope.installDisabled = function () {
+            return $scope.bundleUrl === "";
+        };
+        $scope.install = function () {
+            jolokia.request({
+                type: 'exec',
+                mbean: Osgi.getSelectionFrameworkMBean(workspace),
+                operation: "installBundle(java.lang.String)",
+                arguments: [$scope.bundleUrl]
+            }, {
+                success: function (response) {
+                    var bundleID = response.value;
+                    jolokia.request({
+                        type: 'exec',
+                        mbean: Osgi.getSelectionBundleMBean(workspace),
+                        operation: "isFragment(long)",
+                        arguments: [bundleID]
+                    }, {
+                        success: function (response) {
+                            var isFragment = response.value;
+                            if (isFragment) {
+                                Core.notification("success", "Fragment installed successfully.");
+                                $scope.bundleUrl = "";
                                 Core.$apply($scope);
                             }
-                        }));
-                    }, 500);
+                            else {
+                                jolokia.request({
+                                    type: 'exec',
+                                    mbean: Osgi.getSelectionFrameworkMBean(workspace),
+                                    operation: "startBundle(long)",
+                                    arguments: [bundleID]
+                                }, {
+                                    success: function (response) {
+                                        Core.notification("success", "Bundle installed and started successfully.");
+                                        $scope.bundleUrl = "";
+                                        Core.$apply($scope);
+                                    },
+                                    error: function (response) {
+                                        Core.notification("error", response.error);
+                                    }
+                                });
+                            }
+                        },
+                        error: function (response) {
+                            Core.notification("error", response.error);
+                        }
+                    });
+                },
+                error: function (response) {
+                    Core.notification("error", response.error);
+                }
+            });
+        };
+        $scope.$watch('display.sortField', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                $scope.bundles = $scope.bundles.sortBy(newValue);
+            }
+        });
+        $scope.getStateStyle = function (state) {
+            return Osgi.getStateStyle("badge", state);
+        };
+        $scope.getLabel = function (bundleObject) {
+            var labelText;
+            if ($scope.display.bundleField === "Name") {
+                labelText = bundleObject.Name;
+                if (labelText === "") {
+                    labelText = bundleObject.SymbolicName;
                 }
             }
-            Core.register(jolokia, $scope, {
-                type: 'exec', mbean: Osgi.getSelectionBundleMBean(workspace),
-                operation: 'listBundles()'
-            }, Core.onSuccess(processResponse));
-        }]);
+            else {
+                labelText = bundleObject.SymbolicName;
+            }
+            return labelText;
+        };
+        $scope.filterBundle = function (bundle) {
+            if ($scope.display.startLevelFilter > 0 && bundle.StartLevel < $scope.display.startLevelFilter) {
+                return false;
+            }
+            var labelText = $scope.getLabel(bundle);
+            if ($scope.display.bundleFilter && !labelText.toLowerCase().has($scope.display.bundleFilter.toLowerCase())) {
+                return false;
+            }
+            if (Core.isBlank($scope.display.bundleFilter)) {
+                if (($scope.display.showPlatformBundles && Karaf.isPlatformBundle(bundle['SymbolicName'])) || ($scope.display.showActiveMQBundles && Karaf.isActiveMQBundle(bundle['SymbolicName'])) || ($scope.display.showCxfBundles && Karaf.isCxfBundle(bundle['SymbolicName'])) || ($scope.display.showCamelBundles && Karaf.isCamelBundle(bundle['SymbolicName']))) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            return true;
+        };
+        function processResponse(response) {
+            var value = response['value'];
+            var responseJson = angular.toJson(value);
+            if ($scope.responseJson !== responseJson) {
+                $scope.responseJson = responseJson;
+                $scope.bundles = [];
+                angular.forEach(value, function (value, key) {
+                    var obj = {
+                        Identifier: value.Identifier,
+                        Name: "",
+                        SymbolicName: value.SymbolicName,
+                        Fragment: value.Fragment,
+                        State: value.State,
+                        Version: value.Version,
+                        LastModified: new Date(Number(value.LastModified)),
+                        Location: value.Location,
+                        StartLevel: undefined
+                    };
+                    if (value.Headers['Bundle-Name']) {
+                        obj.Name = value.Headers['Bundle-Name']['Value'];
+                    }
+                    $scope.bundles.push(obj);
+                });
+                $scope.bundles = $scope.bundles.sortBy($scope.display.sortField);
+                Core.$apply($scope);
+                // Obtain start level information for all the bundles, let's do this async though
+                setTimeout(function () {
+                    var requests = [];
+                    for (var i = 0; i < $scope.bundles.length; i++) {
+                        var b = $scope.bundles[i];
+                        requests.push({
+                            type: 'exec',
+                            mbean: Osgi.getSelectionBundleMBean(workspace),
+                            operation: 'getStartLevel(long)',
+                            arguments: [b.Identifier]
+                        });
+                    }
+                    var outstanding = requests.length;
+                    jolokia.request(requests, Core.onSuccess(function (response) {
+                        var id = response['request']['arguments'].first();
+                        if (angular.isDefined(id)) {
+                            var bundle = $scope.bundles[id];
+                            if (bundle) {
+                                Osgi.log.debug("Setting bundle: ", bundle['Identifier'], " start level to: ", response['value']);
+                                bundle['StartLevel'] = response['value'];
+                            }
+                        }
+                        outstanding = outstanding - 1;
+                        Osgi.log.debug("oustanding responses: ", outstanding);
+                        if (outstanding === 0) {
+                            Osgi.log.debug("Updating page...");
+                            Core.$apply($scope);
+                        }
+                    }));
+                }, 500);
+            }
+        }
+        Core.register(jolokia, $scope, {
+            type: 'exec',
+            mbean: Osgi.getSelectionBundleMBean(workspace),
+            operation: 'listBundles()'
+        }, Core.onSuccess(processResponse));
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -8907,7 +8926,6 @@ var Osgi;
             if (separator !== "") {
                 if (skipVersion) {
                     if (da === "Aversion") {
-                        // We're using the 'ReportedVersion' as it comes from PackageAdmin
                         continue;
                     }
                 }
@@ -8942,279 +8960,258 @@ var Osgi;
         return rv.toString();
     }
     Osgi._module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokia", function ($scope, $location, workspace, $routeParams, jolokia) {
-            $scope.bundleId = $routeParams.bundleId;
-            updateTableContents();
-            $scope.showValue = function (key) {
-                switch (key) {
-                    case "Bundle-Name":
-                    case "Bundle-SymbolicName":
-                    case "Bundle-Version":
-                    case "Export-Package":
-                    case "Import-Package":
-                        return false;
-                    default:
-                        return true;
-                }
-            };
-            $scope.executeLoadClass = function (clazz) {
-                var mbean = Osgi.getHawtioOSGiToolsMBean(workspace);
-                if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'getLoadClassOrigin', arguments: [$scope.bundleId, clazz] }, {
-                        success: function (response) {
-                            var divEl = document.getElementById("loadClassResult");
-                            var resultBundle = response.value;
-                            var style;
-                            var resultTxt;
-                            if (resultBundle === -1) {
-                                style = "";
-                                resultTxt = "Class can not be loaded from this bundle.";
-                            }
-                            else {
-                                style = "alert-success";
-                                resultTxt = "Class is served from Bundle " + Osgi.bundleLinks(workspace, resultBundle);
-                            }
-                            divEl.innerHTML +=
-                                "<div class='alert " + style + "'>" +
-                                    "<button type='button' class='close' data-dismiss='alert'>&times;</button>" +
-                                    "Loading class <strong>" + clazz + "</strong> in Bundle " + $scope.bundleId + ". " + resultTxt + "</div>";
-                        },
-                        error: function (response) {
-                            inspectReportError(response);
-                        }
-                    });
-                }
-                else {
-                    inspectReportNoMBeanFound();
-                }
-            };
-            $scope.executeFindResource = function (resource) {
-                var mbean = Osgi.getHawtioOSGiToolsMBean(workspace);
-                if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'getResourceURL', arguments: [$scope.bundleId, resource] }, {
-                        success: function (response) {
-                            var divEl = document.getElementById("loadClassResult");
-                            var resultURL = response.value;
-                            var style;
-                            var resultTxt;
-                            if (resultURL === null) {
-                                style = "";
-                                resultTxt = "Resource can not be found from this bundle.";
-                            }
-                            else {
-                                style = "alert-success";
-                                resultTxt = "Resource is available from: " + resultURL;
-                            }
-                            divEl.innerHTML +=
-                                "<div class='alert " + style + "'>" +
-                                    "<button type='button' class='close' data-dismiss='alert'>&times;</button>" +
-                                    "Finding resource <strong>" + resource + "</strong> in Bundle " + $scope.bundleId + ". " + resultTxt + "</div>";
-                        },
-                        error: function (response) {
-                            inspectReportError(response);
-                        }
-                    });
-                }
-                else {
-                    inspectReportNoMBeanFound();
-                }
-            };
-            $scope.startBundle = function (bundleId) {
-                jolokia.request([
-                    { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'startBundle', arguments: [bundleId] }
-                ], Core.onSuccess(updateTableContents));
-            };
-            $scope.stopBundle = function (bundleId) {
-                jolokia.request([
-                    { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'stopBundle', arguments: [bundleId] }
-                ], Core.onSuccess(updateTableContents));
-            };
-            $scope.updatehBundle = function (bundleId) {
-                jolokia.request([
-                    { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'updateBundle', arguments: [bundleId] }
-                ], Core.onSuccess(updateTableContents));
-            };
-            $scope.refreshBundle = function (bundleId) {
-                jolokia.request([
-                    { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'refreshBundle', arguments: [bundleId] }
-                ], Core.onSuccess(updateTableContents));
-            };
-            $scope.uninstallBundle = function (bundleId) {
-                jolokia.request([{
-                        type: 'exec',
-                        mbean: Osgi.getSelectionFrameworkMBean(workspace),
-                        operation: 'uninstallBundle',
-                        arguments: [bundleId]
-                    }], Core.onSuccess(function () {
-                    $location.path("/osgi/bundle-list");
-                    Core.$apply($scope);
-                }));
-            };
-            function inspectReportNoMBeanFound() {
-                var divEl = document.getElementById("loadClassResult");
-                divEl.innerHTML +=
-                    "<div class='alert alert-error'>" +
-                        "<button type='button' class='close' data-dismiss='alert'>&times;</button>" +
-                        "The hawtio.OSGiTools MBean is not available. Please contact technical support." +
-                        "</div>";
+        $scope.bundleId = $routeParams.bundleId;
+        updateTableContents();
+        $scope.showValue = function (key) {
+            switch (key) {
+                case "Bundle-Name":
+                case "Bundle-SymbolicName":
+                case "Bundle-Version":
+                case "Export-Package":
+                case "Import-Package":
+                    return false;
+                default:
+                    return true;
             }
-            function inspectReportError(response) {
-                var divEl = document.getElementById("loadClassResult");
-                divEl.innerHTML +=
-                    "<div class='alert alert-error'>" +
-                        "<button type='button' class='close' data-dismiss='alert'>&times;</button>" +
-                        "Problem invoking hawtio.OSGiTools MBean. " + response +
-                        "</div>";
-            }
-            function populateTable(response) {
-                var values = response.value;
-                $scope.bundles = values;
-                // now find the row based on the selection ui
-                Osgi.defaultBundleValues(workspace, $scope, values);
-                $scope.row = Osgi.findBundle($scope.bundleId, values);
-                Core.$apply($scope);
-                // This trick is to ensure that the popover is properly visible if it is
-                // smaller than the accordion
-                $('.accordion-body.collapse').hover(function () {
-                    $(this).css('overflow', 'visible');
-                }, function () {
-                    $(this).css('overflow', 'hidden');
+        };
+        $scope.executeLoadClass = function (clazz) {
+            var mbean = Osgi.getHawtioOSGiToolsMBean(workspace);
+            if (mbean) {
+                jolokia.request({ type: 'exec', mbean: mbean, operation: 'getLoadClassOrigin', arguments: [$scope.bundleId, clazz] }, {
+                    success: function (response) {
+                        var divEl = document.getElementById("loadClassResult");
+                        var resultBundle = response.value;
+                        var style;
+                        var resultTxt;
+                        if (resultBundle === -1) {
+                            style = "";
+                            resultTxt = "Class can not be loaded from this bundle.";
+                        }
+                        else {
+                            style = "alert-success";
+                            resultTxt = "Class is served from Bundle " + Osgi.bundleLinks(workspace, resultBundle);
+                        }
+                        divEl.innerHTML += "<div class='alert " + style + "'>" + "<button type='button' class='close' data-dismiss='alert'>&times;</button>" + "Loading class <strong>" + clazz + "</strong> in Bundle " + $scope.bundleId + ". " + resultTxt + "</div>";
+                    },
+                    error: function (response) {
+                        inspectReportError(response);
+                    }
                 });
-                // setup tooltips
-                $("#bsn").tooltip({ title: readBSNHeaderData($scope.row.Headers["Bundle-SymbolicName"].Value),
-                    placement: "right" });
-                createImportPackageSection();
-                createExportPackageSection();
-                populateServicesSection();
             }
-            function createImportPackageSection() {
-                // setup popovers
-                var importPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Import-Package");
-                for (var pkg in $scope.row.ImportData) {
-                    var data = importPackageHeaders[pkg];
-                    var po = "<small><table>" +
-                        "<tr><td><strong>Imported Version=</strong>" + $scope.row.ImportData[pkg].ReportedVersion + "</td></tr>";
-                    if (data !== undefined) {
-                        // This happens in case the package was imported due to a DynamicImport-Package
-                        po += formatAttributesAndDirectivesForPopover(data, false);
-                        if (importPackageHeaders[pkg]["Dresolution"] !== "optional") {
-                            $(document.getElementById("import." + pkg)).addClass("badge-info");
+            else {
+                inspectReportNoMBeanFound();
+            }
+        };
+        $scope.executeFindResource = function (resource) {
+            var mbean = Osgi.getHawtioOSGiToolsMBean(workspace);
+            if (mbean) {
+                jolokia.request({ type: 'exec', mbean: mbean, operation: 'getResourceURL', arguments: [$scope.bundleId, resource] }, {
+                    success: function (response) {
+                        var divEl = document.getElementById("loadClassResult");
+                        var resultURL = response.value;
+                        var style;
+                        var resultTxt;
+                        if (resultURL === null) {
+                            style = "";
+                            resultTxt = "Resource can not be found from this bundle.";
                         }
-                    }
-                    else {
-                        // This is a dynamic import
-                        $(document.getElementById("import." + pkg)).addClass("badge-important");
-                        var reason = $scope.row.Headers["DynamicImport-Package"];
-                        if (reason !== undefined) {
-                            reason = reason.Value;
-                            po += "<tr><td>Dynamic Import. Imported due to:</td></tr>";
-                            po += "<tr><td><strong>DynamicImport-Package=</strong>" + reason + "</td></tr>";
+                        else {
+                            style = "alert-success";
+                            resultTxt = "Resource is available from: " + resultURL;
                         }
+                        divEl.innerHTML += "<div class='alert " + style + "'>" + "<button type='button' class='close' data-dismiss='alert'>&times;</button>" + "Finding resource <strong>" + resource + "</strong> in Bundle " + $scope.bundleId + ". " + resultTxt + "</div>";
+                    },
+                    error: function (response) {
+                        inspectReportError(response);
                     }
-                    po += "</table></small>";
-                    $(document.getElementById("import." + pkg)).
-                        popover({ title: "attributes and directives", content: po, trigger: "hover", html: true });
-                    // Unset the value so that we can see whether there are any unbound optional imports left...
-                    importPackageHeaders[pkg] = undefined;
-                }
-                var unsatisfied = "";
-                for (var pkg in importPackageHeaders) {
-                    if (importPackageHeaders[pkg] === undefined) {
-                        continue;
-                    }
-                    if ($scope.row.ExportData[pkg] !== undefined) {
-                        // The bundle exports this package and also imports it. In this case it is satisfied from the bundle
-                        // itself so it should not be listed as unsatisfied.
-                        continue;
-                    }
-                    unsatisfied += "<tr><td><div class='less-big badge badge-warning' id='unsatisfied." + pkg + "'>" + pkg + "</div></td></tr>";
-                }
-                if (unsatisfied !== "") {
-                    unsatisfied = "<p/><p class='text-warning'>The following optional imports were not satisfied:<table>" + unsatisfied + "</table></p>";
-                    document.getElementById("unsatisfiedOptionalImports").innerHTML = unsatisfied;
-                }
-                for (var pkg in importPackageHeaders) {
-                    if (importPackageHeaders[pkg] === undefined) {
-                        continue;
-                    }
-                    var po = "<small><table>";
-                    po += formatAttributesAndDirectivesForPopover(importPackageHeaders[pkg], false);
-                    po += "</table></small>";
-                    $(document.getElementById("unsatisfied." + pkg)).
-                        popover({ title: "attributes and directives", content: po, trigger: "hover", html: true });
-                }
+                });
             }
-            function createExportPackageSection() {
-                // setup popovers
-                var exportPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Export-Package");
-                for (var pkg in $scope.row.ExportData) {
-                    var po = "<small><table>" +
-                        "<tr><td><strong>Exported Version=</strong>" + $scope.row.ExportData[pkg].ReportedVersion + "</td></tr>";
-                    po += formatAttributesAndDirectivesForPopover(exportPackageHeaders[pkg], true);
-                    po += "</table></small>";
-                    $(document.getElementById("export." + pkg)).
-                        popover({ title: "attributes and directives", content: po, trigger: "hover", html: true });
-                }
+            else {
+                inspectReportNoMBeanFound();
             }
-            function populateServicesSection() {
-                if (($scope.row.RegisteredServices === undefined || $scope.row.RegisteredServices.length === 0) &&
-                    ($scope.row.ServicesInUse === undefined || $scope.row.ServicesInUse === 0)) {
-                    // no services for this bundle
-                    return;
-                }
-                var mbean = Osgi.getSelectionServiceMBean(workspace);
-                if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'listServices()' }, Core.onSuccess(updateServices));
-                }
-            }
-            function updateServices(result) {
-                var data = result.value;
-                for (var id in data) {
-                    var reg = document.getElementById("registers.service." + id);
-                    var uses = document.getElementById("uses.service." + id);
-                    if ((reg === undefined || reg === null) && (uses === undefined || uses === null)) {
-                        continue;
+        };
+        $scope.startBundle = function (bundleId) {
+            jolokia.request([
+                { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'startBundle', arguments: [bundleId] }
+            ], Core.onSuccess(updateTableContents));
+        };
+        $scope.stopBundle = function (bundleId) {
+            jolokia.request([
+                { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'stopBundle', arguments: [bundleId] }
+            ], Core.onSuccess(updateTableContents));
+        };
+        $scope.updatehBundle = function (bundleId) {
+            jolokia.request([
+                { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'updateBundle', arguments: [bundleId] }
+            ], Core.onSuccess(updateTableContents));
+        };
+        $scope.refreshBundle = function (bundleId) {
+            jolokia.request([
+                { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'refreshBundle', arguments: [bundleId] }
+            ], Core.onSuccess(updateTableContents));
+        };
+        $scope.uninstallBundle = function (bundleId) {
+            jolokia.request([{
+                type: 'exec',
+                mbean: Osgi.getSelectionFrameworkMBean(workspace),
+                operation: 'uninstallBundle',
+                arguments: [bundleId]
+            }], Core.onSuccess(function () {
+                $location.path("/osgi/bundle-list");
+                Core.$apply($scope);
+            }));
+        };
+        function inspectReportNoMBeanFound() {
+            var divEl = document.getElementById("loadClassResult");
+            divEl.innerHTML += "<div class='alert alert-error'>" + "<button type='button' class='close' data-dismiss='alert'>&times;</button>" + "The hawtio.OSGiTools MBean is not available. Please contact technical support." + "</div>";
+        }
+        function inspectReportError(response) {
+            var divEl = document.getElementById("loadClassResult");
+            divEl.innerHTML += "<div class='alert alert-error'>" + "<button type='button' class='close' data-dismiss='alert'>&times;</button>" + "Problem invoking hawtio.OSGiTools MBean. " + response + "</div>";
+        }
+        function populateTable(response) {
+            var values = response.value;
+            $scope.bundles = values;
+            // now find the row based on the selection ui
+            Osgi.defaultBundleValues(workspace, $scope, values);
+            $scope.row = Osgi.findBundle($scope.bundleId, values);
+            Core.$apply($scope);
+            // This trick is to ensure that the popover is properly visible if it is
+            // smaller than the accordion
+            $('.accordion-body.collapse').hover(function () {
+                $(this).css('overflow', 'visible');
+            }, function () {
+                $(this).css('overflow', 'hidden');
+            });
+            // setup tooltips
+            $("#bsn").tooltip({ title: readBSNHeaderData($scope.row.Headers["Bundle-SymbolicName"].Value), placement: "right" });
+            createImportPackageSection();
+            createExportPackageSection();
+            populateServicesSection();
+        }
+        function createImportPackageSection() {
+            // setup popovers
+            var importPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Import-Package");
+            for (var pkg in $scope.row.ImportData) {
+                var data = importPackageHeaders[pkg];
+                var po = "<small><table>" + "<tr><td><strong>Imported Version=</strong>" + $scope.row.ImportData[pkg].ReportedVersion + "</td></tr>";
+                if (data !== undefined) {
+                    // This happens in case the package was imported due to a DynamicImport-Package
+                    po += formatAttributesAndDirectivesForPopover(data, false);
+                    if (importPackageHeaders[pkg]["Dresolution"] !== "optional") {
+                        $(document.getElementById("import." + pkg)).addClass("badge-info");
                     }
-                    jolokia.request({
-                        type: 'exec', mbean: Osgi.getSelectionServiceMBean(workspace),
-                        operation: 'getProperties', arguments: [id] }, Core.onSuccess(function (svcId, regEl, usesEl) {
-                        return function (resp) {
-                            var props = resp.value;
-                            var sortedKeys = Object.keys(props).sort();
-                            var po = "<small><table>";
-                            for (var i = 0; i < sortedKeys.length; i++) {
-                                var value = props[sortedKeys[i]];
-                                if (value !== undefined) {
-                                    var fval = value.Value;
-                                    if (fval.length > 15) {
-                                        fval = fval.replace(/[,]/g, ",<br/>&nbsp;&nbsp;");
-                                    }
-                                    po += "<tr><td valign='top'>" + sortedKeys[i] + "</td><td>" + fval + "</td></tr>";
+                }
+                else {
+                    // This is a dynamic import
+                    $(document.getElementById("import." + pkg)).addClass("badge-important");
+                    var reason = $scope.row.Headers["DynamicImport-Package"];
+                    if (reason !== undefined) {
+                        reason = reason.Value;
+                        po += "<tr><td>Dynamic Import. Imported due to:</td></tr>";
+                        po += "<tr><td><strong>DynamicImport-Package=</strong>" + reason + "</td></tr>";
+                    }
+                }
+                po += "</table></small>";
+                $(document.getElementById("import." + pkg)).popover({ title: "attributes and directives", content: po, trigger: "hover", html: true });
+                // Unset the value so that we can see whether there are any unbound optional imports left...
+                importPackageHeaders[pkg] = undefined;
+            }
+            var unsatisfied = "";
+            for (var pkg in importPackageHeaders) {
+                if (importPackageHeaders[pkg] === undefined) {
+                    continue;
+                }
+                if ($scope.row.ExportData[pkg] !== undefined) {
+                    continue;
+                }
+                unsatisfied += "<tr><td><div class='less-big badge badge-warning' id='unsatisfied." + pkg + "'>" + pkg + "</div></td></tr>";
+            }
+            if (unsatisfied !== "") {
+                unsatisfied = "<p/><p class='text-warning'>The following optional imports were not satisfied:<table>" + unsatisfied + "</table></p>";
+                document.getElementById("unsatisfiedOptionalImports").innerHTML = unsatisfied;
+            }
+            for (var pkg in importPackageHeaders) {
+                if (importPackageHeaders[pkg] === undefined) {
+                    continue;
+                }
+                var po = "<small><table>";
+                po += formatAttributesAndDirectivesForPopover(importPackageHeaders[pkg], false);
+                po += "</table></small>";
+                $(document.getElementById("unsatisfied." + pkg)).popover({ title: "attributes and directives", content: po, trigger: "hover", html: true });
+            }
+        }
+        function createExportPackageSection() {
+            // setup popovers
+            var exportPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Export-Package");
+            for (var pkg in $scope.row.ExportData) {
+                var po = "<small><table>" + "<tr><td><strong>Exported Version=</strong>" + $scope.row.ExportData[pkg].ReportedVersion + "</td></tr>";
+                po += formatAttributesAndDirectivesForPopover(exportPackageHeaders[pkg], true);
+                po += "</table></small>";
+                $(document.getElementById("export." + pkg)).popover({ title: "attributes and directives", content: po, trigger: "hover", html: true });
+            }
+        }
+        function populateServicesSection() {
+            if (($scope.row.RegisteredServices === undefined || $scope.row.RegisteredServices.length === 0) && ($scope.row.ServicesInUse === undefined || $scope.row.ServicesInUse === 0)) {
+                // no services for this bundle
+                return;
+            }
+            var mbean = Osgi.getSelectionServiceMBean(workspace);
+            if (mbean) {
+                jolokia.request({ type: 'exec', mbean: mbean, operation: 'listServices()' }, Core.onSuccess(updateServices));
+            }
+        }
+        function updateServices(result) {
+            var data = result.value;
+            for (var id in data) {
+                var reg = document.getElementById("registers.service." + id);
+                var uses = document.getElementById("uses.service." + id);
+                if ((reg === undefined || reg === null) && (uses === undefined || uses === null)) {
+                    continue;
+                }
+                jolokia.request({
+                    type: 'exec',
+                    mbean: Osgi.getSelectionServiceMBean(workspace),
+                    operation: 'getProperties',
+                    arguments: [id]
+                }, Core.onSuccess(function (svcId, regEl, usesEl) {
+                    return function (resp) {
+                        var props = resp.value;
+                        var sortedKeys = Object.keys(props).sort();
+                        var po = "<small><table>";
+                        for (var i = 0; i < sortedKeys.length; i++) {
+                            var value = props[sortedKeys[i]];
+                            if (value !== undefined) {
+                                var fval = value.Value;
+                                if (fval.length > 15) {
+                                    fval = fval.replace(/[,]/g, ",<br/>&nbsp;&nbsp;");
                                 }
+                                po += "<tr><td valign='top'>" + sortedKeys[i] + "</td><td>" + fval + "</td></tr>";
                             }
-                            var regBID = data[svcId].BundleIdentifier;
-                            po += "<tr><td>Registered&nbsp;by</td><td>Bundle " + regBID + " <div class='less-big label'>" + $scope.bundles[regBID].SymbolicName
-                                + "</div></td></tr>";
-                            po += "</table></small>";
-                            if (regEl !== undefined && regEl !== null) {
-                                regEl.innerText = " " + formatServiceName(data[svcId].objectClass);
-                                $(regEl).popover({ title: "service properties", content: po, trigger: "hover", html: true });
-                            }
-                            if (usesEl !== undefined && usesEl !== null) {
-                                usesEl.innerText = " " + formatServiceName(data[svcId].objectClass);
-                                $(usesEl).popover({ title: "service properties", content: po, trigger: "hover", html: true });
-                            }
-                        };
-                    }(id, reg, uses)));
-                }
+                        }
+                        var regBID = data[svcId].BundleIdentifier;
+                        po += "<tr><td>Registered&nbsp;by</td><td>Bundle " + regBID + " <div class='less-big label'>" + $scope.bundles[regBID].SymbolicName + "</div></td></tr>";
+                        po += "</table></small>";
+                        if (regEl !== undefined && regEl !== null) {
+                            regEl.innerText = " " + formatServiceName(data[svcId].objectClass);
+                            $(regEl).popover({ title: "service properties", content: po, trigger: "hover", html: true });
+                        }
+                        if (usesEl !== undefined && usesEl !== null) {
+                            usesEl.innerText = " " + formatServiceName(data[svcId].objectClass);
+                            $(usesEl).popover({ title: "service properties", content: po, trigger: "hover", html: true });
+                        }
+                    };
+                }(id, reg, uses)));
             }
-            function updateTableContents() {
-                //console.log("Loading the bundles");
-                var mbean = Osgi.getSelectionBundleMBean(workspace);
-                if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'listBundles()' }, Core.onSuccess(populateTable));
-                }
+        }
+        function updateTableContents() {
+            //console.log("Loading the bundles");
+            var mbean = Osgi.getSelectionBundleMBean(workspace);
+            if (mbean) {
+                jolokia.request({ type: 'exec', mbean: mbean, operation: 'listBundles()' }, Core.onSuccess(populateTable));
             }
-        }]);
+        }
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -9226,158 +9223,161 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi._module.controller("Osgi.BundlesController", ["$scope", "workspace", "jolokia", function ($scope, workspace, jolokia) {
-            $scope.result = {};
-            $scope.bundles = [];
-            $scope.selected = [];
-            $scope.loading = true;
-            $scope.bundleUrl = "";
-            $scope.installDisabled = function () {
-                return $scope.bundleUrl === "";
-            };
-            var columnDefs = [
-                {
-                    field: 'Identifier',
-                    displayName: 'Identifier',
-                    width: "48",
-                    headerCellTemplate: '<div ng-click="col.sort()" class="ngHeaderSortColumn {{col.headerClass}}" ng-style="{\'cursor\': col.cursor}" ng-class="{ \'ngSorted\': !noSortVisible }"><div class="ngHeaderText colt{{$index}} pagination-centered" title="Identifier"><i class="fa fa-tag"></i></div><div class="ngSortButtonDown" ng-show="col.showSortButtonDown()"></div><div class="ngSortButtonUp" ng-show="col.showSortButtonUp()"></div></div>',
-                },
-                {
-                    field: 'State',
-                    displayName: 'Bundle State',
-                    width: "24",
-                    headerCellTemplate: '<div ng-click="col.sort()" class="ngHeaderSortColumn {{col.headerClass}}" ng-style="{\'cursor\': col.cursor}" ng-class="{ \'ngSorted\': !noSortVisible }"><div class="ngHeaderText colt{{$index}} pagination-centered" title="State"><i class="fa fa-tasks"></i></div><div class="ngSortButtonDown" ng-show="col.showSortButtonDown()"></div><div class="ngSortButtonUp" ng-show="col.showSortButtonUp()"></div></div>',
-                    cellTemplate: '<div class="ngCellText" title="{{row.getProperty(col.field)}}"><i class="{{row.getProperty(col.field)}}"></i></div>'
-                },
-                {
-                    field: 'Name',
-                    displayName: 'Name',
-                    width: "***",
-                    cellTemplate: '<div class="ngCellText"><a href="#/osgi/bundle/{{row.entity.Identifier}}?p=container">{{row.getProperty(col.field)}}</a></div>'
-                },
-                {
-                    field: 'SymbolicName',
-                    displayName: 'Symbolic Name',
-                    width: "***",
-                    cellTemplate: '<div class="ngCellText"><a href="#/osgi/bundle/{{row.entity.Identifier}}?p=container">{{row.getProperty(col.field)}}</a></div>'
-                },
-                {
-                    field: 'Version',
-                    displayName: 'Version',
-                    width: "**"
-                },
-                {
-                    field: 'Location',
-                    displayName: 'Update Location',
-                    width: "***"
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'bundles',
-                showFilter: false,
-                selectedItems: $scope.selected,
-                selectWithCheckboxOnly: true,
-                columnDefs: columnDefs,
-                filterOptions: {
-                    filterText: ''
-                }
-            };
-            $scope.onResponse = function () {
-                jolokia.request({
-                    type: 'exec',
-                    mbean: Osgi.getSelectionBundleMBean(workspace),
-                    operation: 'listBundles()'
-                }, {
-                    success: render,
-                    error: render
-                });
-            };
-            $scope.controlBundles = function (op) {
-                var startBundle = function (response) {
-                };
-                var ids = $scope.selected.map(function (b) { return b.Identifier; });
-                if (!angular.isArray(ids)) {
-                    ids = [ids];
-                }
-                jolokia.request({
-                    type: 'exec',
-                    mbean: Osgi.getSelectionFrameworkMBean(workspace),
-                    operation: op,
-                    arguments: [ids]
-                }, {
-                    success: $scope.onResponse,
-                    error: $scope.onResponse
-                });
-            };
-            $scope.stop = function () {
-                $scope.controlBundles('stopBundles([J)');
-            };
-            $scope.start = function () {
-                $scope.controlBundles('startBundles([J)');
-            };
-            $scope.update = function () {
-                $scope.controlBundles('updateBundles([J)');
-            };
-            $scope.refresh = function () {
-                $scope.controlBundles('refreshBundles([J)');
-            };
-            $scope.uninstall = function () {
-                $scope.controlBundles('uninstallBundles([J)');
-            };
-            $scope.install = function () {
-                jolokia.request({
-                    type: 'exec',
-                    mbean: Osgi.getSelectionFrameworkMBean(workspace),
-                    operation: "installBundle(java.lang.String)",
-                    arguments: [$scope.bundleUrl]
-                }, {
-                    success: function (response) {
-                        console.log("Got: ", response);
-                        $scope.bundleUrl = "";
-                        jolokia.request({
-                            type: 'exec',
-                            mbean: Osgi.getSelectionFrameworkMBean(workspace),
-                            operation: "startBundle(long)",
-                            arguments: [response.value]
-                        }, {
-                            success: $scope.onResponse,
-                            error: $scope.onResponse
-                        });
-                    },
-                    error: function (response) {
-                        $scope.bundleUrl = "";
-                        $scope.onResponse();
-                    }
-                });
-            };
-            function render(response) {
-                if (!angular.equals($scope.result, response.value)) {
-                    $scope.selected.length = 0;
-                    $scope.result = response.value;
-                    $scope.bundles = [];
-                    angular.forEach($scope.result, function (value, key) {
-                        var obj = {
-                            Identifier: value.Identifier,
-                            Name: "",
-                            SymbolicName: value.SymbolicName,
-                            State: value.State,
-                            Version: value.Version,
-                            LastModified: value.LastModified,
-                            Location: value.Location
-                        };
-                        if (value.Headers['Bundle-Name']) {
-                            obj.Name = value.Headers['Bundle-Name']['Value'];
-                        }
-                        $scope.bundles.push(obj);
-                    });
-                    $scope.loading = false;
-                    Core.$apply($scope);
-                }
+        $scope.result = {};
+        $scope.bundles = [];
+        $scope.selected = [];
+        $scope.loading = true;
+        $scope.bundleUrl = "";
+        $scope.installDisabled = function () {
+            return $scope.bundleUrl === "";
+        };
+        var columnDefs = [
+            {
+                field: 'Identifier',
+                displayName: 'Identifier',
+                width: "48",
+                headerCellTemplate: '<div ng-click="col.sort()" class="ngHeaderSortColumn {{col.headerClass}}" ng-style="{\'cursor\': col.cursor}" ng-class="{ \'ngSorted\': !noSortVisible }"><div class="ngHeaderText colt{{$index}} pagination-centered" title="Identifier"><i class="fa fa-tag"></i></div><div class="ngSortButtonDown" ng-show="col.showSortButtonDown()"></div><div class="ngSortButtonUp" ng-show="col.showSortButtonUp()"></div></div>',
+            },
+            {
+                field: 'State',
+                displayName: 'Bundle State',
+                width: "24",
+                headerCellTemplate: '<div ng-click="col.sort()" class="ngHeaderSortColumn {{col.headerClass}}" ng-style="{\'cursor\': col.cursor}" ng-class="{ \'ngSorted\': !noSortVisible }"><div class="ngHeaderText colt{{$index}} pagination-centered" title="State"><i class="fa fa-tasks"></i></div><div class="ngSortButtonDown" ng-show="col.showSortButtonDown()"></div><div class="ngSortButtonUp" ng-show="col.showSortButtonUp()"></div></div>',
+                cellTemplate: '<div class="ngCellText" title="{{row.getProperty(col.field)}}"><i class="{{row.getProperty(col.field)}}"></i></div>'
+            },
+            {
+                field: 'Name',
+                displayName: 'Name',
+                width: "***",
+                cellTemplate: '<div class="ngCellText"><a href="#/osgi/bundle/{{row.entity.Identifier}}?p=container">{{row.getProperty(col.field)}}</a></div>'
+            },
+            {
+                field: 'SymbolicName',
+                displayName: 'Symbolic Name',
+                width: "***",
+                cellTemplate: '<div class="ngCellText"><a href="#/osgi/bundle/{{row.entity.Identifier}}?p=container">{{row.getProperty(col.field)}}</a></div>'
+            },
+            {
+                field: 'Version',
+                displayName: 'Version',
+                width: "**"
+            },
+            {
+                field: 'Location',
+                displayName: 'Update Location',
+                width: "***"
             }
-            Core.register(jolokia, $scope, {
-                type: 'exec', mbean: Osgi.getSelectionBundleMBean(workspace),
+        ];
+        $scope.gridOptions = {
+            data: 'bundles',
+            showFilter: false,
+            selectedItems: $scope.selected,
+            selectWithCheckboxOnly: true,
+            columnDefs: columnDefs,
+            filterOptions: {
+                filterText: ''
+            }
+        };
+        $scope.onResponse = function () {
+            jolokia.request({
+                type: 'exec',
+                mbean: Osgi.getSelectionBundleMBean(workspace),
                 operation: 'listBundles()'
-            }, Core.onSuccess(render));
-        }]);
+            }, {
+                success: render,
+                error: render
+            });
+        };
+        $scope.controlBundles = function (op) {
+            var startBundle = function (response) {
+            };
+            var ids = $scope.selected.map(function (b) {
+                return b.Identifier;
+            });
+            if (!angular.isArray(ids)) {
+                ids = [ids];
+            }
+            jolokia.request({
+                type: 'exec',
+                mbean: Osgi.getSelectionFrameworkMBean(workspace),
+                operation: op,
+                arguments: [ids]
+            }, {
+                success: $scope.onResponse,
+                error: $scope.onResponse
+            });
+        };
+        $scope.stop = function () {
+            $scope.controlBundles('stopBundles([J)');
+        };
+        $scope.start = function () {
+            $scope.controlBundles('startBundles([J)');
+        };
+        $scope.update = function () {
+            $scope.controlBundles('updateBundles([J)');
+        };
+        $scope.refresh = function () {
+            $scope.controlBundles('refreshBundles([J)');
+        };
+        $scope.uninstall = function () {
+            $scope.controlBundles('uninstallBundles([J)');
+        };
+        $scope.install = function () {
+            jolokia.request({
+                type: 'exec',
+                mbean: Osgi.getSelectionFrameworkMBean(workspace),
+                operation: "installBundle(java.lang.String)",
+                arguments: [$scope.bundleUrl]
+            }, {
+                success: function (response) {
+                    console.log("Got: ", response);
+                    $scope.bundleUrl = "";
+                    jolokia.request({
+                        type: 'exec',
+                        mbean: Osgi.getSelectionFrameworkMBean(workspace),
+                        operation: "startBundle(long)",
+                        arguments: [response.value]
+                    }, {
+                        success: $scope.onResponse,
+                        error: $scope.onResponse
+                    });
+                },
+                error: function (response) {
+                    $scope.bundleUrl = "";
+                    $scope.onResponse();
+                }
+            });
+        };
+        function render(response) {
+            if (!angular.equals($scope.result, response.value)) {
+                $scope.selected.length = 0;
+                $scope.result = response.value;
+                $scope.bundles = [];
+                angular.forEach($scope.result, function (value, key) {
+                    var obj = {
+                        Identifier: value.Identifier,
+                        Name: "",
+                        SymbolicName: value.SymbolicName,
+                        State: value.State,
+                        Version: value.Version,
+                        LastModified: value.LastModified,
+                        Location: value.Location
+                    };
+                    if (value.Headers['Bundle-Name']) {
+                        obj.Name = value.Headers['Bundle-Name']['Value'];
+                    }
+                    $scope.bundles.push(obj);
+                });
+                $scope.loading = false;
+                Core.$apply($scope);
+            }
+        }
+        Core.register(jolokia, $scope, {
+            type: 'exec',
+            mbean: Osgi.getSelectionBundleMBean(workspace),
+            operation: 'listBundles()'
+        }, Core.onSuccess(render));
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -9389,339 +9389,339 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi._module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia", function ($scope, $routeParams, $location, workspace, jolokia) {
-            $scope.selectedItems = [];
-            $scope.grid = {
-                data: 'configurations',
-                showFilter: false,
-                showColumnMenu: false,
-                multiSelect: false,
-                filterOptions: {
-                    filterText: "",
-                    useExternalFilter: false
-                },
-                selectedItems: $scope.selectedItems,
-                showSelectionCheckbox: false,
-                displaySelectionCheckbox: false,
-                columnDefs: [
-                    {
-                        field: 'Pid',
-                        displayName: 'Configuration',
-                        cellTemplate: '<div class="ngCellText"><a ng-href="{{row.entity.pidLink}}" title="{{row.entity.description}}">{{row.entity.name}}</a></div>'
-                    }
-                ]
-            };
-            /** the kinds of config */
-            var configKinds = {
-                factory: {
-                    class: "badge badge-info",
-                    title: "Configuration factory used to create separate instances of the configuration"
-                },
-                pid: {
-                    class: "badge badge-success",
-                    title: "Configuration which has a set of properties associated with it"
-                },
-                pidNoValue: {
-                    class: "badge badge-warning",
-                    title: "Configuration which does not yet have any bound values"
+        $scope.selectedItems = [];
+        $scope.grid = {
+            data: 'configurations',
+            showFilter: false,
+            showColumnMenu: false,
+            multiSelect: false,
+            filterOptions: {
+                filterText: "",
+                useExternalFilter: false
+            },
+            selectedItems: $scope.selectedItems,
+            showSelectionCheckbox: false,
+            displaySelectionCheckbox: false,
+            columnDefs: [
+                {
+                    field: 'Pid',
+                    displayName: 'Configuration',
+                    cellTemplate: '<div class="ngCellText"><a ng-href="{{row.entity.pidLink}}" title="{{row.entity.description}}">{{row.entity.name}}</a></div>'
                 }
-            };
-            $scope.addPidDialog = new UI.Dialog();
-            $scope.addPid = function (newPid) {
-                if ($scope.configurations.any(function (c) { return c['pid'] == newPid; })) {
-                    Core.notification("error", "pid \"" + newPid + "\" already exists.");
-                    return;
+            ]
+        };
+        /** the kinds of config */
+        var configKinds = {
+            factory: {
+                class: "badge badge-info",
+                title: "Configuration factory used to create separate instances of the configuration"
+            },
+            pid: {
+                class: "badge badge-success",
+                title: "Configuration which has a set of properties associated with it"
+            },
+            pidNoValue: {
+                class: "badge badge-warning",
+                title: "Configuration which does not yet have any bound values"
+            }
+        };
+        $scope.addPidDialog = new UI.Dialog();
+        $scope.addPid = function (newPid) {
+            if ($scope.configurations.any(function (c) { return c['pid'] == newPid; })) {
+                Core.notification("error", "pid \"" + newPid + "\" already exists.");
+                return;
+            }
+            $scope.addPidDialog.close();
+            var mbean = Osgi.getHawtioConfigAdminMBean($scope.workspace);
+            if (mbean && newPid) {
+                var json = JSON.stringify({});
+                $scope.jolokia.execute(mbean, "configAdminUpdate", newPid, json, Core.onSuccess(function (response) {
+                    Core.notification("success", "Successfully created pid: " + newPid);
+                    updateTableContents();
+                }));
+            }
+        };
+        $scope.$on("$routeChangeSuccess", function (event, current, previous) {
+            // lets do this asynchronously to avoid Error: $digest already in progress
+            setTimeout(updateTableContents, 50);
+        });
+        function onConfigPids(response) {
+            var pids = {};
+            angular.forEach(response, function (row) {
+                var pid = row[0];
+                var bundle = row[1];
+                var config = createPidConfig(pid, bundle);
+                if (!ignorePid(pid)) {
+                    config["hasValue"] = true;
+                    config["kind"] = configKinds.pid;
+                    pids[pid] = config;
                 }
-                $scope.addPidDialog.close();
-                var mbean = Osgi.getHawtioConfigAdminMBean($scope.workspace);
-                if (mbean && newPid) {
-                    var json = JSON.stringify({});
-                    $scope.jolokia.execute(mbean, "configAdminUpdate", newPid, json, Core.onSuccess(function (response) {
-                        Core.notification("success", "Successfully created pid: " + newPid);
-                        updateTableContents();
-                    }));
-                }
-            };
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                setTimeout(updateTableContents, 50);
             });
-            function onConfigPids(response) {
-                var pids = {};
+            $scope.pids = pids;
+            // lets load the factory pids
+            var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
+            if (mbean) {
+                $scope.jolokia.execute(mbean, 'getConfigurations', '(service.factoryPid=*)', Core.onSuccess(onConfigFactoryPids, errorHandler("Failed to load factory PID configurations: ")));
+            }
+            loadMetaType();
+        }
+        /**
+         * For each factory PID lets find the underlying PID to use to edit it, then lets make a link between them
+         */
+        function onConfigFactoryPids(response) {
+            var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
+            var pids = $scope.pids;
+            if (pids && mbean) {
                 angular.forEach(response, function (row) {
                     var pid = row[0];
                     var bundle = row[1];
-                    var config = createPidConfig(pid, bundle);
-                    if (!ignorePid(pid)) {
-                        config["hasValue"] = true;
-                        config["kind"] = configKinds.pid;
+                    if (pid && !ignorePid(pid)) {
+                        var config = pids[pid];
+                        if (config) {
+                            config["isFactoryInstance"] = true;
+                            $scope.jolokia.execute(mbean, 'getFactoryPid', pid, Core.onSuccess(function (factoryPid) {
+                                config["factoryPid"] = factoryPid;
+                                config["name"] = Osgi.removeFactoryPidPrefix(pid, factoryPid);
+                                if (factoryPid) {
+                                    var factoryConfig = getOrCreatePidConfig(factoryPid, bundle, pids);
+                                    if (factoryConfig) {
+                                        configureFactoryPidConfig(pid, factoryConfig, config);
+                                        if ($scope.inFabricProfile) {
+                                            Osgi.getConfigurationProperties($scope.workspace, $scope.jolokia, pid, function (configValues) {
+                                                var zkPid = Core.pathGet(configValues, ["fabric.zookeeper.pid", "Value"]);
+                                                if (zkPid) {
+                                                    config["name"] = Osgi.removeFactoryPidPrefix(zkPid, factoryPid);
+                                                    config["zooKeeperPid"] = zkPid;
+                                                    Core.$apply($scope);
+                                                }
+                                            });
+                                        }
+                                        Core.$apply($scope);
+                                    }
+                                }
+                            }));
+                        }
+                    }
+                });
+            }
+            updateMetaType();
+        }
+        function onMetaType(response) {
+            $scope.metaType = response;
+            updateMetaType();
+        }
+        function updateConfigurations() {
+            var pids = $scope.pids;
+            var configurations = [];
+            angular.forEach(pids, function (config, pid) {
+                if (!config["isFactoryInstance"]) {
+                    configurations.push(config);
+                }
+            });
+            $scope.configurations = configurations.sortBy("name");
+            Core.$apply($scope);
+        }
+        function updateMetaType(lazilyCreateConfigs) {
+            if (lazilyCreateConfigs === void 0) { lazilyCreateConfigs = true; }
+            var metaType = $scope.metaType;
+            if (metaType) {
+                var pidMetadata = Osgi.configuration.pidMetadata;
+                var pids = $scope.pids || {};
+                angular.forEach(metaType.pids, function (value, pid) {
+                    var bundle = null;
+                    var config = lazilyCreateConfigs ? getOrCreatePidConfig(pid, bundle) : pids[pid];
+                    if (config) {
+                        var factoryPidBundleIds = value.factoryPidBundleIds;
+                        if (factoryPidBundleIds && factoryPidBundleIds.length) {
+                            setFactoryPid(config);
+                        }
+                        config["name"] = Core.pathGet(pidMetadata, [pid, "name"]) || trimUnnecessaryPrefixes(value.name) || pid;
+                        var description = Core.pathGet(pidMetadata, [pid, "description"]) || value.description;
+                        /*
+                                    if (description) {
+                                      description = description + "\n" + pidBundleDescription(pid, config.bundle);
+                                    }
+                        */
+                        config["description"] = description;
+                    }
+                });
+            }
+            updateConfigurations();
+        }
+        function loadMetaType() {
+            if ($scope.pids) {
+                if ($scope.profileNotRunning && $scope.profileMetadataMBean && $scope.versionId && $scope.profileId) {
+                    jolokia.execute($scope.profileMetadataMBean, "metaTypeSummary", $scope.versionId, $scope.profileId, Core.onSuccess(onMetaType));
+                }
+                else {
+                    var metaTypeMBean = Osgi.getMetaTypeMBean($scope.workspace);
+                    if (metaTypeMBean) {
+                        $scope.jolokia.execute(metaTypeMBean, "metaTypeSummary", Core.onSuccess(onMetaType));
+                    }
+                }
+            }
+        }
+        function updateTableContents() {
+            $scope.configurations = [];
+            if ($scope.profileNotRunning && $scope.profileMetadataMBean && $scope.versionId && $scope.profileId) {
+                jolokia.execute($scope.profileMetadataMBean, "metaTypeSummary", $scope.versionId, $scope.profileId, Core.onSuccess(onProfileMetaType, { silent: true }));
+            }
+            else {
+                if ($scope.jolokia) {
+                    var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
+                    if (mbean) {
+                        $scope.jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
+                    }
+                }
+            }
+        }
+        function onProfileMetaType(response) {
+            var metaType = response;
+            if (metaType) {
+                var pids = {};
+                angular.forEach(metaType.pids, function (value, pid) {
+                    if (value && !ignorePid(pid)) {
+                        // TODO we don't have a bundle ID
+                        var bundle = "mvn:" + pid;
+                        var config = {
+                            pid: pid,
+                            name: value.name,
+                            class: 'pid',
+                            description: value.description,
+                            bundle: bundle,
+                            kind: configKinds.pid,
+                            pidLink: createPidLink(pid)
+                        };
                         pids[pid] = config;
                     }
                 });
-                $scope.pids = pids;
-                // lets load the factory pids
-                var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
-                if (mbean) {
-                    $scope.jolokia.execute(mbean, 'getConfigurations', '(service.factoryPid=*)', Core.onSuccess(onConfigFactoryPids, errorHandler("Failed to load factory PID configurations: ")));
-                }
-                loadMetaType();
-            }
-            /**
-             * For each factory PID lets find the underlying PID to use to edit it, then lets make a link between them
-             */
-            function onConfigFactoryPids(response) {
-                var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
-                var pids = $scope.pids;
-                if (pids && mbean) {
-                    angular.forEach(response, function (row) {
-                        var pid = row[0];
-                        var bundle = row[1];
-                        if (pid && !ignorePid(pid)) {
-                            var config = pids[pid];
-                            if (config) {
-                                config["isFactoryInstance"] = true;
-                                $scope.jolokia.execute(mbean, 'getFactoryPid', pid, Core.onSuccess(function (factoryPid) {
-                                    config["factoryPid"] = factoryPid;
-                                    config["name"] = Osgi.removeFactoryPidPrefix(pid, factoryPid);
-                                    if (factoryPid) {
-                                        var factoryConfig = getOrCreatePidConfig(factoryPid, bundle, pids);
-                                        if (factoryConfig) {
-                                            configureFactoryPidConfig(pid, factoryConfig, config);
-                                            if ($scope.inFabricProfile) {
-                                                Osgi.getConfigurationProperties($scope.workspace, $scope.jolokia, pid, function (configValues) {
-                                                    var zkPid = Core.pathGet(configValues, ["fabric.zookeeper.pid", "Value"]);
-                                                    if (zkPid) {
-                                                        config["name"] = Osgi.removeFactoryPidPrefix(zkPid, factoryPid);
-                                                        config["zooKeeperPid"] = zkPid;
-                                                        Core.$apply($scope);
-                                                    }
-                                                });
-                                            }
-                                            Core.$apply($scope);
-                                        }
-                                    }
-                                }));
-                            }
-                        }
-                    });
-                }
-                updateMetaType();
-            }
-            function onMetaType(response) {
-                $scope.metaType = response;
-                updateMetaType();
-            }
-            function updateConfigurations() {
-                var pids = $scope.pids;
-                var configurations = [];
                 angular.forEach(pids, function (config, pid) {
-                    if (!config["isFactoryInstance"]) {
-                        configurations.push(config);
+                    var idx = pid.indexOf('-');
+                    if (idx > 0) {
+                        var factoryPid = pid.substring(0, idx);
+                        var name = pid.substring(idx + 1, pid.length);
+                        var factoryConfig = pids[factoryPid];
+                        if (!factoryConfig) {
+                            var bundle = config.bundle;
+                            factoryConfig = getOrCreatePidConfig(factoryPid, bundle, pids);
+                        }
+                        if (factoryConfig) {
+                            configureFactoryPidConfig(pid, factoryConfig, config, factoryPid);
+                            config.name = name;
+                            pids[factoryPid] = factoryConfig;
+                            // lets remove the pid instance as its now a child of the factory
+                            delete pids[pid];
+                        }
                     }
                 });
-                $scope.configurations = configurations.sortBy("name");
-                Core.$apply($scope);
+                $scope.pids = pids;
             }
-            function updateMetaType(lazilyCreateConfigs) {
-                if (lazilyCreateConfigs === void 0) { lazilyCreateConfigs = true; }
-                var metaType = $scope.metaType;
-                if (metaType) {
-                    var pidMetadata = Osgi.configuration.pidMetadata;
-                    var pids = $scope.pids || {};
-                    angular.forEach(metaType.pids, function (value, pid) {
-                        var bundle = null;
-                        var config = lazilyCreateConfigs ? getOrCreatePidConfig(pid, bundle) : pids[pid];
-                        if (config) {
-                            var factoryPidBundleIds = value.factoryPidBundleIds;
-                            if (factoryPidBundleIds && factoryPidBundleIds.length) {
-                                setFactoryPid(config);
-                            }
-                            config["name"] = Core.pathGet(pidMetadata, [pid, "name"]) || trimUnnecessaryPrefixes(value.name) || pid;
-                            var description = Core.pathGet(pidMetadata, [pid, "description"]) || value.description;
-                            /*
-                                        if (description) {
-                                          description = description + "\n" + pidBundleDescription(pid, config.bundle);
-                                        }
-                            */
-                            config["description"] = description;
-                        }
-                    });
+            // now lets process the response and replicate the getConfigurations / getProperties API
+            // calls on the OSGi API
+            // to get the tree of factory pids or pids
+            $scope.metaType = metaType;
+            updateMetaType(false);
+        }
+        function trimUnnecessaryPrefixes(name) {
+            angular.forEach(["Fabric8 ", "Apache "], function (prefix) {
+                if (name && name.startsWith(prefix) && name.length > prefix.length) {
+                    name = name.substring(prefix.length);
                 }
-                updateConfigurations();
-            }
-            function loadMetaType() {
-                if ($scope.pids) {
-                    if ($scope.profileNotRunning && $scope.profileMetadataMBean && $scope.versionId && $scope.profileId) {
-                        jolokia.execute($scope.profileMetadataMBean, "metaTypeSummary", $scope.versionId, $scope.profileId, Core.onSuccess(onMetaType));
-                    }
-                    else {
-                        var metaTypeMBean = Osgi.getMetaTypeMBean($scope.workspace);
-                        if (metaTypeMBean) {
-                            $scope.jolokia.execute(metaTypeMBean, "metaTypeSummary", Core.onSuccess(onMetaType));
-                        }
-                    }
+            });
+            return name;
+        }
+        function pidBundleDescription(pid, bundle) {
+            var pidMetadata = Osgi.configuration.pidMetadata;
+            return Core.pathGet(pidMetadata, [pid, "description"]) || "pid: " + pid + "\nbundle: " + bundle;
+        }
+        function createPidConfig(pid, bundle) {
+            var pidMetadata = Osgi.configuration.pidMetadata;
+            var config = {
+                pid: pid,
+                name: Core.pathGet(pidMetadata, [pid, "name"]) || pid,
+                class: 'pid',
+                description: Core.pathGet(pidMetadata, [pid, "description"]) || pidBundleDescription(pid, bundle),
+                bundle: bundle,
+                kind: configKinds.pidNoValue,
+                pidLink: createPidLink(pid)
+            };
+            return config;
+        }
+        function ignorePid(pid) {
+            var answer = false;
+            angular.forEach(Osgi.configuration.ignorePids, function (pattern) {
+                if (pid.startsWith(pattern)) {
+                    answer = true;
                 }
+            });
+            return answer;
+        }
+        function getOrCreatePidConfig(pid, bundle, pids) {
+            if (pids === void 0) { pids = null; }
+            if (ignorePid(pid)) {
+                Osgi.log.info("ignoring pid " + pid);
+                return null;
             }
-            function updateTableContents() {
-                $scope.configurations = [];
-                if ($scope.profileNotRunning && $scope.profileMetadataMBean && $scope.versionId && $scope.profileId) {
-                    jolokia.execute($scope.profileMetadataMBean, "metaTypeSummary", $scope.versionId, $scope.profileId, Core.onSuccess(onProfileMetaType, { silent: true }));
+            else {
+                if (!pids) {
+                    pids = $scope.pids;
                 }
-                else {
-                    if ($scope.jolokia) {
-                        var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
-                        if (mbean) {
-                            $scope.jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
-                        }
-                    }
+                var factoryConfig = pids[pid];
+                if (!factoryConfig) {
+                    factoryConfig = createPidConfig(pid, bundle);
+                    pids[pid] = factoryConfig;
+                    updateConfigurations();
                 }
+                return factoryConfig;
             }
-            function onProfileMetaType(response) {
-                var metaType = response;
-                if (metaType) {
-                    var pids = {};
-                    angular.forEach(metaType.pids, function (value, pid) {
-                        if (value && !ignorePid(pid)) {
-                            // TODO we don't have a bundle ID
-                            var bundle = "mvn:" + pid;
-                            var config = {
-                                pid: pid,
-                                name: value.name,
-                                class: 'pid',
-                                description: value.description,
-                                bundle: bundle,
-                                kind: configKinds.pid,
-                                pidLink: createPidLink(pid)
-                            };
-                            pids[pid] = config;
-                        }
-                    });
-                    angular.forEach(pids, function (config, pid) {
-                        var idx = pid.indexOf('-');
-                        if (idx > 0) {
-                            var factoryPid = pid.substring(0, idx);
-                            var name = pid.substring(idx + 1, pid.length);
-                            var factoryConfig = pids[factoryPid];
-                            if (!factoryConfig) {
-                                var bundle = config.bundle;
-                                factoryConfig = getOrCreatePidConfig(factoryPid, bundle, pids);
-                            }
-                            if (factoryConfig) {
-                                configureFactoryPidConfig(pid, factoryConfig, config, factoryPid);
-                                config.name = name;
-                                pids[factoryPid] = factoryConfig;
-                                // lets remove the pid instance as its now a child of the factory
-                                delete pids[pid];
-                            }
-                        }
-                    });
-                    $scope.pids = pids;
+        }
+        function configureFactoryPidConfig(pid, factoryConfig, config, factoryPid) {
+            if (factoryPid === void 0) { factoryPid = null; }
+            setFactoryPid(factoryConfig, factoryPid, pid);
+            //config["pidLink"] = createPidLink(pid, factoryPid);
+            var children = factoryConfig.children;
+            if (factoryPid) {
+                factoryConfig.pidLink = createPidLink(factoryPid, true);
+            }
+            if (!children) {
+                children = {};
+                factoryConfig["children"] = children;
+            }
+            children[pid] = config;
+        }
+        function setFactoryPid(factoryConfig, factoryPid, pid) {
+            if (factoryPid === void 0) { factoryPid = null; }
+            if (pid === void 0) { pid = null; }
+            factoryConfig["isFactory"] = true;
+            factoryConfig["class"] = "factoryPid";
+            factoryConfig["kind"] = configKinds.factory;
+            if (!factoryPid) {
+                factoryPid = factoryConfig["factoryPid"] || "";
+            }
+            if (!pid) {
+                pid = factoryConfig["pid"] || "";
+            }
+            if (!factoryPid) {
+                factoryPid = pid;
+                pid = null;
+            }
+            factoryConfig["pidLink"] = createPidLink(factoryPid);
+        }
+        function createPidLink(pid, isFactory) {
+            if (isFactory === void 0) { isFactory = false; }
+            return Osgi.createConfigPidLink($scope, workspace, pid, isFactory);
+        }
+        function errorHandler(message) {
+            return {
+                error: function (response) {
+                    Core.notification("error", message + response['error'] || response);
+                    Core.defaultJolokiaErrorHandler(response);
                 }
-                // now lets process the response and replicate the getConfigurations / getProperties API
-                // calls on the OSGi API
-                // to get the tree of factory pids or pids
-                $scope.metaType = metaType;
-                updateMetaType(false);
-            }
-            function trimUnnecessaryPrefixes(name) {
-                angular.forEach(["Fabric8 ", "Apache "], function (prefix) {
-                    if (name && name.startsWith(prefix) && name.length > prefix.length) {
-                        name = name.substring(prefix.length);
-                    }
-                });
-                return name;
-            }
-            function pidBundleDescription(pid, bundle) {
-                var pidMetadata = Osgi.configuration.pidMetadata;
-                return Core.pathGet(pidMetadata, [pid, "description"]) || "pid: " + pid + "\nbundle: " + bundle;
-            }
-            function createPidConfig(pid, bundle) {
-                var pidMetadata = Osgi.configuration.pidMetadata;
-                var config = {
-                    pid: pid,
-                    name: Core.pathGet(pidMetadata, [pid, "name"]) || pid,
-                    class: 'pid',
-                    description: Core.pathGet(pidMetadata, [pid, "description"]) || pidBundleDescription(pid, bundle),
-                    bundle: bundle,
-                    kind: configKinds.pidNoValue,
-                    pidLink: createPidLink(pid)
-                };
-                return config;
-            }
-            function ignorePid(pid) {
-                var answer = false;
-                angular.forEach(Osgi.configuration.ignorePids, function (pattern) {
-                    if (pid.startsWith(pattern)) {
-                        answer = true;
-                    }
-                });
-                return answer;
-            }
-            function getOrCreatePidConfig(pid, bundle, pids) {
-                if (pids === void 0) { pids = null; }
-                if (ignorePid(pid)) {
-                    Osgi.log.info("ignoring pid " + pid);
-                    return null;
-                }
-                else {
-                    if (!pids) {
-                        pids = $scope.pids;
-                    }
-                    var factoryConfig = pids[pid];
-                    if (!factoryConfig) {
-                        factoryConfig = createPidConfig(pid, bundle);
-                        pids[pid] = factoryConfig;
-                        updateConfigurations();
-                    }
-                    return factoryConfig;
-                }
-            }
-            function configureFactoryPidConfig(pid, factoryConfig, config, factoryPid) {
-                if (factoryPid === void 0) { factoryPid = null; }
-                setFactoryPid(factoryConfig, factoryPid, pid);
-                //config["pidLink"] = createPidLink(pid, factoryPid);
-                var children = factoryConfig.children;
-                if (factoryPid) {
-                    factoryConfig.pidLink = createPidLink(factoryPid, true);
-                }
-                if (!children) {
-                    children = {};
-                    factoryConfig["children"] = children;
-                }
-                children[pid] = config;
-            }
-            function setFactoryPid(factoryConfig, factoryPid, pid) {
-                if (factoryPid === void 0) { factoryPid = null; }
-                if (pid === void 0) { pid = null; }
-                factoryConfig["isFactory"] = true;
-                factoryConfig["class"] = "factoryPid";
-                factoryConfig["kind"] = configKinds.factory;
-                if (!factoryPid) {
-                    factoryPid = factoryConfig["factoryPid"] || "";
-                }
-                if (!pid) {
-                    pid = factoryConfig["pid"] || "";
-                }
-                if (!factoryPid) {
-                    factoryPid = pid;
-                    pid = null;
-                }
-                factoryConfig["pidLink"] = createPidLink(factoryPid);
-            }
-            function createPidLink(pid, isFactory) {
-                if (isFactory === void 0) { isFactory = false; }
-                return Osgi.createConfigPidLink($scope, workspace, pid, isFactory);
-            }
-            function errorHandler(message) {
-                return {
-                    error: function (response) {
-                        Core.notification("error", message + response['error'] || response);
-                        Core.defaultJolokiaErrorHandler(response);
-                    }
-                };
-            }
-            // load the data
-            updateTableContents();
-        }]);
+            };
+        }
+        // load the data
+        updateTableContents();
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -9733,45 +9733,52 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi._module.controller("Osgi.FrameworkController", ["$scope", "$dialog", "workspace", function ($scope, $dialog, workspace) {
-            $scope.editDialog = new UI.Dialog();
-            updateContents();
-            $scope.edit = function (attr, displayName) {
-                $scope.editAttr = attr;
-                $scope.editDisplayName = displayName;
-                $scope.editDialog.open();
-            };
-            $scope.edited = function (name, displayName, res) {
-                $scope.editDialog.close();
-                if (angular.isNumber(res)) {
-                    var mbean = Osgi.getSelectionFrameworkMBean(workspace);
-                    if (mbean) {
-                        var jolokia = workspace.jolokia;
-                        jolokia.request({
-                            type: 'write', mbean: mbean, attribute: name, value: res
-                        }, {
-                            error: function (response) { editWritten("error", response.error); },
-                            success: function (response) { editWritten("success", displayName + " changed to " + res); }
-                        });
-                    }
-                }
-            };
-            function editWritten(status, message) {
-                Core.notification(status, message);
-                updateContents();
-            }
-            function populatePage(response) {
-                $scope.startLevel = response.value.FrameworkStartLevel;
-                $scope.initialBundleStartLevel = response.value.InitialBundleStartLevel;
-                Core.$apply($scope);
-            }
-            function updateContents() {
+        $scope.editDialog = new UI.Dialog();
+        updateContents();
+        $scope.edit = function (attr, displayName) {
+            $scope.editAttr = attr;
+            $scope.editDisplayName = displayName;
+            $scope.editDialog.open();
+        };
+        $scope.edited = function (name, displayName, res) {
+            $scope.editDialog.close();
+            if (angular.isNumber(res)) {
                 var mbean = Osgi.getSelectionFrameworkMBean(workspace);
                 if (mbean) {
                     var jolokia = workspace.jolokia;
-                    jolokia.request({ type: 'read', mbean: mbean }, Core.onSuccess(populatePage));
+                    jolokia.request({
+                        type: 'write',
+                        mbean: mbean,
+                        attribute: name,
+                        value: res
+                    }, {
+                        error: function (response) {
+                            editWritten("error", response.error);
+                        },
+                        success: function (response) {
+                            editWritten("success", displayName + " changed to " + res);
+                        }
+                    });
                 }
             }
-        }]);
+        };
+        function editWritten(status, message) {
+            Core.notification(status, message);
+            updateContents();
+        }
+        function populatePage(response) {
+            $scope.startLevel = response.value.FrameworkStartLevel;
+            $scope.initialBundleStartLevel = response.value.InitialBundleStartLevel;
+            Core.$apply($scope);
+        }
+        function updateContents() {
+            var mbean = Osgi.getSelectionFrameworkMBean(workspace);
+            if (mbean) {
+                var jolokia = workspace.jolokia;
+                jolokia.request({ type: 'read', mbean: mbean }, Core.onSuccess(populatePage));
+            }
+        }
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -10077,9 +10084,13 @@ var Osgi;
             this.addFilteredPackages();
             if (this.hideUnused) {
                 // this will filter out all nodes that are not marked as used in our data model
-                this.graphBuilder.filterNodes(function (node) { return node.used; });
+                this.graphBuilder.filterNodes(function (node) {
+                    return node.used;
+                });
                 // this will remove all nodes that do not have connections after filtering the unused nodes
-                this.graphBuilder.filterNodes(function (node) { return _this.graphBuilder.hasLinks(node.id); });
+                this.graphBuilder.filterNodes(function (node) {
+                    return _this.graphBuilder.hasLinks(node.id);
+                });
             }
             return this.graphBuilder.buildGraph();
         };
@@ -10094,17 +10105,17 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi.TopLevelController = Osgi._module.controller("Osgi.TopLevelController", ["$scope", "workspace", function ($scope, workspace) {
-            $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
-            $scope.bundleMBean = Osgi.getSelectionBundleMBean(workspace);
-            $scope.serviceMBean = Osgi.getSelectionServiceMBean(workspace);
-            $scope.packageMBean = Osgi.getSelectionPackageMBean(workspace);
-            $scope.configAdminMBean = Osgi.getSelectionConfigAdminMBean(workspace);
-            $scope.metaTypeMBean = Osgi.getMetaTypeMBean(workspace);
-            $scope.osgiToolsMBean = Osgi.getHawtioOSGiToolsMBean(workspace);
-            $scope.hawtioConfigAdminMBean = Osgi.getHawtioConfigAdminMBean(workspace);
-            $scope.scrMBean = Karaf.getSelectionScrMBean(workspace);
-            $scope.featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
-        }]);
+        $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
+        $scope.bundleMBean = Osgi.getSelectionBundleMBean(workspace);
+        $scope.serviceMBean = Osgi.getSelectionServiceMBean(workspace);
+        $scope.packageMBean = Osgi.getSelectionPackageMBean(workspace);
+        $scope.configAdminMBean = Osgi.getSelectionConfigAdminMBean(workspace);
+        $scope.metaTypeMBean = Osgi.getMetaTypeMBean(workspace);
+        $scope.osgiToolsMBean = Osgi.getHawtioOSGiToolsMBean(workspace);
+        $scope.hawtioConfigAdminMBean = Osgi.getHawtioConfigAdminMBean(workspace);
+        $scope.scrMBean = Karaf.getSelectionScrMBean(workspace);
+        $scope.featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -10116,23 +10127,23 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi._module.controller("Osgi.PackageController", ["$scope", "$filter", "workspace", "$routeParams", function ($scope, $filter, workspace, $routeParams) {
-            $scope.package = $routeParams.package;
-            $scope.version = $routeParams.version;
-            updateTableContents();
-            function populateTable(response) {
-                var packages = Osgi.defaultPackageValues(workspace, $scope, response.value);
-                $scope.row = packages.filter({ "Name": $scope.package, "Version": $scope.version })[0];
-                Core.$apply($scope);
+        $scope.package = $routeParams.package;
+        $scope.version = $routeParams.version;
+        updateTableContents();
+        function populateTable(response) {
+            var packages = Osgi.defaultPackageValues(workspace, $scope, response.value);
+            $scope.row = packages.filter({ "Name": $scope.package, "Version": $scope.version })[0];
+            Core.$apply($scope);
+        }
+        ;
+        function updateTableContents() {
+            var mbean = Osgi.getSelectionPackageMBean(workspace);
+            if (mbean) {
+                var jolokia = workspace.jolokia;
+                jolokia.request({ type: 'exec', mbean: mbean, operation: 'listPackages' }, Core.onSuccess(populateTable));
             }
-            ;
-            function updateTableContents() {
-                var mbean = Osgi.getSelectionPackageMBean(workspace);
-                if (mbean) {
-                    var jolokia = workspace.jolokia;
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'listPackages' }, Core.onSuccess(populateTable));
-                }
-            }
-        }]);
+        }
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -10144,113 +10155,113 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi.PackagesController = Osgi._module.controller("Osgi.PackagesController", ["$scope", "$filter", "workspace", "$templateCache", "$compile", function ($scope, $filter, workspace, $templateCache, $compile) {
-            var dateFilter = $filter('date');
-            $scope.packages = [];
-            $scope.selectedItems = [];
-            $scope.mygrid = {
-                data: 'packages',
-                showFilter: false,
-                showColumnMenu: false,
-                filterOptions: {
-                    filterText: "",
-                    useExternalFilter: false
+        var dateFilter = $filter('date');
+        $scope.packages = [];
+        $scope.selectedItems = [];
+        $scope.mygrid = {
+            data: 'packages',
+            showFilter: false,
+            showColumnMenu: false,
+            filterOptions: {
+                filterText: "",
+                useExternalFilter: false
+            },
+            selectedItems: $scope.selectedItems,
+            rowHeight: 32,
+            selectWithCheckboxOnly: true,
+            columnDefs: [
+                {
+                    field: 'Name',
+                    displayName: 'Name',
+                    width: "***"
                 },
-                selectedItems: $scope.selectedItems,
-                rowHeight: 32,
-                selectWithCheckboxOnly: true,
-                columnDefs: [
-                    {
-                        field: 'Name',
-                        displayName: 'Name',
-                        width: "***"
-                    },
-                    {
-                        field: 'VersionLink',
-                        displayName: 'Version',
-                        width: "***"
-                    },
-                    {
-                        field: 'RemovalPending',
-                        displayName: 'Removal Pending',
-                        width: "***"
-                    }
-                ]
-            };
-            /*
-                $scope.widget = new DataTable.TableWidget($scope, $templateCache, $compile, [
-                  <DataTable.TableColumnConfig> {
-                    "mDataProp": null,
-                    "sClass": "control center",
-                    "sDefaultContent": '<i class="fa fa-plus"></i>'
-                  },
-                  <DataTable.TableColumnConfig> { "mDataProp": "Name" },
-                  <DataTable.TableColumnConfig> { "mDataProp": "VersionLink" },
-                  <DataTable.TableColumnConfig> { "mDataProp": "RemovalPending" }
-            
-                ], {
-                  rowDetailTemplateId: 'packageBundlesTemplate',
-                  disableAddColumns: true
-                });
-            
-            */
-            $scope.$watch('workspace.selection', function () {
-                updateTableContents();
-            });
-            function populateTable(response) {
-                var packages = Osgi.defaultPackageValues(workspace, $scope, response.value);
-                augmentPackagesInfo(packages);
-            }
-            function augmentPackagesInfo(packages) {
-                var bundleMap = {};
-                var createBundleMap = function (response) {
-                    angular.forEach(response.value, function (value, key) {
-                        var obj = {
-                            Identifier: value.Identifier,
-                            Name: "",
-                            SymbolicName: value.SymbolicName,
-                            State: value.State,
-                            Version: value.Version,
-                            LastModified: value.LastModified,
-                            Location: value.Location
-                        };
-                        if (value.Headers['Bundle-Name']) {
-                            obj.Name = value.Headers['Bundle-Name']['Value'];
-                        }
-                        bundleMap[obj.Identifier] = obj;
-                    });
-                    angular.forEach(packages, function (p, key) {
-                        angular.forEach(p["ExportingBundles"], function (b, key) {
-                            p["ExportingBundles"][key] = bundleMap[b];
-                        });
-                        angular.forEach(p["ImportingBundles"], function (b, key) {
-                            p["ImportingBundles"][key] = bundleMap[b];
-                        });
-                    });
-                    $scope.packages = packages;
-                    Core.$apply($scope);
-                };
-                workspace.jolokia.request({
-                    type: 'exec',
-                    mbean: Osgi.getSelectionBundleMBean(workspace),
-                    operation: 'listBundles()'
-                }, {
-                    success: createBundleMap,
-                    error: createBundleMap
-                });
-            }
-            function updateTableContents() {
-                var mbean = Osgi.getSelectionPackageMBean(workspace);
-                if (mbean) {
-                    var jolokia = workspace.jolokia;
-                    // bundles first:
-                    jolokia.request({
-                        type: 'exec',
-                        mbean: mbean,
-                        operation: 'listPackages'
-                    }, Core.onSuccess(populateTable));
+                {
+                    field: 'VersionLink',
+                    displayName: 'Version',
+                    width: "***"
+                },
+                {
+                    field: 'RemovalPending',
+                    displayName: 'Removal Pending',
+                    width: "***"
                 }
+            ]
+        };
+        /*
+            $scope.widget = new DataTable.TableWidget($scope, $templateCache, $compile, [
+              <DataTable.TableColumnConfig> {
+                "mDataProp": null,
+                "sClass": "control center",
+                "sDefaultContent": '<i class="fa fa-plus"></i>'
+              },
+              <DataTable.TableColumnConfig> { "mDataProp": "Name" },
+              <DataTable.TableColumnConfig> { "mDataProp": "VersionLink" },
+              <DataTable.TableColumnConfig> { "mDataProp": "RemovalPending" }
+        
+            ], {
+              rowDetailTemplateId: 'packageBundlesTemplate',
+              disableAddColumns: true
+            });
+        
+        */
+        $scope.$watch('workspace.selection', function () {
+            updateTableContents();
+        });
+        function populateTable(response) {
+            var packages = Osgi.defaultPackageValues(workspace, $scope, response.value);
+            augmentPackagesInfo(packages);
+        }
+        function augmentPackagesInfo(packages) {
+            var bundleMap = {};
+            var createBundleMap = function (response) {
+                angular.forEach(response.value, function (value, key) {
+                    var obj = {
+                        Identifier: value.Identifier,
+                        Name: "",
+                        SymbolicName: value.SymbolicName,
+                        State: value.State,
+                        Version: value.Version,
+                        LastModified: value.LastModified,
+                        Location: value.Location
+                    };
+                    if (value.Headers['Bundle-Name']) {
+                        obj.Name = value.Headers['Bundle-Name']['Value'];
+                    }
+                    bundleMap[obj.Identifier] = obj;
+                });
+                angular.forEach(packages, function (p, key) {
+                    angular.forEach(p["ExportingBundles"], function (b, key) {
+                        p["ExportingBundles"][key] = bundleMap[b];
+                    });
+                    angular.forEach(p["ImportingBundles"], function (b, key) {
+                        p["ImportingBundles"][key] = bundleMap[b];
+                    });
+                });
+                $scope.packages = packages;
+                Core.$apply($scope);
+            };
+            workspace.jolokia.request({
+                type: 'exec',
+                mbean: Osgi.getSelectionBundleMBean(workspace),
+                operation: 'listBundles()'
+            }, {
+                success: createBundleMap,
+                error: createBundleMap
+            });
+        }
+        function updateTableContents() {
+            var mbean = Osgi.getSelectionPackageMBean(workspace);
+            if (mbean) {
+                var jolokia = workspace.jolokia;
+                // bundles first:
+                jolokia.request({
+                    type: 'exec',
+                    mbean: mbean,
+                    operation: 'listPackages'
+                }, Core.onSuccess(populateTable));
             }
-        }]);
+        }
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -10262,449 +10273,449 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi._module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia", function ($scope, $timeout, $routeParams, $location, workspace, jolokia) {
-            $scope.deletePropDialog = new UI.Dialog();
-            $scope.deletePidDialog = new UI.Dialog();
-            $scope.addPropertyDialog = new UI.Dialog();
-            $scope.factoryPid = $routeParams.factoryPid;
-            $scope.pid = $routeParams.pid;
-            $scope.createForm = {
-                pidInstanceName: null
-            };
-            $scope.newPid = $scope.factoryPid && !$scope.pid;
-            if ($scope.newPid) {
-                $scope.editMode = true;
+        $scope.deletePropDialog = new UI.Dialog();
+        $scope.deletePidDialog = new UI.Dialog();
+        $scope.addPropertyDialog = new UI.Dialog();
+        $scope.factoryPid = $routeParams.factoryPid;
+        $scope.pid = $routeParams.pid;
+        $scope.createForm = {
+            pidInstanceName: null
+        };
+        $scope.newPid = $scope.factoryPid && !$scope.pid;
+        if ($scope.newPid) {
+            $scope.editMode = true;
+        }
+        if ($scope.pid && !$scope.factoryPid) {
+            var idx = $scope.pid.indexOf("-");
+            if (idx > 0) {
+                $scope.factoryPid = $scope.pid.substring(0, idx);
+                $scope.factoryInstanceName = $scope.pid.substring(idx + 1, $scope.pid.length);
             }
-            if ($scope.pid && !$scope.factoryPid) {
-                var idx = $scope.pid.indexOf("-");
-                if (idx > 0) {
-                    $scope.factoryPid = $scope.pid.substring(0, idx);
-                    $scope.factoryInstanceName = $scope.pid.substring(idx + 1, $scope.pid.length);
-                }
+        }
+        $scope.selectValues = {};
+        $scope.modelLoaded = false;
+        $scope.canSave = false;
+        $scope.setEditMode = function (flag) {
+            $scope.editMode = flag;
+            $scope.formMode = flag ? "edit" : "view";
+            if (!flag || !$scope.entity) {
+                $scope.entity = {};
+                updateTableContents();
             }
-            $scope.selectValues = {};
-            $scope.modelLoaded = false;
-            $scope.canSave = false;
-            $scope.setEditMode = function (flag) {
-                $scope.editMode = flag;
-                $scope.formMode = flag ? "edit" : "view";
-                if (!flag || !$scope.entity) {
-                    $scope.entity = {};
-                    updateTableContents();
+        };
+        var startInEditMode = $scope.factoryPid && !$routeParams.pid;
+        $scope.setEditMode(startInEditMode);
+        $scope.$on("hawtio.form.modelChange", function () {
+            if ($scope.modelLoaded) {
+                // TODO lets check if we've really changed the values!
+                enableCanSave();
+                Core.$apply($scope);
+            }
+        });
+        function updatePid(mbean, pid, data) {
+            var completeFn = function (response) {
+                Core.notification("success", "Successfully updated pid: " + pid);
+                if (pid && $scope.factoryPid && $scope.newPid) {
+                    // we've just created a new pid so lets move to the full pid URL
+                    var newPath = Osgi.createConfigPidPath($scope, pid);
+                    $location.path(newPath);
+                }
+                else {
+                    $scope.setEditMode(false);
+                    $scope.canSave = false;
+                    $scope.saved = true;
                 }
             };
-            var startInEditMode = $scope.factoryPid && !$routeParams.pid;
-            $scope.setEditMode(startInEditMode);
-            $scope.$on("hawtio.form.modelChange", function () {
-                if ($scope.modelLoaded) {
-                    // TODO lets check if we've really changed the values!
-                    enableCanSave();
-                    Core.$apply($scope);
+            var callback = Core.onSuccess(completeFn, errorHandler("Failed to update: " + pid));
+            var json = JSON.stringify(data);
+            $scope.jolokia.execute(mbean, "configAdminUpdate", pid, json, callback);
+        }
+        $scope.pidSave = function () {
+            var data = {};
+            angular.forEach($scope.entity, function (value, key) {
+                var text = undefined;
+                if (angular.isString(value)) {
+                    text = value;
+                }
+                else if (angular.isDefined(value)) {
+                    text = value.toString();
+                }
+                if (angular.isDefined(text)) {
+                    data[decodeKey(key, $scope.pid)] = text;
                 }
             });
-            function updatePid(mbean, pid, data) {
-                var completeFn = function (response) {
-                    Core.notification("success", "Successfully updated pid: " + pid);
-                    if (pid && $scope.factoryPid && $scope.newPid) {
-                        // we've just created a new pid so lets move to the full pid URL
-                        var newPath = Osgi.createConfigPidPath($scope, pid);
-                        $location.path(newPath);
-                    }
-                    else {
-                        $scope.setEditMode(false);
-                        $scope.canSave = false;
-                        $scope.saved = true;
-                    }
-                };
-                var callback = Core.onSuccess(completeFn, errorHandler("Failed to update: " + pid));
-                var json = JSON.stringify(data);
-                $scope.jolokia.execute(mbean, "configAdminUpdate", pid, json, callback);
-            }
-            $scope.pidSave = function () {
-                var data = {};
-                angular.forEach($scope.entity, function (value, key) {
-                    var text = undefined;
-                    if (angular.isString(value)) {
-                        text = value;
-                    }
-                    else if (angular.isDefined(value)) {
-                        text = value.toString();
-                    }
-                    if (angular.isDefined(text)) {
-                        data[decodeKey(key, $scope.pid)] = text;
-                    }
-                });
-                //log.info("about to update value " + angular.toJson(data));
-                var mbean = Osgi.getHawtioConfigAdminMBean(workspace);
-                if (mbean || $scope.inFabricProfile) {
-                    var pidMBean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
-                    var pid = $scope.pid;
-                    var zkPid = $scope.zkPid;
-                    var factoryPid = $scope.factoryPid;
-                    if (!$scope.inFabricProfile && factoryPid && pidMBean && !zkPid) {
-                        // lets generate a new pid
-                        $scope.jolokia.execute(pidMBean, "createFactoryConfiguration", factoryPid, Core.onSuccess(function (response) {
-                            pid = response;
-                            if (pid) {
-                                updatePid(mbean, pid, data);
-                            }
-                        }, errorHandler("Failed to create new PID: ")));
-                    }
-                    else {
-                        if ($scope.newPid) {
-                            var pidInstanceName = $scope.createForm.pidInstanceName;
-                            if (!pidInstanceName || !factoryPid) {
-                                return;
-                            }
-                            pid = factoryPid + "-" + pidInstanceName;
+            //log.info("about to update value " + angular.toJson(data));
+            var mbean = Osgi.getHawtioConfigAdminMBean(workspace);
+            if (mbean || $scope.inFabricProfile) {
+                var pidMBean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
+                var pid = $scope.pid;
+                var zkPid = $scope.zkPid;
+                var factoryPid = $scope.factoryPid;
+                if (!$scope.inFabricProfile && factoryPid && pidMBean && !zkPid) {
+                    // lets generate a new pid
+                    $scope.jolokia.execute(pidMBean, "createFactoryConfiguration", factoryPid, Core.onSuccess(function (response) {
+                        pid = response;
+                        if (pid) {
+                            updatePid(mbean, pid, data);
                         }
-                        else if (zkPid) {
-                            pid = zkPid;
-                        }
-                        updatePid(mbean, pid, data);
-                    }
-                }
-            };
-            function errorHandler(message) {
-                return {
-                    error: function (response) {
-                        Core.notification("error", message + "\n" + response['error'] || response);
-                        Core.defaultJolokiaErrorHandler(response);
-                    }
-                };
-            }
-            function enableCanSave() {
-                if ($scope.editMode) {
-                    $scope.canSave = true;
-                }
-            }
-            $scope.addPropertyConfirmed = function (key, value) {
-                $scope.addPropertyDialog.close();
-                $scope.configValues[key] = {
-                    Key: key,
-                    Value: value,
-                    Type: "String"
-                };
-                enableCanSave();
-                updateSchema();
-            };
-            $scope.deletePidProp = function (e) {
-                $scope.deleteKey = e.Key;
-                $scope.deletePropDialog.open();
-            };
-            $scope.deletePidPropConfirmed = function () {
-                $scope.deletePropDialog.close();
-                var cell = document.getElementById("pid." + $scope.deleteKey);
-                cell.parentElement.remove();
-                enableCanSave();
-            };
-            $scope.deletePidConfirmed = function () {
-                $scope.deletePidDialog.close();
-                function errorFn(response) {
-                    Core.notification("error", response.error);
-                }
-                function successFn(response) {
-                    Core.notification("success", "Successfully deleted pid: " + $scope.pid);
-                    $location.path($scope.configurationsLink);
-                }
-                var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
-                if (mbean) {
-                    $scope.jolokia.request({
-                        type: "exec",
-                        mbean: mbean,
-                        operation: 'delete',
-                        arguments: [$scope.pid]
-                    }, {
-                        error: errorFn,
-                        success: successFn
-                    });
-                }
-            };
-            function populateTable(response) {
-                $scope.modelLoaded = true;
-                var configValues = response || {};
-                $scope.configValues = configValues;
-                $scope.zkPid = Core.pathGet(configValues, ["fabric.zookeeper.pid", "Value"]);
-                if ($scope.zkPid && $scope.saved) {
-                    // lets load the current properties direct from git
-                    // in case we have just saved them into git and config admin hasn't yet
-                    // quite caught up yet (to avoid freaking the user out that things look like
-                    // changes got reverted ;)
-                    function onProfileProperties(gitProperties) {
-                        angular.forEach(gitProperties, function (value, key) {
-                            var configProperty = configValues[key];
-                            if (configProperty) {
-                                configProperty.Value = value;
-                            }
-                        });
-                        updateSchemaAndLoadMetaType();
-                        Core.$apply($scope);
-                    }
+                    }, errorHandler("Failed to create new PID: ")));
                 }
                 else {
-                    updateSchemaAndLoadMetaType();
+                    if ($scope.newPid) {
+                        var pidInstanceName = $scope.createForm.pidInstanceName;
+                        if (!pidInstanceName || !factoryPid) {
+                            return;
+                        }
+                        pid = factoryPid + "-" + pidInstanceName;
+                    }
+                    else if (zkPid) {
+                        pid = zkPid;
+                    }
+                    updatePid(mbean, pid, data);
                 }
             }
-            function updateSchemaAndLoadMetaType() {
-                updateSchema();
-                var configValues = $scope.configValues;
-                if (configValues) {
-                    if ($scope.profileNotRunning && $scope.profileMetadataMBean && $scope.versionId && $scope.profileId) {
-                        var pid = $scope.factoryPid || $scope.pid;
-                        jolokia.execute($scope.profileMetadataMBean, "getPidMetaTypeObject", $scope.versionId, $scope.profileId, pid, Core.onSuccess(onMetaType));
-                    }
-                    else {
-                        var locale = null;
-                        var pid = null;
-                        var factoryId = configValues["service.factoryPid"];
-                        if (factoryId && !pid) {
-                            pid = factoryId["Value"];
-                        }
-                        var metaTypeMBean = Osgi.getMetaTypeMBean($scope.workspace);
-                        if (metaTypeMBean) {
-                            $scope.jolokia.execute(metaTypeMBean, "getPidMetaTypeObject", pid, locale, Core.onSuccess(onMetaType));
-                        }
-                    }
+        };
+        function errorHandler(message) {
+            return {
+                error: function (response) {
+                    Core.notification("error", message + "\n" + response['error'] || response);
+                    Core.defaultJolokiaErrorHandler(response);
                 }
-                Core.$apply($scope);
+            };
+        }
+        function enableCanSave() {
+            if ($scope.editMode) {
+                $scope.canSave = true;
             }
-            function onMetaType(response) {
-                $scope.metaType = response;
-                updateSchema();
-                Core.$apply($scope);
+        }
+        $scope.addPropertyConfirmed = function (key, value) {
+            $scope.addPropertyDialog.close();
+            $scope.configValues[key] = {
+                Key: key,
+                Value: value,
+                Type: "String"
+            };
+            enableCanSave();
+            updateSchema();
+        };
+        $scope.deletePidProp = function (e) {
+            $scope.deleteKey = e.Key;
+            $scope.deletePropDialog.open();
+        };
+        $scope.deletePidPropConfirmed = function () {
+            $scope.deletePropDialog.close();
+            var cell = document.getElementById("pid." + $scope.deleteKey);
+            cell.parentElement.remove();
+            enableCanSave();
+        };
+        $scope.deletePidConfirmed = function () {
+            $scope.deletePidDialog.close();
+            function errorFn(response) {
+                Core.notification("error", response.error);
             }
-            /**
-             * Updates the JSON schema model
-             */
-            function updateSchema() {
-                var properties = {};
-                var required = [];
-                $scope.defaultValues = {};
-                var schema = {
-                    type: "object",
-                    required: required,
-                    properties: properties
-                };
-                var inputClass = "span12";
-                var labelClass = "control-label";
-                //var inputClassArray = "span11";
-                var inputClassArray = "";
-                var labelClassArray = labelClass;
-                var metaType = $scope.metaType;
-                if (metaType) {
-                    var pidMetadata = Osgi.configuration.pidMetadata;
-                    var pid = metaType.id;
-                    schema["id"] = pid;
-                    schema["name"] = Core.pathGet(pidMetadata, [pid, "name"]) || metaType.name;
-                    schema["description"] = Core.pathGet(pidMetadata, [pid, "description"]) || metaType.description;
-                    var disableHumanizeLabel = Core.pathGet(pidMetadata, [pid, "schemaExtensions", "disableHumanizeLabel"]);
-                    angular.forEach(metaType.attributes, function (attribute) {
-                        var id = attribute.id;
-                        if (isValidProperty(id)) {
-                            var key = encodeKey(id, pid);
-                            var typeName = asJsonSchemaType(attribute.typeName, attribute.id);
-                            var attributeProperties = {
-                                title: attribute.name,
-                                tooltip: attribute.description,
-                                'input-attributes': {
-                                    class: inputClass
-                                },
-                                'label-attributes': {
-                                    class: labelClass
-                                },
-                                type: typeName
-                            };
-                            if (disableHumanizeLabel) {
-                                attributeProperties.title = id;
-                            }
-                            if (attribute.typeName === "char") {
-                                attributeProperties["maxLength"] = 1;
-                                attributeProperties["minLength"] = 1;
-                            }
-                            var cardinality = attribute.cardinality;
-                            if (cardinality) {
-                                // lets clear the span on arrays to fix layout issues
-                                attributeProperties['input-attributes']['class'] = null;
-                                attributeProperties.type = "array";
-                                attributeProperties["items"] = {
-                                    'input-attributes': {
-                                        class: inputClassArray
-                                    },
-                                    'label-attributes': {
-                                        class: labelClassArray
-                                    },
-                                    "type": typeName
-                                };
-                            }
-                            if (attribute.required) {
-                                required.push(id);
-                            }
-                            var defaultValue = attribute.defaultValue;
-                            if (defaultValue) {
-                                if (angular.isArray(defaultValue) && defaultValue.length === 1) {
-                                    defaultValue = defaultValue[0];
-                                }
-                                //attributeProperties["default"] = defaultValue;
-                                // TODO convert to boolean / number?
-                                $scope.defaultValues[key] = defaultValue;
-                            }
-                            var optionLabels = attribute.optionLabels;
-                            var optionValues = attribute.optionValues;
-                            if (optionLabels && optionLabels.length && optionValues && optionValues.length) {
-                                var enumObject = {};
-                                for (var i = 0; i < optionLabels.length; i++) {
-                                    var label = optionLabels[i];
-                                    var value = optionValues[i];
-                                    enumObject[value] = label;
-                                }
-                                $scope.selectValues[key] = enumObject;
-                                Core.pathSet(attributeProperties, ['input-element'], "select");
-                                Core.pathSet(attributeProperties, ['input-attributes', "ng-options"], "key as value for (key, value) in selectValues." + key);
-                            }
-                            properties[key] = attributeProperties;
+            function successFn(response) {
+                Core.notification("success", "Successfully deleted pid: " + $scope.pid);
+                $location.path($scope.configurationsLink);
+            }
+            var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
+            if (mbean) {
+                $scope.jolokia.request({
+                    type: "exec",
+                    mbean: mbean,
+                    operation: 'delete',
+                    arguments: [$scope.pid]
+                }, {
+                    error: errorFn,
+                    success: successFn
+                });
+            }
+        };
+        function populateTable(response) {
+            $scope.modelLoaded = true;
+            var configValues = response || {};
+            $scope.configValues = configValues;
+            $scope.zkPid = Core.pathGet(configValues, ["fabric.zookeeper.pid", "Value"]);
+            if ($scope.zkPid && $scope.saved) {
+                // lets load the current properties direct from git
+                // in case we have just saved them into git and config admin hasn't yet
+                // quite caught up yet (to avoid freaking the user out that things look like
+                // changes got reverted ;)
+                function onProfileProperties(gitProperties) {
+                    angular.forEach(gitProperties, function (value, key) {
+                        var configProperty = configValues[key];
+                        if (configProperty) {
+                            configProperty.Value = value;
                         }
                     });
-                    // now lets override anything from the custom metadata
-                    var schemaExtensions = Core.pathGet(Osgi.configuration.pidMetadata, [pid, "schemaExtensions"]);
-                    if (schemaExtensions) {
-                        // now lets copy over the schema extensions
-                        overlayProperties(schema, schemaExtensions);
+                    updateSchemaAndLoadMetaType();
+                    Core.$apply($scope);
+                }
+            }
+            else {
+                updateSchemaAndLoadMetaType();
+            }
+        }
+        function updateSchemaAndLoadMetaType() {
+            updateSchema();
+            var configValues = $scope.configValues;
+            if (configValues) {
+                if ($scope.profileNotRunning && $scope.profileMetadataMBean && $scope.versionId && $scope.profileId) {
+                    var pid = $scope.factoryPid || $scope.pid;
+                    jolokia.execute($scope.profileMetadataMBean, "getPidMetaTypeObject", $scope.versionId, $scope.profileId, pid, Core.onSuccess(onMetaType));
+                }
+                else {
+                    var locale = null;
+                    var pid = null;
+                    var factoryId = configValues["service.factoryPid"];
+                    if (factoryId && !pid) {
+                        pid = factoryId["Value"];
+                    }
+                    var metaTypeMBean = Osgi.getMetaTypeMBean($scope.workspace);
+                    if (metaTypeMBean) {
+                        $scope.jolokia.execute(metaTypeMBean, "getPidMetaTypeObject", pid, locale, Core.onSuccess(onMetaType));
                     }
                 }
-                // now add all the missing properties...
-                var entity = {};
-                angular.forEach($scope.configValues, function (value, rawKey) {
-                    if (isValidProperty(rawKey)) {
-                        var key = encodeKey(rawKey, pid);
-                        var attrValue = value;
-                        var attrType = "string";
-                        if (angular.isObject(value)) {
-                            attrValue = value.Value;
-                            attrType = asJsonSchemaType(value.Type, rawKey);
+            }
+            Core.$apply($scope);
+        }
+        function onMetaType(response) {
+            $scope.metaType = response;
+            updateSchema();
+            Core.$apply($scope);
+        }
+        /**
+         * Updates the JSON schema model
+         */
+        function updateSchema() {
+            var properties = {};
+            var required = [];
+            $scope.defaultValues = {};
+            var schema = {
+                type: "object",
+                required: required,
+                properties: properties
+            };
+            var inputClass = "span12";
+            var labelClass = "control-label";
+            //var inputClassArray = "span11";
+            var inputClassArray = "";
+            var labelClassArray = labelClass;
+            var metaType = $scope.metaType;
+            if (metaType) {
+                var pidMetadata = Osgi.configuration.pidMetadata;
+                var pid = metaType.id;
+                schema["id"] = pid;
+                schema["name"] = Core.pathGet(pidMetadata, [pid, "name"]) || metaType.name;
+                schema["description"] = Core.pathGet(pidMetadata, [pid, "description"]) || metaType.description;
+                var disableHumanizeLabel = Core.pathGet(pidMetadata, [pid, "schemaExtensions", "disableHumanizeLabel"]);
+                angular.forEach(metaType.attributes, function (attribute) {
+                    var id = attribute.id;
+                    if (isValidProperty(id)) {
+                        var key = encodeKey(id, pid);
+                        var typeName = asJsonSchemaType(attribute.typeName, attribute.id);
+                        var attributeProperties = {
+                            title: attribute.name,
+                            tooltip: attribute.description,
+                            'input-attributes': {
+                                class: inputClass
+                            },
+                            'label-attributes': {
+                                class: labelClass
+                            },
+                            type: typeName
+                        };
+                        if (disableHumanizeLabel) {
+                            attributeProperties.title = id;
                         }
-                        var property = properties[key];
-                        if (!property) {
-                            property = {
+                        if (attribute.typeName === "char") {
+                            attributeProperties["maxLength"] = 1;
+                            attributeProperties["minLength"] = 1;
+                        }
+                        var cardinality = attribute.cardinality;
+                        if (cardinality) {
+                            // lets clear the span on arrays to fix layout issues
+                            attributeProperties['input-attributes']['class'] = null;
+                            attributeProperties.type = "array";
+                            attributeProperties["items"] = {
                                 'input-attributes': {
-                                    class: inputClass
+                                    class: inputClassArray
                                 },
                                 'label-attributes': {
-                                    class: labelClass
+                                    class: labelClassArray
                                 },
-                                type: attrType
+                                "type": typeName
                             };
-                            properties[key] = property;
-                            if (rawKey == 'org.osgi.service.http.port') {
-                                properties[key]['input-attributes']['disabled'] = 'disabled';
-                                properties[key]['input-attributes']['title'] = 'Changing port of OSGi http service is not possible from Hawtio';
+                        }
+                        if (attribute.required) {
+                            required.push(id);
+                        }
+                        var defaultValue = attribute.defaultValue;
+                        if (defaultValue) {
+                            if (angular.isArray(defaultValue) && defaultValue.length === 1) {
+                                defaultValue = defaultValue[0];
                             }
+                            //attributeProperties["default"] = defaultValue;
+                            // TODO convert to boolean / number?
+                            $scope.defaultValues[key] = defaultValue;
+                        }
+                        var optionLabels = attribute.optionLabels;
+                        var optionValues = attribute.optionValues;
+                        if (optionLabels && optionLabels.length && optionValues && optionValues.length) {
+                            var enumObject = {};
+                            for (var i = 0; i < optionLabels.length; i++) {
+                                var label = optionLabels[i];
+                                var value = optionValues[i];
+                                enumObject[value] = label;
+                            }
+                            $scope.selectValues[key] = enumObject;
+                            Core.pathSet(attributeProperties, ['input-element'], "select");
+                            Core.pathSet(attributeProperties, ['input-attributes', "ng-options"], "key as value for (key, value) in selectValues." + key);
+                        }
+                        properties[key] = attributeProperties;
+                    }
+                });
+                // now lets override anything from the custom metadata
+                var schemaExtensions = Core.pathGet(Osgi.configuration.pidMetadata, [pid, "schemaExtensions"]);
+                if (schemaExtensions) {
+                    // now lets copy over the schema extensions
+                    overlayProperties(schema, schemaExtensions);
+                }
+            }
+            // now add all the missing properties...
+            var entity = {};
+            angular.forEach($scope.configValues, function (value, rawKey) {
+                if (isValidProperty(rawKey)) {
+                    var key = encodeKey(rawKey, pid);
+                    var attrValue = value;
+                    var attrType = "string";
+                    if (angular.isObject(value)) {
+                        attrValue = value.Value;
+                        attrType = asJsonSchemaType(value.Type, rawKey);
+                    }
+                    var property = properties[key];
+                    if (!property) {
+                        property = {
+                            'input-attributes': {
+                                class: inputClass
+                            },
+                            'label-attributes': {
+                                class: labelClass
+                            },
+                            type: attrType
+                        };
+                        properties[key] = property;
+                        if (rawKey == 'org.osgi.service.http.port') {
+                            properties[key]['input-attributes']['disabled'] = 'disabled';
+                            properties[key]['input-attributes']['title'] = 'Changing port of OSGi http service is not possible from Hawtio';
+                        }
+                    }
+                    else {
+                        var propertyType = property["type"];
+                        if ("array" === propertyType) {
+                            if (!angular.isArray(attrValue)) {
+                                attrValue = attrValue ? attrValue.split(",") : [];
+                            }
+                        }
+                    }
+                    if (disableHumanizeLabel) {
+                        property.title = rawKey;
+                    }
+                    //comply with Forms.safeIdentifier in 'forms/js/formHelpers.ts'
+                    key = key.replace(/-/g, "_");
+                    entity[key] = attrValue;
+                }
+            });
+            // add default values for missing values
+            angular.forEach($scope.defaultValues, function (value, key) {
+                var current = entity[key];
+                if (!angular.isDefined(current)) {
+                    //log.info("updating entity " + key + " with default: " + value + " as was: " + current);
+                    entity[key] = value;
+                }
+            });
+            //log.info("default values: " + angular.toJson($scope.defaultValues));
+            $scope.entity = entity;
+            $scope.schema = schema;
+            $scope.fullSchema = schema;
+        }
+        /**
+         * Recursively overlays the properties in the overlay into the object; so any atttributes are added into the object
+         * and any nested objects in the overlay are inserted into the object at the correct path.
+         */
+        function overlayProperties(object, overlay) {
+            if (angular.isObject(object)) {
+                if (angular.isObject(overlay)) {
+                    angular.forEach(overlay, function (value, key) {
+                        if (angular.isObject(value)) {
+                            var child = object[key];
+                            if (!child) {
+                                child = {};
+                                object[key] = child;
+                            }
+                            overlayProperties(child, value);
                         }
                         else {
-                            var propertyType = property["type"];
-                            if ("array" === propertyType) {
-                                if (!angular.isArray(attrValue)) {
-                                    attrValue = attrValue ? attrValue.split(",") : [];
-                                }
-                            }
+                            object[key] = value;
                         }
-                        if (disableHumanizeLabel) {
-                            property.title = rawKey;
-                        }
-                        //comply with Forms.safeIdentifier in 'forms/js/formHelpers.ts'
-                        key = key.replace(/-/g, "_");
-                        entity[key] = attrValue;
-                    }
-                });
-                // add default values for missing values
-                angular.forEach($scope.defaultValues, function (value, key) {
-                    var current = entity[key];
-                    if (!angular.isDefined(current)) {
-                        //log.info("updating entity " + key + " with default: " + value + " as was: " + current);
-                        entity[key] = value;
-                    }
-                });
-                //log.info("default values: " + angular.toJson($scope.defaultValues));
-                $scope.entity = entity;
-                $scope.schema = schema;
-                $scope.fullSchema = schema;
-            }
-            /**
-             * Recursively overlays the properties in the overlay into the object; so any atttributes are added into the object
-             * and any nested objects in the overlay are inserted into the object at the correct path.
-             */
-            function overlayProperties(object, overlay) {
-                if (angular.isObject(object)) {
-                    if (angular.isObject(overlay)) {
-                        angular.forEach(overlay, function (value, key) {
-                            if (angular.isObject(value)) {
-                                var child = object[key];
-                                if (!child) {
-                                    child = {};
-                                    object[key] = child;
-                                }
-                                overlayProperties(child, value);
-                            }
-                            else {
-                                object[key] = value;
-                            }
-                        });
-                    }
+                    });
                 }
             }
-            var ignorePropertyIds = ["service.pid", "service.factoryPid", "fabric.zookeeper.pid"];
-            function isValidProperty(id) {
-                return id && ignorePropertyIds.indexOf(id) < 0;
-            }
-            function encodeKey(key, pid) {
-                return key.replace(/\./g, "__");
-            }
-            function decodeKey(key, pid) {
-                return key.replace(/__/g, ".");
-            }
-            function asJsonSchemaType(typeName, id) {
-                if (typeName) {
-                    var lower = typeName.toLowerCase();
-                    if (lower.startsWith("int") || lower === "long" || lower === "short" || lower === "byte" || lower.endsWith("int")) {
-                        return "integer";
-                    }
-                    if (lower === "double" || lower === "float" || lower === "bigdecimal") {
-                        return "number";
-                    }
-                    if (lower === "string") {
-                        // TODO hack to try force password type on dodgy metadata such as pax web
-                        if (id && id.endsWith("password")) {
-                            return "password";
-                        }
-                        return "string";
-                    }
-                    return typeName;
+        }
+        var ignorePropertyIds = ["service.pid", "service.factoryPid", "fabric.zookeeper.pid"];
+        function isValidProperty(id) {
+            return id && ignorePropertyIds.indexOf(id) < 0;
+        }
+        function encodeKey(key, pid) {
+            return key.replace(/\./g, "__");
+        }
+        function decodeKey(key, pid) {
+            return key.replace(/__/g, ".");
+        }
+        function asJsonSchemaType(typeName, id) {
+            if (typeName) {
+                var lower = typeName.toLowerCase();
+                if (lower.startsWith("int") || lower === "long" || lower === "short" || lower === "byte" || lower.endsWith("int")) {
+                    return "integer";
                 }
-                else {
+                if (lower === "double" || lower === "float" || lower === "bigdecimal") {
+                    return "number";
+                }
+                if (lower === "string") {
+                    // TODO hack to try force password type on dodgy metadata such as pax web
+                    if (id && id.endsWith("password")) {
+                        return "password";
+                    }
                     return "string";
                 }
+                return typeName;
             }
-            function onProfilePropertiesLoaded(response) {
-                $scope.modelLoaded = true;
-                var configValues = {};
-                $scope.configValues = configValues;
-                angular.forEach(response, function (value, oKey) {
-                    // lets remove any dodgy characters
-                    var key = oKey.replace(/:/g, '_').replace(/\//g, '_');
-                    configValues[key] = {
-                        Key: key,
-                        Value: value
-                    };
-                });
-                $scope.zkPid = Core.pathGet(configValues, ["fabric.zookeeper.pid", "Value"]);
-                updateSchemaAndLoadMetaType();
-                Core.$apply($scope);
+            else {
+                return "string";
             }
-            function updateTableContents() {
-                $scope.modelLoaded = false;
-                Osgi.getConfigurationProperties($scope.workspace, $scope.jolokia, $scope.pid, populateTable);
-            }
-            // load initial data
-            updateTableContents();
-        }]);
+        }
+        function onProfilePropertiesLoaded(response) {
+            $scope.modelLoaded = true;
+            var configValues = {};
+            $scope.configValues = configValues;
+            angular.forEach(response, function (value, oKey) {
+                // lets remove any dodgy characters
+                var key = oKey.replace(/:/g, '_').replace(/\//g, '_');
+                configValues[key] = {
+                    Key: key,
+                    Value: value
+                };
+            });
+            $scope.zkPid = Core.pathGet(configValues, ["fabric.zookeeper.pid", "Value"]);
+            updateSchemaAndLoadMetaType();
+            Core.$apply($scope);
+        }
+        function updateTableContents() {
+            $scope.modelLoaded = false;
+            Osgi.getConfigurationProperties($scope.workspace, $scope.jolokia, $scope.pid, populateTable);
+        }
+        // load initial data
+        updateTableContents();
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -10716,104 +10727,104 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi.ServiceController = Osgi._module.controller("Osgi.ServiceController", ["$scope", "$filter", "workspace", "$templateCache", "$compile", function ($scope, $filter, workspace, $templateCache, $compile) {
-            var dateFilter = $filter('date');
-            $scope.services = [];
-            $scope.selectedItems = [];
-            $scope.mygrid = {
-                data: 'services',
-                showFilter: false,
-                showColumnMenu: false,
-                filterOptions: {
-                    filterText: "",
-                    useExternalFilter: false
+        var dateFilter = $filter('date');
+        $scope.services = [];
+        $scope.selectedItems = [];
+        $scope.mygrid = {
+            data: 'services',
+            showFilter: false,
+            showColumnMenu: false,
+            filterOptions: {
+                filterText: "",
+                useExternalFilter: false
+            },
+            selectedItems: $scope.selectedItems,
+            rowHeight: 32,
+            selectWithCheckboxOnly: true,
+            columnDefs: [
+                {
+                    field: 'Identifier',
+                    displayName: 'ID',
+                    width: "***"
                 },
-                selectedItems: $scope.selectedItems,
-                rowHeight: 32,
-                selectWithCheckboxOnly: true,
-                columnDefs: [
-                    {
-                        field: 'Identifier',
-                        displayName: 'ID',
-                        width: "***"
-                    },
-                    {
-                        field: 'BundleIdentifier',
-                        displayName: 'Bundle',
-                        width: "***"
-                    },
-                    {
-                        field: 'objectClass',
-                        displayName: 'Object Class(es)',
-                        width: "***"
-                    }
-                ]
-            };
-            /*
-                $scope.widget = new DataTable.TableWidget($scope, $templateCache, $compile, [
-                  <DataTable.TableColumnConfig> {
-                    "mDataProp": null,
-                    "sClass": "control center",
-                    "sDefaultContent": '<i class="fa fa-plus"></i>'
-                  },
-                  <DataTable.TableColumnConfig> { "mDataProp": "Identifier" },
-                  <DataTable.TableColumnConfig> { "mDataProp": "BundleIdentifier" },
-                  <DataTable.TableColumnConfig> { "mDataProp": "objectClass" }
-                ], {
-                  rowDetailTemplateId: 'osgiServiceTemplate',
-                  disableAddColumns: true
-                });
-            */
-            $scope.$watch('workspace.selection', function () {
-                var mbean = Osgi.getSelectionServiceMBean(workspace);
-                if (mbean) {
-                    var jolokia = workspace.jolokia;
-                    jolokia.request({
-                        type: 'exec',
-                        mbean: mbean,
-                        operation: 'listServices()'
-                    }, Core.onSuccess(populateTable));
+                {
+                    field: 'BundleIdentifier',
+                    displayName: 'Bundle',
+                    width: "***"
+                },
+                {
+                    field: 'objectClass',
+                    displayName: 'Object Class(es)',
+                    width: "***"
                 }
+            ]
+        };
+        /*
+            $scope.widget = new DataTable.TableWidget($scope, $templateCache, $compile, [
+              <DataTable.TableColumnConfig> {
+                "mDataProp": null,
+                "sClass": "control center",
+                "sDefaultContent": '<i class="fa fa-plus"></i>'
+              },
+              <DataTable.TableColumnConfig> { "mDataProp": "Identifier" },
+              <DataTable.TableColumnConfig> { "mDataProp": "BundleIdentifier" },
+              <DataTable.TableColumnConfig> { "mDataProp": "objectClass" }
+            ], {
+              rowDetailTemplateId: 'osgiServiceTemplate',
+              disableAddColumns: true
             });
-            var populateTable = function (response) {
-                var services = Osgi.defaultServiceValues(workspace, $scope, response.value);
-                augmentServicesInfo(services);
-            };
-            function augmentServicesInfo(services) {
-                var bundleMap = {};
-                var createBundleMap = function (response) {
-                    angular.forEach(response.value, function (value, key) {
-                        var obj = {
-                            Identifier: value.Identifier,
-                            Name: "",
-                            SymbolicName: value.SymbolicName,
-                            State: value.State,
-                            Version: value.Version,
-                            LastModified: value.LastModified,
-                            Location: value.Location
-                        };
-                        if (value.Headers['Bundle-Name']) {
-                            obj.Name = value.Headers['Bundle-Name']['Value'];
-                        }
-                        bundleMap[obj.Identifier] = obj;
-                    });
-                    angular.forEach(services, function (s, key) {
-                        angular.forEach(s["UsingBundles"], function (b, key) {
-                            s["UsingBundles"][key] = bundleMap[b];
-                        });
-                    });
-                    $scope.services = services;
-                    Core.$apply($scope);
-                };
-                workspace.jolokia.request({
+        */
+        $scope.$watch('workspace.selection', function () {
+            var mbean = Osgi.getSelectionServiceMBean(workspace);
+            if (mbean) {
+                var jolokia = workspace.jolokia;
+                jolokia.request({
                     type: 'exec',
-                    mbean: Osgi.getSelectionBundleMBean(workspace),
-                    operation: 'listBundles()'
-                }, {
-                    success: createBundleMap,
-                    error: createBundleMap
-                });
+                    mbean: mbean,
+                    operation: 'listServices()'
+                }, Core.onSuccess(populateTable));
             }
-        }]);
+        });
+        var populateTable = function (response) {
+            var services = Osgi.defaultServiceValues(workspace, $scope, response.value);
+            augmentServicesInfo(services);
+        };
+        function augmentServicesInfo(services) {
+            var bundleMap = {};
+            var createBundleMap = function (response) {
+                angular.forEach(response.value, function (value, key) {
+                    var obj = {
+                        Identifier: value.Identifier,
+                        Name: "",
+                        SymbolicName: value.SymbolicName,
+                        State: value.State,
+                        Version: value.Version,
+                        LastModified: value.LastModified,
+                        Location: value.Location
+                    };
+                    if (value.Headers['Bundle-Name']) {
+                        obj.Name = value.Headers['Bundle-Name']['Value'];
+                    }
+                    bundleMap[obj.Identifier] = obj;
+                });
+                angular.forEach(services, function (s, key) {
+                    angular.forEach(s["UsingBundles"], function (b, key) {
+                        s["UsingBundles"][key] = bundleMap[b];
+                    });
+                });
+                $scope.services = services;
+                Core.$apply($scope);
+            };
+            workspace.jolokia.request({
+                type: 'exec',
+                mbean: Osgi.getSelectionBundleMBean(workspace),
+                operation: 'listBundles()'
+            }, {
+                success: createBundleMap,
+                error: createBundleMap
+            });
+        }
+    }]);
 })(Osgi || (Osgi = {}));
 
 /// <reference path="../../includes.ts"/>
@@ -10825,118 +10836,114 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi._module.controller("Osgi.ServiceDependencyController", ["$scope", "$location", "$routeParams", "workspace", "osgiDataService", function ($scope, $location, $routeParams, workspace, osgiDataService) {
-            $scope.init = function () {
-                if ($routeParams["bundleFilter"]) {
-                    $scope.bundleFilter = $routeParams["bundleFilter"];
-                }
-                else {
-                    $scope.bundleFilter = "";
-                }
-                if ($routeParams["pkgFilter"]) {
-                    $scope.packageFilter = $routeParams["pkgFilter"];
-                }
-                else {
-                    $scope.packageFilter = "";
-                }
-                if ($routeParams["view"] == "packages") {
-                    $scope.selectView = "packages";
-                }
-                else {
-                    $scope.selectView = "services";
-                }
-                if ($routeParams['hideUnused']) {
-                    $scope.hideUnused = $routeParams['hideUnused'] == "true";
-                }
-                else {
-                    $scope.hideUnused = true;
-                }
-            };
-            $scope.updateLink = function () {
-                var search = $location.search();
-                if ($scope.bundleFilter && $scope.bundleFilter != "") {
-                    search["bundleFilter"] = $scope.bundleFilter;
-                }
-                else {
-                    delete search["bundleFilter"];
-                }
-                if ($scope.packageFilter && $scope.packageFilter != "") {
-                    search["pkgFilter"] = $scope.packageFilter;
-                }
-                else {
-                    delete search["pkgFilter"];
-                }
-                search["view"] = $scope.selectView;
-                if ($scope.hideUnused) {
-                    search["hideUnused"] = "true";
-                }
-                else {
-                    search["hideUnused"] = "false";
-                }
-                $location.search(search);
-            };
-            $scope.addToDashboardLink = function () {
-                var routeParams = angular.toJson($routeParams);
-                var href = "#/osgi/dependencies";
-                var title = "OSGi dependencies";
-                var size = angular.toJson({
-                    size_x: 2,
-                    size_y: 2
-                });
-                var addLink = "#/dashboard/add?tab=dashboard" +
-                    "&href=" + encodeURIComponent(href) +
-                    "&routeParams=" + encodeURIComponent(routeParams) +
-                    "&size=" + encodeURIComponent(size) +
-                    "&title=" + encodeURIComponent(title);
-                return addLink;
-            };
-            $scope.$on('$routeUpdate', function () {
-                var search = $location.search;
-                if (search["bundleFilter"]) {
-                    $scope.bundleFilter = $routeParams["bundleFilter"];
-                }
-                else {
-                    $scope.bundleFilter = "";
-                }
-                if (search["pkgFilter"]) {
-                    $scope.packageFilter = $routeParams["pkgFilter"];
-                }
-                else {
-                    $scope.packageFilter = "";
-                }
-                if (search["view"] == "packages") {
-                    $scope.selectView = "packages";
-                }
-                else {
-                    $scope.selectView = "services";
-                }
-                if (search['hideUnused']) {
-                    $scope.hideUnused = $routeParams['hideUnused'] == "true";
-                }
-                else {
-                    $scope.hideUnused = true;
-                }
-                $scope.updateLink();
-                $scope.updateGraph();
+        $scope.init = function () {
+            if ($routeParams["bundleFilter"]) {
+                $scope.bundleFilter = $routeParams["bundleFilter"];
+            }
+            else {
+                $scope.bundleFilter = "";
+            }
+            if ($routeParams["pkgFilter"]) {
+                $scope.packageFilter = $routeParams["pkgFilter"];
+            }
+            else {
+                $scope.packageFilter = "";
+            }
+            if ($routeParams["view"] == "packages") {
+                $scope.selectView = "packages";
+            }
+            else {
+                $scope.selectView = "services";
+            }
+            if ($routeParams['hideUnused']) {
+                $scope.hideUnused = $routeParams['hideUnused'] == "true";
+            }
+            else {
+                $scope.hideUnused = true;
+            }
+        };
+        $scope.updateLink = function () {
+            var search = $location.search();
+            if ($scope.bundleFilter && $scope.bundleFilter != "") {
+                search["bundleFilter"] = $scope.bundleFilter;
+            }
+            else {
+                delete search["bundleFilter"];
+            }
+            if ($scope.packageFilter && $scope.packageFilter != "") {
+                search["pkgFilter"] = $scope.packageFilter;
+            }
+            else {
+                delete search["pkgFilter"];
+            }
+            search["view"] = $scope.selectView;
+            if ($scope.hideUnused) {
+                search["hideUnused"] = "true";
+            }
+            else {
+                search["hideUnused"] = "false";
+            }
+            $location.search(search);
+        };
+        $scope.addToDashboardLink = function () {
+            var routeParams = angular.toJson($routeParams);
+            var href = "#/osgi/dependencies";
+            var title = "OSGi dependencies";
+            var size = angular.toJson({
+                size_x: 2,
+                size_y: 2
             });
-            $scope.updateGraph = function () {
-                $scope.updateLink();
-                $scope.updatePkgFilter();
-                var graphBuilder = new Osgi.OsgiGraphBuilder(osgiDataService, $scope.bundleFilter, $scope.packageFilter, $scope.selectView == "services", $scope.selectView == "packages", $scope.hideUnused);
-                $scope.graph = graphBuilder.buildGraph();
-                Core.$apply($scope);
-            };
-            $scope.updatePkgFilter = function () {
-                if ($scope.packageFilter == null || $scope.packageFilter == "") {
-                    $scope.selectView = "services";
-                    $scope.disablePkg = true;
-                }
-                else {
-                    $scope.disablePkg = false;
-                }
-            };
-            $scope.init();
+            var addLink = "#/dashboard/add?tab=dashboard" + "&href=" + encodeURIComponent(href) + "&routeParams=" + encodeURIComponent(routeParams) + "&size=" + encodeURIComponent(size) + "&title=" + encodeURIComponent(title);
+            return addLink;
+        };
+        $scope.$on('$routeUpdate', function () {
+            var search = $location.search;
+            if (search["bundleFilter"]) {
+                $scope.bundleFilter = $routeParams["bundleFilter"];
+            }
+            else {
+                $scope.bundleFilter = "";
+            }
+            if (search["pkgFilter"]) {
+                $scope.packageFilter = $routeParams["pkgFilter"];
+            }
+            else {
+                $scope.packageFilter = "";
+            }
+            if (search["view"] == "packages") {
+                $scope.selectView = "packages";
+            }
+            else {
+                $scope.selectView = "services";
+            }
+            if (search['hideUnused']) {
+                $scope.hideUnused = $routeParams['hideUnused'] == "true";
+            }
+            else {
+                $scope.hideUnused = true;
+            }
+            $scope.updateLink();
             $scope.updateGraph();
-        }]);
+        });
+        $scope.updateGraph = function () {
+            $scope.updateLink();
+            $scope.updatePkgFilter();
+            var graphBuilder = new Osgi.OsgiGraphBuilder(osgiDataService, $scope.bundleFilter, $scope.packageFilter, $scope.selectView == "services", $scope.selectView == "packages", $scope.hideUnused);
+            $scope.graph = graphBuilder.buildGraph();
+            Core.$apply($scope);
+        };
+        $scope.updatePkgFilter = function () {
+            if ($scope.packageFilter == null || $scope.packageFilter == "") {
+                $scope.selectView = "services";
+                $scope.disablePkg = true;
+            }
+            else {
+                $scope.disablePkg = false;
+            }
+        };
+        $scope.init();
+        $scope.updateGraph();
+    }]);
 })(Osgi || (Osgi = {}));
 
 angular.module("hawtio-integration-templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("plugins/activemq/html/browseQueue.html","<div ng-controller=\"ActiveMQ.BrowseQueueController\">\n  <div class=\"row\">\n    <div class=\"col-md-6\">\n      <input class=\"search-query col-md-12\" type=\"text\" ng-model=\"gridOptions.filterOptions.filterText\"\n             placeholder=\"Filter messages\">\n    </div>\n    <div class=\"col-md-6\">\n      <div class=\"pull-right\">\n        <form class=\"form-inline\">\n          <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\" ng-show=\"dlq\" ng-click=\"retryMessages()\"\n                  title=\"Moves the dead letter queue message back to its original destination so it can be retried\" data-placement=\"bottom\">\n            <i class=\"fa fa-reply\"></i> Retry\n          </button>\n          <button class=\"btn\" ng-disabled=\"gridOptions.selectedItems.length !== 1\" ng-click=\"resendMessage()\"\n                    title=\"Edit the message to resend it\" data-placement=\"bottom\">\n           <i class=\"fa fa-share-alt\"></i> Resend\n          </button>\n\n          <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\" ng-click=\"moveMessages()\"\n                  title=\"Move the selected messages to another destination\" data-placement=\"bottom\">\n            <i class=\"fa fa-share-alt\"></i> Move\n          </button>\n          <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\"\n                  ng-click=\"deleteMessages()\"\n                  title=\"Delete the selected messages\">\n            <i class=\"fa fa-remove\"></i> Delete\n          </button>\n          <button class=\"btn\" ng-click=\"refresh()\"\n                  title=\"Refreshes the list of messages\">\n            <i class=\"fa fa-refresh\"></i>\n          </button>\n        </form>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <table class=\"table table-striped\" hawtio-simple-table=\"gridOptions\"></table>\n  </div>\n\n  <div hawtio-slideout=\"showMessageDetails\" title=\"{{row.JMSMessageID}}\">\n    <div class=\"dialog-body\">\n\n      <div class=\"row\">\n        <div class=\"pull-right\">\n          <form class=\"form-horizontal no-bottom-margin\">\n\n            <div class=\"btn-group\"\n                 hawtio-pager=\"messages\"\n                 on-index-change=\"selectRowIndex\"\n                 row-index=\"rowIndex\"></div>\n\n            <button class=\"btn\" ng-disabled=\"!gridOptions.selectedItems.length\" ng-click=\"moveMessages()\"\n                    title=\"Move the selected messages to another destination\" data-placement=\"bottom\">\n              <i class=\"fa fa-share-alt\"></i> Move\n            </button>\n\n            <button class=\"btn btn-danger\" ng-disabled=\"!gridOptions.selectedItems.length\"\n                    ng-click=\"deleteMessages()\"\n                    title=\"Delete the selected messages\">\n              <i class=\"fa fa-remove\"></i> Delete\n            </button>\n\n            <!-- no need for close button as the hawtio-slideout already have that -->\n\n          </form>\n        </div>\n      </div>\n\n      <div class=\"row\">\n        <div class=\"expandable closed\">\n          <div title=\"Headers\" class=\"title\">\n            <i class=\"expandable-indicator\"></i> Headers & Properties\n          </div>\n          <div class=\"expandable-body well\">\n            <table class=\"table table-condensed table-striped\">\n              <thead>\n              <tr>\n                <th>Header</th>\n                <th>Value</th>\n              </tr>\n              </thead>\n              <tbody compile=\"row.headerHtml\"></tbody>\n            </table>\n          </div>\n        </div>\n      </div>\n\n      <div class=\"row\">\n        <div>Displaying body as <span ng-bind=\"row.textMode\"></span></div>\n        <div hawtio-editor=\"row.bodyText\" read-only=\"true\" mode=\'mode\'></div>\n      </div>\n\n    </div>\n  </div>\n\n  <script type=\"text/ng-template\" id=\"activemqMoveMessageDialog.html\">\n    <div class=\"modal-header\">\n      <span>Move messages?</span>\n    </div>\n    <div class=\"modal-body\">\n      <p>Move\n        <ng-pluralize count=\"gridOptions.selectedItems.length\"\n                      when=\"{\'1\': \'message\', \'other\': \'{} messages\'}\"></ng-pluralize>\n        to: <input type=\"text\" ng-model=\"queueName\" placeholder=\"Queue name\"\n                   typeahead=\"title.unescapeHTML() for title in queueNames($viewValue) | filter:$viewValue\" typeahead-editable=\'true\'></p>\n      <p>\n        You cannot undo this operation.<br>\n        Though after the move you can always move the\n        <ng-pluralize count=\"gridOptions.selectedItems.length\"\n                      when=\"{\'1\': \'message\', \'other\': \'messages\'}\"></ng-pluralize>\n        back again.\n      </p>\n    </div>\n    <div class=\"modal-footer\">\n      <button class=\"btn btn-info\" \n              ng-click=\"close(true)\">Move</button>\n      <button class=\"btn\" \n              ng-click=\"close(false)\">Cancel</button>\n    </div>\n  </script>\n\n</div>\n\n");
@@ -10965,6 +10972,7 @@ $templateCache.put("plugins/camel/html/preferences.html","<div ng-controller=\"C
 $templateCache.put("plugins/camel/html/profileRoute.html","<div class=\"row\" ng-controller=\"Camel.ProfileRouteController\">\n\n    <div ng-show=\"initDone\">\n\n        <div class=\"row-fluid\">\n            <div class=\"pull-right\">\n                <hawtio-filter ng-model=\"gridOptions.filterOptions.filterText\"\n                               placeholder=\"Filter...\"></hawtio-filter>\n            </div>\n        </div>\n\n        <div class=\"row-fluid\">\n            <table class=\"table table-condensed table-striped\" hawtio-simple-table=\"gridOptions\"></table>\n        </div>\n\n    </div>\n\n    <div ng-hide=\"initDone\">\n        <p class=\"text-center\"><i class=\"fa fa-spinner fa-spin\"></i></p>\n    </div>\n\n</div>\n\n");
 $templateCache.put("plugins/camel/html/properties.html","<div ng-controller=\"Camel.PropertiesController\">\n\n  <div class=\"control-group inline-block\">\n    <form class=\"form-inline no-bottom-margin\">\n      <label>Hide Documentation:\n        <input type=\"checkbox\" ng-model=\"hideHelp\"\n               title=\"Hide documentation for the options\"/>\n      </label>\n      <label>Hide Default:\n        <input type=\"checkbox\" ng-model=\"hideDefault\"\n               title=\"Hide options with default values\"/>\n      </label>\n      <label>Hide Unused:\n        <input type=\"checkbox\" ng-model=\"hideUnused\"\n               title=\"Hide options with unused/empty values\"/>\n      </label>\n    </form>\n  </div>\n\n  <div ng-include=\"viewTemplate\"></div>\n</div>\n");
 $templateCache.put("plugins/camel/html/propertiesComponent.html","<div ng-controller=\"Camel.PropertiesComponentController\">\n\n  <div class=\"control-group inline-block\">\n    <form class=\"form-inline no-bottom-margin\">\n      <label>Hide Documentation:\n        <input type=\"checkbox\" ng-model=\"hideHelp\"\n               title=\"Hide documentation for the options\"/>\n      </label>\n      <label>Hide Default:\n        <input type=\"checkbox\" ng-model=\"hideDefault\"\n               title=\"Hide options with default values\"/>\n      </label>\n      <label>Hide Unused:\n        <input type=\"checkbox\" ng-model=\"hideUnused\"\n               title=\"Hide options with unused/empty values\"/>\n      </label>\n    </form>\n  </div>\n\n  <div ng-include=\"viewTemplate\"></div>\n</div>\n");
+$templateCache.put("plugins/camel/html/propertiesDataFormat.html","<div ng-controller=\"Camel.PropertiesDataFormatController\">\n\n  <div class=\"control-group inline-block\">\n    <form class=\"form-inline no-bottom-margin\">\n      <label>Hide Documentation:\n        <input type=\"checkbox\" ng-model=\"hideHelp\"\n               title=\"Hide documentation for the options\"/>\n      </label>\n      <label>Hide Default:\n        <input type=\"checkbox\" ng-model=\"hideDefault\"\n               title=\"Hide options with default values\"/>\n      </label>\n      <label>Hide Unused:\n        <input type=\"checkbox\" ng-model=\"hideUnused\"\n               title=\"Hide options with unused/empty values\"/>\n      </label>\n    </form>\n  </div>\n\n  <div ng-include=\"viewTemplate\"></div>\n</div>\n");
 $templateCache.put("plugins/camel/html/propertiesEndpoint.html","<div ng-controller=\"Camel.PropertiesEndpointController\">\n\n  <div class=\"control-group inline-block\">\n    <form class=\"form-inline no-bottom-margin\">\n      <label>Hide Documentation:\n        <input type=\"checkbox\" ng-model=\"hideHelp\"\n               title=\"Hide documentation for the options\"/>\n      </label>\n      <label>Hide Default:\n        <input type=\"checkbox\" ng-model=\"hideDefault\"\n               title=\"Hide options with default values\"/>\n      </label>\n      <label>Hide Unused:\n        <input type=\"checkbox\" ng-model=\"hideUnused\"\n               title=\"Hide options with unused/empty values\"/>\n      </label>\n    </form>\n  </div>\n\n  <div ng-include=\"viewTemplate\"></div>\n</div>\n");
 $templateCache.put("plugins/camel/html/restRegistry.html","<div class=\"row\" ng-controller=\"Camel.RestServiceController\">\n\n  <div ng-show=\"selectedMBean\">\n\n    <div class=\"row\" ng-show=\"data.length > 0\">\n      <div class=\"pull-right\">\n        <form class=\"form-inline no-bottom-margin\">\n          <fieldset>\n            <div class=\"control-group inline-block\">\n              <input type=\"text\" class=\"search-query\" placeholder=\"Filter...\"\n                     ng-model=\"gridOptions.filterOptions.filterText\">\n            </div>\n          </fieldset>\n        </form>\n      </div>\n    </div>\n\n    <div class=\"row\" ng-show=\"data.length > 0\">\n      <table class=\"table table-condensed table-striped\" hawtio-simple-table=\"gridOptions\"></table>\n    </div>\n    <div class=\"row well\" ng-show=\"data.length == 0\">\n      <form>\n        <p>There are no Rest Services registered in this CamelContext.</p>\n      </form>\n    </div>\n  </div>\n\n  <div ng-hide=\"selectedMBean\">\n    <p class=\"text-center\"><i class=\"fa fa-spinner fa-spin\"></i></p>\n  </div>\n\n</div>\n\n");
 $templateCache.put("plugins/camel/html/routeMetrics.html","<div class=\"row\" ng-controller=\"Camel.RouteMetricsController\">\n\n  <div class=\"row\">\n    <div class=\"pull-right\">\n      <form class=\"form-inline no-bottom-margin\">\n        <fieldset>\n          <div class=\"control-group inline-block\">\n            <input type=\"text\" class=\"search-query\" placeholder=\"Filter...\" ng-model=\"filterText\">\n          </div>\n        </fieldset>\n      </form>\n    </div>\n  </div>\n\n  <div class=\"row\" ng-show=\"!initDone\">\n    <p class=\"text-center\"><i class=\"fa fa-spinner fa-spin\"></i></p>\n  </div>\n\n  <div class=\"col-md-8 centered well\" ng-show=\"initDone && metricDivs.length === 0\">\n    <form>\n      This Camel context has no route metrics data.\n    </form>\n  </div>\n\n  <!-- div to contain the graphs -->\n  <div class=\"metricsWatcher container mainContent\">\n    <div id=\"{{metric.id}}\" class=\"row\" ng-repeat=\"metric in metricDivs track by $index\" style=\"{{filterByRoute(metric)}}\"></div>\n  </div>\n\n</div>\n\n");

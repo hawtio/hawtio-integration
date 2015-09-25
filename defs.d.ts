@@ -23,6 +23,7 @@
 /// <reference path="d.ts/camel/ts/profile.d.ts"/>
 /// <reference path="d.ts/camel/ts/properties.d.ts"/>
 /// <reference path="d.ts/camel/ts/propertiesComponent.d.ts"/>
+/// <reference path="d.ts/camel/ts/propertiesDataFormat.d.ts"/>
 /// <reference path="d.ts/camel/ts/propertiesEndpoint.d.ts"/>
 /// <reference path="d.ts/camel/ts/restRegistry.d.ts"/>
 /// <reference path="d.ts/camel/ts/routeMetrics.d.ts"/>
