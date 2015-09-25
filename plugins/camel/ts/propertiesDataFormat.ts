@@ -90,27 +90,18 @@ module Camel {
     }
 
     function updateData() {
-      var contextMBean = getSelectionCamelContextMBean(workspace);
-
-      var componentMBeanName:string = null;
-      if (!componentMBeanName) {
-        componentMBeanName = workspace.getSelectedMBeanName();
+      var dataFormatMBeanName:string = null;
+      if (!dataFormatMBeanName) {
+        dataFormatMBeanName = workspace.getSelectedMBeanName();
       }
-      if (componentMBeanName && contextMBean) {
-        // TODO: grab name from tree instead? avoids a JMX call
-        var reply = jolokia.request({type: "read", mbean: componentMBeanName, attribute: ["DataFormatName"]});
-        var name:string = reply.value["DataFormatName"];
-        if (name) {
-          $scope.dataFormatName = name;
-          log.info("Calling explainDataFormatJson for name: " + name);
-          var query = {
-            type: 'exec',
-            mbean: contextMBean,
-            operation: 'explainDataFormatJson(java.lang.String,boolean)',
-            arguments: [name, true]
-          };
-          jolokia.request(query, Core.onSuccess(populateData));
-        }
+      if (dataFormatMBeanName) {
+        log.info("Calling informationJson");
+        var query = {
+          type: 'exec',
+          mbean: dataFormatMBeanName,
+          operation: 'informationJson'
+        };
+        jolokia.request(query, Core.onSuccess(populateData));
       }
     }
 
@@ -122,7 +113,8 @@ module Camel {
         // the model is json object from the string data
         $scope.model = JSON.parse(data);
         // set title and description
-        $scope.model.title = $scope.dataFormatName;
+        $scope.model.title = $scope.model.dataformat.title;
+        $scope.model.description = $scope.model.dataformat.description;
         // TODO: look for specific component icon,
         $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/marshal24.png");
 
@@ -132,7 +124,8 @@ module Camel {
         angular.forEach($scope.model.properties, function (property, key) {
           // does it have a value or fallback to use a default value
           var value = property["value"] || property["defaultValue"];
-          if (angular.isDefined(value) && value !== null) {
+          // skip id, as it causes the page to indicate a required field
+          if (key !== "id" && angular.isDefined(value) && value !== null) {
             $scope.nodeData[key] = value;
           }
 
@@ -142,8 +135,8 @@ module Camel {
         });
 
         var labels = [];
-        if ($scope.model.label) {
-          labels = $scope.model.label.split(",");
+        if ($scope.model.dataformat.label) {
+          labels = $scope.model.dataformat.label.split(",");
         }
         $scope.labels = labels;
 

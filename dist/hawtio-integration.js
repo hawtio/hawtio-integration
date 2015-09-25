@@ -5814,26 +5814,18 @@ var Camel;
             return true;
         }
         function updateData() {
-            var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
-            var componentMBeanName = null;
-            if (!componentMBeanName) {
-                componentMBeanName = workspace.getSelectedMBeanName();
+            var dataFormatMBeanName = null;
+            if (!dataFormatMBeanName) {
+                dataFormatMBeanName = workspace.getSelectedMBeanName();
             }
-            if (componentMBeanName && contextMBean) {
-                // TODO: grab name from tree instead? avoids a JMX call
-                var reply = jolokia.request({ type: "read", mbean: componentMBeanName, attribute: ["DataFormatName"] });
-                var name = reply.value["DataFormatName"];
-                if (name) {
-                    $scope.dataFormatName = name;
-                    log.info("Calling explainDataFormatJson for name: " + name);
-                    var query = {
-                        type: 'exec',
-                        mbean: contextMBean,
-                        operation: 'explainDataFormatJson(java.lang.String,boolean)',
-                        arguments: [name, true]
-                    };
-                    jolokia.request(query, Core.onSuccess(populateData));
-                }
+            if (dataFormatMBeanName) {
+                log.info("Calling informationJson");
+                var query = {
+                    type: 'exec',
+                    mbean: dataFormatMBeanName,
+                    operation: 'informationJson'
+                };
+                jolokia.request(query, Core.onSuccess(populateData));
             }
         }
         function populateData(response) {
@@ -5843,7 +5835,8 @@ var Camel;
                 // the model is json object from the string data
                 $scope.model = JSON.parse(data);
                 // set title and description
-                $scope.model.title = $scope.dataFormatName;
+                $scope.model.title = $scope.model.dataformat.title;
+                $scope.model.description = $scope.model.dataformat.description;
                 // TODO: look for specific component icon,
                 $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/marshal24.png");
                 // grab all values form the model as they are the current data we need to add to node data (not all properties has a value)
@@ -5851,7 +5844,8 @@ var Camel;
                 angular.forEach($scope.model.properties, function (property, key) {
                     // does it have a value or fallback to use a default value
                     var value = property["value"] || property["defaultValue"];
-                    if (angular.isDefined(value) && value !== null) {
+                    // skip id, as it causes the page to indicate a required field
+                    if (key !== "id" && angular.isDefined(value) && value !== null) {
                         $scope.nodeData[key] = value;
                     }
                     // remove label as that causes the UI to render the label instead of the key as title
@@ -5859,8 +5853,8 @@ var Camel;
                     delete property["label"];
                 });
                 var labels = [];
-                if ($scope.model.label) {
-                    labels = $scope.model.label.split(",");
+                if ($scope.model.dataformat.label) {
+                    labels = $scope.model.dataformat.label.split(",");
                 }
                 $scope.labels = labels;
                 $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
