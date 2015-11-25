@@ -5,8 +5,8 @@
     "hawtio"
   ],
   "main": [
+    "dist/hawtio-integration.css",
     "dist/metrics-watcher.js",
-    "dist/metrics-watcher-style.css",
     "dist/camelModel.js",
     "dist/hawtio-integration.js"
   ],
