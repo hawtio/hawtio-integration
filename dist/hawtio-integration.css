@@ -1,0 +1,314 @@
+.metricsWatcher .heading1 {
+  font-size: 24px;
+  line-height: 30px;
+  margin: 0;
+}
+.metricsWatcher .heading3 {
+  font-size: 18px;
+  line-height: 27px;
+  margin: 0;
+}
+.metricsWatcher .heading4 {
+  font-size: 14px;
+  line-height: 18px;
+  margin: 0;
+}
+.metricsWatcher .heading5 {
+  font-size: 18px;
+  line-height: 18px;
+  margin: 0;
+}
+.metricsWatcher p {
+  font-size: 13px;
+  line-height: 18px;
+}
+.metricsWatcher fieldset legend {
+  margin-bottom: 5px;
+  border-bottom: none;
+  color: inherit;
+}
+.metricsWatcher .activeRequestsGraph {
+  vertical-align: top;
+}
+.metricsWatcher .activeRequestsGraph .counter .histogram {
+  width: 95%;
+}
+.metricsWatcher .nested {
+  margin: 0 10px 10px 0;
+}
+.metricsWatcher .nested h1 {
+  font-size: 24px;
+}
+.metricsWatcher .progressLabel {
+  text-align: right;
+  color: #666;
+}
+.metricsWatcher.histogram .histogramContainer td,
+.metricsWatcher.timer .timerContainer td,
+.metricsWatcher .progressLabel,
+.metricsWatcher .progressValue {
+  vertical-align: top;
+  padding: 0 5px;
+}
+.metricsWatcher .progressValue {
+  font-size: 13px;
+  line-height: 18px;
+  color: #666;
+}
+.metricsWatcher .progress {
+  height: 18px;
+  margin-bottom: 17px;
+}
+.metricsWatcher.timer table,
+.metricsWatcher.histogram table,
+.metricsWatcher.web table,
+.metricsWatcher.log4j table,
+.metricsWatcher.cache table,
+.metricsWatcher.jvm table,
+.metricsWatcher .progressBar,
+.metricsWatcher .progressBar,
+.metricsWatcher .progressTable {
+  width: 100%;
+  font-size: 13px;
+}
+.metricsWatcher.histogram .histogramContainer,
+.metricsWatcher.jvm .jvmContainer,
+.metricsWatcher.web .webContainer,
+.metricsWatcher.log4j .log4jContainer,
+.metricsWatcher.cache .cacheContainer,
+.metricsWatcher.timer .timerContainer,
+.metricsWatcher.cache .gaugeTableContainer {
+  border-style: none;
+  border-width: 1px;
+  padding: 10px 0;
+  margin-left: 0;
+  padding: 10px;
+}
+.metricsWatcher.cache table.gaugeTable td h5,
+.metricsWatcher.jvm table.jvmTable td h5 {
+  font-size: 15px;
+  font-weight: normal;
+  text-align: left;
+}
+.metricsWatcher table.gaugeTable td,
+.metricsWatcher table.jvmTable td {
+  font-size: 14px;
+  text-align: right;
+}
+caption {
+  font-weight: bold;
+}
+/**
+ * Find a nice style for progress bar
+ */
+.metricsWatcher .progress > .progress-bar {
+  display: block;
+  height: 100%;
+  -webkit-border-top-right-radius: 8px;
+  -webkit-border-bottom-right-radius: 8px;
+  -moz-border-radius-topright: 8px;
+  -moz-border-radius-bottomright: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  -webkit-border-top-left-radius: 20px;
+  -webkit-border-bottom-left-radius: 20px;
+  -moz-border-radius-topleft: 20px;
+  -moz-border-radius-bottomleft: 20px;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  background-color: #2b5eb7;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #2b5eb7), color-stop(1, #548cb8));
+  background-image: -webkit-linear-gradient(center bottom, #2b5eb7 37%, #548cb8 69%);
+  background-image: -moz-linear-gradient(center bottom, #2b5eb7 37%, #548cb8 69%);
+  background-image: -ms-linear-gradient(center bottom, #2b5eb7 37%, #548cb8 69%);
+  background-image: -o-linear-gradient(center bottom, #2b5eb7 37%, #548cb8 69%);
+  -webkit-box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3), inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3), inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.camel.tree-header {
+  height: 42px;
+}
+.camel.tree-header > .left {
+  right: 94px;
+}
+.camel.tree-header > .left,
+.camel.tree-header > .right {
+  top: 6px;
+  line-height: 30px;
+}
+.camel.tree-header > .left > .section-filter {
+  width: 100%;
+}
+.camel.tree-header > .left > .section-filter > .search-query {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.camel.tree-header > .left > .section-filter > .icon-remove {
+  right: -16px;
+}
+.camel-tree > ul.nav {
+  margin-bottom: 3px !important;
+}
+.camel-tree > .section-filter {
+  margin: 0 0 8px;
+  display: block;
+}
+
+/* osgi page stuff */
+.ACTIVE:before {
+  font-family: FontAwesome;
+  content: "\f087";
+  font-style: normal;
+  color: #777777;
+}
+.RESOLVED:before {
+  font-family: FontAwesome;
+  content: "\f0ad";
+  font-style: normal;
+}
+.STARTING:before {
+  font-family: FontAwesome;
+  content: "\f021";
+  font-style: normal;
+}
+.STARTING {
+  -moz-animation: spin 2s infinite linear;
+  -o-animation: spin 2s infinite linear;
+  -webkit-animation: spin 2s infinite linear;
+  animation: spin 2s infinite linear;
+}
+.STOPPING:before {
+  font-family: FontAwesome;
+  content: "\f021";
+  font-style: normal;
+}
+.STOPPING {
+  -moz-animation: spin 2s infinite linear;
+  -o-animation: spin 2s infinite linear;
+  -webkit-animation: spin 2s infinite linear;
+  animation: spin 2s infinite linear;
+}
+.UNINSTALLED:before {
+  font-family: FontAwesome;
+  content: "\f014";
+  font-style: normal;
+}
+.INSTALLED:before {
+  font-family: FontAwesome;
+  content: "\f06b";
+  font-style: normal;
+}
+/* end osgi page stuff */
+/* more osgi stuff */
+.bundle-list {
+  width: 100%;
+}
+.bundle-item {
+  position: relative;
+  display: inline-block;
+  width: 300px;
+  margin-bottom: 1px;
+}
+.bundle-item-details table {
+  min-height: 0;
+}
+.bundle-item-details {
+  height: 0;
+  display: inline-block;
+  z-index: 15;
+}
+.bundle-item > a {
+  display: block;
+  z-index: 5;
+}
+.bundle-item > a:hover {
+  text-decoration: none;
+}
+.bundle-item a span {
+  display: block;
+  padding: 8px;
+  font-weight: normal;
+  z-index: 6;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.bundle-item a span.badge {
+  margin-left: 7px;
+}
+.bundle-item a span.badge::before {
+  padding: 0px;
+  float: left;
+  position: relative;
+  top: 4px;
+  left: -8px;
+  display: block;
+  content: ' ';
+  height: 6px;
+  width: 6px;
+  z-index: 10;
+}
+.bundle-item a.toggle-action {
+  position: absolute;
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  right: 12px;
+  top: 6px;
+  opacity: 0.2;
+  transition: all 500ms ease-in-out;
+  font-size: 18px;
+}
+.bundle-item a.toggle-action .icon-power-off {
+  color: orange;
+}
+.bundle-item a.toggle-action .icon-play-circle {
+  color: green;
+}
+.bundle-item a.toggle-action:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+.bundle-list {
+  margin-bottom: 2em;
+}
+/* end more osgi stuff */
+/* osgi page stuff */
+.repository-browser-toolbar > .btn {
+  margin-bottom: 10px;
+}
+.bundle-list-toolbar {
+  vertical-align: top;
+}
+.bundle-list-toolbar > .pull-left > *,
+.bundle-list-toolbar > .pull-right > * {
+  display: inline-block;
+}
+.bundle-list-toolbar > div > input,
+.bundle-list-toolbar > div > div > input {
+  margin-bottom: 10px;
+}
+.bundle-list-toolbar > div > label,
+.bundle-list-toolbar > div > strong {
+  position: relative;
+  top: -3px;
+}
+.bundle-list-toolbar > div > .input-append {
+  position: relative;
+  left: 3px;
+  top: -9px;
+}
+/* osgi page stuff */
+.config-admin-form .form-horizontal .control-label {
+  width: 260px;
+}
+.config-admin-form .form-horizontal .controls {
+  margin-left: 280px;
+}
+.new-config-name-form {
+  margin-top: 30px;
+}
