@@ -383,6 +383,7 @@ var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ.BrowseQueueController = ActiveMQ._module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$dialog", "$templateCache", function ($scope, workspace, jolokia, localStorage, location, activeMQMessage, $timeout, $dialog, $templateCache) {
             $scope.searchText = '';
+            $scope.workspace = workspace;
             $scope.allMessages = [];
             $scope.messages = [];
             $scope.headers = {};
