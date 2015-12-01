@@ -1,97 +1,91 @@
 <div ng-controller="ActiveMQ.BrowseQueueController">
-  <div class="row">
-    <div class="col-md-6">
-      <input class="search-query col-md-12" type="text" ng-model="gridOptions.filterOptions.filterText"
-             placeholder="Filter messages">
-    </div>
-    <div class="col-md-6">
-      <div class="pull-right">
-        <form class="form-inline">
-          <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-show="dlq" ng-click="retryMessages()"
-                  title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">
-            <i class="fa fa-reply"></i> Retry
-          </button>
-          <button class="btn" ng-disabled="gridOptions.selectedItems.length !== 1" ng-click="resendMessage()"
-                    title="Edit the message to resend it" data-placement="bottom">
-           <i class="fa fa-share-alt"></i> Resend
-          </button>
-
-          <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
-                  title="Move the selected messages to another destination" data-placement="bottom">
-            <i class="fa fa-share-alt"></i> Move
-          </button>
-          <button class="btn" ng-disabled="!gridOptions.selectedItems.length"
-                  ng-click="deleteMessages()"
-                  title="Delete the selected messages">
-            <i class="fa fa-remove"></i> Delete
-          </button>
-          <button class="btn" ng-click="refresh()"
-                  title="Refreshes the list of messages">
-            <i class="fa fa-refresh"></i>
-          </button>
-        </form>
+  <div ng-hide="showMessageDetails"> 
+    <div class="row">
+      <div class="col-md-6">
+        <input class="search-query col-md-12" type="text" ng-model="gridOptions.filterOptions.filterText"
+               placeholder="Filter messages">
       </div>
-    </div>
-  </div>
+      <div class="col-md-6 align-right">
+        <div class="search-query">
+        <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-show="dlq" ng-click="retryMessages()"
+          title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">
+          <i class="fa fa-reply"></i> Retry
+        </button>
+        <button class="btn" ng-disabled="gridOptions.selectedItems.length !== 1" ng-click="resendMessage()"
+          title="Edit the message to resend it" data-placement="bottom">
+          <i class="fa fa-share-alt"></i> Resend
+        </button>
 
-  <div class="row">
-    <table class="table table-striped" hawtio-simple-table="gridOptions"></table>
-  </div>
-
-  <div hawtio-slideout="showMessageDetails" title="{{row.JMSMessageID}}">
-    <div class="dialog-body">
-
-      <div class="row">
-        <div class="pull-right">
-          <form class="form-horizontal no-bottom-margin">
-
-            <div class="btn-group"
-                 hawtio-pager="messages"
-                 on-index-change="selectRowIndex"
-                 row-index="rowIndex"></div>
-
-            <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
-                    title="Move the selected messages to another destination" data-placement="bottom">
-              <i class="fa fa-share-alt"></i> Move
-            </button>
-
-            <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length"
-                    ng-click="deleteMessages()"
-                    title="Delete the selected messages">
-              <i class="fa fa-remove"></i> Delete
-            </button>
-
-            <!-- no need for close button as the hawtio-slideout already have that -->
-
-          </form>
+        <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
+          title="Move the selected messages to another destination" data-placement="bottom">
+          <i class="fa fa-share-alt"></i> Move
+        </button>
+        <button class="btn" ng-disabled="!gridOptions.selectedItems.length"
+          ng-click="deleteMessages()"
+          title="Delete the selected messages">
+          <i class="fa fa-remove"></i> Delete
+        </button>
+        <button class="btn" ng-click="refresh()"
+          title="Refreshes the list of messages">
+          <i class="fa fa-refresh"></i>
+        </button>
         </div>
       </div>
+    </div>
 
-      <div class="row">
-        <div class="expandable closed">
-          <div title="Headers" class="title">
-            <i class="expandable-indicator"></i> Headers & Properties
-          </div>
-          <div class="expandable-body well">
-            <table class="table table-condensed table-striped">
-              <thead>
+    <div class="row">
+      <table class="table table-striped" hawtio-simple-table="gridOptions"></table>
+    </div>
+  </div>
+
+  <div ng-show="showMessageDetails">
+    <div class="row">
+      <div class="col-md-4">
+          <button class="btn btn-primary" ng-click="showMessageDetails = false"><i class="fa fa-arrow-left"></i> Back</button>
+      </div>
+      <div class="col-md-4 align-center">
+          <div hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>
+      </div>
+      <div class="col-md-4 align-right">
+
+          <button class="btn" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
+            title="Move the selected messages to another destination" data-placement="bottom">
+            <i class="fa fa-share-alt"></i> Move
+          </button>
+
+          <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length"
+            ng-click="deleteMessages()"
+            title="Delete the selected messages">
+            <i class="fa fa-remove"></i> Delete
+          </button>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="expandable closed">
+        <div title="Headers" class="title">
+          <i class="expandable-indicator"></i> Headers & Properties
+        </div>
+        <div class="expandable-body well">
+          <table class="table table-condensed table-striped">
+            <thead>
               <tr>
                 <th>Header</th>
                 <th>Value</th>
               </tr>
-              </thead>
-              <tbody compile="row.headerHtml"></tbody>
-            </table>
-          </div>
+            </thead>
+            <tbody compile="row.headerHtml"></tbody>
+          </table>
         </div>
       </div>
-
-      <div class="row">
-        <div>Displaying body as <span ng-bind="row.textMode"></span></div>
-        <div hawtio-editor="row.bodyText" read-only="true" mode='mode'></div>
-      </div>
-
     </div>
+
+    <div class="row">
+      <div>Displaying body as <span ng-bind="row.textMode"></span></div>
+      <div hawtio-editor="row.bodyText" read-only="true" mode='mode'></div>
+    </div>
+
   </div>
 
   <script type="text/ng-template" id="activemqMoveMessageDialog.html">
