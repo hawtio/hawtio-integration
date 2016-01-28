@@ -24,6 +24,7 @@
     "wiredep": "^2.2.2"
   },
   "dependencies": {
-    "hawtio-node-backend": "^2.0.5"
+    "hawtio-node-backend": "^2.0.5",
+    "yargs": "^3.32.0"
   }
 }
