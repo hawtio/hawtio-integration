@@ -36,16 +36,24 @@ module Camel {
    * @param jolokia
    * @returns {boolean}
    */
+  var _hasRestServices:boolean = null;
   export function hasRestServices(workspace:Workspace, jolokia):boolean {
+    if (_hasRestServices !== null) {
+      return _hasRestServices;
+    } 
     var mbean = getSelectionCamelRestRegistry(workspace);
-
     if (mbean) {
-      var reply = jolokia.request({ type: "read", mbean: mbean, attribute: ["NumberOfRestServices"] });
-      var num:number = reply.value["NumberOfRestServices"];
-      return num > 0;
-    } else {
-      return false;
+      // TODO replace blocking call with kludgy workaround for now
+      jolokia.request({ 
+        type: "read", 
+        mbean: mbean, 
+        attribute: ["NumberOfRestServices"] 
+      }, Core.onSuccess((response) => {
+        var num:number = response.value;
+        _hasRestServices = num > 0;
+      }));
     }
+    return true;
   }
 
   /**
@@ -1054,20 +1062,7 @@ module Camel {
           var result = tree.navigate(domain, contextId, "context");
           if (result && result.children) {
             var contextBean:any = result.children.first();
-            if (contextBean.version) {
-              // read the cached version
-              return contextBean.version;
-            }
-            if (contextBean.title) {
-              // okay no version cached, so need to get the version using jolokia
-              var contextName = contextBean.title;
-              var mbean = "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
-              // must use Core.onSuccess(null) that means sync as we need the version asap
-              var version = jolokia.getAttribute(mbean, "CamelVersion", Core.onSuccess(null));
-              // cache version so we do not need to read it again using jolokia
-              contextBean.version = version;
-              return version;
-            }
+            return contextBean.version;
           }
         }
       }

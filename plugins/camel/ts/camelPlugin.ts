@@ -65,7 +65,7 @@ module Camel {
   }]);
 
 
-  _module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", (nav:HawtioMainNav.Registry, workspace:Workspace, jolokia, viewRegistry, layoutFull, helpRegistry, preferencesRegistry, $templateCache:ng.ITemplateCacheService, $location) => {
+  _module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", "$rootScope", (nav:HawtioMainNav.Registry, workspace:Workspace, jolokia, viewRegistry, layoutFull, helpRegistry, preferencesRegistry, $templateCache:ng.ITemplateCacheService, $location, $rootScope) => {
 
     viewRegistry['camel/endpoint/'] = layoutFull;
     viewRegistry['camel/route/'] = layoutFull;
@@ -360,7 +360,7 @@ module Camel {
         && (workspace.isCamelContext() || workspace.isRoutesFolder())
         && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
         && getSelectionCamelRestRegistry(workspace)
-        && hasRestServices(workspace, jolokia) // TODO: optimize this so we only invoke it one time until reload
+        && hasRestServices(workspace, jolokia)
         && workspace.hasInvokeRightsForName(getSelectionCamelRestRegistry(workspace), "listRestServices"),
       href: () => "/camel/restRegistry" + workspace.hash()
     });
@@ -483,6 +483,15 @@ module Camel {
                     folder.typeName = contextNode.typeName;
                     folder.key = contextNode.key;
                     folder.version = contextNode.version;
+                    // fetch the camel version and add it to the tree here to avoid making a blocking call elsewhere
+                    jolokia.request({ 
+                      'type': 'read',
+                      'mbean': contextNode.objectName,
+                      'attribute': 'CamelVersion'
+                    }, Core.onSuccess((response) => {
+                      contextNode.version = response.value;
+                      Core.$apply($rootScope);
+                    }));
                     if (routesNode) {
                       var routesFolder = new Folder("Routes");
                       routesFolder.addClass = "org-apache-camel-routes-folder";
@@ -561,6 +570,7 @@ module Camel {
                     }
                     folder.parent = rootFolder;
                     children.push(folder);
+
                   }
                 }
               }
