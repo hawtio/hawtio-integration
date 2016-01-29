@@ -1425,16 +1425,24 @@ var Camel;
      * @param jolokia
      * @returns {boolean}
      */
+    var _hasRestServices = null;
     function hasRestServices(workspace, jolokia) {
+        if (_hasRestServices !== null) {
+            return _hasRestServices;
+        }
         var mbean = getSelectionCamelRestRegistry(workspace);
         if (mbean) {
-            var reply = jolokia.request({ type: "read", mbean: mbean, attribute: ["NumberOfRestServices"] });
-            var num = reply.value["NumberOfRestServices"];
-            return num > 0;
+            // TODO replace blocking call with kludgy workaround for now
+            jolokia.request({
+                type: "read",
+                mbean: mbean,
+                attribute: ["NumberOfRestServices"]
+            }, Core.onSuccess(function (response) {
+                var num = response.value;
+                _hasRestServices = num > 0;
+            }));
         }
-        else {
-            return false;
-        }
+        return true;
     }
     Camel.hasRestServices = hasRestServices;
     /**
@@ -2442,20 +2450,7 @@ var Camel;
                     var result = tree.navigate(domain, contextId, "context");
                     if (result && result.children) {
                         var contextBean = result.children.first();
-                        if (contextBean.version) {
-                            // read the cached version
-                            return contextBean.version;
-                        }
-                        if (contextBean.title) {
-                            // okay no version cached, so need to get the version using jolokia
-                            var contextName = contextBean.title;
-                            var mbean = "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
-                            // must use Core.onSuccess(null) that means sync as we need the version asap
-                            var version = jolokia.getAttribute(mbean, "CamelVersion", Core.onSuccess(null));
-                            // cache version so we do not need to read it again using jolokia
-                            contextBean.version = version;
-                            return version;
-                        }
+                        return contextBean.version;
                     }
                 }
             }
@@ -3125,7 +3120,7 @@ var Camel;
             }
             return answer;
         }]);
-    Camel._module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", function (nav, workspace, jolokia, viewRegistry, layoutFull, helpRegistry, preferencesRegistry, $templateCache, $location) {
+    Camel._module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", "$rootScope", function (nav, workspace, jolokia, viewRegistry, layoutFull, helpRegistry, preferencesRegistry, $templateCache, $location, $rootScope) {
             viewRegistry['camel/endpoint/'] = layoutFull;
             viewRegistry['camel/route/'] = layoutFull;
             viewRegistry['{ "main-tab": "camel" }'] = 'plugins/camel/html/layoutCamelTree.html';
@@ -3423,7 +3418,7 @@ var Camel;
                         && (workspace.isCamelContext() || workspace.isRoutesFolder())
                         && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
                         && Camel.getSelectionCamelRestRegistry(workspace)
-                        && Camel.hasRestServices(workspace, jolokia) // TODO: optimize this so we only invoke it one time until reload
+                        && Camel.hasRestServices(workspace, jolokia)
                         && workspace.hasInvokeRightsForName(Camel.getSelectionCamelRestRegistry(workspace), "listRestServices");
                 },
                 href: function () { return "/camel/restRegistry" + workspace.hash(); }
@@ -3546,6 +3541,15 @@ var Camel;
                                             folder.typeName = contextNode.typeName;
                                             folder.key = contextNode.key;
                                             folder.version = contextNode.version;
+                                            // fetch the camel version and add it to the tree here to avoid making a blocking call elsewhere
+                                            jolokia.request({
+                                                'type': 'read',
+                                                'mbean': contextNode.objectName,
+                                                'attribute': 'CamelVersion'
+                                            }, Core.onSuccess(function (response) {
+                                                contextNode.version = response.value;
+                                                Core.$apply($rootScope);
+                                            }));
                                             if (routesNode) {
                                                 var routesFolder = new Folder("Routes");
                                                 routesFolder.addClass = "org-apache-camel-routes-folder";
