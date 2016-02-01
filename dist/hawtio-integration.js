@@ -877,6 +877,7 @@ var ActiveMQ;
                 Core.notification("success", $scope.message);
                 // and switch to show the attributes (table view)
                 $location.path('/jmx/attributes').search({ "main-tab": "activemq", "sub-tab": "activemq-attributes" });
+                $scope.workspace.loadTree();
                 Core.$apply($scope);
             }
             function getBrokerMBean(jolokia) {
