@@ -7,6 +7,7 @@ var gulp = require('gulp'),
     path = require('path'),
     s = require('underscore.string'),
     argv = require('yargs').argv,
+    urljoin = require('url-join'),
     hawtio = require('hawtio-node-backend');
 
 var plugins = gulpLoadPlugins({});
@@ -113,7 +114,7 @@ gulp.task('watch-less', function() {
 });
 
 gulp.task('watch', ['build', 'watch-less'], function() {
-  plugins.watch(['libs/**/*.js', 'libs/**/*.css', 'index.html', config.dist + '/' + config.js], function() {
+  plugins.watch(['libs/**/*.js', 'libs/**/*.css', 'index.html', urljoin(config.dist, '*')], function() {
     gulp.start('reload');
   });
   plugins.watch(['libs/**/*.d.ts', config.ts, config.templates], function() {

@@ -6,13 +6,13 @@
         <fieldset>
 
           <div class="btn-group inline-block">
-            <a ng-href="#/osgi/bundle-list?p=container"
+            <a ng-href="/osgi/bundle-list?p=container"
                     type="button"
                     class="btn"
                     title="List view">
               <i class="fa fa-list"></i>
             </a>
-            <a ng-href="#/osgi/bundles?p=container"
+            <a ng-href="/osgi/bundles?p=container"
                     type="button"
                     class="btn active"
                     title="Table view">
@@ -55,9 +55,9 @@
   
   
   <div class="row">
-    <div ng-hide="loading" class="gridStyle" ng-grid="gridOptions"></div>
     <div ng-show="loading">
       Please wait, loading...
     </div>
+    <table ng-hide="loading" class="table table-striped" hawtio-simple-table="gridOptions"></table>
   </div>
 </div>

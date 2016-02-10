@@ -312,3 +312,6 @@ caption {
 .new-config-name-form {
   margin-top: 30px;
 }
+.popover {
+  max-width: inherit;
+}

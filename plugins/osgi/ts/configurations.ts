@@ -9,6 +9,7 @@ module Osgi {
 
   _module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia", ($scope, $routeParams, $location, workspace:Core.Workspace, jolokia) => {
     $scope.selectedItems = [];
+    $scope.jolokia = jolokia;
 
     $scope.grid = {
       data: 'configurations',

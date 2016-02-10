@@ -31,7 +31,7 @@
              class="bundle-item"
              ng-show="filterFeature(feature)"
              ng-class="inSelectedRepository(feature)">
-          <a ng-href="#/osgi/feature/{{feature.Id}}?p=container"
+          <a ng-href="/osgi/feature/{{feature.Id}}?p=container"
              hawtio-template-popover title="Feature details">
             <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>
           </a>
@@ -99,7 +99,7 @@
                class="bundle-item"
                ng-show="filterFeature(feature)"
                hawtio-template-popover title="Feature details">
-            <a ng-href="#/osgi/feature/{{feature.Id}}?p=container">
+            <a ng-href="/osgi/feature/{{feature.Id}}?p=container">
               <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>
             </a >
             <span ng-hide="hasFabric">

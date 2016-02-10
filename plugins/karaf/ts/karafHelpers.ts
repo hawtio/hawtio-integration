@@ -332,7 +332,7 @@ module Karaf {
 
   export function getSelectionFeaturesMBean(workspace:Workspace):string {
     if (workspace) {
-      var featuresStuff = workspace.mbeanTypesToDomain["features"] || {};
+      var featuresStuff = workspace.mbeanTypesToDomain["features"] || workspace.mbeanTypesToDomain['feature'] || {};
       var karaf = featuresStuff["org.apache.karaf"] || {};
       var mbean = karaf.objectName;
       if (mbean) {

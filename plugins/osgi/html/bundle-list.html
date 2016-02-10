@@ -3,13 +3,13 @@
 
     <div class="pull-left">
       <div class="btn-group">
-        <a ng-href="#/osgi/bundle-list?p=container"
+        <a ng-href="/osgi/bundle-list?p=container"
                 type="button"
                 class="btn active"
                 title="List view">
           <i class="fa fa-list"></i>
         </a>
-        <a ng-href="#/osgi/bundles?p=container"
+        <a ng-href="/osgi/bundles?p=container"
                 type="button"
                 class="btn"
                 title="Table view">
@@ -94,7 +94,7 @@
            ng-show="filterBundle(bundle)"
            hawtio-template-popover title="Bundle details">
         <a id="{{bundle.Identifier}}"
-           ng-href="#/osgi/bundle/{{bundle.Identifier}}?p=container">
+           ng-href="/osgi/bundle/{{bundle.Identifier}}?p=container">
           <span class="badge" ng-class="getStateStyle(bundle.State)">{{getLabel(bundle)}}</span>
         </a>
       </div>

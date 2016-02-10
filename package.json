@@ -20,6 +20,7 @@
     "proxy-middleware": "^0.9.0",
     "through2": "^0.6.3",
     "underscore.string": "^2.4.0",
+    "url-join": "0.0.1",
     "which": "^1.0.8",
     "wiredep": "^2.2.2"
   },
