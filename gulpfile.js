@@ -13,6 +13,7 @@ var plugins = gulpLoadPlugins({});
 var pkg = require('./package.json');
 
 var config = {
+  proxyPort: argv.port || 8282,
   main: '.',
   ts: ['plugins/**/*.ts'],
   templates: ['plugins/**/*.html'],
@@ -124,7 +125,7 @@ gulp.task('connect', ['watch'], function() {
   hawtio.setConfig({
     port: 2772,
     staticProxies: [{
-      port: 8282,
+      port: config.proxyPort,
       path: '/jolokia',
       targetPath: '/hawtio/jolokia'
     }],
