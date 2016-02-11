@@ -8,13 +8,13 @@
           <div class="btn-group inline-block">
             <a ng-href="/osgi/bundle-list?p=container"
                     type="button"
-                    class="btn"
+                    class="btn btn-default"
                     title="List view">
               <i class="fa fa-list"></i>
             </a>
             <a ng-href="/osgi/bundles?p=container"
                     type="button"
-                    class="btn active"
+                    class="btn btn-default active"
                     title="Table view">
               <i class="fa fa-table"></i>
             </a>
@@ -22,15 +22,15 @@
 
           <div class="controls control-group inline-block controls-row">
             <div class="btn-group">
-              <button ng-disabled="selected.length == 0" class="btn" ng-click="stop()" title="Stop"><i class="fa fa-off"></i></button>
-              <button ng-disabled="selected.length == 0" class="btn" ng-click="start()" title="Start"><i class="fa fa-play-circle"></i></button>
-              <button ng-disabled="selected.length == 0" class="btn" ng-click="refresh()" title="Refresh"><i class="fa fa-refresh"></i></button>
-              <button ng-disabled="selected.length == 0" class="btn" ng-click="update()" title="Update"><i class="fa fa-cloud-download"></i></button>
-              <button ng-disabled="selected.length == 0" class="btn" ng-click="uninstall()" title="Uninstall"><i class="fa fa-eject"></i></button>
+              <button ng-disabled="selected.length == 0" class="btn btn-default" ng-click="stop()" title="Stop"><i class="fa fa-off"></i></button>
+              <button ng-disabled="selected.length == 0" class="btn btn-default" ng-click="start()" title="Start"><i class="fa fa-play-circle"></i></button>
+              <button ng-disabled="selected.length == 0" class="btn btn-default" ng-click="refresh()" title="Refresh"><i class="fa fa-refresh"></i></button>
+              <button ng-disabled="selected.length == 0" class="btn btn-default" ng-click="update()" title="Update"><i class="fa fa-cloud-download"></i></button>
+              <button ng-disabled="selected.length == 0" class="btn btn-default" ng-click="uninstall()" title="Uninstall"><i class="fa fa-eject"></i></button>
             </div>
             <div class="input-group">
               <input class="input-xlarge" type="text" placeholder="Install Bundle..." ng-model="bundleUrl">
-              <button ng-disabled="installDisabled()" class="btn" ng-click="install()" title="Install"><i class="fa fa-ok"></i></button>
+              <button ng-disabled="installDisabled()" class="btn btn-default" ng-click="install()" title="Install"><i class="fa fa-ok"></i></button>
             </div>
           </div>
         </fieldset>

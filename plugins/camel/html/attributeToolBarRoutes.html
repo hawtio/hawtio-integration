@@ -1,10 +1,10 @@
 <div class="row">
   <div class="col-md-6">
     <div class="control-group"  ng-controller="Camel.AttributesToolBarController">
-      <button class="btn" ng-disabled="!anySelectionHasState(['stop', 'suspend'])" ng-click="start()"><i class="fa fa-play-circle"></i> Start</button>
-      <button class="btn" ng-disabled="!anySelectionHasState('start')" ng-click="pause()"><i class="fa fa-pause"></i> Pause</button>
-      <button class="btn" ng-disabled="!anySelectionHasState(['start', 'suspend'])" ng-click="stop()"><i class="fa fa-off"></i> Stop</button>
-      <button class="btn" ng-disabled="!everySelectionHasState('stop')" ng-click="delete()"><i class="fa fa-remove"></i> Delete</button>
+      <button class="btn btn-default" ng-disabled="!anySelectionHasState(['stop', 'suspend'])" ng-click="start()"><i class="fa fa-play-circle"></i> Start</button>
+      <button class="btn btn-default" ng-disabled="!anySelectionHasState('start')" ng-click="pause()"><i class="fa fa-pause"></i> Pause</button>
+      <button class="btn btn-default" ng-disabled="!anySelectionHasState(['start', 'suspend'])" ng-click="stop()"><i class="fa fa-off"></i> Stop</button>
+      <button class="btn btn-default" ng-disabled="!everySelectionHasState('stop')" ng-click="delete()"><i class="fa fa-remove"></i> Delete</button>
     </div>
   </div>
   <div class="col-md-6">

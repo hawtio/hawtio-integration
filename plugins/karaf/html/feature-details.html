@@ -5,43 +5,39 @@
             <td class="less-big">
                 <div class="btn-group">
                   <button ng-click="uninstall(name,version)" 
-                          class="btn" 
+                          class="btn btn-default" 
                           title="uninstall" 
                           hawtio-show
-                          object-name="{{featuresMBean}"
+                          object-name="{{featuresMBean}}"
                           method-name="uninstallFeature">
-                    <i class="fa fa-off"></i>
+                    <i class="fa fa-power-off"></i>
                   </button>
                   <button ng-click="install(name,version)" 
-                          class="btn" 
+                          class="btn btn-default" 
                           title="install" 
                           hawtio-show
-                          object-name="{{featuresMBean}"
+                          object-name="{{featuresMBean}}"
                           method-name="installFeature">
-                    <i class=icon-play-circle"></i>
+                    <i class="fa fa-play-circle"></i>
                   </button>
                 </div>
             </td>
         </tr>
         <tr>
             <td class="pull-right"><strong>Name:</strong></td>
-            <td class="less-big">{{row.Name}}
-            </td>
+            <td class="less-big">{{row.Name}}</td>
         </tr>
         <tr>
             <td class="pull-right"><strong>Version:</strong></td>
-            <td class="less-big">{{row.Version}}
-            </td>
+            <td class="less-big">{{row.Version}}</td>
         </tr>
         <tr>
             <td class="pull-right"><strong>Repository:</strong></td>
-            <td class="less-big">{{row.RepositoryName}}
-            </td>
+            <td class="less-big">{{row.RepositoryName}}</td>
         </tr>
         <tr>
           <td class="pull-right"><strong>Repository URI:</strong></td>
-          <td class="less-big">{{row.RepositoryURI}}
-          </td>
+          <td class="less-big">{{row.RepositoryURI}}</td>
         </tr>
         <tr>
             <td class="pull-right"><strong>State:</strong></td>

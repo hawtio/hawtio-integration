@@ -10,7 +10,7 @@
         </span>
 
         <form class="form-inline pull-right">
-          <button class="btn" ng-click="addHeader()" title="Add a new message header"><i
+          <button class="btn btn-default" ng-click="addHeader()" title="Add a new message header"><i
               class="fa fa-plus"></i> Header
           </button>
           <button type="submit" class="btn btn-primary" ng-click="sendMessage()">Send message</button>
@@ -33,10 +33,10 @@
                        placeholder="Value of the message header">
               </div>
               <div class="col-md-2">
-                <button type="submit" class="btn" title="Add a new message header">
+                <button type="submit" class="btn btn-default" title="Add a new message header">
                   <i class="fa fa-plus"></i>
                 </button>
-                <button type="button" ng-click="removeHeader(header)" class="btn" title="Removes this message header">
+                <button type="button" ng-click="removeHeader(header)" class="btn btn-default" title="Removes this message header">
                   <i class="fa fa-remove"></i>
                 </button>
               </div>
@@ -57,7 +57,7 @@
               <option value="xml">XML</option>
             </select>
 
-            <button class="btn" ng-click="autoFormat()"
+            <button class="btn btn-default" ng-click="autoFormat()"
                     title="Automatically pretty prints the message so its easier to read">Auto format
             </button>
           </div>

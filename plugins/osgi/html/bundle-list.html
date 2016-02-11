@@ -5,13 +5,13 @@
       <div class="btn-group">
         <a ng-href="/osgi/bundle-list?p=container"
                 type="button"
-                class="btn active"
+                class="btn btn-default active"
                 title="List view">
           <i class="fa fa-list"></i>
         </a>
         <a ng-href="/osgi/bundles?p=container"
                 type="button"
-                class="btn"
+                class="btn btn-default"
                 title="Table view">
           <i class="fa fa-table"></i>
         </a>
@@ -23,10 +23,10 @@
                placeholder="Install Bundle..."
                ng-model="bundleUrl">
         <button ng-disabled="installDisabled()"
-                class="btn"
+                class="btn btn-default"
                 ng-click="install()"
                 title="Install">
-          <i class="fa fa-ok"></i>
+          <i class="fa fa-check"></i>
         </button>
       </div>
 

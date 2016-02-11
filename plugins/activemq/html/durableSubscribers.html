@@ -4,17 +4,17 @@
       <div class="col-md-12">
         <div class="pull-right">
             <form class="form-inline">
-                <button class="btn" ng-click="createSubscriberDialog.open()"
+                <button class="btn btn-default" ng-click="createSubscriberDialog.open()"
                         hawtio-show object-name="{{workspace.selection.objectName}}" method-name="createDurableSubscriber"
                         title="Create durable subscriber">
                     <i class="fa fa-plus"></i> Create
                 </button>
-                <button class="btn" ng-click="deleteSubscriberDialog.open()"
+                <button class="btn btn-default" ng-click="deleteSubscriberDialog.open()"
                         hawtio-show object-name="{{$scope.gridOptions.selectedItems[0]._id}}" method-name="destroy"
                         title="Destroy durable subscriber" ng-disabled="gridOptions.selectedItems.length != 1">
                     <i class="fa fa-exclamation"></i> Destroy
                 </button>
-                <button class="btn" ng-click="refresh()"
+                <button class="btn btn-default" ng-click="refresh()"
                         title="Refreshes the list of subscribers">
                     <i class="fa fa-refresh"></i>
                 </button>
@@ -60,7 +60,7 @@
                 <i class="fa fa-remove"></i> Delete
               </button>
 
-              <button class="btn" ng-click="showSubscriberDialog.close()" title="Close this dialog">
+              <button class="btn btn-default" ng-click="showSubscriberDialog.close()" title="Close this dialog">
                 <i class="fa fa-remove"></i> Close
               </button>
 

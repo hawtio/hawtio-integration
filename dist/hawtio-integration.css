@@ -258,7 +258,7 @@ caption {
   margin: 0;
   padding: 0;
   right: 12px;
-  top: 6px;
+  top: 0;
   opacity: 0.2;
   transition: all 500ms ease-in-out;
   font-size: 18px;
@@ -278,7 +278,7 @@ caption {
 }
 /* end more osgi stuff */
 /* osgi page stuff */
-.repository-browser-toolbar > .btn {
+.repository-browser-toolbar {
   margin-bottom: 10px;
 }
 .bundle-list-toolbar {

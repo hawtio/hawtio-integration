@@ -9,27 +9,27 @@
         <div class="btn-toolbar pull-right">
           <div class="btn-group">
             <div ng-switch="hasBreakpoint">
-              <button ng-switch-when="true" class="btn" ng-disabled="!selectedDiagramNodeId"
+              <button ng-switch-when="true" class="btn btn-default" ng-disabled="!selectedDiagramNodeId"
                       ng-click="removeBreakpoint()" title="Remove the breakpoint on the selected node"><i
                       class="fa fa-remove"></i>
               </button>
-              <button ng-switch-default="false" class="btn" ng-disabled="!selectedDiagramNodeId"
+              <button ng-switch-default="false" class="btn btn-default" ng-disabled="!selectedDiagramNodeId"
                       ng-click="addBreakpoint()" title="Add a breakpoint on the selected node"><i class="fa fa-plus"></i>
               </button>
             </div>
           </div>
           <div class="btn-group">
-            <button class="btn" type="submit" ng-click="stopDebugging()" title="Stops the debugger">Close
+            <button class="btn btn-default" type="submit" ng-click="stopDebugging()" title="Stops the debugger">Close
             </button>
           </div>
         </div>
         <div class="btn-toolbar pull-right">
           <div class="btn-group">
-            <button class="btn" ng-click="step()" ng-disabled="!stopped" title="Step into the next node"><img
+            <button class="btn btn-default" ng-click="step()" ng-disabled="!stopped" title="Step into the next node"><img
                     ng-src="img/icons/camel/step.gif"></button>
-            <button class="btn" ng-click="resume()" ng-disabled="!stopped" title="Resume running"><img
+            <button class="btn btn-default" ng-click="resume()" ng-disabled="!stopped" title="Resume running"><img
                     ng-src="img/icons/camel/resume.gif"></button>
-            <button class="btn" ng-click="suspend()" ng-disabled="stopped"
+            <button class="btn btn-default" ng-click="suspend()" ng-disabled="stopped"
                     title="Suspend all threads in this route"><img ng-src="img/icons/camel/suspend.gif"></button>
           </div>
         </div>

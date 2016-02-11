@@ -28,20 +28,39 @@ module Osgi {
         {
           field: 'Name',
           displayName: 'Name',
-          width: "***"
-          //width: 300
         },
         {
           field: 'VersionLink',
           displayName: 'Version',
-          width: "***"
-          //width: 300
+          width: "***",
+          cellTemplate: `
+            <div class="ngCellText">
+              <a ng-href="/osgi/package/{{row.entity.Name}}/{{row.entity.Version}}">{{row.entity.Version}}</a>
+            </div>`
+        },
+        {
+          field: 'ExportingBundles',
+          displayName: 'Exporting Bundles',
+          cellTemplate: `
+            <div class="ngCellText">
+              <div ng-repeat="bundle in row.entity.ExportingBundles">
+                <a title="Exported by bundle {{bundle.Identifier}}" ng-href="/osgi/bundle/{{bundle.Identifier}}">{{bundle.SymbolicName}}</a>
+              </div>
+            </div>`
+        },
+        {
+          field: 'ImportingBundles',
+          displayName: 'Importing Bundles',
+          cellTemplate: `
+            <div class="ngCellText">
+              <div ng-repeat="bundle in row.entity.ImportingBundles">
+                <a title="Imported by bundle {{bundle.Identifier}}" ng-href="/osgi/bundle/{{bundle.Identifier}}">{{bundle.SymbolicName}}</a>
+              </div>
+            </div>`
         },
         {
           field: 'RemovalPending',
           displayName: 'Removal Pending',
-          width: "***"
-          //width: 300
         }
       ]
     };

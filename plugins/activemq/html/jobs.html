@@ -4,13 +4,13 @@
       <div class="col-md-12">
         <div class="pull-right">
             <form class="form-inline">
-                <button class="btn" ng-disabled="!gridOptions.selectedItems.length"
+                <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length"
                         hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeJob"
                         ng-click="deleteJobsDialog.open()"
                         title="Delete the selected jobs">
                   <i class="fa fa-remove"></i> Delete
                 </button>
-                <button class="btn" ng-click="refresh()"
+                <button class="btn btn-default" ng-click="refresh()"
                         title="Refreshes the list of subscribers">
                     <i class="fa fa-refresh"></i>
                 </button>

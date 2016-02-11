@@ -11,6 +11,7 @@ module Osgi {
 
     var dateFilter = $filter('date');
 
+    $scope.workspace = workspace;
     $scope.services = [];
     $scope.selectedItems = [];
 
@@ -22,30 +23,62 @@ module Osgi {
         filterText: "",
         useExternalFilter: false
       },
-      selectedItems: $scope.selectedItems,
+      selectedItems: [],
       rowHeight: 32,
       selectWithCheckboxOnly: true,
       columnDefs: [
+    /*
         {
           field: 'Identifier',
-          displayName: 'ID',
-          width: "***"
+          displayName: 'ID'
+          //width: "***"
           //width: 300
         },
+        */
         {
           field: 'BundleIdentifier',
           displayName: 'Bundle',
-          width: "***"
+          cellTemplate: `
+            <div class="ngCellText">
+              <a ng-href="/osgi/bundle/{{row.entity.Identifier}}">{{row.entity.Identifier}}</a>
+            </div>`
+          //width: "***"
           //width: 300
         },
         {
           field: 'objectClass',
           displayName: 'Object Class(es)',
-          width: "***"
+          cellTemplate: `
+            <div class="ngCellText">
+              <div ng-repeat="clazz in row.entity.objectClass">
+                <span>
+                  {{clazz}}
+                </span>
+              </div>
+            </div>`
+
+          //width: "***"
           //width: 300
+        },
+        {
+          field: 'UsingBundles',
+          displayName: 'Used by',
+          cellTemplate: `
+            <div class="ngCellText">
+              <div ng-repeat="bundle in row.entity.UsingBundles">
+                <a ng-href="/osgi/bundle/{{bundle.Identifier}}">{{bundle.Name || bundle.SymbolicName || bundle.Identifier}}</a>
+                <!--
+                <pre>
+                  {{bundle}}
+                </pre>
+                  -->
+              </div>
+            </div>`
         }
       ]
     };
+
+    $scope.selectedItems = $scope.mygrid.selectedItems;
 /*
     $scope.widget = new DataTable.TableWidget($scope, $templateCache, $compile, [
       <DataTable.TableColumnConfig> {
@@ -98,12 +131,14 @@ module Osgi {
           }
           bundleMap[obj.Identifier] = obj;
         });
+        var servicesArray = [];
         angular.forEach(services, function(s, key) {
           angular.forEach(s["UsingBundles"], function(b, key) {
             s["UsingBundles"][key] = bundleMap[b];
           });
+          servicesArray.push(s);
         });
-        $scope.services = services;
+        $scope.services = servicesArray;
         Core.$apply($scope);
       };
       workspace.jolokia.request({

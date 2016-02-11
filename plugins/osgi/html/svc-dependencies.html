@@ -1,108 +1,104 @@
 <style type="text/css">
 
-    div#pop-up {
-        display: none;
-        position:absolute;
-        color: white;
-        font-size: 14px;
-        background: rgba(0,0,0,0.6);
-        padding: 5px 10px 5px 10px;
-        -moz-border-radius: 8px 8px;
-        border-radius: 8px 8px;
-    }
+  div#pop-up {
+    display: none;
+    position:absolute;
+    color: white;
+    font-size: 14px;
+    background: rgba(0,0,0,0.6);
+    padding: 5px 10px 5px 10px;
+    -moz-border-radius: 8px 8px;
+    border-radius: 8px 8px;
+  }
 
-    div#pop-up-title {
-        font-size: 15px;
-        margin-bottom: 4px;
-        font-weight: bolder;
-    }
-    div#pop-up-content {
-        font-size: 12px;
-    }
+  div#pop-up-title {
+    font-size: 15px;
+    margin-bottom: 4px;
+    font-weight: bolder;
+  }
+  div#pop-up-content {
+    font-size: 12px;
+  }
 
-    rect.graphbox {
-        fill: #DDD;
-    }
+  rect.graphbox {
+    fill: #DDD;
+  }
 
-    rect.graphbox.frame {
-        stroke: #222;
-        stroke-width: 2px
-    }
+  rect.graphbox.frame {
+    stroke: #222;
+    stroke-width: 2px
+  }
 
-    path.link {
-        fill: none;
-        stroke: #666;
-        stroke-width: 1.5px;
-    }
+  path.link {
+    fill: none;
+    stroke: #666;
+    stroke-width: 1.5px;
+  }
 
-    path.link.registered {
-        stroke: #444;
-    }
+  path.link.registered {
+    stroke: #444;
+  }
 
-    path.link.inuse {
-        stroke-dasharray: 0,2 1;
-    }
+  path.link.inuse {
+    stroke-dasharray: 0,2 1;
+  }
 
-    circle {
-        fill: #black;
-    }
+  circle {
+    fill: #black;
+  }
 
-    circle.service {
-        fill: blue;
-    }
+  circle.service {
+    fill: blue;
+  }
 
-    circle.bundle {
-        fill: black;
-    }
+  circle.bundle {
+    fill: black;
+  }
 
-    circle.package {
-        fill: gray;
-    }
+  circle.package {
+    fill: gray;
+  }
 
-    text {
-        font: 10px sans-serif;
-        pointer-events: none;
-    }
+  text {
+    font: 10px sans-serif;
+    pointer-events: none;
+  }
 
-    text.shadow {
-        stroke: #fff;
-        stroke-width: 3px;
-        stroke-opacity: .8;
-    }
+  text.shadow {
+    stroke: #fff;
+    stroke-width: 3px;
+    stroke-opacity: .8;
+  }
 
 </style>
 
 <div ng-controller="Osgi.ServiceDependencyController">
-
-    <div class="pull-left">
-        <form class="form-inline no-bottom-margin">
-            <fieldset>
-                <div class="control-group inline-block">
-                    <input type="text" class="search-query" placeholder="Filter Bundle Symbolic Name..." ng-model="bundleFilter">
-                    <input type="text" class="search-query" placeholder="Filter Package Name..." ng-model="packageFilter" ng-change="updatePkgFilter()">
-                    <label class="radio" for="showServices">
-                        <input id="showServices" type="radio" value="services" ng-model="selectView"> Show Services
-                    </label>
-                    <label class="radio" for="showPackages">
-                        <input id="showPackages" type="radio" value="packages" ng-model="selectView" ng-disabled="disablePkg"> Show Packages
-                    </label>
-                    <label class="checkbox" for="hideUnused">
-                        <input id="hideUnused" type="checkbox" ng-model="hideUnused"> Hide Unused
-                    </label>
-                    <button class="btn btn-primary" ng-click="updateGraph()" title="Apply the selected criteria to the Graph.">Apply</button>
-                </div>
-            </fieldset>
-        </form>
-    </div>
-
-  <div ng-hide="inDashboard" class="add-link">
-    <a ng-href="{{addToDashboardLink()}}" title="Add this view to a Dashboard"><i class="fa fa-share"></i></a>
+  <div class="row">
+    <form class="form-inline no-bottom-margin inline-block">
+      <fieldset>
+        <div class="control-group">
+          <input type="text" class="search-query" placeholder="Filter Bundle Symbolic Name..." ng-model="bundleFilter">
+          <input type="text" class="search-query" placeholder="Filter Package Name..." ng-model="packageFilter" ng-change="updatePkgFilter()">
+          <label class="radio" for="showServices">
+            <input id="showServices" type="radio" value="services" ng-model="selectView"> Show Services
+          </label>
+          <label class="radio" for="showPackages">
+            <input id="showPackages" type="radio" value="packages" ng-model="selectView" ng-disabled="disablePkg"> Show Packages
+          </label>
+          <label class="checkbox" for="hideUnused">
+            <input id="hideUnused" type="checkbox" ng-model="hideUnused"> Hide Unused
+          </label>
+          <button class="btn btn-primary" ng-click="updateGraph()" title="Apply the selected criteria to the Graph.">Apply</button>
+        </div>
+      </fieldset>
+    </form>
+    <a ng-hide="inDashboard" class="pull-right btn btn-default" ng-href="{{addToDashboardLink()}}" title="Add this view to a Dashboard"><i class="fa fa-share"></i></a>
   </div>
 
-    <div id="pop-up">
-        <div id="pop-up-title"></div>
-        <div id="pop-up-content"></div>
-    </div>
+  <div id="pop-up">
+    <div id="pop-up-title"></div>
+    <div id="pop-up-content"></div>
+  </div>
 
   <div class="row">
     <div class="col-md-12 canvas" style="min-height: 800px">

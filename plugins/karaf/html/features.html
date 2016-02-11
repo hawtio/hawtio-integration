@@ -1,7 +1,7 @@
 <div class="controller-section" ng-controller="Karaf.FeaturesController">
 
-  <div class="row section-filter">
-    <input type="text" class="col-md-12 search-query" placeholder="Filter..." ng-model="filter">
+  <div class="row section-filter centered">
+    <input type="text" class="search-query" placeholder="Filter..." ng-model="filter">
     <i class="fa fa-remove clickable" title="Clear filter" ng-click="filter = ''"></i>
   </div>
 
@@ -11,7 +11,7 @@
         <tbody>
         <tr ng-repeat="(k, v) in feature track by $index" ng-show="showRow(k, v)">
           <td class="property-name">{{k}}</td>
-          <td class="property-value" ng-bind-html-unsafe="showValue(v)"></td>
+          <td class="property-value" ng-bind="showValue(v)"></td>
         </tr>
         </tbody>
       </table>
@@ -67,13 +67,13 @@
                 title="Feature repositories"
                 ng-model="selectedRepository"
                 ng-options="r.repository for r in repositories"></select>
-        <button class="btn"
+        <button class="btn btn-default"
                 title="Remove selected feature repository"
                 ng-click="uninstallRepository()"
                 ng-hide="hasFabric"
                 hawtio-show
                 object-name="{{featuresMBean}}"
-                method-name="removeRepository"><i class="fa fa-remove-sign"></i></button>
+                method-name="removeRepository"><i class="fa fa-minus"></i></button>
         <input type="text"
                class="input-xlarge"
                placeholder="mvn:foo/bar/1.0/xml/features"
@@ -83,7 +83,7 @@
                hawtio-show
                object-name="{{featuresMBean}}"
                method-name="addRepository">
-        <button class="btn"
+        <button class="btn btn-default"
                 title="Add feature repository URL"
                 ng-hide="hasFabric"
                 ng-click="installRepository()"
