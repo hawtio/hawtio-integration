@@ -202,7 +202,7 @@ module ActiveMQ {
             node.icon = UrlHelpers.join(documentBase, "/img/icons/activemq/connector.png");
           }
         }
-        angular.forEach(node.children, (child) => setConsumerType(child));
+        angular.forEach(node.children, (child:Folder) => setConsumerType(child));
       }
     }
   }]);

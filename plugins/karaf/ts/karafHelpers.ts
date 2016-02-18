@@ -346,7 +346,7 @@ module Karaf {
         if (folder) {
           var children = folder.children;
           folder = null;
-          angular.forEach(children, (child) => {
+          angular.forEach(children, (child:Folder) => {
             if (!folder) {
               folder = child.navigate("features");
             }
@@ -383,7 +383,7 @@ module Karaf {
                 if (folder) {
                   var children = folder.children;
                   folder = null;
-                  angular.forEach(children, (child) => {
+                  angular.forEach(children, (child:Folder) => {
                       if (!folder) {
                           folder = child.navigate("scr");
                       }

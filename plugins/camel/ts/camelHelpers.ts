@@ -266,7 +266,7 @@ module Camel {
       // use document base to built the url to the icon
       var injector = HawtioCore.injector;
       if (injector) {
-        var documentBase = injector.get("documentBase");
+        var documentBase = injector.get<string>("documentBase");
         if (documentBase) {
           return UrlHelpers.join(documentBase, "/img/icons/camel/", imageName);
         }
@@ -1243,7 +1243,7 @@ module Camel {
                 // use document base to built the url to the icon
                 var injector = HawtioCore.injector;
                 if (injector) {
-                  var documentBase = injector.get("documentBase");
+                  var documentBase = injector.get<string>("documentBase");
                   if (documentBase) {
                     imageUrl = UrlHelpers.join(documentBase, value);
                   }
@@ -1342,7 +1342,7 @@ module Camel {
       if (key) {
         map[key] = folder;
       }
-      angular.forEach(folder.children, (child) => addFoldersToIndex(child, map));
+      angular.forEach(folder.children, (child:Folder) => addFoldersToIndex(child, map));
     }
     return map;
   }
@@ -1410,7 +1410,7 @@ module Camel {
     if (tree) {
       var camelTree = tree.navigate(Camel.jmxDomain);
       if (camelTree) {
-        angular.forEach(camelTree.children, (contextsFolder) => {
+        angular.forEach(camelTree.children, (contextsFolder:Folder) => {
           var contextFolder = contextsFolder.navigate("context");
           if (contextFolder && contextFolder.children && contextFolder.children.length) {
             var contextItem = contextFolder.children[0];
@@ -1451,7 +1451,7 @@ module Camel {
     if (tree) {
       var camelTree = tree.navigate(Camel.jmxDomain);
       if (camelTree) {
-        angular.forEach(camelTree.children, (contextsFolder) => {
+        angular.forEach(camelTree.children, (contextsFolder:Folder) => {
           var contextFolder = contextsFolder.navigate("context");
           var componentsFolder = contextsFolder.navigate(componentsOrRoutes);
           if (contextFolder && componentsFolder && contextFolder.children && contextFolder.children.length) {
@@ -1486,7 +1486,7 @@ module Camel {
     if (tree) {
       var camelTree = tree.navigate(Camel.jmxDomain);
       if (camelTree) {
-        angular.forEach(camelTree.children, (contextsFolder) => {
+        angular.forEach(camelTree.children, (contextsFolder:Folder) => {
           var processorsFolder = contextsFolder.navigate("processors");
           if (processorsFolder && processorsFolder.children && processorsFolder.children.length) {
             angular.forEach(processorsFolder.children, (processorFolder) => {

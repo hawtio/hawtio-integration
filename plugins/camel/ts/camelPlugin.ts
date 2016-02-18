@@ -497,7 +497,7 @@ module Camel {
                       routesFolder.addClass = "org-apache-camel-routes-folder";
                       routesFolder.parent = contextsFolder;
                       routesFolder.children = routesNode.children;
-                      angular.forEach(routesFolder.children, (n) => n.addClass = "org-apache-camel-routes");
+                      angular.forEach(routesFolder.children, (n:Folder) => n.addClass = "org-apache-camel-routes");
                       folder.children.push(routesFolder);
                       routesFolder.typeName = "routes";
                       routesFolder.key = routesNode.key;
@@ -508,11 +508,13 @@ module Camel {
                       endpointsFolder.addClass = "org-apache-camel-endpoints-folder";
                       endpointsFolder.parent = contextsFolder;
                       endpointsFolder.children = endpointsNode.children;
-                      angular.forEach(endpointsFolder.children, (n) => {
+                      angular.forEach(endpointsFolder.children, (n:Folder) => {
                         n.addClass = "org-apache-camel-endpoints";
+                        /* TODO doesn't compile, is getContextId(workspace:Workspace)
                         if (!getContextId(n)) {
                           n.entries["context"] = contextNode.entries["context"];
                         }
+                        */
                       });
                       folder.children.push(endpointsFolder);
                       endpointsFolder.entries = contextNode.entries;
@@ -525,11 +527,13 @@ module Camel {
                       componentsFolder.addClass = "org-apache-camel-components-folder";
                       componentsFolder.parent = contextsFolder;
                       componentsFolder.children = componentsNode.children;
-                      angular.forEach(componentsFolder.children, (n) => {
+                      angular.forEach(componentsFolder.children, (n:Folder) => {
                         n.addClass = "org-apache-camel-components";
+                        /* TODO doesn't compile, is getContextId(workspace:Workspace)
                         if (!getContextId(n)) {
                           n.entries["context"] = contextNode.entries["context"];
                         }
+                        */
                       });
                       folder.children.push(componentsFolder);
                       componentsFolder.entries = contextNode.entries;
@@ -542,11 +546,13 @@ module Camel {
                       dataFormatsFolder.addClass = "org-apache-camel-dataformats-folder";
                       dataFormatsFolder.parent = contextsFolder;
                       dataFormatsFolder.children = dataFormatsNode.children;
-                      angular.forEach(dataFormatsFolder.children, (n) => {
+                      angular.forEach(dataFormatsFolder.children, (n:Folder) => {
                         n.addClass = "org-apache-camel-dataformats";
+                        /* TODO doesn't compile, is getContextId(workspace:Workspace)
                         if (!getContextId(n)) {
                           n.entries["context"] = contextNode.entries["context"];
                         }
+                        */
                       });
                       folder.children.push(dataFormatsFolder);
                       dataFormatsFolder.entries = contextNode.entries;

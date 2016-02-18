@@ -161,7 +161,7 @@ module Camel {
     }
     answer = answer || endpointIcon;
     if (HawtioCore.injector) {
-      var documentBase = HawtioCore.injector.get('documentBase');
+      var documentBase = HawtioCore.injector.get<string>('documentBase');
       answer = UrlHelpers.join(documentBase, answer);
     }
     return answer;

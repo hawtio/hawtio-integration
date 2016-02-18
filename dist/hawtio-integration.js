@@ -3569,9 +3569,11 @@ var Camel;
                                                 endpointsFolder.children = endpointsNode.children;
                                                 angular.forEach(endpointsFolder.children, function (n) {
                                                     n.addClass = "org-apache-camel-endpoints";
-                                                    if (!Camel.getContextId(n)) {
-                                                        n.entries["context"] = contextNode.entries["context"];
+                                                    /* TODO doesn't compile, is getContextId(workspace:Workspace)
+                                                    if (!getContextId(n)) {
+                                                      n.entries["context"] = contextNode.entries["context"];
                                                     }
+                                                    */
                                                 });
                                                 folder.children.push(endpointsFolder);
                                                 endpointsFolder.entries = contextNode.entries;
@@ -3586,9 +3588,11 @@ var Camel;
                                                 componentsFolder.children = componentsNode.children;
                                                 angular.forEach(componentsFolder.children, function (n) {
                                                     n.addClass = "org-apache-camel-components";
-                                                    if (!Camel.getContextId(n)) {
-                                                        n.entries["context"] = contextNode.entries["context"];
+                                                    /* TODO doesn't compile, is getContextId(workspace:Workspace)
+                                                    if (!getContextId(n)) {
+                                                      n.entries["context"] = contextNode.entries["context"];
                                                     }
+                                                    */
                                                 });
                                                 folder.children.push(componentsFolder);
                                                 componentsFolder.entries = contextNode.entries;
@@ -3603,9 +3607,11 @@ var Camel;
                                                 dataFormatsFolder.children = dataFormatsNode.children;
                                                 angular.forEach(dataFormatsFolder.children, function (n) {
                                                     n.addClass = "org-apache-camel-dataformats";
-                                                    if (!Camel.getContextId(n)) {
-                                                        n.entries["context"] = contextNode.entries["context"];
+                                                    /* TODO doesn't compile, is getContextId(workspace:Workspace)
+                                                    if (!getContextId(n)) {
+                                                      n.entries["context"] = contextNode.entries["context"];
                                                     }
+                                                    */
                                                 });
                                                 folder.children.push(dataFormatsFolder);
                                                 dataFormatsFolder.entries = contextNode.entries;
