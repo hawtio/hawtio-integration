@@ -79,7 +79,7 @@ module Camel {
           );
         }
 
-        arr = arr.sortBy("exchangeId");
+        arr = _.sortBy(arr, "exchangeId");
         $scope.data = arr;
 
         // okay we have the data then set the selected mbean which allows UI to display data

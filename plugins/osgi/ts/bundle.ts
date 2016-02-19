@@ -67,12 +67,9 @@ module Osgi {
   function formatServiceNameArray(objClass:string[]):string {
     var rv = [];
     for (var i = 0; i < objClass.length; i++) {
-      rv.add(formatServiceName(objClass[i]));
+      rv.push(formatServiceName(objClass[i]));
     }
-    rv = rv.filter(function (elem, pos, self) {
-      return self.indexOf(elem) === pos;
-    });
-
+    rv = _.filter(rv, (elem, pos, self) => self.indexOf(elem) === pos);
     rv.sort();
     return rv.toString();
   }

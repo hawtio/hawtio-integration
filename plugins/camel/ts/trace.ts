@@ -164,7 +164,7 @@ module Camel {
       if (mbean) {
         // set max only supported on BacklogTracer
         // (the old fabric tracer does not support max length)
-        if (mbean.toString().endsWith("BacklogTracer")) {
+        if (_.endsWith(mbean.toString(), "BacklogTracer")) {
           var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
           var streams = Camel.traceOrDebugIncludeStreams(localStorage);
           jolokia.setAttribute(mbean, "BodyMaxChars",  max);

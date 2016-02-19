@@ -76,29 +76,7 @@ module Karaf {
     var features = [];
     var repos = [];
     populateFeaturesAndRepos(attributes, features, repos);
-    return features.find((feature) => {
-      return feature.Name == name && feature.Version == version;
-    });
-    /*
-    var f = {};
-    angular.forEach(attributes["Features"], (feature) => {
-      angular.forEach(feature, (entry) => {
-        if (entry["Name"] === name && entry["Version"] === version) {
-          var deps = [];
-          populateDependencies(attributes, entry["Dependencies"], deps);
-          f["Name"] = entry["Name"];
-          f["Version"] = entry["Version"];
-          f["Bundles"] = entry["Bundles"];
-          f["Dependencies"] = deps;
-          f["Installed"] = entry["Installed"];
-          f["Configurations"] = entry["Configurations"];
-          f["Configuration Files"] = entry["Configuration Files"];
-          f["Files"] = entry["Configuration Files"];
-        }
-      });
-    });
-    return f;
-    */
+    return _.find(features, (feature) => feature.Name == name && feature.Version == version);
   }
 
   var platformBundlePatterns = [

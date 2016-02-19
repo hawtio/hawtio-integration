@@ -15,7 +15,7 @@ module Osgi {
 
         function populateTable(response) {
             var packages = Osgi.defaultPackageValues(workspace, $scope, response.value);
-            $scope.row = packages.filter({"Name":  $scope.package,  "Version": $scope.version})[0];
+            $scope.row = _.filter(packages, {"Name":  $scope.package,  "Version": $scope.version})[0];
             Core.$apply($scope);
         };
 

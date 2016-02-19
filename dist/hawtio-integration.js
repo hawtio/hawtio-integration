@@ -664,10 +664,8 @@ var ActiveMQ;
                     return 0;
                 }
                 var propertiesKeys = _.keys(properties).sort(sort);
-                var jmsHeaders = headerKeys.filter(function (key) {
-                    return key.startsWith("JMS");
-                }).sort(sort);
-                var remaining = headerKeys.subtract(jmsHeaders.concat(propertiesKeys)).sort(sort);
+                var jmsHeaders = _.filter(headerKeys, function (key) { return _.startsWith(key, "JMS"); }).sort(sort);
+                var remaining = _.difference(headerKeys, jmsHeaders.concat(propertiesKeys)).sort(sort);
                 var buffer = [];
                 function appendHeader(key) {
                     var value = headers[key];
@@ -700,7 +698,7 @@ var ActiveMQ;
                 //log.debug("headers: ", row);
                 var answer = {};
                 angular.forEach(row, function (value, key) {
-                    if (!ignoreColumns.any(key) && !flattenColumns.any(key)) {
+                    if (!_.some(ignoreColumns, key) && !_.some(flattenColumns, key)) {
                         answer[Core.escapeHtml(key)] = Core.escapeHtml(value);
                     }
                 });
@@ -710,7 +708,7 @@ var ActiveMQ;
                 //log.debug("properties: ", row);
                 var answer = {};
                 angular.forEach(row, function (value, key) {
-                    if (!ignoreColumns.any(key) && flattenColumns.any(key)) {
+                    if (!_.some(ignoreColumns, key) && _.some(flattenColumns, key)) {
                         angular.forEach(value, function (v2, k2) {
                             answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + Core.escapeHtml(k2)] = Core.escapeHtml(v2);
                         });
@@ -2144,7 +2142,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "context");
                     if (result && result.children) {
-                        var contextBean = result.children.first();
+                        var contextBean = _.first(result.children);
                         if (contextBean.title) {
                             var contextName = contextBean.title;
                             return "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
@@ -2429,7 +2427,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "routes");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return m.title === routeId; });
+                        var mbean = _.find(result.children, function (m) { return m.title === routeId; });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -2450,7 +2448,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "context");
                     if (result && result.children) {
-                        var contextBean = result.children.first();
+                        var contextBean = _.first(result.children);
                         return contextBean.version;
                     }
                 }
@@ -2528,7 +2526,7 @@ var Camel;
             return "";
         }
         // skip leading java.lang
-        if (type.startsWith("java.lang")) {
+        if (_.startsWith(type, "java.lang")) {
             return type.substr(10);
         }
         return type;
@@ -3136,14 +3134,14 @@ var Camel;
                 // TODO there should be a nicer way to do this!
                 var typeName = selection.typeName;
                 if (typeName) {
-                    if (typeName.startsWith("context"))
+                    if (_.startsWith(typeName, "context"))
                         return contextToolBar;
-                    if (typeName.startsWith("route"))
+                    if (_.startsWith(typeName, "route"))
                         return routeToolBar;
                 }
                 var folderNames = selection.folderNames;
                 if (folderNames && selection.domain === Camel.jmxDomain) {
-                    var last = folderNames.last();
+                    var last = _.last(folderNames);
                     if ("routes" === last)
                         return routeToolBar;
                     if ("context" === last)
@@ -3804,7 +3802,7 @@ var Camel;
                             threadName: entry.name
                         });
                     }
-                    arr = arr.sortBy("exchangeId");
+                    arr = _.sortBy(arr, "exchangeId");
                     $scope.data = arr;
                     // okay we have the data then set the selected mbean which allows UI to display data
                     $scope.selectedMBean = response.request.mbean;
@@ -5289,7 +5287,7 @@ var Camel;
                             hits: entry.hits
                         });
                     }
-                    arr = arr.sortBy("url");
+                    arr = _.sortBy(arr, "url");
                     $scope.data = arr;
                     // okay we have the data then set the selected mbean which allows UI to display data
                     $scope.selectedMBean = response.request.mbean;
@@ -5388,7 +5386,7 @@ var Camel;
                             elapsed: entry.elapsed
                         });
                     }
-                    arr = arr.sortBy("exchangeId");
+                    arr = _.sortBy(arr, "exchangeId");
                     $scope.data = arr;
                     // okay we have the data then set the selected mbean which allows UI to display data
                     $scope.selectedMBean = response.request.mbean;
@@ -6431,7 +6429,7 @@ var Camel;
                             });
                         }
                     }
-                    arr = arr.sortBy("url");
+                    arr = _.sortBy(arr, "url");
                     $scope.data = arr;
                     // okay we have the data then set the selected mbean which allows UI to display data
                     $scope.selectedMBean = response.request.mbean;
@@ -7230,7 +7228,7 @@ var Camel;
                 if (mbean) {
                     // set max only supported on BacklogTracer
                     // (the old fabric tracer does not support max length)
-                    if (mbean.toString().endsWith("BacklogTracer")) {
+                    if (_.endsWith(mbean.toString(), "BacklogTracer")) {
                         var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
                         var streams = Camel.traceOrDebugIncludeStreams(localStorage);
                         jolokia.setAttribute(mbean, "BodyMaxChars", max);
@@ -7400,7 +7398,7 @@ var Camel;
                             arr.push({ from: key, to: v });
                         }
                     }
-                    arr = arr.sortBy("from");
+                    arr = _.sortBy(arr, "from");
                     $scope.data = arr;
                     // okay we have the data then set the selected mbean which allows UI to display data
                     $scope.selectedMBean = response.request.mbean;
@@ -7517,29 +7515,7 @@ var Karaf;
         var features = [];
         var repos = [];
         populateFeaturesAndRepos(attributes, features, repos);
-        return features.find(function (feature) {
-            return feature.Name == name && feature.Version == version;
-        });
-        /*
-        var f = {};
-        angular.forEach(attributes["Features"], (feature) => {
-          angular.forEach(feature, (entry) => {
-            if (entry["Name"] === name && entry["Version"] === version) {
-              var deps = [];
-              populateDependencies(attributes, entry["Dependencies"], deps);
-              f["Name"] = entry["Name"];
-              f["Version"] = entry["Version"];
-              f["Bundles"] = entry["Bundles"];
-              f["Dependencies"] = deps;
-              f["Installed"] = entry["Installed"];
-              f["Configurations"] = entry["Configurations"];
-              f["Configuration Files"] = entry["Configuration Files"];
-              f["Files"] = entry["Configuration Files"];
-            }
-          });
-        });
-        return f;
-        */
+        return _.find(features, function (feature) { return feature.Name == name && feature.Version == version; });
     }
     Karaf.extractFeature = extractFeature;
     var platformBundlePatterns = [
@@ -8158,27 +8134,27 @@ var Karaf;
                     var installedFeatures = features.filter(function (f) { return Core.parseBooleanValue(f.Installed); });
                     var uninstalledFeatures = features.filter(function (f) { return !Core.parseBooleanValue(f.Installed); });
                     //log.debug("repositories: ", repositories);
-                    $scope.installedFeatures = installedFeatures.sortBy(function (f) { return f['Name']; });
-                    uninstalledFeatures = uninstalledFeatures.sortBy(function (f) { return f['Name']; });
-                    repositories.sortBy('id').forEach(function (repo) {
+                    $scope.installedFeatures = _.sortBy(installedFeatures, function (f) { return f['Name']; });
+                    uninstalledFeatures = _.sortBy(uninstalledFeatures, function (f) { return f['Name']; });
+                    _.sortBy(repositories, 'id').forEach(function (repo) {
                         $scope.repositories.push({
                             repository: repo['id'],
                             uri: repo['uri'],
-                            features: uninstalledFeatures.filter(function (f) { return f['RepositoryName'] === repo['id']; })
+                            features: _.filter(uninstalledFeatures, function (f) { return f['RepositoryName'] === repo['id']; })
                         });
                     });
                     if (!Core.isBlank($scope.newRepositoryURI)) {
-                        var selectedRepo = repositories.find(function (r) { return r['uri'] === $scope.newRepositoryURI; });
+                        var selectedRepo = _.find(repositories, function (r) { return r['uri'] === $scope.newRepositoryURI; });
                         if (selectedRepo) {
                             $scope.selectedRepositoryId = selectedRepo['id'];
                         }
                         $scope.newRepositoryURI = '';
                     }
                     if (Core.isBlank($scope.selectedRepositoryId)) {
-                        $scope.selectedRepository = $scope.repositories.first();
+                        $scope.selectedRepository = _.first($scope.repositories);
                     }
                     else {
-                        $scope.selectedRepository = $scope.repositories.find(function (r) { return r.repository === $scope.selectedRepositoryId; });
+                        $scope.selectedRepository = _.find($scope.repositories, function (r) { return r.repository === $scope.selectedRepositoryId; });
                     }
                     Core.$apply($scope);
                 }
@@ -9267,11 +9243,9 @@ var Osgi;
     function formatServiceNameArray(objClass) {
         var rv = [];
         for (var i = 0; i < objClass.length; i++) {
-            rv.add(formatServiceName(objClass[i]));
+            rv.push(formatServiceName(objClass[i]));
         }
-        rv = rv.filter(function (elem, pos, self) {
-            return self.indexOf(elem) === pos;
-        });
+        rv = _.filter(rv, function (elem, pos, self) { return self.indexOf(elem) === pos; });
         rv.sort();
         return rv.toString();
     }
@@ -9853,7 +9827,7 @@ var Osgi;
                         configurations.push(config);
                     }
                 });
-                $scope.configurations = configurations.sortBy("name");
+                $scope.configurations = _.sortBy(configurations, "name");
                 Core.$apply($scope);
             }
             function updateMetaType(lazilyCreateConfigs) {
@@ -10456,7 +10430,7 @@ var Osgi;
             updateTableContents();
             function populateTable(response) {
                 var packages = Osgi.defaultPackageValues(workspace, $scope, response.value);
-                $scope.row = packages.filter({ "Name": $scope.package, "Version": $scope.version })[0];
+                $scope.row = _.filter(packages, { "Name": $scope.package, "Version": $scope.version })[0];
                 Core.$apply($scope);
             }
             ;

@@ -198,7 +198,7 @@ declare module Camel {
         timestamp: string;
         headerHtml: string;
     };
-    function humanizeJavaType(type: String): String;
+    function humanizeJavaType(type: string): string;
     function createBrowseGridOptions(): {
         selectedItems: any[];
         data: string;

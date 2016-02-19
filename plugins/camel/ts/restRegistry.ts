@@ -139,7 +139,7 @@ module Camel {
           }
         }
 
-        arr = arr.sortBy("url");
+        arr = _.sortBy(arr, "url");
         $scope.data = arr;
 
         // okay we have the data then set the selected mbean which allows UI to display data

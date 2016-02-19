@@ -758,7 +758,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "context");
           if (result && result.children) {
-            var contextBean:any = result.children.first();
+            var contextBean:any = _.first(result.children);
             if (contextBean.title) {
               var contextName = contextBean.title;
               return "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
@@ -1040,7 +1040,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "routes");
           if (result && result.children) {
-            var mbean:any = result.children.find(m => m.title === routeId);
+            var mbean:any = _.find(result.children, (m) => m.title === routeId);
             if (mbean) {
               return mbean.objectName;
             }
@@ -1061,7 +1061,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "context");
           if (result && result.children) {
-            var contextBean:any = result.children.first();
+            var contextBean:any = _.first(result.children);
             return contextBean.version;
           }
         }
@@ -1134,12 +1134,12 @@ module Camel {
     return messageData;
   }
 
-  export function humanizeJavaType(type:String) {
+  export function humanizeJavaType(type:string) {
     if (!type) {
       return "";
     }
     // skip leading java.lang
-    if (type.startsWith("java.lang")) {
+    if (_.startsWith(type, "java.lang")) {
       return type.substr(10)
     }
     return type;

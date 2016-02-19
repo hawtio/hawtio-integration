@@ -83,12 +83,12 @@ module Camel {
       // TODO there should be a nicer way to do this!
       var typeName = selection.typeName;
       if (typeName) {
-        if (typeName.startsWith("context")) return contextToolBar;
-        if (typeName.startsWith("route")) return routeToolBar;
+        if (_.startsWith(typeName, "context")) return contextToolBar;
+        if (_.startsWith(typeName, "route")) return routeToolBar;
       }
       var folderNames = selection.folderNames;
       if (folderNames && selection.domain === jmxDomain) {
-        var last = folderNames.last();
+        var last = _.last(folderNames);
         if ("routes" === last)  return routeToolBar;
         if ("context" === last)  return contextToolBar;
       }

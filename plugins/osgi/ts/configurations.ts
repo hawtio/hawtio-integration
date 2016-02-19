@@ -151,7 +151,7 @@ module Osgi {
           configurations.push(config);
         }
       });
-      $scope.configurations = configurations.sortBy("name");
+      $scope.configurations = _.sortBy(configurations, "name");
       Core.$apply($scope);
     }
 

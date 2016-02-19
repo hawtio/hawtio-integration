@@ -255,19 +255,19 @@ module Karaf {
 
         //log.debug("repositories: ", repositories);
 
-        $scope.installedFeatures = installedFeatures.sortBy((f) => { return f['Name'] });
-        uninstalledFeatures = uninstalledFeatures.sortBy((f) => { return f['Name'] });
+        $scope.installedFeatures = _.sortBy(installedFeatures, (f) => f['Name']);
+        uninstalledFeatures = _.sortBy(uninstalledFeatures, (f) => f['Name']);
 
-        repositories.sortBy('id').forEach((repo) => {
+        _.sortBy(repositories, 'id').forEach((repo) => {
           $scope.repositories.push({
             repository: repo['id'],
             uri: repo['uri'],
-            features: uninstalledFeatures.filter((f) => { return f['RepositoryName'] === repo['id'] })
+            features: _.filter(uninstalledFeatures, (f) => f['RepositoryName'] === repo['id'])
           });
         });
 
         if (!Core.isBlank($scope.newRepositoryURI)) {
-          var selectedRepo = repositories.find((r) => { return r['uri'] === $scope.newRepositoryURI });
+          var selectedRepo = _.find(repositories, (r) => r['uri'] === $scope.newRepositoryURI);
           if (selectedRepo) {
             $scope.selectedRepositoryId = selectedRepo['id'];
           }
@@ -275,9 +275,9 @@ module Karaf {
         }
 
         if (Core.isBlank($scope.selectedRepositoryId)) {
-          $scope.selectedRepository = $scope.repositories.first();
+          $scope.selectedRepository = _.first($scope.repositories);
         } else {
-          $scope.selectedRepository = $scope.repositories.find((r) => { return r.repository === $scope.selectedRepositoryId });
+          $scope.selectedRepository = _.find($scope.repositories, (r:any) => r.repository === $scope.selectedRepositoryId);
         }
 
         Core.$apply($scope);

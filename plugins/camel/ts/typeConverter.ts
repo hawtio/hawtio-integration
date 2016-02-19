@@ -62,7 +62,7 @@ module Camel {
             arr.push({from: key, to: v});
           }
         }
-        arr = arr.sortBy("from");
+        arr = _.sortBy(arr, "from");
         $scope.data = arr;
 
         // okay we have the data then set the selected mbean which allows UI to display data
