@@ -262,18 +262,7 @@ module Camel {
     }
     if (nodeSettings) {
       var imageName = nodeSettings["icon"] || "generic24.png";
-
-      // use document base to built the url to the icon
-      var injector = HawtioCore.injector;
-      if (injector) {
-        var documentBase = injector.get<string>("documentBase");
-        if (documentBase) {
-          return UrlHelpers.join(documentBase, "/img/icons/camel/", imageName);
-        }
-      } else {
-        // fallback if no injector
-        return UrlHelpers.join("img/icons/camel/", imageName);
-      }
+      return UrlHelpers.join("img/icons/camel/", imageName);
     } else {
       return null;
     }
@@ -1240,17 +1229,7 @@ module Camel {
             if (componentScheme) {
               var value = Camel.getEndpointIcon(componentScheme);
               if (value) {
-                // use document base to built the url to the icon
-                var injector = HawtioCore.injector;
-                if (injector) {
-                  var documentBase = injector.get<string>("documentBase");
-                  if (documentBase) {
-                    imageUrl = UrlHelpers.join(documentBase, value);
-                  }
-                } else {
-                  // fallback if no injector
-                  imageUrl = Core.url(value);
-                }
+                imageUrl = Core.url(value);
               }
             }
           }

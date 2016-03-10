@@ -160,10 +160,6 @@ module Camel {
       answer = Core.pathGet(category, ["endpointIcon"]);
     }
     answer = answer || endpointIcon;
-    if (HawtioCore.injector) {
-      var documentBase = HawtioCore.injector.get<string>('documentBase');
-      answer = UrlHelpers.join(documentBase, answer);
-    }
     return answer;
   }
 

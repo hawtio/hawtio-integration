@@ -1656,18 +1656,7 @@ var Camel;
         }
         if (nodeSettings) {
             var imageName = nodeSettings["icon"] || "generic24.png";
-            // use document base to built the url to the icon
-            var injector = HawtioCore.injector;
-            if (injector) {
-                var documentBase = injector.get("documentBase");
-                if (documentBase) {
-                    return UrlHelpers.join(documentBase, "/img/icons/camel/", imageName);
-                }
-            }
-            else {
-                // fallback if no injector
-                return UrlHelpers.join("img/icons/camel/", imageName);
-            }
+            return UrlHelpers.join("img/icons/camel/", imageName);
         }
         else {
             return null;
@@ -2628,18 +2617,7 @@ var Camel;
                         if (componentScheme) {
                             var value = Camel.getEndpointIcon(componentScheme);
                             if (value) {
-                                // use document base to built the url to the icon
-                                var injector = HawtioCore.injector;
-                                if (injector) {
-                                    var documentBase = injector.get("documentBase");
-                                    if (documentBase) {
-                                        imageUrl = UrlHelpers.join(documentBase, value);
-                                    }
-                                }
-                                else {
-                                    // fallback if no injector
-                                    imageUrl = Core.url(value);
-                                }
+                                imageUrl = Core.url(value);
                             }
                         }
                     }
@@ -5008,10 +4986,6 @@ var Camel;
             answer = Core.pathGet(category, ["endpointIcon"]);
         }
         answer = answer || Camel.endpointIcon;
-        if (HawtioCore.injector) {
-            var documentBase = HawtioCore.injector.get('documentBase');
-            answer = UrlHelpers.join(documentBase, answer);
-        }
         return answer;
     }
     Camel.getEndpointIcon = getEndpointIcon;
@@ -8880,7 +8854,7 @@ var Osgi;
             return packages;
         };
         return OsgiDataService;
-    })();
+    }());
     Osgi.OsgiDataService = OsgiDataService;
 })(Osgi || (Osgi = {}));
 
@@ -10393,7 +10367,7 @@ var Osgi;
             return this.graphBuilder.buildGraph();
         };
         return OsgiGraphBuilder;
-    })();
+    }());
     Osgi.OsgiGraphBuilder = OsgiGraphBuilder;
 })(Osgi || (Osgi = {}));
 
