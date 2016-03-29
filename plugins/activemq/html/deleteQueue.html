@@ -14,18 +14,18 @@
   </div>
 
   <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="control-group">
         <button type="submit" class="btn btn-warning" ng-click="deleteDialog = true">Delete queue
-          '{{name().unescapeHTML()}}'
+          '{{name}}'
         </button>
         <label>This will remove the queue completely.</label>
       </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="control-group">
         <button type="submit" class="btn btn-warning" ng-click="purgeDialog = true">Purge queue
-          '{{name().unescapeHTML()}}'
+          '{{name}}'
         </button>
         <label>Purges all the current messages on the queue.</label>
       </div>
@@ -38,7 +38,7 @@
        cancel-button-text="Cancel"
        on-ok="deleteDestination()">
     <div class="dialog-body">
-      <p>You are about to delete the <b>{{name().unescapeHTML()}}</b> queue</p>
+      <p>You are about to delete the <b>{{name}}</b> queue</p>
       <p>This operation cannot be undone so please be careful.</p>
     </div>
   </div>
@@ -49,7 +49,7 @@
        cancel-button-text="Cancel"
        on-ok="purgeDestination()">
     <div class="dialog-body">
-      <p>You are about to purge the <b>{{name().unescapeHTML()}}</b> queue</p>
+      <p>You are about to purge the <b>{{name}}</b> queue</p>
       <p>This operation cannot be undone so please be careful.</p>
     </div>
   </div>

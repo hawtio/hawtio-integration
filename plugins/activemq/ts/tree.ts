@@ -67,13 +67,13 @@ module ActiveMQ {
               // we need to store all topics the first time on the workspace
               // so we have access to them later if the user changes the filter in the preferences
               var key = "ActiveMQ-allTopics-" + broker.title;
-              var allTopics = old.children.clone();
+              var allTopics = _.clone(old.children);
               workspace.mapData[key] = allTopics;
 
               var filter = Core.parseBooleanValue(localStorage["activemqFilterAdvisoryTopics"]);
               if (filter) {
                 if (old && old.children) {
-                  var filteredTopics = old.children.filter(c => !c.title.startsWith("ActiveMQ.Advisory"));
+                  var filteredTopics = _.filter(old.children, (c:any) => !c.title.startsWith("ActiveMQ.Advisory"));
                   old.children = filteredTopics;
                 }
               } else if (allTopics) {

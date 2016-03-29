@@ -7,7 +7,6 @@ module ActiveMQ {
     $scope.workspace = workspace;
     $scope.message = "";
     $scope.destinationName = "";
-    $scope.queueType = (isTopicsFolder(workspace) || isTopic(workspace)) ? "false" : "true";
     $scope.destinationTypeName = $scope.queueType ? "Queue" : "Topic";
 
     $scope.deleteDialog = false;
@@ -25,6 +24,8 @@ module ActiveMQ {
 
     $scope.$watch('workspace.selection', function () {
       workspace.moveIfViewInvalid();
+      $scope.queueType = (isTopicsFolder(workspace) || isTopic(workspace)) ? "false" : "true";
+      $scope.name = Core.pathGet(workspace, ['selection', 'title']);
     });
 
     function operationSuccess() {
@@ -95,7 +96,7 @@ module ActiveMQ {
       if (mbean && selection && jolokia && entries) {
         var domain = selection.domain;
         var name = entries["Destination"] || entries["destinationName"] || selection.title;
-        name = name.unescapeHTML();
+        name = _.unescape(name);
         var isQueue = "Topic" !== (entries["Type"] || entries["destinationType"]);
         var operation;
         if (isQueue) {
@@ -115,19 +116,12 @@ module ActiveMQ {
       var entries = selection.entries;
       if (mbean && selection && jolokia && entries) {
         var name = entries["Destination"] || entries["destinationName"] || selection.title;
-        name = name.unescapeHTML();
+        name = _.unescape(name);
         var operation = "purge()";
         $scope.message = "Purged queue " + name;
         jolokia.execute(mbean, operation, Core.onSuccess(operationSuccess));
       }
     };
 
-    $scope.name = () => {
-      var selection = workspace.selection;
-      if (selection) {
-        return selection.title;
-      }
-      return null;
-    }
   }]);
 }

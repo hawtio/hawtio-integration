@@ -24,7 +24,7 @@ module Camel {
       $scope.noCredentials = (Core.isBlank(localStorage['activemqUserName']) || Core.isBlank(localStorage['activemqPassword']));
     };
 
-    if ($location.path().has('activemq')) {
+    if ($location.path().indexOf('activemq') > -1) {
       $scope.localStorage = localStorage;
       $scope.$watch('localStorage.activemqUserName', $scope.checkCredentials);
       $scope.$watch('localStorage.activemqPassword', $scope.checkCredentials);

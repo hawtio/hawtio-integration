@@ -307,20 +307,16 @@ module ActiveMQ {
       }
 
       var propertiesKeys = _.keys(properties).sort(sort);
-
       var jmsHeaders = _.filter(headerKeys, (key) => _.startsWith(key, "JMS")).sort(sort);
-
       var remaining = _.difference(headerKeys, jmsHeaders.concat(propertiesKeys)).sort(sort);
 
       var buffer = [];
 
       function appendHeader(key) {
-
         var value = headers[key];
         if (value === null) {
           value = '';
         }
-
         buffer.push('<tr><td class="propertyName"><span class="green">Header</span> - ' +
             key +
             '</td><td class="property-value">' +
@@ -333,7 +329,6 @@ module ActiveMQ {
         if (value === null) {
           value = '';
         }
-
         buffer.push('<tr><td class="propertyName">' +
             key +
             '</td><td class="property-value">' +
@@ -352,7 +347,7 @@ module ActiveMQ {
       var answer = {};
       angular.forEach(row, (value, key) => {
         if (!_.some(ignoreColumns, key) && !_.some(flattenColumns, key)) {
-            answer[Core.escapeHtml(key)] = Core.escapeHtml(value);
+            answer[_.escape(key)] = _.escape(value);
         }
       });
       return answer;
@@ -364,7 +359,7 @@ module ActiveMQ {
       angular.forEach(row, (value, key) => {
         if (!_.some(ignoreColumns, key) && _.some(flattenColumns, key)) {
           angular.forEach(value, (v2, k2) => {
-            answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + Core.escapeHtml(k2)] = Core.escapeHtml(v2)
+            answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + _.escape(k2)] = _.escape(v2)
           });
         }
       });

@@ -1,8 +1,6 @@
 <div ng-controller="ActiveMQ.DestinationController">
   <div class="row">
-
     <div class="control-group">
-
       <div class="alert alert-warning">
         <span class="pficon-layered">
           <span class="pficon pficon-warning-triangle"></span>
@@ -14,10 +12,10 @@
   </div>
 
   <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-12">
       <div class="control-group">
         <button type="submit" class="btn btn-warning" ng-click="deleteDialog = true">Delete topic
-          '{{name().unescapeHTML()}}'
+          '{{name}}'
         </button>
         <label>This will remove the topic completely.</label>
       </div>
@@ -30,7 +28,7 @@
        cancel-button-text="Cancel"
        on-ok="deleteDestination()">
     <div class="dialog-body">
-      <p>You are about to delete the <b>{{name().unescapeHTML()}}</b> topic</p>
+      <p>You are about to delete the <b>{{name}}</b> topic</p>
       <p>This operation cannot be undone so please be careful.</p>
     </div>
   </div>
