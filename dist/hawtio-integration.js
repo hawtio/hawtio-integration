@@ -698,7 +698,7 @@ var ActiveMQ;
                 //log.debug("headers: ", row);
                 var answer = {};
                 angular.forEach(row, function (value, key) {
-                    if (!_.some(ignoreColumns, key) && !_.some(flattenColumns, key)) {
+                    if (!_.some(ignoreColumns, function (k) { return k === key; }) && !_.some(flattenColumns, function (k) { return k === key; })) {
                         answer[_.escape(key)] = _.escape(value);
                     }
                 });
@@ -708,7 +708,7 @@ var ActiveMQ;
                 //log.debug("properties: ", row);
                 var answer = {};
                 angular.forEach(row, function (value, key) {
-                    if (!_.some(ignoreColumns, key) && _.some(flattenColumns, key)) {
+                    if (!_.some(ignoreColumns, function (k) { return k === key; }) && _.some(flattenColumns, function (k) { return k === key; })) {
                         angular.forEach(value, function (v2, k2) {
                             answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + _.escape(k2)] = _.escape(v2);
                         });

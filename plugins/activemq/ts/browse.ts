@@ -346,7 +346,7 @@ module ActiveMQ {
       //log.debug("headers: ", row);
       var answer = {};
       angular.forEach(row, (value, key) => {
-        if (!_.some(ignoreColumns, key) && !_.some(flattenColumns, key)) {
+        if (!_.some(ignoreColumns, (k) => k === key) && !_.some(flattenColumns, (k) => k === key)) {
             answer[_.escape(key)] = _.escape(value);
         }
       });
@@ -357,7 +357,7 @@ module ActiveMQ {
       //log.debug("properties: ", row);
       var answer = {};
       angular.forEach(row, (value, key) => {
-        if (!_.some(ignoreColumns, key) && _.some(flattenColumns, key)) {
+        if (!_.some(ignoreColumns, (k) => k === key) && _.some(flattenColumns, (k) => k === key)) {
           angular.forEach(value, (v2, k2) => {
             answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + _.escape(k2)] = _.escape(v2)
           });
