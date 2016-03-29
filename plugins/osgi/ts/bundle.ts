@@ -69,7 +69,7 @@ module Osgi {
     for (var i = 0; i < objClass.length; i++) {
       rv.push(formatServiceName(objClass[i]));
     }
-    rv = _.filter(rv, (elem, pos, self) => self.indexOf(elem) === pos);
+    rv = _.filter(rv, (elem, pos, self:Array<any>) => self.indexOf(elem) === pos);
     rv.sort();
     return rv.toString();
   }
