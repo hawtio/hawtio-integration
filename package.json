@@ -21,6 +21,7 @@
     "through2": "^0.6.3",
     "underscore.string": "^2.4.0",
     "url-join": "0.0.1",
+    "util-deprecate": "^1.0.2",
     "which": "^1.0.8",
     "wiredep": "^2.2.2"
   },
