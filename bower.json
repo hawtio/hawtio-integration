@@ -39,6 +39,7 @@
     "hawtio-extension-service": "~2.0.1"
   },
   "resolutions": {
+    "angular": ">= 1.1.0 <= 1.6.0",
     "lodash": "~3.2.0"
   }
 }
