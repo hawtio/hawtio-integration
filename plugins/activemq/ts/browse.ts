@@ -69,7 +69,8 @@ module ActiveMQ {
           displayName: 'Correlation ID',
           width: '10%'
         }
-      ]
+      ],
+      primaryKeyFn: entity => entity.JMSMessageID
     };
 
     $scope.showMessageDetails = false;

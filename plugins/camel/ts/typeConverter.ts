@@ -37,7 +37,8 @@ module Camel {
       selectedItems: [],
       filterOptions: {
         filterText: ''
-      }
+      },
+      primaryKeyFn: entity => entity.from + '/' + entity.to
     };
 
     function onAttributes(response) {

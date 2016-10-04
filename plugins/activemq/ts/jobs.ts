@@ -60,7 +60,8 @@ module ActiveMQ {
           displayName: 'Next',
           width: '25%'
         }
-      ]
+      ],
+      primaryKeyFn: entity => entity.jobId
     };
 
     $scope.$watch('workspace.selection', function () {
