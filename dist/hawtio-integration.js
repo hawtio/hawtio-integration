@@ -442,7 +442,8 @@ var ActiveMQ;
                         displayName: 'Correlation ID',
                         width: '10%'
                     }
-                ]
+                ],
+                primaryKeyFn: function (entity) { return entity.JMSMessageID; }
             };
             $scope.showMessageDetails = false;
             // openMessageDialog is for the dialog itself so we should skip that guy
@@ -1011,7 +1012,8 @@ var ActiveMQ;
                         displayName: 'Status',
                         width: '10%'
                     }
-                ]
+                ],
+                primaryKeyFn: function (entity) { return entity.destinationName + '/' + entity.clientId + '/' + entity.consumerId; }
             };
             $scope.doCreateSubscriber = function (clientId, subscriberName, topicName, subSelector) {
                 $scope.createSubscriberDialog.close();
@@ -1178,7 +1180,8 @@ var ActiveMQ;
                         displayName: 'Next',
                         width: '25%'
                     }
-                ]
+                ],
+                primaryKeyFn: function (entity) { return entity.jobId; }
             };
             $scope.$watch('workspace.selection', function () {
                 if (workspace.moveIfViewInvalid())
@@ -3742,7 +3745,8 @@ var Camel;
                 selectedItems: [],
                 filterOptions: {
                     filterText: ''
-                }
+                },
+                primaryKeyFn: function (entity) { return entity.exchangeId; }
             };
             $scope.doUnblock = function () {
                 var mbean = Camel.getSelectionCamelBlockedExchanges(workspace);
@@ -5237,7 +5241,8 @@ var Camel;
                 selectedItems: [],
                 filterOptions: {
                     filterText: ''
-                }
+                },
+                primaryKeyFn: function (entity) { return entity.routeId; }
             };
             function onRestRegistry(response) {
                 var obj = response.value;
@@ -5337,7 +5342,8 @@ var Camel;
                 selectedItems: [],
                 filterOptions: {
                     filterText: ''
-                }
+                },
+                primaryKeyFn: function (entity) { return entity.exchangeId; }
             };
             function onInflight(response) {
                 var obj = response.value;
@@ -6370,7 +6376,8 @@ var Camel;
                 selectedItems: [],
                 filterOptions: {
                     filterText: ''
-                }
+                },
+                primaryKeyFn: function (entity) { return entity.routeId; }
             };
             function onRestRegistry(response) {
                 var obj = response.value;
@@ -7345,7 +7352,8 @@ var Camel;
                 selectedItems: [],
                 filterOptions: {
                     filterText: ''
-                }
+                },
+                primaryKeyFn: function (entity) { return entity.from + '/' + entity.to; }
             };
             function onAttributes(response) {
                 var obj = response.value;
@@ -8228,7 +8236,8 @@ var Karaf;
                         cellTemplate: '<div class="ngCellText">{{row.getProperty(col.field)}}</div>',
                         width: 200
                     }
-                ]
+                ],
+                primaryKeyFn: function (entity) { return entity.Name; }
             };
             var scrMBean = Karaf.getSelectionScrMBean(workspace);
             if (scrMBean) {
@@ -9555,7 +9564,8 @@ var Osgi;
                 columnDefs: columnDefs,
                 filterOptions: {
                     filterText: ''
-                }
+                },
+                primaryKeyFn: function (entity) { return entity.Identifier; }
             };
             $scope.onResponse = function () {
                 jolokia.request({
@@ -9685,7 +9695,8 @@ var Osgi;
                         displayName: 'Configuration',
                         cellTemplate: '<div class="ngCellText"><a ng-href="{{row.entity.pidLink}}" title="{{row.entity.description}}">{{row.entity.name}}</a></div>'
                     }
-                ]
+                ],
+                primaryKeyFn: function (entity) { return entity.Pid; }
             };
             /** the kinds of config */
             var configKinds = {
@@ -10460,7 +10471,8 @@ var Osgi;
                         field: 'RemovalPending',
                         displayName: 'Removal Pending',
                     }
-                ]
+                ],
+                primaryKeyFn: function (entity) { return entity.Name; }
             };
             /*
                 $scope.widget = new DataTable.TableWidget($scope, $templateCache, $compile, [
@@ -11041,7 +11053,8 @@ var Osgi;
                         displayName: 'Used by',
                         cellTemplate: "\n            <div class=\"ngCellText\">\n              <div ng-repeat=\"bundle in row.entity.UsingBundles\">\n                <a ng-href=\"/osgi/bundle/{{bundle.Identifier}}\">{{bundle.Name || bundle.SymbolicName || bundle.Identifier}}</a>\n                <!--\n                <pre>\n                  {{bundle}}\n                </pre>\n                  -->\n              </div>\n            </div>"
                     }
-                ]
+                ],
+                primaryKeyFn: function (entity) { return entity.BundleIdentifier; }
             };
             $scope.selectedItems = $scope.mygrid.selectedItems;
             /*

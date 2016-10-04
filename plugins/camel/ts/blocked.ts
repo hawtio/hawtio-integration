@@ -66,7 +66,8 @@ module Camel {
       selectedItems: [],
       filterOptions: {
         filterText: ''
-      }
+      },
+      primaryKeyFn: entity => entity.exchangeId
     };
 
     $scope.doUnblock = () => {

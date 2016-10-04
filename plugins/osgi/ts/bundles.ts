@@ -71,7 +71,8 @@ module Osgi {
       columnDefs: columnDefs,
       filterOptions: {
         filterText: ''
-      }
+      },
+      primaryKeyFn: entity => entity.Identifier
     };
 
     $scope.onResponse = function () {

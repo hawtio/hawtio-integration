@@ -46,7 +46,8 @@ module Karaf {
                     cellTemplate: '<div class="ngCellText">{{row.getProperty(col.field)}}</div>',
                     width: 200
                 }
-            ]
+            ],
+            primaryKeyFn: entity => entity.Name
         };
 
         var scrMBean = Karaf.getSelectionScrMBean(workspace);

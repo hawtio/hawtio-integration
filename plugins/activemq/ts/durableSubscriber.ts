@@ -59,7 +59,8 @@ module ActiveMQ {
             displayName: 'Status',
             width: '10%'
           }
-        ]
+        ],
+        primaryKeyFn: entity => entity.destinationName + '/' + entity.clientId + '/' + entity.consumerId
       };
 
       $scope.doCreateSubscriber = (clientId, subscriberName, topicName, subSelector) => {

@@ -75,7 +75,8 @@ module Osgi {
               </div>
             </div>`
         }
-      ]
+      ],
+      primaryKeyFn: entity => entity.BundleIdentifier
     };
 
     $scope.selectedItems = $scope.mygrid.selectedItems;
