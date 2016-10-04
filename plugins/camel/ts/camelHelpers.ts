@@ -505,7 +505,7 @@ module Camel {
         var notFound = true;
         while (notFound) {
           var tmpKey = key + counter;
-          if (folder.children.some({key: tmpKey})) {
+          if (folder.children.indexOf({key: tmpKey}) !== -1) {
             counter += 1;
           } else {
             notFound = false;
@@ -981,7 +981,7 @@ module Camel {
   export function isState(item, state) {
     var value = (item.State || "").toLowerCase();
     if (angular.isArray(state)) {
-      return state.any((stateText) => value.startsWith(stateText));
+      return state.some((stateText) => value.startsWith(stateText));
     } else {
       return value.startsWith(state);
     }

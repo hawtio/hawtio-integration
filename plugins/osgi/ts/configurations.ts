@@ -52,7 +52,7 @@ module Osgi {
     $scope.addPidDialog = new UI.Dialog();
 
     $scope.addPid = (newPid) => {
-      if ($scope.configurations.any((c) => c['pid'] == newPid)) {
+      if ($scope.configurations.some((c) => c['pid'] == newPid)) {
         Core.notification("error", "pid \"" + newPid + "\" already exists.");
         return;
       }

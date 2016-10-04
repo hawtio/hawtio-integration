@@ -278,7 +278,7 @@ module Camel {
     }
 
     function containsNodeId(breakpoints, nodeId) {
-      return nodeId && breakpoints && breakpoints.some(nodeId);
+      return nodeId && breakpoints && breakpoints.indexOf(nodeId) !== -1;
     }
 
     function getDiagramNodes() {
