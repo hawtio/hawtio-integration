@@ -157,8 +157,8 @@ module Karaf {
     $scope.filteredRows = ['Bundles', 'Configurations', 'Configuration Files', 'Dependencies'];
 
     $scope.showRow = (key, value) => {
-
-      if ($scope.filteredRows.any(key)) {
+      
+      if ($scope.filteredRows.indexOf(key) !== -1) {
         return false;
       }
 

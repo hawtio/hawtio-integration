@@ -38,12 +38,12 @@ module Camel {
 
     $scope.anySelectionHasState = (state) => {
       var selected = $scope.selectedItems || [];
-      return selected.length && selected.any((s) => isState(s, state));
+      return selected.some((s) => isState(s, state));
     };
 
     $scope.everySelectionHasState = (state) => {
       var selected = $scope.selectedItems || [];
-      return selected.length && selected.every((s) => isState(s, state));
+      return selected.every((s) => isState(s, state));
     };
   }]);
 }
