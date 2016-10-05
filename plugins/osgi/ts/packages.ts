@@ -62,7 +62,8 @@ module Osgi {
           field: 'RemovalPending',
           displayName: 'Removal Pending',
         }
-      ]
+      ],
+      primaryKeyFn: entity => entity.Name
     };
 
 

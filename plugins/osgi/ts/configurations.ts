@@ -23,14 +23,14 @@ module Osgi {
       selectedItems: $scope.selectedItems,
       showSelectionCheckbox: false,
       displaySelectionCheckbox: false,
-
       columnDefs: [
         {
           field: 'Pid',
           displayName: 'Configuration',
           cellTemplate: '<div class="ngCellText"><a ng-href="{{row.entity.pidLink}}" title="{{row.entity.description}}">{{row.entity.name}}</a></div>'
         }
-      ]
+      ],
+      primaryKeyFn: entity => entity.Pid
     };
 
     /** the kinds of config */

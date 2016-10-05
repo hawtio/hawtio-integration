@@ -65,7 +65,8 @@ module Camel {
       selectedItems: [],
       filterOptions: {
         filterText: ''
-      }
+      },
+      primaryKeyFn: entity => entity.routeId
     };
 
     function onRestRegistry(response) {

@@ -57,7 +57,8 @@ module Camel {
       selectedItems: [],
       filterOptions: {
         filterText: ''
-      }
+      },
+      primaryKeyFn: entity => entity.exchangeId
     };
 
     function onInflight(response) {
