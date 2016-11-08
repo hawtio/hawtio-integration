@@ -32,7 +32,7 @@ module Camel {
       $scope.invokeSelectedMBeans("remove()", () => {
         // force a reload of the tree
         $scope.workspace.operationCounter += 1;
-        Core.$apply($scope);
+        workspace.loadTree();
       });
     };
 
