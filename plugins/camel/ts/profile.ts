@@ -85,6 +85,7 @@ module Camel {
 
     $scope.gridOptions = {
       data: 'data',
+      selectedItems: [],
       displayFooter: true,
       displaySelectionCheckbox: false,
       canSelectRows: false,
