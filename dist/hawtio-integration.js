@@ -3668,7 +3668,7 @@ var Camel;
                 $scope.invokeSelectedMBeans("remove()", function () {
                     // force a reload of the tree
                     $scope.workspace.operationCounter += 1;
-                    Core.$apply($scope);
+                    workspace.loadTree();
                 });
             };
             $scope.anySelectionHasState = function (state) {
