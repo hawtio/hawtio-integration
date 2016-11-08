@@ -79,7 +79,8 @@ module Camel {
     };
 
     $scope.removeHeader = (header) => {
-      $scope.headers = $scope.headers.remove(header);
+      let index = $scope.headers.indexOf(header);
+      $scope.headers.splice(index, 1);
     };
 
     $scope.defaultHeaderNames = () => {

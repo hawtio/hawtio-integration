@@ -6838,7 +6838,8 @@ var Camel;
                 }
             };
             $scope.removeHeader = function (header) {
-                $scope.headers = $scope.headers.remove(header);
+                var index = $scope.headers.indexOf(header);
+                $scope.headers.splice(index, 1);
             };
             $scope.defaultHeaderNames = function () {
                 var answer = [];
