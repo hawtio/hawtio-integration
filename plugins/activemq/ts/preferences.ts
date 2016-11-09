@@ -15,7 +15,7 @@ module ActiveMQ {
           description: 'The user name to be used when connecting to the broker'
         },
         activemqPassword: {
-          type: 'string',
+          type: 'password',
           description: 'Password to be used when connecting to the broker'
         },
         activemqFilterAdvisoryTopics: {
