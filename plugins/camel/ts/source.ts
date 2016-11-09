@@ -15,7 +15,8 @@ module Camel {
     });
 
     $scope.mode = 'xml';
-
+    $scope.showUpdateButton = true;
+    
     function getSource(routeXmlNode) {
       function removeCrappyHeaders(idx, e) {
         var answer = e.getAttribute("customId");
@@ -43,6 +44,7 @@ module Camel {
       var routeXmlNode = getSelectedRouteNode(workspace);
       if (routeXmlNode) {
         $scope.source = getSource(routeXmlNode);
+        $scope.showUpdateButton = routeXmlNode.nodeName === 'route';
         Core.$apply($scope);
       } else {
         // no then try to find the camel context and get all the routes code
@@ -85,9 +87,7 @@ module Camel {
     
     var saveWorked = () => {
       Core.notification("success", "Route updated!");
-      // lets clear the cached route XML so we reload the new value
-      clearSelectedRouteNode(workspace);
-      updateRoutes();
+      workspace.loadTree();
     };
 
     $scope.saveRouteXml = () => {
@@ -103,7 +103,7 @@ module Camel {
           Core.notification("error", "Could not find CamelContext MBean!");
         }
       }
-    };
+    };  
   }]);
 }
 
