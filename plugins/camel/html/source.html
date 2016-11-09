@@ -1,5 +1,5 @@
 <div class="form-horizontal" ng-controller="Camel.SourceController">
-  <div class="row">
+  <div class="row" ng-if="showUpdateButton">
     <div class="col-md-12">
       <button class="pull-right btn btn-primary"
               hawtio-show object-name="{{getSelectionCamelContextMBean(workspace)}}" method-name="addOrUpdateRoutesFromXml"
