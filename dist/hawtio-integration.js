@@ -1362,7 +1362,7 @@ var ActiveMQ;
                                 var filter = Core.parseBooleanValue(localStorage["activemqFilterAdvisoryTopics"]);
                                 if (filter) {
                                     if (old && old.children) {
-                                        var filteredTopics = _.filter(old.children, function (c) { return !c.title.startsWith("ActiveMQ.Advisory"); });
+                                        var filteredTopics = _.filter(old.children, function (c) { return !_.startsWith(c.title, "ActiveMQ.Advisory"); });
                                         old.children = filteredTopics;
                                     }
                                 }
@@ -1624,7 +1624,7 @@ var Camel;
                 }
                 else {
                     if (value) {
-                        if (key.startsWith("_")) {
+                        if (_.startsWith(key, "_")) {
                         }
                         else {
                             var text = value.toString();
@@ -1683,11 +1683,11 @@ var Camel;
             }
             var uri = attributes['name'];
             uri = uri.replace("\\?", "?");
-            if (uri.startsWith("\"")) {
-                uri = uri.last(uri.length - 1);
+            if (_.startsWith(uri, "\"")) {
+                uri = uri.substr(1);
             }
-            if (uri.endsWith("\"")) {
-                uri = uri.first(uri.length - 1);
+            if (_.endsWith(uri, "\"")) {
+                uri = uri.substr(0, uri.length - 1);
             }
             return uri;
         }
@@ -2171,7 +2171,7 @@ var Camel;
                     // look for the Camel 2.11 mbean which we prefer
                     var result = tree.navigate(domain, contextId, "tracer");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return m.title.startsWith("BacklogTracer"); });
+                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "BacklogTracer"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -2192,7 +2192,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "tracer");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return m.title.startsWith("BacklogDebugger"); });
+                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "BacklogDebugger"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -2213,7 +2213,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return m.title.startsWith("DefaultTypeConverter"); });
+                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultTypeConverter"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -2234,7 +2234,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return m.title.startsWith("DefaultRestRegistry"); });
+                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultRestRegistry"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -2255,7 +2255,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return m.title.startsWith("DefaultRuntimeEndpointRegistry"); });
+                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultRuntimeEndpointRegistry"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -2276,7 +2276,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return m.title.startsWith("DefaultInflightRepository"); });
+                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultInflightRepository"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -2297,7 +2297,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return m.title.startsWith("DefaultAsyncProcessorAwaitManager"); });
+                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultAsyncProcessorAwaitManager"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -2318,7 +2318,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return m.title.startsWith("MetricsRegistryService"); });
+                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "MetricsRegistryService"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -2363,10 +2363,10 @@ var Camel;
     function isState(item, state) {
         var value = (item.State || "").toLowerCase();
         if (angular.isArray(state)) {
-            return state.some(function (stateText) { return value.startsWith(stateText); });
+            return state.some(function (stateText) { return _.startsWith(value, stateText); });
         }
         else {
-            return value.startsWith(state);
+            return _.startsWith(value, state);
         }
     }
     Camel.isState = isState;
@@ -2483,7 +2483,7 @@ var Camel;
             angular.forEach(postFixes, function (postfix) {
                 if (!id) {
                     angular.forEach(messageData.headers, function (value, key) {
-                        if (!id && key.endsWith(postfix)) {
+                        if (!id && _.endsWith(key, postfix)) {
                             id = value;
                         }
                     });
@@ -6634,7 +6634,7 @@ var Camel;
             function isSelected(node) {
                 if (node) {
                     var className = node.getAttribute("class");
-                    return className && className.endsWith(postfix);
+                    return className && _.endsWith(className, postfix);
                 }
                 return false;
             }
@@ -6642,7 +6642,7 @@ var Camel;
                 var answer = false;
                 if (node) {
                     var className = node.getAttribute("class");
-                    var selected = className && className.endsWith(postfix);
+                    var selected = className && _.endsWith(className, postfix);
                     if (selected) {
                         className = className.substring(0, className.length - postfix.length);
                     }
@@ -6671,7 +6671,7 @@ var Camel;
                 // do not allow clicking on node to show properties if debugging or tracing as that is for selecting the node instead
                 var onClick;
                 var path = $location.path();
-                if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
+                if (_.startsWith(path, "/camel/debugRoute") || _.startsWith(path, "/camel/traceRoute")) {
                     onClick = null;
                 }
                 else {
@@ -8434,7 +8434,7 @@ var Osgi;
                 row = packageEntry;
             var name = packageEntry["Name"];
             var version = packageEntry["Version"];
-            if (name && !name.startsWith("#")) {
+            if (name && !_.startsWith(name, "#")) {
                 packageEntry["VersionLink"] = "<a href='" + Core.url("#/osgi/package/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
                 var importingBundles = row["ImportingBundles"] || packageEntry["ImportingBundles"];
                 var exportingBundles = row["ExportingBundles"] || packageEntry["ExportingBundles"];
@@ -8776,7 +8776,7 @@ var Osgi;
      */
     function removeFactoryPidPrefix(pid, factoryPid) {
         if (pid && factoryPid) {
-            if (pid.startsWith(factoryPid)) {
+            if (_.startsWith(pid, factoryPid)) {
                 return pid.substring(factoryPid.length + 1);
             }
             var idx = factoryPid.lastIndexOf(".");
@@ -9054,7 +9054,7 @@ var Osgi;
             };
             $scope.$watch('display.sortField', function (newValue, oldValue) {
                 if (newValue !== oldValue) {
-                    $scope.bundles = $scope.bundles.sortBy(newValue);
+                    $scope.bundles = _.sortBy($scope.bundles, newValue);
                 }
             });
             $scope.getStateStyle = function (state) {
@@ -9117,7 +9117,7 @@ var Osgi;
                         }
                         $scope.bundles.push(obj);
                     });
-                    $scope.bundles = $scope.bundles.sortBy($scope.display.sortField);
+                    $scope.bundles = _.sortBy($scope.bundles, $scope.display.sortField);
                     Core.$apply($scope);
                     // Obtain start level information for all the bundles, let's do this async though
                     setTimeout(function () {
@@ -9132,7 +9132,7 @@ var Osgi;
                         }
                         var outstanding = requests.length;
                         jolokia.request(requests, Core.onSuccess(function (response) {
-                            var id = response['request']['arguments'].first();
+                            var id = response['request']['arguments'][0];
                             if (angular.isDefined(id)) {
                                 var bundle = $scope.bundles[id];
                                 if (bundle) {
@@ -9722,7 +9722,7 @@ var Osgi;
                     return;
                 }
                 $scope.addPidDialog.close();
-                var mbean = Osgi.getHawtioConfigAdminMBean($scope.workspace);
+                var mbean = Osgi.getHawtioConfigAdminMBean(workspace);
                 if (mbean && newPid) {
                     var json = JSON.stringify({});
                     $scope.jolokia.execute(mbean, "configAdminUpdate", newPid, json, Core.onSuccess(function (response) {
@@ -9749,7 +9749,7 @@ var Osgi;
                 });
                 $scope.pids = pids;
                 // lets load the factory pids
-                var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
+                var mbean = Osgi.getSelectionConfigAdminMBean(workspace);
                 if (mbean) {
                     $scope.jolokia.execute(mbean, 'getConfigurations', '(service.factoryPid=*)', Core.onSuccess(onConfigFactoryPids, errorHandler("Failed to load factory PID configurations: ")));
                 }
@@ -9759,7 +9759,7 @@ var Osgi;
              * For each factory PID lets find the underlying PID to use to edit it, then lets make a link between them
              */
             function onConfigFactoryPids(response) {
-                var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
+                var mbean = Osgi.getSelectionConfigAdminMBean(workspace);
                 var pids = $scope.pids;
                 if (pids && mbean) {
                     angular.forEach(response, function (row) {
@@ -9777,7 +9777,7 @@ var Osgi;
                                         if (factoryConfig) {
                                             configureFactoryPidConfig(pid, factoryConfig, config);
                                             if ($scope.inFabricProfile) {
-                                                Osgi.getConfigurationProperties($scope.workspace, $scope.jolokia, pid, function (configValues) {
+                                                Osgi.getConfigurationProperties(workspace, $scope.jolokia, pid, function (configValues) {
                                                     var zkPid = Core.pathGet(configValues, ["fabric.zookeeper.pid", "Value"]);
                                                     if (zkPid) {
                                                         config["name"] = Osgi.removeFactoryPidPrefix(zkPid, factoryPid);
@@ -9844,7 +9844,7 @@ var Osgi;
                         jolokia.execute($scope.profileMetadataMBean, "metaTypeSummary", $scope.versionId, $scope.profileId, Core.onSuccess(onMetaType));
                     }
                     else {
-                        var metaTypeMBean = Osgi.getMetaTypeMBean($scope.workspace);
+                        var metaTypeMBean = Osgi.getMetaTypeMBean(workspace);
                         if (metaTypeMBean) {
                             $scope.jolokia.execute(metaTypeMBean, "metaTypeSummary", Core.onSuccess(onMetaType));
                         }
@@ -9858,7 +9858,7 @@ var Osgi;
                 }
                 else {
                     if ($scope.jolokia) {
-                        var mbean = Osgi.getSelectionConfigAdminMBean($scope.workspace);
+                        var mbean = Osgi.getSelectionConfigAdminMBean(workspace);
                         if (mbean) {
                             $scope.jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
                         }
@@ -9914,7 +9914,7 @@ var Osgi;
             }
             function trimUnnecessaryPrefixes(name) {
                 angular.forEach(["Fabric8 ", "Apache "], function (prefix) {
-                    if (name && name.startsWith(prefix) && name.length > prefix.length) {
+                    if (name && _.startsWith(name, prefix) && name.length > prefix.length) {
                         name = name.substring(prefix.length);
                     }
                 });
@@ -9940,7 +9940,7 @@ var Osgi;
             function ignorePid(pid) {
                 var answer = false;
                 angular.forEach(Osgi.configuration.ignorePids, function (pattern) {
-                    if (pid.startsWith(pattern)) {
+                    if (_.startsWith(pid, pattern)) {
                         answer = true;
                     }
                 });
@@ -10300,7 +10300,7 @@ var Osgi;
         OsgiGraphBuilder.prototype.addFilteredBundles = function () {
             var _this = this;
             d3.values(this.getBundles()).forEach(function (bundle) {
-                if (_this.bundleFilter == null || _this.bundleFilter == "" || bundle.SymbolicName.startsWith(_this.bundleFilter)) {
+                if (_this.bundleFilter == null || _this.bundleFilter == "" || _.startsWith(bundle.SymbolicName, _this.bundleFilter.toString())) {
                     var bundleNode = _this.buildBundleNode(bundle);
                     _this.filteredBundles[bundleNode.id] = bundle;
                     bundleNode.used = true;
@@ -10340,7 +10340,7 @@ var Osgi;
             var _this = this;
             if (this.showPackages) {
                 d3.values(this.getPackages()).forEach(function (pkg) {
-                    if (_this.packageFilter == null || _this.packageFilter == "" || pkg.Name.startsWith(_this.packageFilter)) {
+                    if (_this.packageFilter == null || _this.packageFilter == "" || _.startsWith(pkg.Name, _this.packageFilter.toString())) {
                         var exportingId = _this.exportingBundle(pkg);
                         if (exportingId != null) {
                             var bundleNode = _this.graphBuilder.getNode(_this.PREFIX_BUNDLE + exportingId);
@@ -10963,7 +10963,7 @@ var Osgi;
             function asJsonSchemaType(typeName, id) {
                 if (typeName) {
                     var lower = typeName.toLowerCase();
-                    if (lower.startsWith("int") || lower === "long" || lower === "short" || lower === "byte" || lower.endsWith("int")) {
+                    if (_.startsWith(lower, "int") || lower === "long" || lower === "short" || lower === "byte" || _.endsWith(lower, "int")) {
                         return "integer";
                     }
                     if (lower === "double" || lower === "float" || lower === "bigdecimal") {
@@ -10971,7 +10971,7 @@ var Osgi;
                     }
                     if (lower === "string") {
                         // TODO hack to try force password type on dodgy metadata such as pax web
-                        if (id && id.endsWith("password")) {
+                        if (id && _.endsWith(id, "password")) {
                             return "password";
                         }
                         return "string";
