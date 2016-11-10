@@ -444,7 +444,7 @@ module Osgi {
     function asJsonSchemaType(typeName, id) {
       if (typeName) {
         var lower = typeName.toLowerCase();
-        if (lower.startsWith("int") || lower === "long" || lower === "short" || lower === "byte" || lower.endsWith("int")) {
+        if (_.startsWith(lower, "int") || lower === "long" || lower === "short" || lower === "byte" || _.endsWith(lower, "int")) {
           return "integer";
         }
         if (lower === "double" || lower === "float" || lower === "bigdecimal") {
@@ -452,7 +452,7 @@ module Osgi {
         }
         if (lower === "string") {
           // TODO hack to try force password type on dodgy metadata such as pax web
-          if (id && id.endsWith("password")) {
+          if (id && _.endsWith(id, "password")) {
             return "password";
           }
           return "string";

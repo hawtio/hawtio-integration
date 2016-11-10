@@ -56,7 +56,7 @@ module Osgi {
       if (!row) row = packageEntry;
       var name = packageEntry["Name"];
       var version = packageEntry["Version"];
-      if (name && !name.startsWith("#")) {
+      if (name && !_.startsWith(name, "#")) {
         packageEntry["VersionLink"] = "<a href='" + Core.url("#/osgi/package/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
         var importingBundles = row["ImportingBundles"] || packageEntry["ImportingBundles"];
         var exportingBundles = row["ExportingBundles"] || packageEntry["ExportingBundles"];
@@ -403,7 +403,7 @@ module Osgi {
    */
   export function removeFactoryPidPrefix(pid, factoryPid) {
     if (pid && factoryPid) {
-      if (pid.startsWith(factoryPid)) {
+      if (_.startsWith(pid, factoryPid)) {
         return pid.substring(factoryPid.length + 1);
       }
       var idx = factoryPid.lastIndexOf(".");

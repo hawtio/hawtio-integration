@@ -162,7 +162,7 @@ module Osgi {
 
             d3.values(this.getBundles()).forEach( (bundle) => {
 
-                if (this.bundleFilter == null || this.bundleFilter == "" || bundle.SymbolicName.startsWith(this.bundleFilter)) {
+                if (this.bundleFilter == null || this.bundleFilter == "" || _.startsWith(bundle.SymbolicName, this.bundleFilter.toString())) {
                     var bundleNode = this.buildBundleNode(bundle);
 
                     this.filteredBundles[bundleNode.id] = bundle;
@@ -215,7 +215,7 @@ module Osgi {
             if (this.showPackages) {
                 d3.values(this.getPackages()).forEach( (pkg) => {
 
-                    if (this.packageFilter == null || this.packageFilter == "" || pkg.Name.startsWith(this.packageFilter)) {
+                    if (this.packageFilter == null || this.packageFilter == "" || _.startsWith(pkg.Name, this.packageFilter.toString())) {
                         var exportingId = this.exportingBundle(pkg);
 
                         if (exportingId != null) {

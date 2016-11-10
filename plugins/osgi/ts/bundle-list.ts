@@ -87,7 +87,7 @@ module Osgi {
 
     $scope.$watch('display.sortField', (newValue, oldValue) => {
       if (newValue !== oldValue) {
-        $scope.bundles = $scope.bundles.sortBy(newValue);
+        $scope.bundles = _.sortBy($scope.bundles, newValue); 
       }
     });
 
@@ -157,7 +157,7 @@ module Osgi {
           $scope.bundles.push(obj);
         });
 
-        $scope.bundles = $scope.bundles.sortBy($scope.display.sortField);
+        $scope.bundles = _.sortBy($scope.bundles, $scope.display.sortField);
 
         Core.$apply($scope);
 
@@ -178,7 +178,7 @@ module Osgi {
           var outstanding = requests.length;
 
           jolokia.request(requests, Core.onSuccess((response) => {
-            var id = response['request']['arguments'].first();
+            var id = response['request']['arguments'][0];
             if (angular.isDefined(id)) {
               var bundle = $scope.bundles[id];
               if (bundle) {

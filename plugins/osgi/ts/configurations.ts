@@ -57,7 +57,7 @@ module Osgi {
         return;
       }
       $scope.addPidDialog.close();
-      var mbean = getHawtioConfigAdminMBean($scope.workspace);
+      var mbean = getHawtioConfigAdminMBean(workspace);
       if (mbean && newPid) {
         var json = JSON.stringify({});
         $scope.jolokia.execute(mbean, "configAdminUpdate", newPid, json, Core.onSuccess(response => {
@@ -88,7 +88,7 @@ module Osgi {
       $scope.pids = pids;
 
       // lets load the factory pids
-      var mbean = getSelectionConfigAdminMBean($scope.workspace);
+      var mbean = getSelectionConfigAdminMBean(workspace);
       if (mbean) {
         $scope.jolokia.execute(mbean, 'getConfigurations', '(service.factoryPid=*)',
           Core.onSuccess(onConfigFactoryPids, errorHandler("Failed to load factory PID configurations: ")));
@@ -100,7 +100,7 @@ module Osgi {
      * For each factory PID lets find the underlying PID to use to edit it, then lets make a link between them
      */
     function onConfigFactoryPids(response) {
-      var mbean = getSelectionConfigAdminMBean($scope.workspace);
+      var mbean = getSelectionConfigAdminMBean(workspace);
       var pids = $scope.pids;
       if (pids && mbean) {
         angular.forEach(response, (row) => {
@@ -118,7 +118,7 @@ module Osgi {
                   if (factoryConfig) {
                     configureFactoryPidConfig(pid, factoryConfig, config);
                     if ($scope.inFabricProfile) {
-                      Osgi.getConfigurationProperties($scope.workspace, $scope.jolokia, pid, (configValues) => {
+                      Osgi.getConfigurationProperties(workspace, $scope.jolokia, pid, (configValues) => {
                         var zkPid = Core.pathGet(configValues, ["fabric.zookeeper.pid", "Value"]);
                         if (zkPid) {
                           config["name"] = removeFactoryPidPrefix(zkPid, factoryPid);
@@ -187,7 +187,7 @@ module Osgi {
         if ($scope.profileNotRunning && $scope.profileMetadataMBean && $scope.versionId && $scope.profileId) {
           jolokia.execute($scope.profileMetadataMBean, "metaTypeSummary", $scope.versionId, $scope.profileId, Core.onSuccess(onMetaType));
         } else {
-          var metaTypeMBean = getMetaTypeMBean($scope.workspace);
+          var metaTypeMBean = getMetaTypeMBean(workspace);
           if (metaTypeMBean) {
             $scope.jolokia.execute(metaTypeMBean, "metaTypeSummary", Core.onSuccess(onMetaType));
           }
@@ -202,7 +202,7 @@ module Osgi {
           $scope.versionId, $scope.profileId, Core.onSuccess(onProfileMetaType, {silent: true}));
       } else {
         if ($scope.jolokia) {
-          var mbean = getSelectionConfigAdminMBean($scope.workspace);
+          var mbean = getSelectionConfigAdminMBean(workspace);
           if (mbean) {
             $scope.jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
           }
@@ -262,7 +262,7 @@ module Osgi {
 
     function trimUnnecessaryPrefixes(name) {
       angular.forEach(["Fabric8 ", "Apache "], (prefix) => {
-        if (name && name.startsWith(prefix) && name.length > prefix.length) {
+        if (name && _.startsWith(name, prefix) && name.length > prefix.length) {
           name = name.substring(prefix.length);
         }
       });
@@ -291,7 +291,7 @@ module Osgi {
     function ignorePid(pid) {
       var answer = false;
       angular.forEach(Osgi.configuration.ignorePids, (pattern) => {
-        if (pid.startsWith(pattern)) {
+        if (_.startsWith(pid, pattern)) {
           answer = true;
         }
       });
