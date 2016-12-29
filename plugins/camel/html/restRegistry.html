@@ -18,10 +18,10 @@
     <div class="row" ng-show="data.length > 0">
       <table class="table table-condensed table-striped" hawtio-simple-table="gridOptions"></table>
     </div>
-    <div class="row well" ng-show="data.length == 0">
-      <form>
-        <p>There are no Rest Services registered in this CamelContext.</p>
-      </form>
+    <div class="row-fluid" ng-show="data.length == 0">
+      <div class="span12">
+        <p class="well">There are no Rest Services registered in this CamelContext.</p>
+      </div>
     </div>
   </div>
 
@@ -30,4 +30,3 @@
   </div>
 
 </div>
-
