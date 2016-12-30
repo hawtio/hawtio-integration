@@ -3,7 +3,9 @@
 
 module Camel {
 
-  _module.controller("Camel.PropertiesController", ["$scope", "workspace", "localStorage", "jolokia", ($scope, workspace:Workspace, localStorage:WindowLocalStorage, jolokia) => {
+  _module.controller("Camel.PropertiesController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia",
+      ($scope, $rootScope, workspace:Workspace, localStorage:WindowLocalStorage, jolokia) => {
+    
     var log:Logging.Logger = Logger.get("Camel");
 
     $scope.hideHelp = Camel.hideOptionDocumentation(localStorage);
@@ -23,17 +25,30 @@ module Camel {
       }
     });
 
+    // Update local value if corresponding value is changed on the preferences tab.
+    $rootScope.$on('hideOptionDocumentation', (event, value) => {
+      $scope.hideHelp = value;
+    });
+
     $scope.$watch('hideUnused', (newValue, oldValue) => {
       if (newValue !== oldValue) {
         updateData();
       }
     });
 
+    $rootScope.$on('hideOptionUnusedValue', (event, value) => {
+      $scope.hideUnused = value;
+    })
+
     $scope.$watch('hideDefault', (newValue, oldValue) => {
       if (newValue !== oldValue) {
         updateData();
       }
     });
+
+    $rootScope.$on('hideOptionDefaultValue', (event, value) => {
+      $scope.hideDefault = value;
+    })
 
     $scope.$on("$routeChangeSuccess", function (event, current, previous) {
       // lets do this asynchronously to avoid Error: $digest already in progress
