@@ -34,7 +34,9 @@ module Camel {
     $scope.delete = () => {
       $scope.invokeSelectedMBeans("remove()", () => {
         // force a reload of the tree
-        $scope.workspace.operationCounter += 1;
+        if ($scope.workspace) {
+          $scope.workspace.operationCounter += 1;
+        }
         workspace.loadTree();
       });
     };
