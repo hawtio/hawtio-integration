@@ -296,9 +296,10 @@ module Camel {
     function findCamelContextMBean() {
       var profileWorkspace = $scope.profileWorkspace;
       if (!profileWorkspace) {
-        var removeJolokia = $scope.jolokia;
-        if (removeJolokia) {
-          profileWorkspace = Core.createRemoteWorkspace(removeJolokia, $location, localStorage);
+        var remoteJolokia = $scope.jolokia;
+        if (remoteJolokia) {
+          profileWorkspace = Core.createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location,
+            localStorage);
           $scope.profileWorkspace = profileWorkspace;
         }
       }
