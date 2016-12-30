@@ -1082,7 +1082,7 @@ module Camel {
               var contextName = contextBean.title;
               var mbean = "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
               // must use onSuccess(null) that means sync as we need the version asap
-              var version = jolokia.getAttribute(mbean, "CamelVersion", onSuccess(null));
+              var version = jolokia.getAttribute(mbean, "CamelVersion", Core.onSuccess(null));
               // cache version so we do not need to read it again using jolokia
               contextBean.version = version;
               return version;

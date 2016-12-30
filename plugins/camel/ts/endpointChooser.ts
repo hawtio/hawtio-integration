@@ -214,23 +214,6 @@ module Camel {
 
     $scope.jolokia = jolokia;
 
-    // lets see if we need to use a remote jolokia container
-    var versionId = $scope.branch;
-    var profileId = Fabric.pagePathToProfileId($scope.pageId);
-    if (profileId && versionId) {
-      Fabric.profileJolokia(jolokia, profileId, versionId, (profileJolokia) => {
-        if (!profileJolokia) {
-          // TODO we should expose this to the user somewhere nicely!
-          log.info("No container is running for profile " + profileId + " and version " + versionId + " so using current container for endpoint completion");
-          profileJolokia = jolokia;
-        }
-        $scope.jolokia = profileJolokia;
-        // force a reload
-        $scope.profileWorkspace = null;
-        $scope.loadEndpointNames();
-      });
-    }
-
     var silentOptions = {silent: true};
 
     $scope.$watch('workspace.selection', function () {
