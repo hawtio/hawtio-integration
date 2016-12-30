@@ -1073,7 +1073,20 @@ module Camel {
           var result = tree.navigate(domain, contextId, "context");
           if (result && result.children) {
             var contextBean:any = _.first(result.children);
-            return contextBean.version;
+            if (contextBean.version) {
+              // read the cached version
+              return contextBean.version;
+            }
+            if (contextBean.title) {
+              // okay no version cached, so need to get the version using jolokia
+              var contextName = contextBean.title;
+              var mbean = "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
+              // must use onSuccess(null) that means sync as we need the version asap
+              var version = jolokia.getAttribute(mbean, "CamelVersion", onSuccess(null));
+              // cache version so we do not need to read it again using jolokia
+              contextBean.version = version;
+              return version;
+            }
           }
         }
       }

@@ -26,6 +26,11 @@ module Camel {
     // fully loaded the workspace and/or the XML model
     var delayUpdatingRoutes = 300;
 
+    $rootScope.$on('ignoreIdForLabel', (event, value) => {
+      $scope.camelIgnoreIdForLabel = value;
+      $timeout(updateRoutes, delayUpdatingRoutes);
+    });
+
     $scope.$on("$routeChangeSuccess", function (event, current, previous) {
       // lets do this asynchronously to avoid Error: $digest already in progress
       updateRoutes();
