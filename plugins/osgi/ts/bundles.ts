@@ -48,7 +48,8 @@ module Osgi {
       {
         field: 'Version',
         displayName: 'Version',
-        width: "**"
+        width: "**",
+        sortable: false
       },/*
       {
         field: 'LastModified',

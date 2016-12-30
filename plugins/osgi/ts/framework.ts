@@ -18,20 +18,24 @@ module Osgi {
         }
 
         $scope.edited = (name, displayName, res) => {
-            $scope.editDialog.close();
+          $scope.editDialog.close();
 
-            if (angular.isNumber(res)) {
+          if (angular.isNumber(res)) {
+            if (name == "FrameworkStartLevel" && (res < $scope.initialBundleStartLevel)) {
+              editWritten("error", "Can't set Framework Start Level below Initial Bundle Start Level");
+            } else {
               var mbean = getSelectionFrameworkMBean(workspace);
               if (mbean) {
-                  var jolokia = workspace.jolokia;
-                  jolokia.request({
-                          type: 'write', mbean: mbean, attribute: name, value: res
-                      },{
-                          error: function(response) { editWritten("error", response.error) },
-                          success: function(response) { editWritten("success", displayName + " changed to " + res) }
-                      });
+                var jolokia = workspace.jolokia;
+                jolokia.request({
+                  type: 'write', mbean: mbean, attribute: name, value: res
+                }, {
+                    error: function (response) { editWritten("error", response.error) },
+                    success: function (response) { editWritten("success", displayName + " changed to " + res) }
+                  });
               }
             }
+          }
         }
 
         function editWritten(status : string, message : string) {
