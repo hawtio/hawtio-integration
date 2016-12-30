@@ -23,8 +23,13 @@
 
   </div>
   <div class="col-md-6">
+   <div class="section-filter pull-right">
     <div class="control-group">
-      <input class="col-md-12 search-query" type="text" ng-model="$parent.gridOptions.filterOptions.filterText" placeholder="Filter...">
+      <input class="span12 search-query" type="text" ng-model="$parent.gridOptions.filterOptions.filterText" placeholder="Filter...">
+         <i class="icon-remove clickable"
+           title="Clear filter"
+           ng-click="$parent.gridOptions.filterOptions.filterText = ''"></i>
+      </div>
     </div>
   </div>
 </div>
