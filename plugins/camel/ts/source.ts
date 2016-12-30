@@ -4,6 +4,8 @@
 module Camel {
   _module.controller("Camel.SourceController", ["$scope", "workspace", ($scope, workspace:Workspace) => {
 
+    $scope.camelContextMBean = getSelectionCamelContextMBean(workspace);
+
     $scope.$on("$routeChangeSuccess", function (event, current, previous) {
       // lets do this asynchronously to avoid Error: $digest already in progress
       setTimeout(updateRoutes, 50);
