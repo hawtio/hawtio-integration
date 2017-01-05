@@ -1,80 +1,88 @@
-<style type="text/css">
-  .configuration-header {
-    margin: 20px 20px;
-  }
+<h1>Configuration</h1>
 
-  ul.configurations,
-  ul.configurations li {
-    list-style: none;
-  }
-
-  ul.configurations {
-    margin: 0px 20px;
-  }
-
-  ul.configurations .bundle-item {
-    display: list-item;
-    margin-bottom: 4px;
-  }
-
-  ul.configurations li.bundle-item a {
-    /*
-      TODO it'd be nice to use the natural widgth here,
-      but then it might be nice to use multiple columns?
-    */
-    width: 450px;
-  }
-</style>
-
-<div class="controller-section" ng-controller="Osgi.ConfigurationsController">
-  <div class="row">
-    <div class="configuration-header">
-      <div class="configuration-filter">
-        <input type="text" class="col-md-8 search-query" placeholder="Filter..." ng-model="filterText">
-        <i class="fa fa-remove clickable" title="Clear filter" ng-click="filterText = ''"></i>
-        <button class="btn pull-right" ng-click="addPidDialog.open()" title="Add a new configuration" hawtio-show object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate"><i
-                class="fa fa-plus"></i> Configuration
+<div id="osgi-configuration" class="controller-section" ng-controller="Osgi.ConfigurationsController">
+  
+  <div class="row toolbar-pf">
+    <form class="toolbar-pf-actions search-pf">
+      <div class="form-group">
+        <button class="btn btn-default" ng-click="addPidDialog.open()" title="Add a new configuration" hawtio-show object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate">
+          Add configuration
         </button>
+      </div>
+      <div class="form-group has-clear">
+        <div class="search-pf-input-group">
+          <label for="search1" class="sr-only">Filter</label>
+          <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">
+          <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''"><span class="pficon pficon-close"></span></button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="list-group list-view-pf list-view-pf-view">
+    <div ng-repeat="configuration in configurations | filter:filterText">
+      <div class="list-group-item list-view-pf-stacked">
+        <div class="list-group-item-header" ng-click="goTo(configuration.pidLink)">
+          <div class="list-view-pf-main-info">
+            <div class="list-view-pf-left">
+              <span class="list-view-pf-icon-sm" ng-class="configuration.kind.class" title="{{configuration.kind.title}}"></span>
+            </div>
+            <div class="list-view-pf-body">
+              <div class="list-view-pf-description">
+                <div class="list-group-item-heading">
+                  {{configuration.name}}
+                </div>
+                <div class="list-group-item-text">
+                  {{configuration.description}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="list-group-item list-view-pf-stacked child" ng-if="configuration.isFactory"
+           ng-repeat="child in configuration.children">
+        <div class="list-group-item-header" ng-click="goTo(child.pidLink)">
+          <div class="list-view-pf-main-info">
+            <div class="list-view-pf-left">
+              <span class="list-view-pf-icon-sm" ng-class="child.kind.class" title="{{child.kind.title}}"></span>
+            </div>
+            <div class="list-view-pf-body">
+              <div class="list-view-pf-description">
+                <div class="list-group-item-heading">
+                  {{child.name}}
+                </div>
+                <div class="list-group-item-text">
+                  {{child.description}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="row centered" ng-hide="configurations.length">
-    <p class="text-center"><i class="fa fa-spinner fa-spin"></i></p>
-  </div>
-
-  <ul class="configurations">
-    <li ng-repeat='config in configurations | filter:filterText' class='{{config.class}} bundle-item'>
-      <a ng-href="{{config.pidLink}}" title="{{config.description}}">
-        <span class="{{config.kind.class}}">{{config.name}}</span>
-      </a>
-      <ul ng-show="config.isFactory">
-        <li ng-repeat="child in config.children" class='{{child.class}} bundle-item'>
-          <a ng-href="{{child.pidLink}}" title="{{child.description}}">
-            <span class="{{child.kind.class}}">{{child.name}}</span>
-          </a>
-        </li>
-      </ul>
-    </li>
-  </ul>
-
   <div modal="addPidDialog.show" close="addPidDialog.close()" options="addPidDialog.options">
     <form name="addPidDialogForm" class="form-horizontal no-bottom-margin" ng-submit="addPid(newPid)">
-      <div class="modal-header"><h4>Add New Configuration</h4></div>
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" ng-click="addPidDialog.close()">
+          <span class="pficon pficon-close" aria-hidden="true"></span>
+        </button>
+        <h4>Add Configuration</h4>
+      </div>
       <div class="modal-body">
-        <div class="control-group">
-          <label class="control-label" for="newPid">New configuration ID</label>
-
-          <div class="controls">
-            <input class="input-xlarge" type="text" id="newPid" ng-model="newPid"/>
+        <div class="form-group">
+          <label class="col-sm-3 control-label" for="newPid">Configuration ID</label>
+          <div class="col-sm-9">
+            <input type="text" id="newPid" class="form-control" ng-model="newPid"/>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <input class="btn btn-success" ng-disabled="!(newPid !== '' && newPid !== undefined)" type="submit" value="Add">
-        <input class="btn btn-primary" ng-click="addPidDialog.close()" type="button" value="Cancel">
+        <button type="button" class="btn btn-default" ng-click="addPidDialog.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary" ng-disabled="!(newPid !== '' && newPid !== undefined)">Add</button>
       </div>
     </form>
   </div>
 </div>
-

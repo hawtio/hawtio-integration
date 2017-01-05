@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="layout-pf layout-pf-fixed">
 
   <head>
     <title>hawtio-integration</title>
@@ -46,6 +46,7 @@
     <script src="libs/dagre/dist/dagre.core.min.js"></script>
     <script src="libs/zeroclipboard/dist/ZeroClipboard.js"></script>
     <script src="libs/toastr/toastr.js"></script>
+    <script src="libs/bootstrap/dist/js/bootstrap.js"></script>
     <script src="libs/d3/d3.js"></script>
     <script src="libs/jquery-ui/jquery-ui.js"></script>
     <script src="libs/jquery.dynatree/dist/jquery.dynatree.js"></script>
@@ -92,149 +93,16 @@
     <script src="libs/hawtio-dashboard/dist/hawtio-dashboard.js"></script>
     <script src="libs/hawtio-preferences/dist/hawtio-preferences.js"></script>
 
-    <style>
-      body {
-        padding-top: 110px;
-      }
-      .pane {
-        top: 110px;
-      }
-      .navbar-brand > img {
-        height: 20px;
-        margin-top: -5px;
-        margin-bottom: -5px;
-      }
-
-      .navbar-fixed-top [hawtio-sub-tabs] {
-        float: none;
-        display: block;
-        /* border-top: 1px solid #d4d4d4; */
-      }
-
-      .navbar-persistent {
-        background: #f6f6f6;
-        border-bottom: 1px solid #cecdcd;
-        padding: 0;
-        width: 100%;
-      }
-      .navbar-persistent > li.active:before,
-      .navbar-persistent > li.active:hover:before {
-        background: #0099d3;
-        bottom: -1px;
-        content: '';
-        display: block;
-        height: 2px;
-        left: 20px;
-        position: absolute;
-        right: 20px;
-      }
-      .navbar-persistent > li.active > a,
-      .navbar-persistent > li.active > a:hover,
-      .navbar-persistent > li.active:hover > a {
-        background: transparent !important;
-        color: #0099d3 !important;
-      }
-      .navbar-persistent > li.active .active > a {
-        color: #f1f1f1;
-      }
-      .navbar-persistent > li.dropdown-submenu:hover > .dropdown-menu {
-        display: none;
-      }
-      .navbar-persistent > li.dropdown-submenu.open > .dropdown-menu {
-        display: block;
-        left: 20px;
-        margin-top: 1px;
-        top: 100%;
-      }
-      .navbar-persistent > li.dropdown-submenu.open > .dropdown-toggle {
-        color: #222222;
-      }
-      .navbar-persistent > li.dropdown-submenu.open > .dropdown-toggle:after {
-        border-top-color: #222222;
-      }
-      .navbar-persistent > li.dropdown-submenu > .dropdown-toggle {
-        padding-right: 35px !important;
-      }
-      .navbar-persistent > li.dropdown-submenu > .dropdown-toggle:after {
-        position: absolute;
-        right: 20px;
-        top: 10px;
-      }
-      .navbar-persistent > li:hover:before,
-      .navbar-persistent > li.open:before {
-        background: #aaaaaa;
-        bottom: -1px;
-        content: '';
-        display: block;
-        height: 2px;
-        left: 20px;
-        position: absolute;
-        right: 20px;
-      }
-      .navbar-persistent > li:hover > a,
-      .navbar-persistent > li.open > a {
-        color: #222222;
-      }
-      .navbar-persistent > li:hover > a:after,
-      .navbar-persistent > li.open > a:after {
-        border-top-color: #222222;
-      }
-      .navbar-persistent > li > a {
-        background-color: transparent;
-        display: block;
-        line-height: 1;
-        padding: 9px 20px !important;
-      }
-      .navbar-persistent > li > a.dropdown-toggle {
-        padding-right: 35px;
-      }
-      .navbar-persistent > li > a.dropdown-toggle:after {
-        font-size: 15px;
-        position: absolute;
-        right: 20px;
-        top: 9px;
-      }
-      .navbar-persistent > li > a:hover {
-        color: #222222 !important;
-      }
-      .navbar-persistent > li a {
-        color: #4d5258 !important;
-      }
-      .navbar-pf .navbar-primary > li > a {
-        border-bottom: 1px solid transparent;
-        border-top: 1px solid transparent;
-        position: relative;
-        margin: -1px 0 0;
-      }
-    </style>
-
   </head>
 
   <body>
-    <nav class="navbar navbar-default navbar-fixed-top navbar-pf" role="navigation">
-      <div class="navbar-header">
-        <a class="navbar-brand"><img src="img/hawtio_logo.svg"></a>
-      </div>
-      <ul class="nav navbar-nav navbar-utility">
-        <li><a href="">Utility</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <span class="pficon pficon-user"></span>
-            User <b class="caret"></b>
-          </a>
-          <ul class="dropdown-menu" hawtio-extension name="hawtio-user">
-            <li>
-              <a href="#">Link</a>
-            </li>
-          </ul>
-        </li>
-
-      </ul>
-      <ul class="nav navbar-nav navbar-primary" hawtio-main-nav></ul>
-      <ul class="nav navbar-nav navbar-persistent" hawtio-sub-tabs></ul>
+    <nav class="navbar navbar-pf-vertical" style="height: 60px">
     </nav>
+    
+    <hawtio-vertical-nav></hawtio-vertical-nav>
 
-    <div id="main" class="container-fluid ng-cloak" ng-controller="HawtioNav.ViewController">
+    <div id="main" class="container-fluid container-pf-nav-pf-vertical ng-cloak" 
+        ng-controller="HawtioNav.ViewController">
       <div ng-include src="viewPartial"></div>
     </div>
 

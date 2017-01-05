@@ -27,7 +27,7 @@ var config = {
     target: 'ES5',
     module: 'commonjs',
     declarationFiles: true,
-    noExternalResolve: false
+    noResolve: false
   })
 };
 

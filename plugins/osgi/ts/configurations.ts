@@ -7,44 +7,21 @@
  */
 module Osgi {
 
-  _module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia", ($scope, $routeParams, $location, workspace:Core.Workspace, jolokia) => {
-    $scope.selectedItems = [];
-    $scope.jolokia = jolokia;
-
-    $scope.grid = {
-      data: 'configurations',
-      showFilter: false,
-      showColumnMenu: false,
-      multiSelect: false,
-      filterOptions: {
-        filterText: "",
-        useExternalFilter: false
-      },
-      selectedItems: $scope.selectedItems,
-      showSelectionCheckbox: false,
-      displaySelectionCheckbox: false,
-      columnDefs: [
-        {
-          field: 'Pid',
-          displayName: 'Configuration',
-          cellTemplate: '<div class="ngCellText"><a ng-href="{{row.entity.pidLink}}" title="{{row.entity.description}}">{{row.entity.name}}</a></div>'
-        }
-      ],
-      primaryKeyFn: entity => entity.Pid
-    };
+  _module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia",
+      ($scope, $routeParams, $location, workspace:Core.Workspace, jolokia) => {
 
     /** the kinds of config */
-    var configKinds = {
+    let configKinds = {
       factory: {
-        class: "badge badge-info",
+        class: "fa fa-cubes",
         title: "Configuration factory used to create separate instances of the configuration"
       },
       pid: {
-        class: "badge badge-success",
+        class: "fa fa-check list-view-pf-icon-success",
         title: "Configuration which has a set of properties associated with it"
       },
       pidNoValue: {
-        class: "badge badge-warning",
+        class: "fa fa-exclamation list-view-pf-icon-warning",
         title: "Configuration which does not yet have any bound values"
       }
     };
@@ -60,7 +37,7 @@ module Osgi {
       var mbean = getHawtioConfigAdminMBean(workspace);
       if (mbean && newPid) {
         var json = JSON.stringify({});
-        $scope.jolokia.execute(mbean, "configAdminUpdate", newPid, json, Core.onSuccess(response => {
+        jolokia.execute(mbean, "configAdminUpdate", newPid, json, Core.onSuccess(response => {
           Core.notification("success", "Successfully created pid: " + newPid);
           updateTableContents();
         }));
@@ -71,7 +48,6 @@ module Osgi {
       // lets do this asynchronously to avoid Error: $digest already in progress
       setTimeout(updateTableContents, 50);
     });
-
 
     function onConfigPids(response) {
       var pids = {};
@@ -90,7 +66,7 @@ module Osgi {
       // lets load the factory pids
       var mbean = getSelectionConfigAdminMBean(workspace);
       if (mbean) {
-        $scope.jolokia.execute(mbean, 'getConfigurations', '(service.factoryPid=*)',
+        jolokia.execute(mbean, 'getConfigurations', '(service.factoryPid=*)',
           Core.onSuccess(onConfigFactoryPids, errorHandler("Failed to load factory PID configurations: ")));
       }
       loadMetaType();
@@ -110,7 +86,7 @@ module Osgi {
             var config = pids[pid];
             if (config) {
               config["isFactoryInstance"] = true;
-              $scope.jolokia.execute(mbean, 'getFactoryPid', pid, Core.onSuccess(factoryPid => {
+              jolokia.execute(mbean, 'getFactoryPid', pid, Core.onSuccess(factoryPid => {
                 config["factoryPid"] = factoryPid;
                 config["name"] = removeFactoryPidPrefix(pid, factoryPid);
                 if (factoryPid) {
@@ -118,7 +94,7 @@ module Osgi {
                   if (factoryConfig) {
                     configureFactoryPidConfig(pid, factoryConfig, config);
                     if ($scope.inFabricProfile) {
-                      Osgi.getConfigurationProperties(workspace, $scope.jolokia, pid, (configValues) => {
+                      Osgi.getConfigurationProperties(workspace, jolokia, pid, (configValues) => {
                         var zkPid = Core.pathGet(configValues, ["fabric.zookeeper.pid", "Value"]);
                         if (zkPid) {
                           config["name"] = removeFactoryPidPrefix(zkPid, factoryPid);
@@ -189,7 +165,7 @@ module Osgi {
         } else {
           var metaTypeMBean = getMetaTypeMBean(workspace);
           if (metaTypeMBean) {
-            $scope.jolokia.execute(metaTypeMBean, "metaTypeSummary", Core.onSuccess(onMetaType));
+            jolokia.execute(metaTypeMBean, "metaTypeSummary", Core.onSuccess(onMetaType));
           }
         }
       }
@@ -201,10 +177,10 @@ module Osgi {
         jolokia.execute($scope.profileMetadataMBean, "metaTypeSummary",
           $scope.versionId, $scope.profileId, Core.onSuccess(onProfileMetaType, {silent: true}));
       } else {
-        if ($scope.jolokia) {
+        if (jolokia) {
           var mbean = getSelectionConfigAdminMBean(workspace);
           if (mbean) {
-            $scope.jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
+            jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
           }
         }
       }
@@ -237,12 +213,12 @@ module Osgi {
             var name = pid.substring(idx + 1, pid.length);
             var factoryConfig = pids[factoryPid];
             if (!factoryConfig) {
-              var bundle = config.bundle;
+              var bundle = config['bundle'];
               factoryConfig = getOrCreatePidConfig(factoryPid, bundle, pids);
             }
             if (factoryConfig) {
               configureFactoryPidConfig(pid, factoryConfig, config, factoryPid);
-              config.name = name;
+              config['name'] = name;
               pids[factoryPid] = factoryConfig;
 
               // lets remove the pid instance as its now a child of the factory
@@ -360,6 +336,10 @@ module Osgi {
         }
       };
     }
+
+    $scope.goTo = (pidLink) => {
+      $location.path(pidLink);
+    };
 
     // load the data
     updateTableContents();
