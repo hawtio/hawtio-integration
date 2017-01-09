@@ -113,7 +113,8 @@ module Osgi {
         return false;
       }
       var labelText = $scope.getLabel(bundle);
-      if ($scope.display.bundleFilter && !labelText.toLowerCase().has($scope.display.bundleFilter.toLowerCase())) {
+      if ($scope.display.bundleFilter &&
+          labelText.toLowerCase().indexOf($scope.display.bundleFilter.toLowerCase()) === -1) {
         return false;
       }
       if (Core.isBlank($scope.display.bundleFilter)) {

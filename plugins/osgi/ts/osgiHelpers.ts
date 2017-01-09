@@ -12,12 +12,11 @@ module Osgi {
     angular.forEach(values, (row) => {
       row["ImportData"] = parseActualPackages(row["ImportedPackages"])
       row["ExportData"] = parseActualPackages(row["ExportedPackages"]);
-    row["IdentifierLink"] = bundleLinks(workspace, row["Identifier"]);
-    row["Hosts"] = labelBundleLinks(workspace, row["Hosts"], allValues);
-    row["Fragments"] = labelBundleLinks(workspace, row["Fragments"], allValues);
-    row["ImportedPackages"] = row["ImportedPackages"].union([]);
-    row["StateStyle"] = getStateStyle("label", row["State"]);
-    row["RequiringBundles"] = labelBundleLinks(workspace, row["RequiringBundles"], allValues);
+      row["IdentifierLink"] = bundleLinks(workspace, row["Identifier"]);
+      row["Hosts"] = labelBundleLinks(workspace, row["Hosts"], allValues);
+      row["Fragments"] = labelBundleLinks(workspace, row["Fragments"], allValues);
+      row["StateStyle"] = getStateStyle("label", row["State"]);
+      row["RequiringBundles"] = labelBundleLinks(workspace, row["RequiringBundles"], allValues);
     });
     return values;
   }
