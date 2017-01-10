@@ -85,79 +85,83 @@ module ActiveMQ {
       {field: 'LogDirectory', displayName: 'Log Directory', width: "**"}
     ];
 
-    var myUrl = '/jmx/attributes';
+    const myUrl = '/jmx/attributes';
 
-    var builder = nav.builder();
-    var tab = builder.id('activemq')
-                     .title( () => 'ActiveMQ' )
-                     .defaultPage({
-                       rank: 15,
-                       isValid: (yes, no) => {
-                         var name = 'ActiveMQDefaultPage';
-                         workspace.addNamedTreePostProcessor(name, (tree) => {
-                           workspace.removeNamedTreePostProcessor(name);
-                           if (workspace.treeContainsDomainAndProperties(jmxDomain)) {
-                             yes();
-                           } else {
-                             no();
-                           }
-                         });
-                       }
-                     })
-                     .href( () => myUrl )
-                     .isValid( () => workspace.treeContainsDomainAndProperties(jmxDomain) )
-                     .build();
-    tab.tabs = Jmx.getNavItems(builder, workspace, $templateCache, 'activemq');
     // add sub level tabs
-    tab.tabs.push({
-      id: 'activemq-browse',
-      title: () => '<i class="fa fa-envelope"></i> Browse',
-      tooltip: () => "Browse the messages on the queue",
-      show: () => isQueue(workspace) && workspace.hasInvokeRights(workspace.selection, "browse()"),
-      href: () => "/activemq/browseQueue" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'activemq-send',
-      title: () => '<i class="fa fa-pencil"></i> Send',
-      tooltip: () => "Send a message to this destination",
-      show: () => (isQueue(workspace) || isTopic(workspace)) && workspace.hasInvokeRights(workspace.selection, "sendTextMessage(java.util.Map,java.lang.String,java.lang.String,java.lang.String)"),
-      href: () => "/activemq/sendMessage" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'activemq-durable-subscribers',
-      title: () => '<i class="fa fa-list"></i> Durable Subscribers',
-      tooltip: () => "Manage durable subscribers",
-      show: () => isBroker(workspace),
-      href: () => "/activemq/durableSubscribers" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'activemq-jobs',
-      title: () => '<i class="fa fa-list"></i> Jobs',
-      tooltip: () => "Manage jobs",
-      show: () => isJobScheduler(workspace),
-      href: () => "/activemq/jobs" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'activemq-create-destination',
-      title: () => '<i class="fa fa-plus"></i> Create',
-      tooltip: () => "Create a new destination",
-      show: () => (isBroker(workspace) || isQueuesFolder(workspace) || isTopicsFolder(workspace) || isQueue(workspace) || isTopic(workspace)) && workspace.hasInvokeRights(getBroker(workspace), "addQueue", "addTopic"),
-      href: () => "/activemq/createDestination" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'activemq-delete-topic',
-      title: () => '<i class="fa fa-remove"></i> Delete',
-      tooltip: () => "Delete this topic",
-      show: () => isTopic(workspace) && workspace.hasInvokeRights(getBroker(workspace), "removeTopic"),
-      href: () => "/activemq/deleteTopic" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'activemq-delete-queue',
-      title: () => '<i class="fa fa-remove"></i> Delete',
-      tooltip: () => "Delete or purge this queue",
-      show: () => isQueue(workspace) && workspace.hasInvokeRights(getBroker(workspace), "removeQueue"),
-      href: () => "/activemq/deleteQueue" + workspace.hash()
-    });
+    // Do not add JMX tabs as they are already in the layout header
+    // const subTabs = Jmx.getNavItems(builder, workspace, $templateCache, 'activemq');
+    const subTabs = [];
+    subTabs.push({
+        id     : 'activemq-browse',
+        title  : () => '<i class="fa fa-envelope"></i> Browse',
+        tooltip: () => "Browse the messages on the queue",
+        show   : () => isQueue(workspace) && workspace.hasInvokeRights(workspace.selection, "browse()"),
+        href   : () => "/activemq/browseQueue" + workspace.hash()
+      },
+      {
+        id     : 'activemq-send',
+        title  : () => '<i class="fa fa-pencil"></i> Send',
+        tooltip: () => "Send a message to this destination",
+        show   : () => (isQueue(workspace) || isTopic(workspace)) && workspace.hasInvokeRights(workspace.selection, "sendTextMessage(java.util.Map,java.lang.String,java.lang.String,java.lang.String)"),
+        href   : () => "/activemq/sendMessage" + workspace.hash()
+      },
+      {
+        id     : 'activemq-durable-subscribers',
+        title  : () => '<i class="fa fa-list"></i> Durable Subscribers',
+        tooltip: () => "Manage durable subscribers",
+        show   : () => isBroker(workspace),
+        href   : () => "/activemq/durableSubscribers" + workspace.hash()
+      },
+      {
+        id     : 'activemq-jobs',
+        title  : () => '<i class="fa fa-list"></i> Jobs',
+        tooltip: () => "Manage jobs",
+        show   : () => isJobScheduler(workspace),
+        href   : () => "/activemq/jobs" + workspace.hash()
+      },
+      {
+        id     : 'activemq-create-destination',
+        title  : () => '<i class="fa fa-plus"></i> Create',
+        tooltip: () => "Create a new destination",
+        show   : () => (isBroker(workspace) || isQueuesFolder(workspace) || isTopicsFolder(workspace) || isQueue(workspace) || isTopic(workspace)) && workspace.hasInvokeRights(getBroker(workspace), "addQueue", "addTopic"),
+        href   : () => "/activemq/createDestination" + workspace.hash()
+      },
+      {
+        id     : 'activemq-delete-topic',
+        title  : () => '<i class="fa fa-remove"></i> Delete',
+        tooltip: () => "Delete this topic",
+        show   : () => isTopic(workspace) && workspace.hasInvokeRights(getBroker(workspace), "removeTopic"),
+        href   : () => "/activemq/deleteTopic" + workspace.hash()
+      },
+      {
+        id     : 'activemq-delete-queue',
+        title  : () => '<i class="fa fa-remove"></i> Delete',
+        tooltip: () => "Delete or purge this queue",
+        show   : () => isQueue(workspace) && workspace.hasInvokeRights(getBroker(workspace), "removeQueue"),
+        href   : () => "/activemq/deleteQueue" + workspace.hash()
+      });
+
+    const builder = nav.builder();
+    const tab     = builder.id('activemq')
+      .title(() => 'ActiveMQ')
+      .defaultPage({
+        rank   : 15,
+        isValid: (yes, no) => {
+          const name = 'ActiveMQDefaultPage';
+          workspace.addNamedTreePostProcessor(name, (tree) => {
+            workspace.removeNamedTreePostProcessor(name);
+            if (workspace.treeContainsDomainAndProperties(jmxDomain)) {
+              yes();
+            } else {
+              no();
+            }
+          });
+        }
+      })
+      .href(() => myUrl)
+      .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
+      .build();
+
     nav.add(tab);
 
     function postProcessTree(tree) {
