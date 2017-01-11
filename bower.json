@@ -23,7 +23,7 @@
     "hawtio-core-navigation": "~2.0.0",
     "hawtio-forms": "~2.0.0",
     "hawtio-jmx": "~2.0.0",
-    "hawtio-ui": "~2.0.0",
+    "hawtio-ui": "~3.0.1",
     "hawtio-utilities": "~2.0.0",
     "angular-resource": "~1.5.0",
     "hawtio-template-cache": "*"
