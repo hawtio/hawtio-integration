@@ -20,6 +20,8 @@ module Osgi {
       showCxfBundles: false,
       showPlatformBundles: false
     };
+    $scope.listViewUrl = Core.url('/osgi/bundle-list' + workspace.hash());
+    $scope.tableViewUrl = Core.url('/osgi/bundles' + workspace.hash());
 
     if ('bundleList' in localStorage) {
       $scope.display = angular.fromJson(localStorage['bundleList']);
@@ -150,7 +152,8 @@ module Osgi {
             Version: value.Version,
             LastModified: new Date(Number(value.LastModified)),
             Location: value.Location,
-            StartLevel: undefined
+            StartLevel: undefined,
+            Url: Core.url("/osgi/bundle/" + value.Identifier + workspace.hash())
           };
           if (value.Headers['Bundle-Name']) {
             obj.Name = value.Headers['Bundle-Name']['Value'];

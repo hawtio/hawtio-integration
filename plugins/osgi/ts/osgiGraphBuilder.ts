@@ -10,6 +10,7 @@ module Osgi {
     export class OsgiGraphBuilder {
 
         private osgiDataService : OsgiDataService;
+        private workspace : Workspace;
         private bundleFilter : String;
         private packageFilter : String;
         private showServices : boolean;
@@ -28,6 +29,7 @@ module Osgi {
 
         constructor(
             osgiDataService: OsgiDataService,
+            workspace: Workspace,
             bundleFilter: String,
             packageFilter: String,
             showServices: boolean,
@@ -35,6 +37,7 @@ module Osgi {
             hideUnused: boolean
             ) {
                 this.osgiDataService = osgiDataService;
+                this.workspace = workspace;
                 this.bundleFilter = bundleFilter;
                 this.packageFilter = packageFilter;
                 this.showServices = showServices;
@@ -119,7 +122,7 @@ module Osgi {
                 name: bundle.SymbolicName,
                 type: "bundle",
                 used: false,
-                navUrl: "#/osgi/bundle/" + bundle.Identifier,
+                navUrl: Core.url("/osgi/bundle/" + bundle.Identifier + this.workspace.hash()),
 //                image: {
 //                    url: "/img/icons/osgi/bundle.png",
 //                    width: 32,

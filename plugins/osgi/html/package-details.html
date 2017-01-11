@@ -19,7 +19,7 @@
             <td>
                 <ul>
                     <li ng-repeat="name in row.ExportingBundles">
-                        <a href='#/osgi/bundle/{{name}}{{hash}}'>{{name}}</a>
+                        <a href='{{row.ExportingBundleUrls[$index]}}'>{{name}}</a>
                     </li>
                 </ul>
             </td>
@@ -29,7 +29,7 @@
             <td>
                 <ul>
                     <li ng-repeat="name in row.ImportingBundles">
-                        <a href='#/osgi/bundle/{{name}}{{hash}}'>{{name}}</a>
+                        <a href='{{row.ImportingBundleUrls[$index]}}'>{{name}}</a>
                     </li>
                 </ul>
             </td>
