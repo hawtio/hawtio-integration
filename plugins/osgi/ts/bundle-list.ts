@@ -20,6 +20,8 @@ module Osgi {
       showCxfBundles: false,
       showPlatformBundles: false
     };
+    $scope.listViewUrl = Core.url('/osgi/bundle-list' + workspace.hash());
+    $scope.tableViewUrl = Core.url('/osgi/bundles' + workspace.hash());
 
     if ('bundleList' in localStorage) {
       $scope.display = angular.fromJson(localStorage['bundleList']);
@@ -113,7 +115,8 @@ module Osgi {
         return false;
       }
       var labelText = $scope.getLabel(bundle);
-      if ($scope.display.bundleFilter && !labelText.toLowerCase().has($scope.display.bundleFilter.toLowerCase())) {
+      if ($scope.display.bundleFilter &&
+          labelText.toLowerCase().indexOf($scope.display.bundleFilter.toLowerCase()) === -1) {
         return false;
       }
       if (Core.isBlank($scope.display.bundleFilter)) {
@@ -149,7 +152,8 @@ module Osgi {
             Version: value.Version,
             LastModified: new Date(Number(value.LastModified)),
             Location: value.Location,
-            StartLevel: undefined
+            StartLevel: undefined,
+            Url: Core.url("/osgi/bundle/" + value.Identifier + workspace.hash())
           };
           if (value.Headers['Bundle-Name']) {
             obj.Name = value.Headers['Bundle-Name']['Value'];

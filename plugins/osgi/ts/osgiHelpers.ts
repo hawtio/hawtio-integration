@@ -15,7 +15,7 @@ module Osgi {
     row["IdentifierLink"] = bundleLinks(workspace, row["Identifier"]);
     row["Hosts"] = labelBundleLinks(workspace, row["Hosts"], allValues);
     row["Fragments"] = labelBundleLinks(workspace, row["Fragments"], allValues);
-    row["ImportedPackages"] = row["ImportedPackages"].union([]);
+    row["ImportedPackages"] = _.uniq(row["ImportedPackages"]);
     row["StateStyle"] = getStateStyle("label", row["State"]);
     row["RequiringBundles"] = labelBundleLinks(workspace, row["RequiringBundles"], allValues);
     });
@@ -57,12 +57,11 @@ module Osgi {
       var name = packageEntry["Name"];
       var version = packageEntry["Version"];
       if (name && !_.startsWith(name, "#")) {
-        packageEntry["VersionLink"] = "<a href='" + Core.url("#/osgi/package/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
+        packageEntry["VersionUrl"] = Core.url("/osgi/package/" + name + "/" + version + workspace.hash());
         var importingBundles = row["ImportingBundles"] || packageEntry["ImportingBundles"];
         var exportingBundles = row["ExportingBundles"] || packageEntry["ExportingBundles"];
-        packageEntry["ImportingBundleLinks"] = bundleLinks(workspace, importingBundles);
-        packageEntry["ImportingBundleLinks"] = bundleLinks(workspace, importingBundles);
-        packageEntry["ExportingBundleLinks"] = bundleLinks(workspace, exportingBundles);
+        packageEntry["ImportingBundleUrls"] = bundleUrls(workspace, importingBundles);
+        packageEntry["ExportingBundleUrls"] = bundleUrls(workspace, exportingBundles);
         packages.push(packageEntry);
       }
     }
@@ -81,14 +80,14 @@ module Osgi {
     });
     return packages;
   }
-
+  
 
   export function defaultConfigurationValues(workspace:Workspace, $scope, values) {
     var array = [];
     angular.forEach(values, (row) => {
       var map = {};
       map["Pid"] = row[0];
-      map["PidLink"] = "<a href='" + Core.url("#/osgi/pid/" + row[0] + workspace.hash()) + "'>" + row[0] + "</a>";
+      map["PidLink"] = "<a href='" + Core.url("/osgi/pid/" + row[0] + workspace.hash()) + "'>" + row[0] + "</a>";
       map["Bundle"] = row[1];
       array.push(map);
     });
@@ -207,7 +206,7 @@ module Osgi {
       }
       var info = allValues[value] || {};
       var labelText = info.SymbolicName;
-      answer += prefix + "<a class='label' href='" + Core.url("#/osgi/bundle/" + value + workspace.hash()) + "'>" + labelText + "</a>";
+      answer += prefix + "<a class='label' href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + labelText + "</a>";
     });
     return answer;
   }
@@ -220,11 +219,18 @@ module Osgi {
       if (answer.length > 0) {
         prefix = " ";
       }
-      answer += prefix + "<a class='label' href='" + Core.url("#/osgi/bundle/" + value + workspace.hash()) + "'>" + value + "</a>";
+      answer += prefix + "<a class='label' href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + value + "</a>";
     });
     return answer;
   }
 
+  export function bundleUrls(workspace, values) {
+    var answer = [];
+    angular.forEach(values, function (value, key) {
+      answer.push(Core.url("/osgi/bundle/" + value + workspace.hash()));
+    });
+    return answer;
+  }
 
   export function pidLinks(workspace, values) {
     var answer = "";
@@ -233,7 +239,7 @@ module Osgi {
       if (answer.length > 0) {
         prefix = " ";
       }
-      answer += prefix + "<a href='" + Core.url("#/osgi/bundle/" + value + workspace.hash()) + "'>" + value + "</a>";
+      answer += prefix + "<a href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + value + "</a>";
     });
     return answer;
   }
@@ -371,7 +377,7 @@ module Osgi {
    * Creates a link to the given configuration pid and/or factoryPid
    */
   export function createConfigPidLink($scope, workspace, pid, isFactory = false) {
-    return Core.url("#" + createConfigPidPath($scope, pid, isFactory) + workspace.hash())
+    return Core.url(createConfigPidPath($scope, pid, isFactory) + workspace.hash())
   }
 
   /**
