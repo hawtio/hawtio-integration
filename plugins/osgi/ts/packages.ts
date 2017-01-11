@@ -35,7 +35,7 @@ module Osgi {
           width: "***",
           cellTemplate: `
             <div class="ngCellText">
-              <a ng-href="/osgi/package/{{row.entity.Name}}/{{row.entity.Version}}">{{row.entity.Version}}</a>
+              <a ng-href="{{row.entity.VersionUrl}}">{{row.entity.Version}}</a>
             </div>`
         },
         {
@@ -44,7 +44,7 @@ module Osgi {
           cellTemplate: `
             <div class="ngCellText">
               <div ng-repeat="bundle in row.entity.ExportingBundles">
-                <a title="Exported by bundle {{bundle.Identifier}}" ng-href="/osgi/bundle/{{bundle.Identifier}}">{{bundle.SymbolicName}}</a>
+                <a title="Exported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
               </div>
             </div>`
         },
@@ -54,7 +54,7 @@ module Osgi {
           cellTemplate: `
             <div class="ngCellText">
               <div ng-repeat="bundle in row.entity.ImportingBundles">
-                <a title="Imported by bundle {{bundle.Identifier}}" ng-href="/osgi/bundle/{{bundle.Identifier}}">{{bundle.SymbolicName}}</a>
+                <a title="Imported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
               </div>
             </div>`
         },
@@ -104,7 +104,8 @@ module Osgi {
             State: value.State,
             Version: value.Version,
             LastModified: value.LastModified,
-            Location: value.Location
+            Location: value.Location,
+            Url: Core.url("/osgi/bundle/" + value.Identifier + workspace.hash())
           };
           if (value.Headers['Bundle-Name']) {
             obj.Name = value.Headers['Bundle-Name']['Value'];
