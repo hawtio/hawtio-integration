@@ -160,6 +160,7 @@ module ActiveMQ {
       })
       .href(() => myUrl)
       .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
+      .tabs(subTabs[0], ...subTabs.slice(1))
       .build();
 
     nav.add(tab);

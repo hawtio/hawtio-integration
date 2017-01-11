@@ -255,7 +255,7 @@ var ActiveMQ;
                 href: function () { return "/activemq/deleteQueue" + workspace.hash(); }
             });
             var builder = nav.builder();
-            var tab = builder.id('activemq')
+            var tab = (_a = builder.id('activemq')
                 .title(function () { return 'ActiveMQ'; })
                 .defaultPage({
                 rank: 15,
@@ -273,7 +273,7 @@ var ActiveMQ;
                 }
             })
                 .href(function () { return myUrl; })
-                .isValid(function () { return workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain); })
+                .isValid(function () { return workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain); })).tabs.apply(_a, [subTabs[0]].concat(subTabs.slice(1)))
                 .build();
             nav.add(tab);
             function postProcessTree(tree) {
@@ -319,6 +319,7 @@ var ActiveMQ;
                     angular.forEach(node.children, function (child) { return setConsumerType(child); });
                 }
             }
+            var _a;
         }]);
     hawtioPluginLoader.addModule(ActiveMQ.pluginName);
     function getBroker(workspace) {
