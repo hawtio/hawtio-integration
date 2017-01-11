@@ -29,7 +29,6 @@
     "hawtio-template-cache": "~3.0.0"
   },
   "devDependencies": {
-    "patternfly": "~3.17.0",
     "hawtio-core-dts": "~2.0.0",
     "angular-mocks": "~1.5.0",
     "hawtio-dashboard": "~2.0.0",
