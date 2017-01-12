@@ -90,7 +90,11 @@ module Camel {
               });
             }
           }
+<<<<<<< HEAD
 
+=======
+          
+>>>>>>> 2.x-patch
           // TODO turn into XML?
           var routeXml = getSource(selectedRoute);
           if (routeXml) {

@@ -13,7 +13,7 @@ module Camel {
 
   export var defaultMaximumLabelWidth = 34;
   export var defaultCamelMaximumTraceOrDebugBodyLength = 5000;
-  export var defaultCamelTraceOrDebugIncludeStreams = true;
+  export var defaultCamelTraceOrDebugIncludeStreams = false;
   export var defaultCamelRouteMetricMaxSeconds = 10;
   export var defaultHideOptionDocumentation = false;
   export var defaultHideOptionDefaultValue = false;
@@ -1565,6 +1565,7 @@ module Camel {
    */
   export function traceOrDebugIncludeStreams(localStorage) {
     var value = localStorage["camelTraceOrDebugIncludeStreams"];
+    console.log('localStorage["camelTraceOrDebugIncludeStreams"] = ' + value);
     return Core.parseBooleanValue(value, Camel.defaultCamelTraceOrDebugIncludeStreams);
   }
 

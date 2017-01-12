@@ -26,7 +26,7 @@
     "hawtio-ui": "~2.0.0",
     "hawtio-utilities": "~2.0.0",
     "angular-resource": "~1.5.0",
-    "hawtio-template-cache": "*"
+    "hawtio-template-cache": "~2.0.0"
   },
   "devDependencies": {
     "patternfly": "~3.17.0",

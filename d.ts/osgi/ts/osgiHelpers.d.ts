@@ -14,6 +14,7 @@ declare module Osgi {
     function toCollection(values: any): any;
     function labelBundleLinks(workspace: any, values: any, allValues: any): string;
     function bundleLinks(workspace: any, values: any): string;
+    function bundleUrls(workspace: any, values: any): any[];
     function pidLinks(workspace: any, values: any): string;
     /**
      * Finds a bundle by id
