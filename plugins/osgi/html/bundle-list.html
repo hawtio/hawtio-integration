@@ -1,22 +1,79 @@
+<h1>Bundles</h1>
+
 <div class="controller-section" ng-controller="Osgi.BundleListController">
+
+  <div class="row toolbar-pf">
+    <form class="toolbar-pf-actions">
+      <div class="form-group">
+        <label>Show bundles</label>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default" ng-class="{active: display.showActiveMQBundles}"
+                  ng-click="display.showActiveMQBundles = !display.showActiveMQBundles">
+            ActiveMQ
+          </button>
+          <button type="button" class="btn btn-default" ng-class="{active: display.showCamelBundles}"
+                  ng-click="display.showCamelBundles = !display.showCamelBundles">
+            Camel
+          </button>
+          <button type="button" class="btn btn-default" ng-class="{active: display.showCxfBundles}"
+                  ng-click="display.showCxfBundles = !display.showCxfBundles">
+            CXF
+          </button>
+          <button type="button" class="btn btn-default" ng-class="{active: display.showPlatformBundles}"
+                  ng-click="display.showPlatformBundles = !display.showPlatformBundles">
+            Platform
+          </button>
+          <button type="button" class="btn btn-default" ng-class="{active: display.showAllBundles}"
+                  ng-click="display.showAllBundles = !display.showAllBundles">
+            All
+          </button>
+        </div>            
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" ng-model="display.bundleFilter" placeholder="Filter..." autocomplete="off">
+      </div>
+      <div class="toolbar-pf-action-right">
+        <div class="form-group toolbar-pf-view-selector">
+          <a ng-href="{{listViewUrl}}" class="btn btn-link" title="Grid view">
+            <i class="fa fa-th"></i>
+          </a>
+          <a ng-href="{{tableViewUrl}}" class="btn btn-link" title="Table view">
+            <i class="fa fa-table"></i>
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+  
+  <div id="toolbar-row-2" class="row toolbar-pf">
+    <form class="toolbar-pf-actions form-inline">
+      <div class="form-group">
+        <label for="sortField">Sort by</label>
+        <select id="sortField" class="form-control" ng-model="display.sortField">
+          <option value="Identifier">ID</option>
+          <option value="Name">Name</option>
+          <option value="SymbolicName">Symbolic Name</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="bundleField">Display</label>
+        <select id="bundleField" class="form-control" ng-model="display.bundleField">
+          <option value="Name">Name</option>
+          <option value="SymbolicName">Symbolic Name</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="startLevelFilter">Start Level</label>
+        <input id="startLevelFilter" type="number" min="0" class="form-control" ng-model="display.startLevelFilter">
+      </div>
+    </form>
+  </div>
+
+  <br><br><br><br><br>
+
   <div class="row bundle-list-toolbar">
 
     <div class="pull-left">
-      <div class="btn-group">
-        <a ng-href="{{listViewUrl}}"
-                type="button"
-                class="btn btn-default active"
-                title="List view">
-          <i class="fa fa-list"></i>
-        </a>
-        <a ng-href="{{tableViewUrl}}"
-                type="button"
-                class="btn btn-default"
-                title="Table view">
-          <i class="fa fa-table"></i>
-        </a>
-      </div>
-
       <div class="input-group" hawtio-show object-name="{{frameworkMBean}}" method-name="installBundle">
         <input class="input-xxlarge"
                type="text"
@@ -30,44 +87,6 @@
         </button>
       </div>
 
-    </div>
-
-
-    <div class="pull-right">
-      <strong>Show bundles: </strong>
-      &nbsp;
-      <label for="showActiveMQBundles">ActiveMQ</label>
-      <input id="showActiveMQBundles" type="checkbox" ng-model="display.showActiveMQBundles">
-      &nbsp;
-      &nbsp;
-      <label for="showCamelBundles">Camel</label>
-      <input id="showCamelBundles" type="checkbox" ng-model="display.showCamelBundles">
-      &nbsp;
-      &nbsp;
-      <label for="showCxfBundles">CXF</label>
-      <input id="showCxfBundles" type="checkbox" ng-model="display.showCxfBundles">
-      &nbsp;
-      &nbsp;
-      <label for="showPlatformBundles">Platform</label>
-      <input id="showPlatformBundles" type="checkbox" ng-model="display.showPlatformBundles">
-      &nbsp;
-      &nbsp;
-      <label for="showAllBundles">All</label>
-      <input id="showAllBundles" type="checkbox" ng-model="display.showAllBundles">
-      &nbsp;
-      <select class="input-lg" ng-model="display.sortField" id="sortField">
-        <option value="Identifier">Sort by ID</option>
-        <option value="Name">Sort by Name</option>
-        <option value="SymbolicName">Sort by Symbolic Name</option>
-      </select>
-      <select class="input-lg" ng-model="display.bundleField" id="bundleField">
-        <option value="Name">Display Name</option>
-        <option value="SymbolicName">Display Symbolic Name</option>
-      </select>
-      <input class="input-sm search-query" type="number" min="0"
-             ng-model="display.startLevelFilter"
-             placeholder="Start Level..."/>
-      <hawtio-filter ng-model="display.bundleFilter" placeholder="Filter..." save-as="osgi-bundle-list-text-filter"></hawtio-filter>
     </div>
 
   </div>

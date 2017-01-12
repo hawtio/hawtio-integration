@@ -348,6 +348,13 @@ caption {
   border-top: 1px solid #d1d1d1;
   padding-top: 10px;
 }
+#toolbar-row-2 .form-group {
+  border-right: none;
+  padding-right: 0;
+}
+#toolbar-row-2 #startLevelFilter {
+  width: 54px;
+}
 .overviewSection td {
   vertical-align: top;
 }
