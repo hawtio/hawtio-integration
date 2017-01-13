@@ -9,11 +9,12 @@ module Osgi {
   _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia",
       ($scope, $timeout, $routeParams, $location, workspace:Core.Workspace, jolokia) => {
     
+    $scope.configurationUrl = Core.url('/osgi/configurations' + workspace.hash());
     $scope.deletePropDialog = new UI.Dialog();
     $scope.deletePidDialog = new UI.Dialog();
     $scope.addPropertyDialog = new UI.Dialog();
     $scope.factoryPid = $routeParams.factoryPid;
-    $scope.pid = $routeParams.pid;
+    $scope.pid = $routeParams.pid ? $routeParams.pid.substring(0, $routeParams.pid.indexOf('?')) : null;
     $scope.createForm = {
       pidInstanceName: null
     };

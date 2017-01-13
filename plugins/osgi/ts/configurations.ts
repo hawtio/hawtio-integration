@@ -127,7 +127,7 @@ module Osgi {
           configurations.push(config);
         }
       });
-      $scope.configurations = _.sortBy(configurations, "name");
+      $scope.configurations = _.sortBy(configurations, configuration => configuration.name.toLowerCase());
       Core.$apply($scope);
     }
 
