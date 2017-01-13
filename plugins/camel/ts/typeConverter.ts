@@ -3,10 +3,14 @@
 
 module Camel {
 
-  _module.controller("Camel.TypeConverterController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.TypeConverterController", ["$scope", "$location", "$timeout", "workspace", "jolokia",
+      ($scope, $location, $timeout, workspace:Workspace, jolokia) => {
 
     $scope.data = [];
     $scope.selectedMBean = null;
+    $scope.enableTypeConvertersStats = false;
+    $scope.disableTypeConvertersStats = false;
+    $scope.defaultTimeout = 3000;
 
     $scope.mbeanAttributes = {};
 
@@ -79,15 +83,19 @@ module Camel {
     }
 
     $scope.disableStatistics = () => {
+      $scope.disableTypeConvertersStats = true;
       if ($scope.selectedMBean) {
         jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", false);
       }
+      $timeout(function () { $scope.disableTypeConvertersStats = false; }, $scope.defaultTimeout);
     }
 
     $scope.enableStatistics = () => {
+      $scope.enableTypeConvertersStats = true;
       if ($scope.selectedMBean) {
         jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", true);
       }
+      $timeout(function () { $scope.enableTypeConvertersStats = false; }, $scope.defaultTimeout);
     }
 
     $scope.resetStatistics = () => {

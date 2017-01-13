@@ -10,11 +10,12 @@
           <div class="btn-group">
             <div ng-switch="hasBreakpoint">
               <button ng-switch-when="true" class="btn btn-default" ng-disabled="!selectedDiagramNodeId"
-                      ng-click="removeBreakpoint()" title="Remove the breakpoint on the selected node"><i
-                      class="fa fa-remove"></i>
+                      ng-click="removeBreakpoint()" title="Remove the breakpoint on the selected node">
+                <i class="fa fa-remove"></i> Remove breakpoint
               </button>
               <button ng-switch-default="false" class="btn btn-default" ng-disabled="!selectedDiagramNodeId"
-                      ng-click="addBreakpoint()" title="Add a breakpoint on the selected node"><i class="fa fa-plus"></i>
+                      ng-click="addBreakpoint()" title="Add a breakpoint on the selected node">
+                <i class="fa fa-plus"></i> Add breakpoint
               </button>
             </div>
           </div>

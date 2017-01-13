@@ -1,68 +1,115 @@
-<div>
-  <h4 title="{{metaType.description}}">{{zkPid || metaType.name || pid}}
-    <span ng-show="factoryInstanceName">: {{factoryInstanceName}}</span>
-  </h4>
+<div class="pid-details">
+  
+  <h1>Configuration</h1>
 
-  <div ng-hide="editMode">
-    <div class="row">
-      <button class="btn btn-default" ng-click="setEditMode(true)" title="Edit this configuration" hawtio-show object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate"><i class="fa fa-edit"></i> Edit</button>
-      <button class="btn btn-danger pull-right" ng-click="deletePidDialog.open()" title="Delete this configuration" hawtio-show object-name="{{configAdminMBean}}" method-name="delete"><i class="fa fa-remove"></i> Delete</button>
-    </div>
-    <div class="row config-admin-form view">
-      <div simple-form name="pidEditor" mode='view' entity='entity' data='schema' schema="fullSchema"></div>
+  <h3 title="{{metaType.description}}">{{zkPid || metaType.name || pid}}
+    <span ng-show="factoryInstanceName">: {{factoryInstanceName}}</span>
+  </h3>
+
+  <div class="row toolbar-pf">
+    <div class="col-sm-12">
+      <form class="toolbar-pf-actions">
+        <div class="form-group">
+          <button class="btn btn-default" ng-click="setEditMode(true)" title="Edit this configuration" hawtio-show
+                  object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate">
+            Edit
+          </button>
+          <button class="btn btn-default" ng-click="deletePidDialog.open()" title="Delete this configuration"
+                  hawtio-show object-name="{{configAdminMBean}}" method-name="delete">
+            Delete
+          </button>
+        </div>
+        <div class="form-group" ng-show="editMode">
+          <button class="btn btn-default" ng-click="addPropertyDialog.open()" title="Add a new property value to this configuration">
+            Add property
+          </button>
+        </div>
+      </form>
     </div>
   </div>
-  <div ng-show="editMode">
-    <div class="row">
-      <button ng-show="newPid" class="btn btn-primary" ng-disabled="!canSave || !createForm.pidInstanceName" ng-click="pidSave()"><i class="fa fa-save"></i> Create</button>
-      <button ng-hide="newPid" class="btn btn-primary" ng-disabled="!canSave" ng-click="pidSave()"><i class="fa fa-save"></i> Save</button>
-      <button class="btn btn-warning" ng-click="setEditMode(false)"><i class="fa fa-remove"></i> Cancel</button>
-      <button class="btn pull-right" ng-click="addPropertyDialog.open()" title="Add a new property value to this configuration"><i class="fa fa-plus"></i> Property</button>
+
+  <div ng-hide="editMode">
+    <div class="row config-admin-form view">
+      <div class="col-sm-12">
+        <div simple-form name="pidEditor" mode='view' entity='entity' data='schema' schema="fullSchema"></div>
+      </div>
     </div>
+  </div>
+  
+  <div ng-show="editMode">
     <div class="row config-admin-form edit">
-      <div ng-show="newPid" class="new-config-name-form">
+      <div ng-show="newPid" class="col-sm-12 new-config-name-form">
         <form class="form-horizontal" action="">
           <fieldset>
-            <div class="control-group">
-              <label class="control-label" title="The name of the configuration file">Configuration name: </label>
-              <div class="controls">
-                <input type="text" class="col-md-12"
-                       title="The name of the configuration file"
-                       ng-required="true"
-                       ng-model="createForm.pidInstanceName" name="path"
-                       autofocus="autofocus">
+            <div class="spacer"></div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label" title="The name of the configuration file">
+                Configuration name
+              </label>
+              <div class="col-sm-10">
+                <input type="text" title="The name of the configuration file" ng-required="true"
+                       ng-model="createForm.pidInstanceName" name="path" autofocus>
               </div>
             </div>
           </fieldset>
         </form>
       </div>
+      <div class="col-sm-12">
+        <div simple-form name="pidEditor" mode='edit' entity='entity' data='schema' schema="fullSchema" onSubmit="pidSave()"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-10">
+        <button class="btn btn-primary" ng-show="newPid" ng-disabled="!canSave || !createForm.pidInstanceName" ng-click="pidSave()">Create</button>
+        <button class="btn btn-primary" ng-hide="newPid" ng-disabled="!canSave" ng-click="pidSave()">Save</button>
+        <button class="btn btn-default" ng-click="setEditMode(false)">Cancel</button>
+      </div>
+    </div>
+  </div>
 
-      <div simple-form name="pidEditor" mode='edit' entity='entity' data='schema' schema="fullSchema" onSubmit="pidSave()"></div>
+  <div class="row toolbar-bottom">
+    <div class="col-sm-12">
+      <form class="toolbar-pf-actions">
+        <div class="form-group">
+          <button class="btn btn-default" ng-click="goToConfigurationsPage()">Back</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <div modal="deletePropDialog.show" close="deletePropDialog.close()" options="deletePropDialog.options">
     <form name="deleteProperty" class="form-horizontal no-bottom-margin" ng-submit="deletePidPropConfirmed()">
-      <div class="modal-header"><h4>Delete property '{{deleteKey}}'</h4></div>
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" ng-click="addPidDialog.close()">
+          <span class="pficon pficon-close" aria-hidden="true"></span>
+        </button>
+        <h4>Delete property '{{deleteKey}}'</h4>
+      </div>
       <div class="modal-body">
-        <p>Are you sure?</p>
+        <p class="lead">Are you sure?</p>
       </div>
       <div class="modal-footer">
-        <input class="btn btn-success" type="submit" value="Delete">
-        <input class="btn btn-primary" ng-click="deletePropDialog.close()" type="button" value="Cancel">
+        <button type="button" class="btn btn-default" ng-click="deletePropDialog.close()">Cancel</button>
+        <button type="submit" class="btn btn-danger">Delete</button>
       </div>
     </form>
   </div>
 
   <div modal="deletePidDialog.show" close="deletePidDialog.close()" options="deletePidDialog.options">
     <form name="deletePid" class="form-horizontal no-bottom-margin" ng-submit="deletePidConfirmed()">
-      <div class="modal-header"><h4>Delete configuration: {{pid}}</h4></div>
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" ng-click="addPidDialog.close()">
+          <span class="pficon pficon-close" aria-hidden="true"></span>
+        </button>
+        <h4>Delete configuration: {{pid}}</h4>
+      </div>
       <div class="modal-body">
-        <p>Are you sure?</p>
+        <p class="lead">Are you sure?</p>
       </div>
       <div class="modal-footer">
-        <input class="btn btn-success" type="submit" value="Delete">
-        <input class="btn btn-primary" ng-click="deletePidDialog.close()" type="button" value="Cancel">
+        <button type="button" class="btn btn-default" ng-click="deletePidDialog.close()">Cancel</button>
+        <button type="submit" class="btn btn-danger">Delete</button>
       </div>
     </form>
   </div>
@@ -70,30 +117,33 @@
   <div modal="addPropertyDialog.show" close="addPropertyDialog.close()" options="addPropertyDialog.options">
     <form name="addProperty" class="form-horizontal no-bottom-margin"
           ng-submit="addPropertyConfirmed(addPropKey, addPropValue)">
-      <div class="modal-header"><h4>Add property</h4></div>
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" ng-click="addPidDialog.close()">
+          <span class="pficon pficon-close" aria-hidden="true"></span>
+        </button>
+        <h4>Add property</h4>
+      </div>
       <div class="modal-body">
-        <div class="control-group">
-          <label class="control-label" for="propKey">Key</label>
-
-          <div class="controls">
-            <input class="input-xlarge" type="text" id="propKey" placeholder="Key" ng-model="addPropKey"/>
+        <div class="form-group">
+          <label class="col-sm-2 control-label" for="propKey">Key</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="propKey" placeholder="Key" ng-model="addPropKey"/>
             <span class="help-block"
                   ng-hide="addPropKey !== '' && addPropKey !== undefined">A key must be specified</span>
           </div>
         </div>
-        <div class="control-group">
-          <label class="control-label" for="propValue">Value</label>
-
-          <div class="controls">
-            <input class="input-xlarge" type="text" id="propValue" placeholder="Value" ng-model="addPropValue"/>
+        <div class="form-group">
+          <label class="col-sm-2 control-label" for="propValue">Value</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="propValue" placeholder="Value" ng-model="addPropValue"/>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <input class="btn btn-success" ng-disabled="!(addPropKey !== '' && addPropKey !== undefined)" type="submit"
-               value="Add">
-        <input class="btn btn-primary" ng-click="addPropertyDialog.close()" type="button" value="Cancel">
+        <button type="button" class="btn btn-default" ng-click="addPropertyDialog.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary" ng-disabled="!(addPropKey !== '' && addPropKey !== undefined)">Add</button>
       </div>
     </form>
   </div>
+
 </div>

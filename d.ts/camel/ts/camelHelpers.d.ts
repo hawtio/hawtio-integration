@@ -161,6 +161,13 @@ declare module Camel {
      * @method
      */
     function getSelectionCamelContextMBean(workspace: Core.Workspace): string;
+    /**
+     * When lazy loading route info (using dumpRoutesAsXml() operation) we need MBean name from the folder
+     * and *not* from the selection
+     * @param workspace
+     * @param folder
+     */
+    function getExpandingFolderCamelContextMBean(workspace: Core.Workspace, folder: Core.Folder): string;
     function getSelectionCamelContextEndpoints(workspace: Workspace): Core.NodeSelection;
     /**
      * Returns the selected camel trace mbean for the given selection or null if it cannot be found

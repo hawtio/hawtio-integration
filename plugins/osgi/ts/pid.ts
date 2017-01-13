@@ -6,7 +6,9 @@
  * @module Osgi
  */
 module Osgi {
-  _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia", ($scope, $timeout, $routeParams, $location, workspace:Core.Workspace, jolokia) => {
+  _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia",
+      ($scope, $timeout, $routeParams, $location, workspace:Core.Workspace, jolokia) => {
+    
     $scope.deletePropDialog = new UI.Dialog();
     $scope.deletePidDialog = new UI.Dialog();
     $scope.addPropertyDialog = new UI.Dialog();
@@ -68,7 +70,7 @@ module Osgi {
       };
       var callback = Core.onSuccess(completeFn, errorHandler("Failed to update: " + pid));
       var json = JSON.stringify(data);
-      $scope.jolokia.execute(mbean, "configAdminUpdate", pid, json, callback);
+      jolokia.execute(mbean, "configAdminUpdate", pid, json, callback);
     }
 
     $scope.pidSave = () => {
@@ -90,13 +92,13 @@ module Osgi {
 
       var mbean = getHawtioConfigAdminMBean(workspace);
       if (mbean || $scope.inFabricProfile) {
-        var pidMBean = getSelectionConfigAdminMBean($scope.workspace);
+        var pidMBean = getSelectionConfigAdminMBean(workspace);
         var pid = $scope.pid;
         var zkPid = $scope.zkPid;
         var factoryPid = $scope.factoryPid;
         if (!$scope.inFabricProfile && factoryPid && pidMBean && !zkPid) {
           // lets generate a new pid
-          $scope.jolokia.execute(pidMBean, "createFactoryConfiguration", factoryPid, Core.onSuccess((response) => {
+          jolokia.execute(pidMBean, "createFactoryConfiguration", factoryPid, Core.onSuccess((response) => {
             pid = response;
             if (pid) {
               updatePid(mbean, pid, data);
@@ -164,12 +166,12 @@ module Osgi {
 
       function successFn(response) {
         Core.notification("success", "Successfully deleted pid: " + $scope.pid);
-        $location.path($scope.configurationsLink);
+        $scope.goToConfigurationsPage();
       }
 
-      var mbean = getSelectionConfigAdminMBean($scope.workspace);
+      var mbean = getSelectionConfigAdminMBean(workspace);
       if (mbean) {
-        $scope.jolokia.request({
+        jolokia.request({
           type: "exec",
           mbean: mbean,
           operation: 'delete',
@@ -180,6 +182,8 @@ module Osgi {
         });
       }
     };
+
+    $scope.goToConfigurationsPage = () => $location.path('/osgi/configurations');
 
     function populateTable(response) {
       $scope.modelLoaded = true;
@@ -222,9 +226,9 @@ module Osgi {
             pid = factoryId["Value"];
           }
 
-          var metaTypeMBean = getMetaTypeMBean($scope.workspace);
+          var metaTypeMBean = getMetaTypeMBean(workspace);
           if (metaTypeMBean) {
-            $scope.jolokia.execute(metaTypeMBean, "getPidMetaTypeObject", pid, locale, Core.onSuccess(onMetaType));
+            jolokia.execute(metaTypeMBean, "getPidMetaTypeObject", pid, locale, Core.onSuccess(onMetaType));
           }
         }
       }
@@ -251,8 +255,8 @@ module Osgi {
         required: required,
         properties: properties
       };
-      var inputClass = "span12";
-      var labelClass = "control-label";
+      var inputClass = "form-control";
+      var labelClass = "col-sm-2 control-label";
 
       //var inputClassArray = "span11";
       var inputClassArray = "";
@@ -482,7 +486,7 @@ module Osgi {
 
     function updateTableContents() {
       $scope.modelLoaded = false;
-      Osgi.getConfigurationProperties($scope.workspace, $scope.jolokia, $scope.pid, populateTable);
+      Osgi.getConfigurationProperties(workspace, jolokia, $scope.pid, populateTable);
     }
 
     // load initial data

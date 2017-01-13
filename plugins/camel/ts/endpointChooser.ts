@@ -133,7 +133,7 @@ module Camel {
   endpointForms["jms"] = endpointForms.activemq;
 
   angular.forEach(endpointCategories, (category, catKey) => {
-    category.id = catKey;
+    category['id'] = catKey;
     angular.forEach(category.endpoints, (endpoint) => {
       endpointToCategory[endpoint] = category;
     });
@@ -159,8 +159,7 @@ module Camel {
       var category = getEndpointCategory(endpointName);
       answer = Core.pathGet(category, ["endpointIcon"]);
     }
-    answer = answer || endpointIcon;
-    return answer;
+    return answer || endpointIcon;
   }
 
   export function getEndpointConfig(endpointName, category) {
@@ -296,9 +295,10 @@ module Camel {
     function findCamelContextMBean() {
       var profileWorkspace = $scope.profileWorkspace;
       if (!profileWorkspace) {
-        var removeJolokia = $scope.jolokia;
-        if (removeJolokia) {
-          profileWorkspace = Core.createRemoteWorkspace(removeJolokia, $location, localStorage);
+        var remoteJolokia = $scope.jolokia;
+        if (remoteJolokia) {
+          profileWorkspace = Core.createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location,
+            localStorage);
           $scope.profileWorkspace = profileWorkspace;
         }
       }
@@ -345,7 +345,7 @@ module Camel {
       // NOTE we don't really know which camel context to pick, so lets just find the first one?
       var answer = null;
       angular.forEach(contextsById, (details, id) => {
-        var mbean = details.mbean;
+        var mbean = details['mbean'];
         if (!answer && mbean) answer = mbean;
       });
       return answer;
