@@ -13,7 +13,7 @@ module Camel {
 
   export var defaultMaximumLabelWidth = 34;
   export var defaultCamelMaximumTraceOrDebugBodyLength = 5000;
-  export var defaultCamelTraceOrDebugIncludeStreams = true;
+  export var defaultCamelTraceOrDebugIncludeStreams = false;
   export var defaultCamelRouteMetricMaxSeconds = 10;
   export var defaultHideOptionDocumentation = false;
   export var defaultHideOptionDefaultValue = false;
@@ -67,7 +67,7 @@ module Camel {
    */
   export function processRouteXml(workspace:Workspace, jolokia, folder, onRoute) {
     var selectedRouteId = getSelectedRouteId(workspace, folder);
-    var mbean = getSelectionCamelContextMBean(workspace);
+    var mbean = getExpandingFolderCamelContextMBean(workspace, folder) || getSelectionCamelContextMBean(workspace);
 
     function onRouteXml(response) {
       var route = null;
@@ -759,6 +759,25 @@ module Camel {
     return null;
   }
 
+  /**
+   * When lazy loading route info (using dumpRoutesAsXml() operation) we need MBean name from the folder
+   * and *not* from the selection
+   * @param workspace
+   * @param folder
+   */
+  export function getExpandingFolderCamelContextMBean(workspace:Core.Workspace, folder:Core.Folder) : string {
+    if (folder.entries && folder.entries["type"] === "routes") {
+      var result = workspace.tree.navigate("org.apache.camel", folder.entries["context"], "context");
+      if (result && result.children) {
+        var contextBean:any = result.children[0];
+        if (contextBean.objectName) {
+          return contextBean.objectName;
+        }
+      }
+    }
+    return null;
+  }
+
   export function getSelectionCamelContextEndpoints(workspace:Workspace) : Core.NodeSelection {
     if (workspace) {
       var contextId = getContextId(workspace);
@@ -953,18 +972,21 @@ module Camel {
     var selection = workspace.selection;
     if (selection) {
       // find the camel context and find ancestors in the tree until we find the camel context selection
-      // this is either if the title is 'context' or if the parent title is 'org.apache.camel' (the Camel tree is a bit special)
-      selection = selection.findAncestor(s => s.title === 'context' || s.parent != null && s.parent.title === 'org.apache.camel');
+      // this is either if the title is 'context' or 'Camel Contexts', or if the parent title is 'org.apache.camel'
+      // (the Camel tree is a bit special)
+      selection = selection.findAncestor(s =>
+        s.title === 'context' || s.title === 'Camel Contexts'
+        || s.parent != null && s.parent.title === 'org.apache.camel');
       if (selection) {
         var tree = workspace.tree;
         var folderNames = selection.folderNames;
-        var entries = selection.entries;
+        var children = selection.children;
         var contextId;
         if (tree) {
           if (folderNames && folderNames.length > 1) {
             contextId = folderNames[1];
-          } else if (entries) {
-            contextId = entries["context"];
+          } else if (children && children.length > 0 && children[0].entries) {
+            contextId = children[0].entries["context"];
           }
         }
       }
@@ -1051,7 +1073,20 @@ module Camel {
           var result = tree.navigate(domain, contextId, "context");
           if (result && result.children) {
             var contextBean:any = _.first(result.children);
-            return contextBean.version;
+            if (contextBean.version) {
+              // read the cached version
+              return contextBean.version;
+            }
+            if (contextBean.title) {
+              // okay no version cached, so need to get the version using jolokia
+              var contextName = contextBean.title;
+              var mbean = "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
+              // must use onSuccess(null) that means sync as we need the version asap
+              var version = jolokia.getAttribute(mbean, "CamelVersion", Core.onSuccess(null));
+              // cache version so we do not need to read it again using jolokia
+              contextBean.version = version;
+              return version;
+            }
           }
         }
       }
@@ -1238,7 +1273,7 @@ module Camel {
         //console.log("Image URL is " + imageUrl);
         var cid = route.getAttribute("_cid") || route.getAttribute("id");
         node = { "name": name, "label": label, "labelSummary": labelSummary, "group": 1, "id": id, "elementId": elementID,
-          "x": x, "y:": y, "imageUrl": imageUrl, "cid": cid, "tooltip": tooltip, "type": nodeId};
+          "x": x, "y:": y, "imageUrl": imageUrl, "cid": cid, "tooltip": tooltip, "type": nodeId, "uri": uri};
         if (rid) {
           node["rid"] = rid;
           if (!$scope.routeNodes) $scope.routeNodes = {};
@@ -1530,6 +1565,7 @@ module Camel {
    */
   export function traceOrDebugIncludeStreams(localStorage) {
     var value = localStorage["camelTraceOrDebugIncludeStreams"];
+    console.log('localStorage["camelTraceOrDebugIncludeStreams"] = ' + value);
     return Core.parseBooleanValue(value, Camel.defaultCamelTraceOrDebugIncludeStreams);
   }
 

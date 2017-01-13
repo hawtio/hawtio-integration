@@ -8,6 +8,7 @@ var gulp = require('gulp'),
     s = require('underscore.string'),
     argv = require('yargs').argv,
     urljoin = require('url-join'),
+    logger = require('js-logger'),
     hawtio = require('hawtio-node-backend');
 
 var plugins = gulpLoadPlugins({});
@@ -27,7 +28,7 @@ var config = {
     target: 'ES5',
     module: 'commonjs',
     declarationFiles: true,
-    noExternalResolve: false
+    noResolve: false
   })
 };
 
@@ -126,6 +127,7 @@ gulp.task('watch', ['build', 'watch-less'], function() {
 
 gulp.task('connect', ['watch'], function() {
   hawtio.setConfig({
+    logLevel: logger.INFO,
     port: 2772,
     staticProxies: [{
       port: config.proxyPort,

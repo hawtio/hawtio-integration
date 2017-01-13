@@ -14,6 +14,8 @@ module Osgi {
     $scope.selected = [];
     $scope.loading = true;
     $scope.bundleUrl = "";
+    $scope.listViewUrl = Core.url('/osgi/bundle-list' + workspace.hash());
+    $scope.tableViewUrl = Core.url('/osgi/bundles' + workspace.hash());
 
     $scope.installDisabled = function() {
       return $scope.bundleUrl === "";
@@ -31,24 +33,25 @@ module Osgi {
         displayName: 'Bundle State',
         width: "24",
         headerCellTemplate: '<div ng-click="col.sort()" class="ngHeaderSortColumn {{col.headerClass}}" ng-style="{\'cursor\': col.cursor}" ng-class="{ \'ngSorted\': !noSortVisible }"><div class="ngHeaderText colt{{$index}} pagination-centered" title="State"><i class="fa fa-tasks"></i></div><div class="ngSortButtonDown" ng-show="col.showSortButtonDown()"></div><div class="ngSortButtonUp" ng-show="col.showSortButtonUp()"></div></div>',
-        cellTemplate: '<div class="ngCellText" title="{{row.getProperty(col.field)}}"><i class="{{row.getProperty(col.field)}}"></i></div>'
+        cellTemplate: '<div class="ngCellText" title="{{row.entity.State}}"><i class="{{row.entity.State}}"></i></div>'
       },
       {
         field: 'Name',
         displayName: 'Name',
         width: "***",
-        cellTemplate: '<div class="ngCellText"><a href="#/osgi/bundle/{{row.entity.Identifier}}?p=container">{{row.getProperty(col.field)}}</a></div>'
+        cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.Name}}</a></div>'
       },
       {
         field: 'SymbolicName',
         displayName: 'Symbolic Name',
         width: "***",
-        cellTemplate: '<div class="ngCellText"><a href="#/osgi/bundle/{{row.entity.Identifier}}?p=container">{{row.getProperty(col.field)}}</a></div>'
+        cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.SymbolicName}}</a></div>'
       },
       {
         field: 'Version',
         displayName: 'Version',
-        width: "**"
+        width: "**",
+        sortable: false
       },/*
       {
         field: 'LastModified',
@@ -169,7 +172,8 @@ module Osgi {
             State: value.State,
             Version: value.Version,
             LastModified: value.LastModified,
-            Location: value.Location
+            Location: value.Location,
+            Url: Core.url("/osgi/bundle/" + value.Identifier + workspace.hash())
           };
           if (value.Headers['Bundle-Name']) {
             obj.Name = value.Headers['Bundle-Name']['Value'];

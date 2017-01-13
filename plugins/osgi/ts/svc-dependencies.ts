@@ -64,6 +64,7 @@ module Osgi {
             $location.search(search);
         }
 
+        /*
         $scope.addToDashboardLink = () => {
 
             var routeParams = angular.toJson($routeParams);
@@ -84,6 +85,7 @@ module Osgi {
 
             return addLink;
         };
+        */
 
         $scope.$on('$routeUpdate', () => {
 
@@ -124,6 +126,7 @@ module Osgi {
 
             var graphBuilder = new OsgiGraphBuilder(
               osgiDataService,
+              workspace,
               $scope.bundleFilter,
               $scope.packageFilter,
               $scope.selectView == "services",

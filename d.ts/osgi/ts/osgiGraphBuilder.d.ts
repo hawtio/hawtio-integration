@@ -7,6 +7,7 @@
 declare module Osgi {
     class OsgiGraphBuilder {
         private osgiDataService;
+        private workspace;
         private bundleFilter;
         private packageFilter;
         private showServices;
@@ -20,7 +21,7 @@ declare module Osgi {
         private PREFIX_BUNDLE;
         private PREFIX_SVC;
         private PREFIX_PKG;
-        constructor(osgiDataService: OsgiDataService, bundleFilter: String, packageFilter: String, showServices: boolean, showPackages: boolean, hideUnused: boolean);
+        constructor(osgiDataService: OsgiDataService, workspace: Workspace, bundleFilter: String, packageFilter: String, showServices: boolean, showPackages: boolean, hideUnused: boolean);
         getBundles(): any;
         getServices(): any;
         getPackages(): any;

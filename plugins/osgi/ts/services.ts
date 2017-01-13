@@ -40,7 +40,7 @@ module Osgi {
           displayName: 'Bundle',
           cellTemplate: `
             <div class="ngCellText">
-              <a ng-href="/osgi/bundle/{{row.entity.Identifier}}">{{row.entity.Identifier}}</a>
+              <a ng-href="{{row.entity.Url}}">{{row.entity.Identifier}}</a>
             </div>`
           //width: "***"
           //width: 300
@@ -66,7 +66,7 @@ module Osgi {
           cellTemplate: `
             <div class="ngCellText">
               <div ng-repeat="bundle in row.entity.UsingBundles">
-                <a ng-href="/osgi/bundle/{{bundle.Identifier}}">{{bundle.Name || bundle.SymbolicName || bundle.Identifier}}</a>
+                <a ng-href="{{bundle.Url}}">{{bundle.Name || bundle.SymbolicName || bundle.Identifier}}</a>
                 <!--
                 <pre>
                   {{bundle}}
@@ -125,7 +125,8 @@ module Osgi {
             State: value.State,
             Version: value.Version,
             LastModified: value.LastModified,
-            Location: value.Location
+            Location: value.Location,
+            Url: Core.url("/osgi/bundle/" + value.Identifier + workspace.hash())
           };
           if (value.Headers['Bundle-Name']) {
             obj.Name = value.Headers['Bundle-Name']['Value'];
@@ -134,6 +135,7 @@ module Osgi {
         });
         var servicesArray = [];
         angular.forEach(services, function(s, key) {
+          s.Url = Core.url("/osgi/bundle/" + s.Identifier + workspace.hash())
           angular.forEach(s["UsingBundles"], function(b, key) {
             s["UsingBundles"][key] = bundleMap[b];
           });

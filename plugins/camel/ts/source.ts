@@ -4,6 +4,8 @@
 module Camel {
   _module.controller("Camel.SourceController", ["$scope", "workspace", ($scope, workspace:Workspace) => {
 
+    $scope.camelContextMBean = getSelectionCamelContextMBean(workspace);
+
     $scope.$on("$routeChangeSuccess", function (event, current, previous) {
       // lets do this asynchronously to avoid Error: $digest already in progress
       setTimeout(updateRoutes, 50);
@@ -74,6 +76,20 @@ module Camel {
         var routes = $(doc).find('route[id="' + selectedRouteId + '"]');
         if (routes && routes.length) {
           var selectedRoute = routes[0];
+
+          // Copy any XML namespaces over from the routes parent tag to the selected route child node
+          var routeParent = selectedRoute.parentNode;
+          if (routeParent && routeParent.nodeName === 'routes') {
+            if (routeParent.attributes) {
+              angular.forEach(routeParent.attributes, (attr) => {
+                if (attr.name.startsWith("xmlns")) {
+                  var attrCopy = doc.createAttribute(attr.name);
+                  attrCopy.value = attr.value;
+                  selectedRoute.attributes.setNamedItem(attrCopy);
+                }
+              });
+            }
+          }
           // TODO turn into XML?
           var routeXml = getSource(selectedRoute);
           if (routeXml) {

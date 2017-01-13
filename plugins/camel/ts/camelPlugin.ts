@@ -228,133 +228,114 @@ module Camel {
       {field: 'MaximumRedeliveryDelay', displayName: 'Max Redeliveries Delay'}
     ];
 
-    var myUrl = '/jmx/attributes?main-tab=camel&sub-tab=camel-attributes';
-
-    var builder = nav.builder();
-    var tab = builder.id('camel')
-                .title( () => 'Camel' )
-                .defaultPage({
-                  rank: 20,
-                  isValid: (yes, no) => {
-                    var name = 'CamelDefaultPage';
-                    workspace.addNamedTreePostProcessor(name, (tree) => {
-                      workspace.removeNamedTreePostProcessor(name);
-                      if (workspace.treeContainsDomainAndProperties(jmxDomain)) {
-                        yes();
-                      } else {
-                        no();
-                      }
-                    });
-                  }
-                })
-                .href( () => myUrl )
-                .isValid( () => workspace.treeContainsDomainAndProperties(jmxDomain) )
-                .build();
+    const myUrl = '/jmx/attributes?main-tab=camel&sub-tab=camel-attributes';
 
     // add sub level tabs
-    tab.tabs = Jmx.getNavItems(builder, workspace, $templateCache, 'camel');
-
-    // special for route diagram as we want this to be the 1st
-    tab.tabs.push({
-      id: 'camel-route-diagram',
-      title: () => '<i class="fa fa-sitemap"></i> Route Diagram',
-      tooltip: () => "View a diagram of the Camel routes",
-      show: () =>
+    // Do not add JMX tabs as they are already in the layout header
+    // const subTabs = Jmx.getNavItems(builder, workspace, $templateCache, 'camel');
+    const subTabs = [];
+    subTabs.push(
+      // special for route diagram as we want this to be the 1st
+      {
+        id        : 'camel-route-diagram',
+        title     : () => '<i class="fa fa-sitemap"></i> Route Diagram',
+        tooltip   : () => "View a diagram of the Camel routes",
+        show      : () =>
         (workspace.isRoute() || workspace.isRoutesFolder())
         && workspace.hasInvokeRightsForName(getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"),
-      isSelected: () => workspace.isLinkActive('camel/routes'),
-      href: () => "/camel/routes" + workspace.hash(),
-      // make sure we have route diagram shown first
-      index: -2
-    });
-    tab.tabs.push({
-      id: 'camel-route-source',
-      title: () => '<i class=" fa fa-file-code-o"></i> Source',
-      tooltip: () => "View the source of the Camel routes",
-      show: () =>
-      !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-      && (workspace.isRoute() || workspace.isRoutesFolder())
-      && workspace.hasInvokeRightsForName(getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"),
-      isSelected: () => workspace.isLinkActive('camel/source'),
-      href: () => "/camel/source" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-route-properties',
-      title: () => '<i class=" fa fa-edit"></i> Properties',
-      tooltip: () => "View the pattern properties",
-      show: () => getSelectedRouteNode(workspace),
-      href: () => "/camel/properties" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-endpoint-properties',
-      title: () => '<i class="fa fa-list"></i> Properties',
-      tooltip: () => "Show the endpoint properties",
-      show: () =>
-      workspace.isEndpoint()
-      && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-      && workspace.hasInvokeRights(workspace.selection, "explainEndpointJson"),
-      href: () => "/camel/propertiesEndpoint" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-component-properties',
-      title: () => '<i class="fa fa-list"></i> Properties',
-      tooltip: () => "Show the component properties",
-      show: () =>
-      workspace.isComponent()
-      && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-      && workspace.hasInvokeRights(workspace.selection, "explainComponentJson"),
-      href: () => "/camel/propertiesComponent" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-dataformat-properties',
-      title: () => '<i class="fa fa-list"></i> Properties',
-      tooltip: () => "Show the dataformat properties",
-      show: () =>
-      workspace.isDataformat()
-      && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
-      && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson"),
-      href: () => "/camel/propertiesDataFormat" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-inflight-exchanges',
-      title: () => '<i class="fa fa-bar-chart"></i> Inflight',
-      tooltip: () => "View the entire JVMs Camel inflight exchanges",
-      show: () =>
+        isSelected: () => workspace.isLinkActive('camel/routes'),
+        href      : () => "/camel/routes" + workspace.hash(),
+        // make sure we have route diagram shown first
+        index     : -2
+      },
+      {
+        id        : 'camel-route-source',
+        title     : () => '<i class=" fa fa-file-code-o"></i> Source',
+        tooltip   : () => "View the source of the Camel routes",
+        show      : () =>
+        !workspace.isEndpointsFolder() && !workspace.isEndpoint()
+        && (workspace.isRoute() || workspace.isRoutesFolder())
+        && workspace.hasInvokeRightsForName(getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"),
+        isSelected: () => workspace.isLinkActive('camel/source'),
+        href      : () => "/camel/source" + workspace.hash()
+      },
+      {
+        id     : 'camel-route-properties',
+        title  : () => '<i class=" fa fa-edit"></i> Properties',
+        tooltip: () => "View the pattern properties",
+        show   : () => getSelectedRouteNode(workspace),
+        href   : () => "/camel/properties" + workspace.hash()
+      },
+      {
+        id     : 'camel-endpoint-properties',
+        title  : () => '<i class="fa fa-list"></i> Properties',
+        tooltip: () => "Show the endpoint properties",
+        show   : () =>
+        workspace.isEndpoint()
+        && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
+        && workspace.hasInvokeRights(workspace.selection, "explainEndpointJson"),
+        href   : () => "/camel/propertiesEndpoint" + workspace.hash()
+      },
+      {
+        id     : 'camel-component-properties',
+        title  : () => '<i class="fa fa-list"></i> Properties',
+        tooltip: () => "Show the component properties",
+        show   : () =>
+        workspace.isComponent()
+        && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
+        && workspace.hasInvokeRights(workspace.selection, "explainComponentJson"),
+        href   : () => "/camel/propertiesComponent" + workspace.hash()
+      },
+      {
+        id     : 'camel-dataformat-properties',
+        title  : () => '<i class="fa fa-list"></i> Properties',
+        tooltip: () => "Show the dataformat properties",
+        show   : () =>
+        workspace.isDataformat()
+        && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
+        && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson"),
+        href   : () => "/camel/propertiesDataFormat" + workspace.hash()
+      },
+      {
+        id     : 'camel-inflight-exchanges',
+        title  : () => '<i class="fa fa-bar-chart"></i> Inflight',
+        tooltip: () => "View the entire JVMs Camel inflight exchanges",
+        show   : () =>
         !workspace.isEndpointsFolder() && !workspace.isEndpoint()
         && !workspace.isComponentsFolder() && !workspace.isComponent()
         && (workspace.isCamelContext() || workspace.isRoutesFolder() || workspace.isRoute())
         && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
         && workspace.hasInvokeRightsForName(getSelectionCamelInflightRepository(workspace), "browse"),
-      href: () => "/camel/inflight" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-blocked-exchanges',
-      title: () => '<i class="fa fa-bar-chart"></i> Blocked',
-      tooltip: () => "View the entire JVMs Camel blocked exchanges",
-      show: () =>
+        href   : () => "/camel/inflight" + workspace.hash()
+      },
+      {
+        id     : 'camel-blocked-exchanges',
+        title  : () => '<i class="fa fa-bar-chart"></i> Blocked',
+        tooltip: () => "View the entire JVMs Camel blocked exchanges",
+        show   : () =>
         !workspace.isEndpointsFolder()
         && (workspace.isRoute() || workspace.isRoutesFolder())
         && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
         && workspace.hasInvokeRightsForName(getSelectionCamelBlockedExchanges(workspace), "browse"),
-      href: () => "/camel/blocked" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-route-metrics',
-      title: () => '<i class="fa fa-bar-chart"></i> Route Metrics',
-      tooltip: () => "View the entire JVMs Camel route metrics",
-      show: () =>
+        href   : () => "/camel/blocked" + workspace.hash()
+      },
+      {
+        id     : 'camel-route-metrics',
+        title  : () => '<i class="fa fa-bar-chart"></i> Route Metrics',
+        tooltip: () => "View the entire JVMs Camel route metrics",
+        show   : () =>
         !workspace.isEndpointsFolder() && !workspace.isEndpoint()
         && (workspace.isCamelContext() || workspace.isRoutesFolder())
         && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
         && getSelectionCamelRouteMetrics(workspace)
         && workspace.hasInvokeRightsForName(getSelectionCamelRouteMetrics(workspace), "dumpStatisticsAsJson"),
-      href: () => "/camel/routeMetrics" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-rest-services',
-      title: () =>'<i class="fa fa-list"></i> Rest Services',
-      tooltip: () => "List all the REST services registered in the context",
-      show: () =>
+        href   : () => "/camel/routeMetrics" + workspace.hash()
+      },
+      {
+        id     : 'camel-rest-services',
+        title  : () => '<i class="fa fa-list"></i> Rest Services',
+        tooltip: () => "List all the REST services registered in the context",
+        show   : () =>
         !workspace.isEndpointsFolder() && !workspace.isEndpoint()
         && !workspace.isComponentsFolder() && !workspace.isComponent()
         && (workspace.isCamelContext() || workspace.isRoutesFolder())
@@ -362,84 +343,106 @@ module Camel {
         && getSelectionCamelRestRegistry(workspace)
         && hasRestServices(workspace, jolokia)
         && workspace.hasInvokeRightsForName(getSelectionCamelRestRegistry(workspace), "listRestServices"),
-      href: () => "/camel/restRegistry" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-endpoint-runtime-registry',
-      title: () =>'<i class="fa fa-list"></i> Endpoints (in/out)',
-      tooltip: () => "List all the incoming and outgoing endpoints in the context",
-      show: () =>
+        href   : () => "/camel/restRegistry" + workspace.hash()
+      },
+      {
+        id     : 'camel-endpoint-runtime-registry',
+        title  : () => '<i class="fa fa-list"></i> Endpoints (in/out)',
+        tooltip: () => "List all the incoming and outgoing endpoints in the context",
+        show   : () =>
         !workspace.isEndpointsFolder() && !workspace.isEndpoint()
         && !workspace.isComponentsFolder() && !workspace.isComponent()
         && (workspace.isCamelContext() || workspace.isRoutesFolder())
         && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
         && getSelectionCamelEndpointRuntimeRegistry(workspace)
         && workspace.hasInvokeRightsForName(getSelectionCamelEndpointRuntimeRegistry(workspace), "endpointStatistics"),
-      href: () => "/camel/endpointRuntimeRegistry" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-type-converters',
-      title: () => '<i class="fa fa-list"></i> Type Converters',
-      tooltip: () => "List all the type converters registered in the context",
-      show: () =>
-      !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-      && !workspace.isComponentsFolder() && !workspace.isComponent()
-      && (workspace.isCamelContext() || workspace.isRoutesFolder())
-      && Camel.isCamelVersionEQGT(2, 13, workspace, jolokia)
-      && workspace.hasInvokeRightsForName(getSelectionCamelTypeConverter(workspace), "listTypeConverters"),
-      href: () => "/camel/typeConverter" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-route-profile',
-      title: () => '<i class="fa fa-bar-chart"></i> Profile',
-      tooltip: () => "Profile the messages flowing through the Camel route",
-      show: () => workspace.isRoute()
-      && Camel.getSelectionCamelTraceMBean(workspace)
-      && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"),
-      href: () => "/camel/profileRoute" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-route-debug',
-      title: () => '<i class="fa fa-stethoscope"></i> Debug',
-      tooltip: () => "Debug the Camel route",
-      show: () => workspace.isRoute()
-        && Camel.getSelectionCamelDebugMBean(workspace)
-        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelDebugMBean(workspace), "getBreakpoints"),
-      href: () => "/camel/debugRoute" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-route-trace',
-      title: () => '<i class="fa fa-envelope"></i> Trace',
-      tooltip: () => "Trace the messages flowing through the Camel route",
-      show: () => workspace.isRoute()
+        href   : () => "/camel/endpointRuntimeRegistry" + workspace.hash()
+      },
+      {
+        id     : 'camel-type-converters',
+        title  : () => '<i class="fa fa-list"></i> Type Converters',
+        tooltip: () => "List all the type converters registered in the context",
+        show   : () =>
+        !workspace.isEndpointsFolder() && !workspace.isEndpoint()
+        && !workspace.isComponentsFolder() && !workspace.isComponent()
+        && (workspace.isCamelContext() || workspace.isRoutesFolder())
+        && Camel.isCamelVersionEQGT(2, 13, workspace, jolokia)
+        && workspace.hasInvokeRightsForName(getSelectionCamelTypeConverter(workspace), "listTypeConverters"),
+        href   : () => "/camel/typeConverter" + workspace.hash()
+      },
+      {
+        id     : 'camel-route-profile',
+        title  : () => '<i class="fa fa-bar-chart"></i> Profile',
+        tooltip: () => "Profile the messages flowing through the Camel route",
+        show   : () => workspace.isRoute()
         && Camel.getSelectionCamelTraceMBean(workspace)
         && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"),
-      href: () => "/camel/traceRoute" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-endpoint-browser',
-      title: () => '<i class="fa fa-envelope"></i> Browse',
-      tooltip: () => "Browse the messages on the endpoint",
-      show: () => workspace.isEndpoint()
-      && workspace.hasInvokeRights(workspace.selection, "browseAllMessagesAsXml"),
-      href: () => "/camel/browseEndpoint" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-endpoint-send',
-      title: () => '<i class="fa fa-pencil"></i> Send',
-      //title: "Send a message to this endpoint",
-      show: () => workspace.isEndpoint()
+        href   : () => "/camel/profileRoute" + workspace.hash()
+      },
+      {
+        id     : 'camel-route-debug',
+        title  : () => '<i class="fa fa-stethoscope"></i> Debug',
+        tooltip: () => "Debug the Camel route",
+        show   : () => workspace.isRoute()
+        && Camel.getSelectionCamelDebugMBean(workspace)
+        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelDebugMBean(workspace), "getBreakpoints"),
+        href   : () => "/camel/debugRoute" + workspace.hash()
+      },
+      {
+        id     : 'camel-route-trace',
+        title  : () => '<i class="fa fa-envelope"></i> Trace',
+        tooltip: () => "Trace the messages flowing through the Camel route",
+        show   : () => workspace.isRoute()
+        && Camel.getSelectionCamelTraceMBean(workspace)
+        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"),
+        href   : () => "/camel/traceRoute" + workspace.hash()
+      },
+      {
+        id     : 'camel-endpoint-browser',
+        title  : () => '<i class="fa fa-envelope"></i> Browse',
+        tooltip: () => "Browse the messages on the endpoint",
+        show   : () => workspace.isEndpoint()
+        && workspace.hasInvokeRights(workspace.selection, "browseAllMessagesAsXml"),
+        href   : () => "/camel/browseEndpoint" + workspace.hash()
+      },
+      {
+        id   : 'camel-endpoint-send',
+        title: () => '<i class="fa fa-pencil"></i> Send',
+        //title: "Send a message to this endpoint",
+        show : () => workspace.isEndpoint()
         && workspace.hasInvokeRights(workspace.selection, workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage"),
-      href: () => "/camel/sendMessage" + workspace.hash()
-    });
-    tab.tabs.push({
-      id: 'camel-endpoint-create',
-      title: () =>'<i class="fa fa-plus"></i> Endpoint',
-      tooltip: () => "Create a new endpoint",
-      show: () => workspace.isEndpointsFolder()
+        href : () => "/camel/sendMessage" + workspace.hash()
+      },
+      {
+        id     : 'camel-endpoint-create',
+        title  : () => '<i class="fa fa-plus"></i> Endpoint',
+        tooltip: () => "Create a new endpoint",
+        show   : () => workspace.isEndpointsFolder()
         && workspace.hasInvokeRights(workspace.selection, "createEndpoint"),
-      href: () => "/camel/createEndpoint" + workspace.hash()
-    });
+        href   : () => "/camel/createEndpoint" + workspace.hash()
+      });
+
+    const builder = nav.builder();
+    const tab     = builder.id('camel')
+      .title(() => 'Camel')
+      .defaultPage({
+        rank   : 20,
+        isValid: (yes, no) => {
+          const name = 'CamelDefaultPage';
+          workspace.addNamedTreePostProcessor(name, (tree) => {
+            workspace.removeNamedTreePostProcessor(name);
+            if (workspace.treeContainsDomainAndProperties(jmxDomain)) {
+              yes();
+            } else {
+              no();
+            }
+          });
+        }
+      })
+      .href(() => myUrl)
+      .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
+      .tabs(subTabs[0], ...subTabs.slice(1))
+      .build();
 
     nav.add(tab);
 

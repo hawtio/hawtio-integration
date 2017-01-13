@@ -128,6 +128,7 @@ module Camel {
             operation: 'getDebugCounter'}, Core.onSuccess(onBreakpointCounter));
         } else {
           $scope.graphView = null;
+          $scope.tableView = null;
         }
       }
     }
@@ -162,6 +163,8 @@ module Camel {
         // lets update the diagram selection to the newly stopped node
         $scope.selectedDiagramNodeId = stopNodeId;
       }
+      updateBreakpointIcons();
+      Core.$apply($scope);
     }
 
     function onMessages(response, stopNodeId) {

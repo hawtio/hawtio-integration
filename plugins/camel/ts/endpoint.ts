@@ -13,7 +13,7 @@ module Camel {
       if (jolokia) {
         var mbean = getSelectionCamelContextMBean(workspace);
         if (mbean) {
-          $scope.message = "Creating endpoint " + name;
+          $scope.message = name;
           var operation = "createEndpoint(java.lang.String)";
           jolokia.execute(mbean, operation, name, Core.onSuccess(operationSuccess));
         } else {
@@ -58,11 +58,16 @@ module Camel {
       }
     };
 
-    function operationSuccess() {
+    function operationSuccess(endpointCreated) {
       $scope.endpointName = "";
       $scope.workspace.operationCounter += 1;
       Core.$apply($scope);
-      Core.notification("success", $scope.message);
+
+      if (endpointCreated && endpointCreated === true) {
+        Core.notification('success', "Creating endpoint " + $scope.message);
+      } else {
+        Core.notification('error', "Failed to create endpoint " + $scope.message);
+      }
     }
 
     function deleteSuccess() {

@@ -1,15 +1,27 @@
 <div class="row">
   <div class="col-md-6">
     <div class="control-group"  ng-controller="Camel.AttributesToolBarController">
-      <button class="btn btn-default" ng-disabled="!anySelectionHasState(['stop', 'suspend'])" ng-click="start()"><i class="fa fa-play-circle"></i> Start</button>
-      <button class="btn btn-default" ng-disabled="!anySelectionHasState('start')" ng-click="pause()"><i class="fa fa-pause"></i> Pause</button>
-      <button class="btn btn-default" ng-disabled="!anySelectionHasState(['start', 'suspend'])" ng-click="stop()"><i class="fa fa-off"></i> Stop</button>
-      <button class="btn btn-default" ng-disabled="!everySelectionHasState('stop')" ng-click="delete()"><i class="fa fa-remove"></i> Delete</button>
+      <button class="btn" ng-disabled="!anySelectionHasState(['stop', 'suspend'])" ng-click="start()"
+              hawtio-show object-name="{{routeMBean}}" method-name="start"
+              ><i class="fa fa-play-circle"></i> Start</button>
+      <button class="btn" ng-disabled="!anySelectionHasState('start')" ng-click="pause()"
+              hawtio-show object-name="{{routeMBean}}" method-name="suspend"
+              ><i class="fa fa-pause"></i> Pause</button>
+      <button class="btn" ng-disabled="!anySelectionHasState(['start', 'suspend'])" ng-click="stop()"
+              hawtio-show object-name="{{routeMBean}}" method-name="stop"
+              ><i class="fa fa-off"></i> Stop</button>
+      <button class="btn" ng-disabled="!everySelectionHasState('stop')" ng-click="delete()"
+              hawtio-show object-name="{{routeMBean}}" method-name="remove"
+              ><i class="fa fa-remove"></i> Delete</button>
     </div>
   </div>
   <div class="col-md-6">
-    <div class="control-group">
-      <input type="text" class="col-md-12 search-query" ng-model="$parent.gridOptions.filterOptions.filterText" placeholder="Filter...">
+    <div class="section-filter pull-right">
+      <div class="control-group">
+        <input type="text" class="span12 search-query" ng-model="$parent.gridOptions.filterOptions.filterText"
+          placeholder="Filter...">
+        <i class="fa fa-remove clickable" title="Clear filter" ng-click="gridOptions.filterOptions.filterText = ''"></i>
+      </div>
     </div>
   </div>
 </div>
