@@ -8,14 +8,6 @@
 module Osgi {
 
   // These functions are exported independently to facilitate unit testing
-  export function readBSNHeaderData(header:string):string {
-    var idx = header.indexOf(";");
-    if (idx <= 0) {
-      return "";
-    }
-    return header.substring(idx + 1).trim();
-  }
-
   export function formatAttributesAndDirectivesForPopover(data:{}, skipVersion:boolean):string {
     var str = "";
     if (!data) {
@@ -233,10 +225,6 @@ module Osgi {
                 $(this).css('overflow', 'hidden');
               }
       );
-
-      // setup tooltips
-      (<any> $)("#bsn").tooltip({title: readBSNHeaderData($scope.row.Headers["Bundle-SymbolicName"].Value),
-        placement: "right"});
 
       createImportPackageSection();
       createExportPackageSection();

@@ -6,7 +6,9 @@
  * @module Osgi
  */
 module Osgi {
-  _module.controller("Osgi.BundleListController", ["$scope", "workspace", "jolokia", "localStorage", ($scope, workspace:Workspace, jolokia, localStorage) => {
+  _module.controller("Osgi.BundleListController", ["$scope", "workspace", "jolokia", "localStorage", "$location",
+      ($scope, workspace:Workspace, jolokia, localStorage, $location) => {
+
     $scope.result = {};
     $scope.bundles = [];
     $scope.bundleUrl = "";
@@ -15,11 +17,10 @@ module Osgi {
       sortField: "Identifier",
       bundleFilter: "",
       startLevelFilter: 0,
-      showActiveMQBundles: false,
-      showCamelBundles: false,
-      showCxfBundles: false,
-      showPlatformBundles: false,
-      showAllBundles: false
+      showActiveMQBundles: true,
+      showCamelBundles: true,
+      showCxfBundles: true,
+      showPlatformBundles: true
     };
     $scope.listViewUrl = Core.url('/osgi/bundle-list' + workspace.hash());
     $scope.tableViewUrl = Core.url('/osgi/bundles' + workspace.hash());
@@ -140,16 +141,15 @@ module Osgi {
       }
     };
 
+    $scope.showDetails = (bundle) => {
+      $location.path(bundle.Url);
+    }
+
     function matchesCheckedBundle(bundle) {
-      if (($scope.display.showPlatformBundles && Karaf.isPlatformBundle(bundle['SymbolicName'])) ||
+      return ($scope.display.showPlatformBundles && Karaf.isPlatformBundle(bundle['SymbolicName'])) ||
           ($scope.display.showActiveMQBundles && Karaf.isActiveMQBundle(bundle['SymbolicName'])) ||
           ($scope.display.showCxfBundles && Karaf.isCxfBundle(bundle['SymbolicName'])) ||
-          ($scope.display.showCamelBundles && Karaf.isCamelBundle(bundle['SymbolicName'])) || 
-          $scope.display.showAllBundles) {
-        return true;
-      } else {
-        return false;
-      }
+          ($scope.display.showCamelBundles && Karaf.isCamelBundle(bundle['SymbolicName']));
     }
 
     function processResponse(response) {
@@ -160,7 +160,7 @@ module Osgi {
 
       if ($scope.responseJson !== responseJson) {
         $scope.responseJson = responseJson;
-        $scope.bundles = [];
+        let bundles = [];
         angular.forEach(value, function (value, key) {
           var obj = {
             Identifier: value.Identifier,
@@ -172,15 +172,15 @@ module Osgi {
             LastModified: new Date(Number(value.LastModified)),
             Location: value.Location,
             StartLevel: undefined,
-            Url: Core.url("/osgi/bundle/" + value.Identifier + workspace.hash())
+            Url: Core.url("/osgi/bundle/" + value.Identifier)
           };
           if (value.Headers['Bundle-Name']) {
             obj.Name = value.Headers['Bundle-Name']['Value'];
           }
-          $scope.bundles.push(obj);
+          bundles.push(obj);
         });
 
-        $scope.bundles = _.sortBy($scope.bundles, $scope.display.sortField);
+        $scope.bundles = _.sortBy(bundles, $scope.display.sortField);
 
         Core.$apply($scope);
 

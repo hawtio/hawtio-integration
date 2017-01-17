@@ -4,6 +4,9 @@
 .hawtio-btn-danger {
   color: darkred;
 }
+.modal {
+  padding-right: 0 !important;
+}
 
 .metricsWatcher .heading1 {
   font-size: 24px;
@@ -164,197 +167,64 @@ caption {
   display: block;
 }
 
-/*
-
-.ACTIVE:before {
+.bundle-cards .card-pf {
+  cursor: pointer;
+}
+.bundle-cards .content {
+  height: 5em;
+  display: table-cell;
+  vertical-align: middle;
+}
+.bundle-state {
+  margin-right: 1em;
+}
+.bundle-state.active:before {
   font-family: FontAwesome;
   content: "\f087";
   font-style: normal;
   color: #777777;
 }
-
-.RESOLVED:before {
+.bundle-state.resolved:before {
   font-family: FontAwesome;
   content: "\f0ad";
   font-style: normal;
 }
-
-.STARTING:before {
+.bundle-state.starting:before {
   font-family: FontAwesome;
   content: "\f021";
   font-style: normal;
 }
-
-.STARTING {
+.bundle-state.starting {
   -moz-animation: spin 2s infinite linear;
   -o-animation: spin 2s infinite linear;
   -webkit-animation: spin 2s infinite linear;
   animation: spin 2s infinite linear;
 }
-
-.STOPPING:before {
+.bundle-state.stopping:before {
   font-family: FontAwesome;
   content: "\f021";
   font-style: normal;
 }
-
-.STOPPING {
+.bundle-state.stopping {
   -moz-animation: spin 2s infinite linear;
   -o-animation: spin 2s infinite linear;
   -webkit-animation: spin 2s infinite linear;
   animation: spin 2s infinite linear;
 }
-
-.UNINSTALLED:before {
+.bundle-state.uninstalled:before {
   font-family: FontAwesome;
   content: "\f014";
   font-style: normal;
 }
-
-.INSTALLED:before {
+.bundle-state.installed:before {
   font-family: FontAwesome;
   content: "\f06b";
   font-style: normal;
 }
-
-.bundle-list {
-  width: 100%;
-}
-
-.bundle-item {
-  position: relative;
-  display: inline-block;
-  width: 300px;
-  margin-bottom: 1px;
-}
-
-.bundle-item-details table {
-  min-height: 0;
-}
-
-.bundle-item-details {
-  height: 0;
-  display: inline-block;
-  z-index: 15;
-}
-
-.bundle-item > a {
-  display: block;
-  z-index: 5;
-}
-
-.bundle-item > a:hover {
-  text-decoration: none;
-}
-
-.bundle-item a span {
-  display: block;
-  padding: 8px;
-  font-weight: normal;
-  z-index: 6;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-.bundle-item a span.badge {
-  margin-left: 7px;
-}
-
-.bundle-item a span.badge::before {
-  padding: 0px;
-  float: left;
-  position: relative;
-  top: 4px;
-  left: -8px;
-  display: block;
-  content: ' ';
-  height: 6px;
-  width: 6px;
-  z-index: 10;
-}
-
-.bundle-item a.toggle-action {
-  position: absolute;
-  display: block;
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  padding: 0;
-  right: 12px;
-  top: 0;
-  opacity: 0.2;
-  transition: all 500ms ease-in-out;
-  font-size: 18px;
-}
-
-.bundle-item a.toggle-action .icon-power-off {
-  color: orange;
-}
-
-.bundle-item a.toggle-action .icon-play-circle {
-  color: green;
-}
-
-.bundle-item a.toggle-action:hover {
-  opacity: 1;
-  text-decoration: none;
-}
-
-.bundle-list {
-  margin-bottom: 2em;
-}
-
-.repository-browser-toolbar {
-  margin-bottom: 10px;
-}
-
-.bundle-list-toolbar {
-  vertical-align: top;
-}
-
-.bundle-list-toolbar > .pull-left > *,
-.bundle-list-toolbar > .pull-right > * {
-  display: inline-block;
-}
-
-.bundle-list-toolbar > div > input,
-.bundle-list-toolbar > div > div > input {
-  margin-bottom: 10px;
-}
-
-.bundle-list-toolbar > div > label,
-.bundle-list-toolbar > div > strong {
-  position: relative;
-  top: -3px;
-}
-
-.bundle-list-toolbar > div > .input-append {
-  position: relative;
-  left: 3px;
-  top: -9px;
-}
-
-.config-admin-form .form-horizontal .controls {
-    margin-left: 280px;
-}
-
-.new-config-name-form {
-    margin-top: 30px;
-}
-
-.popover {
-  max-width: inherit;
-
-}
-*/
 .list-group-item.child {
   padding-left: 65px;
 }
-#toolbar-row-2 .form-group {
-  border-right: none;
-  padding-right: 0;
-}
-#toolbar-row-2 #startLevelFilter {
+#startLevelFilter {
   width: 54px;
 }
 .overviewSection td {
