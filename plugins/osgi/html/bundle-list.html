@@ -5,25 +5,16 @@
   <div class="row toolbar-pf">
     <form class="toolbar-pf-actions">
       <div class="form-group">
-        <label>Show bundles</label>
-        <div class="btn-group">
-          <button type="button" class="btn btn-default" ng-class="{active: display.showActiveMQBundles}"
-                  ng-click="display.showActiveMQBundles = !display.showActiveMQBundles">
-            ActiveMQ
-          </button>
-          <button type="button" class="btn btn-default" ng-class="{active: display.showCamelBundles}"
-                  ng-click="display.showCamelBundles = !display.showCamelBundles">
-            Camel
-          </button>
-          <button type="button" class="btn btn-default" ng-class="{active: display.showCxfBundles}"
-                  ng-click="display.showCxfBundles = !display.showCxfBundles">
-            CXF
-          </button>
-          <button type="button" class="btn btn-default" ng-class="{active: display.showPlatformBundles}"
-                  ng-click="display.showPlatformBundles = !display.showPlatformBundles">
-            Platform
-          </button>
-        </div>            
+        <label class="sr-only" for="filter">Install Bundle</label>
+        <div class="input-group" hawtio-show object-name="{{frameworkMBean}}" method-name="installBundle">
+          <input type="text" class="form-control" placeholder="Install Bundle..." ng-model="bundleUrl">
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-disabled="installDisabled()" ng-click="install()"
+                    title="Install">
+              <i class="fa fa-download"></i>
+            </button>
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <input type="text" class="form-control" ng-model="display.bundleFilter" placeholder="Filter..." autocomplete="off">
@@ -44,37 +35,38 @@
   <div id="toolbar-row-2" class="row toolbar-pf">
     <form class="toolbar-pf-actions form-inline">
       <div class="form-group">
+        <label>Show bundles</label>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default" ng-class="{active: display.showActiveMQBundles}"
+                  ng-click="display.showActiveMQBundles = !display.showActiveMQBundles">
+            ActiveMQ
+          </button>
+          <button type="button" class="btn btn-default" ng-class="{active: display.showCamelBundles}"
+                  ng-click="display.showCamelBundles = !display.showCamelBundles">
+            Camel
+          </button>
+          <button type="button" class="btn btn-default" ng-class="{active: display.showCxfBundles}"
+                  ng-click="display.showCxfBundles = !display.showCxfBundles">
+            CXF
+          </button>
+          <button type="button" class="btn btn-default" ng-class="{active: display.showPlatformBundles}"
+                  ng-click="display.showPlatformBundles = !display.showPlatformBundles">
+            Platform
+          </button>
+        </div>
         <label for="sortField">Sort by</label>
         <select id="sortField" class="form-control" ng-model="display.sortField">
           <option value="Identifier">ID</option>
           <option value="Name">Name</option>
           <option value="SymbolicName">Symbolic Name</option>
         </select>
-      </div>
-      <div class="form-group">
         <label for="bundleField">Display</label>
         <select id="bundleField" class="form-control" ng-model="display.bundleField">
           <option value="Name">Name</option>
           <option value="SymbolicName">Symbolic Name</option>
         </select>
-      </div>
-      <div class="form-group">
         <label for="startLevelFilter">Start Level</label>
         <input id="startLevelFilter" type="number" min="0" class="form-control" ng-model="display.startLevelFilter">
-      </div>
-      <div class="toolbar-pf-action-right">
-        <div class="form-group">
-          <label class="sr-only" for="filter">Install Bundle</label>
-          <div class="input-group" hawtio-show object-name="{{frameworkMBean}}" method-name="installBundle">
-            <input type="text" class="form-control" placeholder="Install Bundle..." ng-model="bundleUrl">
-            <div class="input-group-btn">
-              <button type="button" class="btn btn-default" ng-disabled="installDisabled()" ng-click="install()"
-                      title="Install">
-                <i class="fa fa-download"></i>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </form>
   </div>
@@ -83,7 +75,7 @@
     <div class="row row-cards-pf">
       <div  ng-repeat="bundle in bundles" ng-show="filterBundle(bundle)">
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-          <div class="card-pf" hawtio-template-popover title="Bundle details" ng-click="showDetails(bundle)">
+          <div class="card-pf card-pf-view card-pf-view-select" hawtio-template-popover title="Bundle details" ng-click="showDetails(bundle)">
             <div class="content">
               <table>
                 <tr>
@@ -94,20 +86,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row" id="bundleTableHolder">
-    <div class="bundle-list centered"
-         hawtio-auto-columns=".bundle-item">
-      <div ng-repeat="bundle in bundles"
-           class="bundle-item"
-           ng-show="filterBundle(bundle)"
-           hawtio-template-popover title="Bundle details">
-        <a id="{{bundle.Identifier}}" ng-href="{{bundle.Url}}">
-          <span class="badge" ng-class="getStateStyle(bundle.State)">{{getLabel(bundle)}}</span>
-        </a>
       </div>
     </div>
   </div>

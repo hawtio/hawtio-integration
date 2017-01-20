@@ -4,9 +4,6 @@
 .hawtio-btn-danger {
   color: darkred;
 }
-.modal {
-  padding-right: 0 !important;
-}
 
 .metricsWatcher .heading1 {
   font-size: 24px;
@@ -229,4 +226,53 @@ caption {
 }
 .overviewSection td {
   vertical-align: top;
+}
+.table-bundles th:nth-child(1) {
+  width: 30px;
+}
+.table-bundles th:nth-child(2) {
+  width: 70px;
+}
+.table-bundles th:nth-child(3) {
+  width: 40px;
+}
+.table-bundles th:nth-child(4) {
+  width: auto;
+}
+.table-bundles th:nth-child(5) {
+  width: auto;
+}
+.table-bundles th:nth-child(6) {
+  width: 120px;
+}
+.table-bundles th:nth-child(7) {
+  width: auto;
+}
+#toolbar-row-2 .form-inline label:not(:first-child) {
+  margin-left: 1em;
+}
+dl.bundle-details {
+  margin: 10px 0 20px;
+}
+dl.bundle-details dt {
+  float: left;
+  width: 16.66666667%;
+}
+dl.bundle-details dd {
+  margin: 2px 0;
+}
+.inspect-classloading .form-group {
+  width: 100%;
+}
+.inspect-classloading .form-group:first-child {
+  margin-bottom: 10px;
+}
+.inspect-classloading .control-label {
+  display: block;
+}
+.inspect-classloading .form-control {
+  width: 50%;
+}
+.list-group.labels .list-group-item {
+  padding: 2px 0;
 }

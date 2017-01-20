@@ -66,8 +66,16 @@ module Osgi {
     return rv.toString();
   }
 
+  interface Alert {
+    type: 'danger' | 'warning' | 'success' | 'info',
+    icon: 'pficon-error-circle-o' | 'pficon-warning-triangle-o' | 'pficon-ok' | 'pficon-info',
+    message: string
+  }
+
   _module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokia", ($scope, $location, workspace:Workspace, $routeParams, jolokia) => {
+    
     $scope.bundleId = $routeParams.bundleId;
+    $scope.classLoadingAlert = null;
 
     updateTableContents();
 
@@ -84,6 +92,8 @@ module Osgi {
       }
     };
 
+    $scope.dismissClassLoadingAlert = () => $scope.classLoadingAlert = null;
+
     $scope.executeLoadClass = (clazz) => {
       var mbean = getHawtioOSGiToolsMBean(workspace);
       if (mbean) {
@@ -91,24 +101,27 @@ module Osgi {
                 {type: 'exec', mbean: mbean, operation: 'getLoadClassOrigin', arguments: [$scope.bundleId, clazz]},
                 {
                   success: function (response) {
-                    var divEl = document.getElementById("loadClassResult");
                     var resultBundle = response.value;
-                    var style;
-                    var resultTxt;
                     if (resultBundle === -1) {
-                      style = "";
-                      resultTxt = "Class can not be loaded from this bundle.";
+                      $scope.classLoadingAlert = <Alert>{
+                        type: 'warning',
+                        icon: 'pficon-warning-triangle-o',
+                        message: `Loading class <strong>${clazz}</strong> in Bundle ${$scope.bundleId}.
+                                  Class can not be loaded from this bundle.`
+                      };
                     } else {
-                      style = "alert-success";
-                      resultTxt = "Class is served from Bundle " + bundleLinks(workspace, resultBundle);
+                      $scope.classLoadingAlert = <Alert>{
+                        type: 'success',
+                        icon: 'pficon-ok',
+                        message: `Loading class <strong>${clazz}</strong> in Bundle ${$scope.bundleId}.
+                                  Class is served from Bundle ${bundleLinks(workspace, resultBundle)}`
+                      };
                     }
-                    divEl.innerHTML +=
-                            "<div class='alert " + style + "'>" +
-                                    "<button type='button' class='close' data-dismiss='alert'>&times;</button>" +
-                                    "Loading class <strong>" + clazz + "</strong> in Bundle " + $scope.bundleId + ". " + resultTxt + "</div>";
+                    Core.$apply($scope);
                   },
                   error: function (response) {
                     inspectReportError(response);
+                    Core.$apply($scope);
                   }
                 });
       } else {
@@ -123,24 +136,27 @@ module Osgi {
                 {type: 'exec', mbean: mbean, operation: 'getResourceURL', arguments: [$scope.bundleId, resource]},
                 {
                   success: function (response) {
-                    var divEl = document.getElementById("loadClassResult");
                     var resultURL = response.value;
-                    var style;
-                    var resultTxt;
                     if (resultURL === null) {
-                      style = "";
-                      resultTxt = "Resource can not be found from this bundle.";
+                      $scope.classLoadingAlert = <Alert>{
+                        type: 'warning',
+                        icon: 'pficon-warning-triangle-o',
+                        message: `Finding resource <strong>${resource}</strong> in Bundle ${$scope.bundleId}.
+                                  Resource can not be found from this bundle.`
+                      };
                     } else {
-                      style = "alert-success";
-                      resultTxt = "Resource is available from: " + resultURL;
+                      $scope.classLoadingAlert = <Alert>{
+                        type: 'success',
+                        icon: 'pficon-ok',
+                        message: `Finding resource <strong>${resource}</strong> in Bundle ${$scope.bundleId}.
+                                  Resource is available from: ${resultURL}`
+                      };
                     }
-                    divEl.innerHTML +=
-                            "<div class='alert " + style + "'>" +
-                                    "<button type='button' class='close' data-dismiss='alert'>&times;</button>" +
-                                    "Finding resource <strong>" + resource + "</strong> in Bundle " + $scope.bundleId + ". " + resultTxt + "</div>";
+                    Core.$apply($scope);
                   },
                   error: function (response) {
                     inspectReportError(response);
+                    Core.$apply($scope);
                   }
                 }
         )
@@ -190,21 +206,19 @@ module Osgi {
     };
 
     function inspectReportNoMBeanFound() {
-      var divEl = document.getElementById("loadClassResult");
-      divEl.innerHTML +=
-              "<div class='alert alert-error'>" +
-                      "<button type='button' class='close' data-dismiss='alert'>&times;</button>" +
-                      "The hawtio.OSGiTools MBean is not available. Please contact technical support." +
-                      "</div>";
+      $scope.classLoadingAlert = <Alert>{
+        type: 'danger',
+        icon: 'pficon-error-circle-o',
+        message: `The hawtio.OSGiTools MBean is not available. Please contact technical support.`
+      };
     }
 
     function inspectReportError(response) {
-      var divEl = document.getElementById("loadClassResult");
-      divEl.innerHTML +=
-              "<div class='alert alert-error'>" +
-                      "<button type='button' class='close' data-dismiss='alert'>&times;</button>" +
-                      "Problem invoking hawtio.OSGiTools MBean. " + response +
-                      "</div>";
+      $scope.classLoadingAlert = <Alert>{
+        type: 'danger',
+        icon: 'pficon-error-circle-o',
+        message: `<strong>Problem invoking hawtio.OSGiTools MBean:</strong> ${response.error}`
+      };
     }
 
     function populateTable(response) {
@@ -232,6 +246,7 @@ module Osgi {
     }
 
     function createImportPackageSection():void {
+      $scope.row.ImportPackages = Object.keys($scope.row.ImportData);
       // setup popovers
       var importPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Import-Package");
       for (var pkg in $scope.row.ImportData) {
@@ -241,12 +256,12 @@ module Osgi {
         if (data !== undefined) {
           // This happens in case the package was imported due to a DynamicImport-Package
           po += formatAttributesAndDirectivesForPopover(data, false);
-          if (importPackageHeaders[pkg]["Dresolution"] !== "optional") {
-            $(document.getElementById("import." + pkg)).addClass("badge-info");
+          if (importPackageHeaders[pkg]["Dresolution"] === "optional") {
+            $(document.getElementById("import." + pkg)).removeClass('label-info').addClass("label-default");
           }
         } else {
           // This is a dynamic import
-          $(document.getElementById("import." + pkg)).addClass("badge-important");
+          $(document.getElementById("import." + pkg)).removeClass('label-info').addClass("label-danger");
           var reason = $scope.row.Headers["DynamicImport-Package"];
           if (reason !== undefined) {
             reason = reason.Value;
@@ -378,6 +393,7 @@ module Osgi {
                 Core.onSuccess(populateTable));
       }
     }
+
   }]);
 
 }

@@ -2,13 +2,9 @@
   
   <h1>{{zkPid || metaType.name || pid}}</h1>
 
-  <ol class="breadcrumb">
-    <li>
-      <a ng-href="{{configurationUrl}}">Configuration</a>
-    </li>
-    <li class="active"> <strong>{{zkPid || metaType.name || pid}}</strong>
-    </li>
-  </ol>
+  <div class="breadcrumb">
+    <a ng-href="{{configurationUrl}}"><span class="fa fa-angle-left"></span> Back to Configuration</a>
+  </div>
 
   <div class="row toolbar-pf">
     <div class="col-sm-12">

@@ -24,45 +24,31 @@ module Osgi {
     var columnDefs = [
       {
         field: 'Identifier',
-        displayName: 'Identifier',
-        width: "48",
-        headerCellTemplate: '<div ng-click="col.sort()" class="ngHeaderSortColumn {{col.headerClass}}" ng-style="{\'cursor\': col.cursor}" ng-class="{ \'ngSorted\': !noSortVisible }"><div class="ngHeaderText colt{{$index}} pagination-centered" title="Identifier"><i class="fa fa-tag"></i></div><div class="ngSortButtonDown" ng-show="col.showSortButtonDown()"></div><div class="ngSortButtonUp" ng-show="col.showSortButtonUp()"></div></div>',
+        displayName: 'ID'
       },
       {
         field: 'State',
-        displayName: 'Bundle State',
-        width: "24",
-        headerCellTemplate: '<div ng-click="col.sort()" class="ngHeaderSortColumn {{col.headerClass}}" ng-style="{\'cursor\': col.cursor}" ng-class="{ \'ngSorted\': !noSortVisible }"><div class="ngHeaderText colt{{$index}} pagination-centered" title="State"><i class="fa fa-tasks"></i></div><div class="ngSortButtonDown" ng-show="col.showSortButtonDown()"></div><div class="ngSortButtonUp" ng-show="col.showSortButtonUp()"></div></div>',
-        cellTemplate: '<div class="ngCellText" title="{{row.entity.State}}"><i class="{{row.entity.State}}"></i></div>'
+        displayName: 'State',
+        cellTemplate: '<span class="bundle-state" ng-class="row.entity.State.toLowerCase()"></span>'
       },
       {
         field: 'Name',
         displayName: 'Name',
-        width: "***",
         cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.Name}}</a></div>'
       },
       {
         field: 'SymbolicName',
         displayName: 'Symbolic Name',
-        width: "***",
         cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.SymbolicName}}</a></div>'
       },
       {
         field: 'Version',
         displayName: 'Version',
-        width: "**",
         sortable: false
-      },/*
-      {
-        field: 'LastModified',
-        displayName: 'Last Modified',
-        cellFilter: "date:'yyyy-MM-dd HH:mm:ss'",
-        width: "**"
-      },  */
+      },
       {
         field: 'Location',
-        displayName: 'Update Location',
-        width: "***"
+        displayName: 'Update Location'
       }
     ];
 
