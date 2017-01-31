@@ -224,21 +224,11 @@ module Osgi {
     function populateTable(response) {
       var values = response.value;
       $scope.bundles = values;
+      
       // now find the row based on the selection ui
       Osgi.defaultBundleValues(workspace, $scope, values);
       $scope.row = Osgi.findBundle($scope.bundleId, values);
       Core.$apply($scope);
-
-      // This trick is to ensure that the popover is properly visible if it is
-      // smaller than the accordion
-      $('.accordion-body.collapse').hover(
-              function () {
-                $(this).css('overflow', 'visible');
-              },
-              function () {
-                $(this).css('overflow', 'hidden');
-              }
-      );
 
       createImportPackageSection();
       createExportPackageSection();
@@ -246,7 +236,6 @@ module Osgi {
     }
 
     function createImportPackageSection():void {
-      $scope.row.ImportPackages = Object.keys($scope.row.ImportData);
       // setup popovers
       var importPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Import-Package");
       for (var pkg in $scope.row.ImportData) {
@@ -278,8 +267,8 @@ module Osgi {
         importPackageHeaders[pkg] = undefined;
       }
 
-      var unsatisfied = "";
-      for (var pkg in importPackageHeaders) {
+      let unsatisfied = "";
+      for (let pkg in importPackageHeaders) {
         if (importPackageHeaders[pkg] === undefined) {
           continue;
         }
@@ -288,11 +277,16 @@ module Osgi {
           // itself so it should not be listed as unsatisfied.
           continue;
         }
-        unsatisfied += "<tr><td><div class='less-big badge badge-warning' id='unsatisfied." + pkg + "'>" + pkg + "</div></td></tr>";
+        unsatisfied += `<li class="list-group-item"><span id="unsatisfied.${pkg}" class="label label-warning">${pkg}</span></li>`;
       }
 
       if (unsatisfied !== "") {
-        unsatisfied = "<p/><p class='text-warning'>The following optional imports were not satisfied:<table>" + unsatisfied + "</table></p>"
+        unsatisfied = `
+          <p class='text-warning'><strong>The following optional imports were not satisfied:</strong></p>
+          <ul class="list-group labels">
+            ${unsatisfied}
+          </ul>
+          `;
         document.getElementById("unsatisfiedOptionalImports").innerHTML = unsatisfied;
       }
 

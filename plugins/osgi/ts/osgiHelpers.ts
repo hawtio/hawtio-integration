@@ -205,7 +205,7 @@ module Osgi {
       }
       var info = allValues[value] || {};
       var labelText = info.SymbolicName;
-      answer += prefix + "<a class='label' href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + labelText + "</a>";
+      answer += prefix + "<a class='label label-default' href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + labelText + "</a>";
     });
     return answer;
   }

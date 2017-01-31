@@ -159,7 +159,7 @@
 <div class="row">
   <div class="col-md-12">
     <ul class="list-group labels">
-      <li class="list-group-item" ng-repeat="package in row.ImportPackages">
+      <li class="list-group-item" ng-repeat="(package, data) in row.ImportData">
         <span id="import.{{package}}" class="label label-info">{{package}}</span>
       </li>
     </ul>
@@ -167,8 +167,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-12">
-    <div id="unsatisfiedOptionalImports"/>
+  <div id="unsatisfiedOptionalImports" class="col-md-12">
   </div>
 </div>
 
@@ -184,108 +183,45 @@
   </div>
 </div>
 
-<br><br><br>
+<h2>Services</h2>
 
-  <table>
-    <tr>
-      <td>
-      </td>
-      <td>
-        <div class="accordion" id="accordionExportedPackages">
-          <div class="accordion-group">
-            <div class="accordion-heading">
-              <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionExportedPackages"
-                 href="collapseExportedPackages">
-                Exported Packages
-              </a>
-            </div>
-            <div id="collapseExportedPackages" class="accordion-body collapse in">
-              <table>
-                <tr ng-repeat="(package, data) in row.ExportData">
-                  <td>
-                    <div class="less-big badge badge-success" id="export.{{package}}">{{package}}</div>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <div class="accordion" id="accordionServices">
-          <div class="accordion-group">
-            <div class="accordion-heading">
-              <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionServices"
-                 href="collapseServices">
-                Services
-              </a>
-            </div>
-            <div id="collapseServices" class="accordion-body collapse in">
-              Registered Services
-              <table>
-                <tr ng-repeat="id in row.RegisteredServices">
-                  <td><i class="fa fa-cog less-big text-success" id="registers.service.{{id}}">{{id}}</i></td>
-                </tr>
-              </table>
-              <br/>
-              Services used by this Bundle
-              <table>
-                <tr ng-repeat="id in row.ServicesInUse">
-                  <td><i class="fa fa-cog less-big text-info" id="uses.service.{{id}}">{{id}}</i></td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>
-        <div class="accordion" id="accordionRequiringBundles">
-          <div class="accordion-group">
-            <div class="accordion-heading">
-              <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionRequiringBundles"
-                 href="collapseRequiringBundles">
-                Other Bundles using this Bundle
-              </a>
-            </div>
-            <div id="collapseRequiringBundles" class="accordion-body collapse in">
-              <div class="accordion-inner">
-                <span ng-bind-html-unsafe="row.RequiringBundles"/>
-              </div>
-            </div>
-          </div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-      </td>
-      <td>
-        <div class="accordion" id="accordionHeaders">
-          <div class="accordion-group">
-            <div class="accordion-heading">
-              <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionHeaders"
-                 href="collapsHeaders">
-                Headers
-              </a>
-            </div>
-            <div id="collapsHeaders" class="accordion-body collapse in">
-              <table class="accordion-inner">
-                <tr ng-repeat="(key, value) in row.Headers" ng-show="showValue(key)">
-                  <td valign="top">{{key}}</td>
-                  <td>{{value.Value}}</td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        </div>
-      </td>
-    </tr>
-  </table>
+<h3>Registered Services</h3>
+
+<div class="row">
+  <div class="col-md-12">
+    <ul class="list-group labels">
+      <li class="list-group-item" ng-repeat="id in row.RegisteredServices">
+        <span id="registers.service.{{id}}" class="fa fa-cog text-success">{{id}}</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<h3>Services used by this Bundle</h3>
+
+<div class="row">
+  <div class="col-md-12">
+    <ul class="list-group labels">
+      <li class="list-group-item" ng-repeat="id in row.ServicesInUse">
+        <span id="uses.service.{{id}}" class="fa fa-cog text-info">{{id}}</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<h2>Other Bundles using this Bundle</h2>
+
+<div class="row requiring-bundles">
+  <div class="col-md-12" ng-bind-html="row.RequiringBundles"></div>
+</div>
+
+<h2>Headers</h2>
+
+<div class="row bundle-headers">
+  <div class="col-md-12">
+    <dl class="dl-horizontal" ng-repeat="(key, value) in row.Headers" ng-show="showValue(key)">
+      <dt>{{key}}</dt>
+      <dd>{{value.Value}}</dd>
+    </dl>
+  </div>
 </div>
