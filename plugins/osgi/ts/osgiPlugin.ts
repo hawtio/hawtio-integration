@@ -18,7 +18,6 @@ module Osgi {
             .when('/osgi/bundle/:bundleId', {templateUrl: 'plugins/osgi/html/bundle.html'})
             .when('/osgi/services', {templateUrl: 'plugins/osgi/html/services.html'})
             .when('/osgi/packages', {templateUrl: 'plugins/osgi/html/packages.html'})
-            .when('/osgi/package/:package/:version', {templateUrl: 'plugins/osgi/html/package.html'})
             .when('/osgi/configurations', {templateUrl: 'plugins/osgi/html/configurations.html'})
             .when('/osgi/pid/:pid/:factoryPid', {templateUrl: 'plugins/osgi/html/pid.html'})
             .when('/osgi/pid/:pid', {templateUrl: 'plugins/osgi/html/pid.html'})

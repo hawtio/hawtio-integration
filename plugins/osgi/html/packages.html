@@ -1,30 +1,79 @@
-<!--
-<script type="text/ng-template" id="packageBundlesTemplate">
-  <table>
-    <tr>
-      <th>Exporting Bundles</th>
-      <th>Importing Bundles</th>
-    </tr>
-    <tr>
-      <td>
-        <ul>
-          <li ng-repeat="b in row.ExportingBundles">
-            <a href='#/osgi/bundle/{{b.Identifier}}?'>{{b.SymbolicName}}</a>
-          </li>
-        </ul>
-      </td>
-      <td>
-        <ul>
-          <li ng-repeat="b in row.ImportingBundles">
-            <a href='#/osgi/bundle/{{b.Identifier}}?'>{{b.SymbolicName}}</a>
-          </li>
-        </ul>
-      </td>
-    </tr>
-  </table>
-</script>
--->
+<h1>Packages</h1>
 
 <div class="controller-section" ng-controller="Osgi.PackagesController">
-  <table class="table table-striped" hawtio-simple-table="mygrid"></table>
+
+  <div class="row toolbar-pf">
+    <form class="toolbar-pf-actions search-pf">
+      <div class="form-group has-clear">
+        <div class="search-pf-input-group">
+          <label for="search1" class="sr-only">Filter</label>
+          <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">
+          <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''"><span class="pficon pficon-close"></span></button>
+        </div>
+      </div>
+      <div class="toolbar-pf-action-right" ng-show="packages !== null">
+        {{filteredPackages.length}} of {{packages.length}}
+      </div>
+    </form>
+  </div>
+
+  <div class="spinner spinner-lg loading-page" ng-if="packages === null"></div>
+
+  <div class="list-group list-view-pf list-view-pf-view list-packages">
+    <div class="list-group-item" ng-class="{'list-view-pf-expand-active': package.expanded}"
+         ng-repeat="package in packages | filter:{Name: filterText} as filteredPackages">
+      <div class="list-group-item-header" ng-click="package.expanded = !package.expanded">
+        <div class="list-view-pf-expand">
+          <span class="fa fa-angle-right" ng-class="{'fa-angle-down': package.expanded}"></span>
+        </div>
+        <div class="list-view-pf-main-info">
+          <div class="list-view-pf-body">
+            <div class="list-view-pf-description">
+              <div class="list-group-item-heading">
+                {{package.Name}}
+              </div>
+              <div class="list-group-item-text">
+                {{package.Version}}
+              </div>
+            </div>
+            <div class="list-view-pf-additional-info">
+              <div class="list-view-pf-additional-info-item">
+                Removal {{package.RemovalPending ? '' : 'Not'}} Pending
+              </div>
+            </div>              
+          </div>
+        </div>
+      </div>
+      <div class="list-group-item-container" ng-if="package.expanded">
+        <div class="close" ng-click="package.expanded = false">
+          <span class="pficon pficon-close"></span>
+        </div>
+        <div class="col-md-5">
+          <dl>
+            <dt>Exporting Bundles</dt>
+            <dd>
+              <ul class="package-bundles-list">
+                <li ng-repeat="bundle in package.ExportingBundles">
+                  <a title="Exported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
+                </li>
+              </ul>
+            </dd>
+          </dl>
+        </div>
+        <div class="col-md-5">
+          <dl>
+            <dt>Importing Bundles</dt>
+            <dd>
+              <ul class="package-bundles-list">
+                <li ng-repeat="bundle in package.ImportingBundles">
+                  <a title="Imported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
+                </li>
+              </ul>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

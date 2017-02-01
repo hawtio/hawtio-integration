@@ -7,83 +7,12 @@
  */
 module Osgi {
 
-  export var PackagesController = _module.controller("Osgi.PackagesController", ["$scope", "$filter", "workspace", "$templateCache", "$compile", ($scope, $filter:ng.IFilterService, workspace:Workspace, $templateCache:ng.ITemplateCacheService, $compile:ng.IAttributes) => {
-    var dateFilter = $filter('date');
+  export var PackagesController = _module.controller("Osgi.PackagesController", ["$scope", "$filter", "workspace",
+      "$templateCache", "$compile", ($scope, $filter:ng.IFilterService, workspace:Workspace,
+      $templateCache:ng.ITemplateCacheService, $compile:ng.IAttributes) => {
 
-    $scope.packages = [];
-    $scope.selectedItems = [];
+    $scope.packages = null;
 
-    $scope.mygrid = {
-      data: 'packages',
-      showFilter: false,
-      showColumnMenu: false,
-      filterOptions: {
-        filterText: "",
-        useExternalFilter: false
-      },
-      selectedItems: $scope.selectedItems,
-      rowHeight: 32,
-      selectWithCheckboxOnly: true,
-      columnDefs: [
-        {
-          field: 'Name',
-          displayName: 'Name',
-        },
-        {
-          field: 'VersionLink',
-          displayName: 'Version',
-          width: "***",
-          cellTemplate: `
-            <div class="ngCellText">
-              <a ng-href="{{row.entity.VersionUrl}}">{{row.entity.Version}}</a>
-            </div>`
-        },
-        {
-          field: 'ExportingBundles',
-          displayName: 'Exporting Bundles',
-          cellTemplate: `
-            <div class="ngCellText">
-              <div ng-repeat="bundle in row.entity.ExportingBundles">
-                <a title="Exported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
-              </div>
-            </div>`
-        },
-        {
-          field: 'ImportingBundles',
-          displayName: 'Importing Bundles',
-          cellTemplate: `
-            <div class="ngCellText">
-              <div ng-repeat="bundle in row.entity.ImportingBundles">
-                <a title="Imported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
-              </div>
-            </div>`
-        },
-        {
-          field: 'RemovalPending',
-          displayName: 'Removal Pending',
-        }
-      ],
-      primaryKeyFn: entity => entity.Name
-    };
-
-
-/*
-    $scope.widget = new DataTable.TableWidget($scope, $templateCache, $compile, [
-      <DataTable.TableColumnConfig> {
-        "mDataProp": null,
-        "sClass": "control center",
-        "sDefaultContent": '<i class="fa fa-plus"></i>'
-      },
-      <DataTable.TableColumnConfig> { "mDataProp": "Name" },
-      <DataTable.TableColumnConfig> { "mDataProp": "VersionLink" },
-      <DataTable.TableColumnConfig> { "mDataProp": "RemovalPending" }
-
-    ], {
-      rowDetailTemplateId: 'packageBundlesTemplate',
-      disableAddColumns: true
-    });
-
-*/
     $scope.$watch('workspace.selection', function() {
       updateTableContents();
     });
@@ -119,7 +48,10 @@ module Osgi {
           angular.forEach(p["ImportingBundles"], function(b, key) {
             p["ImportingBundles"][key] = bundleMap[b];
           });
+          p["ExportingBundles"].sort(sortBy('SymbolicName'));
+          p["ImportingBundles"].sort(sortBy('SymbolicName'));
         });
+        packages.sort(sortBy('Name'));
         $scope.packages = packages;
         Core.$apply($scope);
        };
@@ -132,6 +64,20 @@ module Osgi {
             success: createBundleMap,
             error: createBundleMap
           });
+    }
+
+    function sortBy(fieldName: string) {
+      return function(a, b) {
+        var valueA = a[fieldName].toLowerCase();
+        var valueB = b[fieldName].toLowerCase();
+        if (valueA < valueB) {
+          return -1;
+        }
+        if (valueA > valueB) {
+          return 1;
+        }
+        return 0;
+      }
     }
 
     function updateTableContents() {

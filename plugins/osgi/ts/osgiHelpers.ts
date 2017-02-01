@@ -57,7 +57,6 @@ module Osgi {
       var name = packageEntry["Name"];
       var version = packageEntry["Version"];
       if (name && !_.startsWith(name, "#")) {
-        packageEntry["VersionUrl"] = Core.url("/osgi/package/" + name + "/" + version + workspace.hash());
         var importingBundles = row["ImportingBundles"] || packageEntry["ImportingBundles"];
         var exportingBundles = row["ExportingBundles"] || packageEntry["ExportingBundles"];
         packageEntry["ImportingBundleUrls"] = bundleUrls(workspace, importingBundles);
