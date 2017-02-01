@@ -217,7 +217,7 @@ module Osgi {
       if (answer.length > 0) {
         prefix = " ";
       }
-      answer += prefix + "<a class='label' href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + value + "</a>";
+      answer += prefix + "<a href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>Bundle " + value + "</a>";
     });
     return answer;
   }

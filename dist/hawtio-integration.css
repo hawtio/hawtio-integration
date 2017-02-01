@@ -292,7 +292,9 @@ dl.bundle-details dd {
 .list-packages .list-view-pf-additional-info {
   width: auto;
 }
-.package-bundles-list {
+.package-bundles-list,
+.service-bundles-list,
+.service-object-classes-list {
   list-style-type: none;
   padding-left: 0;
 }

@@ -7,26 +7,13 @@
  */
 module Osgi {
 
-  export var ServiceController = _module.controller("Osgi.ServiceController", ["$scope", "$filter", "workspace", "$templateCache", "$compile", ($scope, $filter:ng.IFilterService, workspace:Workspace, $templateCache:ng.ITemplateCacheService, $compile:ng.IAttributes) => {
-
-    var dateFilter = $filter('date');
+  export var ServiceController = _module.controller("Osgi.ServiceController", ["$scope", "$filter", "workspace",
+      "$templateCache", "$compile", ($scope, $filter:ng.IFilterService, workspace:Workspace,
+      $templateCache:ng.ITemplateCacheService, $compile:ng.IAttributes) => {
 
     $scope.workspace = workspace;
-    $scope.services = [];
-    $scope.selectedItems = [];
+    $scope.services = null;
 
-    $scope.mygrid = {
-      data: 'services',
-      showFilter: false,
-      showColumnMenu: false,
-      filterOptions: {
-        filterText: "",
-        useExternalFilter: false
-      },
-      selectedItems: [],
-      rowHeight: 32,
-      selectWithCheckboxOnly: true,
-      columnDefs: [
     /*
         {
           field: 'Identifier',
@@ -34,7 +21,6 @@ module Osgi {
           //width: "***"
           //width: 300
         },
-        */
         {
           field: 'BundleIdentifier',
           displayName: 'Bundle',
@@ -76,25 +62,7 @@ module Osgi {
             </div>`
         }
       ],
-      primaryKeyFn: entity => entity.BundleIdentifier
-    };
-
-    $scope.selectedItems = $scope.mygrid.selectedItems;
-/*
-    $scope.widget = new DataTable.TableWidget($scope, $templateCache, $compile, [
-      <DataTable.TableColumnConfig> {
-        "mDataProp": null,
-        "sClass": "control center",
-        "sDefaultContent": '<i class="fa fa-plus"></i>'
-      },
-      <DataTable.TableColumnConfig> { "mDataProp": "Identifier" },
-      <DataTable.TableColumnConfig> { "mDataProp": "BundleIdentifier" },
-      <DataTable.TableColumnConfig> { "mDataProp": "objectClass" }
-    ], {
-      rowDetailTemplateId: 'osgiServiceTemplate',
-      disableAddColumns: true
-    });
-*/
+        */
 
     $scope.$watch('workspace.selection', function() {
       var mbean = getSelectionServiceMBean(workspace);
