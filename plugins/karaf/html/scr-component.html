@@ -1,10 +1,11 @@
 <div class="controller-section" ng-controller="Karaf.ScrComponentController">
-    <div class="row">
-        <div class="col-md-4">
-            <h1>{{row.id}}</h1>
-        </div>
-    </div>
 
-    <div ng-include src="'plugins/karaf/html/scr-component-details.html'"></div>
+  <h1>{{row.Id}}</h1>
+
+  <div class="breadcrumb">
+    <a ng-href="{{srcComponentsUrl}}"><span class="fa fa-angle-left"></span> Back to Declarative Services</a>
+  </div>
+
+  <div ng-include src="'plugins/karaf/html/scr-component-details.html'"></div>
 
 </div>

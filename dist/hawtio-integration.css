@@ -167,6 +167,17 @@ caption {
   display: block;
 }
 
+.table-src-components th:nth-child(3) {
+  width: 30%;
+}
+dl.src-component-details dt {
+  text-align: left;
+}
+ul.src-component-bound-services {
+  list-style-type: none;
+  padding-left: 0;
+}
+
 .bundle-cards .card-pf {
   cursor: pointer;
 }
@@ -258,11 +269,11 @@ dl.bundle-details {
   margin: 10px 0 20px;
 }
 dl.bundle-details dt {
-  float: left;
-  width: 16.66666667%;
+  text-align: left;
+  width: 100px;
 }
 dl.bundle-details dd {
-  margin: 2px 0;
+  margin: 2px 0 2px 120px;
 }
 .inspect-classloading .form-group {
   width: 100%;

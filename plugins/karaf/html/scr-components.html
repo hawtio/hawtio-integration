@@ -1,39 +1,41 @@
+<h1>Declarative Services</h1>
+
 <div class="controller-section" ng-controller="Karaf.ScrComponentsController">
-  <div class="row">
-    <div class="pull-left">
-      <form class="form-inline no-bottom-margin">
-        <fieldset>
-          <div class="control-group inline-block">
-            <div class="btn-group">
-              <button ng-disabled="selectedComponents.length == 0" 
-                      class="btn btn-default" 
-                      ng-click="activate()"
-                      hawtio-show
-                      object-name="{{scrMBean}}"
-                      method-name="activateComponent"><i
-                      class="fa fa-play-circle"></i> Activate
-              </button>
-              <button ng-disabled="selectedComponents.length == 0" 
-                      class="btn btn-default" 
-                      ng-click="deactivate()"
-                      hawtio-show
-                      object-name="{{scrMBean}}"
-                      method-name="deactiveateComponent"><i
-                      class="fa fa-off"></i> Deactivate
-              </button>
-            </div>
-          </div>
-        </fieldset>
-      </form>
-    </div>
 
-    <div class="pull-right">
-      <input type="text" class="input-text search-query" placeholder="Filter..." ng-model="scrOptions.filterOptions.filterText">
-    </div>
+  <div class="row toolbar-pf">
+    <form class="toolbar-pf-actions search-pf">
+      <div class="form-group has-clear">
+        <div class="search-pf-input-group">
+          <label for="search1" class="sr-only">Filter</label>
+          <input id="search1" type="search" class="form-control" ng-model="scrOptions.filterOptions.filterText" placeholder="Filter...">
+          <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''">
+            <span class="pficon pficon-close"></span>
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <button ng-disabled="selectedComponents.length == 0" 
+                class="btn btn-default" 
+                ng-click="activate()"
+                hawtio-show
+                object-name="{{scrMBean}}"
+                method-name="activateComponent"><i
+                class="fa fa-play-circle"></i> Activate
+        </button>
+        <button ng-disabled="selectedComponents.length == 0" 
+                class="btn btn-default" 
+                ng-click="deactivate()"
+                hawtio-show
+                object-name="{{scrMBean}}"
+                method-name="deactiveateComponent"><i
+                class="fa fa-stop-circle"></i> Deactivate
+        </button>
+      </div>
+    </form>
   </div>
 
-
   <div class="row">
-    <div class="gridStyle" ng-grid="scrOptions"></div>
+    <table class="table table-striped table-src-components" hawtio-simple-table="scrOptions"></table>
   </div>
+
 </div>

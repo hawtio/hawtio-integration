@@ -7,88 +7,86 @@
  */
 module Karaf {
 
-    _module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace, jolokia) => {
+  _module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace, jolokia) => {
 
-        $scope.component = empty();
+    $scope.component = empty();
 
-        // caches last jolokia result
-        $scope.result = [];
+    // caches last jolokia result
+    $scope.result = [];
 
-        // rows in components table
-        $scope.components = [];
+    // rows in components table
+    $scope.components = [];
 
-        // selected components
-        $scope.selectedComponents = [];
+    // selected components
+    $scope.selectedComponents = [];
 
-
-        $scope.scrOptions = {
-            //plugins: [searchProvider],
-            data: 'components',
-            showFilter: false,
-            showColumnMenu: false,
-            filterOptions: {
-                useExternalFilter: false
-            },
-            sortInfo: { fields: ['Name'], directions: ['asc'] },
-            selectedItems: $scope.selectedComponents,
-            rowHeight: 32,
-            selectWithCheckboxOnly: true,
-            columnDefs: [
-                {
-                    field: 'Name',
-                    displayName: 'Name',
-                    cellTemplate: '<div class="ngCellText"><a href="#/osgi/scr-component/{{row.entity.Name}}?p=container">{{row.getProperty(col.field)}}</a></div>',
-                    width: 400
-                },
-                {
-                    field: 'State',
-                    displayName: 'State',
-                    cellTemplate: '<div class="ngCellText">{{row.getProperty(col.field)}}</div>',
-                    width: 200
-                }
-            ],
-            primaryKeyFn: entity => entity.Name
-        };
-
-        var scrMBean = Karaf.getSelectionScrMBean(workspace);
-        if (scrMBean) {
-            render(getAllComponents(workspace, jolokia))
+    $scope.scrOptions = {
+      data: 'components',
+      sortInfo: { "sortBy": "Name", "ascending": true },
+      selectedItems: $scope.selectedComponents,
+      columnDefs: [
+        {
+          field: 'Name',
+          displayName: 'Name',
+          cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.Name}}</a></div>'
+        },
+        {
+          field: 'State',
+          displayName: 'State',
+          cellTemplate: '{{row.entity.State}}'
         }
+      ],
+      primaryKeyFn: entity => entity.Name
+    };
 
-        $scope.activate = () => {
-            $scope.selectedComponents.forEach(function (component) {
-                activateComponent(workspace, jolokia, component.Name, function () {
-                    console.log("Activated!")
-                }, function () {
-                    console.log("Failed to activate!")
-                });
-            });
-        };
+    var scrMBean = Karaf.getSelectionScrMBean(workspace);
+    if (scrMBean) {
+      let components = getAllComponents(workspace, jolokia);
+      addUrlField(components);
+      render(components);
+    }
 
-        $scope.deactivate = () => {
-            $scope.selectedComponents.forEach(function (component) {
-                deactivateComponent(workspace, jolokia, component.Name, function () {
-                    console.log("Deactivated!")
-                }, function () {
-                    console.log("Failed to deactivate!")
-                });
-            });
-        };
+    function addUrlField(components) {
+      components.forEach(component => 
+        component.Url = Core.url("/osgi/scr-component/" + component.Name + workspace.hash()));
+    }
+
+    $scope.activate = () => {
+      $scope.selectedComponents.forEach(function (component) {
+        activateComponent(workspace, jolokia, component.Name, function () {
+          console.log("Activated!")
+        }, function () {
+          console.log("Failed to activate!")
+        });
+      });
+    };
+
+    $scope.deactivate = () => {
+      $scope.selectedComponents.forEach(function (component) {
+        deactivateComponent(workspace, jolokia, component.Name, function () {
+          console.log("Deactivated!")
+        }, function () {
+          console.log("Failed to deactivate!")
+        });
+      });
+    };
 
 
-        function empty() {
-            return [
-                {Name: "",
-                 Status: false}
-            ];
+    function empty() {
+      return [
+        {
+          Name: "",
+          Status: false
         }
+      ];
+    }
 
-        function render(components) {
-            if (!angular.equals($scope.result, components)) {
-                $scope.components = components
-                $scope.result = $scope.components;
-                Core.$apply($scope);
-            }
-        }
-    }]);
+    function render(components) {
+      if (!angular.equals($scope.result, components)) {
+        $scope.components = components;
+        $scope.result = $scope.components;
+        Core.$apply($scope);
+      }
+    }
+  }]);
 }
