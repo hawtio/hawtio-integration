@@ -6,57 +6,55 @@
  * @module Osgi
  */
 module Osgi {
-    _module.controller("Osgi.FrameworkController", ["$scope", "$dialog", "workspace", ($scope, $dialog, workspace:Workspace) => {
-        $scope.editDialog = new UI.Dialog();
+  _module.controller("Osgi.FrameworkController", ["$scope", "workspace", ($scope, workspace: Workspace) => {
 
-        updateContents();
-
-        $scope.edit = (attr, displayName) => {
-            $scope.editAttr = attr;
-            $scope.editDisplayName = displayName;
-            $scope.editDialog.open();
+    $scope.startLevelChanged = function () {
+      if ($scope.config.startLevel) {
+        if (parseInt($scope.config.startLevel) < parseInt($scope.config.initialBundleStartLevel)) {
+          Core.notification("error", "Can't set Framework Start Level below Initial Bundle Start Level");
+        } else {
+          updateMbeanAttribute('FrameworkStartLevel', $scope.config.startLevel);
         }
+      }
+    };
 
-        $scope.edited = (name, displayName, res) => {
-          $scope.editDialog.close();
+    $scope.initialBundleStartLevelChanged = function () {
+      if ($scope.config.initialBundleStartLevel) {
+        updateMbeanAttribute('InitialBundleStartLevel', $scope.config.initialBundleStartLevel);
+      }
+    };
 
-          if (angular.isNumber(res)) {
-            if (name == "FrameworkStartLevel" && (res < $scope.initialBundleStartLevel)) {
-              editWritten("error", "Can't set Framework Start Level below Initial Bundle Start Level");
-            } else {
-              var mbean = getSelectionFrameworkMBean(workspace);
-              if (mbean) {
-                var jolokia = workspace.jolokia;
-                jolokia.request({
-                  type: 'write', mbean: mbean, attribute: name, value: res
-                }, {
-                    error: function (response) { editWritten("error", response.error) },
-                    success: function (response) { editWritten("success", displayName + " changed to " + res) }
-                  });
-              }
-            }
-          }
-        }
+    function updateMbeanAttribute(name, value) {
+      var mbean = getSelectionFrameworkMBean(workspace);
+      if (mbean) {
+        workspace.jolokia.request({
+          type: 'write', mbean: mbean, attribute: name, value: value
+        }, {
+          error: response => Core.notification("error", response.error),
+          success: response => Core.notification("success", "Configuration updated")
+        });
+      }
+    }
 
-        function editWritten(status : string, message : string) {
-            Core.notification(status, message);
-            updateContents();
-        }
+    function updateContents() {
+      var mbean = getSelectionFrameworkMBean(workspace);
+      if (mbean) {
+        var jolokia = workspace.jolokia;
+        jolokia.request(
+          { type: 'read', mbean: mbean },
+          Core.onSuccess(populatePage));
+      }
+    }
 
-        function populatePage(response) {
-            $scope.startLevel = response.value.FrameworkStartLevel;
-            $scope.initialBundleStartLevel = response.value.InitialBundleStartLevel;
-            Core.$apply($scope);
-        }
+    function populatePage(response) {
+      $scope.config = {
+        startLevel: response.value.FrameworkStartLevel,
+        initialBundleStartLevel: response.value.InitialBundleStartLevel
+      }
+      Core.$apply($scope);
+    }
 
-        function updateContents() {
-            var mbean = getSelectionFrameworkMBean(workspace);
-            if (mbean) {
-                var jolokia = workspace.jolokia;
-                jolokia.request(
-                    {type: 'read', mbean: mbean}, 
-                    Core.onSuccess(populatePage));
-            }
-        }
-    }]);
+    updateContents();
+
+  }]);
 }

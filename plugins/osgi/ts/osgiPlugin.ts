@@ -21,8 +21,8 @@ module Osgi {
             .when('/osgi/configurations', {templateUrl: 'plugins/osgi/html/configurations.html'})
             .when('/osgi/pid/:pid/:factoryPid', {templateUrl: 'plugins/osgi/html/pid.html'})
             .when('/osgi/pid/:pid', {templateUrl: 'plugins/osgi/html/pid.html'})
-            .when('/osgi/fwk', {templateUrl: 'plugins/osgi/html/framework.html'})
-            .when('/osgi/dependencies', {templateUrl: 'plugins/osgi/html/svc-dependencies.html', reloadOnSearch: false });
+            .when('/osgi/fwk', {templateUrl: 'plugins/osgi/html/framework.html'});
+            //.when('/osgi/dependencies', {templateUrl: 'plugins/osgi/html/svc-dependencies.html', reloadOnSearch: false });
   }]);
 
   _module.run(["HawtioNav", "workspace", "viewRegistry", "helpRegistry", (nav:HawtioMainNav.Registry, workspace:Workspace, viewRegistry, helpRegistry) => {
@@ -76,18 +76,19 @@ module Osgi {
                           .title( () => 'Framework' )
                           .isSelected( () => workspace.isLinkPrefixActive('/osgi/fwk') )
                           .build();
+    /*
     var dependencies = builder.id('osgi-dependencies')
                           .href( () => '/osgi/dependencies' + workspace.hash() )
                           .title( () => 'Dependencies' )
                           .isSelected( () => workspace.isLinkPrefixActive('/osgi/dependencies') )
                           .build();
-
+    */
     var tab = builder.id('osgi')
                     .title( () => 'OSGi' )
                     .href( () => '/osgi' )
                     .isValid( () => workspace.treeContainsDomainAndProperties("osgi.core") )
                     .isSelected( () => workspace.isLinkActive('osgi') )
-                    .tabs( configuration, bundles, features, packages, services, scrComponents, server, fwk, dependencies )
+                    .tabs( configuration, bundles, features, packages, services, scrComponents, server, fwk )
                     .build();
     nav.add(tab);
 

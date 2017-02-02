@@ -316,3 +316,11 @@ dl.bundle-details dd {
   list-style-type: none;
   padding-left: 0;
 }
+dl.framework-configuration dt {
+  text-align: left;
+  width: 190px;
+  margin-bottom: 10px;
+}
+dl.framework-configuration dd {
+  margin-left: 210px;
+}
