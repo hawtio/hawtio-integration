@@ -8,6 +8,13 @@
   margin-top: 20px;
 }
 
+.message-modal input.endpointUri {
+  width: 489px;
+}
+.message-modal form.forward {
+  margin-bottom: 20px;
+}
+
 .metricsWatcher .heading1 {
   font-size: 24px;
   line-height: 30px;
@@ -301,7 +308,10 @@ dl.bundle-details dd {
   display: inline-block;
   margin-bottom: 2px;
 }
-.bundle-headers dd {
+dl.bundle-headers dt {
+  text-align: left;
+}
+dl.bundle-headers dd {
   word-break: break-all;
 }
 .list-packages .list-view-pf-description,

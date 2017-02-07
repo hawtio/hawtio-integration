@@ -19,20 +19,19 @@
     "plugins"
   ],
   "dependencies": {
-    "hawtio-core": "~3.0.0",
     "hawtio-core-navigation": "~3.0.0",
     "hawtio-forms": "~3.0.0",
     "hawtio-jmx": "~3.0.0",
     "hawtio-ui": "~3.0.0",
     "hawtio-utilities": "~3.0.0",
     "angular-resource": "~1.5.0",
-    "hawtio-template-cache": "~3.0.0"
+    "hawtio-template-cache": "~3.0.0",
+    "angular-patternfly": "^3.0.0"
   },
   "devDependencies": {
     "hawtio-core-dts": "~2.0.0",
     "angular-mocks": "~1.5.0",
     "hawtio-dashboard": "~2.0.0",
-    "hawtio-preferences": "~2.0.0",
     "hawtio-extension-service": "~2.0.0"
   }
 }

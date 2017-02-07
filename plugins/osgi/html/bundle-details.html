@@ -217,11 +217,11 @@
 
 <h2>Headers</h2>
 
-<div class="row bundle-headers">
+<div class="row">
   <div class="col-md-12">
-    <dl class="dl-horizontal" ng-repeat="(key, value) in row.Headers" ng-show="showValue(key)">
-      <dt>{{key}}</dt>
-      <dd>{{value.Value}}</dd>
+    <dl class="dl-horizontal bundle-headers">
+      <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>
+      <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>
     </dl>
   </div>
 </div>

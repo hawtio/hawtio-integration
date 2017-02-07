@@ -4,19 +4,15 @@
 
 module Camel {
 
-  export var BrowseEndpointController = _module.controller("Camel.BrowseEndpointController", ["$scope", "$routeParams", "workspace", "jolokia", ($scope, $routeParams, workspace:Workspace, jolokia) => {
+  export var BrowseEndpointController = _module.controller("Camel.BrowseEndpointController", ["$scope", "$routeParams",
+      "workspace", "jolokia", "$uibModal", ($scope, $routeParams, workspace:Workspace, jolokia, $uibModal) => {
+    
     $scope.workspace = workspace;
-
-    $scope.forwardDialog = new UI.Dialog();
-
-    $scope.showMessageDetails = false;
     $scope.mode = 'text';
-
     $scope.gridOptions = Camel.createBrowseGridOptions();
-
+    $scope.endpointUri = null;
     $scope.contextId = $routeParams["contextId"];
     $scope.endpointPath = $routeParams["endpointPath"];
-
     $scope.isJmxTab = !$routeParams["contextId"] || !$routeParams["endpointPath"];
 
     $scope.$watch('workspace.selection', function () {
@@ -29,16 +25,25 @@ module Camel {
       ActiveMQ.selectCurrentMessage(message, "id", $scope);
       if ($scope.row) {
         $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
-        $scope.showMessageDetails = true;
+        $uibModal.open({
+          templateUrl: 'camelBrowseEndpointMessageDetails.html',
+          scope: $scope
+        });
       }
+    };
+
+    $scope.openForwardDialog = (message) => {
+      $uibModal.open({
+        templateUrl: 'camelBrowseEndpointForwardMessage.html',
+        scope: $scope
+      });
     };
 
     ActiveMQ.decorate($scope);
 
-    $scope.forwardMessagesAndCloseForwardDialog = () => {
+    $scope.forwardMessages = (uri) => {
       var mbean = getSelectionCamelContextMBean(workspace);
       var selectedItems = $scope.gridOptions.selectedItems;
-      var uri = $scope.endpointUri;
       if (mbean && uri && selectedItems && selectedItems.length) {
         //console.log("Creating a new endpoint called: " + uri + " just in case!");
         jolokia.execute(mbean, "createEndpoint(java.lang.String)", uri, Core.onSuccess(intermediateResult));
@@ -52,7 +57,20 @@ module Camel {
           jolokia.execute(mbean, "sendBodyAndHeaders(java.lang.String, java.lang.Object, java.util.Map)", uri, body, headers, Core.onSuccess(callback));
         });
       }
-      $scope.forwardDialog.close();
+      $scope.endpointUri = null;
+    };
+
+    $scope.forwardMessage = (message, uri) => {
+      var mbean = getSelectionCamelContextMBean(workspace);
+      if (mbean && message && uri) {
+        jolokia.execute(mbean, "createEndpoint(java.lang.String)", uri, Core.onSuccess(function() {
+          jolokia.execute(mbean, "sendBodyAndHeaders(java.lang.String, java.lang.Object, java.util.Map)",
+            uri, message.body, message.headers, Core.onSuccess(function() {
+              Core.notification("success", "Forwarded message to " + uri);
+              setTimeout(loadData, 50);
+            }));
+        }));
+      }
     };
 
     $scope.endpointUris = () => {
@@ -66,9 +84,6 @@ module Camel {
     }
 
     function operationSuccess() {
-      if ($scope.messageDialog) {
-        $scope.messageDialog.close();
-      }
       $scope.gridOptions.selectedItems.splice(0);
       Core.notification("success", $scope.message);
       setTimeout(loadData, 50);

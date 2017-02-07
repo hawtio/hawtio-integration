@@ -1,104 +1,148 @@
 <div ng-controller="Camel.BrowseEndpointController">
+  
   <div ng-hide="isJmxTab">
     <ng-include src="'plugins/camel/html/breadcrumbBar.html'"></ng-include>
   </div>
+  
   <div ng-class="{'wiki-fixed' : !isJmxTab}">
-    <div class="row">
-      <div class="col-md-6">
-        <input class="search-query col-md-12" type="text" ng-model="gridOptions.filterOptions.filterText"
-               placeholder="Filter messages">
-      </div>
-      <div class="col-md-6">
-        <div class="pull-right">
-          <form class="form-inline">
-            <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="forwardDialog.open()"
+
+    <div class="row toolbar-pf">
+      <div class="col-md-12">
+        <form class="toolbar-pf-actions search-pf">
+          <div class="form-group has-clear">
+            <div class="search-pf-input-group">
+              <label for="search1" class="sr-only">Filter</label>
+              <input id="search1" type="search" class="form-control" ng-model="gridOptions.filterOptions.filterText"
+                     placeholder="Filter...">
+              <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''">
+                <span class="pficon pficon-close"></span>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="openForwardDialog()"
                     hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendBodyAndHeaders"
                     title="Forward the selected messages to another endpoint" data-placement="bottom">
               <i class="fa fa-forward"></i> Forward
             </button>
-            <button class="btn btn-default" ng-click="refresh()"
-                    title="Refreshes the list of messages">
-              <i class="fa fa-refresh"></i>
+            <button class="btn btn-default" ng-click="refresh()" title="Refreshes the list of messages">
+              <i class="fa fa-refresh"></i> Refresh
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
-
 
     <div class="row">
-      <table class="table table-striped" hawtio-simple-table="gridOptions"></table>
+      <table class="table" hawtio-simple-table="gridOptions"></table>
     </div>
 
-    <div hawtio-slideout="showMessageDetails" title="{{row.id}}">
-      <div class="dialog-body">
+    <script type="text/ng-template" id="camelBrowseEndpointMessageDetails.html">
+      <div class="modal-dialog message-modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" ng-click="$close()">
+              <span class="pficon pficon-close" aria-hidden="true"></span>
+            </button>
+            <div class="row">
+              <div class="col-md-4">
+                <h4 class="modal-title" id="myModalLabel">Message</h4>
+              </div>
+              <div class="col-md-7">
+                <div class=""
+                    hawtio-pager="messages"
+                    on-index-change="selectRowIndex"
+                    row-index="rowIndex">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <form class="form-inline forward">
+                  <input type="text" class="form-control endpointUri" ng-model="endpointUri" placeholder="Endpoint URI"
+                         typeahead="title for title in endpointUris() | filter:$viewValue" typeahead-editable='true'>
+                  <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length"
+                          ng-click="forwardMessage(row, endpointUri)" hawtio-show object-name="{{workspace.selection.objectName}}"
+                          method-name="sendBodyAndHeaders" title="Forward the selected messages to another endpoint"
+                          data-placement="bottom">
+                    <i class="fa fa-forward"></i> Forward
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <dl>
+                  <dt>ID</dt>
+                  <dd>{{row.id}}</dd>
+                </dl>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <dl>
+                  <dt>Body</dt>
+                  <dd><div hawtio-editor="row.body" read-only="true" mode="mode"></div></dd>
+                </dl>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <dl>
+                  <dt>Headers</dt>
+                  <dd>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Type</th>
+                          <th>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody compile="row.headerHtml"></tbody>
+                    </table>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </script>
 
-        <div class="row">
-          <div class="pull-right">
-            <form class="form-horizontal no-bottom-margin">
-              <div class="btn-group" hawtio-pager="messages" on-index-change="selectRowIndex"
-                   row-index="rowIndex"></div>
-              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="forwardDialog.open()"
-                      hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendBodyAndHeaders"
-                      title="Forward the selected messages to another endpoint" data-placement="bottom">
-                <i class="fa fa-forward"></i> Forward
-              </button>
-
-              <!-- no need for close button as the hawtio-slideout already have that -->
-
+    <script type="text/ng-template" id="camelBrowseEndpointForwardMessage.html">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" ng-click="$close()">
+              <span class="pficon pficon-close" aria-hidden="true"></span>
+            </button>
+            <h4>
+              Forward
+              <ng-pluralize count="gridOptions.selectedItems.length" when="{'1': 'message', 'other': 'messages'}">
+              </ng-pluralize>
+              to
+            </h4>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="endpointUri">Endpoint URI</label>
+                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri"
+                       typeahead="title for title in endpointUris() | filter:$viewValue" typeahead-editable='true'>
+              </div>
             </form>
           </div>
-        </div>
-
-        <div class="row">
-          <div class="expandable closed">
-            <div title="Headers" class="title">
-              <i class="expandable-indicator"></i> Headers
-            </div>
-            <div class="expandable-body well">
-              <table class="table table-condensed table-striped">
-                <thead>
-                <tr>
-                  <th>Header</th>
-                  <th>Type</th>
-                  <th>Value</th>
-                </tr>
-                </thead>
-                <tbody compile="row.headerHtml"></tbody>
-              </table>
-            </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" ng-click="$close()">Close</button>
+            <button type="submit" class="btn btn-primary" ng-click="forwardMessages(endpointUri); $close();" ng-disabled="!endpointUri">Forward</button>
           </div>
-
-          <div class="row">
-            <div hawtio-editor="row.body" read-only="true" mode="mode"></div>
-          </div>
-
         </div>
-
       </div>
-    </div>
+    </script>
+
   </div>
 
-  <div modal="forwardDialog.show" close="forwardDialog.close()" options="forwardDialog.options">
-    <form class="form-horizontal no-bottom-margin" ng-submit="forwardDialog.close()">
-      <div class="modal-header">
-        <h4>Forward
-          <ng-pluralize count="selectedItems.length"
-                        when="{'1': 'a message', 'other': 'messages'}"></ng-pluralize>
-        </h4>
-      </div>
-      <div class="modal-body">
-        <p>Forward
-          <ng-pluralize count="selectedItems.length"
-                        when="{'1': 'a message', 'other': '{} messages'}"></ng-pluralize>
-          to: <input type="text" style="width: 100%" ng-model="endpointUri" placeholder="Endpoint URI"
-                     typeahead="title for title in endpointUris() | filter:$viewValue" typeahead-editable='true'></p>
-      </div>
-      <div class="modal-footer">
-        <input id="submit" class="btn btn-primary add" type="submit" ng-click="forwardMessagesAndCloseForwardDialog()"
-               value="Forward">
-        <button class="btn btn-warning cancel" type="button" ng-click="forwardDialog.close()">Cancel</button>
-      </div>
-    </form>
-  </div>
 </div>
