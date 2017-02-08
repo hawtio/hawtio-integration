@@ -27,7 +27,8 @@ module Camel {
         $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
         $uibModal.open({
           templateUrl: 'camelBrowseEndpointMessageDetails.html',
-          scope: $scope
+          scope: $scope,
+          size: 'lg'
         });
       }
     };
