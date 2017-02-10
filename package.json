@@ -8,8 +8,7 @@
   },
   "scripts": {
     "start": "gulp",
-    "build": "gulp build",
-    "postinstall": "bower install"
+    "build": "gulp build"
   },
   "devDependencies": {
     "bower": "^1.0.0",

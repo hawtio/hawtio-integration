@@ -9,25 +9,27 @@
     <div class="row toolbar-pf">
       <div class="col-md-12">
         <form class="toolbar-pf-actions search-pf">
-          <div class="form-group has-clear">
-            <div class="search-pf-input-group">
-              <label for="search1" class="sr-only">Filter</label>
-              <input id="search1" type="search" class="form-control" ng-model="gridOptions.filterOptions.filterText"
-                     placeholder="Filter...">
-              <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''">
-                <span class="pficon pficon-close"></span>
-              </button>
-            </div>
-          </div>
           <div class="form-group">
             <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="openForwardDialog()"
                     hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendBodyAndHeaders"
                     title="Forward the selected messages to another endpoint" data-placement="bottom">
-              <i class="fa fa-forward"></i> Forward
+              Forward
             </button>
             <button class="btn btn-default" ng-click="refresh()" title="Refreshes the list of messages">
-              <i class="fa fa-refresh"></i> Refresh
+              Refresh
             </button>
+          </div>
+          <div class="toolbar-pf-action-right">
+            <div class="form-group has-clear">
+              <div class="search-pf-input-group">
+                <label for="search1" class="sr-only">Filter</label>
+                <input id="search1" type="search" class="form-control" ng-model="gridOptions.filterOptions.filterText"
+                      placeholder="Search">
+                <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''">
+                  <span class="pficon pficon-close"></span>
+                </button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
@@ -58,16 +60,20 @@
       <div class="modal-body camel-forward-message">
         <div class="row">
           <div class="col-md-12">
-            <form class="form-inline camel-forward-message">
-              <input type="text" class="form-control camel-forward-message" ng-model="endpointUri" placeholder="Endpoint URI"
-                      typeahead="title for title in endpointUris() | filter:$viewValue" typeahead-editable='true'>
-              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length"
-                      ng-click="forwardMessage(row, endpointUri)" hawtio-show object-name="{{workspace.selection.objectName}}"
-                      method-name="sendBodyAndHeaders" title="Forward the selected messages to another endpoint"
-                      data-placement="bottom">
-                <i class="fa fa-forward"></i> Forward
-              </button>
-            </form>
+            <dl>
+              <dt>Forward to endpoint</dt>
+              <dd>
+                <form class="form-inline camel-forward-message" ng-submit="forwardMessage(row, endpointUri)">
+                  <input type="text" class="form-control camel-forward-message" ng-model="endpointUri" placeholder="URI"
+                          uib-typeahead="title for title in endpointUris() | filter:$viewValue" required>
+                  <button type="submit" class="btn btn-default" hawtio-show 
+                          object-name="{{workspace.selection.objectName}}" method-name="sendBodyAndHeaders"
+                          data-placement="bottom" title="Forward the selected messages to another endpoint">
+                    Forward
+                  </button>
+                </form>
+              </dd>
+            </dl>
           </div>
         </div>
         <div class="row">
@@ -109,30 +115,29 @@
     </script>
 
     <script type="text/ng-template" id="camelBrowseEndpointForwardMessage.html">
-      <div class="modal-header">
-        <button type="button" class="close" aria-label="Close" ng-click="$close()">
-          <span class="pficon pficon-close" aria-hidden="true"></span>
-        </button>
-        <h4>
-          Forward
-          <ng-pluralize count="gridOptions.selectedItems.length" when="{'1': 'message', 'other': 'messages'}">
-          </ng-pluralize>
-          to
-        </h4>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="endpointUri">Endpoint URI</label>
-            <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri"
-                    typeahead="title for title in endpointUris() | filter:$viewValue" typeahead-editable='true'>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" ng-click="$close()">Close</button>
-        <button type="submit" class="btn btn-primary" ng-click="forwardMessages(endpointUri); $close();" ng-disabled="!endpointUri">Forward</button>
-      </div>
+      <form class="form-horizontal" ng-submit="forwardMessages(endpointUri); $close();">
+        <div class="modal-header">
+          <button type="button" class="close" aria-label="Close" ng-click="$close()">
+            <span class="pficon pficon-close" aria-hidden="true"></span>
+          </button>
+          <h4>
+            Forward to endpoint
+          </h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+              <label class="col-sm-1 control-label" for="endpointUri">URI</label>
+              <div class="col-sm-11">
+                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri" required
+                        uib-typeahead="title for title in endpointUris() | filter:$viewValue">
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" ng-click="$close()">Close</button>
+          <button type="submit" class="btn btn-primary">Forward</button>
+        </div>
+      </form>
     </script>
 
   </div>

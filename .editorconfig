@@ -3,6 +3,6 @@
 # top-most EditorConfig file
 root = true
 
-[*.{html,ts,js,json}]
+[*.{html,ts,js,json,css,less}]
 indent_style = space
 indent_size = 2

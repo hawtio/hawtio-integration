@@ -36,7 +36,7 @@
           <label>Subscriber name: </label>
           <input name="subscriberName" class="input-xlarge" type="text" ng-model="subscriberName" required>
           <label>Topic name: </label>
-          <input name="topicName" class="input-xlarge" type="text" ng-model="topicName" required typeahead="title for title in topicNames($viewValue) | filter:$viewValue" typeahead-editable='true'>
+          <input name="topicName" class="input-xlarge" type="text" ng-model="topicName" required uib-typeahead="title for title in topicNames($viewValue) | filter:$viewValue">
           <label>Selector: </label>
           <input name="subSelector" class="input-xlarge" type="text" ng-model="subSelector">
         </div>

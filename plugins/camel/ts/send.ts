@@ -5,7 +5,10 @@ module Camel {
 
    var DELIVERY_PERSISTENT = "2";
 
-  _module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", "PreferencesLastPath", ($route, $scope, $element, $timeout, workspace:Workspace, jolokia, localStorage, $location, activeMQMessage, PreferencesLastPath) => {
+  _module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia",
+      "localStorage", "$location", "activeMQMessage", ($route, $scope, $element, $timeout, workspace:Workspace, jolokia,
+      localStorage, $location, activeMQMessage) => {
+
     var log:Logging.Logger = Logger.get("Camel");
 
     $scope.noCredentials = false;
@@ -43,39 +46,24 @@ module Camel {
     }
 
     $scope.openPrefs = () => {
-      PreferencesLastPath.lastPath = $location.path();
-      PreferencesLastPath.lastSearch = $location.search();
       $location.path('/preferences').search({'pref': 'ActiveMQ'});
     };
 
     var LANGUAGE_FORMAT_PREFERENCE = "defaultLanguageFormat";
     var sourceFormat = workspace.getLocalStorage(LANGUAGE_FORMAT_PREFERENCE) || "javascript";
 
-    // TODO Remove this if possible
-    $scope.codeMirror = undefined;
-    var options = {
+    $scope.codeMirrorOptions = CodeEditor.createEditorSettings({
       mode: {
         name: sourceFormat
-      },
-      // Quick hack to get the codeMirror instance.
-      onChange: function (codeMirror) {
-        if (!$scope.codeMirror) {
-          $scope.codeMirror = codeMirror;
-        }
       }
-    };
-    $scope.codeMirrorOptions = CodeEditor.createEditorSettings(options);
+    });
+
+    $scope.$on('hawtioEditor_default_instance', (event, codeMirror) => {
+      $scope.codeMirror = codeMirror;
+    });
 
     $scope.addHeader = () => {
       $scope.headers.push({name: "", value: ""});
-
-      // lets set the focus to the last header
-      if ($element) {
-        $timeout(() => {
-          var lastHeader = $element.find("input.headerName").last();
-          lastHeader.focus();
-        }, 100);
-      }
     };
 
     $scope.removeHeader = (header) => {
@@ -119,11 +107,13 @@ module Camel {
       Core.notification("success", "Message sent!");
     };
 
+    /** AUTO FORMAT IS NOT WORKING ON HAWTIO-EDITOR DUE TO USE OF CODEMIRROR V5, WHICH DOES NOT PROVIDE FORMATTING
     $scope.autoFormat = () => {
       setTimeout(() => {
         CodeEditor.autoFormatEditor($scope.codeMirror);
       }, 50);
     };
+     */
 
     $scope.sendMessage = () => {
       var body = $scope.message;

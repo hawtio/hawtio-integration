@@ -1,76 +1,99 @@
 <div ng-controller="Camel.SendMessageController">
 
-  <div class="tabbable" ng-model="tab">
+  <div class="row">
+    <div class="col-sm-12">
+      <h2>Send Message</h2>
+    </div>
+  </div>
 
-    <div value="compose" class="tab-pane" title="Compose">
-      <div class="row">
-        <span ng-show="noCredentials" class="alert">
-          No credentials set for endpoint!  Please set your username and password in the <a
-            href="" ng-click="openPrefs()">Preferences</a> page
-        </span>
-
-        <form class="form-inline pull-right">
-          <button class="btn btn-default" ng-click="addHeader()" title="Add a new message header"><i
-              class="fa fa-plus"></i> Header
-          </button>
-          <button type="submit" class="btn btn-primary" ng-click="sendMessage()">Send message</button>
-        </form>
-      </div>
-
-      <form class="form-inline bottom-margin" ng-submit="addHeader()">
-        <ol class="zebra-list header-list">
-          <div class="row">
-            <li ng-repeat="header in headers">
-              <div class="col-md-4">
-                <input type="text" style="width: 100%" class="headerName"
-                       ng-model="header.name"
-                       typeahead="completion for completion in defaultHeaderNames() | filter:$viewValue"
-                       typeahead-editable='true'
-                       placeholder="Header name">
-              </div>
-              <div class="col-md-6">
-                <input type="text" style="width: 100%" ng-model="header.value"
-                       placeholder="Value of the message header">
-              </div>
-              <div class="col-md-2">
-                <button type="submit" class="btn btn-default" title="Add a new message header">
-                  <i class="fa fa-plus"></i>
-                </button>
-                <button type="button" ng-click="removeHeader(header)" class="btn btn-default" title="Removes this message header">
-                  <i class="fa fa-remove"></i>
-                </button>
-              </div>
-            </li>
-          </div>
-        </ol>
-      </form>
-
-      <div class="row">
-        <form class="form-inline">
-          <div class="controls">
-            <label class="control-label" for="sourceFormat" title="The text format to use for the message payload">Payload
-              format: </label>
-            <select ng-model="codeMirrorOptions.mode.name" id="sourceFormat">
-              <option value="javascript">JSON</option>
-              <option value="text" selected>Plain text</option>
-              <option value="properties">Properties</option>
-              <option value="xml">XML</option>
-            </select>
-
-            <button class="btn btn-default" ng-click="autoFormat()"
-                    title="Automatically pretty prints the message so its easier to read">Auto format
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="row">
-        <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>
-        <!--
-        <textarea ui-codemirror="codeMirrorOptions" ng-model="message"></textarea>
-        -->
+  <div class="row" ng-show="noCredentials">
+    <div class="col-sm-12">
+      <div class="alert alert-warning">
+        <span class="pficon pficon-warning-triangle-o"></span>
+        <strong>No credentials set for endpoint!</strong>
+        Please set your username and password in the
+        <a href="#" class="alert-link" ng-click="openPrefs()">Preferences</a> page.
       </div>
     </div>
-
   </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <h3>Headers</h3>
+    </div>
+  </div>
+
+  <div class="row camel-message-headers" ng-if="headers.length > 0">
+    <div class="col-sm-5">
+      <form>
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" class="form-control" ng-model="header.name" ng-repeat="header in headers"
+                 uib-typeahead="completion for completion in defaultHeaderNames() | filter:$viewValue"
+                 pf-focused="$last">
+        </div>
+      </form>
+    </div>
+    <div class="col-sm-5">
+      <form>
+        <div class="form-group">
+          <label>Value</label>
+          <input type="text" class="form-control" ng-model="header.value" ng-repeat="header in headers">
+        </div>
+      </form>
+    </div>
+    <div class="col-sm-2">
+      <form>
+        <div class="form-group">
+          <label>&nbsp;</label>
+          <button type="button" class="btn btn-default" title="Delete" ng-click="removeHeader(header)"
+                  ng-repeat="header in headers">
+            <span class="pficon pficon-delete"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <a href="" ng-click="addHeader()">Add header</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <h3>Body</h3>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <form>
+        <div class="form-group">
+          <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>
+        </div>
+        <!--
+        <div class="form-group">
+          <select pf-select ng-model="codeMirrorOptions.mode.name">
+            <option value="javascript">JSON</option>
+            <option value="text" selected>Plain text</option>
+            <option value="properties">Properties</option>
+            <option value="xml">XML</option>
+          </select>
+          <button class="btn btn-default" ng-click="autoFormat()"
+                  title="Automatically pretty prints the message so its easier to read">Format
+          </button>
+        </div>
+        -->
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>
+    </div>
+  </div>
+
 </div>
