@@ -1,5 +1,7 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
+/// <reference path="camelHeaderSchema.ts"/>
+/// <reference path="jmsHeaderSchema.ts"/>
 
 module Camel {
 
@@ -13,7 +15,7 @@ module Camel {
 
     $scope.noCredentials = false;
     $scope.container = {};
-    $scope.message = "\n\n\n\n";
+    $scope.message = "";
     $scope.headers = [];
 
     // bind model values to search params...
@@ -107,13 +109,9 @@ module Camel {
       Core.notification("success", "Message sent!");
     };
 
-    /** AUTO FORMAT IS NOT WORKING ON HAWTIO-EDITOR DUE TO USE OF CODEMIRROR V5, WHICH DOES NOT PROVIDE FORMATTING
-    $scope.autoFormat = () => {
-      setTimeout(() => {
-        CodeEditor.autoFormatEditor($scope.codeMirror);
-      }, 50);
+    $scope.formatMessage = () => {
+      CodeEditor.autoFormatEditor($scope.codeMirror);
     };
-     */
 
     $scope.sendMessage = () => {
       var body = $scope.message;
