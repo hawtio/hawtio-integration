@@ -4,7 +4,7 @@
 module Camel {
   _module.controller("Camel.SourceController", ["$scope", "workspace", ($scope, workspace:Workspace) => {
 
-    $scope.camelContextMBean = getSelectionCamelContextMBean(workspace);
+    $scope.showUpdateButton = true;
 
     $scope.$on("$routeChangeSuccess", function (event, current, previous) {
       // lets do this asynchronously to avoid Error: $digest already in progress
@@ -15,9 +15,6 @@ module Camel {
       if (workspace.moveIfViewInvalid()) return;
       updateRoutes();
     });
-
-    $scope.mode = 'xml';
-    $scope.showUpdateButton = true;
     
     function getSource(routeXmlNode) {
       function removeCrappyHeaders(idx, e) {
