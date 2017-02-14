@@ -1,0 +1,85 @@
+.metricsWatcher .panel-group:first-child {
+  margin-top: 20px;
+}
+
+.metricsWatcher h3 {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.metricsWatcher .panel-body div {
+  margin-bottom: 10px;
+}
+
+.metricsWatcher .panel-group {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.metricsWatcher .activeRequestsGraph {
+	vertical-align: top;
+}
+
+.metricsWatcher .activeRequestsGraph .counter .histogram {
+	width: 95%;
+}
+
+.metricsWatcher .nested {
+	margin: 0 10px 10px 0;
+}
+.metricsWatcher .nested h1 {
+	font-size: 24px;
+}
+
+.metricsWatcher .progressLabel {
+	text-align: right;
+}
+
+.metricsWatcher.histogram .histogramContainer td,
+.metricsWatcher.timer .timerContainer td,
+.metricsWatcher .progressLabel,
+.metricsWatcher .progressValue {
+	padding: 0 5px;
+}
+
+.metricsWatcher.timer table,
+.metricsWatcher.histogram table,
+.metricsWatcher.web table,
+.metricsWatcher.log4j table,
+.metricsWatcher.cache table,
+.metricsWatcher.jvm table,
+.metricsWatcher .progressBar,
+.metricsWatcher .progressBar,
+.metricsWatcher .progressTable {
+	width: 100%;
+}
+
+.metricsWatcher.histogram .histogramContainer,
+.metricsWatcher.jvm .jvmContainer,
+.metricsWatcher.web .webContainer,
+.metricsWatcher.log4j .log4jContainer,
+.metricsWatcher.cache .cacheContainer,
+.metricsWatcher.timer .timerContainer,
+.metricsWatcher.cache .gaugeTableContainer {
+	border-style: none;
+	border-width: 1px;
+	padding: 10px 0;
+	margin-left: 0;
+	padding: 10px;
+}
+
+.metricsWatcher.cache table.gaugeTable td h5,
+.metricsWatcher.jvm table.jvmTable td h5 {
+	font-size: 15px;
+	font-weight: normal;
+	text-align: left;
+}
+.metricsWatcher table.gaugeTable td,
+.metricsWatcher table.jvmTable td {
+	font-size: 14px;
+	text-align: right;
+}
+
+caption {
+	font-weight: bold;
+}

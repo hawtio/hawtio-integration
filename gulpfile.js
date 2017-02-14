@@ -19,7 +19,7 @@ var config = {
   main: '.',
   ts: ['plugins/**/*.ts'],
   templates: ['plugins/**/*.html'],
-  less: ['plugins/**/*.less'],
+  less: ['plugins/**/*.less', 'vendor/**/*.css'],
   templateModule: pkg.name + '-templates',
   dist: argv.out || './dist/',
   js: pkg.name + '.js',
@@ -52,12 +52,7 @@ gulp.task('clean-defs', function() {
 gulp.task('tsc', ['clean-defs'], function() {
   var cwd = process.cwd();
   var tsResult = gulp.src(config.ts)
-    .pipe(plugins.typescript(config.tsProject))
-    .on('error', plugins.notify.onError({
-      onLast: true,
-      message: '<%= error.message %>',
-      title: 'Typescript compilation error'
-    }));
+    .pipe(plugins.typescript(config.tsProject));
 
     return eventStream.merge(
       tsResult.js
@@ -87,7 +82,7 @@ gulp.task('template', ['tsc'], function() {
 });
 
 gulp.task('concat', ['template'], function() {
-  return gulp.src(['compiled.js', 'templates.js'])
+  return gulp.src(['compiled.js', 'templates.js', 'vendor/**/*.js'])
     .pipe(plugins.concat(config.js))
     .pipe(gulp.dest(config.dist));
 });
@@ -100,11 +95,6 @@ gulp.task('less', function () {
   return gulp.src(config.less)
     .pipe(plugins.less({
       paths: [ path.join(__dirname, 'less', 'includes') ]
-    }))
-    .on('error', plugins.notify.onError({
-      onLast: true,
-      message: '<%= error.message %>',
-      title: 'less file compilation error'
     }))
     .pipe(plugins.concat(config.css))
     .pipe(gulp.dest(config.dist));

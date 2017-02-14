@@ -1,31 +1,45 @@
-<div class="row" ng-controller="Camel.RouteMetricsController">
+<div ng-controller="Camel.RouteMetricsController">
 
   <div class="row">
-    <div class="pull-right">
-      <form class="form-inline no-bottom-margin">
-        <fieldset>
-          <div class="control-group inline-block">
-            <input type="text" class="search-query" placeholder="Filter..." ng-model="filterText">
+    <div class="col-md-12">
+      <h1>Route Metrics</h1>
+    </div>
+  </div>
+ 
+  <div class="row toolbar-pf">
+    <div class="col-md-12">
+      <form class="toolbar-pf-actions search-pf">
+        <div class="toolbar-pf-action-right">
+          <div class="form-group has-clear">
+            <div class="search-pf-input-group">
+              <label for="search1" class="sr-only">Filter</label>
+              <input id="search1" type="search" class="form-control" ng-model="filterText"
+                    placeholder="Search">
+              <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''">
+                <span class="pficon pficon-close"></span>
+              </button>
+            </div>
           </div>
-        </fieldset>
+        </div>
       </form>
     </div>
   </div>
 
-  <div class="row" ng-show="!initDone">
-    <p class="text-center"><i class="fa fa-spinner fa-spin"></i></p>
-  </div>
+  <div class="spinner spinner-lg loading-page" ng-if="!initDone"></div>
 
-  <div class="col-md-8 centered well" ng-show="initDone && metricDivs.length === 0">
-    <form>
-      This Camel context has no route metrics data.
-    </form>
-  </div>
-
-  <!-- div to contain the graphs -->
-  <div class="metricsWatcher container mainContent">
-    <div id="{{metric.id}}" class="row" ng-repeat="metric in metricDivs track by $index" style="{{filterByRoute(metric)}}"></div>
+  <div ng-show="initDone">
+    <div class="row" ng-if="metricDivs.length === 0">
+      <div class="col-md-12">
+        <div class="no-data-message">
+          This Camel context has no route metrics data.
+        </div>
+      </div>
+    </div>
+    <div class="row" ng-if="metricDivs.length > 0">
+      <div class="col-md-12">
+        <div id="{{metric.id}}" ng-repeat="metric in metricDivs track by metric.id" ng-show="metricVisible(metric)"></div>
+      </div>
+    </div>
   </div>
 
 </div>
-

@@ -11,7 +11,7 @@
  *
  *****************************************************************************/
 
-(function(metricsWatcher, $, undefined) {
+(function(metricsWatcher, $) {
 
 	/**
 	 * Add a Gauge type graph to your page.
@@ -336,7 +336,7 @@
 		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'timers', eventType);
 
 		metricInfo.getMeterInfo = function() {
-			var myDivId = this.divId + " div.timerGraph td.meterGraph";
+			var myDivId = this.divId + " div.timerGraph div.meterGraph";
 			var retVal = new MetricInfo(myDivId, this.className, this.metricName, this.max, "Frequency", 'timers', null);
 
 			retVal.getMetricNode = function(className, metricName, jsonRoot) {
@@ -348,10 +348,10 @@
 		};
 
 		metricInfo.getTimerStatsDivId = function() {
-			return "#" + this.divId + " div.timerGraph td.timerStatsGraph";
+			return "#" + this.divId + " div.timerGraph div.timerStatsGraph";
 		};
 		metricInfo.getTimerHistogramDivId = function() {
-			return "#" + this.divId + " div.timerGraph td.timerHistogram";
+			return "#" + this.divId + " div.timerGraph div.timerHistogram";
 		};
 		metricInfo.durationMax = durationMax;
 		metricInfo.isNested = isNested;
@@ -364,8 +364,8 @@
 	 */
 	function drawCounter(counterInfo) {
 		var parentDiv = $("#" + counterInfo.divId);
-		var html = "<div class='metricsWatcher counter counterGraph'><div class='heading3'>" + counterInfo.title
-				+ "</div><div class='progress'><div class='progress-bar' style='width: 0%;'></div></div></div>";
+		var html = "<div class='counter counterGraph'><h3>" + counterInfo.title
+				+ "</h3><div class='progress'><div class='progress-bar' style='width: 0%;'></div></div></div>";
 		parentDiv.html(html);
 	}
 	
@@ -384,15 +384,28 @@
 		var parentDiv = $("#" + timerInfo.divId);
 
 		var nested = (timerInfo.isNested) ? " nested" : "";
-		var html = "<div class='metricsWatcher timer timerGraph" + nested + " col-md-12'>"
-				+ "<fieldset><legend>" + ((timerInfo.isNested) ? "<div class='heading1'>":"<div class='heading1 btn-link' data-toggle='collapse' data-target='#" + timerInfo.divId + "Collapse'>") 
-				+ timerInfo.title + "</div></legend>"
-				+ "<div class='timerContainer col-md-12" + ((timerInfo.isNested) ? "": "collapse") +"' id='" + timerInfo.divId +"Collapse'>"
-				+ "<table><tr>"
-				+ "<td class='meterGraph col-md-4'></td>"
-				+ "<td class='timerStatsGraph col-md-4'></td>"
-				+ "<td class='timerHistogram col-md-4'></td>"
-				+ "</tr></table></div></fieldset>";
+		var html = 
+          '<div class="metricsWatcher timer timerGraph' + nested + '">'
+        + '  <div class="panel-group" id="accordion-' + timerInfo.divId + '">'
+				+ '    <div class="panel panel-default">'
+				+ '      <div class="panel-heading">'
+				+ '        <h4 class="panel-title">'
+        +            ((timerInfo.isNested)
+                       ? '<a>'
+                       : '<a data-toggle="collapse" data-parent="accordion-' + timerInfo.divId + '" href="#' + timerInfo.divId + 'Collapse">')
+				+            timerInfo.title + '</a>'
+				+ '        </h4>'
+				+ '      </div>'
+				+ '      <div id="' + timerInfo.divId + 'Collapse" class="panel-collapse' + ((timerInfo.isNested) ? '': ' collapse in') + '">'
+				+ '        <div class="panel-body">'
+				+ '          <div class="meterGraph col-md-12 col-lg-4"></div>'
+				+ '          <div class="timerStatsGraph col-md-12 col-lg-4"></div>'
+				+ '          <div class="timerHistogram col-md-12 col-lg-4"></div>'
+				+ '        </div>'
+        + '      </div>'
+        + '    </div>'
+        + '  </div>'
+        + '</div>';
 		parentDiv.html(html);
 
 		drawMeter(timerInfo.getMeterInfo());
@@ -401,7 +414,7 @@
 	};
 
 	function drawDurationStats(timerInfo) {
-		var html = "<div class='heading3'>Duration</div><div class='timeUnit'></div><div class='metricGraph'><table class='progressTable'>"
+		var html = "<h3>Duration</h3><div class='timeUnit'></div><div class='metricGraph'><table class='progressTable'>"
 			+ addMeterRow("Min", "min")
 			+ addMeterRow("Mean", "mean")
 			+ addMeterRow("Max", "max")
@@ -412,7 +425,7 @@
 	}
 
 	function drawDurationHistogram(timerInfo) {
-		var html = "<div class='heading3'> " +(timerInfo.isNested?  "Histogram" :timerInfo.getSubTitle()) + "</div><p>Percentiles</p><div class='metricGraph'><table class='progressTable'>"
+		var html = "<h3> " +(timerInfo.isNested?  "Histogram" :timerInfo.getSubTitle()) + "</h3><div>Percentiles</div><div class='metricGraph'><table class='progressTable'>"
 			+ addMeterRow("99.9%", "p999")
 			+ addMeterRow("99%", "p99")
 			+ addMeterRow("98%", "p98")
@@ -507,8 +520,8 @@
 	function drawMeter(meterInfo) {
 		var parentDiv = $("#" + meterInfo.divId);
 
-		var html = "<div class='metricsWatcher metric metricGraph'><div class='heading3'>" + meterInfo.title
-			+ "</div><div class='counterVal'></div><table class='progressTable'>"
+		var html = "<div class='metric metricGraph'><h3>" + meterInfo.title
+			+ "</h3><div class='counterVal'></div><table class='progressTable'>"
 			+ addMeterRow("1&nbsp;min", "onemin")
 			+ addMeterRow("5&nbsp;min", "fivemin")
 			+ addMeterRow("15&nbsp;min", "fifteenmin")
@@ -560,7 +573,7 @@
 	 */
 	function drawGauge(gaugeInfo) {
 		var parentDiv = $("#" + gaugeInfo.divId);
-		var html = "<div class='metricsWatcher metric metricGraph'><div class='heading3'>" + gaugeInfo.title + "</span><div class='gaugeDataVal'></div></div>";
+		var html = "<div class='metric metricGraph'><h3>" + gaugeInfo.title + "</h3><div class='gaugeDataVal'></div></div>";
 		parentDiv.html(html);
 	}
 	function updateGauge(gaugeInfo, json) {

@@ -3,7 +3,8 @@
 
 module Camel {
 
-  _module.controller("Camel.RouteMetricsController", ["$scope", "$location", "workspace", "jolokia", "metricsWatcher", ($scope, $location, workspace:Workspace, jolokia, metricsWatcher) => {
+  _module.controller("Camel.RouteMetricsController", ["$scope", "$location", "workspace", "jolokia", "metricsWatcher",
+      ($scope, $location, workspace:Workspace, jolokia, metricsWatcher) => {
 
     var log:Logging.Logger = Logger.get("Camel");
 
@@ -13,17 +14,9 @@ module Camel {
     $scope.initDone = false;
     $scope.metricDivs = [];
 
-    $scope.filterByRoute = (div) => {
-      log.debug("Filter by route " + div);
-
-      var match = Core.matchFilterIgnoreCase(div.routeId, $scope.filterText);
-
-      if (!match) {
-        // hide using CSS style
-        return "display: none;"
-      } else {
-        return "";
-      }
+    $scope.metricVisible = (metric) => {
+      log.debug("Filter by route " + metric);
+      return Core.matchFilterIgnoreCase(metric.routeId, $scope.filterText);
     }
 
     function populateRouteStatistics(response) {
@@ -41,7 +34,9 @@ module Camel {
             for (var v in meters) {
               var key = v;
 
+              var firstDot = key.indexOf(".");
               var lastDot = key.lastIndexOf(".");
+              var title = key.substring(firstDot + 1, lastDot);
               var className = key.substr(0, lastDot);
               var metricsName = key.substr(lastDot + 1);
               var firstColon = key.indexOf(":");
@@ -63,7 +58,7 @@ module Camel {
               counter++;
 
               log.info("Added timer: " + div + " (" + className + "." + metricsName + ") for route: " + routeId + " with max seconds: " + $scope.maxSeconds);
-              metricsWatcher.addTimer(div, className, metricsName, $scope.maxSeconds, routeId, "Histogram", $scope.maxSeconds * 1000);
+              metricsWatcher.addTimer(div, className, metricsName, $scope.maxSeconds, title, "Histogram", $scope.maxSeconds * 1000);
             }
 
             // ensure web page is updated at this point, as we need the metricDivs in the HTML before we call init graphs later
