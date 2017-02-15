@@ -3,20 +3,22 @@
 <div id="osgi-configuration" class="controller-section" ng-controller="Osgi.ConfigurationsController">
   
   <div class="row toolbar-pf">
-    <form class="toolbar-pf-actions search-pf">
-      <div class="form-group">
-        <button class="btn btn-default" ng-click="addPidDialog.open()" title="Add a new configuration" hawtio-show object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate">
-          Add configuration
-        </button>
-      </div>
-      <div class="form-group has-clear">
-        <div class="search-pf-input-group">
-          <label for="search1" class="sr-only">Filter</label>
-          <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">
-          <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''"><span class="pficon pficon-close"></span></button>
+    <div class="col-md-12">
+      <form class="toolbar-pf-actions search-pf">
+        <div class="form-group">
+          <button class="btn btn-default" ng-click="addPidDialog.open()" title="Add a new configuration" hawtio-show object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate">
+            Add configuration
+          </button>
         </div>
-      </div>
-    </form>
+        <div class="form-group has-clear">
+          <div class="search-pf-input-group">
+            <label for="search1" class="sr-only">Filter</label>
+            <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">
+            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''"><span class="pficon pficon-close"></span></button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 
   <div class="list-group list-view-pf list-view-pf-view">

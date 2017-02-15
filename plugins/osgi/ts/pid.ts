@@ -7,12 +7,11 @@
  */
 module Osgi {
   _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia",
-      ($scope, $timeout, $routeParams, $location, workspace:Core.Workspace, jolokia) => {
-    
+      "$uibModal", ($scope, $timeout, $routeParams, $location, workspace:Core.Workspace, jolokia, $uibModal) => {
+
+    let uibModalInstance = null;
+
     $scope.configurationUrl = Core.url('/osgi/configurations' + workspace.hash());
-    $scope.deletePropDialog = new UI.Dialog();
-    $scope.deletePidDialog = new UI.Dialog();
-    $scope.addPropertyDialog = new UI.Dialog();
     $scope.factoryPid = $routeParams.factoryPid;
     $scope.pid = $routeParams.pid ? $routeParams.pid.substring(0, $routeParams.pid.indexOf('?')) : null;
     $scope.createForm = {
@@ -135,6 +134,13 @@ module Osgi {
       }
     }
 
+    $scope.openAddPropertyDialog = () => {
+      uibModalInstance = $uibModal.open({
+        templateUrl: 'addPropertyDialog.html',
+        scope: $scope
+      });      
+    }
+
     $scope.addPropertyConfirmed = (key, value) => {
       $scope.addPropertyDialog.close();
       $scope.configValues[key] = {
@@ -148,18 +154,28 @@ module Osgi {
 
     $scope.deletePidProp = (e) => {
       $scope.deleteKey = e.Key;
-      $scope.deletePropDialog.open();
+      uibModalInstance = $uibModal.open({
+        templateUrl: 'deletePropDialog.html',
+        scope: $scope
+      });      
     };
 
+    $scope.openDeletePidDialog = () => {
+      uibModalInstance = $uibModal.open({
+        templateUrl: 'deletePidDialog.html',
+        scope: $scope
+      });      
+    }
+
     $scope.deletePidPropConfirmed = () => {
-      $scope.deletePropDialog.close();
+      uibModalInstance.close();
       var cell:any = document.getElementById("pid." + $scope.deleteKey);
       cell.parentElement.remove();
       enableCanSave();
     };
 
     $scope.deletePidConfirmed = () => {
-      $scope.deletePidDialog.close();
+      uibModalInstance.close();
 
       function errorFn(response) {
         Core.notification("error", response.error);

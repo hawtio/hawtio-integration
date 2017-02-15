@@ -3,18 +3,20 @@
 <div class="controller-section" ng-controller="Osgi.PackagesController">
 
   <div class="row toolbar-pf">
-    <form class="toolbar-pf-actions search-pf">
-      <div class="form-group has-clear">
-        <div class="search-pf-input-group">
-          <label for="search1" class="sr-only">Filter</label>
-          <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">
-          <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''"><span class="pficon pficon-close"></span></button>
+    <div class="col-md-12">
+      <form class="toolbar-pf-actions search-pf">
+        <div class="form-group has-clear">
+          <div class="search-pf-input-group">
+            <label for="search1" class="sr-only">Filter</label>
+            <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">
+            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''"><span class="pficon pficon-close"></span></button>
+          </div>
         </div>
-      </div>
-      <div class="toolbar-pf-action-right" ng-show="packages !== null">
-        {{filteredPackages.length}} of {{packages.length}}
-      </div>
-    </form>
+        <div class="toolbar-pf-action-right" ng-show="packages !== null">
+          {{filteredPackages.length}} of {{packages.length}}
+        </div>
+      </form>
+    </div>
   </div>
 
   <div class="spinner spinner-lg loading-page" ng-if="packages === null"></div>
