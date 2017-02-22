@@ -333,7 +333,7 @@ module Camel {
       },
       {
         id     : 'camel-rest-services',
-        title  : () => '<i class="fa fa-list"></i> Rest Services',
+        title  : () => '<i class="fa fa-list"></i> Rest',
         tooltip: () => "List all the REST services registered in the context",
         show   : () =>
         !workspace.isEndpointsFolder() && !workspace.isEndpoint()
