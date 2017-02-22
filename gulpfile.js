@@ -29,7 +29,8 @@ var config = {
     module: 'commonjs',
     declarationFiles: true,
     noResolve: false
-  })
+  }),
+  sourceMap: argv.sourcemap
 };
 
 gulp.task('bower', function() {
@@ -52,11 +53,13 @@ gulp.task('clean-defs', function() {
 gulp.task('tsc', ['clean-defs'], function() {
   var cwd = process.cwd();
   var tsResult = gulp.src(config.ts)
+    .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
     .pipe(plugins.typescript(config.tsProject));
 
   return eventStream.merge(
     tsResult.js
       .pipe(plugins.concat('compiled.js'))
+      .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.write()))
       .pipe(gulp.dest('.')),
     tsResult.dts
       .pipe(gulp.dest('d.ts')))
