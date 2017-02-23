@@ -30,7 +30,7 @@ module Camel {
 
 
   /**
-   * Does the given CamelContext has any rest services
+   * Returns if the given CamelContext has any rest services
    *
    * @param workspace
    * @param jolokia
@@ -47,7 +47,7 @@ module Camel {
       jolokia.request({ 
         type: "read", 
         mbean: mbean, 
-        attribute: ["NumberOfRestServices"] 
+        attribute: "NumberOfRestServices"
       }, Core.onSuccess((response) => {
         var num:number = response.value;
         _hasRestServices = num > 0;
