@@ -335,8 +335,8 @@ module Camel {
         id     : 'camel-rest-services',
         title  : () => '<i class="fa fa-list"></i> Rest',
         tooltip: () => "List all the REST services registered in the context",
-        show   : () =>
-        !workspace.isEndpointsFolder() && !workspace.isEndpoint()
+        show   : () => !getSelectedRouteNode(workspace)
+        && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
         && !workspace.isComponentsFolder() && !workspace.isComponent()
         && (workspace.isCamelContext() || workspace.isRoutesFolder())
         && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
@@ -362,8 +362,8 @@ module Camel {
         id     : 'camel-type-converters',
         title  : () => '<i class="fa fa-list"></i> Type Converters',
         tooltip: () => "List all the type converters registered in the context",
-        show   : () =>
-        !workspace.isEndpointsFolder() && !workspace.isEndpoint()
+        show   : () => !getSelectedRouteNode(workspace)
+        && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
         && !workspace.isComponentsFolder() && !workspace.isComponent()
         && (workspace.isCamelContext() || workspace.isRoutesFolder())
         && Camel.isCamelVersionEQGT(2, 13, workspace, jolokia)
