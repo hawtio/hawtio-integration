@@ -17,12 +17,7 @@
     "plugins"
   ],
   "dependencies": {
-    "hawtio-core-navigation": "~3.0.0",
-    "hawtio-forms": "~3.0.0",
     "hawtio-jmx": "~3.0.0",
-    "hawtio-ui": "~3.0.0",
-    "hawtio-utilities": "~3.0.0",
-    "hawtio-template-cache": "~3.0.0",
     "angular-resource": "~1.5.0",
     "angular-drag-and-drop-lists": "^2.0.0"
   },
@@ -39,12 +34,6 @@
     }
   },
   "resolutions": {
-    "hawtio-utilities": "~3.0.0",
-    "hawtio-core-navigation": "~3.0.0",
-    "hawtio-forms": "~3.0.0",
-    "hawtio-ui": "~3.0.0",
-    "hawtio-core": "~3.0.0",
-    "urijs": "~1.18.0",
-    "angular-bootstrap": "0.14.x"
+    "hawtio-core": "~3.0.0"
   }
 }
