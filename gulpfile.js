@@ -97,7 +97,7 @@ gulp.task('clean', ['concat'], function() {
 gulp.task('less', function () {
   return gulp.src(config.less)
     .pipe(plugins.less({
-      paths: [ path.join(__dirname, 'less', 'includes') ]
+      paths: [path.join(__dirname, 'libs')]
     }))
     .pipe(plugins.concat(config.css))
     .pipe(gulp.dest(config.dist));
