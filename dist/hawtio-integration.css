@@ -54,58 +54,6 @@ dl.server-details dd {
   margin-left: 140px;
 }
 
-.form-inline.camel-forward-message {
-  margin-bottom: 20px;
-}
-.form-inline input.camel-forward-message {
-  width: 50%;
-}
-.camel-forward-message dl dt {
-  font-size: larger;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.camel-message-headers input,
-.camel-message-headers button {
-  margin-bottom: 5px;
-}
-.camel-message-headers button {
-  display: block;
-}
-.camel-send-message-button {
-  margin-top: 15px;
-}
-
-.camel.tree-header {
-  height: 42px;
-}
-.camel.tree-header > .left {
-  right: 94px;
-}
-.camel.tree-header > .left,
-.camel.tree-header > .right {
-  top: 6px;
-  line-height: 30px;
-}
-.camel.tree-header > .left > .section-filter {
-  width: 100%;
-}
-.camel.tree-header > .left > .section-filter > .search-query {
-  width: 100%;
-  margin-bottom: 10px;
-}
-.camel.tree-header > .left > .section-filter > .icon-remove {
-  right: -16px;
-}
-.camel-tree > ul.nav {
-  margin-bottom: 3px !important;
-}
-.camel-tree > .section-filter {
-  margin: 0 0 8px;
-  display: block;
-}
-
 .bundles-container {
   margin-left: -20px;
   margin-right: -20px;
@@ -258,6 +206,58 @@ dl.framework-configuration dt {
 }
 dl.framework-configuration dd {
   margin-left: 210px;
+}
+
+.form-inline.camel-forward-message {
+  margin-bottom: 20px;
+}
+.form-inline input.camel-forward-message {
+  width: 50%;
+}
+.camel-forward-message dl dt {
+  font-size: larger;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.camel-message-headers input,
+.camel-message-headers button {
+  margin-bottom: 5px;
+}
+.camel-message-headers button {
+  display: block;
+}
+.camel-send-message-button {
+  margin-top: 15px;
+}
+
+.camel.tree-header {
+  height: 42px;
+}
+.camel.tree-header > .left {
+  right: 94px;
+}
+.camel.tree-header > .left,
+.camel.tree-header > .right {
+  top: 6px;
+  line-height: 30px;
+}
+.camel.tree-header > .left > .section-filter {
+  width: 100%;
+}
+.camel.tree-header > .left > .section-filter > .search-query {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.camel.tree-header > .left > .section-filter > .icon-remove {
+  right: -16px;
+}
+.camel-tree > ul.nav {
+  margin-bottom: 3px !important;
+}
+.camel-tree > .section-filter {
+  margin: 0 0 8px;
+  display: block;
 }
 
 .metricsWatcher .panel-group:first-child {
