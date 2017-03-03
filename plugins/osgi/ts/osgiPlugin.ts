@@ -9,7 +9,7 @@
  */
 module Osgi {
   export var pluginName = 'osgi';
-  export var _module = angular.module(pluginName, []);
+  export var _module = angular.module(pluginName, ['patternfly']);
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
             .when('/osgi', { redirectTo: '/osgi/bundle-list' })
@@ -88,7 +88,7 @@ module Osgi {
                     .href( () => '/osgi' )
                     .isValid( () => workspace.treeContainsDomainAndProperties("osgi.core") )
                     .isSelected( () => workspace.isLinkActive('osgi') )
-                    .tabs( configuration, bundles, features, packages, services, scrComponents, server, fwk )
+                    .tabs( bundles, features, packages, services, scrComponents, server, fwk, configuration )
                     .build();
     nav.add(tab);
 

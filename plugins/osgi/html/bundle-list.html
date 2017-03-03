@@ -18,7 +18,7 @@
           </div>
         </div>
         <div class="form-group">
-          <input type="text" class="form-control" ng-model="display.bundleFilter" placeholder="Filter..." autocomplete="off">
+          <input type="text" class="form-control" ng-model="display.bundleFilter" placeholder="Filter by keyword..." autocomplete="off">
         </div>
         <div class="toolbar-pf-action-right">
           <div class="form-group toolbar-pf-view-selector">
@@ -38,25 +38,10 @@
     <div class="col-md-12">
       <form class="toolbar-pf-actions form-inline">
         <div class="form-group">
-          <label>Show</label>
-          <div class="btn-group">
-            <button type="button" class="btn btn-default" ng-class="{active: display.showActiveMQBundles}"
-                    ng-click="display.showActiveMQBundles = !display.showActiveMQBundles">
-              ActiveMQ
-            </button>
-            <button type="button" class="btn btn-default" ng-class="{active: display.showCamelBundles}"
-                    ng-click="display.showCamelBundles = !display.showCamelBundles">
-              Camel
-            </button>
-            <button type="button" class="btn btn-default" ng-class="{active: display.showCxfBundles}"
-                    ng-click="display.showCxfBundles = !display.showCxfBundles">
-              CXF
-            </button>
-            <button type="button" class="btn btn-default" ng-class="{active: display.showPlatformBundles}"
-                    ng-click="display.showPlatformBundles = !display.showPlatformBundles">
-              Platform
-            </button>
-          </div>
+          <label class="sr-only" for="service-filter">Service</label>
+          <select pf-select id="service-filter" title="Filter by service..." ng-model="display.showBundleGroups"
+                  ng-options="service.name for service in availableServices track by service.id" multiple>
+          </select>
         </div>
         <div class="form-group">
           <label for="sortField">Sort by</label>

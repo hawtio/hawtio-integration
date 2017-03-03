@@ -6,9 +6,26 @@
  * @module Osgi
  */
 module Osgi {
+
+  interface BundleGroup {
+    id: string,
+    name: string
+  }
+
   _module.controller("Osgi.BundleListController", ["$scope", "workspace", "jolokia", "localStorage", "$location",
       ($scope, workspace:Workspace, jolokia, localStorage, $location) => {
 
+    const ACTIVEMQ_SERVICE = {id: 'ACTIVEMQ', name: 'ActiveMQ'};
+    const CAMEL_SERVICE = {id: 'CAMEL', name: 'Camel'};
+    const CXF_SERVICE = {id: 'CXF', name: 'CXF'};
+    const PLATFORM_SERVICE = {id: 'PLATFORM', name: 'Platform'};
+
+    $scope.availableServices = [
+      ACTIVEMQ_SERVICE,
+      CAMEL_SERVICE,
+      CXF_SERVICE,
+      PLATFORM_SERVICE
+    ];
     $scope.result = {};
     $scope.bundles = [];
     $scope.bundleUrl = "";
@@ -17,16 +34,16 @@ module Osgi {
       sortField: "Identifier",
       bundleFilter: "",
       startLevelFilter: 0,
-      showActiveMQBundles: true,
-      showCamelBundles: true,
-      showCxfBundles: true,
-      showPlatformBundles: true
+      showBundleGroups: []
     };
     $scope.listViewUrl = Core.url('/osgi/bundle-list' + workspace.hash());
     $scope.tableViewUrl = Core.url('/osgi/bundles' + workspace.hash());
 
     if ('bundleList' in localStorage) {
       $scope.display = angular.fromJson(localStorage['bundleList']);
+      if ($scope.display.showBundleGroups === undefined) {
+        $scope.display.showBundleGroups = [];
+      }
     }
 
     $scope.$watch('display', (newValue, oldValue) => {
@@ -121,23 +138,12 @@ module Osgi {
         if (labelText.toLowerCase().indexOf($scope.display.bundleFilter.toLowerCase()) === -1) {
           return false;
         } else {
-          if ($scope.display.showActiveMQBundles || $scope.display.showPlatformBundles
-              || $scope.display.showCxfBundles || $scope.display.showCamelBundles) {
-            if ((matchesCheckedBundle(bundle)) ) {
-              return true;
-            } else {
-              return false;
-            }
-          } else {
-            return true;
-          }
+          return $scope.display.showBundleGroups.length === 0 ||
+            ($scope.display.showBundleGroups.length > 0 && matchesCheckedBundle(bundle));
         }
       } else {
-        if (matchesCheckedBundle(bundle)){
-          return true;
-        } else {
-          return false;
-        }
+        return $scope.display.showBundleGroups.length === 0 ||
+          ($scope.display.showBundleGroups.length > 0 && matchesCheckedBundle(bundle));
       }
     };
 
@@ -146,10 +152,19 @@ module Osgi {
     }
 
     function matchesCheckedBundle(bundle) {
-      return ($scope.display.showPlatformBundles && Karaf.isPlatformBundle(bundle['SymbolicName'])) ||
-          ($scope.display.showActiveMQBundles && Karaf.isActiveMQBundle(bundle['SymbolicName'])) ||
-          ($scope.display.showCxfBundles && Karaf.isCxfBundle(bundle['SymbolicName'])) ||
-          ($scope.display.showCamelBundles && Karaf.isCamelBundle(bundle['SymbolicName']));
+      return (shouldShowBundleGroup(ACTIVEMQ_SERVICE) && Karaf.isActiveMQBundle(bundle['SymbolicName'])) ||
+        (shouldShowBundleGroup(CAMEL_SERVICE) && Karaf.isCamelBundle(bundle['SymbolicName'])) ||
+        (shouldShowBundleGroup(CXF_SERVICE) && Karaf.isCxfBundle(bundle['SymbolicName'])) ||
+        (shouldShowBundleGroup(PLATFORM_SERVICE) && Karaf.isPlatformBundle(bundle['SymbolicName']));
+    }
+
+    function shouldShowBundleGroup(bundleGroup: BundleGroup) {
+      for (let i = 0; i < $scope.display.showBundleGroups.length; i++) {
+        if ($scope.display.showBundleGroups[i].id === bundleGroup.id) {
+          return true;
+        }
+      }
+      return false;
     }
 
     function processResponse(response) {
