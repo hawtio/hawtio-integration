@@ -15,7 +15,9 @@ var plugins = gulpLoadPlugins({});
 var pkg = require('./package.json');
 
 var config = {
-  proxyPort: argv.port || 8282,
+  proxyPort: argv.port || 8181,
+  targetPath: argv.path || '/jolokia',
+  logLevel: argv.debug ? logger.DEBUG : logger.INFO,
   main: '.',
   ts: ['plugins/**/*.ts'],
   templates: ['plugins/**/*.html'],
@@ -120,12 +122,12 @@ gulp.task('watch', ['build', 'watch-less'], function() {
 
 gulp.task('connect', ['watch'], function() {
   hawtio.setConfig({
-    logLevel: logger.INFO,
+    logLevel: config.logLevel,
     port: 2772,
     staticProxies: [{
-      port: 8181,
+      port: config.proxyPort,
       path: '/jolokia',
-      targetPath: '/jolokia'
+      targetPath: config.targetPath
     }],
     staticAssets: [{
       path: '/',
