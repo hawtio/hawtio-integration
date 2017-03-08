@@ -5,13 +5,13 @@ module Camel {
 
   _module.controller("Camel.TreeHeaderController", ["$scope", "$location", ($scope, $location) => {
 
-    $scope.contextFilterText = '';
+    // $scope.contextFilterText = '';
 
-    $scope.$watch('contextFilterText', (newValue, oldValue) => {
-      if (newValue !== oldValue) {
-        $scope.$emit("camel-contextFilterText", newValue);
-      }
-    });
+    // $scope.$watch('contextFilterText', (newValue, oldValue) => {
+    //   if (newValue !== oldValue) {
+    //     $scope.$emit("camel-contextFilterText", newValue);
+    //   }
+    // });
 
     $scope.expandAll = () => {
       Tree.expandAll("#cameltree");
