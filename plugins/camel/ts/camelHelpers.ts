@@ -344,6 +344,15 @@ module Camel {
   }
 
   /**
+   * Returns true when the selected node is a Camel XML route node, false otherwise.
+   * @method
+   */
+  export function isRouteNode(workspace:Workspace) {
+    var selection = workspace.selection || workspace.getSelectedMBean();
+    return selection && jmxDomain === selection.domain && "routeXmlNode" in selection;
+  }
+
+  /**
    * Flushes the cached Camel XML route node stored in the selected tree Folder
    * @method
    * @param workspace

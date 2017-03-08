@@ -31,6 +31,7 @@
 /// <reference path="d.ts/camel/ts/routes.d.ts"/>
 /// <reference path="d.ts/camel/ts/send.d.ts"/>
 /// <reference path="d.ts/camel/ts/source.d.ts"/>
+/// <reference path="d.ts/camel/ts/tabsController.d.ts"/>
 /// <reference path="d.ts/camel/ts/trace.d.ts"/>
 /// <reference path="d.ts/camel/ts/tree.d.ts"/>
 /// <reference path="d.ts/camel/ts/typeConverter.d.ts"/>

@@ -75,6 +75,11 @@ declare module Camel {
      */
     function getSelectedRouteNode(workspace: Workspace): any;
     /**
+     * Returns true when the selected node is a Camel XML route node, false otherwise.
+     * @method
+     */
+    function isRouteNode(workspace: Workspace): boolean;
+    /**
      * Flushes the cached Camel XML route node stored in the selected tree Folder
      * @method
      * @param workspace
