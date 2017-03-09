@@ -48,6 +48,17 @@
   margin-bottom: 10px;
 }
 
+#camel-debug .debug-toolbar {
+  margin-bottom: 10px;
+}
+#camel-debug .debug-icon-buttons button {
+  width: 26px;
+}
+#camel-debug .breakpoint-list {
+  float: left;
+  margin-right: 10px;
+}
+
 .camel-message-headers input,
 .camel-message-headers button {
   margin-bottom: 5px;
@@ -57,24 +68,6 @@
 }
 .camel-send-message-button {
   margin-top: 15px;
-}
-
-.table-src-components th:nth-child(3) {
-  width: 30%;
-}
-dl.src-component-details dt {
-  text-align: left;
-}
-ul.src-component-bound-services {
-  list-style-type: none;
-  padding-left: 0;
-}
-dl.server-details dt {
-  text-align: left;
-  width: 120px;
-}
-dl.server-details dd {
-  margin-left: 140px;
 }
 
 .bundles-container {
@@ -229,6 +222,24 @@ dl.framework-configuration dt {
 }
 dl.framework-configuration dd {
   margin-left: 210px;
+}
+
+.table-src-components th:nth-child(3) {
+  width: 30%;
+}
+dl.src-component-details dt {
+  text-align: left;
+}
+ul.src-component-bound-services {
+  list-style-type: none;
+  padding-left: 0;
+}
+dl.server-details dt {
+  text-align: left;
+  width: 120px;
+}
+dl.server-details dd {
+  margin-left: 140px;
 }
 
 .metricsWatcher .panel-group:first-child {

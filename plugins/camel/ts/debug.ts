@@ -102,15 +102,7 @@ module Camel {
     };
 
     function onSelectionChanged() {
-      var toNode = getStoppedBreakpointId();
-      if (toNode) {
-        // lets highlight the node in the diagram
-        var nodes = getDiagramNodes();
-        Camel.highlightSelectedNode(nodes, toNode);
-      } else {
-        // clear highlight
-        Camel.highlightSelectedNode(nodes, null);
-      }
+      Camel.highlightSelectedNode(getDiagramNodes(), getStoppedBreakpointId());
     }
 
     function reloadData() {
@@ -213,14 +205,6 @@ module Camel {
         if ("javascript" == $scope.mode) {
           $scope.mode = "text";
         }
-      } else {
-        // lets make a dummy empty row so we can keep the detail view while resuming
-        $scope.row = {
-          headers: {},
-          body: "",
-          bodyType: ""
-        };
-        $scope.mode = "text";
       }
     }
 
@@ -258,6 +242,7 @@ module Camel {
     }
 
     function onBreakpoints(response) {
+      console.log(response);
       $scope.breakpoints = response;
       updateBreakpointFlag();
 
