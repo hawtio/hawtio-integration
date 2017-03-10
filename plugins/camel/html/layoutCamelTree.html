@@ -1,44 +1,26 @@
-<div id="jmx-box">
-  <header>
-    <h1>Camel</h1>
-  </header>
+<div class="row tree-nav-layout">
 
-  <div class="main">
-
-    <div id="tree-container">
-      
-      <div class="tree-header" ng-controller="Camel.TreeHeaderController">
-        <div id="jmx-tree-controls" class="pull-right">
-          <i class="fa fa-chevron-down clickable" title="Expand All" ng-click="expandAll()"></i>
-          <i class="fa fa-chevron-up clickable" title="Collapse All" ng-click="contractAll()"></i>
-        </div>
+  <div class="col-sm-3 sidebar-pf sidebar-pf-left tree-nav-sidebar">
+    <div class="tree-nav-sidebar-header" ng-controller="Camel.TreeHeaderController">
+      <div class="pull-right">
+        <i class="fa fa-plus-square-o tree-nav-sidebar-header-icon" title="Expand All" ng-click="expandAll()"></i>
+        <i class="fa fa-minus-square-o tree-nav-sidebar-header-icon" title="Collapse All" ng-click="contractAll()"></i>
       </div>
-      
-      <div id="jmxtree" ng-controller="Camel.TreeController">
-        <div id="cameltree"></div>
-      </div>
-    
     </div>
-
-    <div id="properties">
-      
-      <div ng-controller="Camel.TabsController">
-        <ul class="nav nav-tabs" hawtio-auto-dropdown>
-          <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
-            <a ng-href="{{tab.href}}">{{tab.title}}</a>
-          </li>
-          <li class="dropdown overflow">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              More <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" role="menu"></ul>
-          </li>
-        </ul>
-      </div>
-      
-      <div class="contents" ng-view></div>
-
-    </div>
+    <div id="cameltree" class="tree-nav-sidebar-content" ng-controller="Camel.TreeController"></div>
   </div>
 
+  <div class="col-sm-9 tree-nav-main">
+    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">
+      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
+        <a ng-href="{{tab.href}}">{{tab.title}}</a>
+      </li>
+      <li class="dropdown overflow">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          More <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu"></ul>
+      </li>
+    </ul>
+    <div class="contents" ng-view></div>
 </div>
