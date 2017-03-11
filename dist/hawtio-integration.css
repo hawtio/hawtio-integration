@@ -59,6 +59,35 @@
   margin-right: 10px;
 }
 
+.camel-diagram {
+  margin: 20px 20px 0 0;
+}
+.camel-diagram #node-CLOSED rect {
+  stroke-width: 1px;
+  fill: #f88;
+}
+.camel-diagram .node:hover,
+.camel-diagram .node > *:hover,
+.camel-diagram rect > *:hover {
+  cursor: pointer;
+  opacity: 0.6;
+}
+.camel-diagram path.edge {
+  fill: none;
+  stroke: #666;
+  stroke-width: 3px;
+}
+.camel-diagram .edge:hover {
+  cursor: pointer;
+  opacity: 0.4;
+}
+.camel-diagram text.counter {
+  stroke: #080;
+}
+.camel-diagram text.inflight {
+  stroke: #08f;
+}
+
 .camel-message-headers input,
 .camel-message-headers button {
   margin-bottom: 5px;

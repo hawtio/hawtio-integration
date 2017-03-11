@@ -1,36 +1,3 @@
-<style>
-
-  #node-CLOSED rect {
-    stroke-width: 1px;
-    fill: #f88;
-  }
-
-  .node:hover,
-  .node > *:hover,
-  rect > *:hover {
-    cursor: pointer;
-    opacity: 0.6;
-  }
-
-  path.edge {
-    fill: none;
-    stroke: #666;
-    stroke-width: 3px;
-  }
-
-  .edge:hover {
-    cursor: pointer;
-    opacity: 0.4;
-  }
-
-  text.counter {
-    stroke: #080;
-  }
-
-  text.inflight {
-    stroke: #08f;
-  }
-</style>
 <div ng-class="{'wiki-fixed' : !isJmxTab}" id="canvas" ng-controller="Camel.RouteController">
   <div ng-hide="isJmxTab">
     <ng-include src="'plugins/camel/html/breadcrumbBar.html'"></ng-include>
