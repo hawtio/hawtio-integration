@@ -244,7 +244,7 @@ module Camel {
           });
         }
       })
-      .href(() => '/jmx/attributes?main-tab=camel&sub-tab=camel-attributes')
+      .href(() => '/jmx/attributes?main-tab=camel')
       .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
       .build();
 
