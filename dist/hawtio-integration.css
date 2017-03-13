@@ -99,6 +99,19 @@
   margin-top: 15px;
 }
 
+.camel-trace-alert {
+  background-color: transparent;
+  border-color: #8b8d8f;
+  padding-left: 14px;
+}
+.camel-trace-pager {
+  width: 100%;
+  text-align: center;
+}
+.camel-trace-pager .pagination {
+  margin: 0;
+}
+
 .table-src-components th:nth-child(3) {
   width: 30%;
 }

@@ -34,6 +34,10 @@ module Camel {
       setTracing(false);
     };
 
+    $scope.closeMessageDetails = () => {
+      $scope.showMessageDetails = false;
+    };
+
     $scope.clear = () => {
       log.debug("Clear messages");
       tracerStatus.messages = [];

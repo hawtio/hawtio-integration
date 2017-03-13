@@ -1,19 +1,16 @@
 <div id="camel-debug" ng-controller="Camel.DebugRouteController">
-  <h1>Debug</h1>
-  <p>Debugging allows you to step through camel routes to diagnose issues.</p>
   
-  <div class="toolbar-pf debug-toolbar">
-    <form class="toolbar-pf-actions">
-      <div class="form-group" ng-switch="debugging">
-        <button type="button" ng-switch-when="false" class="btn btn-default" ng-click="startDebugging()">
-          Start debugging
-        </button>
-        <button type="button" ng-switch-when="true" class="btn btn-default" ng-click="stopDebugging()">
-          Stop debugging
-        </button>
-      </div>
-      <div class="form-group">
-        <div ng-if="debugging">
+  <h1>Debug</h1>
+  
+  <div ng-hide="debugging">
+    <p>Debugging allows you to step through camel routes to diagnose issues.</p>
+    <button type="button" class="btn btn-primary" ng-click="startDebugging()">Start debugging</button>
+  </div>
+  
+  <div ng-if="debugging">
+    <div class="toolbar-pf debug-toolbar">
+      <form class="toolbar-pf-actions">
+        <div class="form-group">
           <div ng-switch="hasBreakpoint">
             <button type="button" ng-switch-when="true" class="btn btn-default" ng-disabled="!selectedDiagramNodeId"
                     ng-click="removeBreakpoint()" title="Remove the breakpoint on the selected node">
@@ -25,9 +22,7 @@
             </button>
           </div>
         </div>
-      </div>
-      <div class="form-group debug-icon-buttons">
-        <div ng-if="debugging">
+        <div class="form-group debug-icon-buttons">
           <button type="button" class="btn btn-default" ng-click="step()" ng-disabled="!stopped"
                   title="Step into the next node">
             <i class="fa fa-arrow-down" aria-hidden="true"></i>
@@ -41,11 +36,12 @@
             <i class="fa fa-pause" aria-hidden="true"></i>
           </button>
         </div>
-      </div>
-    </form>
-  </div>
+        <div class="form-group">
+          <button type="button" class="btn btn-default" ng-click="stopDebugging()">Stop debugging</button>
+        </div>
+      </form>
+    </div>
   
-  <div ng-if="debugging">
     <div class="breakpoint-list" ng-if="breakpoints.length > 0">
       <label>Breakpoints</label>
       <ul>
@@ -77,6 +73,6 @@
         <div hawtio-editor="row.body" read-only="true" mode="mode"></div>
       </div>
     </div>
-
   </div>
+
 </div>

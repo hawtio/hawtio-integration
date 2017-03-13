@@ -1,80 +1,58 @@
 <div ng-controller="Camel.TraceRouteController">
-  <div class="col-md-12 well" ng-hide="tracing">
-    <form>
-      <p>Tracing allows you to send messages to a route and then step through and see the messages flow through a route
-        to aid debugging and to help diagnose issues.</p>
-
-      <p>Once you start tracing, you can send messages to the input endpoints, then come back to this page and see the
-        flow of messages through your route.</p>
-
-      <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up
-        and down in the message table lets you see the flow of the message through the diagram.</p>
-
-      <button class="btn btn-info" type="submit" ng-click="startTracing()">Start tracing</button>
-    </form>
+  <h1>Trace</h1>
+  <div ng-hide="tracing">
+    <p>Tracing allows you to send messages to a route and then step through and see the messages flow through a route
+      to aid debugging and to help diagnose issues.
+    </p>
+    <p>Once you start tracing, you can send messages to the input endpoints, then come back to this page and see the
+      flow of messages through your route.
+    </p>
+    <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up
+      and down in the message table lets you see the flow of the message through the diagram.
+    </p>
+    <button type="button" class="btn btn-primary" ng-click="startTracing()">
+      Start tracing
+    </button>
   </div>
-  <div ng-show="tracing">
-
-    <form>
-      <button class="btn btn-info pull-right" type="submit" ng-click="stopTracing()">Stop tracing</button>
-    </form>
-    <div ng-include src="graphView">
-    </div>
-
-    <form>
-      <button class="btn btn-info pull-right" type="submit" ng-click="clear()">Clear messages</button>
-    </form>
-    <div>&nbsp;</div>
-
-    <!-- table and slider to show the traced messages -->
-    <div class="row">
-      <table class="table table-striped" hawtio-simple-table="gridOptions"></table>
-    </div>
-
-    <div hawtio-slideout="showMessageDetails" title="{{row.id}}" top="60%" height="40%">
-      <div class="dialog-body">
-
-        <div class="row">
-          <div class="pull-right">
-            <form class="form-horizontal no-bottom-margin">
-              <div class="btn-group" hawtio-pager="messages" on-index-change="selectRowIndex"
-                   row-index="rowIndex"></div>
-
-              <!-- no need for close button as the hawtio-slideout already have that -->
-
-            </form>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="expandable closed">
-            <div title="Headers" class="title">
-              <i class="expandable-indicator"></i> Headers
-            </div>
-            <div class="expandable-body well">
-              <table class="table table-condensed table-striped">
-                <thead>
-                <tr>
-                  <th>Header</th>
-                  <th>Type</th>
-                  <th>Value</th>
-                </tr>
-                </thead>
-                <tbody compile="row.headerHtml"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="row">
-            <div>Body type: <span ng-bind="row.bodyType"></span></div>
-            <div hawtio-editor="row.body" read-only="true" mode="mode"></div>
-          </div>
-
-        </div>
-
+  <div class="toolbar-pf debug-toolbar" ng-if="tracing">
+    <form class="toolbar-pf-actions">
+      <div class="form-group">
+        <button type="button" class="btn btn-default" ng-click="clear()">Clear messages</button>
       </div>
-    </div>
-
+      <div class="form-group">
+        <button type="button" class="btn btn-default" ng-click="stopTracing()">Stop tracing</button>
+      </div>
+    </form>
   </div>
-
+  <div ng-if="tracing">
+    <div ng-include src="graphView"></div>
+    <h2>Messages</h2>
+    <div ng-if="!showMessageDetails">
+      <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>
+    </div>
+    <div ng-if="showMessageDetails">
+      <div class="alert camel-trace-alert">
+        <button type="button" class="close" aria-hidden="true" ng-click="closeMessageDetails()">
+          <span class="pficon pficon-close"></span>
+        </button>
+        <div class="btn-group camel-trace-pager" hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>
+        <h3>ID</h3>
+        <p>{{row.id}}</p>
+        <h3>Headers</h3>
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody compile="row.headerHtml"></tbody>
+        </table>
+        <h3>Body</h3>
+        <p><label>Type:</label> <span ng-bind="row.bodyType"></span></p>
+        <div hawtio-editor="row.body" read-only="true" mode="mode"></div>
+      </div>    
+    </div>
+  </div>
 </div>
