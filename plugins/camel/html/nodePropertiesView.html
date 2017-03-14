@@ -1,29 +1,50 @@
-<div class="row-fluid">
-
-  <!-- the label and input fields needs to be wider -->
-  <style>
-    input, textarea, .uneditable-input {
-      width: 600px;
-    }
-
-    input, textarea, .editable-input {
-      width: 600px;
-    }
-
-    .form-horizontal .control-label {
-      width: 180px;
-    }
-
-    .form-horizontal .controls {
-      margin-left: 200px;
-    }
-  </style>
-
-  <h3>
-    <img src="{{icon}}" width="48" height="48" ng-show="icon"/> {{model.title}}
-    <span style="margin-left: 10px" ng-repeat="label in labels track by $index" class="pod-label badge" title="{{label}}">{{label}}</span>
-  </h3>
-
-  <div simple-form name="formViewer" mode='view' entity='nodeData' data='model' schema="schema"
-       showhelp="!hideHelp" showempty="showEntity"></div>
+<h1>Properties</h1>
+<h2 class="camel-properties-heading2">
+  <img ng-src="{{icon}}" width="24" height="24" ng-show="icon"/>
+  <span>{{title}}</span>
+  <!--span style="margin-left: 10px" ng-repeat="label in labels track by $index" class="pod-label badge" title="{{label}}">{{label}}</span-->
+</h2>
+<p>{{description}}</p>
+<h3>Defined Properties</h3>
+<dl class="dl-horizontal">
+  <dt ng-repeat-start="property in definedProperties">
+    {{property.name}}
+    <a role="button" data-toggle="property-popover" data-html="false" title="" data-content="{{property.description}}"
+       data-placement="right">
+      <span class="fa fa-info-circle"></span>
+    </a>
+  </dt>
+  <dd ng-repeat-end>
+    {{property.value}}
+  </dd>
+</dl>
+<div ng-show="defaultProperties.length > 0">
+  <h3>Default Properties</h3>
+  <dl class="dl-horizontal">
+    <dt ng-repeat-start="property in defaultProperties">
+      {{property.name}}
+      <a role="button" data-toggle="property-popover" data-html="false" title="" data-content="{{property.description}}"
+        data-placement="right" ng-show="property.description">
+        <span class="fa fa-info-circle"></span>
+      </a>
+    </dt>
+    <dd ng-repeat-end>
+      {{property.value}}
+    </dd>
+  </dl>
+</div>
+<div ng-show="undefinedProperties.length > 0">
+  <h3>Undefined Properties</h3>
+  <dl class="dl-horizontal">
+    <dt ng-repeat-start="property in undefinedProperties">
+      {{property.name}}
+      <a role="button" data-toggle="property-popover" data-html="false" title="" data-content="{{property.description}}"
+        data-placement="right">
+        <span class="fa fa-info-circle"></span>
+      </a>
+    </dt>
+    <dd ng-repeat-end>
+      {{property.value}}
+    </dd>
+  </dl>
 </div>
