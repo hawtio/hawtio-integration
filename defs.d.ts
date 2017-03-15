@@ -1,12 +1,4 @@
 /// <reference path="d.ts/includes.d.ts"/>
-/// <reference path="d.ts/activemq/ts/activemqHelpers.d.ts"/>
-/// <reference path="d.ts/activemq/ts/activemqPlugin.d.ts"/>
-/// <reference path="d.ts/activemq/ts/browse.d.ts"/>
-/// <reference path="d.ts/activemq/ts/destination.d.ts"/>
-/// <reference path="d.ts/activemq/ts/durableSubscriber.d.ts"/>
-/// <reference path="d.ts/activemq/ts/jobs.d.ts"/>
-/// <reference path="d.ts/activemq/ts/preferences.d.ts"/>
-/// <reference path="d.ts/activemq/ts/tree.d.ts"/>
 /// <reference path="d.ts/camel/ts/camelHelpers.d.ts"/>
 /// <reference path="d.ts/camel/ts/camelPlugin.d.ts"/>
 /// <reference path="d.ts/camel/ts/attributesToolBar.d.ts"/>

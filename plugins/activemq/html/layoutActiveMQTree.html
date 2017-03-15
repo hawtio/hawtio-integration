@@ -1,45 +1,27 @@
-<div id="jmx-box">
-  <div class="header">
+<div class="row tree-nav-layout">
 
-    <div id="jmx-tree-controls" class="pull-left" ng-controller="ActiveMQ.TreeHeaderController">
-      <i class="fa fa-chevron-down clickable"
-         title="Expand all nodes"
-         ng-click="expandAll()"></i>
-      <i class="fa fa-chevron-up clickable"
-         title="Unexpand all nodes"
-         ng-click="contractAll()"></i>
-    </div>
-
-    <div class="pull-right" ng-include="'plugins/jmx/html/subLevelTabs.html'"></div>
-
-    <ul class="nav nav-pills pull-right" ng-controller="Jmx.TabController">
-      <li class="nav-link" ng-class="{active: isTabActive('jmx-attributes')}">
-        <a class="nav-link" href="#" ng-click="goto('/jmx/attributes', 'jmx-attributes')">Attributes</a>
-      </li>
-      <li class="nav-link" ng-class="{active: isTabActive('jmx-operations')}">
-        <a class="nav-link" href="#" ng-click="goto('/jmx/operations', 'jmx-operations')">Operations</a>
-      </li>
-      <li class="nav-link" ng-class="{active: isTabActive('jmx-chart')}">
-        <a class="nav-link" href="#" ng-click="goto('/jmx/charts', 'jmx-chart')">Chart</a>
-      </li>
-      <li class="nav-link" ng-class="{active: isTabActive('jmx-edit-chart')}">
-        <a class="nav-link"
-           ng-class="{disabled: !isTabActive('jmx-chart') && !isTabActive('jmx-edit-chart')}"
-           href="#" ng-click="editChart()">Edit Chart</a>
-      </li>
-    </ul>
-
-  </div>
-
-  <div class="main">
-
-    <div id="tree-container" ng-controller="Jmx.MBeansController">
-      <div class="camel-tree" ng-controller="ActiveMQ.TreeController">
-        <div id="activemqtree"></div>
+  <div class="col-sm-3 sidebar-pf sidebar-pf-left">
+    <div class="tree-nav-sidebar-header" ng-controller="ActiveMQ.TreeHeaderController">
+      <div class="pull-right">
+        <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>
+        <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>
       </div>
     </div>
-
-    <div id="properties" ng-view></div>
+    <div id="activemqtree" class="tree-nav-sidebar-content" ng-controller="ActiveMQ.TreeController"></div>
   </div>
 
+  <div class="col-sm-9 tree-nav-main">
+    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="ActiveMQ.TabsController">
+      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
+        <a ng-href="{{tab.href}}">{{tab.title}}</a>
+      </li>
+      <li class="dropdown overflow">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          More <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu"></ul>
+      </li>
+    </ul>
+    <div class="contents" ng-view></div>
+  </div>
 </div>
