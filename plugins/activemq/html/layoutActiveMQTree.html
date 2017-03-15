@@ -11,15 +11,15 @@
   </div>
 
   <div class="col-sm-9 tree-nav-main">
-    <ul class="nav nav-tabs" ng-controller="Jmx.TabController">
-      <li ng-class="{active: isTabActive('/jmx/attributes')}">
-        <a href="#" ng-click="goto('/jmx/attributes')">Attributes</a>
+    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="ActiveMQ.TabsController">
+      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
+        <a ng-href="{{tab.href}}">{{tab.title}}</a>
       </li>
-      <li ng-class="{active: isTabActive('/jmx/operations')}">
-        <a href="#" ng-click="goto('/jmx/operations')">Operations</a>
-      </li>
-      <li ng-class="{active: isTabActive('/jmx/charts')}">
-        <a href="#" ng-click="goto('/jmx/charts')">Chart</a>
+      <li class="dropdown overflow">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          More <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu"></ul>
       </li>
     </ul>
     <div class="contents" ng-view></div>
