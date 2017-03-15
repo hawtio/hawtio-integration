@@ -65,6 +65,9 @@
 .camel-properties-heading2 span {
   vertical-align: sub;
 }
+.camel-properties-info-circle {
+  color: gray;
+}
 
 .camel-diagram {
   margin: 20px 20px 0 0;

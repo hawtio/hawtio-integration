@@ -1,7 +1,7 @@
 /// <reference path="../../includes.d.ts" />
 /// <reference path="camelPlugin.d.ts" />
 interface JQuery {
-    popovers(): JQuery;
+    tooltip(): JQuery;
 }
 declare module Camel {
 }
