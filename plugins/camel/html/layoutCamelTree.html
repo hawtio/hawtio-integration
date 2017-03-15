@@ -1,10 +1,10 @@
 <div class="row tree-nav-layout">
 
-  <div class="col-sm-3 sidebar-pf sidebar-pf-left tree-nav-sidebar">
+  <div class="col-sm-3 sidebar-pf sidebar-pf-left">
     <div class="tree-nav-sidebar-header" ng-controller="Camel.TreeHeaderController">
       <div class="pull-right">
-        <i class="fa fa-plus-square-o tree-nav-sidebar-header-icon" title="Expand All" ng-click="expandAll()"></i>
-        <i class="fa fa-minus-square-o tree-nav-sidebar-header-icon" title="Collapse All" ng-click="contractAll()"></i>
+        <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>
+        <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>
       </div>
     </div>
     <div id="cameltree" class="tree-nav-sidebar-content" ng-controller="Camel.TreeController"></div>
@@ -23,4 +23,5 @@
       </li>
     </ul>
     <div class="contents" ng-view></div>
+  </div>
 </div>

@@ -36,107 +36,6 @@
   text-align: center;
 }
 
-.form-inline.camel-forward-message {
-  margin-bottom: 20px;
-}
-.form-inline input.camel-forward-message {
-  width: 50%;
-}
-.camel-forward-message dl dt {
-  font-size: larger;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-#camel-debug .debug-toolbar {
-  margin-bottom: 10px;
-}
-#camel-debug .debug-icon-buttons button {
-  width: 26px;
-}
-#camel-debug .breakpoint-list {
-  float: left;
-  margin-right: 10px;
-}
-
-.camel-properties-heading2 img {
-  margin-right: 5px;
-}
-.camel-properties-heading2 span {
-  vertical-align: sub;
-}
-
-.camel-diagram {
-  margin: 20px 20px 0 0;
-}
-.camel-diagram #node-CLOSED rect {
-  stroke-width: 1px;
-  fill: #f88;
-}
-.camel-diagram .node:hover,
-.camel-diagram .node > *:hover,
-.camel-diagram rect > *:hover {
-  cursor: pointer;
-  opacity: 0.6;
-}
-.camel-diagram path.edge {
-  fill: none;
-  stroke: #666;
-  stroke-width: 3px;
-}
-.camel-diagram .edge:hover {
-  cursor: pointer;
-  opacity: 0.4;
-}
-.camel-diagram text.counter {
-  stroke: #080;
-}
-.camel-diagram text.inflight {
-  stroke: #08f;
-}
-
-.camel-message-headers input,
-.camel-message-headers button {
-  margin-bottom: 5px;
-}
-.camel-message-headers button {
-  display: block;
-}
-.camel-send-message-button {
-  margin-top: 15px;
-}
-
-.camel-trace-alert {
-  background-color: transparent;
-  border-color: #8b8d8f;
-  padding-left: 14px;
-}
-.camel-trace-pager {
-  width: 100%;
-  text-align: center;
-}
-.camel-trace-pager .pagination {
-  margin: 0;
-}
-
-.table-src-components th:nth-child(3) {
-  width: 30%;
-}
-dl.src-component-details dt {
-  text-align: left;
-}
-ul.src-component-bound-services {
-  list-style-type: none;
-  padding-left: 0;
-}
-dl.server-details dt {
-  text-align: left;
-  width: 120px;
-}
-dl.server-details dd {
-  margin-left: 140px;
-}
-
 .bundles-container {
   margin-left: -20px;
   margin-right: -20px;
@@ -289,6 +188,107 @@ dl.framework-configuration dt {
 }
 dl.framework-configuration dd {
   margin-left: 210px;
+}
+
+.form-inline.camel-forward-message {
+  margin-bottom: 20px;
+}
+.form-inline input.camel-forward-message {
+  width: 50%;
+}
+.camel-forward-message dl dt {
+  font-size: larger;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+#camel-debug .debug-toolbar {
+  margin-bottom: 10px;
+}
+#camel-debug .debug-icon-buttons button {
+  width: 26px;
+}
+#camel-debug .breakpoint-list {
+  float: left;
+  margin-right: 10px;
+}
+
+.camel-properties-heading2 img {
+  margin-right: 5px;
+}
+.camel-properties-heading2 span {
+  vertical-align: sub;
+}
+
+.camel-diagram {
+  margin: 20px 20px 0 0;
+}
+.camel-diagram #node-CLOSED rect {
+  stroke-width: 1px;
+  fill: #f88;
+}
+.camel-diagram .node:hover,
+.camel-diagram .node > *:hover,
+.camel-diagram rect > *:hover {
+  cursor: pointer;
+  opacity: 0.6;
+}
+.camel-diagram path.edge {
+  fill: none;
+  stroke: #666;
+  stroke-width: 3px;
+}
+.camel-diagram .edge:hover {
+  cursor: pointer;
+  opacity: 0.4;
+}
+.camel-diagram text.counter {
+  stroke: #080;
+}
+.camel-diagram text.inflight {
+  stroke: #08f;
+}
+
+.camel-message-headers input,
+.camel-message-headers button {
+  margin-bottom: 5px;
+}
+.camel-message-headers button {
+  display: block;
+}
+.camel-send-message-button {
+  margin-top: 15px;
+}
+
+.camel-trace-alert {
+  background-color: transparent;
+  border-color: #8b8d8f;
+  padding-left: 14px;
+}
+.camel-trace-pager {
+  width: 100%;
+  text-align: center;
+}
+.camel-trace-pager .pagination {
+  margin: 0;
+}
+
+.table-src-components th:nth-child(3) {
+  width: 30%;
+}
+dl.src-component-details dt {
+  text-align: left;
+}
+ul.src-component-bound-services {
+  list-style-type: none;
+  padding-left: 0;
+}
+dl.server-details dt {
+  text-align: left;
+  width: 120px;
+}
+dl.server-details dd {
+  margin-left: 140px;
 }
 
 .metricsWatcher .panel-group:first-child {
