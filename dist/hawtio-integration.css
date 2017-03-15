@@ -59,6 +59,22 @@
   margin-right: 10px;
 }
 
+@media screen and (max-width: 767px) {
+}
+@media (min-width: 768px) {
+}
+@media (min-width: 768px) {
+}
+@media (max-width: 767px) {
+}
+@media (min-width: 768px) {
+}
+@media (min-width: 768px) {
+}
+@media (max-width: 767px) {
+}
+@media (max-width: 767px) {
+}
 .camel-properties-heading2 img {
   margin-right: 5px;
 }
@@ -66,7 +82,7 @@
   vertical-align: sub;
 }
 .camel-properties-info-circle {
-  color: gray;
+  color: #8b8d8f;
 }
 
 .camel-diagram {
