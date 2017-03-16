@@ -1,6 +1,6 @@
-<div class="row tree-nav-layout">
+<div class="tree-nav-layout">
 
-  <div class="col-sm-3 sidebar-pf sidebar-pf-left">
+  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="['right']">
     <div class="tree-nav-sidebar-header" ng-controller="Camel.TreeHeaderController">
       <div class="pull-right">
         <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>
@@ -10,7 +10,7 @@
     <div id="cameltree" class="tree-nav-sidebar-content" ng-controller="Camel.TreeController"></div>
   </div>
 
-  <div class="col-sm-9 tree-nav-main">
+  <div class="tree-nav-main">
     <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">
       <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
         <a ng-href="{{tab.href}}">{{tab.title}}</a>
