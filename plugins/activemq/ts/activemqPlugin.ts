@@ -6,7 +6,7 @@
  * @main ActiveMQ
  */
 module ActiveMQ {
-  export var _module = angular.module(pluginName, []);
+  export var _module = angular.module(pluginName, ['angularResizable']);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider.
