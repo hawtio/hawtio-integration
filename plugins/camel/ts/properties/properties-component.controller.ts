@@ -43,7 +43,6 @@ module Camel {
       log.debug("Populate data " + response);
 
       if (response.value) {
-        // the model is json object from the string data
         let schema = JSON.parse(response.value);
 
         // var labels = [];
