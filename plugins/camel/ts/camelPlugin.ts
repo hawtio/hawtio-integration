@@ -34,7 +34,7 @@ module Camel {
             .when('/camel/traceRoute', {templateUrl: 'plugins/camel/html/traceRoute.html'})
             .when('/camel/debugRoute', {templateUrl: 'plugins/camel/html/debug.html'})
             .when('/camel/profileRoute', {templateUrl: 'plugins/camel/html/profileRoute.html'})
-            .when('/camel/properties', {templateUrl: 'plugins/camel/html/properties.html'})
+            .when('/camel/propertiesRoute', {templateUrl: 'plugins/camel/html/propertiesRoute.html'})
             .when('/camel/propertiesComponent', {templateUrl: 'plugins/camel/html/propertiesComponent.html'})
             .when('/camel/propertiesDataFormat', {templateUrl: 'plugins/camel/html/propertiesDataFormat.html'})
             .when('/camel/propertiesEndpoint', {templateUrl: 'plugins/camel/html/propertiesEndpoint.html'});

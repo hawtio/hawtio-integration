@@ -7,7 +7,7 @@ interface JQuery {
 
 module Camel {
 
-  _module.controller("Camel.PropertiesController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia",
+  _module.controller("Camel.PropertiesRouteController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia",
     'propertiesService', ($scope, $rootScope, workspace: Workspace, localStorage: WindowLocalStorage, jolokia,
     propertiesService: PropertiesService) => {
 
@@ -41,9 +41,9 @@ module Camel {
           $scope.icon = getRouteNodeIcon(routeXmlNode);
           $scope.title = schema.title;
           $scope.description = schema.description;
-          $scope.definedProperties = propertiesService.getDefinedProperties(schema);
-          $scope.defaultProperties = propertiesService.getDefaultProperties(schema);
-          $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema);
+          $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
+          $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
+          $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
           $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
 
           Core.$apply($scope);

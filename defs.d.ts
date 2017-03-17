@@ -30,7 +30,7 @@
 /// <reference path="d.ts/camel/ts/routes.d.ts"/>
 /// <reference path="d.ts/camel/ts/send.d.ts"/>
 /// <reference path="d.ts/camel/ts/source.d.ts"/>
-/// <reference path="d.ts/camel/ts/tabsController.d.ts"/>
+/// <reference path="d.ts/camel/ts/tabs.controller.d.ts"/>
 /// <reference path="d.ts/camel/ts/trace.d.ts"/>
 /// <reference path="d.ts/camel/ts/tree.d.ts"/>
 /// <reference path="d.ts/camel/ts/typeConverter.d.ts"/>
@@ -59,6 +59,7 @@
 /// <reference path="d.ts/osgi/ts/svc-dependencies.d.ts"/>
 /// <reference path="d.ts/camel/ts/properties/property.d.ts"/>
 /// <reference path="d.ts/camel/ts/properties/properties.service.d.ts"/>
+/// <reference path="d.ts/camel/ts/properties/properties-component.controller.d.ts"/>
 /// <reference path="d.ts/camel/ts/properties/properties-endpoint.controller.d.ts"/>
-/// <reference path="d.ts/camel/ts/properties/properties.controller.d.ts"/>
+/// <reference path="d.ts/camel/ts/properties/properties-route.controller.d.ts"/>
 /// <reference path="d.ts/camel/ts/properties/property-list.component.d.ts"/>

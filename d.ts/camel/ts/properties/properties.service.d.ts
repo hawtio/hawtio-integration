@@ -2,8 +2,8 @@
 /// <reference path="property.d.ts" />
 declare module Camel {
     class PropertiesService {
-        getDefinedProperties(schema: {}): Property[];
-        getDefaultProperties(schema: {}): Property[];
-        getUndefinedProperties(schema: {}): Property[];
+        getDefinedProperties(schemaProperties: {}): Property[];
+        getDefaultProperties(schemaProperties: {}): Property[];
+        getUndefinedProperties(schemaProperties: {}): Property[];
     }
 }

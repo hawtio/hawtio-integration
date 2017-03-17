@@ -3,7 +3,7 @@
 
 module Camel {
 
-  _module.controller("Camel.PropertiesEndpointController", ["$scope", "workspace", "localStorage", "jolokia",
+  _module.controller("Camel.PropertiesComponentController", ["$scope", "workspace", "localStorage", "jolokia",
     "documentBase", 'propertiesService', ($scope, workspace:Workspace, localStorage:WindowLocalStorage, jolokia,
     documentBase, propertiesService: PropertiesService) => {
     
@@ -17,32 +17,22 @@ module Camel {
     function updateData() {
       var contextMBean = getSelectionCamelContextMBean(workspace);
 
-      var endpointMBean:string = null;
-      if ($scope.contextId && $scope.endpointPath) {
-        var node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
-          context: $scope.contextId,
-          type: "endpoints",
-          name: $scope.endpointPath
-        });
-        if (node) {
-          endpointMBean = node.objectName;
-        }
+      var componentMBeanName:string = null;
+      if (!componentMBeanName) {
+        componentMBeanName = workspace.getSelectedMBeanName();
       }
-      if (!endpointMBean) {
-        endpointMBean = workspace.getSelectedMBeanName();
-      }
-      if (endpointMBean && contextMBean) {
-        // TODO: grab url from tree instead? avoids a JMX call
-        var reply = jolokia.request({type: "read", mbean: endpointMBean, attribute: ["EndpointUri"]});
-        var url:string = reply.value["EndpointUri"];
-        if (url) {
-          $scope.endpointUrl = url;
-          log.info("Calling explainEndpointJson for url: " + url);
+      if (componentMBeanName && contextMBean) {
+        // TODO: grab name from tree instead? avoids a JMX call
+        var reply = jolokia.request({type: "read", mbean: componentMBeanName, attribute: ["ComponentName"]});
+        var name:string = reply.value["ComponentName"];
+        if (name) {
+          $scope.componentName = name;
+          log.info("Calling explainComponentJson for name: " + name);
           var query = {
             type: 'exec',
             mbean: contextMBean,
-            operation: 'explainEndpointJson(java.lang.String,boolean)',
-            arguments: [url, true]
+            operation: 'explainComponentJson(java.lang.String,boolean)',
+            arguments: [name, true]
           };
           jolokia.request(query, Core.onSuccess(populateData));
         }
@@ -65,9 +55,9 @@ module Camel {
         $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
         $scope.title = $scope.endpointUrl;
         $scope.description = schema.component.description;
-        $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
-        $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
-        $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
+        $scope.definedProperties = propertiesService.getDefinedProperties(schema['componentProperties']);
+        $scope.defaultProperties = propertiesService.getDefaultProperties(schema['componentProperties']);
+        $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['componentProperties']);
         $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
 
         Core.$apply($scope);

@@ -138,24 +138,6 @@
   margin: 0;
 }
 
-.table-src-components th:nth-child(3) {
-  width: 30%;
-}
-dl.src-component-details dt {
-  text-align: left;
-}
-ul.src-component-bound-services {
-  list-style-type: none;
-  padding-left: 0;
-}
-dl.server-details dt {
-  text-align: left;
-  width: 120px;
-}
-dl.server-details dd {
-  margin-left: 140px;
-}
-
 .bundles-container {
   margin-left: -20px;
   margin-right: -20px;
@@ -308,6 +290,24 @@ dl.framework-configuration dt {
 }
 dl.framework-configuration dd {
   margin-left: 210px;
+}
+
+.table-src-components th:nth-child(3) {
+  width: 30%;
+}
+dl.src-component-details dt {
+  text-align: left;
+}
+ul.src-component-bound-services {
+  list-style-type: none;
+  padding-left: 0;
+}
+dl.server-details dt {
+  text-align: left;
+  width: 120px;
+}
+dl.server-details dd {
+  margin-left: 140px;
 }
 
 .metricsWatcher .panel-group:first-child {

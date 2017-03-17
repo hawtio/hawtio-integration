@@ -5,36 +5,35 @@ module Camel {
 
   export class PropertiesService {
     
-    getDefinedProperties(schema: {}): Property[] {
-      return Object.keys(schema['properties'])
-        .filter(key => 'value' in schema['properties'][key])
+    getDefinedProperties(schemaProperties: {}): Property[] {
+      return Object.keys(schemaProperties)
+        .filter(key => schemaProperties[key]['value'])
         .map(key => {
-          let propertySchema = schema['properties'][key];
-          console.log(propertySchema);
+          let propertySchema = schemaProperties[key];
           let name = propertySchema['title'] || key;
           return new Property(name, propertySchema['value'], propertySchema['description']);
         })
         .sort(Property.sortByName);
     }
 
-    getDefaultProperties(schema: {}): Property[] {
-      return Object.keys(schema['properties'])
-        .filter(key => !('value' in schema['properties'][key]))
-        .filter(key => 'defaultValue' in schema['properties'][key])
+    getDefaultProperties(schemaProperties: {}): Property[] {
+      return Object.keys(schemaProperties)
+        .filter(key => !schemaProperties[key]['value'])
+        .filter(key => 'defaultValue' in schemaProperties[key])
         .map(key => {
-          let propertySchema = schema['properties'][key];
+          let propertySchema = schemaProperties[key];
           let name = propertySchema['title'] || key;
           return new Property(name, propertySchema['defaultValue'], propertySchema['description']);
         })
         .sort(Property.sortByName);
     }
 
-    getUndefinedProperties(schema: {}): Property[] {
-      return Object.keys(schema['properties'])
-        .filter(key => !('value' in schema['properties'][key]))
-        .filter(key => !('defaultValue' in schema['properties'][key]))
+    getUndefinedProperties(schemaProperties: {}): Property[] {
+      return Object.keys(schemaProperties)
+        .filter(key => !schemaProperties[key]['value'])
+        .filter(key => !('defaultValue' in schemaProperties[key]))
         .map(key => {
-          let propertySchema = schema['properties'][key];
+          let propertySchema = schemaProperties[key];
           let name = propertySchema['title'] || key;
           return new Property(name, null, propertySchema['description']);
         })

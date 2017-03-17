@@ -150,7 +150,7 @@ module Camel {
     };
 
     function navigateToNodeProperties(cid) {
-      $location.path('/camel/properties').search({"main-tab": "camel", "nid": cid});
+      $location.path('/camel/propertiesRoute').search({"main-tab": "camel", "nid": cid});
       Core.$apply($scope);
     }
 

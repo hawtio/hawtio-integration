@@ -32,7 +32,7 @@ namespace Camel {
         {
           id: 'camel-route-properties',
           title: 'Properties',
-          href: "/camel/properties" + workspace.hash(),
+          href: "/camel/propertiesRoute" + workspace.hash(),
           show: () => isRouteNode(workspace)
         },
         {
@@ -42,6 +42,14 @@ namespace Camel {
           show: () => workspace.isEndpoint()
             && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
             && workspace.hasInvokeRights(workspace.selection, "explainEndpointJson")
+        },
+        {
+          id: 'camel-component-properties',
+          title: 'Properties',
+          href: "/camel/propertiesComponent" + workspace.hash(),
+          show: () => workspace.isComponent()
+            && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
+            && workspace.hasInvokeRights(workspace.selection, "explainComponentJson")
         },
         {
           id: 'camel-dataformat-properties',
