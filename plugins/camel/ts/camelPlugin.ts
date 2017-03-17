@@ -14,7 +14,7 @@ module Camel {
   var routeToolBar = "plugins/camel/html/attributeToolBarRoutes.html";
   var contextToolBar = "plugins/camel/html/attributeToolBarContext.html";
 
-  export var _module = angular.module(pluginName, ['patternfly']);
+  export var _module = angular.module(pluginName, ['patternfly', 'angularResizable']);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
