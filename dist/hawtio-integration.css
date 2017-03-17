@@ -83,6 +83,16 @@
 }
 .camel-properties-info-circle {
   color: #8b8d8f;
+  position: relative;
+  left: -17px;
+  float: left;
+  line-height: inherit;
+}
+.camel-properties-value {
+  overflow-wrap: break-word;
+}
+.camel-properties-empty-space-for-tooltip {
+  margin-bottom: 100px;
 }
 
 .camel-diagram {

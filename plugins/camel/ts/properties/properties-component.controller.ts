@@ -52,7 +52,7 @@ module Camel {
         // $scope.labels = labels;
 
         $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
-        $scope.title = $scope.endpointUrl;
+        $scope.title = schema.component.title;
         $scope.description = schema.component.description;
         $scope.definedProperties = propertiesService.getDefinedProperties(schema['componentProperties']);
         $scope.defaultProperties = propertiesService.getDefaultProperties(schema['componentProperties']);
