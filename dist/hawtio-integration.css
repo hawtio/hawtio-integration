@@ -59,6 +59,10 @@
   margin-right: 10px;
 }
 
+.camel-profile-table th:nth-child(1) {
+  width: 20%;
+}
+
 @media screen and (max-width: 767px) {
 }
 @media (min-width: 768px) {

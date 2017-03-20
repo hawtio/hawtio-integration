@@ -11,7 +11,7 @@ module Camel {
     var columnDefs:any[] = [
       {
         field: 'id',
-        displayName: 'Id',
+        displayName: 'ID',
         cellFilter: null,
         width: "**",
         resizable: true
@@ -74,6 +74,10 @@ module Camel {
       }
     ];
 
+    $scope.clearFilter = function() {
+      $scope.gridOptions.filterOptions.filterText = '';
+    }
+
     $scope.rowIcon = (id) => {
       var entry = $scope.icons[id];
       if (entry) {
@@ -95,7 +99,6 @@ module Camel {
         filterText: ''
       }
     };
-
 
     function onProfile(response) {
       var updatedData = [];
