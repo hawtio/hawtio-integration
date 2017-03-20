@@ -75,10 +75,17 @@
 }
 @media (max-width: 767px) {
 }
-.camel-properties-heading2 img {
+.camel-properties-header h2 {
+  display: inline-block;
+  margin-right: 50px;
+}
+.camel-properties-header h2 img {
   margin-right: 5px;
 }
-.camel-properties-heading2 span {
+.camel-properties-header h2 span {
+  vertical-align: sub;
+}
+.camel-properties-header em {
   vertical-align: sub;
 }
 .camel-properties-info-circle {
@@ -89,7 +96,7 @@
   line-height: inherit;
 }
 .camel-properties-value {
-  overflow-wrap: break-word;
+  word-break: break-all;
 }
 .camel-properties-empty-space-for-tooltip {
   margin-bottom: 100px;

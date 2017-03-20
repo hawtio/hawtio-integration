@@ -1,10 +1,17 @@
 @import (reference) "../../global.less";
 
-.camel-properties-heading2 {
-  img {
-    margin-right: 5px;
+.camel-properties-header {
+  h2 {
+    display: inline-block;
+    margin-right: 50px;
+    img {
+      margin-right: 5px;
+    }
+    span {
+      vertical-align: sub;
+    }
   }
-  span {
+  em {
     vertical-align: sub;
   }
 }
@@ -18,7 +25,7 @@
 }
 
 .camel-properties-value {
-  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 .camel-properties-empty-space-for-tooltip {

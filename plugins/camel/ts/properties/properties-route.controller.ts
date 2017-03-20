@@ -31,15 +31,9 @@ module Camel {
             log.debug("Properties - schema: " + JSON.stringify(schema, null, "  "));
           }
 
-          // // labels is named group in camelModel.js
-          // var labels = [];
-          // if ($scope.model.group) {
-          //   labels = $scope.model.group.split(",");
-          // }
-          // $scope.labels = labels;
-
           $scope.icon = getRouteNodeIcon(routeXmlNode);
           $scope.title = schema.title;
+          $scope.labels = schema.group ? schema.group.split(',') : [];
           $scope.description = schema.description;
           $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
           $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);

@@ -1,9 +1,11 @@
-<h1>Properties</h1>
-<h2 class="camel-properties-heading2">
-  <img ng-src="{{icon}}" width="24" height="24" ng-show="icon"/>
-  <span>{{title}}</span>
-  <!--span style="margin-left: 10px" ng-repeat="label in labels track by $index" class="pod-label badge" title="{{label}}">{{label}}</span-->
-</h2>
+<header class="camel-properties-header">
+  <h1>Properties</h1>
+  <h2>
+    <img ng-src="{{icon}}" width="24" height="24" ng-show="icon"/>
+    <span>{{title}}</span>
+  </h2>
+  <em><span ng-repeat="label in labels track by $index">{{$first ? '' : ' / '}}{{label}}<span></em>
+</header>
 <p>{{description}}</p>
 <property-list title="Defined Properties" properties="definedProperties"></property-list>
 <property-list title="Default Properties" properties="defaultProperties"></property-list>

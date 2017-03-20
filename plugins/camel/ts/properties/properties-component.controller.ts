@@ -45,15 +45,10 @@ module Camel {
       if (response.value) {
         let schema = JSON.parse(response.value);
 
-        // var labels = [];
-        // if ($scope.model.component.label) {
-        //   labels = $scope.model.component.label.split(",");
-        // }
-        // $scope.labels = labels;
-
         $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
         $scope.title = schema.component.title;
         $scope.description = schema.component.description;
+        $scope.labels = schema.component.label ? schema.component.label.split(',') : [];
         $scope.definedProperties = propertiesService.getDefinedProperties(schema['componentProperties']);
         $scope.defaultProperties = propertiesService.getDefaultProperties(schema['componentProperties']);
         $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['componentProperties']);
