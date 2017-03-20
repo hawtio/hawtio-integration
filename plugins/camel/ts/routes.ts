@@ -243,7 +243,7 @@ module Camel {
         onClick = onClickGraphNode;
       }
 
-      $scope.graphData = Core.dagreLayoutGraph(nodes, links, width, height, svg, false, onClick);
+      $scope.graphData = dagreLayoutGraph(nodes, links, width, height, svg, false, onClick);
 
       // Only apply node selection behavior if debugging or tracing
       if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
@@ -304,7 +304,7 @@ module Camel {
         });
 
         // now lets try update the graph
-        Core.dagreUpdateGraphData($scope.graphData);
+        dagreUpdateGraphData($scope.graphData);
       }
 
       function addTooltipToNode(isRoute, stat) {

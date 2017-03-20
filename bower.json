@@ -18,7 +18,8 @@
   ],
   "dependencies": {
     "hawtio-jmx": "~3.0.0",
-    "angular-resource": "~1.5.0"
+    "angular-resource": "~1.5.0",
+    "dagre": "~0.7.3"
   },
   "devDependencies": {
     "hawtio-core-dts": "~2.0.0",
