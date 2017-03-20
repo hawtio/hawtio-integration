@@ -90,8 +90,8 @@ namespace Camel {
         },
         {
           id: 'camel-rest-services',
-          title: 'Rest',
-          href: "/camel/restRegistry" + workspace.hash(),
+          title: 'REST Services',
+          href: "/camel/restServices" + workspace.hash(),
           show: () => !getSelectedRouteNode(workspace)
             && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
             && !workspace.isComponentsFolder() && !workspace.isComponent()

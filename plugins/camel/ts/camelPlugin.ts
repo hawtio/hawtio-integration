@@ -24,7 +24,7 @@ module Camel {
             .when('/camel/route/diagram/:contextId/:routeId', {templateUrl: 'plugins/camel/html/routes.html'})
             .when('/camel/routes', {templateUrl: 'plugins/camel/html/routes.html'})
             .when('/camel/typeConverter', {templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false})
-            .when('/camel/restRegistry', {templateUrl: 'plugins/camel/html/restRegistry.html', reloadOnSearch: false})
+            .when('/camel/restServices', {templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false})
             .when('/camel/endpointRuntimeRegistry', {templateUrl: 'plugins/camel/html/endpointRuntimeRegistry.html', reloadOnSearch: false})
             .when('/camel/routeMetrics', {templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false})
             .when('/camel/inflight', {templateUrl: 'plugins/camel/html/inflight.html', reloadOnSearch: false})

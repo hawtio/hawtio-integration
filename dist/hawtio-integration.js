@@ -3134,7 +3134,7 @@ var Camel;
                 .when('/camel/route/diagram/:contextId/:routeId', { templateUrl: 'plugins/camel/html/routes.html' })
                 .when('/camel/routes', { templateUrl: 'plugins/camel/html/routes.html' })
                 .when('/camel/typeConverter', { templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false })
-                .when('/camel/restRegistry', { templateUrl: 'plugins/camel/html/restRegistry.html', reloadOnSearch: false })
+                .when('/camel/restServices', { templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false })
                 .when('/camel/endpointRuntimeRegistry', { templateUrl: 'plugins/camel/html/endpointRuntimeRegistry.html', reloadOnSearch: false })
                 .when('/camel/routeMetrics', { templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false })
                 .when('/camel/inflight', { templateUrl: 'plugins/camel/html/inflight.html', reloadOnSearch: false })
@@ -5676,95 +5676,43 @@ var Camel;
 /// <reference path="camelPlugin.ts"/>
 var Camel;
 (function (Camel) {
-    Camel._module.controller("Camel.RestServiceController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+    Camel._module.controller("Camel.RestServicesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
             $scope.data = [];
             $scope.selectedMBean = null;
             $scope.mbeanAttributes = {};
             var columnDefs = [
                 {
+                    field: 'routeId',
+                    displayName: 'Route ID'
+                },
+                {
                     field: 'url',
-                    displayName: 'Absolute Url',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
+                    displayName: 'URL'
                 },
-                {
-                    field: 'baseUrl',
-                    displayName: 'Base Url',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'basePath',
-                    displayName: 'Base Path',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'uriTemplate',
-                    displayName: 'Uri Template',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
+                // {
+                //   field: 'baseUrl',
+                //   displayName: 'Base Url'
+                // },
+                // {
+                //   field: 'basePath',
+                //   displayName: 'Base Path'
+                // },
+                // {
+                //   field: 'uriTemplate',
+                //   displayName: 'Uri Template'
+                // },
                 {
                     field: 'method',
-                    displayName: 'Method',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
+                    displayName: 'Method'
                 },
                 {
                     field: 'consumes',
-                    displayName: 'Consumes',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
+                    displayName: 'Consumes'
                 },
                 {
                     field: 'produces',
-                    displayName: 'Produces',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
+                    displayName: 'Produces'
                 },
-                {
-                    field: 'inType',
-                    displayName: 'Input Type',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'outType',
-                    displayName: 'Output Type',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'state',
-                    displayName: 'State',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'routeId',
-                    displayName: 'Route Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'description',
-                    displayName: 'Description',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
             ];
             $scope.gridOptions = {
                 data: 'data',
@@ -5790,17 +5738,16 @@ var Camel;
                             var entry = values[v];
                             arr.push({
                                 url: entry.url,
-                                baseUrl: entry.baseUrl,
-                                basePath: entry.basePath,
-                                uriTemplate: entry.uriTemplate,
-                                method: entry.method,
+                                // baseUrl: entry.baseUrl,
+                                // basePath: entry.basePath,
+                                // uriTemplate: entry.uriTemplate,
+                                method: entry.method ? entry.method.toUpperCase() : '',
                                 consumes: entry.consumes,
                                 produces: entry.produces,
-                                inType: entry.inType,
-                                outType: entry.outType,
-                                state: entry.state,
+                                // inType: entry.inType,
+                                // outType: entry.outType,
+                                // state: entry.state,
                                 routeId: entry.routeId,
-                                description: entry.description
                             });
                         }
                     }
@@ -6617,8 +6564,8 @@ var Camel;
                 },
                 {
                     id: 'camel-rest-services',
-                    title: 'Rest',
-                    href: "/camel/restRegistry" + workspace.hash(),
+                    title: 'REST Services',
+                    href: "/camel/restServices" + workspace.hash(),
                     show: function () { return !Camel.getSelectedRouteNode(workspace)
                         && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
                         && !workspace.isComponentsFolder() && !workspace.isComponent()
@@ -11195,7 +11142,7 @@ $templateCache.put('plugins/camel/html/propertiesComponent.html','<div ng-contro
 $templateCache.put('plugins/camel/html/propertiesDataFormat.html','<div ng-controller="Camel.PropertiesDataFormatController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/propertiesEndpoint.html','<div ng-controller="Camel.PropertiesEndpointController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/propertiesRoute.html','<div ng-controller="Camel.PropertiesRouteController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
-$templateCache.put('plugins/camel/html/restRegistry.html','<div class="row" ng-controller="Camel.RestServiceController">\n\n  <div ng-show="selectedMBean">\n\n    <div class="row" ng-show="data.length > 0">\n      <div class="pull-right">\n        <form class="form-inline no-bottom-margin">\n          <fieldset>\n            <div class="control-group inline-block">\n              <input type="text" class="search-query" placeholder="Filter..."\n                     ng-model="gridOptions.filterOptions.filterText">\n            </div>\n          </fieldset>\n        </form>\n      </div>\n    </div>\n\n    <div class="row" ng-show="data.length > 0">\n      <table class="table table-condensed table-striped" hawtio-simple-table="gridOptions"></table>\n    </div>\n    <div class="row-fluid" ng-show="data.length == 0">\n      <div class="span12">\n        <p class="well">There are no Rest Services registered in this CamelContext.</p>\n      </div>\n    </div>\n  </div>\n\n  <div ng-hide="selectedMBean">\n    <p class="text-center"><i class="fa fa-spinner fa-spin"></i></p>\n  </div>\n\n</div>\n');
+$templateCache.put('plugins/camel/html/restServices.html','<div ng-controller="Camel.RestServicesController">\n  <h1>REST Services</h1>\n  <div ng-if="!selectedMBean">\n    <div class="spinner spinner-lg loading-page"></div>\n  </div>\n  <div ng-if="selectedMBean">\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-rest-services-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n    <div class="row" ng-if="data.length === 0">\n      <div class="col-sm-12">\n        <div class="loading-message">\n          There are no REST Services registered in this CamelContext.\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/camel/html/routeMetrics.html','<div ng-controller="Camel.RouteMetricsController">\n\n  <div class="row">\n    <div class="col-md-12">\n      <h1>Route Metrics</h1>\n    </div>\n  </div>\n \n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="toolbar-pf-action-right">\n          <div class="form-group has-clear">\n            <div class="search-pf-input-group">\n              <label for="search1" class="sr-only">Filter</label>\n              <input id="search1" type="search" class="form-control" ng-model="filterText"\n                    placeholder="Search">\n              <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n                <span class="pficon pficon-close"></span>\n              </button>\n            </div>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="spinner spinner-lg loading-page" ng-if="!initDone"></div>\n\n  <div ng-show="initDone">\n    <div class="row" ng-if="metricDivs.length === 0">\n      <div class="col-md-12">\n        <div class="loading-message">\n          This Camel context has no route metrics data.\n        </div>\n      </div>\n    </div>\n    <div class="row" ng-if="metricDivs.length > 0">\n      <div class="col-md-12">\n        <div id="{{metric.id}}" ng-repeat="metric in metricDivs track by metric.id" ng-show="metricVisible(metric)"></div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/routes.html','<div ng-class="{\'wiki-fixed\' : !isJmxTab}" id="canvas" ng-controller="Camel.RouteController">\n  <div ng-hide="isJmxTab">\n    <ng-include src="\'plugins/camel/html/breadcrumbBar.html\'"></ng-include>\n  </div>\n  <svg class="camel-diagram" width=0 height=0>\n    <defs>\n      <marker id="arrowhead"\n              viewBox="0 0 10 10"\n              refX="8"\n              refY="5"\n              markerUnits="strokeWidth"\n              markerWidth="4"\n              markerHeight="3"\n              orient="auto"\n              style="fill: #333">\n        <path d="M 0 0 L 10 5 L 0 10 z"></path>\n      </marker>\n\n      <filter id="drop-shadow" width="300%" height="300%">\n        <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="19"/>\n        <feOffset in="blur-out" result="the-shadow" dx="2" dy="2"/>\n        <feComponentTransfer xmlns="http://www.w3.org/2000/svg">\n          <feFuncA type="linear" slope="0.2"/>\n        </feComponentTransfer>\n        <feMerge xmlns="http://www.w3.org/2000/svg">\n          <feMergeNode/>\n          <feMergeNode in="SourceGraphic"/>\n        </feMerge>\n      </filter>\n      <linearGradient id="rect-gradient" x1="0%" y1="0%" x2="0%" y2="100%">\n        <stop offset="0%" style="stop-color:rgb(254,254,255);stop-opacity:1"/>\n        <stop offset="100%" style="stop-color:rgb(247,247,255);stop-opacity:1"/>\n      </linearGradient>\n      <linearGradient id="rect-select-gradient" x1="0%" y1="0%" x2="0%" y2="100%">\n        <stop offset="0%" style="stop-color: #ffffa0; stop-opacity: 0.7"/>\n        <stop offset="100%" style="stop-color: #f0f0a0; stop-opacity: 0.7"/>\n      </linearGradient>\n    </defs>\n  </svg>\n</div>\n\n');
 $templateCache.put('plugins/camel/html/sendMessage.html','<div ng-controller="Camel.SendMessageController">\n\n  <div class="row">\n    <div class="col-sm-12">\n      <h1>Send Message</h1>\n    </div>\n  </div>\n\n  <div class="row" ng-show="noCredentials">\n    <div class="col-sm-12">\n      <div class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        <strong>No credentials set for endpoint!</strong>\n        Please set your username and password in the\n        <a href="#" class="alert-link" ng-click="openPrefs()">Preferences</a> page.\n      </div>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <h3>Headers</h3>\n    </div>\n  </div>\n\n  <div class="row camel-message-headers" ng-if="headers.length > 0">\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Name</label>\n          <input type="text" class="form-control" ng-model="header.name" ng-repeat="header in headers"\n                 uib-typeahead="completion for completion in defaultHeaderNames() | filter:$viewValue"\n                 pf-focused="$last">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Value</label>\n          <input type="text" class="form-control" ng-model="header.value" ng-repeat="header in headers">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-2">\n      <form>\n        <div class="form-group">\n          <label>&nbsp;</label>\n          <button type="button" class="btn btn-default" title="Delete" ng-click="removeHeader(header)"\n                  ng-repeat="header in headers">\n            <span class="pficon pficon-delete"></span>\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <a href="" ng-click="addHeader()">Add header</a>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <h3>Body</h3>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <form>\n        <div class="form-group">\n          <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>\n        </div>\n        <div class="form-group">\n          <select pf-select ng-model="codeMirrorOptions.mode.name">\n            <option value="javascript">JSON</option>\n            <option value="xml">XML</option>\n          </select>\n          <button class="btn btn-default" ng-click="formatMessage()"\n                  title="Automatically pretty prints the message so its easier to read">Format\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>\n    </div>\n  </div>\n\n</div>\n');

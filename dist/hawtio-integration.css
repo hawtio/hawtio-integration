@@ -106,6 +106,22 @@
   margin-bottom: 100px;
 }
 
+.camel-rest-services-table th:nth-child(1) {
+  width: 15%;
+}
+.camel-rest-services-table th:nth-child(2) {
+  width: 45%;
+}
+.camel-rest-services-table th:nth-child(3) {
+  width: 10%;
+}
+.camel-rest-services-table th:nth-child(4) {
+  width: 15%;
+}
+.camel-rest-services-table th:nth-child(5) {
+  width: 15%;
+}
+
 .camel-diagram {
   margin: 20px 20px 0 0;
 }

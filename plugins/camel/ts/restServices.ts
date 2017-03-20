@@ -3,7 +3,7 @@
 
 module Camel {
 
-  _module.controller("Camel.RestServiceController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.RestServicesController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
 
     $scope.data = [];
     $scope.selectedMBean = null;
@@ -12,89 +12,53 @@ module Camel {
 
     var columnDefs:any[] = [
       {
+        field: 'routeId',
+        displayName: 'Route ID'
+      },
+      {
         field: 'url',
-        displayName: 'Absolute Url',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'URL'
       },
-      {
-        field: 'baseUrl',
-        displayName: 'Base Url',
-        cellFilter: null,
-        width: "*",
-        resizable: true
-      },
-      {
-        field: 'basePath',
-        displayName: 'Base Path',
-        cellFilter: null,
-        width: "*",
-        resizable: true
-      },
-      {
-        field: 'uriTemplate',
-        displayName: 'Uri Template',
-        cellFilter: null,
-        width: "*",
-        resizable: true
-      },
+      // {
+      //   field: 'baseUrl',
+      //   displayName: 'Base Url'
+      // },
+      // {
+      //   field: 'basePath',
+      //   displayName: 'Base Path'
+      // },
+      // {
+      //   field: 'uriTemplate',
+      //   displayName: 'Uri Template'
+      // },
       {
         field: 'method',
-        displayName: 'Method',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'Method'
       },
       {
         field: 'consumes',
-        displayName: 'Consumes',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'Consumes'
       },
       {
         field: 'produces',
-        displayName: 'Produces',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'Produces'
       },
-      {
-        field: 'inType',
-        displayName: 'Input Type',
-        cellFilter: null,
-        width: "*",
-        resizable: true
-      },
-      {
-        field: 'outType',
-        displayName: 'Output Type',
-        cellFilter: null,
-        width: "*",
-        resizable: true
-      },
-      {
-        field: 'state',
-        displayName: 'State',
-        cellFilter: null,
-        width: "*",
-        resizable: true
-      },
-      {
-        field: 'routeId',
-        displayName: 'Route Id',
-        cellFilter: null,
-        width: "*",
-        resizable: true
-      },
-      {
-        field: 'description',
-        displayName: 'Description',
-        cellFilter: null,
-        width: "*",
-        resizable: true
-      }
+      // {
+      //   field: 'inType',
+      //   displayName: 'Input Type'
+      // },
+      // {
+      //   field: 'outType',
+      //   displayName: 'Output Type'
+      // },
+      // {
+      //   field: 'state',
+      //   displayName: 'State'
+      // },
+      // {
+      //   field: 'description',
+      //   displayName: 'Description'
+      // }
     ];
 
     $scope.gridOptions = {
@@ -124,17 +88,17 @@ module Camel {
             arr.push(
               {
                 url: entry.url,
-                baseUrl: entry.baseUrl,
-                basePath: entry.basePath,
-                uriTemplate: entry.uriTemplate,
-                method: entry.method,
+                // baseUrl: entry.baseUrl,
+                // basePath: entry.basePath,
+                // uriTemplate: entry.uriTemplate,
+                method: entry.method ? entry.method.toUpperCase() : '',
                 consumes: entry.consumes,
                 produces: entry.produces,
-                inType: entry.inType,
-                outType: entry.outType,
-                state: entry.state,
+                // inType: entry.inType,
+                // outType: entry.outType,
+                // state: entry.state,
                 routeId: entry.routeId,
-                description: entry.description
+                // description: entry.description
               }
             );
           }

@@ -23,7 +23,7 @@
 /// <reference path="d.ts/camel/ts/jmsHeaderSchema.d.ts"/>
 /// <reference path="d.ts/camel/ts/preferences.d.ts"/>
 /// <reference path="d.ts/camel/ts/profile.d.ts"/>
-/// <reference path="d.ts/camel/ts/restRegistry.d.ts"/>
+/// <reference path="d.ts/camel/ts/restServices.d.ts"/>
 /// <reference path="d.ts/camel/ts/routeMetrics.d.ts"/>
 /// <reference path="d.ts/camel/ts/routes.d.ts"/>
 /// <reference path="d.ts/camel/ts/send.d.ts"/>
