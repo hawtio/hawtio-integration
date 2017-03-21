@@ -14,7 +14,7 @@ module Osgi {
     $scope.selected = [];
     $scope.loading = true;
     $scope.bundleUrl = "";
-    $scope.listViewUrl = Core.url('/osgi/bundle-list' + workspace.hash());
+    // $scope.listViewUrl = Core.url('/osgi/bundle-list' + workspace.hash());
     $scope.tableViewUrl = Core.url('/osgi/bundles' + workspace.hash());
 
     $scope.installDisabled = function() {
@@ -24,12 +24,13 @@ module Osgi {
     var columnDefs = [
       {
         field: 'Identifier',
-        displayName: 'ID'
+        displayName: 'ID',
+        customSortField: (item) => parseInt(item.Identifier)
       },
       {
         field: 'State',
         displayName: 'State',
-        cellTemplate: '<span class="bundle-state" ng-class="row.entity.State.toLowerCase()"></span>'
+        cellTemplate: '{{row.entity.State.toLowerCase()}}'
       },
       {
         field: 'Name',
@@ -45,10 +46,6 @@ module Osgi {
         field: 'Version',
         displayName: 'Version',
         sortable: false
-      },
-      {
-        field: 'Location',
-        displayName: 'Update Location'
       }
     ];
 

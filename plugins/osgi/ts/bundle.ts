@@ -200,7 +200,7 @@ module Osgi {
         operation: 'uninstallBundle', 
         arguments: [bundleId]
         }], Core.onSuccess(function() {
-          $location.path("/osgi/bundle-list");
+          $location.path("/osgi/bundles");
           Core.$apply($scope); 
         }));
     };

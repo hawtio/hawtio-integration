@@ -12,8 +12,8 @@ module Osgi {
   export var _module = angular.module(pluginName, ['patternfly']);
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
-            .when('/osgi', { redirectTo: '/osgi/bundle-list' })
-            .when('/osgi/bundle-list', {templateUrl: 'plugins/osgi/html/bundle-list.html'})
+            .when('/osgi', { redirectTo: '/osgi/bundles' })
+            // .when('/osgi/bundle-list', {templateUrl: 'plugins/osgi/html/bundle-list.html'})
             .when('/osgi/bundles', {templateUrl: 'plugins/osgi/html/bundles.html'})
             .when('/osgi/bundle/:bundleId', {templateUrl: 'plugins/osgi/html/bundle.html'})
             .when('/osgi/services', {templateUrl: 'plugins/osgi/html/services.html'})
@@ -33,14 +33,8 @@ module Osgi {
     });
 
     var builder = nav.builder();
-    var configuration = builder.id('osgi-configuration')
-                          .href( () => '/osgi/configurations' + workspace.hash() )
-                          .title( () => 'Configuration' )
-                          .isSelected( () => workspace.isLinkPrefixActive('/osgi/configuration') 
-                                          || workspace.isLinkPrefixActive('/osgi/pid') )
-                          .build();
     var bundles = builder.id('osgi-bundles')
-                          .href( () => '/osgi/bundle-list' + workspace.hash() )
+                          .href( () => '/osgi/bundles' + workspace.hash() )
                           .title( () => 'Bundles' )
                           .isSelected( () => workspace.isLinkPrefixActive('/osgi/bundle') )
                           .build();
@@ -75,6 +69,12 @@ module Osgi {
                           .href( () => '/osgi/fwk' + workspace.hash() )
                           .title( () => 'Framework' )
                           .isSelected( () => workspace.isLinkPrefixActive('/osgi/fwk') )
+                          .build();
+    var configuration = builder.id('osgi-configuration')
+                          .href( () => '/osgi/configurations' + workspace.hash() )
+                          .title( () => 'Configuration' )
+                          .isSelected( () => workspace.isLinkPrefixActive('/osgi/configuration') 
+                                          || workspace.isLinkPrefixActive('/osgi/pid') )
                           .build();
     /*
     var dependencies = builder.id('osgi-dependencies')

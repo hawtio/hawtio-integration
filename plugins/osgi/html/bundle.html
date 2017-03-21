@@ -1,3 +1,186 @@
 <div class="controller-section" ng-controller="Osgi.BundleController">
-  <div ng-include src="'plugins/osgi/html/bundle-details.html'"></div>
+
+  <h1>{{row.Headers['Bundle-Name'].Value}}</h1>
+
+  <div class="breadcrumb">
+    <a href="#" onclick="window.history.back()"><span class="fa fa-angle-left"></span> Back to Bundles</a>
+  </div>
+
+  <div class="toolbar-pf">
+    <form class="toolbar-pf-actions">
+      <div class="form-group">
+        <button ng-click="startBundle(bundleId)" 
+                class="btn btn-default" 
+                hawtio-show
+                object-name="{{frameworkMBean}}"
+                method-name="startBundle">Start</button>
+        <button ng-click="stopBundle(bundleId)" 
+                class="btn btn-default" 
+                hawtio-show
+                object-name="{{frameworkMBean}}"
+                method-name="stopBundle">Stop</button>
+        <button ng-click="refreshBundle(bundleId)" 
+                class="btn btn-default" 
+                hawtio-show
+                object-name="{{frameworkMBean}}"
+                method-name="refreshBundle">Refresh</button>
+        <button ng-click="updateBundle(bundleId)" 
+                class="btn btn-default" 
+                hawtio-show
+                object-name="{{frameworkMBean}}"
+                method-name="updateBundle">Update</button>
+        <button ng-click="uninstallBundle(bundleId)" 
+                class="btn btn-default" 
+                hawtio-show
+                object-name="{{frameworkMBean}}"
+                method-name="uninstallBundle">Uninstall</button>
+      </div>
+    </form>
+  </div>
+
+  <h2>Details</h2>
+
+  <dl class="dl-horizontal osgi-bundle-details-dl">
+    <dt ng-switch="row.Fragment">
+      <span ng-switch-when="true">Fragment&nbsp;ID</span>
+      <span ng-switch-default>Bundle&nbsp;ID</span>
+    </dt>
+    <dd>
+      {{row.Identifier}}
+    </dd>
+    <dt>
+      Bundle&nbsp;Name
+    </dt>
+    <dd>
+      {{row.Headers['Bundle-Name'].Value}}
+    </dd>
+    <dt>
+      Symbolic&nbsp;Name
+    </dt>
+    <dd>
+      <span class="label label-default">{{row.SymbolicName}}</span>
+    </dd>
+    <dt>
+      Version
+    </dt>
+    <dd>
+      {{row.Version}}
+    </dd>
+    <dt>
+      Start&nbsp;Level
+    </dt>
+    <dd>
+      {{row.StartLevel}}
+    </dd>
+    <dt>
+      Location
+    </dt>
+    <dd>
+      {{row.Location}}
+    </dd>
+    <dt>
+      State
+    </dt>
+    <dd>
+      <span class="label" ng-class="row.StateStyle">{{row.State.toLowerCase()}}</span>
+    </dd>
+    <dt>
+      Last&nbsp;Modified
+    </dt>
+    <dd>
+      {{row.LastModified | date:'medium'}}
+    </dd>
+    <div>
+    <dt ng-switch="row.Fragment">
+      <span ng-switch-when="true">Hosts</span>
+      <span ng-switch-default>Fragments</span>
+    </dt>
+    <dd ng-switch="row.Fragment">
+      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"/>
+      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"/>
+    </dd>
+  </dl>
+
+  <h2>Inspect Classloading</h2>
+
+  <div class="alert alert-dismissable" ng-class="'alert-' + classLoadingAlert.type" ng-if="classLoadingAlert">
+    <span class="pficon" ng-class="classLoadingAlert.icon"></span>
+    <button type="button" class="close" aria-hidden="true" ng-click="dismissClassLoadingAlert()">
+      <span class="pficon pficon-close"></span>
+    </button>
+    <span ng-bind-html="classLoadingAlert.message"></span>
+  </div>
+
+  <form class="form-inline inspect-classloading">
+    <div class="form-group">
+      <label class="control-label" for="exampleInput">Class Name</label>
+      <input type="text" class="form-control" ng-model="classToLoad">
+      <button class="btn btn-default" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">
+        Load Class
+      </button>
+    </div>
+  </form>
+
+  <form class="form-inline inspect-classloading">
+    <div class="form-group">
+      <label class="control-label" for="exampleInput">Resource Name</label>
+      <input type="text" class="form-control" ng-model="resourceToLoad">
+      <button class="btn btn-default" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">
+        Get Resource
+      </button>
+    </div>
+  </form>
+
+  <h2>Imported Packages</h2>
+
+  <ul class="list-group labels">
+    <li class="list-group-item" ng-repeat="(package, data) in row.ImportData">
+      <span id="import.{{package}}" class="label label-info">{{package}}</span>
+    </li>
+  </ul>
+
+  <div class="row">
+    <div id="unsatisfiedOptionalImports" class="col-md-12">
+    </div>
+  </div>
+
+  <h2>Exported Packages</h2>
+
+  <ul class="list-group labels">
+    <li class="list-group-item" ng-repeat="(package, data) in row.ExportData">
+      <span id="export.{{package}}" class="label label-success">{{package}}</span>
+    </li>
+  </ul>
+
+  <h2>Services</h2>
+
+  <h3>Registered Services</h3>
+
+  <ul class="list-group labels">
+    <li class="list-group-item" ng-repeat="id in row.RegisteredServices">
+      <span id="registers.service.{{id}}" class="fa fa-cog text-success">{{id}}</span>
+    </li>
+  </ul>
+
+  <h3>Services used by this Bundle</h3>
+
+  <ul class="list-group labels">
+    <li class="list-group-item" ng-repeat="id in row.ServicesInUse">
+      <span id="uses.service.{{id}}" class="fa fa-cog text-info">{{id}}</span>
+    </li>
+  </ul>
+
+  <h2>Other Bundles using this Bundle</h2>
+
+  <div class="row requiring-bundles">
+    <div class="col-md-12" ng-bind-html="row.RequiringBundles"></div>
+  </div>
+
+  <h2>Headers</h2>
+
+  <dl class="dl-horizontal osgi-bundle-headers-dl">
+    <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>
+    <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>
+  </dl>
+
 </div>

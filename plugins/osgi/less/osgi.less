@@ -22,61 +22,6 @@
   vertical-align: middle;
 }
 
-.bundle-state {
-  margin-right: 1em;
-}
-
-.bundle-state.active:before {
-  font-family: FontAwesome;
-  content: "\f087";
-  font-style: normal;
-  color: #777777;
-}
-
-.bundle-state.resolved:before {
-  font-family: FontAwesome;
-  content: "\f0ad";
-  font-style: normal;
-}
-
-.bundle-state.starting:before {
-  font-family: FontAwesome;
-  content: "\f021";
-  font-style: normal;
-}
-
-.bundle-state.starting {
-  -moz-animation: spin 2s infinite linear;
-  -o-animation: spin 2s infinite linear;
-  -webkit-animation: spin 2s infinite linear;
-  animation: spin 2s infinite linear;
-}
-
-.bundle-state.stopping:before {
-  font-family: FontAwesome;
-  content: "\f021";
-  font-style: normal;
-}
-
-.bundle-state.stopping {
-  -moz-animation: spin 2s infinite linear;
-  -o-animation: spin 2s infinite linear;
-  -webkit-animation: spin 2s infinite linear;
-  animation: spin 2s infinite linear;
-}
-
-.bundle-state.uninstalled:before {
-  font-family: FontAwesome;
-  content: "\f014";
-  font-style: normal;
-}
-
-.bundle-state.installed:before {
-  font-family: FontAwesome;
-  content: "\f06b";
-  font-style: normal;
-}
-
 .list-group-item.child {
   padding-left: 65px;
 }
@@ -89,43 +34,29 @@
   vertical-align: top;
 }
 
-.table-bundles th:nth-child(1) {
-  width: 30px;
-}
-.table-bundles th:nth-child(2) {
-  width: 70px;
-}
-.table-bundles th:nth-child(3) {
-  width: 40px;
-}
-.table-bundles th:nth-child(4) {
-  width: auto;
-}
-.table-bundles th:nth-child(5) {
-  width: auto;
-}
-.table-bundles th:nth-child(6) {
-  width: 120px;
-}
-.table-bundles th:nth-child(7) {
-  width: auto;
+.osgi-bundles-table {
+  th:nth-child(1) {
+    width: 30px;
+  }
+  th:nth-child(2) {
+    width: 55px;
+  }
+  th:nth-child(3) {
+    width: 65px;
+  }
+  th:nth-child(4) {
+    width: auto;
+  }
+  th:nth-child(5) {
+    width: auto;
+  }
+  th:nth-child(6) {
+    width: 120px;
+  }
 }
 
 #toolbar-row-2 .form-inline label:not(:first-child) {
   margin-left: 1em;
-}
-
-dl.bundle-details {
-  margin: 10px 0 20px;
-}
-
-dl.bundle-details dt {
-  text-align: left;
-  width: 100px;
-}
-
-dl.bundle-details dd {
-  margin: 2px 0 2px 120px;
 }
 
 .inspect-classloading .form-group {
@@ -153,11 +84,17 @@ dl.bundle-details dd {
   margin-bottom: 2px;
 }
 
-dl.bundle-headers dt {
-  text-align: left;
+.osgi-bundle-details-dl {
+  dd {
+    word-break: break-all;
+    .label {
+      padding-top: 1px;
+      padding-bottom: 1px;
+    }
+  }
 }
 
-dl.bundle-headers dd {
+.osgi-bundle-headers-dl dd {
   word-break: break-all;
 }
 
@@ -171,12 +108,15 @@ dl.bundle-headers dd {
   padding-left: 0;
 }
 
-dl.framework-configuration dt {
-  text-align: left;
-  width: 190px;
-  margin-bottom: 10px;
-}
-
-dl.framework-configuration dd {
-  margin-left: 210px;
+.framework-configuration {
+  margin-top: 20px;
+  dt {
+    width: 190px;
+    margin-bottom: 10px;
+  }
+  dd {
+    margin-left: 210px;
+    width: 50px;
+    text-align: right;
+  }
 }
