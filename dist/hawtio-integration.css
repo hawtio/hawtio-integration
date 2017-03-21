@@ -175,6 +175,19 @@
   margin: 0;
 }
 
+.camel-type-converters-dl {
+  margin-top: 15px;
+}
+.camel-type-converters-dl dt {
+  width: 170px;
+}
+.camel-type-converters-dl dd {
+  margin-left: 190px;
+}
+.camel-type-converters-enable-statistics-button {
+  width: 111px;
+}
+
 .table-src-components th:nth-child(3) {
   width: 30%;
 }

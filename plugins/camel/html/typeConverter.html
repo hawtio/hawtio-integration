@@ -1,96 +1,58 @@
-<div class="row" ng-controller="Camel.TypeConverterController">
-
-  <!-- the dl need to be wider so we can see the labels -->
-  <style>
-    .dl-horizontal dt {
-      width: 260px;
-    }
-    .dl-horizontal dd {
-      margin-left: 280px;
-    }
-  </style>
-
-  <div ng-show="enableTypeConvertersStats">
-    <p></p>
-
-    <div class="alert alert-info">
-      <i class="icon-spinner icon-spin"></i> Please wait, Enablig Type Converters Statitics
-    </div>
+<div class="table-view" ng-controller="Camel.TypeConverterController">
+  
+  <h1>Type Converters</h1>
+  
+  <div class="toolbar-pf">
+      <form class="toolbar-pf-actions">
+        <div class="form-group">
+          <button type="button" class="btn btn-default camel-type-converters-enable-statistics-button"
+            ng-click="enableStatistics()" ng-if="!mbeanAttributes.StatisticsEnabled">
+            <span ng-show="enableTypeConvertersStats" class="spinner spinner-xs spinner-inline"></span>
+            <span ng-show="!enableTypeConvertersStats">Enable statistics</span>
+          </button>
+          <button type="button" class="btn btn-default camel-type-converters-enable-statistics-button"
+            ng-click="disableStatistics()" ng-if="mbeanAttributes.StatisticsEnabled">
+            <span ng-show="disableTypeConvertersStats" class="spinner spinner-xs spinner-inline"></span>
+            <span ng-show="!disableTypeConvertersStats">Disable statistics</span>
+          </button>
+          <button type="button" class="btn btn-default" ng-click="resetStatistics()"
+            ng-disabled="!mbeanAttributes.StatisticsEnabled">Reset statistics</button>
+        </div>
+      </form>
   </div>
   
-  <div ng-show="disableTypeConvertersStats">
-    <p></p>
+  <div>
+    <dl class="dl-horizontal camel-type-converters-dl">
+      <dt>Number of Type Converters</dt>
+      <dd>{{mbeanAttributes.NumberOfTypeConverters}}</dd>
+      <dt># Attempts</dt>
+      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.AttemptCounter : '-'}}</dd>
+      <dt># Hit</dt>
+      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.HitCounter : '-'}}</dd>
+      <dt># Miss</dt>
+      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.MissCounter : '-'}}</dd>
+      <dt># Failed</dt>
+      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.FailedCounter : '-'}}</dd>
+    </dl>
+  </div>
 
-    <div class="alert alert-info">
-      <i class="icon-spinner icon-spin"></i> Please wait, Disabling Type Converters Statitics
+  <div class="row toolbar-pf table-view-pf-toolbar">
+    <div class="col-sm-12">
+      <form class="toolbar-pf-actions search-pf">
+        <div class="form-group has-clear">
+          <div class="search-pf-input-group">
+            <label for="filterByKeyword" class="sr-only">Filter by keyword</label>
+            <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"
+                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">
+            <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">
+              <span class="pficon pficon-close"></span>
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 
-  <div ng-show="selectedMBean">
-
-    <div class="row">
-
-      <div class="pull-right">
-        <form class="form-inline no-bottom-margin">
-          <fieldset>
-            <div class="controls control-group inline-block controls-row">
-              <div class="btn-group">
-                <button
-                    class="btn btn-default" ng-click="resetStatistics()" title="Reset statistics">
-                  <i class="fa fa-refresh"></i></button>
-                <button
-                    ng-disabled="mbeanAttributes.StatisticsEnabled"
-                    class="btn btn-default" ng-click="enableStatistics()" title="Enable statistics">
-                  <i class="fa fa-play-circle"></i></button>
-                <button
-                    ng-disabled="!mbeanAttributes.StatisticsEnabled"
-                    class="btn btn-default" ng-click="disableStatistics()" title="Disable statistics">
-                  <i class="fa fa-power-off"></i></button>
-              </div>
-            </div>
-          </fieldset>
-        </form>
-      </div>
-      <div>
-        <dl class="dl-horizontal">
-          <dt>Number of Type Converters</dt>
-          <dd>{{mbeanAttributes.NumberOfTypeConverters}}</dd>
-          <dt># Attempts</dt>
-          <dd>{{mbeanAttributes.AttemptCounter}}</dd>
-          <dt># Hit</dt>
-          <dd>{{mbeanAttributes.HitCounter}}</dd>
-          <dt># Miss</dt>
-          <dd>{{mbeanAttributes.MissCounter}}</dd>
-          <dt># Failed</dt>
-          <dd>{{mbeanAttributes.FailedCounter}}</dd>
-          <dt>Statistics Enabled</dt>
-          <dd>{{mbeanAttributes.StatisticsEnabled}}</dd>
-        </dl>
-      </div>
-
-    </div>
-
-    <div class="row">
-      <div class="pull-right">
-        <form class="form-inline no-bottom-margin">
-          <fieldset>
-            <div class="control-group inline-block">
-              <input type="text" class="search-query" placeholder="Filter..."
-                     ng-model="gridOptions.filterOptions.filterText">
-            </div>
-          </fieldset>
-        </form>
-      </div>
-    </div>
-
-    <div class="row" ng-show="data.length > 0">
-      <table class="table table-condensed table-striped" hawtio-simple-table="gridOptions"></table>
-    </div>
-    <div class="row" ng-show="data.length == 0">
-      <p class="text-center"><i class="fa fa-spinner fa-spin"></i></p>
-    </div>
-
-  </div>
+  <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>
 
 </div>
-

@@ -10,7 +10,7 @@ module Camel {
     $scope.selectedMBean = null;
     $scope.enableTypeConvertersStats = false;
     $scope.disableTypeConvertersStats = false;
-    $scope.defaultTimeout = 3000;
+    $scope.defaultTimeout = 5000;
 
     $scope.mbeanAttributes = {};
 
