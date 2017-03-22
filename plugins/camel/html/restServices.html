@@ -1,9 +1,13 @@
 <div ng-controller="Camel.RestServicesController">
+  
   <h1>REST Services</h1>
-  <div ng-if="!selectedMBean">
-    <div class="spinner spinner-lg loading-page"></div>
-  </div>
+  
+  <div ng-if="!selectedMBean" class="spinner spinner-lg loading-page"></div>
+  
   <div ng-if="selectedMBean">
+    <div ng-if="data.length === 0" class="loading-message">
+      There are no REST Services registered in this CamelContext.
+    </div>
     <div ng-if="data.length > 0">
       <div class="row toolbar-pf table-view-pf-toolbar">
         <div class="col-sm-12">
@@ -22,13 +26,6 @@
         </div>
       </div>
       <table class="table table-striped table-bordered camel-rest-services-table" hawtio-simple-table="gridOptions"></table>
-    </div>
-    <div class="row" ng-if="data.length === 0">
-      <div class="col-sm-12">
-        <div class="loading-message">
-          There are no REST Services registered in this CamelContext.
-        </div>
-      </div>
     </div>
   </div>
 </div>

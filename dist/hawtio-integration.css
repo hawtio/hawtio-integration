@@ -51,6 +51,25 @@
   margin-right: 10px;
 }
 
+.camel-endpoints-table th:nth-child(1) {
+  width: auto;
+}
+.camel-endpoints-table th:nth-child(2) {
+  width: 20%;
+}
+.camel-endpoints-table th:nth-child(3) {
+  width: 60px;
+}
+.camel-endpoints-table th:nth-child(4) {
+  width: 60px;
+}
+.camel-endpoints-table th:nth-child(5) {
+  width: 60px;
+}
+.camel-endpoints-table th:nth-child(6) {
+  width: 60px;
+}
+
 .camel-inflight-exchanges-table th:nth-child(1) {
   width: 40%;
 }

@@ -3,7 +3,8 @@
 
 module Camel {
 
-  _module.controller("Camel.EndpointRuntimeRegistryController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.EndpointRuntimeRegistryController", ["$scope", "$location", "workspace", "jolokia",
+    ($scope, $location, workspace:Workspace, jolokia) => {
 
     $scope.data = [];
     $scope.selectedMBean = null;
@@ -13,45 +14,27 @@ module Camel {
     var columnDefs:any[] = [
       {
         field: 'url',
-        displayName: 'Url',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'URL'
       },
       {
         field: 'routeId',
-        displayName: 'Route Id',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'Route ID'
       },
       {
         field: 'direction',
-        displayName: 'Direction',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'Direction'
       },
       {
         field: 'static',
-        displayName: 'Static',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'Static'
       },
       {
         field: 'dynamic',
-        displayName: 'Dynamic',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'Dynamic'
       },
       {
         field: 'hits',
-        displayName: 'Hits',
-        cellFilter: null,
-        width: "*",
-        resizable: true
+        displayName: 'Hits'
       }
     ];
 
