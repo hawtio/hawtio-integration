@@ -36,163 +36,6 @@
   text-align: center;
 }
 
-.form-inline.camel-forward-message {
-  margin-bottom: 20px;
-}
-.form-inline input.camel-forward-message {
-  width: 50%;
-}
-.camel-forward-message dl dt {
-  font-size: larger;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-#camel-debug .debug-toolbar {
-  margin-bottom: 10px;
-}
-#camel-debug .debug-icon-buttons button {
-  width: 26px;
-}
-#camel-debug .breakpoint-list {
-  float: left;
-  margin-right: 10px;
-}
-
-.camel-profile-table th:nth-child(1) {
-  width: 20%;
-}
-
-@media screen and (max-width: 767px) {
-}
-@media (min-width: 768px) {
-}
-@media (min-width: 768px) {
-}
-@media (max-width: 767px) {
-}
-@media (min-width: 768px) {
-}
-@media (min-width: 768px) {
-}
-@media (max-width: 767px) {
-}
-@media (max-width: 767px) {
-}
-div.camel-properties {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-}
-.camel-properties-header h2 {
-  display: inline-block;
-  margin-right: 50px;
-}
-.camel-properties-header h2 img {
-  margin-right: 5px;
-}
-.camel-properties-header h2 span {
-  vertical-align: sub;
-}
-.camel-properties-header em {
-  vertical-align: sub;
-}
-.camel-properties-info-circle {
-  color: #8b8d8f;
-  position: relative;
-  left: -17px;
-  float: left;
-  line-height: inherit;
-}
-.camel-properties-value {
-  word-break: break-all;
-}
-.camel-properties-empty-space-for-tooltip {
-  margin-bottom: 100px;
-}
-
-.camel-rest-services-table th:nth-child(1) {
-  width: 15%;
-}
-.camel-rest-services-table th:nth-child(2) {
-  width: 45%;
-}
-.camel-rest-services-table th:nth-child(3) {
-  width: 10%;
-}
-.camel-rest-services-table th:nth-child(4) {
-  width: 15%;
-}
-.camel-rest-services-table th:nth-child(5) {
-  width: 15%;
-}
-
-.camel-diagram {
-  margin: 20px 20px 0 0;
-}
-.camel-diagram #node-CLOSED rect {
-  stroke-width: 1px;
-  fill: #f88;
-}
-.camel-diagram .node:hover,
-.camel-diagram .node > *:hover,
-.camel-diagram rect > *:hover {
-  cursor: pointer;
-  opacity: 0.6;
-}
-.camel-diagram path.edge {
-  fill: none;
-  stroke: #666;
-  stroke-width: 3px;
-}
-.camel-diagram .edge:hover {
-  cursor: pointer;
-  opacity: 0.4;
-}
-.camel-diagram text.counter {
-  stroke: #080;
-}
-.camel-diagram text.inflight {
-  stroke: #08f;
-}
-
-.camel-message-headers input,
-.camel-message-headers button {
-  margin-bottom: 5px;
-}
-.camel-message-headers button {
-  display: block;
-}
-.camel-send-message-button {
-  margin-top: 15px;
-}
-
-.camel-trace-alert {
-  background-color: transparent;
-  border-color: #8b8d8f;
-  padding-left: 14px;
-}
-.camel-trace-pager {
-  width: 100%;
-  text-align: center;
-}
-.camel-trace-pager .pagination {
-  margin: 0;
-}
-
-.camel-type-converters-dl {
-  margin-top: 15px;
-}
-.camel-type-converters-dl dt {
-  width: 170px;
-}
-.camel-type-converters-dl dd {
-  margin-left: 190px;
-}
-.camel-type-converters-enable-statistics-button {
-  width: 111px;
-}
-
 .table-src-components th:nth-child(3) {
   width: 30%;
 }
@@ -312,6 +155,169 @@ dl.server-details dd {
   margin-left: 210px;
   width: 50px;
   text-align: right;
+}
+
+.form-inline.camel-forward-message {
+  margin-bottom: 20px;
+}
+.form-inline input.camel-forward-message {
+  width: 50%;
+}
+.camel-forward-message dl dt {
+  font-size: larger;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+#camel-debug .debug-toolbar {
+  margin-bottom: 10px;
+}
+#camel-debug .debug-icon-buttons button {
+  width: 26px;
+}
+#camel-debug .breakpoint-list {
+  float: left;
+  margin-right: 10px;
+}
+
+.camel-profile-table th:nth-child(1) {
+  width: 20%;
+}
+
+@media screen and (max-width: 767px) {
+}
+@media (min-width: 768px) {
+}
+@media (min-width: 768px) {
+}
+@media (max-width: 767px) {
+}
+@media (min-width: 768px) {
+}
+@media (min-width: 768px) {
+}
+@media (max-width: 767px) {
+}
+@media (max-width: 767px) {
+}
+div.camel-properties {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+.camel-properties-header h2 {
+  display: inline-block;
+  margin-right: 50px;
+}
+.camel-properties-header h2 img {
+  margin-right: 5px;
+}
+.camel-properties-header h2 span {
+  vertical-align: sub;
+}
+.camel-properties-header em {
+  vertical-align: sub;
+}
+.camel-properties-info-circle {
+  color: #8b8d8f;
+  position: relative;
+  left: -17px;
+  float: left;
+  line-height: inherit;
+}
+.camel-properties-value {
+  word-break: break-all;
+}
+.camel-properties-empty-space-for-tooltip {
+  margin-bottom: 100px;
+}
+
+.camel-rest-services-table th:nth-child(1) {
+  width: 15%;
+}
+.camel-rest-services-table th:nth-child(2) {
+  width: 45%;
+}
+.camel-rest-services-table th:nth-child(3) {
+  width: 10%;
+}
+.camel-rest-services-table th:nth-child(4) {
+  width: 15%;
+}
+.camel-rest-services-table th:nth-child(5) {
+  width: 15%;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+}
+.camel-diagram {
+  padding: 20px 0 10px 0;
+}
+.camel-diagram #node-CLOSED rect {
+  stroke-width: 1px;
+  fill: #f88;
+}
+.camel-diagram .node:hover,
+.camel-diagram .node > *:hover,
+.camel-diagram rect > *:hover {
+  cursor: pointer;
+  opacity: 0.6;
+}
+.camel-diagram path.edge {
+  fill: none;
+  stroke: #666;
+  stroke-width: 3px;
+}
+.camel-diagram .edge:hover {
+  cursor: pointer;
+  opacity: 0.4;
+}
+.camel-diagram text.counter {
+  stroke: #080;
+}
+.camel-diagram text.inflight {
+  stroke: #08f;
+}
+
+.camel-message-headers input,
+.camel-message-headers button {
+  margin-bottom: 5px;
+}
+.camel-message-headers button {
+  display: block;
+}
+.camel-send-message-button {
+  margin-top: 15px;
+}
+
+.camel-trace-alert {
+  background-color: transparent;
+  border-color: #8b8d8f;
+  padding-left: 14px;
+}
+.camel-trace-pager {
+  width: 100%;
+  text-align: center;
+}
+.camel-trace-pager .pagination {
+  margin: 0;
+}
+
+.camel-type-converters-dl {
+  margin-top: 15px;
+}
+.camel-type-converters-dl dt {
+  width: 170px;
+}
+.camel-type-converters-dl dd {
+  margin-left: 190px;
+}
+.camel-type-converters-enable-statistics-button {
+  width: 111px;
 }
 
 .metricsWatcher .panel-group:first-child {

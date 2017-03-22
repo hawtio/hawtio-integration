@@ -57,7 +57,7 @@ module Camel {
     }
     $(svg).children("g").remove();
 
-    var svgGroup = svg.append("g").attr("transform", "translate(5, 5)");
+    var svgGroup = svg.append("g");
 
     // `nodes` is center positioned for easy layout later
     var nodes = svgGroup
@@ -177,14 +177,9 @@ module Camel {
       .attr('id', e => e.id)
       .attr("d", e => line(e.points));
 
-    // Resize the SVG element
     var svgNode = svg.node();
     if (svgNode) {
       var svgBBox = svgNode.getBBox();
-      if (svgBBox) {
-        svg.attr("width", svgBBox.width + 10);
-        svg.attr("height", svgBBox.height + 10);
-      }
     }
 
     // configure dragging if enabled
@@ -222,7 +217,7 @@ module Camel {
       edges.call(edgeDrag);
     }
 
-    return states;
+    return {nodes: states, graph: g};
   }
 
   // TODO Export as a service

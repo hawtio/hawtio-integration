@@ -243,7 +243,10 @@ module Camel {
         onClick = onClickGraphNode;
       }
 
-      $scope.graphData = dagreLayoutGraph(nodes, links, width, height, svg, false, onClick);
+      const {nodes: states, graph: render} = dagreLayoutGraph(nodes, links, 0, 0, svg, false, onClick);
+      $scope.graphData = states;
+
+      d3.select("svg").attr("viewBox", "0 0 " + (render.graph().width) + " " + (render.graph().height));
 
       // Only apply node selection behavior if debugging or tracing
       if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
@@ -275,7 +278,6 @@ module Camel {
         }, Core.onSuccess(statsCallback, {silent: true, error: false}));
       }
       $scope.$emit("camel.diagram.layoutComplete");
-      return width;
     }
 
     function getWidth() {

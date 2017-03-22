@@ -1424,965 +1424,6 @@ var ActiveMQ;
 
 /// <reference path="../../includes.ts"/>
 /**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf.log = Logger.get("Karaf");
-    function setSelect(selection, group) {
-        if (!angular.isDefined(selection)) {
-            return group[0];
-        }
-        var answer = group.findIndex(function (item) {
-            return item.id === selection.id;
-        });
-        if (answer !== -1) {
-            return group[answer];
-        }
-        else {
-            return group[0];
-        }
-    }
-    Karaf.setSelect = setSelect;
-    function installRepository(workspace, jolokia, uri, success, error) {
-        Karaf.log.info("installing URI: ", uri);
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'addRepository(java.lang.String)',
-            arguments: [uri]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.installRepository = installRepository;
-    function uninstallRepository(workspace, jolokia, uri, success, error) {
-        Karaf.log.info("uninstalling URI: ", uri);
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'removeRepository(java.lang.String)',
-            arguments: [uri]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.uninstallRepository = uninstallRepository;
-    function installFeature(workspace, jolokia, feature, version, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'installFeature(java.lang.String, java.lang.String)',
-            arguments: [feature, version]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.installFeature = installFeature;
-    function uninstallFeature(workspace, jolokia, feature, version, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'uninstallFeature(java.lang.String, java.lang.String)',
-            arguments: [feature, version]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.uninstallFeature = uninstallFeature;
-    // TODO move to core?
-    function toCollection(values) {
-        var collection = values;
-        if (!angular.isArray(values)) {
-            collection = [values];
-        }
-        return collection;
-    }
-    Karaf.toCollection = toCollection;
-    function featureLinks(workspace, name, version) {
-        return "<a href='" + Core.url("#/karaf/feature/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
-    }
-    Karaf.featureLinks = featureLinks;
-    function extractFeature(attributes, name, version) {
-        var features = [];
-        var repos = [];
-        populateFeaturesAndRepos(attributes, features, repos);
-        return _.find(features, function (feature) { return feature.Name == name && feature.Version == version; });
-    }
-    Karaf.extractFeature = extractFeature;
-    var platformBundlePatterns = [
-        "^org.apache.aries",
-        "^org.apache.karaf",
-        "^activemq-karaf",
-        "^org.apache.commons",
-        "^org.apache.felix",
-        "^io.fabric8",
-        "^io.fabric8.fab",
-        "^io.fabric8.insight",
-        "^io.fabric8.mq",
-        "^io.fabric8.patch",
-        "^io.fabric8.runtime",
-        "^io.fabric8.security",
-        "^org.apache.geronimo.specs",
-        "^org.apache.servicemix.bundles",
-        "^org.objectweb.asm",
-        "^io.hawt",
-        "^javax.mail",
-        "^javax",
-        "^org.jvnet",
-        "^org.mvel2",
-        "^org.apache.mina.core",
-        "^org.apache.sshd.core",
-        "^org.apache.neethi",
-        "^org.apache.servicemix.specs",
-        "^org.apache.xbean",
-        "^org.apache.santuario.xmlsec",
-        "^biz.aQute.bndlib",
-        "^groovy-all",
-        "^com.google.guava",
-        "jackson-\\w+-asl",
-        "^com.fasterxml.jackson",
-        "^org.ops4j",
-        "^org.springframework",
-        "^bcprov$",
-        "^jline$",
-        "scala-library$",
-        "^org.scala-lang",
-        "^stax2-api$",
-        "^woodstox-core-asl",
-        "^org.jboss.amq.mq-fabric",
-        "^gravia-",
-        "^joda-time$",
-        "^org.apache.ws",
-        "-commands$",
-        "patch.patch",
-        "org.fusesource.insight",
-        "activeio-core",
-        "activemq-osgi",
-        "^org.eclipse.jetty",
-        "org.codehaus.jettison.jettison",
-        "org.jledit.core",
-        "org.fusesource.jansi",
-        "org.eclipse.equinox.region"
-    ];
-    var platformBundleRegex = new RegExp(platformBundlePatterns.join('|'));
-    var camelBundlePatterns = ["^org.apache.camel", "camel-karaf-commands$", "activemq-camel$"];
-    var camelBundleRegex = new RegExp(camelBundlePatterns.join('|'));
-    var cxfBundlePatterns = ["^org.apache.cxf"];
-    var cxfBundleRegex = new RegExp(cxfBundlePatterns.join('|'));
-    var activemqBundlePatterns = ["^org.apache.activemq", "activemq-camel$"];
-    var activemqBundleRegex = new RegExp(activemqBundlePatterns.join('|'));
-    function isPlatformBundle(symbolicName) {
-        return platformBundleRegex.test(symbolicName);
-    }
-    Karaf.isPlatformBundle = isPlatformBundle;
-    function isActiveMQBundle(symbolicName) {
-        return activemqBundleRegex.test(symbolicName);
-    }
-    Karaf.isActiveMQBundle = isActiveMQBundle;
-    function isCamelBundle(symbolicName) {
-        return camelBundleRegex.test(symbolicName);
-    }
-    Karaf.isCamelBundle = isCamelBundle;
-    function isCxfBundle(symbolicName) {
-        return cxfBundleRegex.test(symbolicName);
-    }
-    Karaf.isCxfBundle = isCxfBundle;
-    function populateFeaturesAndRepos(attributes, features, repositories) {
-        var fullFeatures = attributes["Features"];
-        angular.forEach(attributes["Repositories"], function (repo) {
-            repositories.push({
-                id: repo["Name"],
-                uri: repo["Uri"]
-            });
-            if (!fullFeatures) {
-                return;
-            }
-            angular.forEach(repo["Features"], function (feature) {
-                angular.forEach(feature, function (entry) {
-                    if (fullFeatures[entry['Name']] !== undefined) {
-                        var f = _.cloneDeep(fullFeatures[entry['Name']][entry['Version']]);
-                        f["Id"] = entry["Name"] + "/" + entry["Version"];
-                        f["RepositoryName"] = repo["Name"];
-                        f["RepositoryURI"] = repo["Uri"];
-                        features.push(f);
-                    }
-                });
-            });
-        });
-    }
-    Karaf.populateFeaturesAndRepos = populateFeaturesAndRepos;
-    function createScrComponentsView(workspace, jolokia, components) {
-        var result = [];
-        angular.forEach(components, function (component) {
-            result.push({
-                Name: component,
-                State: getComponentStateDescription(getComponentState(workspace, jolokia, component))
-            });
-        });
-        return result;
-    }
-    Karaf.createScrComponentsView = createScrComponentsView;
-    function getComponentStateDescription(state) {
-        switch (state) {
-            case 2:
-                return "Enabled";
-            case 4:
-                return "Unsatisfied";
-            case 8:
-                return "Activating";
-            case 16:
-                return "Active";
-            case 32:
-                return "Registered";
-            case 64:
-                return "Factory";
-            case 128:
-                return "Deactivating";
-            case 256:
-                return "Destroying";
-            case 1024:
-                return "Disabling";
-            case 2048:
-                return "Disposing";
-        }
-        return "Unknown";
-    }
-    Karaf.getComponentStateDescription = getComponentStateDescription;
-    ;
-    function getAllComponents(workspace, jolokia) {
-        var scrMBean = getSelectionScrMBean(workspace);
-        var response = jolokia.request({
-            type: 'read', mbean: scrMBean,
-            arguments: []
-        });
-        //Check if the MBean provides the Components attribute.
-        if (!('Components' in response.value)) {
-            response = jolokia.request({
-                type: 'exec', mbean: scrMBean, operation: 'listComponents()'
-            });
-            return createScrComponentsView(workspace, jolokia, response.value);
-        }
-        return response.value['Components'].values;
-    }
-    Karaf.getAllComponents = getAllComponents;
-    function getComponentByName(workspace, jolokia, componentName) {
-        var components = getAllComponents(workspace, jolokia);
-        return components.find(function (c) {
-            return c.Name == componentName;
-        });
-    }
-    Karaf.getComponentByName = getComponentByName;
-    function isComponentActive(workspace, jolokia, component) {
-        var response = jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'isComponentActive(java.lang.String)',
-            arguments: [component]
-        });
-        return response.value;
-    }
-    Karaf.isComponentActive = isComponentActive;
-    function getComponentState(workspace, jolokia, component) {
-        var response = jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'componentState(java.lang.String)',
-            arguments: [component]
-        });
-        return response.value;
-    }
-    Karaf.getComponentState = getComponentState;
-    function activateComponent(workspace, jolokia, component, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'activateComponent(java.lang.String)',
-            arguments: [component]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.activateComponent = activateComponent;
-    function deactivateComponent(workspace, jolokia, component, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'deactiveateComponent(java.lang.String)',
-            arguments: [component]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.deactivateComponent = deactivateComponent;
-    function populateDependencies(attributes, dependencies, features) {
-        angular.forEach(dependencies, function (feature) {
-            angular.forEach(feature, function (entry) {
-                var enhancedFeature = extractFeature(attributes, entry["Name"], entry["Version"]);
-                enhancedFeature["id"] = entry["Name"] + "/" + entry["Version"];
-                //enhancedFeature["repository"] = repo["Name"];
-                features.push(enhancedFeature);
-            });
-        });
-    }
-    Karaf.populateDependencies = populateDependencies;
-    function getSelectionFeaturesMBean(workspace) {
-        if (workspace) {
-            var featuresStuff = workspace.mbeanTypesToDomain["features"] || workspace.mbeanTypesToDomain['feature'] || {};
-            var karaf = featuresStuff["org.apache.karaf"] || {};
-            var mbean = karaf.objectName;
-            if (mbean) {
-                return mbean;
-            }
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("org.apache.karaf", "features");
-            if (!folder) {
-                // sometimes the features mbean is inside the 'root' folder
-                folder = workspace.tree.navigate("org.apache.karaf");
-                if (folder) {
-                    var children = folder.children;
-                    folder = null;
-                    angular.forEach(children, function (child) {
-                        if (!folder) {
-                            folder = child.navigate("features");
-                        }
-                    });
-                }
-            }
-            if (folder) {
-                var children = folder.children;
-                if (children) {
-                    var node = children[0];
-                    if (node) {
-                        return node.objectName;
-                    }
-                }
-                return folder.objectName;
-            }
-        }
-        return null;
-    }
-    Karaf.getSelectionFeaturesMBean = getSelectionFeaturesMBean;
-    function getSelectionScrMBean(workspace) {
-        if (workspace) {
-            var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
-            var karaf = scrStuff["org.apache.karaf"] || {};
-            var mbean = karaf.objectName;
-            if (mbean) {
-                return mbean;
-            }
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("org.apache.karaf", "scr");
-            if (!folder) {
-                // sometimes the features mbean is inside the 'root' folder
-                folder = workspace.tree.navigate("org.apache.karaf");
-                if (folder) {
-                    var children = folder.children;
-                    folder = null;
-                    angular.forEach(children, function (child) {
-                        if (!folder) {
-                            folder = child.navigate("scr");
-                        }
-                    });
-                }
-            }
-            if (folder) {
-                var children = folder.children;
-                if (children) {
-                    var node = children[0];
-                    if (node) {
-                        return node.objectName;
-                    }
-                }
-                return folder.objectName;
-            }
-        }
-        return null;
-    }
-    Karaf.getSelectionScrMBean = getSelectionScrMBean;
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/**
- * @module Karaf
- * @main Karaf
- */
-var Karaf;
-(function (Karaf) {
-    var pluginName = 'karaf';
-    //export var _module = angular.module(pluginName, ['bootstrap', 'ngResource', 'hawtio-core']);
-    Karaf._module = angular.module(pluginName, ['ngResource', 'hawtio-core']);
-    Karaf._module.config(["$routeProvider", function ($routeProvider) {
-            $routeProvider.
-                when('/osgi/server', { templateUrl: 'plugins/karaf/html/server.html' }).
-                when('/osgi/features', { templateUrl: 'plugins/karaf/html/features.html', reloadOnSearch: false }).
-                when('/osgi/scr-components', { templateUrl: 'plugins/karaf/html/scr-components.html' }).
-                when('/osgi/scr-component/:name', { templateUrl: 'plugins/karaf/html/scr-component.html' }).
-                when('/osgi/feature/:name/:version', { templateUrl: 'plugins/karaf/html/feature.html' });
-        }]);
-    Karaf._module.run(["workspace", "viewRegistry", "helpRegistry", function (workspace, viewRegistry, helpRegistry) {
-            helpRegistry.addUserDoc('karaf', 'plugins/karaf/doc/help.md', function () {
-                return workspace.treeContainsDomainAndProperties('org.apache.karaf');
-            });
-        }]);
-    hawtioPluginLoader.addModule(pluginName);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.FeatureController", ["$scope", "jolokia", "workspace", "$routeParams", function ($scope, jolokia, workspace, $routeParams) {
-            $scope.name = $routeParams.name;
-            $scope.version = $routeParams.version;
-            $scope.bundlesByLocation = {};
-            $scope.props = "properties";
-            updateTableContents();
-            $scope.install = function () {
-                Karaf.installFeature(workspace, jolokia, $scope.name, $scope.version, function () {
-                    Core.notification('success', 'Installed feature ' + $scope.name);
-                }, function (response) {
-                    Core.notification('error', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
-                });
-            };
-            $scope.uninstall = function () {
-                Karaf.uninstallFeature(workspace, jolokia, $scope.name, $scope.version, function () {
-                    Core.notification('success', 'Uninstalled feature ' + $scope.name);
-                }, function (response) {
-                    Core.notification('error', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
-                });
-            };
-            $scope.toProperties = function (elements) {
-                var answer = '';
-                angular.forEach(elements, function (value, name) {
-                    answer += value['Key'] + " = " + value['Value'] + "\n";
-                });
-                return answer.trim();
-            };
-            function populateTable(response) {
-                $scope.row = Karaf.extractFeature(response.value, $scope.name, $scope.version);
-                if ($scope.row) {
-                    addBundleDetails($scope.row);
-                    var dependencies = [];
-                    //TODO - if the version isn't set or is 0.0.0 then maybe we show the highest available?
-                    angular.forEach($scope.row.Dependencies, function (version, name) {
-                        angular.forEach(version, function (data, version) {
-                            dependencies.push({
-                                Name: name,
-                                Version: version
-                            });
-                        });
-                    });
-                    $scope.row.Dependencies = dependencies;
-                }
-                Core.$apply($scope);
-            }
-            function setBundles(response) {
-                var bundleMap = {};
-                Osgi.defaultBundleValues(workspace, $scope, response.values);
-                angular.forEach(response.value, function (bundle) {
-                    var location = bundle["Location"];
-                    $scope.bundlesByLocation[location] = bundle;
-                });
-            }
-            function updateTableContents() {
-                var featureMbean = Karaf.getSelectionFeaturesMBean(workspace);
-                var bundleMbean = Osgi.getSelectionBundleMBean(workspace);
-                var jolokia = workspace.jolokia;
-                if (bundleMbean) {
-                    setBundles(jolokia.request({ type: 'exec', mbean: bundleMbean, operation: 'listBundles()' }));
-                }
-                if (featureMbean) {
-                    jolokia.request({ type: 'read', mbean: featureMbean }, Core.onSuccess(populateTable));
-                }
-            }
-            function addBundleDetails(feature) {
-                var bundleDetails = [];
-                angular.forEach(feature["Bundles"], function (bundleLocation) {
-                    var bundle = $scope.bundlesByLocation[bundleLocation];
-                    if (bundle) {
-                        bundle["Installed"] = true;
-                        bundleDetails.push(bundle);
-                    }
-                    else {
-                        bundleDetails.push({
-                            "Location": bundleLocation,
-                            "Installed": false
-                        });
-                    }
-                });
-                feature["BundleDetails"] = bundleDetails;
-            }
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.FeaturesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.responseJson = '';
-            $scope.filter = '';
-            $scope.installedFeatures = [];
-            $scope.features = [];
-            $scope.repositories = [];
-            $scope.selectedRepositoryId = '';
-            $scope.selectedRepository = {};
-            $scope.newRepositoryURI = '';
-            $scope.init = function () {
-                var selectedRepositoryId = $location.search()['repositoryId'];
-                if (selectedRepositoryId) {
-                    $scope.selectedRepositoryId = selectedRepositoryId;
-                }
-                var filter = $location.search()['filter'];
-                if (filter) {
-                    $scope.filter = filter;
-                }
-            };
-            $scope.init();
-            $scope.$watch('selectedRepository', function (newValue, oldValue) {
-                //log.debug("selectedRepository: ", $scope.selectedRepository);
-                if (newValue !== oldValue) {
-                    if (!newValue) {
-                        $scope.selectedRepositoryId = '';
-                    }
-                    else {
-                        $scope.selectedRepositoryId = newValue['repository'];
-                    }
-                    $location.search('repositoryId', $scope.selectedRepositoryId);
-                }
-            }, true);
-            $scope.$watch('filter', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    $location.search('filter', newValue);
-                }
-            });
-            var featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
-            Karaf.log.debug("Features mbean: ", featuresMBean);
-            if (featuresMBean) {
-                Core.register(jolokia, $scope, {
-                    type: 'read', mbean: featuresMBean
-                }, Core.onSuccess(render));
-            }
-            $scope.inSelectedRepository = function (feature) {
-                if (!$scope.selectedRepository || !('repository' in $scope.selectedRepository)) {
-                    return "";
-                }
-                if (!feature || !('RepositoryName' in feature)) {
-                    return "";
-                }
-                if (feature['RepositoryName'] === $scope.selectedRepository['repository']) {
-                    return "in-selected-repository";
-                }
-                return "";
-            };
-            $scope.isValidRepository = function () {
-                return Core.isBlank($scope.newRepositoryURI);
-            };
-            $scope.installRepository = function () {
-                var repoURL = $scope.newRepositoryURI;
-                Core.notification('info', 'Adding feature repository URL');
-                Karaf.installRepository(workspace, jolokia, repoURL, function () {
-                    Core.notification('success', 'Added feature repository URL');
-                    $scope.selectedRepository = {};
-                    $scope.selectedRepositoryId = '';
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                }, function (response) {
-                    Karaf.log.error('Failed to add feature repository URL ', repoURL, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.uninstallRepository = function () {
-                var repoURI = $scope.selectedRepository['uri'];
-                Core.notification('info', 'Removing feature repository ' + repoURI);
-                Karaf.uninstallRepository(workspace, jolokia, repoURI, function () {
-                    Core.notification('success', 'Removed feature repository ' + repoURI);
-                    $scope.responseJson = null;
-                    $scope.selectedRepositoryId = '';
-                    $scope.selectedRepository = {};
-                    $scope.triggerRefresh();
-                }, function (response) {
-                    Karaf.log.error('Failed to remove feature repository ', repoURI, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.triggerRefresh = function () {
-                jolokia.request({
-                    type: 'read',
-                    method: 'POST',
-                    mbean: featuresMBean
-                }, Core.onSuccess(render));
-            };
-            $scope.install = function (feature) {
-                //$('.popover').remove();
-                Core.notification('info', 'Installing feature ' + feature.Name);
-                Karaf.installFeature(workspace, jolokia, feature.Name, feature.Version, function () {
-                    Core.notification('success', 'Installed feature ' + feature.Name);
-                    $scope.installedFeatures.add(feature);
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                    //Core.$apply($scope);
-                }, function (response) {
-                    Karaf.log.error('Failed to install feature ', feature.Name, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.uninstall = function (feature) {
-                //$('.popover').remove();
-                Core.notification('info', 'Uninstalling feature ' + feature.Name);
-                Karaf.uninstallFeature(workspace, jolokia, feature.Name, feature.Version, function () {
-                    Core.notification('success', 'Uninstalled feature ' + feature.Name);
-                    $scope.installedFeatures.remove(feature);
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                    //Core.$apply($scope);
-                }, function (response) {
-                    Karaf.log.error('Failed to uninstall feature ', feature.Name, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.filteredRows = ['Bundles', 'Configurations', 'Configuration Files', 'Dependencies'];
-            $scope.showRow = function (key, value) {
-                if ($scope.filteredRows.indexOf(key) !== -1) {
-                    return false;
-                }
-                if (angular.isArray(value)) {
-                    if (value.length === 0) {
-                        return false;
-                    }
-                }
-                if (angular.isString(value)) {
-                    if (Core.isBlank(value)) {
-                        return false;
-                    }
-                }
-                if (angular.isObject(value)) {
-                    if (!value || angular.equals(value, {})) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            $scope.installed = function (installed) {
-                var answer = Core.parseBooleanValue(installed);
-                return answer;
-            };
-            $scope.showValue = function (value) {
-                if (angular.isArray(value)) {
-                    var answer = ['<ul class="zebra-list">'];
-                    value.forEach(function (v) { answer.push('<li>' + v + '</li>'); });
-                    answer.push('</ul>');
-                    return answer.join('\n');
-                }
-                if (angular.isObject(value)) {
-                    var answer = ['<table class="table">', '<tbody>'];
-                    angular.forEach(value, function (value, key) {
-                        answer.push('<tr>');
-                        answer.push('<td>' + key + '</td>');
-                        answer.push('<td>' + value + '</td>');
-                        answer.push('</tr>');
-                    });
-                    answer.push('</tbody>');
-                    answer.push('</table>');
-                    return answer.join('\n');
-                }
-                return "" + value;
-            };
-            $scope.getStateStyle = function (feature) {
-                if (Core.parseBooleanValue(feature.Installed)) {
-                    return "badge badge-success";
-                }
-                return "badge";
-            };
-            $scope.filterFeature = function (feature) {
-                if (Core.isBlank($scope.filter)) {
-                    return true;
-                }
-                if (feature.Id.has($scope.filter)) {
-                    return true;
-                }
-                return false;
-            };
-            function render(response) {
-                var responseJson = angular.toJson(response.value);
-                if ($scope.responseJson !== responseJson) {
-                    $scope.responseJson = responseJson;
-                    //log.debug("Got response: ", response.value);
-                    if (response['value']['Features'] === null) {
-                        $scope.featuresError = true;
-                    }
-                    else {
-                        $scope.featuresError = false;
-                    }
-                    $scope.features = [];
-                    $scope.repositories = [];
-                    var features = [];
-                    var repositories = [];
-                    Karaf.populateFeaturesAndRepos(response.value, features, repositories);
-                    var installedFeatures = features.filter(function (f) { return Core.parseBooleanValue(f.Installed); });
-                    var uninstalledFeatures = features.filter(function (f) { return !Core.parseBooleanValue(f.Installed); });
-                    //log.debug("repositories: ", repositories);
-                    $scope.installedFeatures = _.sortBy(installedFeatures, function (f) { return f['Name']; });
-                    uninstalledFeatures = _.sortBy(uninstalledFeatures, function (f) { return f['Name']; });
-                    _.sortBy(repositories, 'id').forEach(function (repo) {
-                        $scope.repositories.push({
-                            repository: repo['id'],
-                            uri: repo['uri'],
-                            features: _.filter(uninstalledFeatures, function (f) { return f['RepositoryName'] === repo['id']; })
-                        });
-                    });
-                    if (!Core.isBlank($scope.newRepositoryURI)) {
-                        var selectedRepo = _.find(repositories, function (r) { return r['uri'] === $scope.newRepositoryURI; });
-                        if (selectedRepo) {
-                            $scope.selectedRepositoryId = selectedRepo['id'];
-                        }
-                        $scope.newRepositoryURI = '';
-                    }
-                    if (Core.isBlank($scope.selectedRepositoryId)) {
-                        $scope.selectedRepository = _.first($scope.repositories);
-                    }
-                    else {
-                        $scope.selectedRepository = _.find($scope.repositories, function (r) { return r.repository === $scope.selectedRepositoryId; });
-                    }
-                    Core.$apply($scope);
-                }
-            }
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.NavBarController", ["$scope", "workspace", function ($scope, workspace) {
-            $scope.hash = workspace.hash();
-            $scope.isKarafEnabled = workspace.treeContainsDomainAndProperties("org.apache.karaf");
-            $scope.isFeaturesEnabled = Karaf.getSelectionFeaturesMBean(workspace);
-            $scope.isScrEnabled = Karaf.getSelectionScrMBean(workspace);
-            $scope.$on('$routeChangeSuccess', function () {
-                $scope.hash = workspace.hash();
-            });
-            $scope.isActive = function (nav) {
-                return workspace.isLinkActive(nav);
-            };
-            $scope.isPrefixActive = function (nav) {
-                return workspace.isLinkPrefixActive(nav);
-            };
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.ScrComponentController", ["$scope", "$location", "workspace", "jolokia", "$routeParams", function ($scope, $location, workspace, jolokia, $routeParams) {
-            $scope.srcComponentsUrl = Core.url('/osgi/scr-components' + workspace.hash());
-            $scope.name = $routeParams.name;
-            populateTable();
-            function populateTable() {
-                $scope.row = Karaf.getComponentByName(workspace, jolokia, $scope.name);
-                Core.$apply($scope);
-            }
-            $scope.activate = function () {
-                Karaf.activateComponent(workspace, jolokia, $scope.row['Name'], function () {
-                    console.log("Activated!");
-                }, function () {
-                    console.log("Failed to activate!");
-                });
-            };
-            $scope.deactivate = function () {
-                Karaf.deactivateComponent(workspace, jolokia, $scope.row['Name'], function () {
-                    console.log("Deactivated!");
-                }, function () {
-                    console.log("Failed to deactivate!");
-                });
-            };
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.component = empty();
-            // caches last jolokia result
-            $scope.result = [];
-            // rows in components table
-            $scope.components = [];
-            // selected components
-            $scope.selectedComponents = [];
-            $scope.scrOptions = {
-                data: 'components',
-                sortInfo: { "sortBy": "Name", "ascending": true },
-                selectedItems: $scope.selectedComponents,
-                columnDefs: [
-                    {
-                        field: 'Name',
-                        displayName: 'Name',
-                        cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.Name}}</a></div>'
-                    },
-                    {
-                        field: 'State',
-                        displayName: 'State',
-                        cellTemplate: '{{row.entity.State}}'
-                    }
-                ],
-                primaryKeyFn: function (entity) { return entity.Name; }
-            };
-            var scrMBean = Karaf.getSelectionScrMBean(workspace);
-            if (scrMBean) {
-                var components = Karaf.getAllComponents(workspace, jolokia);
-                addUrlField(components);
-                render(components);
-            }
-            function addUrlField(components) {
-                components.forEach(function (component) {
-                    return component.Url = Core.url("/osgi/scr-component/" + component.Name + workspace.hash());
-                });
-            }
-            $scope.activate = function () {
-                $scope.selectedComponents.forEach(function (component) {
-                    Karaf.activateComponent(workspace, jolokia, component.Name, function () {
-                        console.log("Activated!");
-                    }, function () {
-                        console.log("Failed to activate!");
-                    });
-                });
-            };
-            $scope.deactivate = function () {
-                $scope.selectedComponents.forEach(function (component) {
-                    Karaf.deactivateComponent(workspace, jolokia, component.Name, function () {
-                        console.log("Deactivated!");
-                    }, function () {
-                        console.log("Failed to deactivate!");
-                    });
-                });
-            };
-            function empty() {
-                return [
-                    {
-                        Name: "",
-                        Status: false
-                    }
-                ];
-            }
-            function render(components) {
-                if (!angular.equals($scope.result, components)) {
-                    $scope.components = components;
-                    $scope.result = $scope.components;
-                    Core.$apply($scope);
-                }
-            }
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.ServerController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = {
-                name: "",
-                version: "",
-                state: "",
-                root: "",
-                startLevel: "",
-                framework: "",
-                frameworkVersion: "",
-                location: "",
-                sshPort: "",
-                rmiRegistryPort: "",
-                rmiServerPort: "",
-                pid: "" };
-            $scope.$on('jmxTreeUpdated', reloadFunction);
-            $scope.$watch('workspace.tree', reloadFunction);
-            function reloadFunction() {
-                // if the JMX tree is reloaded its probably because a new MBean has been added or removed
-                // so lets reload, asynchronously just in case
-                setTimeout(loadData, 50);
-            }
-            function loadData() {
-                console.log("Loading Karaf data...");
-                jolokia.search("org.apache.karaf:type=admin,*", Core.onSuccess(render));
-            }
-            function render(response) {
-                // grab the first mbean as there should ideally only be one karaf in the JVM
-                if (angular.isArray(response)) {
-                    var mbean = response[0];
-                    if (mbean) {
-                        jolokia.getAttribute(mbean, "Instances", Core.onSuccess(function (response) {
-                            onInstances(response, mbean);
-                        }));
-                    }
-                }
-            }
-            function onInstances(instances, mbean) {
-                if (instances) {
-                    var parsedMBean = Core.parseMBean(mbean);
-                    var instanceName = 'root';
-                    if ('attributes' in parsedMBean) {
-                        if ('name' in parsedMBean['attributes']) {
-                            instanceName = parsedMBean['attributes']['name'];
-                        }
-                    }
-                    //log.debug("mbean: ", Core.parseMBean(mbean));
-                    //log.debug("Instances: ", instances);
-                    // the name is the first child
-                    var rootInstance = instances[instanceName];
-                    $scope.data.name = rootInstance.Name;
-                    $scope.data.state = rootInstance.State;
-                    $scope.data.root = rootInstance["Is Root"];
-                    $scope.data.location = rootInstance.Location;
-                    $scope.data.sshPort = rootInstance["SSH Port"];
-                    $scope.data.rmiRegistryPort = rootInstance["RMI Registry Port"];
-                    $scope.data.rmiServerPort = rootInstance["RMI Server Port"];
-                    $scope.data.pid = rootInstance.Pid;
-                    // we need to get these data from the system mbean
-                    $scope.data.version = "?";
-                    $scope.data.startLevel = "?";
-                    $scope.data.framework = "?";
-                    $scope.data.frameworkVersion = "?";
-                    var systemMbean = "org.apache.karaf:type=system,name=" + rootInstance.Name;
-                    // get more data, and its okay to do this synchronously
-                    var response = jolokia.request({ type: "read", mbean: systemMbean,
-                        attribute: ["StartLevel", "Framework", "Version"] }, Core.onSuccess(null));
-                    var obj = response.value;
-                    if (obj) {
-                        $scope.data.version = obj.Version;
-                        $scope.data.startLevel = obj.StartLevel;
-                        $scope.data.framework = obj.Framework;
-                    }
-                    // and the osgi framework version is the bundle version
-                    var response2 = jolokia.search("osgi.core:type=bundleState,*", Core.onSuccess(null));
-                    if (angular.isArray(response2)) {
-                        var mbean = response2[0];
-                        if (mbean) {
-                            // get more data, and its okay to do this synchronously
-                            var response3 = jolokia.request({ type: 'exec', mbean: mbean, operation: 'getVersion(long)', arguments: [0] }, Core.onSuccess(null));
-                            var obj3 = response3.value;
-                            if (obj3) {
-                                $scope.data.frameworkVersion = obj3;
-                            }
-                        }
-                    }
-                }
-                // ensure web page is updated
-                Core.$apply($scope);
-            }
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/**
  * @module Camel
  */
 var Camel;
@@ -7052,7 +6093,9 @@ var Camel;
                 else {
                     onClick = onClickGraphNode;
                 }
-                $scope.graphData = Camel.dagreLayoutGraph(nodes, links, width, height, svg, false, onClick);
+                var _a = Camel.dagreLayoutGraph(nodes, links, 0, 0, svg, false, onClick), states = _a.nodes, render = _a.graph;
+                $scope.graphData = states;
+                d3.select("svg").attr("viewBox", "0 0 " + (render.graph().width) + " " + (render.graph().height));
                 // Only apply node selection behavior if debugging or tracing
                 if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
                     var gNodes = canvasDiv.find("g.node");
@@ -7079,7 +6122,6 @@ var Camel;
                     }, Core.onSuccess(statsCallback, { silent: true, error: false }));
                 }
                 $scope.$emit("camel.diagram.layoutComplete");
-                return width;
             }
             function getWidth() {
                 var canvasDiv = $element;
@@ -7207,7 +6249,7 @@ var Camel;
             $(svgElement).children("g").remove();
         }
         $(svg).children("g").remove();
-        var svgGroup = svg.append("g").attr("transform", "translate(5, 5)");
+        var svgGroup = svg.append("g");
         // `nodes` is center positioned for easy layout later
         var nodes = svgGroup
             .selectAll("g .node")
@@ -7300,14 +6342,9 @@ var Camel;
         edges
             .attr('id', function (e) { return e.id; })
             .attr("d", function (e) { return line(e.points); });
-        // Resize the SVG element
         var svgNode = svg.node();
         if (svgNode) {
             var svgBBox = svgNode.getBBox();
-            if (svgBBox) {
-                svg.attr("width", svgBBox.width + 10);
-                svg.attr("height", svgBBox.height + 10);
-            }
         }
         // configure dragging if enabled
         if (allowDrag) {
@@ -7335,7 +6372,7 @@ var Camel;
             nodes.call(nodeDrag);
             edges.call(edgeDrag);
         }
-        return states;
+        return { nodes: states, graph: g };
     }
     Camel.dagreLayoutGraph = dagreLayoutGraph;
     // TODO Export as a service
@@ -8700,6 +7737,366 @@ var Osgi;
     }());
     Osgi.OsgiDataService = OsgiDataService;
 })(Osgi || (Osgi = {}));
+
+/// <reference path="../../includes.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf.log = Logger.get("Karaf");
+    function setSelect(selection, group) {
+        if (!angular.isDefined(selection)) {
+            return group[0];
+        }
+        var answer = group.findIndex(function (item) {
+            return item.id === selection.id;
+        });
+        if (answer !== -1) {
+            return group[answer];
+        }
+        else {
+            return group[0];
+        }
+    }
+    Karaf.setSelect = setSelect;
+    function installRepository(workspace, jolokia, uri, success, error) {
+        Karaf.log.info("installing URI: ", uri);
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'addRepository(java.lang.String)',
+            arguments: [uri]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.installRepository = installRepository;
+    function uninstallRepository(workspace, jolokia, uri, success, error) {
+        Karaf.log.info("uninstalling URI: ", uri);
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'removeRepository(java.lang.String)',
+            arguments: [uri]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.uninstallRepository = uninstallRepository;
+    function installFeature(workspace, jolokia, feature, version, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'installFeature(java.lang.String, java.lang.String)',
+            arguments: [feature, version]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.installFeature = installFeature;
+    function uninstallFeature(workspace, jolokia, feature, version, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'uninstallFeature(java.lang.String, java.lang.String)',
+            arguments: [feature, version]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.uninstallFeature = uninstallFeature;
+    // TODO move to core?
+    function toCollection(values) {
+        var collection = values;
+        if (!angular.isArray(values)) {
+            collection = [values];
+        }
+        return collection;
+    }
+    Karaf.toCollection = toCollection;
+    function featureLinks(workspace, name, version) {
+        return "<a href='" + Core.url("#/karaf/feature/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
+    }
+    Karaf.featureLinks = featureLinks;
+    function extractFeature(attributes, name, version) {
+        var features = [];
+        var repos = [];
+        populateFeaturesAndRepos(attributes, features, repos);
+        return _.find(features, function (feature) { return feature.Name == name && feature.Version == version; });
+    }
+    Karaf.extractFeature = extractFeature;
+    var platformBundlePatterns = [
+        "^org.apache.aries",
+        "^org.apache.karaf",
+        "^activemq-karaf",
+        "^org.apache.commons",
+        "^org.apache.felix",
+        "^io.fabric8",
+        "^io.fabric8.fab",
+        "^io.fabric8.insight",
+        "^io.fabric8.mq",
+        "^io.fabric8.patch",
+        "^io.fabric8.runtime",
+        "^io.fabric8.security",
+        "^org.apache.geronimo.specs",
+        "^org.apache.servicemix.bundles",
+        "^org.objectweb.asm",
+        "^io.hawt",
+        "^javax.mail",
+        "^javax",
+        "^org.jvnet",
+        "^org.mvel2",
+        "^org.apache.mina.core",
+        "^org.apache.sshd.core",
+        "^org.apache.neethi",
+        "^org.apache.servicemix.specs",
+        "^org.apache.xbean",
+        "^org.apache.santuario.xmlsec",
+        "^biz.aQute.bndlib",
+        "^groovy-all",
+        "^com.google.guava",
+        "jackson-\\w+-asl",
+        "^com.fasterxml.jackson",
+        "^org.ops4j",
+        "^org.springframework",
+        "^bcprov$",
+        "^jline$",
+        "scala-library$",
+        "^org.scala-lang",
+        "^stax2-api$",
+        "^woodstox-core-asl",
+        "^org.jboss.amq.mq-fabric",
+        "^gravia-",
+        "^joda-time$",
+        "^org.apache.ws",
+        "-commands$",
+        "patch.patch",
+        "org.fusesource.insight",
+        "activeio-core",
+        "activemq-osgi",
+        "^org.eclipse.jetty",
+        "org.codehaus.jettison.jettison",
+        "org.jledit.core",
+        "org.fusesource.jansi",
+        "org.eclipse.equinox.region"
+    ];
+    var platformBundleRegex = new RegExp(platformBundlePatterns.join('|'));
+    var camelBundlePatterns = ["^org.apache.camel", "camel-karaf-commands$", "activemq-camel$"];
+    var camelBundleRegex = new RegExp(camelBundlePatterns.join('|'));
+    var cxfBundlePatterns = ["^org.apache.cxf"];
+    var cxfBundleRegex = new RegExp(cxfBundlePatterns.join('|'));
+    var activemqBundlePatterns = ["^org.apache.activemq", "activemq-camel$"];
+    var activemqBundleRegex = new RegExp(activemqBundlePatterns.join('|'));
+    function isPlatformBundle(symbolicName) {
+        return platformBundleRegex.test(symbolicName);
+    }
+    Karaf.isPlatformBundle = isPlatformBundle;
+    function isActiveMQBundle(symbolicName) {
+        return activemqBundleRegex.test(symbolicName);
+    }
+    Karaf.isActiveMQBundle = isActiveMQBundle;
+    function isCamelBundle(symbolicName) {
+        return camelBundleRegex.test(symbolicName);
+    }
+    Karaf.isCamelBundle = isCamelBundle;
+    function isCxfBundle(symbolicName) {
+        return cxfBundleRegex.test(symbolicName);
+    }
+    Karaf.isCxfBundle = isCxfBundle;
+    function populateFeaturesAndRepos(attributes, features, repositories) {
+        var fullFeatures = attributes["Features"];
+        angular.forEach(attributes["Repositories"], function (repo) {
+            repositories.push({
+                id: repo["Name"],
+                uri: repo["Uri"]
+            });
+            if (!fullFeatures) {
+                return;
+            }
+            angular.forEach(repo["Features"], function (feature) {
+                angular.forEach(feature, function (entry) {
+                    if (fullFeatures[entry['Name']] !== undefined) {
+                        var f = _.cloneDeep(fullFeatures[entry['Name']][entry['Version']]);
+                        f["Id"] = entry["Name"] + "/" + entry["Version"];
+                        f["RepositoryName"] = repo["Name"];
+                        f["RepositoryURI"] = repo["Uri"];
+                        features.push(f);
+                    }
+                });
+            });
+        });
+    }
+    Karaf.populateFeaturesAndRepos = populateFeaturesAndRepos;
+    function createScrComponentsView(workspace, jolokia, components) {
+        var result = [];
+        angular.forEach(components, function (component) {
+            result.push({
+                Name: component,
+                State: getComponentStateDescription(getComponentState(workspace, jolokia, component))
+            });
+        });
+        return result;
+    }
+    Karaf.createScrComponentsView = createScrComponentsView;
+    function getComponentStateDescription(state) {
+        switch (state) {
+            case 2:
+                return "Enabled";
+            case 4:
+                return "Unsatisfied";
+            case 8:
+                return "Activating";
+            case 16:
+                return "Active";
+            case 32:
+                return "Registered";
+            case 64:
+                return "Factory";
+            case 128:
+                return "Deactivating";
+            case 256:
+                return "Destroying";
+            case 1024:
+                return "Disabling";
+            case 2048:
+                return "Disposing";
+        }
+        return "Unknown";
+    }
+    Karaf.getComponentStateDescription = getComponentStateDescription;
+    ;
+    function getAllComponents(workspace, jolokia) {
+        var scrMBean = getSelectionScrMBean(workspace);
+        var response = jolokia.request({
+            type: 'read', mbean: scrMBean,
+            arguments: []
+        });
+        //Check if the MBean provides the Components attribute.
+        if (!('Components' in response.value)) {
+            response = jolokia.request({
+                type: 'exec', mbean: scrMBean, operation: 'listComponents()'
+            });
+            return createScrComponentsView(workspace, jolokia, response.value);
+        }
+        return response.value['Components'].values;
+    }
+    Karaf.getAllComponents = getAllComponents;
+    function getComponentByName(workspace, jolokia, componentName) {
+        var components = getAllComponents(workspace, jolokia);
+        return components.find(function (c) {
+            return c.Name == componentName;
+        });
+    }
+    Karaf.getComponentByName = getComponentByName;
+    function isComponentActive(workspace, jolokia, component) {
+        var response = jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'isComponentActive(java.lang.String)',
+            arguments: [component]
+        });
+        return response.value;
+    }
+    Karaf.isComponentActive = isComponentActive;
+    function getComponentState(workspace, jolokia, component) {
+        var response = jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'componentState(java.lang.String)',
+            arguments: [component]
+        });
+        return response.value;
+    }
+    Karaf.getComponentState = getComponentState;
+    function activateComponent(workspace, jolokia, component, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'activateComponent(java.lang.String)',
+            arguments: [component]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.activateComponent = activateComponent;
+    function deactivateComponent(workspace, jolokia, component, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'deactiveateComponent(java.lang.String)',
+            arguments: [component]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.deactivateComponent = deactivateComponent;
+    function populateDependencies(attributes, dependencies, features) {
+        angular.forEach(dependencies, function (feature) {
+            angular.forEach(feature, function (entry) {
+                var enhancedFeature = extractFeature(attributes, entry["Name"], entry["Version"]);
+                enhancedFeature["id"] = entry["Name"] + "/" + entry["Version"];
+                //enhancedFeature["repository"] = repo["Name"];
+                features.push(enhancedFeature);
+            });
+        });
+    }
+    Karaf.populateDependencies = populateDependencies;
+    function getSelectionFeaturesMBean(workspace) {
+        if (workspace) {
+            var featuresStuff = workspace.mbeanTypesToDomain["features"] || workspace.mbeanTypesToDomain['feature'] || {};
+            var karaf = featuresStuff["org.apache.karaf"] || {};
+            var mbean = karaf.objectName;
+            if (mbean) {
+                return mbean;
+            }
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("org.apache.karaf", "features");
+            if (!folder) {
+                // sometimes the features mbean is inside the 'root' folder
+                folder = workspace.tree.navigate("org.apache.karaf");
+                if (folder) {
+                    var children = folder.children;
+                    folder = null;
+                    angular.forEach(children, function (child) {
+                        if (!folder) {
+                            folder = child.navigate("features");
+                        }
+                    });
+                }
+            }
+            if (folder) {
+                var children = folder.children;
+                if (children) {
+                    var node = children[0];
+                    if (node) {
+                        return node.objectName;
+                    }
+                }
+                return folder.objectName;
+            }
+        }
+        return null;
+    }
+    Karaf.getSelectionFeaturesMBean = getSelectionFeaturesMBean;
+    function getSelectionScrMBean(workspace) {
+        if (workspace) {
+            var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
+            var karaf = scrStuff["org.apache.karaf"] || {};
+            var mbean = karaf.objectName;
+            if (mbean) {
+                return mbean;
+            }
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("org.apache.karaf", "scr");
+            if (!folder) {
+                // sometimes the features mbean is inside the 'root' folder
+                folder = workspace.tree.navigate("org.apache.karaf");
+                if (folder) {
+                    var children = folder.children;
+                    folder = null;
+                    angular.forEach(children, function (child) {
+                        if (!folder) {
+                            folder = child.navigate("scr");
+                        }
+                    });
+                }
+            }
+            if (folder) {
+                var children = folder.children;
+                if (children) {
+                    var node = children[0];
+                    if (node) {
+                        return node.objectName;
+                    }
+                }
+                return folder.objectName;
+            }
+        }
+        return null;
+    }
+    Karaf.getSelectionScrMBean = getSelectionScrMBean;
+})(Karaf || (Karaf = {}));
 
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiData.ts"/>
@@ -11034,6 +10431,605 @@ var Osgi;
         }]);
 })(Osgi || (Osgi = {}));
 
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/**
+ * @module Karaf
+ * @main Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    var pluginName = 'karaf';
+    //export var _module = angular.module(pluginName, ['bootstrap', 'ngResource', 'hawtio-core']);
+    Karaf._module = angular.module(pluginName, ['ngResource', 'hawtio-core']);
+    Karaf._module.config(["$routeProvider", function ($routeProvider) {
+            $routeProvider.
+                when('/osgi/server', { templateUrl: 'plugins/karaf/html/server.html' }).
+                when('/osgi/features', { templateUrl: 'plugins/karaf/html/features.html', reloadOnSearch: false }).
+                when('/osgi/scr-components', { templateUrl: 'plugins/karaf/html/scr-components.html' }).
+                when('/osgi/scr-component/:name', { templateUrl: 'plugins/karaf/html/scr-component.html' }).
+                when('/osgi/feature/:name/:version', { templateUrl: 'plugins/karaf/html/feature.html' });
+        }]);
+    Karaf._module.run(["workspace", "viewRegistry", "helpRegistry", function (workspace, viewRegistry, helpRegistry) {
+            helpRegistry.addUserDoc('karaf', 'plugins/karaf/doc/help.md', function () {
+                return workspace.treeContainsDomainAndProperties('org.apache.karaf');
+            });
+        }]);
+    hawtioPluginLoader.addModule(pluginName);
+})(Karaf || (Karaf = {}));
+
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.FeatureController", ["$scope", "jolokia", "workspace", "$routeParams", function ($scope, jolokia, workspace, $routeParams) {
+            $scope.name = $routeParams.name;
+            $scope.version = $routeParams.version;
+            $scope.bundlesByLocation = {};
+            $scope.props = "properties";
+            updateTableContents();
+            $scope.install = function () {
+                Karaf.installFeature(workspace, jolokia, $scope.name, $scope.version, function () {
+                    Core.notification('success', 'Installed feature ' + $scope.name);
+                }, function (response) {
+                    Core.notification('error', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
+                });
+            };
+            $scope.uninstall = function () {
+                Karaf.uninstallFeature(workspace, jolokia, $scope.name, $scope.version, function () {
+                    Core.notification('success', 'Uninstalled feature ' + $scope.name);
+                }, function (response) {
+                    Core.notification('error', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
+                });
+            };
+            $scope.toProperties = function (elements) {
+                var answer = '';
+                angular.forEach(elements, function (value, name) {
+                    answer += value['Key'] + " = " + value['Value'] + "\n";
+                });
+                return answer.trim();
+            };
+            function populateTable(response) {
+                $scope.row = Karaf.extractFeature(response.value, $scope.name, $scope.version);
+                if ($scope.row) {
+                    addBundleDetails($scope.row);
+                    var dependencies = [];
+                    //TODO - if the version isn't set or is 0.0.0 then maybe we show the highest available?
+                    angular.forEach($scope.row.Dependencies, function (version, name) {
+                        angular.forEach(version, function (data, version) {
+                            dependencies.push({
+                                Name: name,
+                                Version: version
+                            });
+                        });
+                    });
+                    $scope.row.Dependencies = dependencies;
+                }
+                Core.$apply($scope);
+            }
+            function setBundles(response) {
+                var bundleMap = {};
+                Osgi.defaultBundleValues(workspace, $scope, response.values);
+                angular.forEach(response.value, function (bundle) {
+                    var location = bundle["Location"];
+                    $scope.bundlesByLocation[location] = bundle;
+                });
+            }
+            function updateTableContents() {
+                var featureMbean = Karaf.getSelectionFeaturesMBean(workspace);
+                var bundleMbean = Osgi.getSelectionBundleMBean(workspace);
+                var jolokia = workspace.jolokia;
+                if (bundleMbean) {
+                    setBundles(jolokia.request({ type: 'exec', mbean: bundleMbean, operation: 'listBundles()' }));
+                }
+                if (featureMbean) {
+                    jolokia.request({ type: 'read', mbean: featureMbean }, Core.onSuccess(populateTable));
+                }
+            }
+            function addBundleDetails(feature) {
+                var bundleDetails = [];
+                angular.forEach(feature["Bundles"], function (bundleLocation) {
+                    var bundle = $scope.bundlesByLocation[bundleLocation];
+                    if (bundle) {
+                        bundle["Installed"] = true;
+                        bundleDetails.push(bundle);
+                    }
+                    else {
+                        bundleDetails.push({
+                            "Location": bundleLocation,
+                            "Installed": false
+                        });
+                    }
+                });
+                feature["BundleDetails"] = bundleDetails;
+            }
+        }]);
+})(Karaf || (Karaf = {}));
+
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.FeaturesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            $scope.responseJson = '';
+            $scope.filter = '';
+            $scope.installedFeatures = [];
+            $scope.features = [];
+            $scope.repositories = [];
+            $scope.selectedRepositoryId = '';
+            $scope.selectedRepository = {};
+            $scope.newRepositoryURI = '';
+            $scope.init = function () {
+                var selectedRepositoryId = $location.search()['repositoryId'];
+                if (selectedRepositoryId) {
+                    $scope.selectedRepositoryId = selectedRepositoryId;
+                }
+                var filter = $location.search()['filter'];
+                if (filter) {
+                    $scope.filter = filter;
+                }
+            };
+            $scope.init();
+            $scope.$watch('selectedRepository', function (newValue, oldValue) {
+                //log.debug("selectedRepository: ", $scope.selectedRepository);
+                if (newValue !== oldValue) {
+                    if (!newValue) {
+                        $scope.selectedRepositoryId = '';
+                    }
+                    else {
+                        $scope.selectedRepositoryId = newValue['repository'];
+                    }
+                    $location.search('repositoryId', $scope.selectedRepositoryId);
+                }
+            }, true);
+            $scope.$watch('filter', function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    $location.search('filter', newValue);
+                }
+            });
+            var featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
+            Karaf.log.debug("Features mbean: ", featuresMBean);
+            if (featuresMBean) {
+                Core.register(jolokia, $scope, {
+                    type: 'read', mbean: featuresMBean
+                }, Core.onSuccess(render));
+            }
+            $scope.inSelectedRepository = function (feature) {
+                if (!$scope.selectedRepository || !('repository' in $scope.selectedRepository)) {
+                    return "";
+                }
+                if (!feature || !('RepositoryName' in feature)) {
+                    return "";
+                }
+                if (feature['RepositoryName'] === $scope.selectedRepository['repository']) {
+                    return "in-selected-repository";
+                }
+                return "";
+            };
+            $scope.isValidRepository = function () {
+                return Core.isBlank($scope.newRepositoryURI);
+            };
+            $scope.installRepository = function () {
+                var repoURL = $scope.newRepositoryURI;
+                Core.notification('info', 'Adding feature repository URL');
+                Karaf.installRepository(workspace, jolokia, repoURL, function () {
+                    Core.notification('success', 'Added feature repository URL');
+                    $scope.selectedRepository = {};
+                    $scope.selectedRepositoryId = '';
+                    $scope.responseJson = null;
+                    $scope.triggerRefresh();
+                }, function (response) {
+                    Karaf.log.error('Failed to add feature repository URL ', repoURL, ' due to ', response.error);
+                    Karaf.log.info('stack trace: ', response.stacktrace);
+                    Core.$apply($scope);
+                });
+            };
+            $scope.uninstallRepository = function () {
+                var repoURI = $scope.selectedRepository['uri'];
+                Core.notification('info', 'Removing feature repository ' + repoURI);
+                Karaf.uninstallRepository(workspace, jolokia, repoURI, function () {
+                    Core.notification('success', 'Removed feature repository ' + repoURI);
+                    $scope.responseJson = null;
+                    $scope.selectedRepositoryId = '';
+                    $scope.selectedRepository = {};
+                    $scope.triggerRefresh();
+                }, function (response) {
+                    Karaf.log.error('Failed to remove feature repository ', repoURI, ' due to ', response.error);
+                    Karaf.log.info('stack trace: ', response.stacktrace);
+                    Core.$apply($scope);
+                });
+            };
+            $scope.triggerRefresh = function () {
+                jolokia.request({
+                    type: 'read',
+                    method: 'POST',
+                    mbean: featuresMBean
+                }, Core.onSuccess(render));
+            };
+            $scope.install = function (feature) {
+                //$('.popover').remove();
+                Core.notification('info', 'Installing feature ' + feature.Name);
+                Karaf.installFeature(workspace, jolokia, feature.Name, feature.Version, function () {
+                    Core.notification('success', 'Installed feature ' + feature.Name);
+                    $scope.installedFeatures.add(feature);
+                    $scope.responseJson = null;
+                    $scope.triggerRefresh();
+                    //Core.$apply($scope);
+                }, function (response) {
+                    Karaf.log.error('Failed to install feature ', feature.Name, ' due to ', response.error);
+                    Karaf.log.info('stack trace: ', response.stacktrace);
+                    Core.$apply($scope);
+                });
+            };
+            $scope.uninstall = function (feature) {
+                //$('.popover').remove();
+                Core.notification('info', 'Uninstalling feature ' + feature.Name);
+                Karaf.uninstallFeature(workspace, jolokia, feature.Name, feature.Version, function () {
+                    Core.notification('success', 'Uninstalled feature ' + feature.Name);
+                    $scope.installedFeatures.remove(feature);
+                    $scope.responseJson = null;
+                    $scope.triggerRefresh();
+                    //Core.$apply($scope);
+                }, function (response) {
+                    Karaf.log.error('Failed to uninstall feature ', feature.Name, ' due to ', response.error);
+                    Karaf.log.info('stack trace: ', response.stacktrace);
+                    Core.$apply($scope);
+                });
+            };
+            $scope.filteredRows = ['Bundles', 'Configurations', 'Configuration Files', 'Dependencies'];
+            $scope.showRow = function (key, value) {
+                if ($scope.filteredRows.indexOf(key) !== -1) {
+                    return false;
+                }
+                if (angular.isArray(value)) {
+                    if (value.length === 0) {
+                        return false;
+                    }
+                }
+                if (angular.isString(value)) {
+                    if (Core.isBlank(value)) {
+                        return false;
+                    }
+                }
+                if (angular.isObject(value)) {
+                    if (!value || angular.equals(value, {})) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+            $scope.installed = function (installed) {
+                var answer = Core.parseBooleanValue(installed);
+                return answer;
+            };
+            $scope.showValue = function (value) {
+                if (angular.isArray(value)) {
+                    var answer = ['<ul class="zebra-list">'];
+                    value.forEach(function (v) { answer.push('<li>' + v + '</li>'); });
+                    answer.push('</ul>');
+                    return answer.join('\n');
+                }
+                if (angular.isObject(value)) {
+                    var answer = ['<table class="table">', '<tbody>'];
+                    angular.forEach(value, function (value, key) {
+                        answer.push('<tr>');
+                        answer.push('<td>' + key + '</td>');
+                        answer.push('<td>' + value + '</td>');
+                        answer.push('</tr>');
+                    });
+                    answer.push('</tbody>');
+                    answer.push('</table>');
+                    return answer.join('\n');
+                }
+                return "" + value;
+            };
+            $scope.getStateStyle = function (feature) {
+                if (Core.parseBooleanValue(feature.Installed)) {
+                    return "badge badge-success";
+                }
+                return "badge";
+            };
+            $scope.filterFeature = function (feature) {
+                if (Core.isBlank($scope.filter)) {
+                    return true;
+                }
+                if (feature.Id.has($scope.filter)) {
+                    return true;
+                }
+                return false;
+            };
+            function render(response) {
+                var responseJson = angular.toJson(response.value);
+                if ($scope.responseJson !== responseJson) {
+                    $scope.responseJson = responseJson;
+                    //log.debug("Got response: ", response.value);
+                    if (response['value']['Features'] === null) {
+                        $scope.featuresError = true;
+                    }
+                    else {
+                        $scope.featuresError = false;
+                    }
+                    $scope.features = [];
+                    $scope.repositories = [];
+                    var features = [];
+                    var repositories = [];
+                    Karaf.populateFeaturesAndRepos(response.value, features, repositories);
+                    var installedFeatures = features.filter(function (f) { return Core.parseBooleanValue(f.Installed); });
+                    var uninstalledFeatures = features.filter(function (f) { return !Core.parseBooleanValue(f.Installed); });
+                    //log.debug("repositories: ", repositories);
+                    $scope.installedFeatures = _.sortBy(installedFeatures, function (f) { return f['Name']; });
+                    uninstalledFeatures = _.sortBy(uninstalledFeatures, function (f) { return f['Name']; });
+                    _.sortBy(repositories, 'id').forEach(function (repo) {
+                        $scope.repositories.push({
+                            repository: repo['id'],
+                            uri: repo['uri'],
+                            features: _.filter(uninstalledFeatures, function (f) { return f['RepositoryName'] === repo['id']; })
+                        });
+                    });
+                    if (!Core.isBlank($scope.newRepositoryURI)) {
+                        var selectedRepo = _.find(repositories, function (r) { return r['uri'] === $scope.newRepositoryURI; });
+                        if (selectedRepo) {
+                            $scope.selectedRepositoryId = selectedRepo['id'];
+                        }
+                        $scope.newRepositoryURI = '';
+                    }
+                    if (Core.isBlank($scope.selectedRepositoryId)) {
+                        $scope.selectedRepository = _.first($scope.repositories);
+                    }
+                    else {
+                        $scope.selectedRepository = _.find($scope.repositories, function (r) { return r.repository === $scope.selectedRepositoryId; });
+                    }
+                    Core.$apply($scope);
+                }
+            }
+        }]);
+})(Karaf || (Karaf = {}));
+
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.NavBarController", ["$scope", "workspace", function ($scope, workspace) {
+            $scope.hash = workspace.hash();
+            $scope.isKarafEnabled = workspace.treeContainsDomainAndProperties("org.apache.karaf");
+            $scope.isFeaturesEnabled = Karaf.getSelectionFeaturesMBean(workspace);
+            $scope.isScrEnabled = Karaf.getSelectionScrMBean(workspace);
+            $scope.$on('$routeChangeSuccess', function () {
+                $scope.hash = workspace.hash();
+            });
+            $scope.isActive = function (nav) {
+                return workspace.isLinkActive(nav);
+            };
+            $scope.isPrefixActive = function (nav) {
+                return workspace.isLinkPrefixActive(nav);
+            };
+        }]);
+})(Karaf || (Karaf = {}));
+
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.ScrComponentController", ["$scope", "$location", "workspace", "jolokia", "$routeParams", function ($scope, $location, workspace, jolokia, $routeParams) {
+            $scope.srcComponentsUrl = Core.url('/osgi/scr-components' + workspace.hash());
+            $scope.name = $routeParams.name;
+            populateTable();
+            function populateTable() {
+                $scope.row = Karaf.getComponentByName(workspace, jolokia, $scope.name);
+                Core.$apply($scope);
+            }
+            $scope.activate = function () {
+                Karaf.activateComponent(workspace, jolokia, $scope.row['Name'], function () {
+                    console.log("Activated!");
+                }, function () {
+                    console.log("Failed to activate!");
+                });
+            };
+            $scope.deactivate = function () {
+                Karaf.deactivateComponent(workspace, jolokia, $scope.row['Name'], function () {
+                    console.log("Deactivated!");
+                }, function () {
+                    console.log("Failed to deactivate!");
+                });
+            };
+        }]);
+})(Karaf || (Karaf = {}));
+
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            $scope.component = empty();
+            // caches last jolokia result
+            $scope.result = [];
+            // rows in components table
+            $scope.components = [];
+            // selected components
+            $scope.selectedComponents = [];
+            $scope.scrOptions = {
+                data: 'components',
+                sortInfo: { "sortBy": "Name", "ascending": true },
+                selectedItems: $scope.selectedComponents,
+                columnDefs: [
+                    {
+                        field: 'Name',
+                        displayName: 'Name',
+                        cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.Name}}</a></div>'
+                    },
+                    {
+                        field: 'State',
+                        displayName: 'State',
+                        cellTemplate: '{{row.entity.State}}'
+                    }
+                ],
+                primaryKeyFn: function (entity) { return entity.Name; }
+            };
+            var scrMBean = Karaf.getSelectionScrMBean(workspace);
+            if (scrMBean) {
+                var components = Karaf.getAllComponents(workspace, jolokia);
+                addUrlField(components);
+                render(components);
+            }
+            function addUrlField(components) {
+                components.forEach(function (component) {
+                    return component.Url = Core.url("/osgi/scr-component/" + component.Name + workspace.hash());
+                });
+            }
+            $scope.activate = function () {
+                $scope.selectedComponents.forEach(function (component) {
+                    Karaf.activateComponent(workspace, jolokia, component.Name, function () {
+                        console.log("Activated!");
+                    }, function () {
+                        console.log("Failed to activate!");
+                    });
+                });
+            };
+            $scope.deactivate = function () {
+                $scope.selectedComponents.forEach(function (component) {
+                    Karaf.deactivateComponent(workspace, jolokia, component.Name, function () {
+                        console.log("Deactivated!");
+                    }, function () {
+                        console.log("Failed to deactivate!");
+                    });
+                });
+            };
+            function empty() {
+                return [
+                    {
+                        Name: "",
+                        Status: false
+                    }
+                ];
+            }
+            function render(components) {
+                if (!angular.equals($scope.result, components)) {
+                    $scope.components = components;
+                    $scope.result = $scope.components;
+                    Core.$apply($scope);
+                }
+            }
+        }]);
+})(Karaf || (Karaf = {}));
+
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.ServerController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            $scope.data = {
+                name: "",
+                version: "",
+                state: "",
+                root: "",
+                startLevel: "",
+                framework: "",
+                frameworkVersion: "",
+                location: "",
+                sshPort: "",
+                rmiRegistryPort: "",
+                rmiServerPort: "",
+                pid: "" };
+            $scope.$on('jmxTreeUpdated', reloadFunction);
+            $scope.$watch('workspace.tree', reloadFunction);
+            function reloadFunction() {
+                // if the JMX tree is reloaded its probably because a new MBean has been added or removed
+                // so lets reload, asynchronously just in case
+                setTimeout(loadData, 50);
+            }
+            function loadData() {
+                console.log("Loading Karaf data...");
+                jolokia.search("org.apache.karaf:type=admin,*", Core.onSuccess(render));
+            }
+            function render(response) {
+                // grab the first mbean as there should ideally only be one karaf in the JVM
+                if (angular.isArray(response)) {
+                    var mbean = response[0];
+                    if (mbean) {
+                        jolokia.getAttribute(mbean, "Instances", Core.onSuccess(function (response) {
+                            onInstances(response, mbean);
+                        }));
+                    }
+                }
+            }
+            function onInstances(instances, mbean) {
+                if (instances) {
+                    var parsedMBean = Core.parseMBean(mbean);
+                    var instanceName = 'root';
+                    if ('attributes' in parsedMBean) {
+                        if ('name' in parsedMBean['attributes']) {
+                            instanceName = parsedMBean['attributes']['name'];
+                        }
+                    }
+                    //log.debug("mbean: ", Core.parseMBean(mbean));
+                    //log.debug("Instances: ", instances);
+                    // the name is the first child
+                    var rootInstance = instances[instanceName];
+                    $scope.data.name = rootInstance.Name;
+                    $scope.data.state = rootInstance.State;
+                    $scope.data.root = rootInstance["Is Root"];
+                    $scope.data.location = rootInstance.Location;
+                    $scope.data.sshPort = rootInstance["SSH Port"];
+                    $scope.data.rmiRegistryPort = rootInstance["RMI Registry Port"];
+                    $scope.data.rmiServerPort = rootInstance["RMI Server Port"];
+                    $scope.data.pid = rootInstance.Pid;
+                    // we need to get these data from the system mbean
+                    $scope.data.version = "?";
+                    $scope.data.startLevel = "?";
+                    $scope.data.framework = "?";
+                    $scope.data.frameworkVersion = "?";
+                    var systemMbean = "org.apache.karaf:type=system,name=" + rootInstance.Name;
+                    // get more data, and its okay to do this synchronously
+                    var response = jolokia.request({ type: "read", mbean: systemMbean,
+                        attribute: ["StartLevel", "Framework", "Version"] }, Core.onSuccess(null));
+                    var obj = response.value;
+                    if (obj) {
+                        $scope.data.version = obj.Version;
+                        $scope.data.startLevel = obj.StartLevel;
+                        $scope.data.framework = obj.Framework;
+                    }
+                    // and the osgi framework version is the bundle version
+                    var response2 = jolokia.search("osgi.core:type=bundleState,*", Core.onSuccess(null));
+                    if (angular.isArray(response2)) {
+                        var mbean = response2[0];
+                        if (mbean) {
+                            // get more data, and its okay to do this synchronously
+                            var response3 = jolokia.request({ type: 'exec', mbean: mbean, operation: 'getVersion(long)', arguments: [0] }, Core.onSuccess(null));
+                            var obj3 = response3.value;
+                            if (obj3) {
+                                $scope.data.frameworkVersion = obj3;
+                            }
+                        }
+                    }
+                }
+                // ensure web page is updated
+                Core.$apply($scope);
+            }
+        }]);
+})(Karaf || (Karaf = {}));
+
 var Camel;
 (function (Camel) {
     var Property = (function () {
@@ -11355,7 +11351,7 @@ $templateCache.put('plugins/camel/html/propertiesEndpoint.html','<div class="cam
 $templateCache.put('plugins/camel/html/propertiesRoute.html','<div class="camel-properties" ng-controller="Camel.PropertiesRouteController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/restServices.html','<div ng-controller="Camel.RestServicesController">\n  <h1>REST Services</h1>\n  <div ng-if="!selectedMBean">\n    <div class="spinner spinner-lg loading-page"></div>\n  </div>\n  <div ng-if="selectedMBean">\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-rest-services-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n    <div class="row" ng-if="data.length === 0">\n      <div class="col-sm-12">\n        <div class="loading-message">\n          There are no REST Services registered in this CamelContext.\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/camel/html/routeMetrics.html','<div ng-controller="Camel.RouteMetricsController">\n\n  <div class="row">\n    <div class="col-md-12">\n      <h1>Route Metrics</h1>\n    </div>\n  </div>\n \n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="toolbar-pf-action-right">\n          <div class="form-group has-clear">\n            <div class="search-pf-input-group">\n              <label for="search1" class="sr-only">Filter</label>\n              <input id="search1" type="search" class="form-control" ng-model="filterText"\n                    placeholder="Search">\n              <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n                <span class="pficon pficon-close"></span>\n              </button>\n            </div>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="spinner spinner-lg loading-page" ng-if="!initDone"></div>\n\n  <div ng-show="initDone">\n    <div class="row" ng-if="metricDivs.length === 0">\n      <div class="col-md-12">\n        <div class="loading-message">\n          This Camel context has no route metrics data.\n        </div>\n      </div>\n    </div>\n    <div class="row" ng-if="metricDivs.length > 0">\n      <div class="col-md-12">\n        <div id="{{metric.id}}" ng-repeat="metric in metricDivs track by metric.id" ng-show="metricVisible(metric)"></div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/camel/html/routes.html','<div ng-class="{\'wiki-fixed\' : !isJmxTab}" id="canvas" ng-controller="Camel.RouteController">\n  <div ng-hide="isJmxTab">\n    <ng-include src="\'plugins/camel/html/breadcrumbBar.html\'"></ng-include>\n  </div>\n  <svg class="camel-diagram" width=0 height=0>\n    <defs>\n      <marker id="arrowhead"\n              viewBox="0 0 10 10"\n              refX="8"\n              refY="5"\n              markerUnits="strokeWidth"\n              markerWidth="4"\n              markerHeight="3"\n              orient="auto"\n              style="fill: #333">\n        <path d="M 0 0 L 10 5 L 0 10 z"></path>\n      </marker>\n\n      <filter id="drop-shadow" width="300%" height="300%">\n        <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="19"/>\n        <feOffset in="blur-out" result="the-shadow" dx="2" dy="2"/>\n        <feComponentTransfer xmlns="http://www.w3.org/2000/svg">\n          <feFuncA type="linear" slope="0.2"/>\n        </feComponentTransfer>\n        <feMerge xmlns="http://www.w3.org/2000/svg">\n          <feMergeNode/>\n          <feMergeNode in="SourceGraphic"/>\n        </feMerge>\n      </filter>\n      <linearGradient id="rect-gradient" x1="0%" y1="0%" x2="0%" y2="100%">\n        <stop offset="0%" style="stop-color:rgb(254,254,255);stop-opacity:1"/>\n        <stop offset="100%" style="stop-color:rgb(247,247,255);stop-opacity:1"/>\n      </linearGradient>\n      <linearGradient id="rect-select-gradient" x1="0%" y1="0%" x2="0%" y2="100%">\n        <stop offset="0%" style="stop-color: #ffffa0; stop-opacity: 0.7"/>\n        <stop offset="100%" style="stop-color: #f0f0a0; stop-opacity: 0.7"/>\n      </linearGradient>\n    </defs>\n  </svg>\n</div>\n\n');
+$templateCache.put('plugins/camel/html/routes.html','<div ng-class="{\'wiki-fixed\' : !isJmxTab}" id="canvas" ng-controller="Camel.RouteController">\n  <div ng-hide="isJmxTab">\n    <ng-include src="\'plugins/camel/html/breadcrumbBar.html\'"></ng-include>\n  </div>\n  <svg class="camel-diagram" width="100%" height="100%" preserveAspectRatio="xMidYMid">\n    <defs>\n      <marker id="arrowhead"\n              viewBox="0 0 10 10"\n              refX="8"\n              refY="5"\n              markerUnits="strokeWidth"\n              markerWidth="4"\n              markerHeight="3"\n              orient="auto"\n              style="fill: #333">\n        <path d="M 0 0 L 10 5 L 0 10 z"></path>\n      </marker>\n\n      <filter id="drop-shadow" width="300%" height="300%">\n        <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="19"/>\n        <feOffset in="blur-out" result="the-shadow" dx="2" dy="2"/>\n        <feComponentTransfer xmlns="http://www.w3.org/2000/svg">\n          <feFuncA type="linear" slope="0.2"/>\n        </feComponentTransfer>\n        <feMerge xmlns="http://www.w3.org/2000/svg">\n          <feMergeNode/>\n          <feMergeNode in="SourceGraphic"/>\n        </feMerge>\n      </filter>\n      <linearGradient id="rect-gradient" x1="0%" y1="0%" x2="0%" y2="100%">\n        <stop offset="0%" style="stop-color:rgb(254,254,255);stop-opacity:1"/>\n        <stop offset="100%" style="stop-color:rgb(247,247,255);stop-opacity:1"/>\n      </linearGradient>\n      <linearGradient id="rect-select-gradient" x1="0%" y1="0%" x2="0%" y2="100%">\n        <stop offset="0%" style="stop-color: #ffffa0; stop-opacity: 0.7"/>\n        <stop offset="100%" style="stop-color: #f0f0a0; stop-opacity: 0.7"/>\n      </linearGradient>\n    </defs>\n  </svg>\n</div>\n\n');
 $templateCache.put('plugins/camel/html/sendMessage.html','<div ng-controller="Camel.SendMessageController">\n\n  <div class="row">\n    <div class="col-sm-12">\n      <h1>Send Message</h1>\n    </div>\n  </div>\n\n  <div class="row" ng-show="noCredentials">\n    <div class="col-sm-12">\n      <div class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        <strong>No credentials set for endpoint!</strong>\n        Please set your username and password in the\n        <a href="#" class="alert-link" ng-click="openPrefs()">Preferences</a> page.\n      </div>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <h3>Headers</h3>\n    </div>\n  </div>\n\n  <div class="row camel-message-headers" ng-if="headers.length > 0">\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Name</label>\n          <input type="text" class="form-control" ng-model="header.name" ng-repeat="header in headers"\n                 uib-typeahead="completion for completion in defaultHeaderNames() | filter:$viewValue"\n                 pf-focused="$last">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Value</label>\n          <input type="text" class="form-control" ng-model="header.value" ng-repeat="header in headers">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-2">\n      <form>\n        <div class="form-group">\n          <label>&nbsp;</label>\n          <button type="button" class="btn btn-default" title="Delete" ng-click="removeHeader(header)"\n                  ng-repeat="header in headers">\n            <span class="pficon pficon-delete"></span>\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <a href="" ng-click="addHeader()">Add header</a>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <h3>Body</h3>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <form>\n        <div class="form-group">\n          <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>\n        </div>\n        <div class="form-group">\n          <select pf-select ng-model="codeMirrorOptions.mode.name">\n            <option value="javascript">JSON</option>\n            <option value="xml">XML</option>\n          </select>\n          <button class="btn btn-default" ng-click="formatMessage()"\n                  title="Automatically pretty prints the message so its easier to read">Format\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-sm-12">\n      <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/source.html','<div ng-controller="Camel.SourceController">\n  \n  <div class="row">\n    <div class="col-md-12">\n      <h1>Source</h1>\n    </div>\n  </div>\n  \n  <div class="row">\n    <div class="col-md-12">\n      <form>\n        <div class="form-group">\n          <div hawtio-editor="source" mode="\'xml\'" read-only="!showUpdateButton"></div>\n        </div>\n      </form>\n    </div>\n  </div>\n  \n  <div class="row" ng-if="showUpdateButton">\n    <div class="col-md-12">\n      <button class="btn btn-primary" hawtio-show object-name="{{camelContextMBean}}"\n              method-name="addOrUpdateRoutesFromXml" ng-click="saveRouteXml()">\n        Update\n      </button>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/traceRoute.html','<div ng-controller="Camel.TraceRouteController">\n  <h1>Trace</h1>\n  <div ng-hide="tracing">\n    <p>Tracing allows you to send messages to a route and then step through and see the messages flow through a route\n      to aid debugging and to help diagnose issues.\n    </p>\n    <p>Once you start tracing, you can send messages to the input endpoints, then come back to this page and see the\n      flow of messages through your route.\n    </p>\n    <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up\n      and down in the message table lets you see the flow of the message through the diagram.\n    </p>\n    <button type="button" class="btn btn-primary" ng-click="startTracing()">\n      Start tracing\n    </button>\n  </div>\n  <div class="toolbar-pf debug-toolbar" ng-if="tracing">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button type="button" class="btn btn-default" ng-click="clear()">Clear messages</button>\n      </div>\n      <div class="form-group">\n        <button type="button" class="btn btn-default" ng-click="stopTracing()">Stop tracing</button>\n      </div>\n    </form>\n  </div>\n  <div ng-if="tracing">\n    <div ng-include src="graphView"></div>\n    <h2>Messages</h2>\n    <div ng-if="!showMessageDetails">\n      <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>\n    </div>\n    <div ng-if="showMessageDetails">\n      <div class="alert camel-trace-alert">\n        <button type="button" class="close" aria-hidden="true" ng-click="closeMessageDetails()">\n          <span class="pficon pficon-close"></span>\n        </button>\n        <div class="btn-group camel-trace-pager" hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>\n        <h3>ID</h3>\n        <p>{{row.id}}</p>\n        <h3>Headers</h3>\n        <table class="table table-striped table-bordered">\n          <thead>\n            <tr>\n              <th>Name</th>\n              <th>Type</th>\n              <th>Value</th>\n            </tr>\n          </thead>\n          <tbody compile="row.headerHtml"></tbody>\n        </table>\n        <h3>Body</h3>\n        <p><label>Type:</label> <span ng-bind="row.bodyType"></span></p>\n        <div hawtio-editor="row.body" read-only="true" mode="mode"></div>\n      </div>    \n    </div>\n  </div>\n</div>\n');
@@ -11378,820 +11374,6 @@ $templateCache.put('plugins/osgi/html/pid-details.html','<div class="pid-details
 $templateCache.put('plugins/osgi/html/pid.html','<div class="controller-section" ng-controller="Osgi.PidController">\n  <div ng-include src="\'plugins/osgi/html/pid-details.html\'"></div>\n</div>\n');
 $templateCache.put('plugins/osgi/html/services.html','<h1>Services</h1>\n\n<div class="controller-section" ng-controller="Osgi.ServiceController">\n\n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="search1" class="sr-only">Filter</label>\n            <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">\n            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="toolbar-pf-action-right" ng-show="services !== null">\n          {{filteredServices.length}} of {{services.length}}\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="spinner spinner-lg loading-page" ng-if="services === null"></div>\n\n  <div class="list-group list-view-pf list-view-pf-view">\n    <div class="list-group-item" ng-class="{\'list-view-pf-expand-active\': service.expanded}"\n         ng-repeat="service in services | filter:filterText as filteredServices">\n      <div class="list-group-item-header" ng-click="service.expanded = !service.expanded">\n        <div class="list-view-pf-expand">\n          <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': service.expanded}"></span>\n        </div>\n        <div class="list-view-pf-main-info">\n          <div class="list-view-pf-body">\n            <div class="list-view-pf-description">\n              <div class="list-group-item-heading">\n                ID {{service.Identifier}}\n              </div>\n              <div class="list-group-item-text" ng-bind-html="service.BundleIdentifier">\n              </div>\n            </div>\n            <div class="list-view-pf-additional-info">\n              <div class="list-view-pf-additional-info-item" title="Object Classes">\n                {{service.objectClass[0]}}{{service.objectClass.length > 1 ? \'...\' : \'\'}}\n              </div>\n            </div>              \n          </div>\n        </div>\n      </div>\n      <div class="list-group-item-container" ng-if="service.expanded">\n        <div class="close" ng-click="service.expanded = false">\n          <span class="pficon pficon-close"></span>\n        </div>\n        <div class="col-md-5">\n          <dl>\n            <dt>Using Bundles</dt>\n            <dd>\n              <ul class="service-bundles-list">\n                <li ng-repeat="bundle in service.UsingBundles">\n                  <a ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n        <div class="col-md-5">\n          <dl>\n            <dt>Object Classes</dt>\n            <dd>\n              <ul class="service-object-classes-list">\n                <li ng-repeat="clazz in service.objectClass">\n                  {{clazz}}\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/svc-dependencies.html','<style type="text/css">\n\n  div#pop-up {\n    display: none;\n    position:absolute;\n    color: white;\n    font-size: 14px;\n    background: rgba(0,0,0,0.6);\n    padding: 5px 10px 5px 10px;\n    -moz-border-radius: 8px 8px;\n    border-radius: 8px 8px;\n  }\n\n  div#pop-up-title {\n    font-size: 15px;\n    margin-bottom: 4px;\n    font-weight: bolder;\n  }\n  div#pop-up-content {\n    font-size: 12px;\n  }\n\n  rect.graphbox {\n    fill: #DDD;\n  }\n\n  rect.graphbox.frame {\n    stroke: #222;\n    stroke-width: 2px\n  }\n\n  path.link {\n    fill: none;\n    stroke: #666;\n    stroke-width: 1.5px;\n  }\n\n  path.link.registered {\n    stroke: #444;\n  }\n\n  path.link.inuse {\n    stroke-dasharray: 0,2 1;\n  }\n\n  circle {\n    fill: #black;\n  }\n\n  circle.service {\n    fill: blue;\n  }\n\n  circle.bundle {\n    fill: black;\n  }\n\n  circle.package {\n    fill: gray;\n  }\n\n  text {\n    font: 10px sans-serif;\n    pointer-events: none;\n  }\n\n  text.shadow {\n    stroke: #fff;\n    stroke-width: 3px;\n    stroke-opacity: .8;\n  }\n\n</style>\n\n<div ng-controller="Osgi.ServiceDependencyController">\n  <div class="row">\n    <form class="form-inline no-bottom-margin inline-block">\n      <fieldset>\n        <div class="control-group">\n          <input type="text" class="search-query" placeholder="Filter Bundle Symbolic Name..." ng-model="bundleFilter">\n          <input type="text" class="search-query" placeholder="Filter Package Name..." ng-model="packageFilter" ng-change="updatePkgFilter()">\n          <label class="radio" for="showServices">\n            <input id="showServices" type="radio" value="services" ng-model="selectView"> Show Services\n          </label>\n          <label class="radio" for="showPackages">\n            <input id="showPackages" type="radio" value="packages" ng-model="selectView" ng-disabled="disablePkg"> Show Packages\n          </label>\n          <label class="checkbox" for="hideUnused">\n            <input id="hideUnused" type="checkbox" ng-model="hideUnused"> Hide Unused\n          </label>\n          <button class="btn btn-primary" ng-click="updateGraph()" title="Apply the selected criteria to the Graph.">Apply</button>\n        </div>\n      </fieldset>\n    </form>\n    <!-- a ng-hide="inDashboard" class="pull-right btn btn-default" ng-href="{{addToDashboardLink()}}" title="Add this view to a Dashboard"><i class="fa fa-share"></i></a -->\n  </div>\n\n  <div id="pop-up">\n    <div id="pop-up-title"></div>\n    <div id="pop-up-content"></div>\n  </div>\n\n  <div class="row">\n    <div class="col-md-12 canvas" style="min-height: 800px">\n      <div hawtio-force-graph graph="graph" link-distance="100" charge="-300" nodesize="6"></div>\n    </div>\n  </div>\n\n</div>\n');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");
-/*****************************************************************************
- * Metrics-Watcher
- *
- * Copyright 2012 Ben Bertola and iovation, Inc.
- *
- * To use this library:
- * 1. Call metricsWatcher.addXXX() for each graph you want on your page
- * 2. Call metricsWatcher.initGraphs() once to draw the initial graphs
- * 3. Call metricsWatcher.updateGraphs(jsonData) with JSON data from your
- *    metrics/servlet as often as you'd like your graphs to update
- *
- *****************************************************************************/
-
-(function(metricsWatcher, $) {
-
-	/**
-	 * Add a Gauge type graph to your page.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addGauge = function(divId, className, metricName, title) {
-		var metricInfo = new MetricInfo(divId, className, metricName, null, title, 'gauges', null);
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a Meter type graph to your page.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addMeter = function(divId, className, metricName, max, title, eventType) {
-		if (eventType == undefined) eventType = 'Calls';
-		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'meters', eventType);
-		metricInfo.eventType = eventType;
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a Counter graph
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addCounter = function(divId, className, metricName, max, title) {
-		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'counters', null);
-		graphs.push(metricInfo);
-	};
-
-		/**
-	 * Add a standalone Histogram graph
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addHistogram = function(divId, className, metricName, max, title){
-		var metricInfo = new MetricInfo(divId, className, metricName, (!max ? 1: max), title, 'histograms', null);
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a linked Counter graph. Linked Counters differ from a plain counter graph in that both the numerator and denominator
-	 * of a linked counter graph each come from individual Counter Metrics.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param maxClassName
-	 * @param maxMetricName
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addLinkedCounter = function(divId, className, metricName, maxClassName, maxMetricName, title) {
-		var metricInfo = new MetricInfo(divId, className, metricName, null, title, "counters", null);
-		if(!metricInfo)
-			metricInfo = new MetricInfo(divId, className, metricName, null, title, "timers", null);
-		
-		metricInfo.maxClassName = maxClassName;
-		metricInfo.maxMetricName = maxMetricName;
-
-		metricInfo.getMax = function(json) {
-			var maxNode = this.getMetricNode(this.maxClassName, this.maxMetricName, json);
-			return maxNode["count"];
-		};
-		
-			metricInfo.getMetricNode = function getMetricNode(className, metricName, jsonRoot) {
-				
-				var node=!(jsonRoot["counters"][className+'.'+metricName]) ? null : jsonRoot["counters"][className+'.'+metricName];
-				if(node){
-					return node;
-				}else{
-					return !(jsonRoot["timers"][className+'.'+metricName]) ? null : jsonRoot["timers"][className+'.'+metricName];
-				}
-			};
-
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a Timer graph. This will include a Meter, Timing Info, and a Histogram.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param max The max target value for the Meter, showing frequency
-	 * @param title The user-displayed title of this graph
-	 * @param eventType a name for this event type
-	 * @param durationMax The max target value for duration
-	 */
-	metricsWatcher.addTimer = function(divId, className, metricName, max, title, eventType, durationMax) {
-		var timer = addTimerInternal(divId, className, metricName, max, title, eventType, durationMax, false);
-		graphs.push(timer);
-	};
-
-	/**
-	 * Add an ehcache graph.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addCache = function(divId, className, title) {
-		var metricInfo = new MetricInfo(divId, className, null, null, title, "caches", null);
-
-		metricInfo.components = {
-			gauges : [
-				new MetricInfo(null, className, "hits", null, "Hits", "gauges", null),
-				new MetricInfo(null, className, "misses", null, "Misses", "gauges", null),
-				new MetricInfo(null, className, "objects", null, "Objects", "gauges", null),
-				new MetricInfo(null, className, "eviction-count", null, "Eviction Count", "gauges", null),
-				new MetricInfo(null, className, "in-memory-hits", null, "In Memory Hits", "gauges", null),
-				new MetricInfo(null, className, "in-memory-misses", null, "In Memory Misses", "gauges", null),
-				new MetricInfo(null, className, "in-memory-objects", null, "In Memory Objects", "gauges", null),
-				new MetricInfo(null, className, "off-heap-hits", null, "Off Heap Hits", "gauges", null),
-				new MetricInfo(null, className, "off-heap-misses", null, "Off Heap Misses", "gauges", null),
-				new MetricInfo(null, className, "off-heap-objects", null, "Off Heap Objects", "gauges", null),
-				new MetricInfo(null, className, "on-disk-hits", null, "On Disk Hits", "gauges", null),
-				new MetricInfo(null, className, "on-disk-misses", null, "On Disk Misses", "gauges", null),
-				new MetricInfo(null, className, "on-disk-objects", null, "On Disk Objects", "gauges", null),
-				new MetricInfo(null, className, "mean-get-time", null, "Mean Get Time", "gauges", null),
-				new MetricInfo(null, className, "mean-search-time", null, "Mean Search Time", "gauges", null),
-				new MetricInfo(null, className, "searches-per-second", null, "Searches Per Sec", "gauges", null),
-				new MetricInfo(null, className, "writer-queue-size", null, "Writer Queue Size", "gauges", null),
-				new MetricInfo(null, className, "accuracy", null, "Accuracy", "gauges", null)
-			]
-		};
-		metricInfo.getTimer = addTimerInternal(divId + "gettimer", className, "gets", 5, "Get", "get", 1, true);
-		metricInfo.putTimer = addTimerInternal(divId + "puttimer", className, "puts", 5, "Put", "put", 1, true);
-
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a JVM graph.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addJvm = function(divId, className, title) {
-		var metricInfo = new MetricInfo(divId, className, null, null, title, "jvms", null);
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a web server graph.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addWeb = function(divId, className, title) {
-		var metricInfo = new MetricInfo(divId, className, null, null, title, "webs", null);
-
-		metricInfo.components = {
-			meters : [
-				new MetricInfo(divId + " td.responseCodesOkGraph", className, "responseCodes.ok", 10, "OK Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesBadRequestGraph", className, "responseCodes.badRequest", 10, "Bad Requests", "meters", null),
-				new MetricInfo(divId + " td.responseCodesCreatedGraph", className, "responseCodes.created", 10, "Created Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesNoContentGraph", className, "responseCodes.noContent", 10, "No Content Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesNotFoundGraph", className, "responseCodes.notFound", 10, "Not Found Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesOtherGraph", className, "responseCodes.other", 10, "Other Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesServerErrorGraph", className, "responseCodes.serverError", 10, "Server Error Responses", "meters", null)
-			],
-			activeRequestsInfo : new MetricInfo(divId + " td.activeRequestsGraph", className, "activeRequests", 10, "Active Requests", "counters", null),
-			requestsInfo : addTimerInternal(divId + " td.requestsGraph", className, "requests", 100, "Requests", "requests", 100, true)
-		};
-
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a log4j logged events graph.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addLog4j = function(divId, className, title) {
-		var metricInfo = new MetricInfo(divId, className, null, null, title, "log4js", null);
-
-		metricInfo.components = {
-			meters : [
-				new MetricInfo(divId + " td.all", className, "all", 100, "all", "meters", null),
-				new MetricInfo(divId + " td.fatal", className, "fatal", 100, "fatal", "meters", null),
-				new MetricInfo(divId + " td.error", className, "error", 100, "error", "meters", null),
-				new MetricInfo(divId + " td.warn", className, "warn", 100, "warn", "meters", null),
-				new MetricInfo(divId + " td.info", className, "info", 100, "info", "meters", null),
-				new MetricInfo(divId + " td.debug", className, "debug", 100, "debug", "meters", null),
-				new MetricInfo(divId + " td.trace", className, "trace", 100, "trace", "meters", null)
-			]
-		};
-
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Initialized each of the graphs that you have added through addXXX() calls,
-	 * and draws them on the screen for the first time
-	 */
-	metricsWatcher.initGraphs = function() {
-		// draw all graphs for the first time
-		for (var i = 0; i < graphs.length; i++) {
-			if (graphs[i].type == "gauges")
-				drawGauge(graphs[i]);
-			else if (graphs[i].type == "meters")
-				drawMeter(graphs[i]);
-			else if (graphs[i].type == "counters" || graphs[i].type == "linkedTimerCounters")
-				drawCounter(graphs[i]);
-			else if (graphs[i].type == "histograms")
-				drawHistogram(graphs[i]);
-			else if (graphs[i].type == "timers")
-				drawTimer(graphs[i]);
-			else if (graphs[i].type == "caches")
-				drawCache(graphs[i]);
-			else if (graphs[i].type == "jvms")
-				drawJvm(graphs[i]);
-			else if (graphs[i].type == "webs")
-				drawWeb(graphs[i]);
-			else if (graphs[i].type == "log4js")
-				drawLog4j(graphs[i]);
-			else
-				alert("Unknown meter info type: " + graphs[i].type);
-		}
-	};
-
-	/**
-	 * Update the existing graphs with new data. You can call this method as frequently as you would
-	 * like to, and all graph info will be updated.
-	 *
-	 * @param json The root of the json node returned from your ajax call to the metrics servlet
-	 */
-	metricsWatcher.updateGraphs = function(json) {
-		for (var i = 0; i < graphs.length; i++) {
-			if (graphs[i].type == "gauges")
-				updateGauge(graphs[i], json);
-			else if (graphs[i].type == "meters")
-				updateMeter(graphs[i], json);
-			else if (graphs[i].type == "counters" || graphs[i].type == "linkedTimerCounters")
-				updateCounter(graphs[i], json);
-			else if (graphs[i].type == "histograms")
-				updateHistogram(graphs[i], json);
-			else if (graphs[i].type == "timers")
-				updateTimer(graphs[i], json);
-			else if (graphs[i].type == "caches")
-				updateCache(graphs[i], json);
-			else if (graphs[i].type == "jvms")
-				updateJvm(graphs[i], json);
-			else if (graphs[i].type == "webs")
-				updateWeb(graphs[i], json);
-			else if (graphs[i].type == "log4js")
-				updateLog4j(graphs[i], json);
-			else
-				alert("Unknown meter info type: " + graphs[i].type);
-		}
-	};
-
-	/*
-	 * Private Methods
-	 */
-	var graphs = [];
-
-  function MetricInfo(divId, className, metricName, max, title, type, subTitle) {
-		this.divId = divId;
-		this.className = className;
-		this.metricName = metricName;
-		this.max = max;
-		this.title = title;
-		this.type = type;
-    this.subTitle = subTitle;
-
-		this.getMax = function(json) {
-			return this.max;
-		};
-		this.getMetricNode = function getMetricNode(className, metricName, jsonRoot) {
-			return !(jsonRoot[type][className+'.'+metricName]) ? null : jsonRoot[type][className+'.'+metricName];
-		};
-
-    this.getSubTitle = function() {
-      if (this.subTitle != null) {
-        return this.subTitle;
-      } else {
-        // fallback and use title
-        return this.title;
-      }
-    }
-	}
-
-	function calculatePercentage(currentVal, maxVal) {
-		var p = (currentVal / maxVal) * 100;
-		return p.toFixed(0);
-	}
-
-	function formatNumber(varNumber, n) {
-		if (isNaN(n)) n = 1;
-
-		return !isNaN(varNumber)?varNumber.toFixed(n):n;
-	}
-
-	function capitalizeFirstLetter(input) {
-		return input.charAt(0).toUpperCase() + input.slice(1);
-	}
-
-	function addTimerInternal(divId, className, metricName, max, title, eventType, durationMax, isNested) {
-		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'timers', eventType);
-
-		metricInfo.getMeterInfo = function() {
-			var myDivId = this.divId + " div.timerGraph div.meterGraph";
-			var retVal = new MetricInfo(myDivId, this.className, this.metricName, this.max, "Frequency", 'timers', null);
-
-			retVal.getMetricNode = function(className, metricName, jsonRoot) {
-				return !jsonRoot['timers'][className+'.'+metricName] ? null : jsonRoot['timers'][className+'.'+metricName];
-			};
-
-			retVal.eventType = eventType;
-			return retVal;
-		};
-
-		metricInfo.getTimerStatsDivId = function() {
-			return "#" + this.divId + " div.timerGraph div.timerStatsGraph";
-		};
-		metricInfo.getTimerHistogramDivId = function() {
-			return "#" + this.divId + " div.timerGraph div.timerHistogram";
-		};
-		metricInfo.durationMax = durationMax;
-		metricInfo.isNested = isNested;
-
-		return metricInfo;
-	}
-
-	/*
-	 * Counter methods
-	 */
-	function drawCounter(counterInfo) {
-		var parentDiv = $("#" + counterInfo.divId);
-		var html = "<div class='counter counterGraph'><h3>" + counterInfo.title
-				+ "</h3><div class='progress'><div class='progress-bar' style='width: 0%;'></div></div></div>";
-		parentDiv.html(html);
-	}
-	
-	function updateCounter(counterInfo, json) {
-		var metricData = counterInfo.getMetricNode(counterInfo.className, counterInfo.metricName, json);
-		var pct = calculatePercentage(metricData.count, counterInfo.getMax(json));
-
-		$("#" + counterInfo.divId + " div.progress div.progress-bar").css("width", pct + "%");
-		$("#" + counterInfo.divId + " div.progress div.progress-bar").html(metricData.count + "/" + counterInfo.getMax(json));
-	}
-
-	/*
-	 * Timer methods
-	 */
-	function drawTimer(timerInfo) {
-		var parentDiv = $("#" + timerInfo.divId);
-
-		var nested = (timerInfo.isNested) ? " nested" : "";
-		var html = 
-          '<div class="metricsWatcher timer timerGraph' + nested + '">'
-        + '  <div class="panel-group" id="accordion-' + timerInfo.divId + '">'
-				+ '    <div class="panel panel-default">'
-				+ '      <div class="panel-heading">'
-				+ '        <h4 class="panel-title">'
-        +            ((timerInfo.isNested)
-                       ? '<a>'
-                       : '<a data-toggle="collapse" data-parent="accordion-' + timerInfo.divId + '" href="#' + timerInfo.divId + 'Collapse">')
-				+            timerInfo.title + '</a>'
-				+ '        </h4>'
-				+ '      </div>'
-				+ '      <div id="' + timerInfo.divId + 'Collapse" class="panel-collapse' + ((timerInfo.isNested) ? '': ' collapse in') + '">'
-				+ '        <div class="panel-body">'
-				+ '          <div class="meterGraph col-md-12 col-lg-4"></div>'
-				+ '          <div class="timerStatsGraph col-md-12 col-lg-4"></div>'
-				+ '          <div class="timerHistogram col-md-12 col-lg-4"></div>'
-				+ '        </div>'
-        + '      </div>'
-        + '    </div>'
-        + '  </div>'
-        + '</div>';
-		parentDiv.html(html);
-
-		drawMeter(timerInfo.getMeterInfo());
-		drawDurationStats(timerInfo);
-		drawDurationHistogram(timerInfo);
-	};
-
-	function drawDurationStats(timerInfo) {
-		var html = "<h3>Duration</h3><div class='timeUnit'></div><div class='metricGraph'><table class='progressTable'>"
-			+ addMeterRow("Min", "min")
-			+ addMeterRow("Mean", "mean")
-			+ addMeterRow("Max", "max")
-			+ addMeterRow("Std&nbsp;Dev", "stddev")
-			+ "</table></div>";
-		var parentDiv = $(timerInfo.getTimerStatsDivId());
-		parentDiv.html(html);
-	}
-
-	function drawDurationHistogram(timerInfo) {
-		var html = "<h3> " +(timerInfo.isNested?  "Histogram" :timerInfo.getSubTitle()) + "</h3><div>Percentiles</div><div class='metricGraph'><table class='progressTable'>"
-			+ addMeterRow("99.9%", "p999")
-			+ addMeterRow("99%", "p99")
-			+ addMeterRow("98%", "p98")
-			+ addMeterRow("95%", "p95")
-			+ addMeterRow("75%", "p75")
-			+ addMeterRow("50%", "p50")
-			+ "</table></div>";
-		var parentDiv = $(timerInfo.getTimerHistogramDivId());
-		parentDiv.html(html);
-	}
-
-	function updateTimer(timerInfo, json) {
-		updateMeter(timerInfo.getMeterInfo(), json);
-		updateDurationStats(timerInfo, json);
-		updateDurationHistogram(timerInfo, json);
-	}
-
-	function updateDurationStats(timerInfo, json) {
-		var metricNode = timerInfo.getMetricNode(timerInfo.className, timerInfo.metricName, json);
-		if (!metricNode) return;
-
-		var timeUnitDiv = $(timerInfo.getTimerStatsDivId() + " div.timeUnit");
-		timeUnitDiv.html(capitalizeFirstLetter(metricNode["duration_units"]));
-
-		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "min", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "mean", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "max", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "stddev", timerInfo.durationMax);
-	}
-
-	function updateDuration(timerStatsDivId, durationData, style, max) {
-		$(timerStatsDivId + " tr." + style + " td.progressValue").html(formatNumber(durationData[style]));
-		$(timerStatsDivId + " tr." + style + " td.progressBar div.progress div.progress-bar")
-			.css("width", calculatePercentage(durationData[style], max) + "%");
-	}
-
-	function updateDurationHistogram(timerInfo, json) {
-		var metricNode = timerInfo.getMetricNode(timerInfo.className, timerInfo.metricName, json);
-		if (!metricNode) return;
-
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p999", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p99", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p98", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p95", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p75", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p50", timerInfo.durationMax);
-	}
-
-/*
- * Histogram methods
- */
-
-	function drawHistogram(histogramInfo) {
-		var parentDiv = $("#" + histogramInfo.divId);
-		var html = "<div class='metricsWatcher histogram histogramContainer'>" 
-			+ "<div class='heading1 btn-link col-md-12' data-toggle='collapse' data-target='#" + histogramInfo.divId + "Collapse'> " +(histogramInfo.isNested?  "Histogram" :histogramInfo.title) + "</div>" 
-			+ "<div class='collapse' id='" + histogramInfo.divId + "Collapse'>"
-			+ "<table>" 
-				+ "<tr><td class='col-md-4'>Count</td><td class='col-md-4'>Min</td><td class='col-md-4'>Max<td class='col-md-4'>Mean</td></tr>" 
-				+ "<tr><td class='countVal'></td><td class='minVal'></td><td class='meanVal'></td><td class='maxVal'></td></tr>"
-			+ "</table>"
-			+	"<p>Percentiles</p>"
-			+"<table class='progressTable'>"
-			+ addMeterRow("99.9%", "p999")
-			+ addMeterRow("99%", "p99")
-			+ addMeterRow("98%", "p98")
-			+ addMeterRow("95%", "p95")
-			+ addMeterRow("75%", "p75")
-			+ addMeterRow("50%", "p50")
-			+ "</table></div></div>";
-		parentDiv.html(html);
-	}
-
-	function updateHistogram(histogramInfo, json) {
-		var metricNode = histogramInfo.getMetricNode(histogramInfo.className, histogramInfo.metricName, json);
-		$("#" + histogramInfo.divId +  " td.countVal").html(formatNumber(metricNode['count'],0));
-		$("#" + histogramInfo.divId +  " td.minVal").html(formatNumber(metricNode['min'],0));
-		$("#" + histogramInfo.divId +  " td.maxVal").html(formatNumber(metricNode['max'],0));
-		$("#" + histogramInfo.divId +  " td.meanVal").html(formatNumber(metricNode['mean'],0));
-		
-		setMeterRow(histogramInfo, metricNode, "p999", "p999", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p99", "p99", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p98", "p98", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p95", "p95", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p75", "p75", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p50", "p50", histogramInfo.max);
-	}
-
-	/*
-	 * Meter methods
-	 */
-	function drawMeter(meterInfo) {
-		var parentDiv = $("#" + meterInfo.divId);
-
-		var html = "<div class='metric metricGraph'><h3>" + meterInfo.title
-			+ "</h3><div class='counterVal'></div><table class='progressTable'>"
-			+ addMeterRow("1&nbsp;min", "onemin")
-			+ addMeterRow("5&nbsp;min", "fivemin")
-			+ addMeterRow("15&nbsp;min", "fifteenmin")
-			+ addMeterRow("Mean", "mean")
-			+ "</table></div>";
-		parentDiv.html(html);
-	}
-
-	function addMeterRow(type, className) {
-		return "<tr class='" + className + "'><td class='progressLabel'>" + type + "</td>"
-			+ "<td class='progressBar'><div class='progress'><div class='progress-bar' style='width: 0%;'></div>"
-			+ "</div></td><td class='progressValue'>0</td></tr>";
-	}
-
-	function updateMeter(meterInfo, json) {
-		var metricData = meterInfo.getMetricNode(meterInfo.className, meterInfo.metricName, json);
-		if (metricData) {
-			updateMeterData(meterInfo, metricData);
-		}
-	}
-
-	function updateMeterData(meterInfo, meterData) {
-		// set the big counter
-		var gaugeDiv = $("#" + meterInfo.divId + " div.counterVal");
-
-		gaugeDiv.html(meterData.rate_units + " (" + meterData.count + " total)");
-
-		var maxRate = Math.max(meterData['mean_rate'],meterData['m1_rate'],meterData['m5_rate'],meterData['m15_rate']);
-
-		// set the mean count
-		setMeterRow(meterInfo, meterData, "mean_rate", "mean", maxRate);
-		setMeterRow(meterInfo, meterData, "m1_rate", "onemin", maxRate);
-		setMeterRow(meterInfo, meterData, "m5_rate", "fivemin", maxRate);
-		setMeterRow(meterInfo, meterData, "m15_rate", "fifteenmin", maxRate);
-	}
-
-	function setMeterRow(meterInfo, meterData, rowType, rowStyle) {
-		setMeterRow(meterInfo, meterData, rowType, rowStyle, meterInfo.max);
-	}
-
-	function setMeterRow(meterInfo, meterData, rowType, rowStyle, max) {
-		$("#" + meterInfo.divId + " tr." + rowStyle + " td.progressValue").html(formatNumber(meterData[rowType]));
-		$("#" + meterInfo.divId + " tr." + rowStyle + " td.progressBar div.progress div.progress-bar")
-			.css("width", calculatePercentage(meterData[rowType], max) + "%");
-	}
-
-	/*
-	 * Gauge methods
-	 */
-	function drawGauge(gaugeInfo) {
-		var parentDiv = $("#" + gaugeInfo.divId);
-		var html = "<div class='metric metricGraph'><h3>" + gaugeInfo.title + "</h3><div class='gaugeDataVal'></div></div>";
-		parentDiv.html(html);
-	}
-	function updateGauge(gaugeInfo, json) {
-		var metricData = gaugeInfo.getMetricNode(gaugeInfo.className, gaugeInfo.metricName, json);
-		if (metricData) {
-			updateGaugeData(gaugeInfo, metricData);
-		}
-	}
-	function updateGaugeData(gaugeInfo, gaugeData) {
-		var gaugeDiv = $("#" + gaugeInfo.divId + " div.gaugeDataVal");
-		gaugeDiv.html(gaugeData.value);
-	}
-
-	/*
-	 * GaugeTable methods
-	 */
-	function drawGaugeTable(divId, title, gauges) {
-		var parentDiv = $("#" + divId);
-		var html = "<div class='metricsWatcher metric metricGraph nested'>"
-				+ "<fieldset><legend><div class='heading1'>" + title + "</div></legend>"
-				+ "<div class='gaugeTableContainer'><table class='gaugeTable'></table></div></fieldset></div>";
-
-		parentDiv.html(html);
-	}
-	function updateGaugeTable(divId, gauges, json) {
-		var div = $("#" + divId + " table");
-
-		var html = "";
-		var length = gauges.length;
-		for (var i = 0; i < length; i++) {
-			var gauge = gauges[i];
-			html += "<tr><td><h5>" + gauge.title + "</h5></td>"
-				+ "<td><h4>" + gauge.getMetricNode(gauge.className, gauge.metricName, json).value
-				+ "</h4></td></tr>";
-		}
-		div.html(html);
-	}
-
-	/*
-	 * Cache methods
-	 */
-	function drawCache(cacheInfo) {
-		var parentDiv = $("#" + cacheInfo.divId);
-
-		var html = "<div class='metricsWatcher cache cacheGraph col-md-12'>"
-				+ "<fieldset><legend><div class='heading1'>" + cacheInfo.title + "</div></legend>"
-				+ "<div class='cacheContainer col-md-12'>"
-				+ "	<div class='row'>"
-				+ "		<div class='col-md-3'><div id='" + cacheInfo.divId + "Statistics'></div></div>"
-				+ "		<div class='col-md-9'>"
-				+ "			<div id='" + cacheInfo.divId + "gettimer'></div>"
-				+ "			<div id='" + cacheInfo.divId + "puttimer'></div>"
-				+ "		</div>"
-				+ "	</div>"
-				+ "</div></fieldset></div>";
-		parentDiv.html(html);
-
-		var length = cacheInfo.components.gauges.length;
-		for (var i = 0; i < length; i++) {
-			drawGauge(cacheInfo.components.gauges[i]);
-		}
-		drawTimer(cacheInfo.getTimer);
-		drawTimer(cacheInfo.putTimer);
-		drawGaugeTable(cacheInfo.divId + "Statistics", "Statistics", cacheInfo.components.gauges);
-	}
-	function updateCache(cacheInfo, json) {
-		var length = cacheInfo.components.gauges.length;
-		for (var i = 0; i < length; i++) {
-			var gauge = cacheInfo.components.gauges[i];
-			var data = gauge.getMetricNode(cacheInfo.className, gauge.metricName, json);
-			if (data) {
-				var gaugeDiv = $("#" + gauge.divId + " div.metricGraph div.gaugeDataVal");
-				gaugeDiv.html(data.value);
-			}
-		}
-		updateTimer(cacheInfo.getTimer, json);
-		updateTimer(cacheInfo.putTimer, json);
-		updateGaugeTable(cacheInfo.divId + "Statistics", cacheInfo.components.gauges, json);
-	}
-
-	/*
-	 * JVM methods
-	 */
-	function drawJvm(jvmInfo) {
-		var parentDiv = $("#" + jvmInfo.divId);
-		var html = "<div class='metricsWatcher jvm metricGraph col-md-12'>"
-				+ "<fieldset><legend><div  class='heading1 btn-link' data-toggle='collapse' data-target='#" + jvmInfo.divId + "Collapse'>" + jvmInfo.title + "</div></legend>"
-				+ "<div class='jvmContainer col-md-12 collapse' id='" + jvmInfo.divId + "Collapse'>"
-				+ "	<div id='" + jvmInfo.divId + "Vm'></div>"
-				+ "</div>"
-				+ "</fieldset></div>";
-		parentDiv.html(html);
-	}
-
-	function updateJvm(jvmInfo, json) {
-		var vmDiv = $("#" + jvmInfo.divId + "Vm");
-		var jvm = json['gauges'];
-		var html = "<div class='row'>"
-				+ "<div class='col-md-3'><table class='jvmTable'><caption>Memory</caption>"
-				+ "<tr><td><h5>Total Init</h5></td><td>" + jvm['jvm.memory.total.init'].value + "</td></tr>"
-				+ "<tr><td><h5>Total Used</h5></td><td>" + jvm['jvm.memory.total.used'].value + "</td></tr>"
-				+ "<tr><td><h5>Total Max</h5></td><td>" + jvm['jvm.memory.total.max'].value + "</td></tr>"
-				+ "<tr><td><h5>Total Committed</h5></td><td>" + jvm['jvm.memory.total.committed'].value + "</td></tr>"
-				+ "<tr><td><h5>Heap Init</h5></td><td>" + jvm['jvm.memory.heap.init'].value + "</td></tr>"
-				+ "<tr><td><h5>Heap Used</h5></td><td>" + jvm['jvm.memory.heap.used'].value + "</td></tr>"
-				+ "<tr><td><h5>Heap Max</h5></td><td>" + jvm['jvm.memory.heap.max'].value + "</td></tr>"
-				+ "<tr><td><h5>Heap Committed</h5></td><td>" + jvm['jvm.memory.heap.committed'].value + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Init</h5></td><td>" + jvm['jvm.memory.non-heap.init'].value + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Used</h5></td><td>" + jvm['jvm.memory.non-heap.used'].value + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Max</h5></td><td>" + jvm['jvm.memory.non-heap.max'].value + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Committed</h5></td><td>" + jvm['jvm.memory.non-heap.committed'].value + "</td></tr>"
-				+ "</table></div>"
-				+ "<div class='col-md-3'><table class='jvmTable'><caption>Memory Usage</caption>"
-				+ "<tr><td><h5>Heap Usage</h5></td><td>" + (jvm['jvm.memory.heap.usage'].value * 100).toFixed(2) + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Usage</h5></td><td>" + (jvm['jvm.memory.non-heap.usage'].value * 100).toFixed(2) + "</td></tr>"
-				+ (!jvm['jvm.memory.pools.JIT-code-cache.usage']?"":("<tr><td><h5>JIT Code Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.JIT-code-cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Code-Cache.usage']?"":("<tr><td><h5>JIT Code Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.Code-Cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.JIT-data-cache.usage']?"":("<tr><td><h5>JIT Data Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.JIT-data-cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Java-heap.usage']?"":("<tr><td><h5>Java Heap Usage</h5></td><td>" + (jvm['jvm.memory.pools.Java-heap.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.class-storage.usage']?"":("<tr><td><h5>Class Storage Usage</h5></td><td>" + (jvm['jvm.memory.pools.class-storage.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Perm-Gen.usage']?"":("<tr><td><h5>Perm Gen Usage</h5></td><td>" + (jvm['jvm.memory.pools.Perm-Gen.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Tenured-Gen.usage']?"":("<tr><td><h5>Tenured Gen Usage</h5></td><td>" + (jvm['jvm.memory.pools.Tenured-Gen.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.miscellaneous-non-heap-storage.usage']?"":("<tr><td><h5>Misc Non Heap Storage Usage</h5></td><td>" + (jvm['jvm.memory.pools.miscellaneous-non-heap-storage.usage'].value * 100).toFixed(2)  + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Survivor-Space.usage']?"":("<tr><td><h5>Survivor Space Usage</h5></td><td>" + (jvm['jvm.memory.pools.Survivor-Space.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Eden-Space.usage']?"":("<tr><td><h5>Eden Space Usage</h5></td><td>" + (jvm['jvm.memory.pools.Eden-Space.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+"</table></div>"
-				+ "<div class='col-md-3'><table class='jvmTable'><caption>Garbage Collection</caption>"
-				+ "<tr><td><h5>PS Mark Sweep Runs</h5></td><td>" + jvm['jvm.gc.MarkSweepCompact.count'].value + "</td></tr>"
-				+ "<tr><td><h5>PS Mark Sweep Time</h5></td><td>" + jvm['jvm.gc.MarkSweepCompact.time'].value + "</td></tr>"
-				+ "<tr><td><h5>GC Copy Runs</h5></td><td>" + jvm['jvm.gc.Copy.count'].value + "</td></tr>"
-				+ "<tr><td><h5>GC Copy Time</h5></td><td>" + jvm['jvm.gc.Copy.time'].value + "</td></tr>"
-				+ "</table></div>"
-				+ "<div class='col-md-3'><table class='jvmTable'><caption>Threads</caption>"
-//				+ "<tr><td class='rowName'><h5>Name</h5></td><td>" + jvm['jvm.vm.name'].value + "</td></tr>"
-//				+ "<tr><td><h5>Version</h5></td><td>" + jvm['jvm.vm.version'].value + "</td></tr>"
-//				+ "<tr><td><h5>Current Time</h5></td><td>" + jvm['jvm.current_time'].value + "</td></tr>"
-//				+ "<tr><td><h5>Uptime</h5></td><td>" + jvm['jvm.uptime'].value + "</td></tr>"
-				+ "<tr><td><h5>FD Usage</h5></td><td>" + formatNumber(jvm['jvm.fd.usage'].value, 2) + "</td></tr>"
-				+ "<tr><td><h5>Daemon Threads</h5></td><td>" + jvm['jvm.thread-states.daemon.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Threads</h5></td><td>" + jvm['jvm.thread-states.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Deadlocks</h5></td><td>" + jvm['jvm.thread-states.deadlocks'].value + "</td></tr>"
-				+ "</table><table class='jvmTable'><caption>Thread States</caption>"
-				+ "<tr><td><h5>Terminated</h5></td><td>" + jvm['jvm.thread-states.terminated.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Timed Waiting</h5></td><td>" + jvm['jvm.thread-states.timed_waiting.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Blocked</h5></td><td>" + jvm['jvm.thread-states.blocked.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Waiting</h5></td><td>" + jvm['jvm.thread-states.waiting.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Runnable</h5></td><td>" + jvm['jvm.thread-states.runnable.count'].value + "</td></tr>"
-				+ "<tr><td><h5>New</h5></td><td>" + jvm['jvm.thread-states.new.count'].value + "</td></tr>"
-				+ "</table></div></div>";
-
-		vmDiv.html(html);
-	};
-
-	/*
-	 * Web Server methods
-	 */
-	function drawWeb(webInfo) {
-		var parentDiv = $("#" + webInfo.divId);
-		var html = "<div class='metricsWatcher web metricGraph col-md-12'>"
-				+ "<fieldset><legend><div class='heading1 btn-link' data-toggle='collapse' data-target='#"+webInfo.divId+"Collapse'>" + webInfo.title + "</div></legend>"
-				+ "<div class='webContainer col-md-12' id='"+webInfo.divId+"Collapse'>"
-				+ "	<div id='" + webInfo.divId + "Web'></div>"
-				+ "<table><tr>"
-				+ "<td colspan='4' class='requestsGraph col-md-12'></td>"
-				+ "</tr><tr>"
-				+ "<td class='activeRequestsGraph col-md-3'></td>"
-				+ "<td class='responseCodesOkGraph col-md-3'></td>"
-				+ "<td class='responseCodesCreatedGraph col-md-3'></td>"
-				+ "<td class='responseCodesOtherGraph col-md-3'></td>"
-				+ "</tr><tr>"
-				+ "<td class='responseCodesBadRequestGraph col-md-3'></td>"
-				+ "<td class='responseCodesNoContentGraph col-md-3'></td>"
-				+ "<td class='responseCodesNotFoundGraph col-md-3'></td>"
-				+ "<td class='responseCodesServerErrorGraph col-md-3'></td>"
-				+ "</tr></table>"
-				+ "</div>"
-				+ "</fieldset></div>";
-		parentDiv.html(html);
-
-		drawTimer(webInfo.components.requestsInfo);
-		drawCounter(webInfo.components.activeRequestsInfo);
-
-		var length = webInfo.components.meters.length;
-		for (var i = 0; i < length; i++) {
-			drawMeter(webInfo.components.meters[i]);
-		}
-	};
-
-	function updateWeb(webInfo, json) {
-		updateTimer(webInfo.components.requestsInfo, json);
-		updateCounter(webInfo.components.activeRequestsInfo, json);
-
-		var length = webInfo.components.meters.length;
-		for (var i = 0; i < length; i++) {
-			updateMeter(webInfo.components.meters[i], json);
-		}
-	};
-
-	/*
-	 * Log4j events stream  methods
-	 */
-	function drawLog4j(log4jInfo) {
-		var parentDiv = $("#" + log4jInfo.divId);
-		var html = "<div class='metricsWatcher log4j metricGraph col-md-12'>"
-				+ "<fieldset><legend><div class='heading1 btn-link' data-toggle='collapse' data-target='#"+log4jInfo.divId+"Collapse'>" + log4jInfo.title + "</div></legend>"
-				+ "<div class='log4jContainer col-md-12' id='"+log4jInfo.divId+"Collapse'>"
-				+ "	<div id='" + log4jInfo.divId + "Log4j'></div>"
-				+ "<table><tr>"
-				+ "<td colspan='4' class='col-md-12'></td>"
-				+ "</tr><tr>"
-				+ "<td class='all col-md-3'></td>"
-				+ "<td class='fatal col-md-3'></td>"
-				+ "<td class='error col-md-3'></td>"
-				+ "<td class='warn col-md-3'></td>"
-				+ "</tr><tr>"
-				+ "<td class='info col-md-3'></td>"
-				+ "<td class='debug col-md-3'></td>"
-				+ "<td class='trace col-md-3'></td>"
-				+ "</tr></table>"
-				+ "</div>"
-				+ "</fieldset></div>";
-		parentDiv.html(html);
-
-		var length = log4jInfo.components.meters.length;
-		for (var i = 0; i < length; i++) {
-			drawMeter(log4jInfo.components.meters[i]);
-		}
-	};
-
-	function updateLog4j(log4jInfo, json) {
-		var length = log4jInfo.components.meters.length;
-		for (var i = 0; i < length; i++) {
-			updateMeter(log4jInfo.components.meters[i], json);
-		}
-	};
-
-}(window.metricsWatcher = window.metricsWatcher || {}, jQuery));
-
 var _apacheCamelModelVersion = '2.18.1';
 
 var _apacheCamelModel ={
@@ -25157,3 +24339,817 @@ var _apacheCamelModel ={
     }
   }
 };
+
+/*****************************************************************************
+ * Metrics-Watcher
+ *
+ * Copyright 2012 Ben Bertola and iovation, Inc.
+ *
+ * To use this library:
+ * 1. Call metricsWatcher.addXXX() for each graph you want on your page
+ * 2. Call metricsWatcher.initGraphs() once to draw the initial graphs
+ * 3. Call metricsWatcher.updateGraphs(jsonData) with JSON data from your
+ *    metrics/servlet as often as you'd like your graphs to update
+ *
+ *****************************************************************************/
+
+(function(metricsWatcher, $) {
+
+	/**
+	 * Add a Gauge type graph to your page.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addGauge = function(divId, className, metricName, title) {
+		var metricInfo = new MetricInfo(divId, className, metricName, null, title, 'gauges', null);
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a Meter type graph to your page.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addMeter = function(divId, className, metricName, max, title, eventType) {
+		if (eventType == undefined) eventType = 'Calls';
+		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'meters', eventType);
+		metricInfo.eventType = eventType;
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a Counter graph
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addCounter = function(divId, className, metricName, max, title) {
+		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'counters', null);
+		graphs.push(metricInfo);
+	};
+
+		/**
+	 * Add a standalone Histogram graph
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addHistogram = function(divId, className, metricName, max, title){
+		var metricInfo = new MetricInfo(divId, className, metricName, (!max ? 1: max), title, 'histograms', null);
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a linked Counter graph. Linked Counters differ from a plain counter graph in that both the numerator and denominator
+	 * of a linked counter graph each come from individual Counter Metrics.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param maxClassName
+	 * @param maxMetricName
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addLinkedCounter = function(divId, className, metricName, maxClassName, maxMetricName, title) {
+		var metricInfo = new MetricInfo(divId, className, metricName, null, title, "counters", null);
+		if(!metricInfo)
+			metricInfo = new MetricInfo(divId, className, metricName, null, title, "timers", null);
+		
+		metricInfo.maxClassName = maxClassName;
+		metricInfo.maxMetricName = maxMetricName;
+
+		metricInfo.getMax = function(json) {
+			var maxNode = this.getMetricNode(this.maxClassName, this.maxMetricName, json);
+			return maxNode["count"];
+		};
+		
+			metricInfo.getMetricNode = function getMetricNode(className, metricName, jsonRoot) {
+				
+				var node=!(jsonRoot["counters"][className+'.'+metricName]) ? null : jsonRoot["counters"][className+'.'+metricName];
+				if(node){
+					return node;
+				}else{
+					return !(jsonRoot["timers"][className+'.'+metricName]) ? null : jsonRoot["timers"][className+'.'+metricName];
+				}
+			};
+
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a Timer graph. This will include a Meter, Timing Info, and a Histogram.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param max The max target value for the Meter, showing frequency
+	 * @param title The user-displayed title of this graph
+	 * @param eventType a name for this event type
+	 * @param durationMax The max target value for duration
+	 */
+	metricsWatcher.addTimer = function(divId, className, metricName, max, title, eventType, durationMax) {
+		var timer = addTimerInternal(divId, className, metricName, max, title, eventType, durationMax, false);
+		graphs.push(timer);
+	};
+
+	/**
+	 * Add an ehcache graph.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addCache = function(divId, className, title) {
+		var metricInfo = new MetricInfo(divId, className, null, null, title, "caches", null);
+
+		metricInfo.components = {
+			gauges : [
+				new MetricInfo(null, className, "hits", null, "Hits", "gauges", null),
+				new MetricInfo(null, className, "misses", null, "Misses", "gauges", null),
+				new MetricInfo(null, className, "objects", null, "Objects", "gauges", null),
+				new MetricInfo(null, className, "eviction-count", null, "Eviction Count", "gauges", null),
+				new MetricInfo(null, className, "in-memory-hits", null, "In Memory Hits", "gauges", null),
+				new MetricInfo(null, className, "in-memory-misses", null, "In Memory Misses", "gauges", null),
+				new MetricInfo(null, className, "in-memory-objects", null, "In Memory Objects", "gauges", null),
+				new MetricInfo(null, className, "off-heap-hits", null, "Off Heap Hits", "gauges", null),
+				new MetricInfo(null, className, "off-heap-misses", null, "Off Heap Misses", "gauges", null),
+				new MetricInfo(null, className, "off-heap-objects", null, "Off Heap Objects", "gauges", null),
+				new MetricInfo(null, className, "on-disk-hits", null, "On Disk Hits", "gauges", null),
+				new MetricInfo(null, className, "on-disk-misses", null, "On Disk Misses", "gauges", null),
+				new MetricInfo(null, className, "on-disk-objects", null, "On Disk Objects", "gauges", null),
+				new MetricInfo(null, className, "mean-get-time", null, "Mean Get Time", "gauges", null),
+				new MetricInfo(null, className, "mean-search-time", null, "Mean Search Time", "gauges", null),
+				new MetricInfo(null, className, "searches-per-second", null, "Searches Per Sec", "gauges", null),
+				new MetricInfo(null, className, "writer-queue-size", null, "Writer Queue Size", "gauges", null),
+				new MetricInfo(null, className, "accuracy", null, "Accuracy", "gauges", null)
+			]
+		};
+		metricInfo.getTimer = addTimerInternal(divId + "gettimer", className, "gets", 5, "Get", "get", 1, true);
+		metricInfo.putTimer = addTimerInternal(divId + "puttimer", className, "puts", 5, "Put", "put", 1, true);
+
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a JVM graph.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addJvm = function(divId, className, title) {
+		var metricInfo = new MetricInfo(divId, className, null, null, title, "jvms", null);
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a web server graph.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addWeb = function(divId, className, title) {
+		var metricInfo = new MetricInfo(divId, className, null, null, title, "webs", null);
+
+		metricInfo.components = {
+			meters : [
+				new MetricInfo(divId + " td.responseCodesOkGraph", className, "responseCodes.ok", 10, "OK Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesBadRequestGraph", className, "responseCodes.badRequest", 10, "Bad Requests", "meters", null),
+				new MetricInfo(divId + " td.responseCodesCreatedGraph", className, "responseCodes.created", 10, "Created Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesNoContentGraph", className, "responseCodes.noContent", 10, "No Content Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesNotFoundGraph", className, "responseCodes.notFound", 10, "Not Found Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesOtherGraph", className, "responseCodes.other", 10, "Other Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesServerErrorGraph", className, "responseCodes.serverError", 10, "Server Error Responses", "meters", null)
+			],
+			activeRequestsInfo : new MetricInfo(divId + " td.activeRequestsGraph", className, "activeRequests", 10, "Active Requests", "counters", null),
+			requestsInfo : addTimerInternal(divId + " td.requestsGraph", className, "requests", 100, "Requests", "requests", 100, true)
+		};
+
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a log4j logged events graph.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addLog4j = function(divId, className, title) {
+		var metricInfo = new MetricInfo(divId, className, null, null, title, "log4js", null);
+
+		metricInfo.components = {
+			meters : [
+				new MetricInfo(divId + " td.all", className, "all", 100, "all", "meters", null),
+				new MetricInfo(divId + " td.fatal", className, "fatal", 100, "fatal", "meters", null),
+				new MetricInfo(divId + " td.error", className, "error", 100, "error", "meters", null),
+				new MetricInfo(divId + " td.warn", className, "warn", 100, "warn", "meters", null),
+				new MetricInfo(divId + " td.info", className, "info", 100, "info", "meters", null),
+				new MetricInfo(divId + " td.debug", className, "debug", 100, "debug", "meters", null),
+				new MetricInfo(divId + " td.trace", className, "trace", 100, "trace", "meters", null)
+			]
+		};
+
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Initialized each of the graphs that you have added through addXXX() calls,
+	 * and draws them on the screen for the first time
+	 */
+	metricsWatcher.initGraphs = function() {
+		// draw all graphs for the first time
+		for (var i = 0; i < graphs.length; i++) {
+			if (graphs[i].type == "gauges")
+				drawGauge(graphs[i]);
+			else if (graphs[i].type == "meters")
+				drawMeter(graphs[i]);
+			else if (graphs[i].type == "counters" || graphs[i].type == "linkedTimerCounters")
+				drawCounter(graphs[i]);
+			else if (graphs[i].type == "histograms")
+				drawHistogram(graphs[i]);
+			else if (graphs[i].type == "timers")
+				drawTimer(graphs[i]);
+			else if (graphs[i].type == "caches")
+				drawCache(graphs[i]);
+			else if (graphs[i].type == "jvms")
+				drawJvm(graphs[i]);
+			else if (graphs[i].type == "webs")
+				drawWeb(graphs[i]);
+			else if (graphs[i].type == "log4js")
+				drawLog4j(graphs[i]);
+			else
+				alert("Unknown meter info type: " + graphs[i].type);
+		}
+	};
+
+	/**
+	 * Update the existing graphs with new data. You can call this method as frequently as you would
+	 * like to, and all graph info will be updated.
+	 *
+	 * @param json The root of the json node returned from your ajax call to the metrics servlet
+	 */
+	metricsWatcher.updateGraphs = function(json) {
+		for (var i = 0; i < graphs.length; i++) {
+			if (graphs[i].type == "gauges")
+				updateGauge(graphs[i], json);
+			else if (graphs[i].type == "meters")
+				updateMeter(graphs[i], json);
+			else if (graphs[i].type == "counters" || graphs[i].type == "linkedTimerCounters")
+				updateCounter(graphs[i], json);
+			else if (graphs[i].type == "histograms")
+				updateHistogram(graphs[i], json);
+			else if (graphs[i].type == "timers")
+				updateTimer(graphs[i], json);
+			else if (graphs[i].type == "caches")
+				updateCache(graphs[i], json);
+			else if (graphs[i].type == "jvms")
+				updateJvm(graphs[i], json);
+			else if (graphs[i].type == "webs")
+				updateWeb(graphs[i], json);
+			else if (graphs[i].type == "log4js")
+				updateLog4j(graphs[i], json);
+			else
+				alert("Unknown meter info type: " + graphs[i].type);
+		}
+	};
+
+	/*
+	 * Private Methods
+	 */
+	var graphs = [];
+
+  function MetricInfo(divId, className, metricName, max, title, type, subTitle) {
+		this.divId = divId;
+		this.className = className;
+		this.metricName = metricName;
+		this.max = max;
+		this.title = title;
+		this.type = type;
+    this.subTitle = subTitle;
+
+		this.getMax = function(json) {
+			return this.max;
+		};
+		this.getMetricNode = function getMetricNode(className, metricName, jsonRoot) {
+			return !(jsonRoot[type][className+'.'+metricName]) ? null : jsonRoot[type][className+'.'+metricName];
+		};
+
+    this.getSubTitle = function() {
+      if (this.subTitle != null) {
+        return this.subTitle;
+      } else {
+        // fallback and use title
+        return this.title;
+      }
+    }
+	}
+
+	function calculatePercentage(currentVal, maxVal) {
+		var p = (currentVal / maxVal) * 100;
+		return p.toFixed(0);
+	}
+
+	function formatNumber(varNumber, n) {
+		if (isNaN(n)) n = 1;
+
+		return !isNaN(varNumber)?varNumber.toFixed(n):n;
+	}
+
+	function capitalizeFirstLetter(input) {
+		return input.charAt(0).toUpperCase() + input.slice(1);
+	}
+
+	function addTimerInternal(divId, className, metricName, max, title, eventType, durationMax, isNested) {
+		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'timers', eventType);
+
+		metricInfo.getMeterInfo = function() {
+			var myDivId = this.divId + " div.timerGraph div.meterGraph";
+			var retVal = new MetricInfo(myDivId, this.className, this.metricName, this.max, "Frequency", 'timers', null);
+
+			retVal.getMetricNode = function(className, metricName, jsonRoot) {
+				return !jsonRoot['timers'][className+'.'+metricName] ? null : jsonRoot['timers'][className+'.'+metricName];
+			};
+
+			retVal.eventType = eventType;
+			return retVal;
+		};
+
+		metricInfo.getTimerStatsDivId = function() {
+			return "#" + this.divId + " div.timerGraph div.timerStatsGraph";
+		};
+		metricInfo.getTimerHistogramDivId = function() {
+			return "#" + this.divId + " div.timerGraph div.timerHistogram";
+		};
+		metricInfo.durationMax = durationMax;
+		metricInfo.isNested = isNested;
+
+		return metricInfo;
+	}
+
+	/*
+	 * Counter methods
+	 */
+	function drawCounter(counterInfo) {
+		var parentDiv = $("#" + counterInfo.divId);
+		var html = "<div class='counter counterGraph'><h3>" + counterInfo.title
+				+ "</h3><div class='progress'><div class='progress-bar' style='width: 0%;'></div></div></div>";
+		parentDiv.html(html);
+	}
+	
+	function updateCounter(counterInfo, json) {
+		var metricData = counterInfo.getMetricNode(counterInfo.className, counterInfo.metricName, json);
+		var pct = calculatePercentage(metricData.count, counterInfo.getMax(json));
+
+		$("#" + counterInfo.divId + " div.progress div.progress-bar").css("width", pct + "%");
+		$("#" + counterInfo.divId + " div.progress div.progress-bar").html(metricData.count + "/" + counterInfo.getMax(json));
+	}
+
+	/*
+	 * Timer methods
+	 */
+	function drawTimer(timerInfo) {
+		var parentDiv = $("#" + timerInfo.divId);
+
+		var nested = (timerInfo.isNested) ? " nested" : "";
+		var html = 
+          '<div class="metricsWatcher timer timerGraph' + nested + '">'
+        + '  <div class="panel-group" id="accordion-' + timerInfo.divId + '">'
+				+ '    <div class="panel panel-default">'
+				+ '      <div class="panel-heading">'
+				+ '        <h4 class="panel-title">'
+        +            ((timerInfo.isNested)
+                       ? '<a>'
+                       : '<a data-toggle="collapse" data-parent="accordion-' + timerInfo.divId + '" href="#' + timerInfo.divId + 'Collapse">')
+				+            timerInfo.title + '</a>'
+				+ '        </h4>'
+				+ '      </div>'
+				+ '      <div id="' + timerInfo.divId + 'Collapse" class="panel-collapse' + ((timerInfo.isNested) ? '': ' collapse in') + '">'
+				+ '        <div class="panel-body">'
+				+ '          <div class="meterGraph col-md-12 col-lg-4"></div>'
+				+ '          <div class="timerStatsGraph col-md-12 col-lg-4"></div>'
+				+ '          <div class="timerHistogram col-md-12 col-lg-4"></div>'
+				+ '        </div>'
+        + '      </div>'
+        + '    </div>'
+        + '  </div>'
+        + '</div>';
+		parentDiv.html(html);
+
+		drawMeter(timerInfo.getMeterInfo());
+		drawDurationStats(timerInfo);
+		drawDurationHistogram(timerInfo);
+	};
+
+	function drawDurationStats(timerInfo) {
+		var html = "<h3>Duration</h3><div class='timeUnit'></div><div class='metricGraph'><table class='progressTable'>"
+			+ addMeterRow("Min", "min")
+			+ addMeterRow("Mean", "mean")
+			+ addMeterRow("Max", "max")
+			+ addMeterRow("Std&nbsp;Dev", "stddev")
+			+ "</table></div>";
+		var parentDiv = $(timerInfo.getTimerStatsDivId());
+		parentDiv.html(html);
+	}
+
+	function drawDurationHistogram(timerInfo) {
+		var html = "<h3> " +(timerInfo.isNested?  "Histogram" :timerInfo.getSubTitle()) + "</h3><div>Percentiles</div><div class='metricGraph'><table class='progressTable'>"
+			+ addMeterRow("99.9%", "p999")
+			+ addMeterRow("99%", "p99")
+			+ addMeterRow("98%", "p98")
+			+ addMeterRow("95%", "p95")
+			+ addMeterRow("75%", "p75")
+			+ addMeterRow("50%", "p50")
+			+ "</table></div>";
+		var parentDiv = $(timerInfo.getTimerHistogramDivId());
+		parentDiv.html(html);
+	}
+
+	function updateTimer(timerInfo, json) {
+		updateMeter(timerInfo.getMeterInfo(), json);
+		updateDurationStats(timerInfo, json);
+		updateDurationHistogram(timerInfo, json);
+	}
+
+	function updateDurationStats(timerInfo, json) {
+		var metricNode = timerInfo.getMetricNode(timerInfo.className, timerInfo.metricName, json);
+		if (!metricNode) return;
+
+		var timeUnitDiv = $(timerInfo.getTimerStatsDivId() + " div.timeUnit");
+		timeUnitDiv.html(capitalizeFirstLetter(metricNode["duration_units"]));
+
+		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "min", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "mean", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "max", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "stddev", timerInfo.durationMax);
+	}
+
+	function updateDuration(timerStatsDivId, durationData, style, max) {
+		$(timerStatsDivId + " tr." + style + " td.progressValue").html(formatNumber(durationData[style]));
+		$(timerStatsDivId + " tr." + style + " td.progressBar div.progress div.progress-bar")
+			.css("width", calculatePercentage(durationData[style], max) + "%");
+	}
+
+	function updateDurationHistogram(timerInfo, json) {
+		var metricNode = timerInfo.getMetricNode(timerInfo.className, timerInfo.metricName, json);
+		if (!metricNode) return;
+
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p999", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p99", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p98", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p95", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p75", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p50", timerInfo.durationMax);
+	}
+
+/*
+ * Histogram methods
+ */
+
+	function drawHistogram(histogramInfo) {
+		var parentDiv = $("#" + histogramInfo.divId);
+		var html = "<div class='metricsWatcher histogram histogramContainer'>" 
+			+ "<div class='heading1 btn-link col-md-12' data-toggle='collapse' data-target='#" + histogramInfo.divId + "Collapse'> " +(histogramInfo.isNested?  "Histogram" :histogramInfo.title) + "</div>" 
+			+ "<div class='collapse' id='" + histogramInfo.divId + "Collapse'>"
+			+ "<table>" 
+				+ "<tr><td class='col-md-4'>Count</td><td class='col-md-4'>Min</td><td class='col-md-4'>Max<td class='col-md-4'>Mean</td></tr>" 
+				+ "<tr><td class='countVal'></td><td class='minVal'></td><td class='meanVal'></td><td class='maxVal'></td></tr>"
+			+ "</table>"
+			+	"<p>Percentiles</p>"
+			+"<table class='progressTable'>"
+			+ addMeterRow("99.9%", "p999")
+			+ addMeterRow("99%", "p99")
+			+ addMeterRow("98%", "p98")
+			+ addMeterRow("95%", "p95")
+			+ addMeterRow("75%", "p75")
+			+ addMeterRow("50%", "p50")
+			+ "</table></div></div>";
+		parentDiv.html(html);
+	}
+
+	function updateHistogram(histogramInfo, json) {
+		var metricNode = histogramInfo.getMetricNode(histogramInfo.className, histogramInfo.metricName, json);
+		$("#" + histogramInfo.divId +  " td.countVal").html(formatNumber(metricNode['count'],0));
+		$("#" + histogramInfo.divId +  " td.minVal").html(formatNumber(metricNode['min'],0));
+		$("#" + histogramInfo.divId +  " td.maxVal").html(formatNumber(metricNode['max'],0));
+		$("#" + histogramInfo.divId +  " td.meanVal").html(formatNumber(metricNode['mean'],0));
+		
+		setMeterRow(histogramInfo, metricNode, "p999", "p999", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p99", "p99", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p98", "p98", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p95", "p95", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p75", "p75", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p50", "p50", histogramInfo.max);
+	}
+
+	/*
+	 * Meter methods
+	 */
+	function drawMeter(meterInfo) {
+		var parentDiv = $("#" + meterInfo.divId);
+
+		var html = "<div class='metric metricGraph'><h3>" + meterInfo.title
+			+ "</h3><div class='counterVal'></div><table class='progressTable'>"
+			+ addMeterRow("1&nbsp;min", "onemin")
+			+ addMeterRow("5&nbsp;min", "fivemin")
+			+ addMeterRow("15&nbsp;min", "fifteenmin")
+			+ addMeterRow("Mean", "mean")
+			+ "</table></div>";
+		parentDiv.html(html);
+	}
+
+	function addMeterRow(type, className) {
+		return "<tr class='" + className + "'><td class='progressLabel'>" + type + "</td>"
+			+ "<td class='progressBar'><div class='progress'><div class='progress-bar' style='width: 0%;'></div>"
+			+ "</div></td><td class='progressValue'>0</td></tr>";
+	}
+
+	function updateMeter(meterInfo, json) {
+		var metricData = meterInfo.getMetricNode(meterInfo.className, meterInfo.metricName, json);
+		if (metricData) {
+			updateMeterData(meterInfo, metricData);
+		}
+	}
+
+	function updateMeterData(meterInfo, meterData) {
+		// set the big counter
+		var gaugeDiv = $("#" + meterInfo.divId + " div.counterVal");
+
+		gaugeDiv.html(meterData.rate_units + " (" + meterData.count + " total)");
+
+		var maxRate = Math.max(meterData['mean_rate'],meterData['m1_rate'],meterData['m5_rate'],meterData['m15_rate']);
+
+		// set the mean count
+		setMeterRow(meterInfo, meterData, "mean_rate", "mean", maxRate);
+		setMeterRow(meterInfo, meterData, "m1_rate", "onemin", maxRate);
+		setMeterRow(meterInfo, meterData, "m5_rate", "fivemin", maxRate);
+		setMeterRow(meterInfo, meterData, "m15_rate", "fifteenmin", maxRate);
+	}
+
+	function setMeterRow(meterInfo, meterData, rowType, rowStyle) {
+		setMeterRow(meterInfo, meterData, rowType, rowStyle, meterInfo.max);
+	}
+
+	function setMeterRow(meterInfo, meterData, rowType, rowStyle, max) {
+		$("#" + meterInfo.divId + " tr." + rowStyle + " td.progressValue").html(formatNumber(meterData[rowType]));
+		$("#" + meterInfo.divId + " tr." + rowStyle + " td.progressBar div.progress div.progress-bar")
+			.css("width", calculatePercentage(meterData[rowType], max) + "%");
+	}
+
+	/*
+	 * Gauge methods
+	 */
+	function drawGauge(gaugeInfo) {
+		var parentDiv = $("#" + gaugeInfo.divId);
+		var html = "<div class='metric metricGraph'><h3>" + gaugeInfo.title + "</h3><div class='gaugeDataVal'></div></div>";
+		parentDiv.html(html);
+	}
+	function updateGauge(gaugeInfo, json) {
+		var metricData = gaugeInfo.getMetricNode(gaugeInfo.className, gaugeInfo.metricName, json);
+		if (metricData) {
+			updateGaugeData(gaugeInfo, metricData);
+		}
+	}
+	function updateGaugeData(gaugeInfo, gaugeData) {
+		var gaugeDiv = $("#" + gaugeInfo.divId + " div.gaugeDataVal");
+		gaugeDiv.html(gaugeData.value);
+	}
+
+	/*
+	 * GaugeTable methods
+	 */
+	function drawGaugeTable(divId, title, gauges) {
+		var parentDiv = $("#" + divId);
+		var html = "<div class='metricsWatcher metric metricGraph nested'>"
+				+ "<fieldset><legend><div class='heading1'>" + title + "</div></legend>"
+				+ "<div class='gaugeTableContainer'><table class='gaugeTable'></table></div></fieldset></div>";
+
+		parentDiv.html(html);
+	}
+	function updateGaugeTable(divId, gauges, json) {
+		var div = $("#" + divId + " table");
+
+		var html = "";
+		var length = gauges.length;
+		for (var i = 0; i < length; i++) {
+			var gauge = gauges[i];
+			html += "<tr><td><h5>" + gauge.title + "</h5></td>"
+				+ "<td><h4>" + gauge.getMetricNode(gauge.className, gauge.metricName, json).value
+				+ "</h4></td></tr>";
+		}
+		div.html(html);
+	}
+
+	/*
+	 * Cache methods
+	 */
+	function drawCache(cacheInfo) {
+		var parentDiv = $("#" + cacheInfo.divId);
+
+		var html = "<div class='metricsWatcher cache cacheGraph col-md-12'>"
+				+ "<fieldset><legend><div class='heading1'>" + cacheInfo.title + "</div></legend>"
+				+ "<div class='cacheContainer col-md-12'>"
+				+ "	<div class='row'>"
+				+ "		<div class='col-md-3'><div id='" + cacheInfo.divId + "Statistics'></div></div>"
+				+ "		<div class='col-md-9'>"
+				+ "			<div id='" + cacheInfo.divId + "gettimer'></div>"
+				+ "			<div id='" + cacheInfo.divId + "puttimer'></div>"
+				+ "		</div>"
+				+ "	</div>"
+				+ "</div></fieldset></div>";
+		parentDiv.html(html);
+
+		var length = cacheInfo.components.gauges.length;
+		for (var i = 0; i < length; i++) {
+			drawGauge(cacheInfo.components.gauges[i]);
+		}
+		drawTimer(cacheInfo.getTimer);
+		drawTimer(cacheInfo.putTimer);
+		drawGaugeTable(cacheInfo.divId + "Statistics", "Statistics", cacheInfo.components.gauges);
+	}
+	function updateCache(cacheInfo, json) {
+		var length = cacheInfo.components.gauges.length;
+		for (var i = 0; i < length; i++) {
+			var gauge = cacheInfo.components.gauges[i];
+			var data = gauge.getMetricNode(cacheInfo.className, gauge.metricName, json);
+			if (data) {
+				var gaugeDiv = $("#" + gauge.divId + " div.metricGraph div.gaugeDataVal");
+				gaugeDiv.html(data.value);
+			}
+		}
+		updateTimer(cacheInfo.getTimer, json);
+		updateTimer(cacheInfo.putTimer, json);
+		updateGaugeTable(cacheInfo.divId + "Statistics", cacheInfo.components.gauges, json);
+	}
+
+	/*
+	 * JVM methods
+	 */
+	function drawJvm(jvmInfo) {
+		var parentDiv = $("#" + jvmInfo.divId);
+		var html = "<div class='metricsWatcher jvm metricGraph col-md-12'>"
+				+ "<fieldset><legend><div  class='heading1 btn-link' data-toggle='collapse' data-target='#" + jvmInfo.divId + "Collapse'>" + jvmInfo.title + "</div></legend>"
+				+ "<div class='jvmContainer col-md-12 collapse' id='" + jvmInfo.divId + "Collapse'>"
+				+ "	<div id='" + jvmInfo.divId + "Vm'></div>"
+				+ "</div>"
+				+ "</fieldset></div>";
+		parentDiv.html(html);
+	}
+
+	function updateJvm(jvmInfo, json) {
+		var vmDiv = $("#" + jvmInfo.divId + "Vm");
+		var jvm = json['gauges'];
+		var html = "<div class='row'>"
+				+ "<div class='col-md-3'><table class='jvmTable'><caption>Memory</caption>"
+				+ "<tr><td><h5>Total Init</h5></td><td>" + jvm['jvm.memory.total.init'].value + "</td></tr>"
+				+ "<tr><td><h5>Total Used</h5></td><td>" + jvm['jvm.memory.total.used'].value + "</td></tr>"
+				+ "<tr><td><h5>Total Max</h5></td><td>" + jvm['jvm.memory.total.max'].value + "</td></tr>"
+				+ "<tr><td><h5>Total Committed</h5></td><td>" + jvm['jvm.memory.total.committed'].value + "</td></tr>"
+				+ "<tr><td><h5>Heap Init</h5></td><td>" + jvm['jvm.memory.heap.init'].value + "</td></tr>"
+				+ "<tr><td><h5>Heap Used</h5></td><td>" + jvm['jvm.memory.heap.used'].value + "</td></tr>"
+				+ "<tr><td><h5>Heap Max</h5></td><td>" + jvm['jvm.memory.heap.max'].value + "</td></tr>"
+				+ "<tr><td><h5>Heap Committed</h5></td><td>" + jvm['jvm.memory.heap.committed'].value + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Init</h5></td><td>" + jvm['jvm.memory.non-heap.init'].value + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Used</h5></td><td>" + jvm['jvm.memory.non-heap.used'].value + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Max</h5></td><td>" + jvm['jvm.memory.non-heap.max'].value + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Committed</h5></td><td>" + jvm['jvm.memory.non-heap.committed'].value + "</td></tr>"
+				+ "</table></div>"
+				+ "<div class='col-md-3'><table class='jvmTable'><caption>Memory Usage</caption>"
+				+ "<tr><td><h5>Heap Usage</h5></td><td>" + (jvm['jvm.memory.heap.usage'].value * 100).toFixed(2) + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Usage</h5></td><td>" + (jvm['jvm.memory.non-heap.usage'].value * 100).toFixed(2) + "</td></tr>"
+				+ (!jvm['jvm.memory.pools.JIT-code-cache.usage']?"":("<tr><td><h5>JIT Code Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.JIT-code-cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Code-Cache.usage']?"":("<tr><td><h5>JIT Code Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.Code-Cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.JIT-data-cache.usage']?"":("<tr><td><h5>JIT Data Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.JIT-data-cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Java-heap.usage']?"":("<tr><td><h5>Java Heap Usage</h5></td><td>" + (jvm['jvm.memory.pools.Java-heap.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.class-storage.usage']?"":("<tr><td><h5>Class Storage Usage</h5></td><td>" + (jvm['jvm.memory.pools.class-storage.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Perm-Gen.usage']?"":("<tr><td><h5>Perm Gen Usage</h5></td><td>" + (jvm['jvm.memory.pools.Perm-Gen.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Tenured-Gen.usage']?"":("<tr><td><h5>Tenured Gen Usage</h5></td><td>" + (jvm['jvm.memory.pools.Tenured-Gen.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.miscellaneous-non-heap-storage.usage']?"":("<tr><td><h5>Misc Non Heap Storage Usage</h5></td><td>" + (jvm['jvm.memory.pools.miscellaneous-non-heap-storage.usage'].value * 100).toFixed(2)  + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Survivor-Space.usage']?"":("<tr><td><h5>Survivor Space Usage</h5></td><td>" + (jvm['jvm.memory.pools.Survivor-Space.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Eden-Space.usage']?"":("<tr><td><h5>Eden Space Usage</h5></td><td>" + (jvm['jvm.memory.pools.Eden-Space.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+"</table></div>"
+				+ "<div class='col-md-3'><table class='jvmTable'><caption>Garbage Collection</caption>"
+				+ "<tr><td><h5>PS Mark Sweep Runs</h5></td><td>" + jvm['jvm.gc.MarkSweepCompact.count'].value + "</td></tr>"
+				+ "<tr><td><h5>PS Mark Sweep Time</h5></td><td>" + jvm['jvm.gc.MarkSweepCompact.time'].value + "</td></tr>"
+				+ "<tr><td><h5>GC Copy Runs</h5></td><td>" + jvm['jvm.gc.Copy.count'].value + "</td></tr>"
+				+ "<tr><td><h5>GC Copy Time</h5></td><td>" + jvm['jvm.gc.Copy.time'].value + "</td></tr>"
+				+ "</table></div>"
+				+ "<div class='col-md-3'><table class='jvmTable'><caption>Threads</caption>"
+//				+ "<tr><td class='rowName'><h5>Name</h5></td><td>" + jvm['jvm.vm.name'].value + "</td></tr>"
+//				+ "<tr><td><h5>Version</h5></td><td>" + jvm['jvm.vm.version'].value + "</td></tr>"
+//				+ "<tr><td><h5>Current Time</h5></td><td>" + jvm['jvm.current_time'].value + "</td></tr>"
+//				+ "<tr><td><h5>Uptime</h5></td><td>" + jvm['jvm.uptime'].value + "</td></tr>"
+				+ "<tr><td><h5>FD Usage</h5></td><td>" + formatNumber(jvm['jvm.fd.usage'].value, 2) + "</td></tr>"
+				+ "<tr><td><h5>Daemon Threads</h5></td><td>" + jvm['jvm.thread-states.daemon.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Threads</h5></td><td>" + jvm['jvm.thread-states.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Deadlocks</h5></td><td>" + jvm['jvm.thread-states.deadlocks'].value + "</td></tr>"
+				+ "</table><table class='jvmTable'><caption>Thread States</caption>"
+				+ "<tr><td><h5>Terminated</h5></td><td>" + jvm['jvm.thread-states.terminated.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Timed Waiting</h5></td><td>" + jvm['jvm.thread-states.timed_waiting.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Blocked</h5></td><td>" + jvm['jvm.thread-states.blocked.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Waiting</h5></td><td>" + jvm['jvm.thread-states.waiting.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Runnable</h5></td><td>" + jvm['jvm.thread-states.runnable.count'].value + "</td></tr>"
+				+ "<tr><td><h5>New</h5></td><td>" + jvm['jvm.thread-states.new.count'].value + "</td></tr>"
+				+ "</table></div></div>";
+
+		vmDiv.html(html);
+	};
+
+	/*
+	 * Web Server methods
+	 */
+	function drawWeb(webInfo) {
+		var parentDiv = $("#" + webInfo.divId);
+		var html = "<div class='metricsWatcher web metricGraph col-md-12'>"
+				+ "<fieldset><legend><div class='heading1 btn-link' data-toggle='collapse' data-target='#"+webInfo.divId+"Collapse'>" + webInfo.title + "</div></legend>"
+				+ "<div class='webContainer col-md-12' id='"+webInfo.divId+"Collapse'>"
+				+ "	<div id='" + webInfo.divId + "Web'></div>"
+				+ "<table><tr>"
+				+ "<td colspan='4' class='requestsGraph col-md-12'></td>"
+				+ "</tr><tr>"
+				+ "<td class='activeRequestsGraph col-md-3'></td>"
+				+ "<td class='responseCodesOkGraph col-md-3'></td>"
+				+ "<td class='responseCodesCreatedGraph col-md-3'></td>"
+				+ "<td class='responseCodesOtherGraph col-md-3'></td>"
+				+ "</tr><tr>"
+				+ "<td class='responseCodesBadRequestGraph col-md-3'></td>"
+				+ "<td class='responseCodesNoContentGraph col-md-3'></td>"
+				+ "<td class='responseCodesNotFoundGraph col-md-3'></td>"
+				+ "<td class='responseCodesServerErrorGraph col-md-3'></td>"
+				+ "</tr></table>"
+				+ "</div>"
+				+ "</fieldset></div>";
+		parentDiv.html(html);
+
+		drawTimer(webInfo.components.requestsInfo);
+		drawCounter(webInfo.components.activeRequestsInfo);
+
+		var length = webInfo.components.meters.length;
+		for (var i = 0; i < length; i++) {
+			drawMeter(webInfo.components.meters[i]);
+		}
+	};
+
+	function updateWeb(webInfo, json) {
+		updateTimer(webInfo.components.requestsInfo, json);
+		updateCounter(webInfo.components.activeRequestsInfo, json);
+
+		var length = webInfo.components.meters.length;
+		for (var i = 0; i < length; i++) {
+			updateMeter(webInfo.components.meters[i], json);
+		}
+	};
+
+	/*
+	 * Log4j events stream  methods
+	 */
+	function drawLog4j(log4jInfo) {
+		var parentDiv = $("#" + log4jInfo.divId);
+		var html = "<div class='metricsWatcher log4j metricGraph col-md-12'>"
+				+ "<fieldset><legend><div class='heading1 btn-link' data-toggle='collapse' data-target='#"+log4jInfo.divId+"Collapse'>" + log4jInfo.title + "</div></legend>"
+				+ "<div class='log4jContainer col-md-12' id='"+log4jInfo.divId+"Collapse'>"
+				+ "	<div id='" + log4jInfo.divId + "Log4j'></div>"
+				+ "<table><tr>"
+				+ "<td colspan='4' class='col-md-12'></td>"
+				+ "</tr><tr>"
+				+ "<td class='all col-md-3'></td>"
+				+ "<td class='fatal col-md-3'></td>"
+				+ "<td class='error col-md-3'></td>"
+				+ "<td class='warn col-md-3'></td>"
+				+ "</tr><tr>"
+				+ "<td class='info col-md-3'></td>"
+				+ "<td class='debug col-md-3'></td>"
+				+ "<td class='trace col-md-3'></td>"
+				+ "</tr></table>"
+				+ "</div>"
+				+ "</fieldset></div>";
+		parentDiv.html(html);
+
+		var length = log4jInfo.components.meters.length;
+		for (var i = 0; i < length; i++) {
+			drawMeter(log4jInfo.components.meters[i]);
+		}
+	};
+
+	function updateLog4j(log4jInfo, json) {
+		var length = log4jInfo.components.meters.length;
+		for (var i = 0; i < length; i++) {
+			updateMeter(log4jInfo.components.meters[i], json);
+		}
+	};
+
+}(window.metricsWatcher = window.metricsWatcher || {}, jQuery));

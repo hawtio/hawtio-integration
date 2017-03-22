@@ -8,14 +8,6 @@
 /// <reference path="d.ts/activemq/ts/preferences.d.ts"/>
 /// <reference path="d.ts/activemq/ts/tabsController.d.ts"/>
 /// <reference path="d.ts/activemq/ts/tree.d.ts"/>
-/// <reference path="d.ts/karaf/ts/karafHelpers.d.ts"/>
-/// <reference path="d.ts/karaf/ts/karafPlugin.d.ts"/>
-/// <reference path="d.ts/karaf/ts/feature.d.ts"/>
-/// <reference path="d.ts/karaf/ts/features.d.ts"/>
-/// <reference path="d.ts/karaf/ts/navbar.d.ts"/>
-/// <reference path="d.ts/karaf/ts/scr-component.d.ts"/>
-/// <reference path="d.ts/karaf/ts/scr-components.d.ts"/>
-/// <reference path="d.ts/karaf/ts/server.d.ts"/>
 /// <reference path="d.ts/camel/ts/camelHelpers.d.ts"/>
 /// <reference path="d.ts/camel/ts/camelPlugin.d.ts"/>
 /// <reference path="d.ts/camel/ts/attributesToolBar.d.ts"/>
@@ -43,6 +35,7 @@
 /// <reference path="d.ts/camel/ts/typeConverter.d.ts"/>
 /// <reference path="d.ts/osgi/ts/osgiHelpers.d.ts"/>
 /// <reference path="d.ts/osgi/ts/osgiData.d.ts"/>
+/// <reference path="d.ts/karaf/ts/karafHelpers.d.ts"/>
 /// <reference path="d.ts/osgi/ts/osgiPlugin.d.ts"/>
 /// <reference path="d.ts/osgi/ts/bundle-list.d.ts"/>
 /// <reference path="d.ts/osgi/ts/bundle.d.ts"/>
@@ -56,6 +49,13 @@
 /// <reference path="d.ts/osgi/ts/pid.d.ts"/>
 /// <reference path="d.ts/osgi/ts/services.d.ts"/>
 /// <reference path="d.ts/osgi/ts/svc-dependencies.d.ts"/>
+/// <reference path="d.ts/karaf/ts/karafPlugin.d.ts"/>
+/// <reference path="d.ts/karaf/ts/feature.d.ts"/>
+/// <reference path="d.ts/karaf/ts/features.d.ts"/>
+/// <reference path="d.ts/karaf/ts/navbar.d.ts"/>
+/// <reference path="d.ts/karaf/ts/scr-component.d.ts"/>
+/// <reference path="d.ts/karaf/ts/scr-components.d.ts"/>
+/// <reference path="d.ts/karaf/ts/server.d.ts"/>
 /// <reference path="d.ts/camel/ts/properties/property.d.ts"/>
 /// <reference path="d.ts/camel/ts/properties/properties.service.d.ts"/>
 /// <reference path="d.ts/camel/ts/properties/properties-component.controller.d.ts"/>
