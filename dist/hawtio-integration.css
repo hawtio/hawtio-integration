@@ -79,6 +79,11 @@
 }
 @media (max-width: 767px) {
 }
+div.camel-properties {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
 .camel-properties-header h2 {
   display: inline-block;
   margin-right: 50px;
