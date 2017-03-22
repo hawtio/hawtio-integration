@@ -60,24 +60,24 @@ namespace Camel {
             && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson")
         },
         {
-          id: 'camel-inflight-exchanges',
-          title: 'Inflight',
-          href: "/camel/inflight" + workspace.hash(),
+          id: 'camel-exchanges',
+          title: 'Exchanges',
+          href: "/camel/exchanges" + workspace.hash(),
           show: () => !workspace.isEndpointsFolder() && !workspace.isEndpoint()
             && !workspace.isComponentsFolder() && !workspace.isComponent()
             && (workspace.isCamelContext() || workspace.isRoutesFolder() || workspace.isRoute())
             && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
             && workspace.hasInvokeRightsForName(getSelectionCamelInflightRepository(workspace), "browse")
         },
-        {
-          id: 'camel-blocked-exchanges',
-          title: 'Blocked',
-          href: "/camel/blocked" + workspace.hash(),
-          show: () => !workspace.isEndpointsFolder()
-            && (workspace.isRoute() || workspace.isRoutesFolder())
-            && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-            && workspace.hasInvokeRightsForName(getSelectionCamelBlockedExchanges(workspace), "browse")
-        },
+        // {
+        //   id: 'camel-blocked-exchanges',
+        //   title: 'Blocked',
+        //   href: "/camel/blocked" + workspace.hash(),
+        //   show: () => !workspace.isEndpointsFolder()
+        //     && (workspace.isRoute() || workspace.isRoutesFolder())
+        //     && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
+        //     && workspace.hasInvokeRightsForName(getSelectionCamelBlockedExchanges(workspace), "browse")
+        // },
         {
           id: 'camel-route-metrics',
           title: 'Route Metrics',

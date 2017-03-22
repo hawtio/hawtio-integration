@@ -1,4 +1,4 @@
-/// <reference path="camelPlugin.ts"/>
+/// <reference path="../camelPlugin.ts"/>
 module Camel {
 
   _module.controller("Camel.BlockedExchangesController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
@@ -97,6 +97,7 @@ module Camel {
         var arr = [];
         for (var key in obj) {
           var entry = obj[key];
+          console.log('blocked: ' + JSON.stringify(entry));
           arr.push(
             {
               exchangeId: entry.exchangeId,

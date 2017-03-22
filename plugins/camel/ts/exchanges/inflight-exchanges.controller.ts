@@ -1,8 +1,8 @@
-/// <reference path="../../includes.ts"/>
-/// <reference path="camelPlugin.ts"/>
+/// <reference path="../../../includes.ts"/>
+/// <reference path="../camelPlugin.ts"/>
 module Camel {
 
-  _module.controller("Camel.InflightController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.InflightExchangesController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
 
     $scope.data = [];
     $scope.initDone = false;
@@ -69,6 +69,7 @@ module Camel {
         var arr = [];
         for (var key in obj) {
           var entry = obj[key];
+          console.log('inflight: ' + JSON.stringify(entry));
           arr.push(
             {
               exchangeId: entry.exchangeId,

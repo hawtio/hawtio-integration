@@ -27,14 +27,6 @@
 .modal-header div[hawtio-pager] {
   line-height: 1;
 }
-.spinner.loading-page {
-  margin-top: 20px;
-}
-.loading-message {
-  margin-top: 20px;
-  font-weight: bold;
-  text-align: center;
-}
 
 .form-inline.camel-forward-message {
   margin-bottom: 20px;
@@ -57,6 +49,22 @@
 #camel-debug .breakpoint-list {
   float: left;
   margin-right: 10px;
+}
+
+.camel-inflight-exchanges-table th:nth-child(1) {
+  width: 40%;
+}
+.camel-inflight-exchanges-table th:nth-child(2) {
+  width: auto;
+}
+.camel-inflight-exchanges-table th:nth-child(3) {
+  width: auto;
+}
+.camel-inflight-exchanges-table th:nth-child(4) {
+  width: 80px;
+}
+.camel-inflight-exchanges-table th:nth-child(5) {
+  width: 80px;
 }
 
 .camel-profile-table th:nth-child(1) {
