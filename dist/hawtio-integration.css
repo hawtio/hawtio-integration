@@ -154,9 +154,26 @@ div.camel-properties {
   width: 15%;
 }
 
+@media screen and (max-width: 767px) {
+}
+@media (min-width: 768px) {
+}
+@media (min-width: 768px) {
+}
+@media (max-width: 767px) {
+}
+@media (min-width: 768px) {
+}
+@media (min-width: 768px) {
+}
+@media (max-width: 767px) {
+}
+@media (max-width: 767px) {
+}
 #canvas {
-  width: 100%;
+  width: calc(100% + 2*20px);
   height: 100%;
+  left: -20px;
   position: absolute;
   overflow: hidden;
 }
