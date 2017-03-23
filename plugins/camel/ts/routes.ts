@@ -141,6 +141,8 @@ module Camel {
     var onClickGraphNode = function (node) {
       log.debug("Clicked on Camel Route Diagram node: " + node.cid);
 
+      console.log('test: ', workspace.isRoutesFolder());
+
       if (workspace.isRoutesFolder()) {
         // Handle nodes selection from a diagram displaying multiple routes
         handleGraphNode(node);
@@ -151,6 +153,7 @@ module Camel {
 
     function navigateToNodeProperties(cid) {
       $location.path('/camel/propertiesRoute').search({"main-tab": "camel", "nid": cid});
+      console.log('$location: ', $location.search());
       Core.$apply($scope);
     }
 
@@ -181,6 +184,7 @@ module Camel {
             // Populate route folder child nodes for the context tree
             if (!routeFolder.children.length) {
               processRouteXml(workspace, workspace.jolokia, routeFolder, (route) => {
+                console.log('loaded route')
                 addRouteChildren(routeFolder, route);
                 updateRouteProperties(node, route, routeFolder)
               });
@@ -197,6 +201,8 @@ module Camel {
     function updateRouteProperties(node, route, routeFolder) {
       var cid = node.cid;
 
+      // console.log('updateRouteProperties: ', cid);
+
       $("#cameltree").dynatree("getTree").getNodeByKey(routeFolder.key).expand("true");
 
       // Get the 'real' cid of the selected diagram node
@@ -210,6 +216,8 @@ module Camel {
       if (routeChild) {
         cid = routeChild.key;
       }
+
+      console.log('updateRouteProperties: ', cid);
 
       // Setup the properties tab view for the selected diagram node
       $scope.model = getCamelSchema("route");
@@ -245,7 +253,15 @@ module Camel {
 
       const {graph: render} = dagreLayoutGraph(nodes, links, 0, 0, svg, false, onClick);
 
-      d3.select("svg").attr("viewBox", "0 0 " + (render.graph().width) + " " + (render.graph().height));
+      const container = d3.select(svg);
+      container.attr("viewBox", "0 0 " + (render.graph().width) + " " + (render.graph().height));
+
+      var zoom = d3.behavior.zoom()
+        .scaleExtent([1, 5])
+        .on('zoom', () => container.select('g')
+          .attr('transform', `translate(${d3.event.translate}) scale(${d3.event.scale})`));
+
+      container.call(zoom);
 
       // Only apply node selection behavior if debugging or tracing
       if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
