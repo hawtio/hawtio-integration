@@ -6,5 +6,5 @@ declare module Camel {
         nodes: any;
         graph: any;
     };
-    function dagreUpdateGraphData(data: any): void;
+    function dagreUpdateGraphData(): void;
 }

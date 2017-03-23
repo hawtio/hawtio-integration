@@ -221,7 +221,7 @@ module Camel {
   }
 
   // TODO Export as a service
-  export function dagreUpdateGraphData(data) {
+  export function dagreUpdateGraphData() {
     var svg = d3.select("svg");
     svg.selectAll("text.counter").text(_counterFunction);
     svg.selectAll("text.inflight").text(_inflightFunction);

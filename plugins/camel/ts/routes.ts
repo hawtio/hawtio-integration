@@ -243,8 +243,7 @@ module Camel {
         onClick = onClickGraphNode;
       }
 
-      const {nodes: states, graph: render} = dagreLayoutGraph(nodes, links, 0, 0, svg, false, onClick);
-      $scope.graphData = states;
+      const {graph: render} = dagreLayoutGraph(nodes, links, 0, 0, svg, false, onClick);
 
       d3.select("svg").attr("viewBox", "0 0 " + (render.graph().width) + " " + (render.graph().height));
 
@@ -306,7 +305,7 @@ module Camel {
         });
 
         // now lets try update the graph
-        dagreUpdateGraphData($scope.graphData);
+        dagreUpdateGraphData();
       }
 
       function addTooltipToNode(isRoute, stat) {
