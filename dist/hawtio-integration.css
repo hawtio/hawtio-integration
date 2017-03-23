@@ -14,10 +14,6 @@
 }
 @media (max-width: 767px) {
 }
-#main {
-  height: 100%;
-  overflow: auto;
-}
 .toolbar-pf .form-group:first-child {
   padding-left: 0;
 }
