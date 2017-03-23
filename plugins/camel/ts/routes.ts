@@ -242,6 +242,9 @@ module Camel {
       var height = getHeight();
       var svg = canvasDiv.children("svg")[0];
 
+      // Let the diagram be visible full width without parent margins
+      canvasDiv.parent().css('overflow', 'visible');
+
       // do not allow clicking on node to show properties if debugging or tracing as that is for selecting the node instead
       var onClick;
       var path = $location.path();
