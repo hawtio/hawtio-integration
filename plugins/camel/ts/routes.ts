@@ -251,10 +251,10 @@ module Camel {
         onClick = onClickGraphNode;
       }
 
-      const {graph: render} = dagreLayoutGraph(nodes, links, 0, 0, svg, false, onClick);
+      const {graph: render} = dagreLayoutGraph(nodes, links, svg, false, onClick);
 
       const container = d3.select(svg);
-      container.attr("viewBox", "0 0 " + (render.graph().width) + " " + (render.graph().height));
+      container.attr('viewBox', `0 0 ${render.graph().width} ${render.graph().height}`);
 
       var zoom = d3.behavior.zoom()
         .scaleExtent([1, 5])

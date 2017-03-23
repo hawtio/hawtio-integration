@@ -35,7 +35,7 @@ module Camel {
   }
 
   // TODO Export as a service
-  export function dagreLayoutGraph(nodes, links, width, height, svgElement, allowDrag = false, onClick = null) {
+  export function dagreLayoutGraph(nodes, links, svgElement, allowDrag = false, onClick = null) {
     var nodePadding = 10;
     var transitions = [];
     var states      = createGraphStates(nodes, links, transitions);
