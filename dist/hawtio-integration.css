@@ -174,7 +174,7 @@ div.camel-properties {
   overflow: hidden;
 }
 .camel-diagram {
-  padding: 20px 0 10px 0;
+  padding: 20px;
 }
 .camel-diagram #node-CLOSED rect {
   stroke-width: 1px;
