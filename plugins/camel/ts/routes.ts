@@ -99,7 +99,7 @@ module Camel {
       if (data) {
         var doc = $.parseXML(data);
         $scope.processorTree = camelProcessorMBeansById(workspace);
-        Camel.loadRouteXmlNodes($scope, doc, selectedRouteId, nodes, links, getWidth());
+        Camel.loadRouteXmlNodes($scope, doc, selectedRouteId, nodes, links, $element.width());
         showGraph(nodes, links);
       } else {
         console.log("No data from route XML!")
@@ -238,8 +238,6 @@ module Camel {
 
     function showGraph(nodes, links) {
       var canvasDiv = $element;
-      var width = getWidth();
-      var height = getHeight();
       var svg = canvasDiv.children("svg")[0];
 
       // Let the diagram be visible full width without parent margins
@@ -313,16 +311,6 @@ module Camel {
         }, Core.onSuccess(statsCallback, {silent: true, error: false}));
       }
       $scope.$emit("camel.diagram.layoutComplete");
-    }
-
-    function getWidth() {
-      var canvasDiv = $element;
-      return canvasDiv.width();
-    }
-
-    function getHeight() {
-      var canvasDiv = $element;
-      return getCanvasHeight(canvasDiv);
     }
 
     function statsCallback(response) {
