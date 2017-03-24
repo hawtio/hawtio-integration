@@ -2,10 +2,9 @@
 @pf-less-path: "/patternfly/dist/less";
 @import (reference) "@{pf-less-path}/patternfly.less";
 
-#main {
-  height: 100%;
-  overflow: auto;
-}
+// We may want to distribute Hawtio plugins LESS files
+@pf-padding: @grid-gutter-width / 2;
+
 
 .toolbar-pf .form-group:first-child {
   padding-left: 0;

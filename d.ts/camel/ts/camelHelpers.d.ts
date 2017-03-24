@@ -233,7 +233,6 @@ declare module Camel {
     };
     function loadRouteXmlNodes($scope: any, doc: any, selectedRouteId: any, nodes: any, links: any, width: any): void;
     function addRouteXmlChildren($scope: any, parent: any, nodes: any, links: any, parentId: any, parentX: any, parentY: any, parentNode?: any): any[];
-    function getCanvasHeight(canvasDiv: any): any;
     /**
      * Recursively add all the folders which have a cid value into the given map
      * @method

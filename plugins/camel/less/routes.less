@@ -1,6 +1,9 @@
+@import (reference) "global.less";
+
 #canvas {
-  width: 100%;
+  width: ~"calc(100% + 2*@{pf-padding})";
   height: 100%;
+  left: -@pf-padding;
   position: absolute;
   overflow: hidden;
 }

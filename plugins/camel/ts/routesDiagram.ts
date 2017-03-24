@@ -35,7 +35,7 @@ module Camel {
   }
 
   // TODO Export as a service
-  export function dagreLayoutGraph(nodes, links, width, height, svgElement, allowDrag = false, onClick = null) {
+  export function dagreLayoutGraph(nodes, links, svgElement, allowDrag = false, onClick = null) {
     var nodePadding = 10;
     var transitions = [];
     var states      = createGraphStates(nodes, links, transitions);
@@ -221,7 +221,7 @@ module Camel {
   }
 
   // TODO Export as a service
-  export function dagreUpdateGraphData(data) {
+  export function dagreUpdateGraphData() {
     var svg = d3.select("svg");
     svg.selectAll("text.counter").text(_counterFunction);
     svg.selectAll("text.inflight").text(_inflightFunction);

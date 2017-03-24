@@ -2760,22 +2760,6 @@ var Camel;
         return siblingNodes;
     }
     Camel.addRouteXmlChildren = addRouteXmlChildren;
-    function getCanvasHeight(canvasDiv) {
-        var height = canvasDiv.height();
-        if (height < 300) {
-            console.log("browse thinks the height is only " + height + " so calculating offset from doc height");
-            var offset = canvasDiv.offset();
-            height = $(document).height() - 5;
-            if (offset) {
-                var top = offset['top'];
-                if (top) {
-                    height -= top;
-                }
-            }
-        }
-        return height;
-    }
-    Camel.getCanvasHeight = getCanvasHeight;
     /**
      * Recursively add all the folders which have a cid value into the given map
      * @method
@@ -5709,7 +5693,7 @@ var Camel;
                 if (data) {
                     var doc = $.parseXML(data);
                     $scope.processorTree = Camel.camelProcessorMBeansById(workspace);
-                    Camel.loadRouteXmlNodes($scope, doc, selectedRouteId, nodes, links, getWidth());
+                    Camel.loadRouteXmlNodes($scope, doc, selectedRouteId, nodes, links, $element.width());
                     showGraph(nodes, links);
                 }
                 else {
@@ -5747,6 +5731,7 @@ var Camel;
             }
             var onClickGraphNode = function (node) {
                 log.debug("Clicked on Camel Route Diagram node: " + node.cid);
+                console.log('test: ', workspace.isRoutesFolder());
                 if (workspace.isRoutesFolder()) {
                     // Handle nodes selection from a diagram displaying multiple routes
                     handleGraphNode(node);
@@ -5757,6 +5742,7 @@ var Camel;
             };
             function navigateToNodeProperties(cid) {
                 $location.path('/camel/propertiesRoute').search({ "main-tab": "camel", "nid": cid });
+                console.log('$location: ', $location.search());
                 Core.$apply($scope);
             }
             function handleGraphNode(node) {
@@ -5782,6 +5768,7 @@ var Camel;
                             // Populate route folder child nodes for the context tree
                             if (!routeFolder.children.length) {
                                 Camel.processRouteXml(workspace, workspace.jolokia, routeFolder, function (route) {
+                                    console.log('loaded route');
                                     Camel.addRouteChildren(routeFolder, route);
                                     updateRouteProperties(node, route, routeFolder);
                                 });
@@ -5798,6 +5785,7 @@ var Camel;
             }
             function updateRouteProperties(node, route, routeFolder) {
                 var cid = node.cid;
+                // console.log('updateRouteProperties: ', cid);
                 $("#cameltree").dynatree("getTree").getNodeByKey(routeFolder.key).expand("true");
                 // Get the 'real' cid of the selected diagram node
                 var routeChild = routeFolder.findDescendant(function (d) {
@@ -5810,6 +5798,7 @@ var Camel;
                 if (routeChild) {
                     cid = routeChild.key;
                 }
+                console.log('updateRouteProperties: ', cid);
                 // Setup the properties tab view for the selected diagram node
                 $scope.model = Camel.getCamelSchema("route");
                 if ($scope.model) {
@@ -5826,9 +5815,9 @@ var Camel;
             }
             function showGraph(nodes, links) {
                 var canvasDiv = $element;
-                var width = getWidth();
-                var height = getHeight();
                 var svg = canvasDiv.children("svg")[0];
+                // Let the diagram be visible full width without parent margins
+                canvasDiv.parent().css('overflow', 'visible');
                 // do not allow clicking on node to show properties if debugging or tracing as that is for selecting the node instead
                 var onClick;
                 var path = $location.path();
@@ -5838,9 +5827,31 @@ var Camel;
                 else {
                     onClick = onClickGraphNode;
                 }
-                var _a = Camel.dagreLayoutGraph(nodes, links, 0, 0, svg, false, onClick), states = _a.nodes, render = _a.graph;
-                $scope.graphData = states;
-                d3.select("svg").attr("viewBox", "0 0 " + (render.graph().width) + " " + (render.graph().height));
+                var render = Camel.dagreLayoutGraph(nodes, links, svg, false, onClick).graph;
+                var container = d3.select(svg);
+                // We want to have the diagram to be uniformally scaled and centered within the SVG viewport
+                function viewBox() {
+                    // But we don't want smaller diagrams to be scaled up so we set the viewBox to
+                    // the diagram bounding box only for diagrams that overflow the SVG viewport,
+                    // so that they scale down with preserved aspect ratio
+                    if (render.graph().width > canvasDiv.width() || render.graph().height > canvasDiv.height()) {
+                        container.attr('viewBox', "0 0 " + render.graph().width + " " + render.graph().height);
+                    }
+                    else {
+                        // For diagrams smaller than the SVG viewport size, we still want them to be centered
+                        // with the 'preserveAspectRatio' attribute set to 'xMidYMid'
+                        container.attr('viewBox', (render.graph().width - canvasDiv.width()) / 2 + " " + (render.graph().height - canvasDiv.height()) / 2 + " " + canvasDiv.width() + " " + canvasDiv.height());
+                    }
+                }
+                // We need to adapt the viewBox for smaller diagrams as it depends on the SVG viewport size
+                window.addEventListener('resize', viewBox);
+                // Lastly, we need to do it once at initialisation
+                viewBox();
+                var zoom = d3.behavior.zoom()
+                    .scaleExtent([1, 3])
+                    .on('zoom', function () { return container.select('g')
+                    .attr('transform', "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")"); });
+                container.call(zoom);
                 // Only apply node selection behavior if debugging or tracing
                 if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
                     var gNodes = canvasDiv.find("g.node");
@@ -5868,14 +5879,6 @@ var Camel;
                 }
                 $scope.$emit("camel.diagram.layoutComplete");
             }
-            function getWidth() {
-                var canvasDiv = $element;
-                return canvasDiv.width();
-            }
-            function getHeight() {
-                var canvasDiv = $element;
-                return Camel.getCanvasHeight(canvasDiv);
-            }
             function statsCallback(response) {
                 var data = response.value;
                 if (data) {
@@ -5889,7 +5892,7 @@ var Camel;
                         addTooltipToNode(false, stat);
                     });
                     // now lets try update the graph
-                    Camel.dagreUpdateGraphData($scope.graphData);
+                    Camel.dagreUpdateGraphData();
                 }
                 function addTooltipToNode(isRoute, stat) {
                     // we could have used a function instead of the boolean isRoute parameter (but sometimes that is easier)
@@ -5973,7 +5976,7 @@ var Camel;
     }
     Camel.createGraphStates = createGraphStates;
     // TODO Export as a service
-    function dagreLayoutGraph(nodes, links, width, height, svgElement, allowDrag, onClick) {
+    function dagreLayoutGraph(nodes, links, svgElement, allowDrag, onClick) {
         var _this = this;
         if (allowDrag === void 0) { allowDrag = false; }
         if (onClick === void 0) { onClick = null; }
@@ -6121,7 +6124,7 @@ var Camel;
     }
     Camel.dagreLayoutGraph = dagreLayoutGraph;
     // TODO Export as a service
-    function dagreUpdateGraphData(data) {
+    function dagreUpdateGraphData() {
         var svg = d3.select("svg");
         svg.selectAll("text.counter").text(_counterFunction);
         svg.selectAll("text.inflight").text(_inflightFunction);
