@@ -257,7 +257,24 @@ module Camel {
       const {graph: render} = dagreLayoutGraph(nodes, links, svg, false, onClick);
 
       const container = d3.select(svg);
-      container.attr('viewBox', `0 0 ${render.graph().width} ${render.graph().height}`);
+
+      // We want to have the diagram to be uniformally scaled and centered within the SVG viewport
+      function viewBox() {
+        // But we don't want smaller diagrams to be scaled up so we set the viewBox to
+        // the diagram bounding box only for diagrams that overflow the SVG viewport,
+        // so that they scale down with preserved aspect ratio
+        if (render.graph().width > canvasDiv.width() || render.graph().height > canvasDiv.height()) {
+          container.attr('viewBox', `0 0 ${render.graph().width} ${render.graph().height}`);
+        } else {
+          // For diagrams smaller than the SVG viewport size, we still want them to be centered
+          // with the 'preserveAspectRatio' attribute set to 'xMidYMid'
+          container.attr('viewBox', `${(render.graph().width - canvasDiv.width()) / 2} ${(render.graph().height - canvasDiv.height()) / 2} ${canvasDiv.width()} ${canvasDiv.height()}`);
+        }
+      }
+      // We need to adapt the viewBox for smaller diagrams as it depends on the SVG viewport size
+      window.addEventListener('resize', viewBox);
+      // Lastly, we need to do it once at initialisation
+      viewBox();
 
       var zoom = d3.behavior.zoom()
         .scaleExtent([1, 5])
