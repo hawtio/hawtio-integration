@@ -258,6 +258,7 @@ module Camel {
 
       // We want to have the diagram to be uniformally scaled and centered within the SVG viewport
       function viewBox() {
+        console.log('TEST');
         // But we don't want smaller diagrams to be scaled up so we set the viewBox to
         // the diagram bounding box only for diagrams that overflow the SVG viewport,
         // so that they scale down with preserved aspect ratio
@@ -271,6 +272,7 @@ module Camel {
       }
       // We need to adapt the viewBox for smaller diagrams as it depends on the SVG viewport size
       window.addEventListener('resize', viewBox);
+      $scope.$on('$destroy', () => window.removeEventListener('resize', viewBox));
       // Lastly, we need to do it once at initialisation
       viewBox();
 
