@@ -245,6 +245,7 @@ module Camel {
       })
       .href(() => '/jmx/attributes?main-tab=camel')
       .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
+      .isSelected(() => workspace.isMainTabActive('camel'))
       .build();
 
     nav.add(tab);
