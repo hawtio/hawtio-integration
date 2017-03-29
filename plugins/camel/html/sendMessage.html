@@ -1,27 +1,15 @@
 <div ng-controller="Camel.SendMessageController">
 
-  <div class="row">
-    <div class="col-sm-12">
-      <h1>Send Message</h1>
-    </div>
+  <h1>Send Message</h1>
+
+  <div class="alert alert-warning" ng-show="noCredentials">
+    <span class="pficon pficon-warning-triangle-o"></span>
+    <strong>No credentials set for endpoint!</strong>
+    Please set your username and password in the
+    <a href="#" class="alert-link" ng-click="openPrefs()">Preferences</a> page.
   </div>
 
-  <div class="row" ng-show="noCredentials">
-    <div class="col-sm-12">
-      <div class="alert alert-warning">
-        <span class="pficon pficon-warning-triangle-o"></span>
-        <strong>No credentials set for endpoint!</strong>
-        Please set your username and password in the
-        <a href="#" class="alert-link" ng-click="openPrefs()">Preferences</a> page.
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-12">
-      <h3>Headers</h3>
-    </div>
-  </div>
+  <h3>Headers</h3>
 
   <div class="row camel-message-headers" ng-if="headers.length > 0">
     <div class="col-sm-5">
@@ -55,41 +43,29 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-sm-12">
-      <a href="" ng-click="addHeader()">Add header</a>
-    </div>
+  <div>
+    <a href="" ng-click="addHeader()">Add header</a>
   </div>
 
-  <div class="row">
-    <div class="col-sm-12">
-      <h3>Body</h3>
-    </div>
-  </div>
+  <h3>Body</h3>
 
-  <div class="row">
-    <div class="col-sm-12">
-      <form>
-        <div class="form-group">
-          <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>
-        </div>
-        <div class="form-group">
-          <select pf-select ng-model="codeMirrorOptions.mode.name">
-            <option value="javascript">JSON</option>
-            <option value="xml">XML</option>
-          </select>
-          <button class="btn btn-default" ng-click="formatMessage()"
-                  title="Automatically pretty prints the message so its easier to read">Format
-          </button>
-        </div>
-      </form>
+  <form>
+    <div class="form-group">
+      <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>
     </div>
-  </div>
+    <div class="form-group">
+      <select class="form-control camel-send-message-format" ng-model="codeMirrorOptions.mode.name">
+        <option value="javascript">JSON</option>
+        <option value="xml">XML</option>
+      </select>
+      <button class="btn btn-default" ng-click="formatMessage()"
+              title="Automatically pretty prints the message so its easier to read">Format
+      </button>
+    </div>
+  </form>
 
-  <div class="row">
-    <div class="col-sm-12">
-      <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>
-    </div>
-  </div>
+  <p>
+    <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>
+  </p>
 
 </div>

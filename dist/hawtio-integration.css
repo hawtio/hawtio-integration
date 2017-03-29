@@ -212,6 +212,11 @@ div.camel-properties {
 .camel-send-message-button {
   margin-top: 15px;
 }
+.camel-send-message-format {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+}
 
 .camel-trace-alert {
   background-color: transparent;
