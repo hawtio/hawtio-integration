@@ -6,9 +6,10 @@
  * @main Karaf
  */
 module Karaf {
+
   var pluginName = 'karaf';
-  //export var _module = angular.module(pluginName, ['bootstrap', 'ngResource', 'hawtio-core']);
-  export var _module = angular.module(pluginName, ['ngResource', 'hawtio-core']);
+
+  export var _module = angular.module(pluginName, ['hawtio-core']);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider.
