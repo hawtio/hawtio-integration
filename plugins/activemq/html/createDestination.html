@@ -1,7 +1,7 @@
 <form class="form-horizontal" ng-controller="ActiveMQ.DestinationController">
 
   <div class="alert alert-info">
-    <span class="pficon pficon-info"></span>The JMS API does not define a standard address syntax. <p></p> Although a
+    <span class="pficon pficon-info"></span>The JMS API does not define a standard address syntax. Although a
     standard address syntax was considered, it was decided that the differences in address semantics between existing
     message-oriented middleware (MOM) products were too wide to bridge with a single syntax.
   </div>
@@ -10,7 +10,7 @@
     <label class="col-sm-2 control-label" for="name-markup">{{destinationTypeName}} name</label>
 
     <div class="col-sm-10">
-      <input id="name-markup" class="form-control" type="text" size="60" style="margin-left:15px;" maxlength="300"
+      <input id="name-markup" class="form-control" type="text" maxlength="300"
              name="destinationName" ng-model="destinationName" placeholder="{{destinationTypeName}} name"/>
     </div>
   </div>
@@ -27,10 +27,12 @@
     </div>
   </div>
 
-  <div class="control-group col-md-12">
-    <button type="submit" class="btn btn-primary" ng-click="createDestination(destinationName, queueType)"
-            ng-disabled="!destinationName">Create {{destinationTypeName}}
-    </button>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-primary" ng-click="createDestination(destinationName, queueType)"
+              ng-disabled="!destinationName">Create {{destinationTypeName}}
+      </button>
+    </div>
   </div>
 
 </form>
