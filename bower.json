@@ -33,7 +33,19 @@
     }
   },
   "resolutions": {
+    "angular": "~1.5.0",
+    "angular-bootstrap": "2.2.x",
+    "graphlib": "^2.1.1",
+    "hawtio-core": "~3.0.0",
+    "hawtio-core-navigation": "~3.0.0",
+    "hawtio-extension-service": "~3.0.0",
+    "hawtio-forms": "~3.0.0",
+    "hawtio-template-cache": "~3.0.0",
+    "hawtio-ui": "~3.0.0",
+    "hawtio-utilities": "~3.0.0",
     "jquery": "~2.1.0",
-    "angular": "~1.5.0"
+    "lodash": "4.x",
+    "patternfly": "~4.0.0-alpha.3",
+    "urijs": "<2.0.0"
   }
 }
