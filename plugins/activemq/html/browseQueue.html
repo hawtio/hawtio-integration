@@ -56,24 +56,24 @@
             <button class="btn btn-primary" ng-click="showMessageDetails = false"><i class="fa fa-arrow-left"></i> Back</button>
           </div>
 
-          <div class="form-group">
-            <div hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>
-          </div>
-
           <div class="toolbar-pf-action-right">
-            <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
-              title="Move the selected messages to another destination" data-placement="bottom">
-              <i class="fa fa-share-alt"></i> Move
-            </button>
-            <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length"
-              ng-click="deleteMessages()"
-              title="Delete the selected messages">
-              <i class="fa fa-remove"></i> Delete
-            </button>
+            <div class="form-group">
+              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
+                title="Move the selected messages to another destination" data-placement="bottom">
+                <i class="fa fa-share-alt"></i> Move
+              </button>
+              <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length"
+                ng-click="deleteMessages()"
+                title="Delete the selected messages">
+                <i class="fa fa-remove"></i> Delete
+              </button>
+            </div>
           </div>
         </form>
       </div>
     </div>
+
+    <div hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>
 
     <div class="expandable closed">
       <div title="Headers" class="title">
