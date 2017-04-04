@@ -21,7 +21,7 @@ var config = {
   main: '.',
   ts: ['plugins/**/*.ts'],
   templates: ['plugins/**/*.html'],
-  less: ['plugins/**/*.less', 'vendor/**/*.css'],
+  less: ['plugins/**/*.less', 'vendor/**/*.less', 'vendor/**/*.css'],
   templateModule: pkg.name + '-templates',
   dist: argv.out || './dist/',
   js: pkg.name + '.js',
