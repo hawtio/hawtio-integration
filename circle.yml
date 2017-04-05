@@ -1,0 +1,20 @@
+machine:
+  node:
+    version: 0.10.33
+  services:
+
+branches:
+  ignore:
+    - gh-pages
+
+dependencies:
+  pre:
+    - npm install -g bower gulp
+    - npm install
+    - bower install
+  override:
+    - gulp build
+
+test:
+  override:
+    - echo yes
