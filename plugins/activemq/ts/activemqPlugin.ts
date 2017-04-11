@@ -16,8 +16,14 @@ module ActiveMQ {
             when('/activemq/deleteTopic', {templateUrl: 'plugins/activemq/html/deleteTopic.html'}).
             when('/activemq/sendMessage', {templateUrl: 'plugins/camel/html/sendMessage.html'}).
             when('/activemq/durableSubscribers', {templateUrl: 'plugins/activemq/html/durableSubscribers.html'}).
-            when('/activemq/jobs', {templateUrl: 'plugins/activemq/html/jobs.html'})
+            when('/activemq/jobs', {templateUrl: 'plugins/activemq/html/jobs.html'}).
+            when('/activemq/queues', {templateUrl: 'app/activemq/html/destinations.html'}).
+            when('/activemq/topics', {templateUrl: 'app/activemq/html/destinations.html', controller: 'topicsController'})
   }]);
+
+  _module.controller('topicsController', function($scope) {
+      $scope.destinationType = 'topic';
+  });
 
   _module.run(["HawtioNav", "$location", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "$templateCache", "documentBase", (nav:HawtioMainNav.Registry, $location:ng.ILocationService, workspace:Workspace, viewRegistry, helpRegistry, preferencesRegistry, $templateCache:ng.ITemplateCacheService, documentBase) => {
 
@@ -27,7 +33,7 @@ module ActiveMQ {
     });
 
     preferencesRegistry.addTab("ActiveMQ", "plugins/activemq/html/preferences.html", () => {
-      return workspace.treeContainsDomainAndProperties("org.apache.activemq");              
+      return workspace.treeContainsDomainAndProperties("org.apache.activemq");
     });
 
     workspace.addTreePostProcessor(postProcessTree);
@@ -171,7 +177,6 @@ module ActiveMQ {
           return false;
         }
       });
-      // log.debug("Found ancestor: ", answer);
     }
     return answer;
   }

@@ -70,9 +70,23 @@ namespace ActiveMQ {
         {
           id     : 'activemq-delete-queue',
           title  : 'Delete',
-          tooltip: "Delete or purge this queue",
+          tooltip: 'Delete or purge this queue',
           show   : () => isQueue(workspace) && workspace.hasInvokeRights(getBroker(workspace), 'removeQueue'),
           href   : '/activemq/deleteQueue' + workspace.hash()
+        },
+        {
+          id     : 'activemq-queues',
+          title  : 'Queues',
+          tooltip: 'View Queues',
+          show   : () => isBroker(workspace),
+          href   : '/activemq/queues' + workspace.hash()
+        },
+        {
+          id     : 'activemq-topics',
+          title  : 'Topics',
+          tooltip: 'View Topics',
+          show   : () => isBroker(workspace),
+          href   : '/activemq/topics' + workspace.hash()
         }
       ];
 

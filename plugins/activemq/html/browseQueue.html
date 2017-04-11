@@ -22,16 +22,16 @@
                 title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">
                 <i class="fa fa-reply"></i> Retry
               </button>
-              <button class="btn btn-default" ng-disabled="gridOptions.selectedItems.length !== 1" ng-click="resendMessage()"
+              <button class="btn btn-default" ng-disabled="gridOptions.selectedItems.length !== 1" ng-show="showButtons" ng-click="resendMessage()"
                 title="Edit the message to resend it" data-placement="bottom">
                 <i class="fa fa-share-alt"></i> Resend
               </button>
 
-              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
+              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons" ng-click="moveMessages()"
                 title="Move the selected messages to another destination" data-placement="bottom">
                 <i class="fa fa-share-alt"></i> Move
               </button>
-              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length"
+              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"
                 ng-click="deleteMessages()"
                 title="Delete the selected messages">
                 <i class="fa fa-remove"></i> Delete
@@ -58,11 +58,11 @@
 
           <div class="toolbar-pf-action-right">
             <div class="form-group">
-              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="moveMessages()"
+              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons" ng-click="moveMessages()"
                 title="Move the selected messages to another destination" data-placement="bottom">
                 <i class="fa fa-share-alt"></i> Move
               </button>
-              <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length"
+              <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"
                 ng-click="deleteMessages()"
                 title="Delete the selected messages">
                 <i class="fa fa-remove"></i> Delete
