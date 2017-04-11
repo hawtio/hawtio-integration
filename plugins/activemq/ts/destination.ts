@@ -12,6 +12,7 @@ module ActiveMQ {
     $scope.destinationName = "";
     $scope.destinationTypeName = $scope.queueType ? "Queue" : "Topic";
 
+    $scope.createDialog = false;
     $scope.deleteDialog = false;
     $scope.purgeDialog = false;
 
@@ -48,6 +49,33 @@ module ActiveMQ {
       $location.path('/jmx/attributes').search({"main-tab": "activemq", "sub-tab": "activemq-attributes"});
       $scope.workspace.loadTree();
       Core.$apply($scope);
+    }
+
+    function validateDestinationName(name:string):boolean {
+      return name.indexOf(":") == -1;
+    }
+
+    function checkIfDestinationExists(name:string, isQueue:boolean):boolean {
+      var answer = false;
+      var destinations = isQueue ? retrieveQueueNames(workspace, false) : retrieveTopicNames(workspace, false);
+      angular.forEach(destinations, (destination) => {
+        if (name === destination) {
+          answer = true;
+        }
+      })
+      return answer;
+    }
+
+    $scope.validateAndCreateDestination = (name:string, isQueue:boolean) => {
+      if (!validateDestinationName(name)) {
+        $scope.createDialog = true;
+        return;
+      }
+      if (checkIfDestinationExists(name, isQueue)) {
+        Core.notification("error", "The " + (isQueue ? "queue" : "topic") + " \"" + name + "\" already exists");
+        return;
+      }
+      $scope.createDestination(name, isQueue);
     }
 
     $scope.createDestination = (name, isQueue) => {

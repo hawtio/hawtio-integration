@@ -29,9 +29,18 @@
 
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
-      <button type="submit" class="btn btn-primary" ng-click="createDestination(destinationName, queueType)"
+      <button type="submit" class="btn btn-primary" ng-click="validateAndCreateDestinationa(destinationName, queueType)"
               ng-disabled="!destinationName">Create {{destinationTypeName}}
       </button>
+    </div>
+  </div>
+
+  <div hawtio-confirm-dialog="createDialog"
+        ok-button-text="Create"
+        on-ok="createDestination(destinationName, queueType)">
+    <div class="dialog-body">
+      <p>{{destinationTypeName}} name <b>{{destinationName}}</b> contains unrecommended characters: ":"</p>
+      <p>This may cause unexpected problems. Are you really sure to create this {{destinationTypeName.charAt(0).toLowerCase() + destinationTypeName.substring(1)}}?</p>
     </div>
   </div>
 

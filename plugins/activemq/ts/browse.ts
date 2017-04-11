@@ -209,13 +209,14 @@ module ActiveMQ {
       }
     };
 
-    $scope.queueNames = (completionText) => {
-      var queuesFolder = getSelectionQueuesFolder(workspace);
-      return (queuesFolder) ? queuesFolder.children.map(n => n.title) : [];
-    };
-
-
     function populateTable(response) {
+      // setup queue names
+      if ($scope.queueNames.length === 0) {
+        var queueNames = retrieveQueueNames(workspace, true);
+        var selectedQueue = workspace.selection.key;
+        $scope.queueNames = queueNames.exclude((child) => { return child.key == selectedQueue });
+      }
+
       var data = response.value;
       if (!angular.isArray(data)) {
         $scope.allMessages = [];
