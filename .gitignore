@@ -1,4 +1,14 @@
-node_modules/
-libs/
+# IDE
 .idea
 .vscode
+
+# Dependency directories
+node_modules/
+
+# Bower dependency directory (https://bower.io/)
+libs/
+
+# Logs
+logs
+*.log
+npm-debug.log*
