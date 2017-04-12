@@ -114,8 +114,7 @@ module ActiveMQ {
           operation = "removeTopic(java.lang.String)";
           $scope.message = "Deleted topic " + name;
         }
-        // unescape should be done right before invoking jolokia
-        name = _.unescape(name);
+        // do not unescape name for destination deletion
         jolokia.execute(mbean, operation, name, Core.onSuccess(deleteSuccess));
       }
     };
