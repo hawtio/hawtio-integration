@@ -98,6 +98,18 @@ module ActiveMQ {
       }
     };
 
+    /**
+     * When destination name contains "_" like "aaa_bbb", the actual name might be either
+     * "aaa_bbb" or "aaa:bbb", so the actual name needs to be checked before removal.
+     * @param name destination name
+     */
+    function restoreRealDestinationName(name:string):string {
+      if (name.indexOf("_") === -1) {
+        return name;
+      }
+      return jolokia.getAttribute(workspace.getSelectedMBeanName(), "Name", Core.onSuccess(null));
+    }
+
     $scope.deleteDestination = () => {
       var mbean = getBrokerMBean(workspace, jolokia, amqJmxDomain);
       var selection = workspace.selection;
@@ -114,6 +126,7 @@ module ActiveMQ {
           operation = "removeTopic(java.lang.String)";
           $scope.message = "Deleted topic " + name;
         }
+        name = restoreRealDestinationName(name);
         // do not unescape name for destination deletion
         jolokia.execute(mbean, operation, name, Core.onSuccess(deleteSuccess));
       }
