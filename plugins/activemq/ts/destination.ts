@@ -105,7 +105,6 @@ module ActiveMQ {
       if (mbean && selection && jolokia && entries) {
         var domain = selection.domain;
         var name = entries["Destination"] || entries["destinationName"] || selection.title;
-        name = _.unescape(name);
         var isQueue = "Topic" !== (entries["Type"] || entries["destinationType"]);
         var operation;
         if (isQueue) {
@@ -115,6 +114,8 @@ module ActiveMQ {
           operation = "removeTopic(java.lang.String)";
           $scope.message = "Deleted topic " + name;
         }
+        // unescape should be done right before invoking jolokia
+        name = _.unescape(name);
         jolokia.execute(mbean, operation, name, Core.onSuccess(deleteSuccess));
       }
     };
@@ -125,9 +126,10 @@ module ActiveMQ {
       var entries = selection.entries;
       if (mbean && selection && jolokia && entries) {
         var name = entries["Destination"] || entries["destinationName"] || selection.title;
-        name = _.unescape(name);
         var operation = "purge()";
         $scope.message = "Purged queue " + name;
+        // unescape should be done right before invoking jolokia
+        name = _.unescape(name);
         jolokia.execute(mbean, operation, Core.onSuccess(operationSuccess));
       }
     };
