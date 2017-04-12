@@ -52,7 +52,7 @@ module ActiveMQ {
     }
 
     function validateDestinationName(name:string):boolean {
-      return name.indexOf(":") == -1;
+      return name.indexOf(":") === -1;
     }
 
     function checkIfDestinationExists(name:string, isQueue:boolean):boolean {

@@ -29,7 +29,7 @@
 
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
-      <button type="submit" class="btn btn-primary" ng-click="validateAndCreateDestinationa(destinationName, queueType)"
+      <button type="submit" class="btn btn-primary" ng-click="validateAndCreateDestination(destinationName, queueType)"
               ng-disabled="!destinationName">Create {{destinationTypeName}}
       </button>
     </div>
@@ -37,6 +37,7 @@
 
   <div hawtio-confirm-dialog="createDialog"
         ok-button-text="Create"
+        cancel-button-text="Cancel"
         on-ok="createDestination(destinationName, queueType)">
     <div class="dialog-body">
       <p>{{destinationTypeName}} name <b>{{destinationName}}</b> contains unrecommended characters: ":"</p>
