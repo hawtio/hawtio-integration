@@ -78,11 +78,12 @@ module ActiveMQ {
       $scope.createDestination(name, isQueue);
     }
 
-    $scope.createDestination = (name, isQueue) => {
+    $scope.createDestination = (name:string, isQueue:boolean) => {
       var mbean = getBrokerMBean(workspace, jolokia, amqJmxDomain);
+      name = Core.escapeHtml(name);
       if (mbean) {
         var operation;
-        if (isQueue === "true") {
+        if (isQueue) {
           operation = "addQueue(java.lang.String)";
           $scope.message = "Created queue " + name;
         } else {
