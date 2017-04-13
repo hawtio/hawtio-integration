@@ -18,6 +18,7 @@
   ],
   "dependencies": {
     "hawtio-jmx": "~3.0.0",
+    "hawtio-preferences": "~3.0.0",
     "dagre": "https://github.com/hawtio/dagre.git#3825485552cb2ebc79afab24f9a90f14c7e1e2df"
   },
   "devDependencies": {

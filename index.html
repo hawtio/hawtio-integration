@@ -5,6 +5,7 @@
     <title>hawtio-integration</title>
     <base href='/'></base>
     <meta charset="UTF8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- bower:css -->
     <link rel="stylesheet" href="libs/codemirror/lib/codemirror.css" />
@@ -107,6 +108,8 @@
     <script src="libs/hawtio-jmx/dist/jolokia-simple.js"></script>
     <script src="libs/hawtio-jmx/dist/jolokia-cubism.js"></script>
     <script src="libs/hawtio-jmx/dist/hawtio-jmx.js"></script>
+    <script src="libs/hawtio-extension-service/dist/hawtio-extension-service.js"></script>
+    <script src="libs/hawtio-preferences/dist/hawtio-preferences.js"></script>
     <script src="libs/graphlib/dist/graphlib.core.js"></script>
     <script src="libs/dagre/dist/dagre.core.js"></script>
     <!-- endbower -->
@@ -128,7 +131,6 @@
     <script type="text/javascript" src="libs/codemirror/mode/yaml/yaml.js"></script>
 
 
-    <script src="libs/hawtio-extension-service/dist/hawtio-extension-service.js"></script>
     <!--script src="libs/hawtio-dashboard/dist/jquery.gridster.js"></script-->
     <!--script src="libs/hawtio-dashboard/dist/hawtio-dashboard.js"></script-->
 
@@ -136,6 +138,16 @@
 
   <body>
     <nav class="navbar navbar-pf-vertical" style="height: 60px">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">
+          <img class="navbar-brand-icon" src="libs/hawtio-ui/img/hawtio_icon.svg" alt="" height="30px"/>
+          Hawtio Integration Test
+        </a>
+      </div>
+      <nav class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right" hawtio-extension name="hawtio-user">
+        </ul>
+      </nav>
     </nav>
 
     <hawtio-vertical-nav></hawtio-vertical-nav>
