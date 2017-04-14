@@ -65,11 +65,11 @@ module Camel {
    * @param {Folder} folder
    * @param {Function} onRoute
    */
-  export function processRouteXml(workspace:Workspace, jolokia, folder, onRoute) {
+  export function processRouteXml(workspace: Workspace, jolokia: Jolokia.IJolokia, folder: Folder, onRoute: (string) => void) {
     var selectedRouteId = getSelectedRouteId(workspace, folder);
     var mbean = getExpandingFolderCamelContextMBean(workspace, folder) || getSelectionCamelContextMBean(workspace);
 
-    function onRouteXml(response) {
+    var onRouteXml = response => {
       var route = null;
       var data = response ? response.value : null;
       if (data) {
@@ -88,7 +88,7 @@ module Camel {
               Core.onSuccess(onRouteXml, {error: onRouteXml}));
     } else {
       if (!selectedRouteId) {
-        console.log("No selectedRouteId when trying to lazy load the route!")
+        log.warn("No selectedRouteId when trying to lazy load the route!")
       }
       onRoute(null);
     }
@@ -746,17 +746,17 @@ module Camel {
    * @method
    */
     // TODO should be a service
-  export function getSelectionCamelContextMBean(workspace:Core.Workspace) : string {
+  export function getSelectionCamelContextMBean(workspace: Core.Workspace) : string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
-      var tree:Core.Folder = workspace.tree;
+      var tree = workspace.tree;
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "context");
           if (result && result.children) {
-            var contextBean:any = _.first(result.children);
+            var contextBean = _.first(result.children);
             if (contextBean.title) {
               var contextName = contextBean.title;
               return "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
@@ -771,14 +771,14 @@ module Camel {
   /**
    * When lazy loading route info (using dumpRoutesAsXml() operation) we need MBean name from the folder
    * and *not* from the selection
-   * @param workspace
-   * @param folder
+   * @param {Workspace} workspace
+   * @param {Folder} folder
    */
-  export function getExpandingFolderCamelContextMBean(workspace:Core.Workspace, folder:Core.Folder) : string {
+  export function getExpandingFolderCamelContextMBean(workspace: Core.Workspace, folder: Core.Folder) : string {
     if (folder.entries && folder.entries["type"] === "routes") {
       var result = workspace.tree.navigate("org.apache.camel", folder.entries["context"], "context");
       if (result && result.children) {
-        var contextBean:any = result.children[0];
+        var contextBean: any = result.children[0];
         if (contextBean.objectName) {
           return contextBean.objectName;
         }
@@ -1030,7 +1030,7 @@ module Camel {
     return "orange fa fa-off";
   }
 
-  export function getSelectedRouteId(workspace:Workspace, folder = null) {
+  export function getSelectedRouteId(workspace: Workspace, folder?: NodeSelection) {
     var selection = folder || workspace.selection;
     var selectedRouteId = null;
     if (selection) {

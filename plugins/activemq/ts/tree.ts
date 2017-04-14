@@ -59,7 +59,6 @@ module ActiveMQ {
         children.forEach(broker => {
           var grandChildren = broker.children;
           if (grandChildren) {
-            Tree.sanitize(grandChildren);
             var idx = grandChildren.findIndex(n => n.title === "Topic");
             if (idx > 0) {
               var old = grandChildren[idx];

@@ -7,7 +7,6 @@
  * @main Camel
  */
 module Camel {
-  import jmxModule = Jmx;
 
   export var pluginName = 'camel';
 
@@ -400,7 +399,7 @@ module Camel {
 
   // register the jmx lazy loader here as it won't have been invoked in the run method
   hawtioPluginLoader.registerPreBootstrapTask((task) => {
-    jmxModule.registerLazyLoadHandler(jmxDomain, (folder:Folder) => {
+    Jmx.registerLazyLoadHandler(jmxDomain, (folder: Folder) => {
       if (jmxDomain === folder.domain && "routes" === folder.typeName) {
         return (workspace, folder, onComplete) => {
           if ("routes" === folder.typeName) {
