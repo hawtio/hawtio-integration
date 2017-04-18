@@ -1,13 +1,15 @@
 <div class="table-view" ng-controller="Camel.BlockedExchangesController">
 
-  <h2>Blocked</h2>
+  <h3>Blocked</h3>
   
-  <div ng-if="!initDone" class="spinner spinner-lg loading-page"></div>
+  <p ng-if="!initDone">
+    <span class="spinner spinner-xs spinner-inline"></span> Loading...
+  </p>
   
   <div ng-if="initDone">
-    <div class="loading-message" ng-if="data.length === 0">
+    <p ng-if="data.length === 0">
       No blocked exchanges
-    </div>
+    </p>
     <div ng-if="data.length > 0">
       <div class="row toolbar-pf table-view-pf-toolbar">
         <div class="col-sm-12">

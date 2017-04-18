@@ -14,9 +14,6 @@
 }
 @media (max-width: 767px) {
 }
-.toolbar-pf .form-group:first-child {
-  padding-left: 0;
-}
 .hawtio-btn-danger {
   color: darkred;
 }
@@ -132,14 +129,14 @@ div.camel-properties {
   height: 100%;
   width: 100%;
 }
-.camel-properties-header h2 {
+.camel-properties-header h3 {
   display: inline-block;
   margin-right: 50px;
 }
-.camel-properties-header h2 img {
+.camel-properties-header h3 img {
   margin-right: 5px;
 }
-.camel-properties-header h2 span {
+.camel-properties-header h3 span {
   vertical-align: sub;
 }
 .camel-properties-header em {
@@ -191,7 +188,7 @@ div.camel-properties {
 }
 @media (max-width: 767px) {
 }
-#canvas {
+.camel-route-diagram-canvas {
   width: 100%;
   height: 100%;
   left: 0;

@@ -3,8 +3,10 @@ declare module ActiveMQ {
     var pluginName: string;
     var log: Logging.Logger;
     var jmxDomain: string;
-    function getSelectionQueuesFolder(workspace: any): any;
-    function getSelectionTopicsFolder(workspace: any): any;
+    function getSelectionQueuesFolder(workspace: Workspace, ascend: boolean): any;
+    function retrieveQueueNames(workspace: Workspace, ascend: boolean): any;
+    function getSelectionTopicsFolder(workspace: Workspace, ascend: boolean): any;
+    function retrieveTopicNames(workspace: Workspace, ascend: boolean): any;
     /**
      * Sets $scope.row to currently selected JMS message.
      * Used in:
@@ -27,4 +29,5 @@ declare module ActiveMQ {
      * @param fn optional function to call if the selected row was changed
      */
     function decorate($scope: any, fn?: any): void;
+    function getBrokerMBean(workspace: Workspace, jolokia: any, jmxDomain: string): any;
 }

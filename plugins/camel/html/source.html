@@ -1,28 +1,16 @@
-<div ng-controller="Camel.SourceController">
+<div class="table-view" ng-controller="Camel.SourceController">
   
-  <div class="row">
-    <div class="col-md-12">
-      <h1>Source</h1>
-    </div>
-  </div>
+  <h2>Source</h2>
   
-  <div class="row">
-    <div class="col-md-12">
-      <form>
-        <div class="form-group">
-          <div hawtio-editor="source" mode="'xml'" read-only="!showUpdateButton"></div>
-        </div>
-      </form>
+  <form>
+    <div class="form-group">
+      <div hawtio-editor="source" mode="'xml'" read-only="!showUpdateButton"></div>
     </div>
-  </div>
+  </form>
   
-  <div class="row" ng-if="showUpdateButton">
-    <div class="col-md-12">
-      <button class="btn btn-primary" hawtio-show object-name="{{camelContextMBean}}"
-              method-name="addOrUpdateRoutesFromXml" ng-click="saveRouteXml()">
-        Update
-      </button>
-    </div>
-  </div>
+  <button class="btn btn-primary" hawtio-show object-name="{{camelContextMBean}}"
+          method-name="addOrUpdateRoutesFromXml" ng-click="saveRouteXml()" ng-if="showUpdateButton">
+    Update
+  </button>
 
 </div>

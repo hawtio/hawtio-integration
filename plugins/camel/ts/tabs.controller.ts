@@ -14,6 +14,15 @@ namespace Camel {
           show: () => true
         },
         {
+          id: 'camel-contexts',
+          title: 'Contexts',
+          href: "/camel/contexts" + workspace.hash(),
+          show: () => {
+            let selection = workspace.selection;
+            return selection && selection.children.length > 0 && selection.children[0].typeName === 'context';
+          }
+        },
+        {
           id: 'camel-route-diagram',
           title: 'Route Diagram',
           href: "/camel/routes" + workspace.hash(),

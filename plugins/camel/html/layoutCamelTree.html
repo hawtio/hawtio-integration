@@ -12,6 +12,7 @@
 
   <div class="tree-nav-main">
     <jmx-header></jmx-header>
+    <camel-toolbar></camel-toolbar>
     <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">
       <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
         <a ng-href="{{tab.href}}">{{tab.title}}</a>

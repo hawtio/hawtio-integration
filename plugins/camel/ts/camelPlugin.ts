@@ -13,10 +13,16 @@ module Camel {
   var routeToolBar = "plugins/camel/html/attributeToolBarRoutes.html";
   var contextToolBar = "plugins/camel/html/attributeToolBarContext.html";
 
-  export var _module = angular.module(pluginName, ['patternfly', 'angularResizable']);
+  export var _module = angular.module(pluginName, [
+    'patternfly',
+    'patternfly.table',
+    'angularResizable',
+    'hawtio-camel-contexts'
+  ]);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
+            .when('/camel/contexts', {template: '<contexts></contexts>'})
             .when('/camel/browseEndpoint', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
             .when('/camel/endpoint/browse/:contextId/*endpointPath', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
             .when('/camel/createEndpoint', {templateUrl: 'plugins/camel/html/createEndpoint.html'})
