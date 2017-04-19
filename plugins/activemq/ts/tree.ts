@@ -14,7 +14,11 @@ module ActiveMQ {
     };
   }]);
 
-  _module.controller("ActiveMQ.TreeController", ["$scope", "$location", "workspace", "localStorage", ($scope, $location:ng.ILocationService, workspace:Workspace, localStorage) => {
+  _module.controller("ActiveMQ.TreeController", ["$scope", "$location", "workspace", "localStorage", (
+      $scope,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      localStorage: WindowLocalStorage) => {
 
     $scope.$on("$routeChangeSuccess", function (event, current, previous) {
       // lets do this asynchronously to avoid Error: $digest already in progress

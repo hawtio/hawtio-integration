@@ -6,7 +6,12 @@
  * @module ActiveMQ
  */
 module ActiveMQ {
-  _module.controller("ActiveMQ.PreferencesController", ["$scope", "localStorage", "userDetails", "$rootScope", ($scope, localStorage, userDetails, $rootScope) => {
+
+  _module.controller("ActiveMQ.PreferencesController", ["$scope", "localStorage", "userDetails", "$rootScope", (
+      $scope,
+      localStorage: WindowLocalStorage,
+      userDetails: Core.UserDetails,
+      $rootScope: ng.IRootScopeService) => {
 
     var config = {
       properties: {
@@ -41,24 +46,24 @@ module ActiveMQ {
     $scope.config = config;
 
     Core.initPreferenceScope($scope, localStorage, {
-        'activemqUserName': {
-          'value': userDetails.username ? userDetails.username : ""
-        },
-        'activemqPassword': {
-          'value': userDetails.password ? userDetails.password : ""
-        },
-        'activemqBrowseBytesMessages': {
-          'value': 1,
-          'converter': parseInt
-        },
-        'activemqFilterAdvisoryTopics': {
-          'value': false,
-          'converter': Core.parseBooleanValue,
-          'post': (newValue) => {
-            $rootScope.$broadcast('jmxTreeUpdated');
-          }
+      'activemqUserName': {
+        'value': userDetails.username ? userDetails.username : ""
+      },
+      'activemqPassword': {
+        'value': userDetails.password ? userDetails.password : ""
+      },
+      'activemqBrowseBytesMessages': {
+        'value': 1,
+        'converter': parseInt
+      },
+      'activemqFilterAdvisoryTopics': {
+        'value': false,
+        'converter': Core.parseBooleanValue,
+        'post': (newValue) => {
+          $rootScope.$broadcast('jmxTreeUpdated');
         }
-      });
+      }
+    });
 
   }]);
 }

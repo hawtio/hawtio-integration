@@ -2,9 +2,9 @@
 
 module ActiveMQ {
 
-  export var pluginName = 'activemq';
-  export var log:Logging.Logger = Logger.get("activemq");
-  export var jmxDomain = 'org.apache.activemq';
+  export var pluginName: string = 'activemq';
+  export var log: Logging.Logger = Logger.get("activemq");
+  export var jmxDomain: string = 'org.apache.activemq';
 
   function findFolder(node, titles:string[], ascend:boolean) {
     if (!node) {

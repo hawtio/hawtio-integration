@@ -25,7 +25,15 @@ module ActiveMQ {
       $scope.destinationType = 'topic';
   });
 
-  _module.run(["HawtioNav", "$location", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "$templateCache", "documentBase", (nav:HawtioMainNav.Registry, $location:ng.ILocationService, workspace:Workspace, viewRegistry, helpRegistry, preferencesRegistry, $templateCache:ng.ITemplateCacheService, documentBase) => {
+  _module.run(["HawtioNav", "$location", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "$templateCache", "documentBase", (
+      nav: HawtioMainNav.Registry,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      viewRegistry,
+      helpRegistry,
+      preferencesRegistry: HawtioPreferences.PreferencesRegistry,
+      $templateCache: ng.ITemplateCacheService,
+      documentBase: string) => {
 
     viewRegistry['{ "main-tab": "activemq" }'] = 'plugins/activemq/html/layoutActiveMQTree.html';
     helpRegistry.addUserDoc('activemq', 'plugins/activemq/doc/help.md', () => {

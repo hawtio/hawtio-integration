@@ -3,7 +3,18 @@
 /// <reference path="activemqPlugin.ts"/>
 
 module ActiveMQ {
-  export var BrowseQueueController = _module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$routeParams", "$dialog", "$templateCache", ($scope, workspace:Workspace, jolokia, localStorage, location, activeMQMessage, $timeout, $routeParams, $dialog, $templateCache) => {
+
+  export var BrowseQueueController = _module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$routeParams", "$dialog", "$templateCache", (
+      $scope,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      localStorage: WindowLocalStorage,
+      $location: ng.ILocationService,
+      activeMQMessage,
+      $timeout: ng.ITimeoutService,
+      $routeParams: ng.route.IRouteParamsService,
+      $dialog,
+      $templateCache: ng.ITemplateCacheService) => {
 
     var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
 
@@ -153,7 +164,7 @@ module ActiveMQ {
             var selectedItems = $scope.gridOptions.selectedItems;
             //always assume a single message
             activeMQMessage.message = selectedItems[0];
-            location.path('activemq/sendMessage');
+            $location.path('activemq/sendMessage');
         }
     };
 
@@ -386,7 +397,7 @@ module ActiveMQ {
           objName = workspace.selection.objectName;
         } else {
           // in case of refresh
-          var key = location.search()['nid'];
+          var key = $location.search()['nid'];
           var node = workspace.keyToNodeMap[key];
           objName = node.objectName;
         }
