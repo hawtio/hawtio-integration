@@ -21,7 +21,10 @@ module Karaf {
   }]);
 
 
-  _module.run(["workspace", "viewRegistry", "helpRegistry", (workspace:Workspace, viewRegistry, helpRegistry) => {
+  _module.run(["workspace", "viewRegistry", "helpRegistry", (
+      workspace: Workspace,
+      viewRegistry,
+      helpRegistry) => {
 
     helpRegistry.addUserDoc('karaf', 'plugins/karaf/doc/help.md', () => {
       return workspace.treeContainsDomainAndProperties('org.apache.karaf');

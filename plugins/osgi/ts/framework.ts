@@ -6,7 +6,9 @@
  * @module Osgi
  */
 module Osgi {
-  _module.controller("Osgi.FrameworkController", ["$scope", "workspace", ($scope, workspace: Workspace) => {
+  _module.controller("Osgi.FrameworkController", ["$scope", "workspace", (
+      $scope,
+      workspace: Workspace) => {
 
     $scope.startLevelChanged = function () {
       if ($scope.config.startLevel) {

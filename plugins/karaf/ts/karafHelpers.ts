@@ -5,7 +5,7 @@
  */
 module Karaf {
 
-  export var log:Logging.Logger = Logger.get("Karaf");
+  export var log: Logging.Logger = Logger.get("Karaf");
 
   export function setSelect(selection, group) {
     if (!angular.isDefined(selection)) {

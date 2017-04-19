@@ -6,9 +6,14 @@
  */
 module Karaf {
 
-  _module.controller("Karaf.FeatureController", ["$scope", "jolokia", "workspace", "$routeParams", ($scope, jolokia, workspace:Workspace, $routeParams) => {
-    $scope.name = $routeParams.name;
-    $scope.version = $routeParams.version;
+  _module.controller("Karaf.FeatureController", ["$scope", "jolokia", "workspace", "$routeParams", (
+      $scope,
+      jolokia: Jolokia.IJolokia,
+      workspace: Workspace,
+      $routeParams: ng.route.IRouteParamsService) => {
+
+    $scope.name = $routeParams['name'];
+    $scope.version = $routeParams['version'];
     $scope.bundlesByLocation = {};
     $scope.props = "properties";
 

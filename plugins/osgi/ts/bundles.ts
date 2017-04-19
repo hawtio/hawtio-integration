@@ -7,7 +7,10 @@
  */
 module Osgi {
 
-  _module.controller("Osgi.BundlesController", ["$scope", "workspace", "jolokia", ($scope, workspace:Workspace, jolokia) => {
+  _module.controller("Osgi.BundlesController", ["$scope", "workspace", "jolokia", (
+      $scope,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
 
     $scope.result = {};
     $scope.bundles = [];

@@ -7,8 +7,12 @@
  */
 module Osgi {
 
-  _module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia",
-      ($scope, $routeParams, $location, workspace:Core.Workspace, jolokia) => {
+  _module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia", (
+      $scope,
+      $routeParams: ng.route.IRouteParamsService,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
 
     /** the kinds of config */
     let configKinds = {

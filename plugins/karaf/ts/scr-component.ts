@@ -7,10 +7,15 @@
  */
 module Karaf {
 
-  _module.controller("Karaf.ScrComponentController", ["$scope", "$location", "workspace", "jolokia", "$routeParams", ($scope, $location, workspace, jolokia, $routeParams) => {
+  _module.controller("Karaf.ScrComponentController", ["$scope", "$location", "workspace", "jolokia", "$routeParams", (
+      $scope,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      $routeParams: ng.route.IRouteParamsService) => {
 
     $scope.srcComponentsUrl = Core.url('/osgi/scr-components' + workspace.hash());
-    $scope.name = $routeParams.name;
+    $scope.name = $routeParams['name'];
     populateTable();
 
     function populateTable() {

@@ -8,8 +8,10 @@
  * @main Osgi
  */
 module Osgi {
+
   export var pluginName = 'osgi';
   export var _module = angular.module(pluginName, ['patternfly']);
+
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
             .when('/osgi', { redirectTo: '/osgi/bundles' })
@@ -25,7 +27,11 @@ module Osgi {
             //.when('/osgi/dependencies', {templateUrl: 'plugins/osgi/html/svc-dependencies.html', reloadOnSearch: false });
   }]);
 
-  _module.run(["HawtioNav", "workspace", "viewRegistry", "helpRegistry", (nav:HawtioMainNav.Registry, workspace:Workspace, viewRegistry, helpRegistry) => {
+  _module.run(["HawtioNav", "workspace", "viewRegistry", "helpRegistry", (
+      nav: HawtioMainNav.Registry,
+      workspace: Workspace,
+      viewRegistry,
+      helpRegistry) => {
 
     //viewRegistry['osgi'] = "plugins/osgi/html/layoutOsgi.html";
     helpRegistry.addUserDoc('osgi', 'plugins/osgi/doc/help.md', () => {

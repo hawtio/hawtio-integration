@@ -1,19 +1,27 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
+/// <reference path="metadata.ts"/>
 
 /**
  * @module Osgi
  */
 module Osgi {
-  _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia",
-      "$uibModal", ($scope, $timeout, $routeParams, $location, workspace:Core.Workspace, jolokia, $uibModal) => {
+
+  _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia", "$uibModal", (
+      $scope,
+      $timeout: ng.ITimeoutService,
+      $routeParams: ng.route.IRouteParamsService,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      $uibModal) => {
 
     let uibModalInstance = null;
 
     $scope.configurationUrl = Core.url('/osgi/configurations' + workspace.hash());
-    $scope.factoryPid = $routeParams.factoryPid;
-    $scope.pid = $routeParams.pid ? $routeParams.pid.substring(0, $routeParams.pid.indexOf('?')) : null;
+    $scope.factoryPid = $routeParams['factoryPid'];
+    $scope.pid = $routeParams['pid'] ? $routeParams['pid'].substring(0, $routeParams['pid'].indexOf('?')) : null;
     $scope.createForm = {
       pidInstanceName: null
     };
@@ -43,7 +51,7 @@ module Osgi {
         updateTableContents();
       }
     };
-    var startInEditMode = $scope.factoryPid && !$routeParams.pid;
+    var startInEditMode = $scope.factoryPid && !$routeParams['pid'];
     $scope.setEditMode(startInEditMode);
 
     $scope.$on("hawtio.form.modelChange", () => {

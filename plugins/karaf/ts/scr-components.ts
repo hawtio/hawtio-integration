@@ -7,7 +7,11 @@
  */
 module Karaf {
 
-  _module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace, jolokia) => {
+  _module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", (
+      $scope,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
 
     $scope.component = empty();
 

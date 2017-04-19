@@ -7,7 +7,7 @@
  */
 module Karaf {
 
-  _module.controller("Karaf.NavBarController", ["$scope", "workspace", ($scope, workspace:Workspace) => {
+  _module.controller("Karaf.NavBarController", ["$scope", "workspace", ($scope, workspace: Workspace) => {
 
     $scope.hash = workspace.hash();
 

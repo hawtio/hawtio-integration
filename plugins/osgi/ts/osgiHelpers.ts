@@ -5,7 +5,7 @@
  */
 module Osgi {
 
-  export var log:Logging.Logger = Logger.get("OSGi");
+  export var log: Logging.Logger = Logger.get("OSGi");
 
   export function defaultBundleValues(workspace:Workspace, $scope, values) {
     var allValues = values;

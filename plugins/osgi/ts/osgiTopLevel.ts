@@ -4,7 +4,9 @@
 
 module Osgi {
 
-  export var TopLevelController = _module.controller("Osgi.TopLevelController", ["$scope", "workspace", ($scope, workspace:Core.Workspace) => {
+  export var TopLevelController = _module.controller("Osgi.TopLevelController", ["$scope", "workspace", (
+      $scope,
+      workspace: Workspace) => {
 
     $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
     $scope.bundleMBean = Osgi.getSelectionBundleMBean(workspace);

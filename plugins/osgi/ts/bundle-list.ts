@@ -12,8 +12,12 @@ module Osgi {
     name: string
   }
 
-  _module.controller("Osgi.BundleListController", ["$scope", "workspace", "jolokia", "localStorage", "$location",
-      ($scope, workspace:Workspace, jolokia, localStorage, $location) => {
+  _module.controller("Osgi.BundleListController", ["$scope", "workspace", "jolokia", "localStorage", "$location", (
+      $scope,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      localStorage: WindowLocalStorage,
+      $location: ng.ILocationService) => {
 
     const ACTIVEMQ_SERVICE = {id: 'ACTIVEMQ', name: 'ActiveMQ'};
     const CAMEL_SERVICE = {id: 'CAMEL', name: 'Camel'};
