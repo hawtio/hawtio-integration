@@ -15,7 +15,7 @@ declare module Camel {
     var defaultHideOptionUnusedValue: boolean;
     var _apacheCamelModel: any;
     var _jsonSchema: any;
-    function hasRestServices(workspace: Workspace, jolokia: any): boolean;
+    function hasRestServices(workspace: Workspace, jolokia: Jolokia.IJolokia): boolean;
     /**
      * Looks up the route XML for the given context and selected route and
      * processes the selected route's XML with the given function
@@ -25,7 +25,7 @@ declare module Camel {
      * @param {Folder} folder
      * @param {Function} onRoute
      */
-    function processRouteXml(workspace: Workspace, jolokia: any, folder: any, onRoute: any): void;
+    function processRouteXml(workspace: Workspace, jolokia: Jolokia.IJolokia, folder: Folder, onRoute: (string) => void): void;
     /**
      * Returns the URI string for the given EIP pattern node or null if it is not applicable
      * @method getRouteNodeUri
@@ -169,8 +169,8 @@ declare module Camel {
     /**
      * When lazy loading route info (using dumpRoutesAsXml() operation) we need MBean name from the folder
      * and *not* from the selection
-     * @param workspace
-     * @param folder
+     * @param {Workspace} workspace
+     * @param {Folder} folder
      */
     function getExpandingFolderCamelContextMBean(workspace: Core.Workspace, folder: Core.Folder): string;
     function getSelectionCamelContextEndpoints(workspace: Workspace): Core.NodeSelection;
@@ -195,7 +195,7 @@ declare module Camel {
      */
     function isState(item: any, state: any): any;
     function iconClass(state: string): string;
-    function getSelectedRouteId(workspace: Workspace, folder?: any): any;
+    function getSelectedRouteId(workspace: Workspace, folder?: NodeSelection): any;
     /**
      * Returns the selected camel route mbean for the given route id
      * @method

@@ -7,7 +7,7 @@ declare module Camel {
      * Define the default categories for endpoints and map them to endpoint names
      * @property
      * @for Camel
-     * @type {ObjecT}
+     * @type {Object}
      */
     var endpointCategories: {
         bigdata: {
@@ -59,7 +59,7 @@ declare module Camel {
      * Maps endpoint names to a category object
      * @property
      * @for Camel
-     * @type {ObjecT}
+     * @type {Object}
      */
     var endpointToCategory: {};
     var endpointIcon: string;
@@ -67,7 +67,7 @@ declare module Camel {
      *  specify custom label & icon properties for endpoint names
      * @property
      * @for Camel
-     * @type {ObjecT}
+     * @type {Object}
      */
     var endpointConfigurations: {
         drools: {
@@ -102,7 +102,7 @@ declare module Camel {
      * Define the default form configurations
      * @property
      * @for Camel
-     * @type {ObjecT}
+     * @type {Object}
      */
     var endpointForms: {
         file: {
