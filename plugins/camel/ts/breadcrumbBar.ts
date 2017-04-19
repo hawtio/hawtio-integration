@@ -3,7 +3,12 @@
 
 module Camel {
 
-  _module.controller("Camel.BreadcrumbBarController", ["$scope", "$routeParams", "workspace", "jolokia", ($scope, $routeParams, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.BreadcrumbBarController", ["$scope", "$routeParams", "workspace", "jolokia", (
+      $scope,
+      $routeParams: ng.route.IRouteParamsService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
+
     $scope.workspace = workspace;
 
     // if we are in dashboard then $routeParams may be null

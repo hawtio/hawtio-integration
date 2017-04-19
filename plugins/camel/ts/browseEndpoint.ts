@@ -1,11 +1,15 @@
 /// <reference path="../../includes.ts"/>
-/// <reference path="camelPlugin.ts"/>
 /// <reference path="../../activemq/ts/activemqHelpers.ts"/>
+/// <reference path="camelPlugin.ts"/>
 
 module Camel {
 
-  export var BrowseEndpointController = _module.controller("Camel.BrowseEndpointController", ["$scope", "$routeParams",
-      "workspace", "jolokia", "$uibModal", ($scope, $routeParams, workspace:Workspace, jolokia, $uibModal) => {
+  export var BrowseEndpointController = _module.controller("Camel.BrowseEndpointController", ["$scope", "$routeParams", "workspace", "jolokia", "$uibModal", (
+      $scope,
+      $routeParams: ng.route.IRouteParamsService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      $uibModal) => {
     
     $scope.workspace = workspace;
     $scope.mode = 'text';

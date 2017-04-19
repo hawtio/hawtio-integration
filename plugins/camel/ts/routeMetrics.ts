@@ -3,8 +3,12 @@
 
 module Camel {
 
-  _module.controller("Camel.RouteMetricsController", ["$scope", "$location", "workspace", "jolokia", "metricsWatcher",
-      ($scope, $location, workspace:Workspace, jolokia, metricsWatcher) => {
+  _module.controller("Camel.RouteMetricsController", ["$scope", "$location", "workspace", "jolokia", "metricsWatcher", (
+      $scope,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      metricsWatcher: MetricsWatcher.IMetricsWatcher) => {
 
     var log:Logging.Logger = Logger.get("Camel");
 

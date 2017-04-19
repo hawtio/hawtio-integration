@@ -5,7 +5,9 @@
  * @module Camel
  */
 module Camel {
-  _module.controller("Camel.PreferencesController", ["$scope", "localStorage", ($scope, localStorage) => {
+  _module.controller("Camel.PreferencesController", ["$scope", "localStorage", (
+      $scope,
+      localStorage: WindowLocalStorage) => {
 
     var config = {
       properties: {

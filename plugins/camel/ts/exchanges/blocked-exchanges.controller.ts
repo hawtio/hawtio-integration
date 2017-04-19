@@ -1,9 +1,13 @@
 /// <reference path="../camelPlugin.ts"/>
 module Camel {
 
-  _module.controller("Camel.BlockedExchangesController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.BlockedExchangesController", ["$scope", "$location", "workspace", "jolokia", (
+      $scope,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
 
-    var log:Logging.Logger = Logger.get("Camel");
+    var log: Logging.Logger = Logger.get("Camel");
 
     $scope.data = [];
     $scope.initDone = false;

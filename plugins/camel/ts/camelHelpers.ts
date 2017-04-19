@@ -7,9 +7,9 @@ declare var _apacheCamelModel:any;
  */
 module Camel {
 
-  export var log:Logging.Logger = Logger.get("Camel");
+  export var log: Logging.Logger = Logger.get("Camel");
 
-  export var jmxDomain = 'org.apache.camel';
+  export var jmxDomain: string = 'org.apache.camel';
 
   export var defaultMaximumLabelWidth = 34;
   export var defaultCamelMaximumTraceOrDebugBodyLength = 5000;
@@ -36,8 +36,8 @@ module Camel {
    * @param jolokia
    * @returns {boolean}
    */
-  var _hasRestServices:boolean = null;
-  export function hasRestServices(workspace:Workspace, jolokia):boolean {
+  var _hasRestServices: boolean = null;
+  export function hasRestServices(workspace: Workspace, jolokia: Jolokia.IJolokia): boolean {
     if (_hasRestServices !== null) {
       return _hasRestServices;
     } 

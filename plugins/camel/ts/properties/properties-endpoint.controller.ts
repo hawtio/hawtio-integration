@@ -3,11 +3,15 @@
 
 module Camel {
 
-  _module.controller("Camel.PropertiesEndpointController", ["$scope", "workspace", "localStorage", "jolokia",
-    "documentBase", 'propertiesService', ($scope, workspace:Workspace, localStorage:WindowLocalStorage, jolokia,
-    documentBase, propertiesService: PropertiesService) => {
+  _module.controller("Camel.PropertiesEndpointController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', (
+      $scope,
+      workspace: Workspace,
+      localStorage: WindowLocalStorage,
+      jolokia: Jolokia.IJolokia,
+      documentBase: string,
+      propertiesService: PropertiesService) => {
     
-    var log:Logging.Logger = Logger.get("Camel");
+    var log: Logging.Logger = Logger.get("Camel");
 
     $scope.$on("$routeChangeSuccess", function (event, current, previous) {
       // lets do this asynchronously to avoid Error: $digest already in progress

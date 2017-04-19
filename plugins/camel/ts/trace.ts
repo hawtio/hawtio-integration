@@ -1,10 +1,16 @@
 /// <reference path="../../includes.ts"/>
+/// <reference path="../../activemq/ts/activemqHelpers.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
 module Camel {
-  _module.controller("Camel.TraceRouteController", ["$scope", "workspace", "jolokia", "localStorage", "tracerStatus", ($scope, workspace:Workspace, jolokia, localStorage, tracerStatus) => {
+  _module.controller("Camel.TraceRouteController", ["$scope", "workspace", "jolokia", "localStorage", "tracerStatus", (
+      $scope,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      localStorage: WindowLocalStorage,
+      tracerStatus) => {
 
-    var log:Logging.Logger = Logger.get("CamelTracer");
+    var log: Logging.Logger = Logger.get("CamelTracer");
 
     $scope.workspace = workspace;
 

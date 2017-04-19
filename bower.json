@@ -22,7 +22,7 @@
     "dagre": "https://github.com/hawtio/dagre.git#3825485552cb2ebc79afab24f9a90f14c7e1e2df"
   },
   "devDependencies": {
-    "hawtio-core-dts": "~2.0.0",
+    "hawtio-core-dts": "~3.0.0",
     "hawtio-extension-service": "~3.0.0"
   },
   "overrides": {

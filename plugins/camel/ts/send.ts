@@ -7,11 +7,18 @@ module Camel {
 
    var DELIVERY_PERSISTENT = "2";
 
-  _module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia",
-      "localStorage", "$location", "activeMQMessage", ($route, $scope, $element, $timeout, workspace:Workspace, jolokia,
-      localStorage, $location, activeMQMessage) => {
+  _module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", (
+      $route: ng.route.IRouteService,
+      $scope,
+      $element,
+      $timeout: ng.ITimeoutService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      localStorage: WindowLocalStorage,
+      $location: ng.ILocationService,
+      activeMQMessage) => {
 
-    var log:Logging.Logger = Logger.get("Camel");
+    var log: Logging.Logger = Logger.get("Camel");
 
     $scope.noCredentials = false;
     $scope.container = {};

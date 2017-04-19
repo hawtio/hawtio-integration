@@ -3,7 +3,9 @@
 
 module Camel {
 
-  _module.controller("Camel.TreeHeaderController", ["$scope", "$location", ($scope, $location) => {
+  _module.controller("Camel.TreeHeaderController", ["$scope", "$location", (
+      $scope,
+      $location: ng.ILocationService) => {
 
     // $scope.contextFilterText = '';
 
@@ -22,11 +24,13 @@ module Camel {
     };
   }]);
 
-  _module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", "$rootScope", ($scope,
-                                 $location:ng.ILocationService,
-                                 $timeout,
-                                 workspace:Workspace,
-                                 $rootScope) => {
+  _module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", "$rootScope", (
+      $scope,
+      $location: ng.ILocationService,
+      $timeout: ng.ITimeoutService,
+      workspace: Workspace,
+      $rootScope: ng.IRootScopeService) => {
+
     $scope.contextFilterText = $location.search()["cq"];
     $scope.fullScreenViewLink = Camel.linkToFullScreenView(workspace);
 

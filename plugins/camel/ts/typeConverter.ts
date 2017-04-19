@@ -3,8 +3,12 @@
 
 module Camel {
 
-  _module.controller("Camel.TypeConverterController", ["$scope", "$location", "$timeout", "workspace", "jolokia",
-      ($scope, $location, $timeout, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.TypeConverterController", ["$scope", "$location", "$timeout", "workspace", "jolokia", (
+      $scope,
+      $location: ng.ILocationService,
+      $timeout: ng.ITimeoutService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
 
     $scope.data = [];
     $scope.selectedMBean = null;
@@ -14,7 +18,7 @@ module Camel {
 
     $scope.mbeanAttributes = {};
 
-    var columnDefs:any[] = [
+    var columnDefs: any[] = [
       {
         field: 'from',
         displayName: 'From',
@@ -109,8 +113,11 @@ module Camel {
       var mbean = getSelectionCamelTypeConverter(workspace);
       if (mbean) {
         // grab attributes in real time
-        var query = {type: "read", mbean: mbean,
-          attribute: ["AttemptCounter", "FailedCounter", "HitCounter", "MissCounter", "NumberOfTypeConverters", "StatisticsEnabled"]};
+        var query = {
+          type: "read",
+          mbean: mbean,
+          attribute: ["AttemptCounter", "FailedCounter", "HitCounter", "MissCounter", "NumberOfTypeConverters", "StatisticsEnabled"]
+        };
 
         jolokia.request(query, Core.onSuccess(onAttributes));
 

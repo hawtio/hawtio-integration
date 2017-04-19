@@ -2,9 +2,15 @@
 /// <reference path="camelPlugin.ts"/>
 
 module Camel {
-  _module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", ($scope, $element, workspace:Workspace, jolokia, localStorage, documentBase) => {
+  _module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", (
+      $scope,
+      $element,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      localStorage: WindowLocalStorage,
+      documentBase: string) => {
 
-    var log:Logging.Logger = Logger.get("CamelDebugger");
+    var log: Logging.Logger = Logger.get("CamelDebugger");
 
     // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
     $scope.debugging = false;

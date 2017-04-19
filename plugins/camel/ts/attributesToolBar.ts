@@ -3,7 +3,10 @@
 
 module Camel {
 
-  _module.controller("Camel.AttributesToolBarController", ["$scope", "workspace", "jolokia", ($scope, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.AttributesToolBarController", ["$scope", "workspace", "jolokia", (
+      $scope,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
 
     $scope.camelContextMBean = getSelectionCamelContextMBean(workspace);
     $scope.routeMBean = searchRouteMBean();

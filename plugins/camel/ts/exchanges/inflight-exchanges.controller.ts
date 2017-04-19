@@ -2,7 +2,11 @@
 /// <reference path="../camelPlugin.ts"/>
 module Camel {
 
-  _module.controller("Camel.InflightExchangesController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.InflightExchangesController", ["$scope", "$location", "workspace", "jolokia", (
+      $scope,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
 
     $scope.data = [];
     $scope.initDone = false;

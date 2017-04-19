@@ -1,10 +1,20 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
+/// <reference path="routesDiagram.ts"/>
 
 module Camel {
 
-  _module.controller("Camel.RouteController", ["$scope", "$routeParams", "$element", "$timeout", "workspace", "$location", "jolokia", "localStorage", ($scope, $routeParams, $element, $timeout, workspace:Workspace, $location, jolokia, localStorage) => {
-    var log:Logging.Logger = Logger.get("Camel");
+  _module.controller("Camel.RouteController", ["$scope", "$routeParams", "$element", "$timeout", "workspace", "$location", "jolokia", "localStorage", (
+      $scope,
+      $routeParams: ng.route.IRouteParamsService,
+      $element,
+      $timeout: ng.ITimeoutService,
+      workspace: Workspace,
+      $location: ng.ILocationService,
+      jolokia: Jolokia.IJolokia,
+      localStorage: WindowLocalStorage) => {
+
+    var log: Logging.Logger = Logger.get("Camel");
 
     $scope.routes = [];
     $scope.routeNodes = {};
@@ -280,7 +290,7 @@ module Camel {
       container.call(zoom);
 
       // Only apply node selection behavior if debugging or tracing
-      if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
+      if (_.startsWith(path, "/camel/debugRoute") || _.startsWith(path, "/camel/traceRoute")) {
         var gNodes = canvasDiv.find("g.node");
         gNodes.click(function () {
           var selected = isSelected(this);

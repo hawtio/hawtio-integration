@@ -3,7 +3,11 @@
 
 module Camel {
 
-  _module.controller("Camel.ProfileRouteController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.ProfileRouteController", ["$scope", "$location", "workspace", "jolokia", (
+      $scope,
+      $location: ng.ILocationService,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
 
     $scope.initDone = false;
     $scope.data = [];

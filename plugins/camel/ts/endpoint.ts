@@ -1,8 +1,15 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
+/// <reference path="endpointChooser.ts"/>
 
 module Camel {
-  _module.controller("Camel.EndpointController", ["$scope", "$location", "localStorage", "workspace", "jolokia", ($scope, $location, localStorage:WindowLocalStorage, workspace:Workspace, jolokia) => {
+  _module.controller("Camel.EndpointController", ["$scope", "$location", "localStorage", "workspace", "jolokia", (
+      $scope,
+      $location: ng.ILocationService,
+      localStorage: WindowLocalStorage,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia) => {
+
     Camel.initEndpointChooserScope($scope, $location, localStorage, workspace, jolokia);
 
     $scope.workspace = workspace;
@@ -58,7 +65,7 @@ module Camel {
       }
     };
 
-    function operationSuccess(endpointCreated) {
+    function operationSuccess(endpointCreated): void {
       $scope.endpointName = "";
       $scope.workspace.operationCounter += 1;
       Core.$apply($scope);
@@ -70,7 +77,7 @@ module Camel {
       }
     }
 
-    function deleteSuccess() {
+    function deleteSuccess(): void {
       // lets set the selection to the parent
       if (workspace.selection) {
         var parent = Core.pathGet(workspace, ["selection", "parent"]);

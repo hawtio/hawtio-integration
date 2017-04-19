@@ -7,9 +7,13 @@ interface JQuery {
 
 module Camel {
 
-  _module.controller("Camel.PropertiesRouteController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia",
-    'propertiesService', ($scope, $rootScope, workspace: Workspace, localStorage: WindowLocalStorage, jolokia,
-    propertiesService: PropertiesService) => {
+  _module.controller("Camel.PropertiesRouteController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia", "propertiesService", (
+      $scope,
+      $rootScope: ng.IRootScopeService,
+      workspace: Workspace,
+      localStorage: WindowLocalStorage,
+      jolokia: Jolokia.IJolokia,
+      propertiesService: PropertiesService) => {
 
       var log: Logging.Logger = Logger.get("Camel");
 

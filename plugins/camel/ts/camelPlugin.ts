@@ -69,7 +69,17 @@ module Camel {
   }]);
 
 
-  _module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", "$rootScope", (nav:HawtioMainNav.Registry, workspace:Workspace, jolokia, viewRegistry, layoutFull, helpRegistry, preferencesRegistry, $templateCache:ng.ITemplateCacheService, $location, $rootScope) => {
+  _module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", "$rootScope", (
+      nav: HawtioMainNav.Registry,
+      workspace: Workspace,
+      jolokia: Jolokia.IJolokia,
+      viewRegistry,
+      layoutFull,
+      helpRegistry,
+      preferencesRegistry: HawtioPreferences.PreferencesRegistry,
+      $templateCache: ng.ITemplateCacheService,
+      $location: ng.ILocationService,
+      $rootScope: ng.IRootScopeService) => {
 
     viewRegistry['camel/endpoint/'] = layoutFull;
     viewRegistry['camel/route/'] = layoutFull;

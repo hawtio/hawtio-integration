@@ -2,7 +2,10 @@
 /// <reference path="camelPlugin.ts"/>
 
 module Camel {
-  _module.controller("Camel.SourceController", ["$scope", "workspace", ($scope, workspace:Workspace) => {
+
+  _module.controller("Camel.SourceController", ["$scope", "workspace", (
+      $scope,
+      workspace: Workspace) => {
 
     $scope.showUpdateButton = true;
 
