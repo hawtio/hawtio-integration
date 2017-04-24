@@ -103,5 +103,20 @@ module ActiveMQ {
         return null;
       }, true);
     }
+
+    $scope.$on('$destroy', () => {
+      const tree = (<any>$('#activemqtree')).treeview(true);
+      tree.clearSearch();
+      // Bootstrap tree view leaks the node elements into the data structure
+      // so let's clean this up when the user leaves the view
+      const cleanTreeFolder = (node:Jmx.Folder) => {
+        delete node['$el'];
+        if (node.nodes) node.nodes.forEach(cleanTreeFolder);
+      };
+      cleanTreeFolder(workspace.tree);
+      // Then call the tree clean-up method
+      tree.remove();
+    });
+
   }]);
 }
