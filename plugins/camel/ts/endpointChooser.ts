@@ -297,7 +297,7 @@ module Camel {
       if (!profileWorkspace) {
         var remoteJolokia = $scope.jolokia;
         if (remoteJolokia) {
-          profileWorkspace = Core.createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location,
+          profileWorkspace = Jmx.createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location,
             localStorage);
           $scope.profileWorkspace = profileWorkspace;
         }
