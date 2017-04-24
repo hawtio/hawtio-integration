@@ -514,7 +514,7 @@ module Camel {
         var notFound = true;
         while (notFound) {
           var tmpKey = key + counter;
-          if (folder.children.indexOf({key: tmpKey}) !== -1) {
+          if (_.find(folder.children, { key: tmpKey })) {
             counter += 1;
           } else {
             notFound = false;
@@ -817,7 +817,7 @@ module Camel {
           // look for the Camel 2.11 mbean which we prefer
           var result = tree.navigate(domain, contextId, "tracer");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.text, "BacklogTracer"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, "BacklogTracer"));
             if (mbean) {
               return mbean.objectName;
             }
@@ -838,7 +838,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "tracer");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.text, "BacklogDebugger"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, "BacklogDebugger"));
             if (mbean) {
               return mbean.objectName;
             }
@@ -859,7 +859,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.text, "DefaultTypeConverter"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultTypeConverter"));
             if (mbean) {
               return mbean.objectName;
             }
@@ -880,7 +880,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.text, "DefaultRestRegistry"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultRestRegistry"));
             if (mbean) {
               return mbean.objectName;
             }
@@ -901,7 +901,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.text, "DefaultRuntimeEndpointRegistry"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultRuntimeEndpointRegistry"));
             if (mbean) {
               return mbean.objectName;
             }
@@ -922,7 +922,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.text, "DefaultInflightRepository"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultInflightRepository"));
             if (mbean) {
               return mbean.objectName;
             }
@@ -943,7 +943,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.text, "DefaultAsyncProcessorAwaitManager"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultAsyncProcessorAwaitManager"));
             if (mbean) {
               return mbean.objectName;
             }
@@ -964,7 +964,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.text, "MetricsRegistryService"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, "MetricsRegistryService"));
             if (mbean) {
               return mbean.objectName;
             }
@@ -1059,7 +1059,7 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "routes");
           if (result && result.children) {
-            var mbean:any = _.find(result.children, (m) => m.text === routeId);
+            var mbean = _.find(result.children, m => m.text === routeId);
             if (mbean) {
               return mbean.objectName;
             }
