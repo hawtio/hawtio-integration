@@ -4,8 +4,8 @@
 module Camel {
 
   _module.controller("Camel.TreeHeaderController", ["$scope", "$location", (
-      $scope,
-      $location: ng.ILocationService) => {
+    $scope,
+    $location: ng.ILocationService) => {
 
     // $scope.contextFilterText = '';
 
@@ -25,11 +25,11 @@ module Camel {
   }]);
 
   _module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", "$rootScope", (
-      $scope,
-      $location: ng.ILocationService,
-      $timeout: ng.ITimeoutService,
-      workspace: Jmx.Workspace,
-      $rootScope: ng.IRootScopeService) => {
+    $scope,
+    $location: ng.ILocationService,
+    $timeout: ng.ITimeoutService,
+    workspace: Jmx.Workspace,
+    $rootScope: ng.IRootScopeService) => {
 
     $scope.contextFilterText = $location.search()["cq"];
     $scope.fullScreenViewLink = Camel.linkToFullScreenView(workspace);
@@ -115,6 +115,19 @@ module Camel {
       }, true);
       $scope.fullScreenViewLink = Camel.linkToFullScreenView(workspace);
     }
-  }]);
 
+    $scope.$on('$destroy', () => {
+      const tree = (<any>$('#cameltree')).treeview(true);
+      tree.clearSearch();
+      // Bootstrap tree view leaks the node elements into the data structure
+      // so let's clean this up when the user leaves the view
+      const cleanTreeFolder = (node:Jmx.Folder) => {
+        delete node['$el'];
+        if (node.nodes) node.nodes.forEach(cleanTreeFolder);
+      };
+      cleanTreeFolder(workspace.tree);
+      // Then call the tree clean-up method
+      tree.remove();
+    });
+  }]);
 }
