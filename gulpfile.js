@@ -43,9 +43,14 @@ gulp.task('bower', function() {
 
 /** Adjust the reference path of any typescript-built plugin this project depends on */
 gulp.task('path-adjust', function() {
-  return gulp.src('libs/**/includes.d.ts')
-    .pipe(plugins.replace(/"\.\.\/libs/gm, '"../../../libs'))
-    .pipe(gulp.dest('libs'));
+  return eventStream.merge(
+    gulp.src('libs/**/includes.d.ts')
+      .pipe(plugins.replace(/"\.\.\/libs/gm, '"../../../libs'))
+      .pipe(gulp.dest('libs')),
+    gulp.src('libs/**/defs.d.ts')
+      .pipe(plugins.replace(/"libs/gm, '"../../libs'))
+      .pipe(gulp.dest('libs'))
+  );
 });
 
 gulp.task('clean-defs', function() {
