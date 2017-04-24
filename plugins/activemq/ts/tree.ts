@@ -87,7 +87,7 @@ module ActiveMQ {
         });
 
         var treeElement = $("#activemqtree");
-        Jmx.enableTree($scope, $location, workspace, treeElement, children, true);
+        Jmx.enableTree($scope, $location, workspace, treeElement, children);
         // lets do this asynchronously to avoid Error: $digest already in progress
         setTimeout(updateSelectionFromURL, 50);
       }

@@ -82,7 +82,7 @@ module Camel {
         if (rootFolder) {
           $timeout(() => {
             var treeElement = $("#cameltree");
-            Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder], true);
+            Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
             // lets do this asynchronously to avoid Error: $digest already in progress
             updateSelectionFromURL();
             if (angular.isFunction(afterSelectionFn)) {
