@@ -6,7 +6,7 @@ module Camel {
 
   _module.controller("Camel.RouteController", ["$scope", "$routeParams", "$element", "$timeout", "workspace", "$location", "jolokia", "localStorage", (
       $scope,
-      $routeParams: ng.route.IRouteParamsService,
+      $routeParams: angular.route.IRouteParamsService,
       $element,
       $timeout: ng.ITimeoutService,
       workspace: Workspace,

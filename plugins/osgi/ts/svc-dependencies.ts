@@ -10,7 +10,7 @@ module Osgi {
     _module.controller("Osgi.ServiceDependencyController", ["$scope", "$location", "$routeParams", "workspace", "osgiDataService", (
         $scope,
         $location: ng.ILocationService,
-        $routeParams: ng.route.IRouteParamsService,
+        $routeParams: angular.route.IRouteParamsService,
         workspace: Workspace,
         osgiDataService: OsgiDataService) => {
 

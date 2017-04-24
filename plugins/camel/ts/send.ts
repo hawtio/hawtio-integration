@@ -8,7 +8,7 @@ module Camel {
    var DELIVERY_PERSISTENT = "2";
 
   _module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", (
-      $route: ng.route.IRouteService,
+      $route: angular.route.IRouteService,
       $scope,
       $element,
       $timeout: ng.ITimeoutService,

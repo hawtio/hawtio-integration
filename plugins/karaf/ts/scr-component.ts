@@ -12,7 +12,7 @@ module Karaf {
       $location: ng.ILocationService,
       workspace: Workspace,
       jolokia: Jolokia.IJolokia,
-      $routeParams: ng.route.IRouteParamsService) => {
+      $routeParams: angular.route.IRouteParamsService) => {
 
     $scope.srcComponentsUrl = Core.url('/osgi/scr-components' + workspace.hash());
     $scope.name = $routeParams['name'];

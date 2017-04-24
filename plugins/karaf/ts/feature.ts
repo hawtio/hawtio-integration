@@ -10,7 +10,7 @@ module Karaf {
       $scope,
       jolokia: Jolokia.IJolokia,
       workspace: Workspace,
-      $routeParams: ng.route.IRouteParamsService) => {
+      $routeParams: angular.route.IRouteParamsService) => {
 
     $scope.name = $routeParams['name'];
     $scope.version = $routeParams['version'];

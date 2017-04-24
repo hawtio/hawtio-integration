@@ -11,7 +11,7 @@ module Osgi {
   _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia", "$uibModal", (
       $scope,
       $timeout: ng.ITimeoutService,
-      $routeParams: ng.route.IRouteParamsService,
+      $routeParams: angular.route.IRouteParamsService,
       $location: ng.ILocationService,
       workspace: Workspace,
       jolokia: Jolokia.IJolokia,

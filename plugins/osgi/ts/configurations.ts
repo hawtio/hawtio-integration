@@ -9,7 +9,7 @@ module Osgi {
 
   _module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia", (
       $scope,
-      $routeParams: ng.route.IRouteParamsService,
+      $routeParams: angular.route.IRouteParamsService,
       $location: ng.ILocationService,
       workspace: Workspace,
       jolokia: Jolokia.IJolokia) => {

@@ -12,7 +12,7 @@ module ActiveMQ {
       $location: ng.ILocationService,
       activeMQMessage,
       $timeout: ng.ITimeoutService,
-      $routeParams: ng.route.IRouteParamsService,
+      $routeParams: angular.route.IRouteParamsService,
       $dialog,
       $templateCache: ng.ITemplateCacheService) => {
 
