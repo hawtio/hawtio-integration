@@ -277,8 +277,9 @@ module Camel {
         }
       }
       // We need to adapt the viewBox for smaller diagrams as it depends on the SVG viewport size
-      window.addEventListener('resize', viewBox);
-      $scope.$on('$destroy', () => window.removeEventListener('resize', viewBox));
+      const resizeViewBox = _.debounce(viewBox,  250, { leading: true, trailing: true });
+      window.addEventListener('resize', resizeViewBox);
+      $scope.$on('$destroy', () => window.removeEventListener('resize', resizeViewBox));
       // Lastly, we need to do it once at initialisation
       viewBox();
 
