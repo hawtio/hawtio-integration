@@ -80,7 +80,7 @@ module Camel {
 
     $scope.endpointUris = () => {
       var endpointFolder = Camel.getSelectionCamelContextEndpoints(workspace);
-      return (endpointFolder) ? endpointFolder.children.map(n => n.title) : [];
+      return (endpointFolder) ? endpointFolder.children.map(n => n.text) : [];
     };
 
     $scope.refresh = loadData;

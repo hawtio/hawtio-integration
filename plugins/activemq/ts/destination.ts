@@ -120,7 +120,7 @@ module ActiveMQ {
       var entries = selection.entries;
       if (mbean && selection && jolokia && entries) {
         var domain = selection.domain;
-        var name = entries["Destination"] || entries["destinationName"] || selection.title;
+        var name = entries["Destination"] || entries["destinationName"] || selection.text;
         var isQueue = "Topic" !== (entries["Type"] || entries["destinationType"]);
         var operation;
         if (isQueue) {
@@ -141,7 +141,7 @@ module ActiveMQ {
       var selection = workspace.selection;
       var entries = selection.entries;
       if (mbean && selection && jolokia && entries) {
-        var name = entries["Destination"] || entries["destinationName"] || selection.title;
+        var name = entries["Destination"] || entries["destinationName"] || selection.text;
         var operation = "purge()";
         $scope.message = "Purged queue " + name;
         // unescape should be done right before invoking jolokia

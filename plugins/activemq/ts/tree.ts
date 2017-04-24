@@ -37,7 +37,7 @@ module ActiveMQ {
     function reloadTree() {
       log.debug("workspace tree has changed, lets reload the activemq tree");
 
-      var children = [];
+      var children: Array<Jmx.NodeSelection> = [];
       var tree = workspace.tree;
       if (tree) {
         var domainName = "org.apache.activemq";
@@ -63,20 +63,20 @@ module ActiveMQ {
         children.forEach(broker => {
           var grandChildren = broker.children;
           if (grandChildren) {
-            var idx = grandChildren.findIndex(n => n.title === "Topic");
+            var idx = grandChildren.findIndex(n => n.text === "Topic");
             if (idx > 0) {
               var old = grandChildren[idx];
 
               // we need to store all topics the first time on the workspace
               // so we have access to them later if the user changes the filter in the preferences
-              var key = "ActiveMQ-allTopics-" + broker.title;
+              var key = "ActiveMQ-allTopics-" + broker.text;
               var allTopics = _.clone(old.children);
               workspace.mapData[key] = allTopics;
 
               var filter = Core.parseBooleanValue(localStorage["activemqFilterAdvisoryTopics"]);
               if (filter) {
                 if (old && old.children) {
-                  var filteredTopics = _.filter(old.children, (c:any) => !_.startsWith(c.title, "ActiveMQ.Advisory"));
+                  var filteredTopics = _.filter(old.children, (c:any) => !_.startsWith(c.text, "ActiveMQ.Advisory"));
                   old.children = filteredTopics;
                 }
               } else if (allTopics) {

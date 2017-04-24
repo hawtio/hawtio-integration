@@ -185,7 +185,7 @@ module Camel {
         if (route && route.length) {
           var routeFolder = null;
           angular.forEach(workspace.selection.children, (c) => {
-            if (c.title === route[0].id) {
+            if (c.text === route[0].id) {
               routeFolder = c;
             }
           });

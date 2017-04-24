@@ -55,7 +55,7 @@ module Camel {
       var rootFolder = Camel.getRootCamelFolder(workspace);
       if (rootFolder) {
         angular.forEach(rootFolder.children, (contextFolder) => {
-          var id = contextFolder.title;
+          var id = contextFolder.text;
           if (id && id !== $scope.contextId) {
             var name = id;
             var link = createLinkToFirstChildEntity(id, currentChildEntity());
