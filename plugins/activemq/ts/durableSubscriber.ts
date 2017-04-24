@@ -6,7 +6,7 @@ module ActiveMQ {
 
   _module.controller("ActiveMQ.DurableSubscriberController", ["$scope", "workspace", "jolokia", (
       $scope,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
     var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";

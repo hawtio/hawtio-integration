@@ -308,7 +308,7 @@ module Karaf {
     });
   }
 
-  export function getSelectionFeaturesMBean(workspace:Workspace):string {
+  export function getSelectionFeaturesMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       var featuresStuff = workspace.mbeanTypesToDomain["features"] || workspace.mbeanTypesToDomain['feature'] || {};
       var karaf = featuresStuff["org.apache.karaf"] || {};
@@ -324,7 +324,7 @@ module Karaf {
         if (folder) {
           var children = folder.children;
           folder = null;
-          angular.forEach(children, (child:Folder) => {
+          angular.forEach(children, (child: Jmx.Folder) => {
             if (!folder) {
               folder = child.navigate("features");
             }
@@ -345,7 +345,7 @@ module Karaf {
     return null;
   }
 
-    export function getSelectionScrMBean(workspace:Workspace):string {
+    export function getSelectionScrMBean(workspace: Jmx.Workspace):string {
         if (workspace) {
             var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
             var karaf = scrStuff["org.apache.karaf"] || {};
@@ -361,7 +361,7 @@ module Karaf {
                 if (folder) {
                   var children = folder.children;
                   folder = null;
-                  angular.forEach(children, (child:Folder) => {
+                  angular.forEach(children, (child: Jmx.Folder) => {
                       if (!folder) {
                           folder = child.navigate("scr");
                       }

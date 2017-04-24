@@ -10,7 +10,7 @@ module Camel {
   _module.controller("Camel.PropertiesRouteController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia", "propertiesService", (
       $scope,
       $rootScope: ng.IRootScopeService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       localStorage: WindowLocalStorage,
       jolokia: Jolokia.IJolokia,
       propertiesService: PropertiesService) => {

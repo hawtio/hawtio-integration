@@ -7,7 +7,7 @@ module Camel {
       $scope,
       $location: ng.ILocationService,
       localStorage: WindowLocalStorage,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
     Camel.initEndpointChooserScope($scope, $location, localStorage, workspace, jolokia);

@@ -28,7 +28,7 @@ module Camel {
       $scope,
       $location: ng.ILocationService,
       $timeout: ng.ITimeoutService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       $rootScope: ng.IRootScopeService) => {
 
     $scope.contextFilterText = $location.search()["cq"];

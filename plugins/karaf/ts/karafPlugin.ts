@@ -22,7 +22,7 @@ module Karaf {
 
 
   _module.run(["workspace", "viewRegistry", "helpRegistry", (
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       viewRegistry,
       helpRegistry) => {
 

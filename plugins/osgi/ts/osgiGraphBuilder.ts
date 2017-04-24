@@ -10,7 +10,7 @@ module Osgi {
     export class OsgiGraphBuilder {
 
         private osgiDataService : OsgiDataService;
-        private workspace : Workspace;
+        private workspace : Jmx.Workspace;
         private bundleFilter : String;
         private packageFilter : String;
         private showServices : boolean;
@@ -29,7 +29,7 @@ module Osgi {
 
         constructor(
             osgiDataService: OsgiDataService,
-            workspace: Workspace,
+            workspace: Jmx.Workspace,
             bundleFilter: String,
             packageFilter: String,
             showServices: boolean,

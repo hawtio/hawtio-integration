@@ -10,7 +10,7 @@ module Osgi {
   export var ServiceController = _module.controller("Osgi.ServiceController", ["$scope", "$filter", "workspace", "$templateCache", "$compile", (
       $scope,
       $filter: ng.IFilterService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       $templateCache: ng.ITemplateCacheService,
       $compile: ng.IAttributes) => {
 

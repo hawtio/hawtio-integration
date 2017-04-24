@@ -5,7 +5,7 @@ module Camel {
 
   _module.controller("Camel.SourceController", ["$scope", "workspace", (
       $scope,
-      workspace: Workspace) => {
+      workspace: Jmx.Workspace) => {
 
     $scope.showUpdateButton = true;
 

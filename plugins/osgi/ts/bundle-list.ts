@@ -14,7 +14,7 @@ module Osgi {
 
   _module.controller("Osgi.BundleListController", ["$scope", "workspace", "jolokia", "localStorage", "$location", (
       $scope,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       localStorage: WindowLocalStorage,
       $location: ng.ILocationService) => {

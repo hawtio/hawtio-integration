@@ -6,7 +6,7 @@ namespace ActiveMQ {
   _module.controller('ActiveMQ.TabsController', ['$scope', '$location', 'workspace', (
       $scope,
       $location: ng.ILocationService,
-      workspace: Workspace) => {
+      workspace: Jmx.Workspace) => {
 
     $scope.tabs = [
       {

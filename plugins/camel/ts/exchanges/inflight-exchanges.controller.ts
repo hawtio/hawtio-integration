@@ -5,7 +5,7 @@ module Camel {
   _module.controller("Camel.InflightExchangesController", ["$scope", "$location", "workspace", "jolokia", (
       $scope,
       $location: ng.ILocationService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
     $scope.data = [];

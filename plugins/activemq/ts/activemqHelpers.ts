@@ -36,7 +36,7 @@ module ActiveMQ {
     return answer;
   }
 
-  export function getSelectionQueuesFolder(workspace:Workspace, ascend:boolean) {
+  export function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean) {
     var selection = workspace.selection;
     if (selection) {
       return findFolder(selection, ["Queues", "Queue"], ascend);
@@ -44,7 +44,7 @@ module ActiveMQ {
     return null;
   }
 
-  export function retrieveQueueNames(workspace:Workspace, ascend:boolean) {
+  export function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean) {
     var queuesFolder = getSelectionQueuesFolder(workspace, ascend);
     if (queuesFolder) {
       return queuesFolder.children.map(n => n.title);
@@ -52,7 +52,7 @@ module ActiveMQ {
     return [];
   }
 
-  export function getSelectionTopicsFolder(workspace:Workspace, ascend:boolean) {
+  export function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean) {
     var selection = workspace.selection;
     if (selection) {
       return findFolder(selection, ["Topics", "Topic"], ascend);
@@ -60,7 +60,7 @@ module ActiveMQ {
     return null;
   }
 
-  export function retrieveTopicNames(workspace:Workspace, ascend:boolean) {
+  export function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean) {
     var topicsFolder = getSelectionTopicsFolder(workspace, ascend);
     if (topicsFolder) {
       return topicsFolder.children.map(n => n.title);
@@ -136,7 +136,7 @@ module ActiveMQ {
     });
   }
 
-  export function getBrokerMBean(workspace:Workspace, jolokia, jmxDomain:string) {
+  export function getBrokerMBean(workspace: Jmx.Workspace, jolokia, jmxDomain: string) {
     var mbean = null;
     var selection = workspace.selection;
     if (selection && isBroker(workspace) && selection.objectName) {

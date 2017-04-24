@@ -7,7 +7,7 @@ module Camel {
   export var BrowseEndpointController = _module.controller("Camel.BrowseEndpointController", ["$scope", "$routeParams", "workspace", "jolokia", "$uibModal", (
       $scope,
       $routeParams: angular.route.IRouteParamsService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       $uibModal) => {
     

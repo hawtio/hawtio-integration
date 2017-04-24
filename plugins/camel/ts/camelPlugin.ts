@@ -71,7 +71,7 @@ module Camel {
 
   _module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", "$rootScope", (
       nav: HawtioMainNav.Registry,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       viewRegistry,
       layoutFull,
@@ -93,7 +93,7 @@ module Camel {
     });
 
     // TODO should really do this via a service that the JMX plugin exposes
-    Jmx.addAttributeToolBar(pluginName, jmxDomain, (selection: NodeSelection) => {
+    Jmx.addAttributeToolBar(pluginName, jmxDomain, (selection: Jmx.NodeSelection) => {
       // TODO there should be a nicer way to do this!
       var typeName = selection.typeName;
       if (typeName) {
@@ -269,7 +269,7 @@ module Camel {
       var children = [];
       var domainName = Camel.jmxDomain;
       if (tree) {
-        var rootFolder = new Folder("Camel Contexts");
+        var rootFolder = new Jmx.Folder("Camel Contexts");
         rootFolder.addClass = "org-apache-camel-context-folder";
         rootFolder.children = children;
         rootFolder.typeName = "context";
@@ -297,7 +297,7 @@ module Camel {
                   var title = contextNode.title;
                   var match = true;
                   if (match) {
-                    var folder = new Folder(title);
+                    var folder = new Jmx.Folder(title);
                     folder.addClass = "org-apache-camel-context";
                     folder.domain = domainName;
                     folder.objectName = contextNode.objectName;
@@ -315,22 +315,22 @@ module Camel {
                       Core.$apply($rootScope);
                     }));
                     if (routesNode) {
-                      var routesFolder = new Folder("Routes");
+                      var routesFolder = new Jmx.Folder("Routes");
                       routesFolder.addClass = "org-apache-camel-routes-folder";
                       routesFolder.parent = contextsFolder;
                       routesFolder.children = routesNode.children;
-                      angular.forEach(routesFolder.children, (n:Folder) => n.addClass = "org-apache-camel-routes");
+                      angular.forEach(routesFolder.children, (n: Jmx.Folder) => n.addClass = "org-apache-camel-routes");
                       folder.children.push(routesFolder);
                       routesFolder.typeName = "routes";
                       routesFolder.key = routesNode.key;
                       routesFolder.domain = routesNode.domain;
                     }
                     if (endpointsNode) {
-                      var endpointsFolder = new Folder("Endpoints");
+                      var endpointsFolder = new Jmx.Folder("Endpoints");
                       endpointsFolder.addClass = "org-apache-camel-endpoints-folder";
                       endpointsFolder.parent = contextsFolder;
                       endpointsFolder.children = endpointsNode.children;
-                      angular.forEach(endpointsFolder.children, (n:Folder) => {
+                      angular.forEach(endpointsFolder.children, (n: Jmx.Folder) => {
                         n.addClass = "org-apache-camel-endpoints";
                         /* TODO doesn't compile, is getContextId(workspace:Workspace)
                         if (!getContextId(n)) {
@@ -345,11 +345,11 @@ module Camel {
                       endpointsFolder.domain = endpointsNode.domain;
                     }
                     if (componentsNode) {
-                      var componentsFolder = new Folder("Components");
+                      var componentsFolder = new Jmx.Folder("Components");
                       componentsFolder.addClass = "org-apache-camel-components-folder";
                       componentsFolder.parent = contextsFolder;
                       componentsFolder.children = componentsNode.children;
-                      angular.forEach(componentsFolder.children, (n:Folder) => {
+                      angular.forEach(componentsFolder.children, (n: Jmx.Folder) => {
                         n.addClass = "org-apache-camel-components";
                         /* TODO doesn't compile, is getContextId(workspace:Workspace)
                         if (!getContextId(n)) {
@@ -364,11 +364,11 @@ module Camel {
                       componentsFolder.domain = componentsNode.domain;
                     }
                     if (dataFormatsNode) {
-                      var dataFormatsFolder = new Folder("Dataformats");
+                      var dataFormatsFolder = new Jmx.Folder("Dataformats");
                       dataFormatsFolder.addClass = "org-apache-camel-dataformats-folder";
                       dataFormatsFolder.parent = contextsFolder;
                       dataFormatsFolder.children = dataFormatsNode.children;
-                      angular.forEach(dataFormatsFolder.children, (n:Folder) => {
+                      angular.forEach(dataFormatsFolder.children, (n: Jmx.Folder) => {
                         n.addClass = "org-apache-camel-dataformats";
                         /* TODO doesn't compile, is getContextId(workspace:Workspace)
                         if (!getContextId(n)) {
@@ -383,7 +383,7 @@ module Camel {
                       dataFormatsFolder.domain = dataFormatsNode.domain;
                     }
 
-                    var jmxNode = new Folder("MBeans");
+                    var jmxNode = new Jmx.Folder("MBeans");
 
                     // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
                     angular.forEach(entries, (jmxChild, name) => {
@@ -415,7 +415,7 @@ module Camel {
 
   // register the jmx lazy loader here as it won't have been invoked in the run method
   hawtioPluginLoader.registerPreBootstrapTask((task) => {
-    Jmx.registerLazyLoadHandler(jmxDomain, (folder: Folder) => {
+    Jmx.registerLazyLoadHandler(jmxDomain, (folder: Jmx.Folder) => {
       if (jmxDomain === folder.domain && "routes" === folder.typeName) {
         return (workspace, folder, onComplete) => {
           if ("routes" === folder.typeName) {

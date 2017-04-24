@@ -6,7 +6,7 @@ namespace Camel {
   _module.controller("Camel.TabsController", ["$scope", "$location", "workspace", "jolokia", (
       $scope,
       $location: ng.ILocationService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
     $scope.tabs = [

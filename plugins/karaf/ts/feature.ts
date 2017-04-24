@@ -9,7 +9,7 @@ module Karaf {
   _module.controller("Karaf.FeatureController", ["$scope", "jolokia", "workspace", "$routeParams", (
       $scope,
       jolokia: Jolokia.IJolokia,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       $routeParams: angular.route.IRouteParamsService) => {
 
     $scope.name = $routeParams['name'];

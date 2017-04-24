@@ -62,7 +62,7 @@ namespace Camel {
     
     contexts: Context[];
 
-    constructor(private $uibModal, private workspace: Core.Workspace, private contextsService: ContextsService) {
+    constructor(private $uibModal, private workspace: Jmx.Workspace, private contextsService: ContextsService) {
       'ngInject';
     }
 

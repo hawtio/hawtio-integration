@@ -10,7 +10,7 @@ module Karaf {
   _module.controller("Karaf.ScrComponentController", ["$scope", "$location", "workspace", "jolokia", "$routeParams", (
       $scope,
       $location: ng.ILocationService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       $routeParams: angular.route.IRouteParamsService) => {
 

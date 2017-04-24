@@ -8,7 +8,7 @@
 module Osgi {
   _module.controller("Osgi.FrameworkController", ["$scope", "workspace", (
       $scope,
-      workspace: Workspace) => {
+      workspace: Jmx.Workspace) => {
 
     $scope.startLevelChanged = function () {
       if ($scope.config.startLevel) {

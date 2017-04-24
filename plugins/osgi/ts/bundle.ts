@@ -72,7 +72,7 @@ module Osgi {
     message: string
   }
 
-  _module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokia", ($scope, $location, workspace:Workspace, $routeParams, jolokia) => {
+  _module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokia", ($scope, $location, workspace: Jmx.Workspace, $routeParams, jolokia) => {
     
     $scope.bundleId = $routeParams.bundleId;
     $scope.classLoadingAlert = null;

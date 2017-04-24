@@ -5,7 +5,7 @@ module Camel {
   _module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", (
       $scope,
       $element,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       localStorage: WindowLocalStorage,
       documentBase: string) => {

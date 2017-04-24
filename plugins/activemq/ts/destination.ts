@@ -5,7 +5,7 @@
 module ActiveMQ {
   _module.controller("ActiveMQ.DestinationController", ["$scope", "workspace", "$location", "jolokia", (
       $scope,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       $location: ng.ILocationService,
       jolokia: Jolokia.IJolokia) => {
 

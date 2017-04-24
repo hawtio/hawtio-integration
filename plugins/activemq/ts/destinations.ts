@@ -3,7 +3,7 @@ module ActiveMQ {
 
     _module.controller("ActiveMQ.QueuesController", ["$scope", "workspace", "jolokia", "localStorage", (
         $scope,
-        workspace: Workspace,
+        workspace: Jmx.Workspace,
         jolokia: Jolokia.IJolokia,
         localStorage: WindowLocalStorage) => {
 

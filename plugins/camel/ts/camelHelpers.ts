@@ -37,7 +37,7 @@ module Camel {
    * @returns {boolean}
    */
   var _hasRestServices: boolean = null;
-  export function hasRestServices(workspace: Workspace, jolokia: Jolokia.IJolokia): boolean {
+  export function hasRestServices(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia): boolean {
     if (_hasRestServices !== null) {
       return _hasRestServices;
     } 
@@ -65,7 +65,7 @@ module Camel {
    * @param {Folder} folder
    * @param {Function} onRoute
    */
-  export function processRouteXml(workspace: Workspace, jolokia: Jolokia.IJolokia, folder: Folder, onRoute: (string) => void) {
+  export function processRouteXml(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, folder: Jmx.Folder, onRoute: (string) => void) {
     var selectedRouteId = getSelectedRouteId(workspace, folder);
     var mbean = getExpandingFolderCamelContextMBean(workspace, folder) || getSelectionCamelContextMBean(workspace);
 
@@ -275,7 +275,7 @@ module Camel {
    * @param {Workspace} workspace
    * @return {any} either a string that is the endpoint name or null if it couldn't be parsed
    */
-  export function getSelectedEndpointName(workspace:Workspace) {
+  export function getSelectedEndpointName(workspace: Jmx.Workspace) {
     var selection = workspace.selection;
     if (selection && selection['objectName'] && selection['typeName'] && selection['typeName'] === 'endpoints') {
       var mbean = Core.parseMBean(selection['objectName']);
@@ -327,7 +327,7 @@ module Camel {
    * @param workspace
    * @return {{uri: string, mbean: string}} either value could be null if there's a parse failure
    */
-  export function getContextAndTargetEndpoint(workspace:Workspace) {
+  export function getContextAndTargetEndpoint(workspace: Jmx.Workspace) {
     return {
       uri: Camel.getSelectedEndpointName(workspace),
       mbean: Camel.getSelectionCamelContextMBean(workspace)
@@ -338,7 +338,7 @@ module Camel {
    * Returns the cached Camel XML route node stored in the current tree selection Folder
    * @method
    */
-  export function getSelectedRouteNode(workspace:Workspace) {
+  export function getSelectedRouteNode(workspace: Jmx.Workspace) {
     var selection = workspace.selection || workspace.getSelectedMBean();
     return (selection && jmxDomain === selection.domain) ? selection["routeXmlNode"] : null;
   }
@@ -347,7 +347,7 @@ module Camel {
    * Returns true when the selected node is a Camel XML route node, false otherwise.
    * @method
    */
-  export function isRouteNode(workspace:Workspace) {
+  export function isRouteNode(workspace: Jmx.Workspace) {
     var selection = workspace.selection || workspace.getSelectedMBean();
     return selection && jmxDomain === selection.domain && "routeXmlNode" in selection;
   }
@@ -357,7 +357,7 @@ module Camel {
    * @method
    * @param workspace
    */
-  export function clearSelectedRouteNode(workspace:Workspace) {
+  export function clearSelectedRouteNode(workspace: Jmx.Workspace) {
     var selection = workspace.selection;
     if (selection && jmxDomain === selection.domain) {
       delete selection["routeXmlNode"];
@@ -433,7 +433,7 @@ module Camel {
 
     // TODO get id from camelContext
     var id = "camelContext";
-    var folder = new Folder(id);
+    var folder = new Jmx.Folder(id);
     folder.addClass = "org-apache-camel-context";
     folder.domain = Camel.jmxDomain;
     folder.typeName = "context";
@@ -454,7 +454,7 @@ module Camel {
           id = "route" + idx;
           route.setAttribute("id", id);
         }
-        var routeFolder = new Folder(id);
+        var routeFolder = new Jmx.Folder(id);
         routeFolder.addClass = "org-apache-camel-route";
         routeFolder.typeName = "routes";
         routeFolder.domain = Camel.jmxDomain;
@@ -478,7 +478,7 @@ module Camel {
    * Adds the route children to the given folder for each step in the route
    * @method
    */
-  export function addRouteChildren(folder:Folder, route) {
+  export function addRouteChildren(folder: Jmx.Folder, route) {
     folder.children = [];
     folder["routeXmlNode"] = route;
     route.setAttribute("_cid", folder.key);
@@ -498,7 +498,7 @@ module Camel {
       if (nodeSettings) {
         var imageUrl = getRouteNodeIcon(nodeSettings);
 
-        var child = new Folder(nodeName);
+        var child = new Jmx.Folder(nodeName);
         child.domain = jmxDomain;
         child.typeName = "routeNode";
         updateRouteNodeLabelAndTooltip(child, n, nodeSettings);
@@ -746,7 +746,7 @@ module Camel {
    * @method
    */
     // TODO should be a service
-  export function getSelectionCamelContextMBean(workspace: Core.Workspace) : string {
+  export function getSelectionCamelContextMBean(workspace: Jmx.Workspace) : string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -774,7 +774,7 @@ module Camel {
    * @param {Workspace} workspace
    * @param {Folder} folder
    */
-  export function getExpandingFolderCamelContextMBean(workspace: Core.Workspace, folder: Core.Folder) : string {
+  export function getExpandingFolderCamelContextMBean(workspace: Jmx.Workspace, folder: Jmx.Folder) : string {
     if (folder.entries && folder.entries["type"] === "routes") {
       var result = workspace.tree.navigate("org.apache.camel", folder.entries["context"], "context");
       if (result && result.children) {
@@ -787,7 +787,7 @@ module Camel {
     return null;
   }
 
-  export function getSelectionCamelContextEndpoints(workspace:Workspace) : Core.NodeSelection {
+  export function getSelectionCamelContextEndpoints(workspace: Jmx.Workspace) : Jmx.NodeSelection {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -977,7 +977,7 @@ module Camel {
   }
 
   // TODO should be a service
-  export function getContextId(workspace:Workspace) {
+  export function getContextId(workspace: Jmx.Workspace) {
     var selection = workspace.selection;
     if (selection) {
       // find the camel context and find ancestors in the tree until we find the camel context selection
@@ -1030,7 +1030,7 @@ module Camel {
     return "orange fa fa-off";
   }
 
-  export function getSelectedRouteId(workspace: Workspace, folder?: NodeSelection) {
+  export function getSelectedRouteId(workspace: Jmx.Workspace, folder?: Jmx.NodeSelection) {
     var selection = folder || workspace.selection;
     var selectedRouteId = null;
     if (selection) {
@@ -1050,7 +1050,7 @@ module Camel {
    * @method
    */
     // TODO Should be a service
-  export function getSelectionRouteMBean(workspace:Workspace, routeId:String) : string {
+  export function getSelectionRouteMBean(workspace: Jmx.Workspace, routeId: String) : string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -1071,7 +1071,7 @@ module Camel {
     return null;
   }
 
-  export function getCamelVersion(workspace:Workspace, jolokia) {
+  export function getCamelVersion(workspace: Jmx.Workspace, jolokia) {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -1343,13 +1343,13 @@ module Camel {
    * Recursively add all the folders which have a cid value into the given map
    * @method
    */
-  export function addFoldersToIndex(folder:Folder, map = {}) {
+  export function addFoldersToIndex(folder: Jmx.Folder, map = {}) {
     if (folder) {
       var key = folder.key
       if (key) {
         map[key] = folder;
       }
-      angular.forEach(folder.children, (child:Folder) => addFoldersToIndex(child, map));
+      angular.forEach(folder.children, (child: Jmx.Folder) => addFoldersToIndex(child, map));
     }
     return map;
   }
@@ -1411,13 +1411,13 @@ module Camel {
    * Returns an object of all the CamelContext MBeans keyed by their id
    * @method
    */
-  export function camelContextMBeansById(workspace:Workspace) {
+  export function camelContextMBeansById(workspace: Jmx.Workspace) {
     var answer = {};
     var tree = workspace.tree;
     if (tree) {
       var camelTree = tree.navigate(Camel.jmxDomain);
       if (camelTree) {
-        angular.forEach(camelTree.children, (contextsFolder:Folder) => {
+        angular.forEach(camelTree.children, (contextsFolder: Jmx.Folder) => {
           var contextFolder = contextsFolder.navigate("context");
           if (contextFolder && contextFolder.children && contextFolder.children.length) {
             var contextItem = contextFolder.children[0];
@@ -1440,7 +1440,7 @@ module Camel {
    * Returns an object of all the CamelContext MBeans keyed by the component name
    * @method
    */
-  export function camelContextMBeansByComponentName(workspace:Workspace) {
+  export function camelContextMBeansByComponentName(workspace: Jmx.Workspace) {
     return camelContextMBeansByRouteOrComponentId(workspace, "components")
   }
 
@@ -1448,17 +1448,17 @@ module Camel {
    * Returns an object of all the CamelContext MBeans keyed by the route ID
    * @method
    */
-  export function camelContextMBeansByRouteId(workspace:Workspace) {
+  export function camelContextMBeansByRouteId(workspace: Jmx.Workspace) {
     return camelContextMBeansByRouteOrComponentId(workspace, "routes")
   }
 
-  function camelContextMBeansByRouteOrComponentId(workspace:Workspace, componentsOrRoutes: string) {
+  function camelContextMBeansByRouteOrComponentId(workspace: Jmx.Workspace, componentsOrRoutes: string) {
     var answer = {};
     var tree = workspace.tree;
     if (tree) {
       var camelTree = tree.navigate(Camel.jmxDomain);
       if (camelTree) {
-        angular.forEach(camelTree.children, (contextsFolder:Folder) => {
+        angular.forEach(camelTree.children, (contextsFolder: Jmx.Folder) => {
           var contextFolder = contextsFolder.navigate("context");
           var componentsFolder = contextsFolder.navigate(componentsOrRoutes);
           if (contextFolder && componentsFolder && contextFolder.children && contextFolder.children.length) {
@@ -1487,13 +1487,13 @@ module Camel {
    * Returns an object for the given processor from the Camel tree
    * @method
    */
-  export function camelProcessorMBeansById(workspace:Workspace) {
+  export function camelProcessorMBeansById(workspace: Jmx.Workspace) {
     var answer = {};
     var tree = workspace.tree;
     if (tree) {
       var camelTree = tree.navigate(Camel.jmxDomain);
       if (camelTree) {
-        angular.forEach(camelTree.children, (contextsFolder:Folder) => {
+        angular.forEach(camelTree.children, (contextsFolder: Jmx.Folder) => {
           var processorsFolder = contextsFolder.navigate("processors");
           if (processorsFolder && processorsFolder.children && processorsFolder.children.length) {
             angular.forEach(processorsFolder.children, (processorFolder) => {

@@ -11,7 +11,7 @@ module Osgi {
         $scope,
         $location: ng.ILocationService,
         $routeParams: angular.route.IRouteParamsService,
-        workspace: Workspace,
+        workspace: Jmx.Workspace,
         osgiDataService: OsgiDataService) => {
 
       $scope.init = () => {

@@ -5,7 +5,7 @@ module Camel {
 
   _module.controller("Camel.PropertiesEndpointController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', (
       $scope,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       localStorage: WindowLocalStorage,
       jolokia: Jolokia.IJolokia,
       documentBase: string,

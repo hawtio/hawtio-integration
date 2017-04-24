@@ -9,7 +9,7 @@ module Camel {
       $routeParams: angular.route.IRouteParamsService,
       $element,
       $timeout: ng.ITimeoutService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       $location: ng.ILocationService,
       jolokia: Jolokia.IJolokia,
       localStorage: WindowLocalStorage) => {

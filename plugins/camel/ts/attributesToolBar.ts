@@ -5,7 +5,7 @@ module Camel {
 
   _module.controller("Camel.AttributesToolBarController", ["$scope", "workspace", "jolokia", (
       $scope,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
     $scope.camelContextMBean = getSelectionCamelContextMBean(workspace);

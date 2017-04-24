@@ -9,7 +9,7 @@ module Karaf {
   _module.controller("Karaf.FeaturesController", ["$scope", "$location", "workspace", "jolokia", (
       $scope,
       $location: ng.ILocationService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
     $scope.responseJson = '';

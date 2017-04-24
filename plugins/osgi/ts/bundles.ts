@@ -9,7 +9,7 @@ module Osgi {
 
   _module.controller("Osgi.BundlesController", ["$scope", "workspace", "jolokia", (
       $scope,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
     $scope.result = {};

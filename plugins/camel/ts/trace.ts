@@ -5,7 +5,7 @@
 module Camel {
   _module.controller("Camel.TraceRouteController", ["$scope", "workspace", "jolokia", "localStorage", "tracerStatus", (
       $scope,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       localStorage: WindowLocalStorage,
       tracerStatus) => {

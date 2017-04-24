@@ -6,7 +6,7 @@ module ActiveMQ {
 
   export var BrowseQueueController = _module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$routeParams", "$dialog", "$templateCache", (
       $scope,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       localStorage: WindowLocalStorage,
       $location: ng.ILocationService,

@@ -7,7 +7,7 @@ module Osgi {
 
   export var log: Logging.Logger = Logger.get("OSGi");
 
-  export function defaultBundleValues(workspace:Workspace, $scope, values) {
+  export function defaultBundleValues(workspace: Jmx.Workspace, $scope, values) {
     var allValues = values;
     angular.forEach(values, (row) => {
       row["ImportData"] = parseActualPackages(row["ImportedPackages"])
@@ -41,7 +41,7 @@ module Osgi {
     }
   }
 
-  export function defaultServiceValues(workspace:Workspace, $scope, values) {
+  export function defaultServiceValues(workspace: Jmx.Workspace, $scope, values) {
     angular.forEach(values, (row) => {
       row["BundleIdentifier"] = bundleLinks(workspace, row["BundleIdentifier"]);
     });
@@ -49,7 +49,7 @@ module Osgi {
   }
 
 
-  export function defaultPackageValues(workspace:Workspace, $scope, values) {
+  export function defaultPackageValues(workspace: Jmx.Workspace, $scope, values) {
     var packages = [];
 
     function onPackageEntry(packageEntry, row) {
@@ -80,7 +80,7 @@ module Osgi {
     return packages;
   }
 
-  export function defaultConfigurationValues(workspace:Workspace, $scope, values) {
+  export function defaultConfigurationValues(workspace: Jmx.Workspace, $scope, values) {
     var array = [];
     angular.forEach(values, (row) => {
       var map = {};
@@ -264,7 +264,7 @@ module Osgi {
     return answer;
   }
 
-  export function getSelectionBundleMBean(workspace:Workspace):string {
+  export function getSelectionBundleMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       // lets navigate to the tree item based on paths
       var folder = workspace.tree.navigate("osgi.core", "bundleState");
@@ -296,7 +296,7 @@ module Osgi {
     return null;
   }
 
-  export function getSelectionFrameworkMBean(workspace:Workspace):string {
+  export function getSelectionFrameworkMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       // lets navigate to the tree item based on paths
       var folder = workspace.tree.navigate("osgi.core", "framework");
@@ -304,7 +304,7 @@ module Osgi {
     }
     return null;
   }
-  export function getSelectionServiceMBean(workspace:Workspace):string {
+  export function getSelectionServiceMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       // lets navigate to the tree item based on paths
       var folder = workspace.tree.navigate("osgi.core", "serviceState");
@@ -313,7 +313,7 @@ module Osgi {
     return null;
   }
 
-  export function getSelectionPackageMBean(workspace:Workspace):string {
+  export function getSelectionPackageMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       // lets navigate to the tree item based on paths
       var folder = workspace.tree.navigate("osgi.core", "packageState");
@@ -322,7 +322,7 @@ module Osgi {
     return null;
   }
 
-  export function getSelectionConfigAdminMBean(workspace:Workspace):string {
+  export function getSelectionConfigAdminMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       // lets navigate to the tree item based on paths
       var folder = workspace.tree.navigate("osgi.compendium", "cm");
@@ -331,7 +331,7 @@ module Osgi {
     return null;
   }
 
-  export function getMetaTypeMBean(workspace:Workspace):string {
+  export function getMetaTypeMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
       var typeFolder = mbeanTypesToDomain["MetaTypeFacade"] || {};
@@ -341,7 +341,7 @@ module Osgi {
     return null;
   }
 
-  export function getProfileMetadataMBean(workspace:Workspace):string {
+  export function getProfileMetadataMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
       var typeFolder = mbeanTypesToDomain["ProfileMetadata"] || {};
@@ -351,7 +351,7 @@ module Osgi {
     return null;
   }
 
-  export function getHawtioOSGiToolsMBean(workspace:Workspace):string {
+  export function getHawtioOSGiToolsMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
       var toolsFacades = mbeanTypesToDomain["OSGiTools"] || {};
@@ -360,7 +360,7 @@ module Osgi {
     }
     return null;
   }
-  export function getHawtioConfigAdminMBean(workspace:Workspace):string {
+  export function getHawtioConfigAdminMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
       var typeFolder = mbeanTypesToDomain["ConfigAdmin"] || {};

@@ -6,7 +6,7 @@ module Camel {
   _module.controller("Camel.RouteMetricsController", ["$scope", "$location", "workspace", "jolokia", "metricsWatcher", (
       $scope,
       $location: ng.ILocationService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       metricsWatcher: MetricsWatcher.IMetricsWatcher) => {
 

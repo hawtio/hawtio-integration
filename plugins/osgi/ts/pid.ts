@@ -13,7 +13,7 @@ module Osgi {
       $timeout: ng.ITimeoutService,
       $routeParams: angular.route.IRouteParamsService,
       $location: ng.ILocationService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       $uibModal) => {
 

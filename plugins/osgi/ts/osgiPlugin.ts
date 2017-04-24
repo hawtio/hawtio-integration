@@ -29,7 +29,7 @@ module Osgi {
 
   _module.run(["HawtioNav", "workspace", "viewRegistry", "helpRegistry", (
       nav: HawtioMainNav.Registry,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       viewRegistry,
       helpRegistry) => {
 
@@ -110,7 +110,7 @@ module Osgi {
     */
   }]);
 
-  _module.factory('osgiDataService', ["workspace", "jolokia", (workspace: Workspace, jolokia) => {
+  _module.factory('osgiDataService', ["workspace", "jolokia", (workspace: Jmx.Workspace, jolokia) => {
     return new OsgiDataService(workspace, jolokia);
   }]);
 

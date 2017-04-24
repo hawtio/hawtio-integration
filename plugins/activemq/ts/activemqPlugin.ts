@@ -28,7 +28,7 @@ module ActiveMQ {
   _module.run(["HawtioNav", "$location", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "$templateCache", "documentBase", (
       nav: HawtioMainNav.Registry,
       $location: ng.ILocationService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       viewRegistry,
       helpRegistry,
       preferencesRegistry: HawtioPreferences.PreferencesRegistry,
@@ -149,7 +149,7 @@ module ActiveMQ {
       }
     }
 
-    function setConsumerType(node:Core.Folder) {
+    function setConsumerType(node: Jmx.Folder) {
       if (node) {
         var parent = node.parent;
         var entries = node.entries;
@@ -165,18 +165,18 @@ module ActiveMQ {
             node.icon = UrlHelpers.join(documentBase, "/img/icons/activemq/connector.png");
           }
         }
-        angular.forEach(node.children, (child:Folder) => setConsumerType(child));
+        angular.forEach(node.children, (child: Jmx.Folder) => setConsumerType(child));
       }
     }
   }]);
 
   hawtioPluginLoader.addModule(pluginName);
 
-  export function getBroker(workspace:Workspace) {
-    var answer:Core.Folder = null;
+  export function getBroker(workspace: Jmx.Workspace) {
+    var answer: Jmx.Folder = null;
     var selection = workspace.selection;
     if (selection) {
-      answer = <Core.Folder> selection.findAncestor((current:Core.Folder) => {
+      answer = <Jmx.Folder> selection.findAncestor((current: Jmx.Folder) => {
         // log.debug("Checking current: ", current);
         var entries = <any> current.entries;
         if (entries) {
@@ -189,29 +189,29 @@ module ActiveMQ {
     return answer;
   }
 
-  export function isQueue(workspace:Workspace) {
+  export function isQueue(workspace: Jmx.Workspace) {
     //return workspace.selectionHasDomainAndType(jmxDomain, 'Queue');
     return workspace.hasDomainAndProperties(jmxDomain, {'destinationType': 'Queue'}, 4) || workspace.selectionHasDomainAndType(jmxDomain, 'Queue');
   }
 
-  export function isTopic(workspace:Workspace) {
+  export function isTopic(workspace: Jmx.Workspace) {
     //return workspace.selectionHasDomainAndType(jmxDomain, 'Topic');
     return workspace.hasDomainAndProperties(jmxDomain, {'destinationType': 'Topic'}, 4) || workspace.selectionHasDomainAndType(jmxDomain, 'Topic');
   }
 
-  export function isQueuesFolder(workspace:Workspace) {
+  export function isQueuesFolder(workspace: Jmx.Workspace) {
     return workspace.selectionHasDomainAndLastFolderName(jmxDomain, 'Queue');
   }
 
-  export function isTopicsFolder(workspace:Workspace) {
+  export function isTopicsFolder(workspace: Jmx.Workspace) {
     return workspace.selectionHasDomainAndLastFolderName(jmxDomain, 'Topic');
   }
 
-  export function isJobScheduler(workspace:Workspace) {
+  export function isJobScheduler(workspace: Jmx.Workspace) {
       return workspace.hasDomainAndProperties(jmxDomain, {'service': 'JobScheduler'}, 4);
   }
 
-  export function isBroker(workspace:Workspace) {
+  export function isBroker(workspace: Jmx.Workspace) {
     if (workspace.selectionHasDomainAndType(jmxDomain, 'Broker')) {
       var self = Core.pathGet(workspace, ["selection"]);
       var parent = Core.pathGet(workspace, ["selection", "parent"]);

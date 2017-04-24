@@ -202,7 +202,7 @@ module Camel {
   }
 
 
-  export function initEndpointChooserScope($scope, $location, localStorage:WindowLocalStorage, workspace:Workspace, jolokia) {
+  export function initEndpointChooserScope($scope, $location, localStorage:WindowLocalStorage, workspace: Jmx.Workspace, jolokia) {
     $scope.selectedComponentName = null;
     $scope.endpointParameters = {};
     $scope.endpointPath = "";

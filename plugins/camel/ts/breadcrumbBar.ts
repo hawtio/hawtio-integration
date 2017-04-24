@@ -6,7 +6,7 @@ module Camel {
   _module.controller("Camel.BreadcrumbBarController", ["$scope", "$routeParams", "workspace", "jolokia", (
       $scope,
       $routeParams: angular.route.IRouteParamsService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
     $scope.workspace = workspace;

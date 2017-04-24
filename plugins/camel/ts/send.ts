@@ -12,7 +12,7 @@ module Camel {
       $scope,
       $element,
       $timeout: ng.ITimeoutService,
-      workspace: Workspace,
+      workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       localStorage: WindowLocalStorage,
       $location: ng.ILocationService,

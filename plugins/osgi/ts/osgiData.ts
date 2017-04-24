@@ -10,9 +10,9 @@ module Osgi {
     export class OsgiDataService {
 
         private jolokia;
-        private workspace : Workspace;
+        private workspace : Jmx.Workspace;
 
-        constructor (workspace: Workspace, jolokia) {
+        constructor (workspace: Jmx.Workspace, jolokia) {
 
             this.jolokia = jolokia;
             this.workspace = workspace;
