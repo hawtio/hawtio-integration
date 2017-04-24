@@ -6,11 +6,11 @@ module ActiveMQ {
 
   _module.controller("ActiveMQ.TreeHeaderController", ["$scope", ($scope) => {
     $scope.expandAll = () => {
-      Tree.expandAll("#activemqtree");
+      (<any>$('#activemqtree')).treeview('expandAll', { silent: true });
     };
 
     $scope.contractAll = () => {
-      Tree.contractAll("#activemqtree");
+      (<any>$('#activemqtree')).treeview('collapseAll', { silent: true });
     };
   }]);
 

@@ -16,11 +16,11 @@ module Camel {
     // });
 
     $scope.expandAll = () => {
-      Tree.expandAll("#cameltree");
+      (<any>$('#cameltree')).treeview('expandAll', { silent: true });
     };
 
     $scope.contractAll = () => {
-      Tree.contractAll("#cameltree");
+      (<any>$('#cameltree')).treeview('collapseAll', { silent: true });
     };
   }]);
 
