@@ -211,9 +211,7 @@ module Camel {
     function updateRouteProperties(node, route, routeFolder) {
       var cid = node.cid;
 
-      // console.log('updateRouteProperties: ', cid);
-
-      $("#cameltree").dynatree("getTree").getNodeByKey(routeFolder.key).expand("true");
+      (<any>$("#cameltree")).dynatree("getTree").getNodeByKey(routeFolder.key).expand("true");
 
       // Get the 'real' cid of the selected diagram node
       var routeChild = routeFolder.findDescendant((d) => {
