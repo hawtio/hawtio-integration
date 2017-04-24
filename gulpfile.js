@@ -61,7 +61,7 @@ gulp.task('tsc', ['clean-defs'], function() {
   var cwd = process.cwd();
   var tsResult = gulp.src(config.ts)
     .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
-    .pipe(plugins.typescript(config.tsProject()));
+    .pipe(config.tsProject());
 
   return eventStream.merge(
     tsResult.js
