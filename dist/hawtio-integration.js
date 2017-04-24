@@ -3,7 +3,6 @@
 /// <reference path="../libs/hawtio-preferences/defs.d.ts"/>
 /// <reference path="../libs/hawtio-ui/defs.d.ts"/>
 /// <reference path="../libs/hawtio-utilities/defs.d.ts"/>
-
 /// <reference path="../../includes.ts"/>
 /**
  * @module Camel
@@ -435,7 +434,7 @@ var Camel;
         }
         // TODO get id from camelContext
         var id = "camelContext";
-        var folder = new Folder(id);
+        var folder = new Jmx.Folder(id);
         folder.addClass = "org-apache-camel-context";
         folder.domain = Camel.jmxDomain;
         folder.typeName = "context";
@@ -453,7 +452,7 @@ var Camel;
                     id = "route" + idx;
                     route.setAttribute("id", id);
                 }
-                var routeFolder = new Folder(id);
+                var routeFolder = new Jmx.Folder(id);
                 routeFolder.addClass = "org-apache-camel-route";
                 routeFolder.typeName = "routes";
                 routeFolder.domain = Camel.jmxDomain;
@@ -495,7 +494,7 @@ var Camel;
             var nodeSettings = getCamelSchema(nodeName);
             if (nodeSettings) {
                 var imageUrl = getRouteNodeIcon(nodeSettings);
-                var child = new Folder(nodeName);
+                var child = new Jmx.Folder(nodeName);
                 child.domain = Camel.jmxDomain;
                 child.typeName = "routeNode";
                 updateRouteNodeLabelAndTooltip(child, n, nodeSettings);
@@ -509,7 +508,7 @@ var Camel;
                 var notFound = true;
                 while (notFound) {
                     var tmpKey = key + counter;
-                    if (folder.children.indexOf({ key: tmpKey }) !== -1) {
+                    if (_.find(folder.children, { key: tmpKey })) {
                         counter += 1;
                     }
                     else {
@@ -550,7 +549,7 @@ var Camel;
         var root = getRootCamelFolder(workspace);
         if (root && camelContextId) {
             angular.forEach(root.children, function (contextFolder) {
-                if (!answer && camelContextId === contextFolder.title) {
+                if (!answer && camelContextId === contextFolder.text) {
                     answer = contextFolder;
                 }
             });
@@ -728,7 +727,7 @@ var Camel;
                 }
             }
         }
-        folder.title = label;
+        folder.text = label;
         folder.tooltip = tooltip;
         return label;
     }
@@ -749,8 +748,8 @@ var Camel;
                     var result = tree.navigate(domain, contextId, "context");
                     if (result && result.children) {
                         var contextBean = _.first(result.children);
-                        if (contextBean.title) {
-                            var contextName = contextBean.title;
+                        if (contextBean.text) {
+                            var contextName = contextBean.text;
                             return "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
                         }
                     }
@@ -810,7 +809,7 @@ var Camel;
                     // look for the Camel 2.11 mbean which we prefer
                     var result = tree.navigate(domain, contextId, "tracer");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "BacklogTracer"); });
+                        var mbean = _.find(result.children, function (m) { return _.startsWith(m.text, "BacklogTracer"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -831,7 +830,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "tracer");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "BacklogDebugger"); });
+                        var mbean = _.find(result.children, function (m) { return _.startsWith(m.text, "BacklogDebugger"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -852,7 +851,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultTypeConverter"); });
+                        var mbean = _.find(result.children, function (m) { return _.startsWith(m.text, "DefaultTypeConverter"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -873,7 +872,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultRestRegistry"); });
+                        var mbean = _.find(result.children, function (m) { return _.startsWith(m.text, "DefaultRestRegistry"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -894,7 +893,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultRuntimeEndpointRegistry"); });
+                        var mbean = _.find(result.children, function (m) { return _.startsWith(m.text, "DefaultRuntimeEndpointRegistry"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -915,7 +914,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultInflightRepository"); });
+                        var mbean = _.find(result.children, function (m) { return _.startsWith(m.text, "DefaultInflightRepository"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -936,7 +935,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "DefaultAsyncProcessorAwaitManager"); });
+                        var mbean = _.find(result.children, function (m) { return _.startsWith(m.text, "DefaultAsyncProcessorAwaitManager"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -957,7 +956,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "services");
                     if (result && result.children) {
-                        var mbean = result.children.find(function (m) { return _.startsWith(m.title, "MetricsRegistryService"); });
+                        var mbean = _.find(result.children, function (m) { return _.startsWith(m.text, "MetricsRegistryService"); });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -1055,7 +1054,7 @@ var Camel;
                 if (domain && contextId) {
                     var result = tree.navigate(domain, contextId, "routes");
                     if (result && result.children) {
-                        var mbean = _.find(result.children, function (m) { return m.title === routeId; });
+                        var mbean = _.find(result.children, function (m) { return m.text === routeId; });
                         if (mbean) {
                             return mbean.objectName;
                         }
@@ -1081,9 +1080,9 @@ var Camel;
                             // read the cached version
                             return contextBean.version;
                         }
-                        if (contextBean.title) {
+                        if (contextBean.text) {
                             // okay no version cached, so need to get the version using jolokia
-                            var contextName = contextBean.title;
+                            var contextName = contextBean.text;
                             var mbean = "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
                             // must use onSuccess(null) that means sync as we need the version asap
                             var version = jolokia.getAttribute(mbean, "CamelVersion", Core.onSuccess(null));
@@ -1471,7 +1470,7 @@ var Camel;
                                 mbean: mbean
                             };
                             angular.forEach(componentsFolder.children, function (componentFolder) {
-                                var id = componentFolder.title;
+                                var id = componentFolder.text;
                                 if (id) {
                                     answer[id] = contextValues;
                                 }
@@ -1497,7 +1496,7 @@ var Camel;
                     var processorsFolder = contextsFolder.navigate("processors");
                     if (processorsFolder && processorsFolder.children && processorsFolder.children.length) {
                         angular.forEach(processorsFolder.children, function (processorFolder) {
-                            var id = processorFolder.title;
+                            var id = processorFolder.text;
                             if (id) {
                                 var processorValues = {
                                     folder: processorsFolder,
@@ -1676,7 +1675,6 @@ var Camel;
     }
     Camel.isCamelVersionEQGT = isCamelVersionEQGT;
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelHelpers.ts"/>
 /**
@@ -1924,7 +1922,7 @@ var Camel;
                 var children = [];
                 var domainName = Camel.jmxDomain;
                 if (tree) {
-                    var rootFolder = new Folder("Camel Contexts");
+                    var rootFolder = new Jmx.Folder("Camel Contexts");
                     rootFolder.addClass = "org-apache-camel-context-folder";
                     rootFolder.children = children;
                     rootFolder.typeName = "context";
@@ -1951,7 +1949,7 @@ var Camel;
                                         var title = contextNode.title;
                                         var match = true;
                                         if (match) {
-                                            var folder = new Folder(title);
+                                            var folder = new Jmx.Folder(title);
                                             folder.addClass = "org-apache-camel-context";
                                             folder.domain = domainName;
                                             folder.objectName = contextNode.objectName;
@@ -1969,7 +1967,7 @@ var Camel;
                                                 Core.$apply($rootScope);
                                             }));
                                             if (routesNode) {
-                                                var routesFolder = new Folder("Routes");
+                                                var routesFolder = new Jmx.Folder("Routes");
                                                 routesFolder.addClass = "org-apache-camel-routes-folder";
                                                 routesFolder.parent = contextsFolder;
                                                 routesFolder.children = routesNode.children;
@@ -1980,7 +1978,7 @@ var Camel;
                                                 routesFolder.domain = routesNode.domain;
                                             }
                                             if (endpointsNode) {
-                                                var endpointsFolder = new Folder("Endpoints");
+                                                var endpointsFolder = new Jmx.Folder("Endpoints");
                                                 endpointsFolder.addClass = "org-apache-camel-endpoints-folder";
                                                 endpointsFolder.parent = contextsFolder;
                                                 endpointsFolder.children = endpointsNode.children;
@@ -1999,7 +1997,7 @@ var Camel;
                                                 endpointsFolder.domain = endpointsNode.domain;
                                             }
                                             if (componentsNode) {
-                                                var componentsFolder = new Folder("Components");
+                                                var componentsFolder = new Jmx.Folder("Components");
                                                 componentsFolder.addClass = "org-apache-camel-components-folder";
                                                 componentsFolder.parent = contextsFolder;
                                                 componentsFolder.children = componentsNode.children;
@@ -2018,7 +2016,7 @@ var Camel;
                                                 componentsFolder.domain = componentsNode.domain;
                                             }
                                             if (dataFormatsNode) {
-                                                var dataFormatsFolder = new Folder("Dataformats");
+                                                var dataFormatsFolder = new Jmx.Folder("Dataformats");
                                                 dataFormatsFolder.addClass = "org-apache-camel-dataformats-folder";
                                                 dataFormatsFolder.parent = contextsFolder;
                                                 dataFormatsFolder.children = dataFormatsNode.children;
@@ -2036,7 +2034,7 @@ var Camel;
                                                 dataFormatsFolder.key = dataFormatsNode.key;
                                                 dataFormatsFolder.domain = dataFormatsNode.domain;
                                             }
-                                            var jmxNode = new Folder("MBeans");
+                                            var jmxNode = new Jmx.Folder("MBeans");
                                             // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
                                             angular.forEach(entries, function (jmxChild, name) {
                                                 if (name !== "context" && name !== "routes" && name !== "endpoints" && name !== "components" && name !== "dataformats") {
@@ -2083,7 +2081,6 @@ var Camel;
         task();
     });
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -2145,7 +2142,6 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -2192,7 +2188,7 @@ var Camel;
                 var rootFolder = Camel.getRootCamelFolder(workspace);
                 if (rootFolder) {
                     angular.forEach(rootFolder.children, function (contextFolder) {
-                        var id = contextFolder.title;
+                        var id = contextFolder.text;
                         if (id && id !== $scope.contextId) {
                             var name = id;
                             var link = createLinkToFirstChildEntity(id, currentChildEntity());
@@ -2335,7 +2331,6 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 var ActiveMQ;
 (function (ActiveMQ) {
@@ -2498,7 +2493,6 @@ var ActiveMQ;
     ActiveMQ.getBrokerMBean = getBrokerMBean;
     ;
 })(ActiveMQ || (ActiveMQ = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="../../activemq/ts/activemqHelpers.ts"/>
 /// <reference path="camelPlugin.ts"/>
@@ -2566,7 +2560,7 @@ var Camel;
             };
             $scope.endpointUris = function () {
                 var endpointFolder = Camel.getSelectionCamelContextEndpoints(workspace);
-                return (endpointFolder) ? endpointFolder.children.map(function (n) { return n.title; }) : [];
+                return (endpointFolder) ? endpointFolder.children.map(function (n) { return n.text; }) : [];
             };
             $scope.refresh = loadData;
             function intermediateResult() {
@@ -2615,7 +2609,6 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
-
 var Camel;
 (function (Camel) {
     // NOTE this file is code generated by the ide-codegen module in Fuse IDE
@@ -2955,7 +2948,6 @@ var Camel;
         }
     };
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -3057,7 +3049,8 @@ var Camel;
                         $scope.graphView = "plugins/camel/html/routes.html";
                         Core.register(jolokia, $scope, {
                             type: 'exec', mbean: mbean,
-                            operation: 'getDebugCounter' }, Core.onSuccess(onBreakpointCounter));
+                            operation: 'getDebugCounter'
+                        }, Core.onSuccess(onBreakpointCounter));
                     }
                     else {
                         $scope.graphView = null;
@@ -3253,7 +3246,6 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /**
  * @module Camel
@@ -3282,7 +3274,8 @@ var Camel;
             endpoints: [
                 "aws-cw", "aws-ddb", "aws-sdb", "aws-ses", "aws-sns", "aws-sqs", "aws-s3",
                 "gauth", "ghhtp", "glogin", "gtask",
-                "jclouds"]
+                "jclouds"
+            ]
         },
         core: {
             label: "Core",
@@ -3532,7 +3525,7 @@ var Camel;
             if (!profileWorkspace) {
                 var remoteJolokia = $scope.jolokia;
                 if (remoteJolokia) {
-                    profileWorkspace = Core.createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location, localStorage);
+                    profileWorkspace = Jmx.createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location, localStorage);
                     $scope.profileWorkspace = profileWorkspace;
                 }
             }
@@ -3601,7 +3594,6 @@ var Camel;
     }
     Camel.initEndpointChooserScope = initEndpointChooserScope;
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 /// <reference path="endpointChooser.ts"/>
@@ -3683,7 +3675,6 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -3773,7 +3764,6 @@ var Camel;
             loadEndpointRegistry();
         }]);
 })(Camel || (Camel = {}));
-
 var Camel;
 (function (Camel) {
     Camel.jmsHeaderSchema = {
@@ -3828,7 +3818,6 @@ var Camel;
         }
     };
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 /**
@@ -3940,7 +3929,6 @@ var Camel;
             });
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -4149,7 +4137,6 @@ var Camel;
             loadData();
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -4255,7 +4242,6 @@ var Camel;
             loadRestRegistry();
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -4349,7 +4335,6 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -4559,7 +4544,6 @@ var Camel;
         return d.inflight || "";
     }
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 /// <reference path="routesDiagram.ts"/>
@@ -4719,7 +4703,7 @@ var Camel;
                     if (route && route.length) {
                         var routeFolder = null;
                         angular.forEach(workspace.selection.children, function (c) {
-                            if (c.title === route[0].id) {
+                            if (c.text === route[0].id) {
                                 routeFolder = c;
                             }
                         });
@@ -4744,7 +4728,6 @@ var Camel;
             }
             function updateRouteProperties(node, route, routeFolder) {
                 var cid = node.cid;
-                // console.log('updateRouteProperties: ', cid);
                 $("#cameltree").dynatree("getTree").getNodeByKey(routeFolder.key).expand("true");
                 // Get the 'real' cid of the selected diagram node
                 var routeChild = routeFolder.findDescendant(function (d) {
@@ -4897,7 +4880,6 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 /// <reference path="camelHeaderSchema.ts"/>
@@ -5066,7 +5048,6 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -5180,7 +5161,6 @@ var Camel;
             };
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -5373,7 +5353,6 @@ var Camel;
             $scope.isActive = function (tab) { return workspace.isLinkActive(tab.href); };
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="../../activemq/ts/activemqHelpers.ts"/>
 /// <reference path="camelPlugin.ts"/>
@@ -5545,7 +5524,6 @@ var Camel;
             $scope.tracing = tracerStatus.jhandle != null;
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -5558,10 +5536,10 @@ var Camel;
             //   }
             // });
             $scope.expandAll = function () {
-                Tree.expandAll("#cameltree");
+                $('#cameltree').treeview('expandAll', { silent: true });
             };
             $scope.contractAll = function () {
-                Tree.contractAll("#cameltree");
+                $('#cameltree').treeview('collapseAll', { silent: true });
             };
         }]);
     Camel._module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", "$rootScope", function ($scope, $location, $timeout, workspace, $rootScope) {
@@ -5610,7 +5588,7 @@ var Camel;
                     if (rootFolder) {
                         $timeout(function () {
                             var treeElement = $("#cameltree");
-                            Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder], true);
+                            Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
                             // lets do this asynchronously to avoid Error: $digest already in progress
                             updateSelectionFromURL();
                             if (angular.isFunction(afterSelectionFn)) {
@@ -5644,7 +5622,6 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
@@ -5754,7 +5731,6 @@ var Camel;
             loadConverters();
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /**
@@ -5958,7 +5934,6 @@ var ActiveMQ;
     }
     ActiveMQ.isBroker = isBroker;
 })(ActiveMQ || (ActiveMQ = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="activemqPlugin.ts"/>
@@ -6433,7 +6408,6 @@ var ActiveMQ;
             }
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="activemqPlugin.ts"/>
@@ -6539,7 +6513,7 @@ var ActiveMQ;
                 var entries = selection.entries;
                 if (mbean && selection && jolokia && entries) {
                     var domain = selection.domain;
-                    var name = entries["Destination"] || entries["destinationName"] || selection.title;
+                    var name = entries["Destination"] || entries["destinationName"] || selection.text;
                     var isQueue = "Topic" !== (entries["Type"] || entries["destinationType"]);
                     var operation;
                     if (isQueue) {
@@ -6560,7 +6534,7 @@ var ActiveMQ;
                 var selection = workspace.selection;
                 var entries = selection.entries;
                 if (mbean && selection && jolokia && entries) {
-                    var name = entries["Destination"] || entries["destinationName"] || selection.title;
+                    var name = entries["Destination"] || entries["destinationName"] || selection.text;
                     var operation = "purge()";
                     $scope.message = "Purged queue " + name;
                     // unescape should be done right before invoking jolokia
@@ -6570,7 +6544,6 @@ var ActiveMQ;
             };
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
-
 /// <reference path="activemqPlugin.ts"/>
 var ActiveMQ;
 (function (ActiveMQ) {
@@ -6873,7 +6846,6 @@ var ActiveMQ;
             }, true);
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="activemqPlugin.ts"/>
@@ -7016,7 +6988,6 @@ var ActiveMQ;
             }
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="activemqPlugin.ts"/>
@@ -7133,7 +7104,6 @@ var ActiveMQ;
             }
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="activemqPlugin.ts"/>
@@ -7194,7 +7164,6 @@ var ActiveMQ;
             });
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="activemqPlugin.ts"/>
 var ActiveMQ;
@@ -7286,7 +7255,6 @@ var ActiveMQ;
             $scope.isActive = function (tab) { return workspace.isLinkActive(tab.href); };
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="activemqPlugin.ts"/>
@@ -7294,10 +7262,10 @@ var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ._module.controller("ActiveMQ.TreeHeaderController", ["$scope", function ($scope) {
             $scope.expandAll = function () {
-                Tree.expandAll("#activemqtree");
+                $('#activemqtree').treeview('expandAll', { silent: true });
             };
             $scope.contractAll = function () {
-                Tree.contractAll("#activemqtree");
+                $('#activemqtree').treeview('collapseAll', { silent: true });
             };
         }]);
     ActiveMQ._module.controller("ActiveMQ.TreeController", ["$scope", "$location", "workspace", "localStorage", function ($scope, $location, workspace, localStorage) {
@@ -7338,18 +7306,17 @@ var ActiveMQ;
                     children.forEach(function (broker) {
                         var grandChildren = broker.children;
                         if (grandChildren) {
-                            var idx = grandChildren.findIndex(function (n) { return n.title === "Topic"; });
-                            if (idx > 0) {
-                                var old = grandChildren[idx];
+                            var old = _.find(grandChildren, function (n) { return n.text === "Topic"; });
+                            if (old) {
                                 // we need to store all topics the first time on the workspace
                                 // so we have access to them later if the user changes the filter in the preferences
-                                var key = "ActiveMQ-allTopics-" + broker.title;
+                                var key = "ActiveMQ-allTopics-" + broker.text;
                                 var allTopics = _.clone(old.children);
                                 workspace.mapData[key] = allTopics;
                                 var filter = Core.parseBooleanValue(localStorage["activemqFilterAdvisoryTopics"]);
                                 if (filter) {
                                     if (old && old.children) {
-                                        var filteredTopics = _.filter(old.children, function (c) { return !_.startsWith(c.title, "ActiveMQ.Advisory"); });
+                                        var filteredTopics = _.filter(old.children, function (c) { return !_.startsWith(c.text, "ActiveMQ.Advisory"); });
                                         old.children = filteredTopics;
                                     }
                                 }
@@ -7360,7 +7327,7 @@ var ActiveMQ;
                         }
                     });
                     var treeElement = $("#activemqtree");
-                    Jmx.enableTree($scope, $location, workspace, treeElement, children, true);
+                    Jmx.enableTree($scope, $location, workspace, treeElement, children);
                     // lets do this asynchronously to avoid Error: $digest already in progress
                     setTimeout(updateSelectionFromURL, 50);
                 }
@@ -7379,965 +7346,6 @@ var ActiveMQ;
             }
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
-
-/// <reference path="../../includes.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf.log = Logger.get("Karaf");
-    function setSelect(selection, group) {
-        if (!angular.isDefined(selection)) {
-            return group[0];
-        }
-        var answer = group.findIndex(function (item) {
-            return item.id === selection.id;
-        });
-        if (answer !== -1) {
-            return group[answer];
-        }
-        else {
-            return group[0];
-        }
-    }
-    Karaf.setSelect = setSelect;
-    function installRepository(workspace, jolokia, uri, success, error) {
-        Karaf.log.info("installing URI: ", uri);
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'addRepository(java.lang.String)',
-            arguments: [uri]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.installRepository = installRepository;
-    function uninstallRepository(workspace, jolokia, uri, success, error) {
-        Karaf.log.info("uninstalling URI: ", uri);
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'removeRepository(java.lang.String)',
-            arguments: [uri]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.uninstallRepository = uninstallRepository;
-    function installFeature(workspace, jolokia, feature, version, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'installFeature(java.lang.String, java.lang.String)',
-            arguments: [feature, version]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.installFeature = installFeature;
-    function uninstallFeature(workspace, jolokia, feature, version, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'uninstallFeature(java.lang.String, java.lang.String)',
-            arguments: [feature, version]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.uninstallFeature = uninstallFeature;
-    // TODO move to core?
-    function toCollection(values) {
-        var collection = values;
-        if (!angular.isArray(values)) {
-            collection = [values];
-        }
-        return collection;
-    }
-    Karaf.toCollection = toCollection;
-    function featureLinks(workspace, name, version) {
-        return "<a href='" + Core.url("#/karaf/feature/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
-    }
-    Karaf.featureLinks = featureLinks;
-    function extractFeature(attributes, name, version) {
-        var features = [];
-        var repos = [];
-        populateFeaturesAndRepos(attributes, features, repos);
-        return _.find(features, function (feature) { return feature.Name == name && feature.Version == version; });
-    }
-    Karaf.extractFeature = extractFeature;
-    var platformBundlePatterns = [
-        "^org.apache.aries",
-        "^org.apache.karaf",
-        "^activemq-karaf",
-        "^org.apache.commons",
-        "^org.apache.felix",
-        "^io.fabric8",
-        "^io.fabric8.fab",
-        "^io.fabric8.insight",
-        "^io.fabric8.mq",
-        "^io.fabric8.patch",
-        "^io.fabric8.runtime",
-        "^io.fabric8.security",
-        "^org.apache.geronimo.specs",
-        "^org.apache.servicemix.bundles",
-        "^org.objectweb.asm",
-        "^io.hawt",
-        "^javax.mail",
-        "^javax",
-        "^org.jvnet",
-        "^org.mvel2",
-        "^org.apache.mina.core",
-        "^org.apache.sshd.core",
-        "^org.apache.neethi",
-        "^org.apache.servicemix.specs",
-        "^org.apache.xbean",
-        "^org.apache.santuario.xmlsec",
-        "^biz.aQute.bndlib",
-        "^groovy-all",
-        "^com.google.guava",
-        "jackson-\\w+-asl",
-        "^com.fasterxml.jackson",
-        "^org.ops4j",
-        "^org.springframework",
-        "^bcprov$",
-        "^jline$",
-        "scala-library$",
-        "^org.scala-lang",
-        "^stax2-api$",
-        "^woodstox-core-asl",
-        "^org.jboss.amq.mq-fabric",
-        "^gravia-",
-        "^joda-time$",
-        "^org.apache.ws",
-        "-commands$",
-        "patch.patch",
-        "org.fusesource.insight",
-        "activeio-core",
-        "activemq-osgi",
-        "^org.eclipse.jetty",
-        "org.codehaus.jettison.jettison",
-        "org.jledit.core",
-        "org.fusesource.jansi",
-        "org.eclipse.equinox.region"
-    ];
-    var platformBundleRegex = new RegExp(platformBundlePatterns.join('|'));
-    var camelBundlePatterns = ["^org.apache.camel", "camel-karaf-commands$", "activemq-camel$"];
-    var camelBundleRegex = new RegExp(camelBundlePatterns.join('|'));
-    var cxfBundlePatterns = ["^org.apache.cxf"];
-    var cxfBundleRegex = new RegExp(cxfBundlePatterns.join('|'));
-    var activemqBundlePatterns = ["^org.apache.activemq", "activemq-camel$"];
-    var activemqBundleRegex = new RegExp(activemqBundlePatterns.join('|'));
-    function isPlatformBundle(symbolicName) {
-        return platformBundleRegex.test(symbolicName);
-    }
-    Karaf.isPlatformBundle = isPlatformBundle;
-    function isActiveMQBundle(symbolicName) {
-        return activemqBundleRegex.test(symbolicName);
-    }
-    Karaf.isActiveMQBundle = isActiveMQBundle;
-    function isCamelBundle(symbolicName) {
-        return camelBundleRegex.test(symbolicName);
-    }
-    Karaf.isCamelBundle = isCamelBundle;
-    function isCxfBundle(symbolicName) {
-        return cxfBundleRegex.test(symbolicName);
-    }
-    Karaf.isCxfBundle = isCxfBundle;
-    function populateFeaturesAndRepos(attributes, features, repositories) {
-        var fullFeatures = attributes["Features"];
-        angular.forEach(attributes["Repositories"], function (repo) {
-            repositories.push({
-                id: repo["Name"],
-                uri: repo["Uri"]
-            });
-            if (!fullFeatures) {
-                return;
-            }
-            angular.forEach(repo["Features"], function (feature) {
-                angular.forEach(feature, function (entry) {
-                    if (fullFeatures[entry['Name']] !== undefined) {
-                        var f = _.cloneDeep(fullFeatures[entry['Name']][entry['Version']]);
-                        f["Id"] = entry["Name"] + "/" + entry["Version"];
-                        f["RepositoryName"] = repo["Name"];
-                        f["RepositoryURI"] = repo["Uri"];
-                        features.push(f);
-                    }
-                });
-            });
-        });
-    }
-    Karaf.populateFeaturesAndRepos = populateFeaturesAndRepos;
-    function createScrComponentsView(workspace, jolokia, components) {
-        var result = [];
-        angular.forEach(components, function (component) {
-            result.push({
-                Name: component,
-                State: getComponentStateDescription(getComponentState(workspace, jolokia, component))
-            });
-        });
-        return result;
-    }
-    Karaf.createScrComponentsView = createScrComponentsView;
-    function getComponentStateDescription(state) {
-        switch (state) {
-            case 2:
-                return "Enabled";
-            case 4:
-                return "Unsatisfied";
-            case 8:
-                return "Activating";
-            case 16:
-                return "Active";
-            case 32:
-                return "Registered";
-            case 64:
-                return "Factory";
-            case 128:
-                return "Deactivating";
-            case 256:
-                return "Destroying";
-            case 1024:
-                return "Disabling";
-            case 2048:
-                return "Disposing";
-        }
-        return "Unknown";
-    }
-    Karaf.getComponentStateDescription = getComponentStateDescription;
-    ;
-    function getAllComponents(workspace, jolokia) {
-        var scrMBean = getSelectionScrMBean(workspace);
-        var response = jolokia.request({
-            type: 'read', mbean: scrMBean,
-            arguments: []
-        });
-        //Check if the MBean provides the Components attribute.
-        if (!('Components' in response.value)) {
-            response = jolokia.request({
-                type: 'exec', mbean: scrMBean, operation: 'listComponents()'
-            });
-            return createScrComponentsView(workspace, jolokia, response.value);
-        }
-        return response.value['Components'].values;
-    }
-    Karaf.getAllComponents = getAllComponents;
-    function getComponentByName(workspace, jolokia, componentName) {
-        var components = getAllComponents(workspace, jolokia);
-        return components.find(function (c) {
-            return c.Name == componentName;
-        });
-    }
-    Karaf.getComponentByName = getComponentByName;
-    function isComponentActive(workspace, jolokia, component) {
-        var response = jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'isComponentActive(java.lang.String)',
-            arguments: [component]
-        });
-        return response.value;
-    }
-    Karaf.isComponentActive = isComponentActive;
-    function getComponentState(workspace, jolokia, component) {
-        var response = jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'componentState(java.lang.String)',
-            arguments: [component]
-        });
-        return response.value;
-    }
-    Karaf.getComponentState = getComponentState;
-    function activateComponent(workspace, jolokia, component, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'activateComponent(java.lang.String)',
-            arguments: [component]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.activateComponent = activateComponent;
-    function deactivateComponent(workspace, jolokia, component, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'deactiveateComponent(java.lang.String)',
-            arguments: [component]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.deactivateComponent = deactivateComponent;
-    function populateDependencies(attributes, dependencies, features) {
-        angular.forEach(dependencies, function (feature) {
-            angular.forEach(feature, function (entry) {
-                var enhancedFeature = extractFeature(attributes, entry["Name"], entry["Version"]);
-                enhancedFeature["id"] = entry["Name"] + "/" + entry["Version"];
-                //enhancedFeature["repository"] = repo["Name"];
-                features.push(enhancedFeature);
-            });
-        });
-    }
-    Karaf.populateDependencies = populateDependencies;
-    function getSelectionFeaturesMBean(workspace) {
-        if (workspace) {
-            var featuresStuff = workspace.mbeanTypesToDomain["features"] || workspace.mbeanTypesToDomain['feature'] || {};
-            var karaf = featuresStuff["org.apache.karaf"] || {};
-            var mbean = karaf.objectName;
-            if (mbean) {
-                return mbean;
-            }
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("org.apache.karaf", "features");
-            if (!folder) {
-                // sometimes the features mbean is inside the 'root' folder
-                folder = workspace.tree.navigate("org.apache.karaf");
-                if (folder) {
-                    var children = folder.children;
-                    folder = null;
-                    angular.forEach(children, function (child) {
-                        if (!folder) {
-                            folder = child.navigate("features");
-                        }
-                    });
-                }
-            }
-            if (folder) {
-                var children = folder.children;
-                if (children) {
-                    var node = children[0];
-                    if (node) {
-                        return node.objectName;
-                    }
-                }
-                return folder.objectName;
-            }
-        }
-        return null;
-    }
-    Karaf.getSelectionFeaturesMBean = getSelectionFeaturesMBean;
-    function getSelectionScrMBean(workspace) {
-        if (workspace) {
-            var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
-            var karaf = scrStuff["org.apache.karaf"] || {};
-            var mbean = karaf.objectName;
-            if (mbean) {
-                return mbean;
-            }
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("org.apache.karaf", "scr");
-            if (!folder) {
-                // sometimes the features mbean is inside the 'root' folder
-                folder = workspace.tree.navigate("org.apache.karaf");
-                if (folder) {
-                    var children = folder.children;
-                    folder = null;
-                    angular.forEach(children, function (child) {
-                        if (!folder) {
-                            folder = child.navigate("scr");
-                        }
-                    });
-                }
-            }
-            if (folder) {
-                var children = folder.children;
-                if (children) {
-                    var node = children[0];
-                    if (node) {
-                        return node.objectName;
-                    }
-                }
-                return folder.objectName;
-            }
-        }
-        return null;
-    }
-    Karaf.getSelectionScrMBean = getSelectionScrMBean;
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/**
- * @module Karaf
- * @main Karaf
- */
-var Karaf;
-(function (Karaf) {
-    var pluginName = 'karaf';
-    Karaf._module = angular.module(pluginName, ['hawtio-core']);
-    Karaf._module.config(["$routeProvider", function ($routeProvider) {
-            $routeProvider.
-                when('/osgi/server', { templateUrl: 'plugins/karaf/html/server.html' }).
-                when('/osgi/features', { templateUrl: 'plugins/karaf/html/features.html', reloadOnSearch: false }).
-                when('/osgi/scr-components', { templateUrl: 'plugins/karaf/html/scr-components.html' }).
-                when('/osgi/scr-component/:name', { templateUrl: 'plugins/karaf/html/scr-component.html' }).
-                when('/osgi/feature/:name/:version', { templateUrl: 'plugins/karaf/html/feature.html' });
-        }]);
-    Karaf._module.run(["workspace", "viewRegistry", "helpRegistry", function (workspace, viewRegistry, helpRegistry) {
-            helpRegistry.addUserDoc('karaf', 'plugins/karaf/doc/help.md', function () {
-                return workspace.treeContainsDomainAndProperties('org.apache.karaf');
-            });
-        }]);
-    hawtioPluginLoader.addModule(pluginName);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.FeatureController", ["$scope", "jolokia", "workspace", "$routeParams", function ($scope, jolokia, workspace, $routeParams) {
-            $scope.name = $routeParams['name'];
-            $scope.version = $routeParams['version'];
-            $scope.bundlesByLocation = {};
-            $scope.props = "properties";
-            updateTableContents();
-            $scope.install = function () {
-                Karaf.installFeature(workspace, jolokia, $scope.name, $scope.version, function () {
-                    Core.notification('success', 'Installed feature ' + $scope.name);
-                }, function (response) {
-                    Core.notification('error', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
-                });
-            };
-            $scope.uninstall = function () {
-                Karaf.uninstallFeature(workspace, jolokia, $scope.name, $scope.version, function () {
-                    Core.notification('success', 'Uninstalled feature ' + $scope.name);
-                }, function (response) {
-                    Core.notification('error', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
-                });
-            };
-            $scope.toProperties = function (elements) {
-                var answer = '';
-                angular.forEach(elements, function (value, name) {
-                    answer += value['Key'] + " = " + value['Value'] + "\n";
-                });
-                return answer.trim();
-            };
-            function populateTable(response) {
-                $scope.row = Karaf.extractFeature(response.value, $scope.name, $scope.version);
-                if ($scope.row) {
-                    addBundleDetails($scope.row);
-                    var dependencies = [];
-                    //TODO - if the version isn't set or is 0.0.0 then maybe we show the highest available?
-                    angular.forEach($scope.row.Dependencies, function (version, name) {
-                        angular.forEach(version, function (data, version) {
-                            dependencies.push({
-                                Name: name,
-                                Version: version
-                            });
-                        });
-                    });
-                    $scope.row.Dependencies = dependencies;
-                }
-                Core.$apply($scope);
-            }
-            function setBundles(response) {
-                var bundleMap = {};
-                Osgi.defaultBundleValues(workspace, $scope, response.values);
-                angular.forEach(response.value, function (bundle) {
-                    var location = bundle["Location"];
-                    $scope.bundlesByLocation[location] = bundle;
-                });
-            }
-            function updateTableContents() {
-                var featureMbean = Karaf.getSelectionFeaturesMBean(workspace);
-                var bundleMbean = Osgi.getSelectionBundleMBean(workspace);
-                var jolokia = workspace.jolokia;
-                if (bundleMbean) {
-                    setBundles(jolokia.request({ type: 'exec', mbean: bundleMbean, operation: 'listBundles()' }));
-                }
-                if (featureMbean) {
-                    jolokia.request({ type: 'read', mbean: featureMbean }, Core.onSuccess(populateTable));
-                }
-            }
-            function addBundleDetails(feature) {
-                var bundleDetails = [];
-                angular.forEach(feature["Bundles"], function (bundleLocation) {
-                    var bundle = $scope.bundlesByLocation[bundleLocation];
-                    if (bundle) {
-                        bundle["Installed"] = true;
-                        bundleDetails.push(bundle);
-                    }
-                    else {
-                        bundleDetails.push({
-                            "Location": bundleLocation,
-                            "Installed": false
-                        });
-                    }
-                });
-                feature["BundleDetails"] = bundleDetails;
-            }
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.FeaturesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.responseJson = '';
-            $scope.filter = '';
-            $scope.installedFeatures = [];
-            $scope.features = [];
-            $scope.repositories = [];
-            $scope.selectedRepositoryId = '';
-            $scope.selectedRepository = {};
-            $scope.newRepositoryURI = '';
-            $scope.init = function () {
-                var selectedRepositoryId = $location.search()['repositoryId'];
-                if (selectedRepositoryId) {
-                    $scope.selectedRepositoryId = selectedRepositoryId;
-                }
-                var filter = $location.search()['filter'];
-                if (filter) {
-                    $scope.filter = filter;
-                }
-            };
-            $scope.init();
-            $scope.$watch('selectedRepository', function (newValue, oldValue) {
-                //log.debug("selectedRepository: ", $scope.selectedRepository);
-                if (newValue !== oldValue) {
-                    if (!newValue) {
-                        $scope.selectedRepositoryId = '';
-                    }
-                    else {
-                        $scope.selectedRepositoryId = newValue['repository'];
-                    }
-                    $location.search('repositoryId', $scope.selectedRepositoryId);
-                }
-            }, true);
-            $scope.$watch('filter', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    $location.search('filter', newValue);
-                }
-            });
-            var featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
-            Karaf.log.debug("Features mbean: ", featuresMBean);
-            if (featuresMBean) {
-                Core.register(jolokia, $scope, {
-                    type: 'read', mbean: featuresMBean
-                }, Core.onSuccess(render));
-            }
-            $scope.inSelectedRepository = function (feature) {
-                if (!$scope.selectedRepository || !('repository' in $scope.selectedRepository)) {
-                    return "";
-                }
-                if (!feature || !('RepositoryName' in feature)) {
-                    return "";
-                }
-                if (feature['RepositoryName'] === $scope.selectedRepository['repository']) {
-                    return "in-selected-repository";
-                }
-                return "";
-            };
-            $scope.isValidRepository = function () {
-                return Core.isBlank($scope.newRepositoryURI);
-            };
-            $scope.installRepository = function () {
-                var repoURL = $scope.newRepositoryURI;
-                Core.notification('info', 'Adding feature repository URL');
-                Karaf.installRepository(workspace, jolokia, repoURL, function () {
-                    Core.notification('success', 'Added feature repository URL');
-                    $scope.selectedRepository = {};
-                    $scope.selectedRepositoryId = '';
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                }, function (response) {
-                    Karaf.log.error('Failed to add feature repository URL ', repoURL, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.uninstallRepository = function () {
-                var repoURI = $scope.selectedRepository['uri'];
-                Core.notification('info', 'Removing feature repository ' + repoURI);
-                Karaf.uninstallRepository(workspace, jolokia, repoURI, function () {
-                    Core.notification('success', 'Removed feature repository ' + repoURI);
-                    $scope.responseJson = null;
-                    $scope.selectedRepositoryId = '';
-                    $scope.selectedRepository = {};
-                    $scope.triggerRefresh();
-                }, function (response) {
-                    Karaf.log.error('Failed to remove feature repository ', repoURI, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.triggerRefresh = function () {
-                jolokia.request({
-                    type: 'read',
-                    method: 'POST',
-                    mbean: featuresMBean
-                }, Core.onSuccess(render));
-            };
-            $scope.install = function (feature) {
-                //$('.popover').remove();
-                Core.notification('info', 'Installing feature ' + feature.Name);
-                Karaf.installFeature(workspace, jolokia, feature.Name, feature.Version, function () {
-                    Core.notification('success', 'Installed feature ' + feature.Name);
-                    $scope.installedFeatures.add(feature);
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                    //Core.$apply($scope);
-                }, function (response) {
-                    Karaf.log.error('Failed to install feature ', feature.Name, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.uninstall = function (feature) {
-                //$('.popover').remove();
-                Core.notification('info', 'Uninstalling feature ' + feature.Name);
-                Karaf.uninstallFeature(workspace, jolokia, feature.Name, feature.Version, function () {
-                    Core.notification('success', 'Uninstalled feature ' + feature.Name);
-                    $scope.installedFeatures.remove(feature);
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                    //Core.$apply($scope);
-                }, function (response) {
-                    Karaf.log.error('Failed to uninstall feature ', feature.Name, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.filteredRows = ['Bundles', 'Configurations', 'Configuration Files', 'Dependencies'];
-            $scope.showRow = function (key, value) {
-                if ($scope.filteredRows.indexOf(key) !== -1) {
-                    return false;
-                }
-                if (angular.isArray(value)) {
-                    if (value.length === 0) {
-                        return false;
-                    }
-                }
-                if (angular.isString(value)) {
-                    if (Core.isBlank(value)) {
-                        return false;
-                    }
-                }
-                if (angular.isObject(value)) {
-                    if (!value || angular.equals(value, {})) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            $scope.installed = function (installed) {
-                var answer = Core.parseBooleanValue(installed);
-                return answer;
-            };
-            $scope.showValue = function (value) {
-                if (angular.isArray(value)) {
-                    var answer = ['<ul class="zebra-list">'];
-                    value.forEach(function (v) { answer.push('<li>' + v + '</li>'); });
-                    answer.push('</ul>');
-                    return answer.join('\n');
-                }
-                if (angular.isObject(value)) {
-                    var answer = ['<table class="table">', '<tbody>'];
-                    angular.forEach(value, function (value, key) {
-                        answer.push('<tr>');
-                        answer.push('<td>' + key + '</td>');
-                        answer.push('<td>' + value + '</td>');
-                        answer.push('</tr>');
-                    });
-                    answer.push('</tbody>');
-                    answer.push('</table>');
-                    return answer.join('\n');
-                }
-                return "" + value;
-            };
-            $scope.getStateStyle = function (feature) {
-                if (Core.parseBooleanValue(feature.Installed)) {
-                    return "badge badge-success";
-                }
-                return "badge";
-            };
-            $scope.filterFeature = function (feature) {
-                if (Core.isBlank($scope.filter)) {
-                    return true;
-                }
-                if (feature.Id.has($scope.filter)) {
-                    return true;
-                }
-                return false;
-            };
-            function render(response) {
-                var responseJson = angular.toJson(response.value);
-                if ($scope.responseJson !== responseJson) {
-                    $scope.responseJson = responseJson;
-                    //log.debug("Got response: ", response.value);
-                    if (response['value']['Features'] === null) {
-                        $scope.featuresError = true;
-                    }
-                    else {
-                        $scope.featuresError = false;
-                    }
-                    $scope.features = [];
-                    $scope.repositories = [];
-                    var features = [];
-                    var repositories = [];
-                    Karaf.populateFeaturesAndRepos(response.value, features, repositories);
-                    var installedFeatures = features.filter(function (f) { return Core.parseBooleanValue(f.Installed); });
-                    var uninstalledFeatures = features.filter(function (f) { return !Core.parseBooleanValue(f.Installed); });
-                    //log.debug("repositories: ", repositories);
-                    $scope.installedFeatures = _.sortBy(installedFeatures, function (f) { return f['Name']; });
-                    uninstalledFeatures = _.sortBy(uninstalledFeatures, function (f) { return f['Name']; });
-                    _.sortBy(repositories, 'id').forEach(function (repo) {
-                        $scope.repositories.push({
-                            repository: repo['id'],
-                            uri: repo['uri'],
-                            features: _.filter(uninstalledFeatures, function (f) { return f['RepositoryName'] === repo['id']; })
-                        });
-                    });
-                    if (!Core.isBlank($scope.newRepositoryURI)) {
-                        var selectedRepo = _.find(repositories, function (r) { return r['uri'] === $scope.newRepositoryURI; });
-                        if (selectedRepo) {
-                            $scope.selectedRepositoryId = selectedRepo['id'];
-                        }
-                        $scope.newRepositoryURI = '';
-                    }
-                    if (Core.isBlank($scope.selectedRepositoryId)) {
-                        $scope.selectedRepository = _.first($scope.repositories);
-                    }
-                    else {
-                        $scope.selectedRepository = _.find($scope.repositories, function (r) { return r.repository === $scope.selectedRepositoryId; });
-                    }
-                    Core.$apply($scope);
-                }
-            }
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.NavBarController", ["$scope", "workspace", function ($scope, workspace) {
-            $scope.hash = workspace.hash();
-            $scope.isKarafEnabled = workspace.treeContainsDomainAndProperties("org.apache.karaf");
-            $scope.isFeaturesEnabled = Karaf.getSelectionFeaturesMBean(workspace);
-            $scope.isScrEnabled = Karaf.getSelectionScrMBean(workspace);
-            $scope.$on('$routeChangeSuccess', function () {
-                $scope.hash = workspace.hash();
-            });
-            $scope.isActive = function (nav) {
-                return workspace.isLinkActive(nav);
-            };
-            $scope.isPrefixActive = function (nav) {
-                return workspace.isLinkPrefixActive(nav);
-            };
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.ScrComponentController", ["$scope", "$location", "workspace", "jolokia", "$routeParams", function ($scope, $location, workspace, jolokia, $routeParams) {
-            $scope.srcComponentsUrl = Core.url('/osgi/scr-components' + workspace.hash());
-            $scope.name = $routeParams['name'];
-            populateTable();
-            function populateTable() {
-                $scope.row = Karaf.getComponentByName(workspace, jolokia, $scope.name);
-                Core.$apply($scope);
-            }
-            $scope.activate = function () {
-                Karaf.activateComponent(workspace, jolokia, $scope.row['Name'], function () {
-                    console.log("Activated!");
-                }, function () {
-                    console.log("Failed to activate!");
-                });
-            };
-            $scope.deactivate = function () {
-                Karaf.deactivateComponent(workspace, jolokia, $scope.row['Name'], function () {
-                    console.log("Deactivated!");
-                }, function () {
-                    console.log("Failed to deactivate!");
-                });
-            };
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.component = empty();
-            // caches last jolokia result
-            $scope.result = [];
-            // rows in components table
-            $scope.components = [];
-            // selected components
-            $scope.selectedComponents = [];
-            $scope.scrOptions = {
-                data: 'components',
-                sortInfo: { "sortBy": "Name", "ascending": true },
-                selectedItems: $scope.selectedComponents,
-                columnDefs: [
-                    {
-                        field: 'Name',
-                        displayName: 'Name',
-                        cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.Name}}</a></div>'
-                    },
-                    {
-                        field: 'State',
-                        displayName: 'State',
-                        cellTemplate: '{{row.entity.State}}'
-                    }
-                ],
-                primaryKeyFn: function (entity) { return entity.Name; }
-            };
-            var scrMBean = Karaf.getSelectionScrMBean(workspace);
-            if (scrMBean) {
-                var components = Karaf.getAllComponents(workspace, jolokia);
-                addUrlField(components);
-                render(components);
-            }
-            function addUrlField(components) {
-                components.forEach(function (component) {
-                    return component.Url = Core.url("/osgi/scr-component/" + component.Name + workspace.hash());
-                });
-            }
-            $scope.activate = function () {
-                $scope.selectedComponents.forEach(function (component) {
-                    Karaf.activateComponent(workspace, jolokia, component.Name, function () {
-                        console.log("Activated!");
-                    }, function () {
-                        console.log("Failed to activate!");
-                    });
-                });
-            };
-            $scope.deactivate = function () {
-                $scope.selectedComponents.forEach(function (component) {
-                    Karaf.deactivateComponent(workspace, jolokia, component.Name, function () {
-                        console.log("Deactivated!");
-                    }, function () {
-                        console.log("Failed to deactivate!");
-                    });
-                });
-            };
-            function empty() {
-                return [
-                    {
-                        Name: "",
-                        Status: false
-                    }
-                ];
-            }
-            function render(components) {
-                if (!angular.equals($scope.result, components)) {
-                    $scope.components = components;
-                    $scope.result = $scope.components;
-                    Core.$apply($scope);
-                }
-            }
-        }]);
-})(Karaf || (Karaf = {}));
-
-/// <reference path="../../includes.ts"/>
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-/**
- * @module Karaf
- */
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.ServerController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = {
-                name: "",
-                version: "",
-                state: "",
-                root: "",
-                startLevel: "",
-                framework: "",
-                frameworkVersion: "",
-                location: "",
-                sshPort: "",
-                rmiRegistryPort: "",
-                rmiServerPort: "",
-                pid: "" };
-            $scope.$on('jmxTreeUpdated', reloadFunction);
-            $scope.$watch('workspace.tree', reloadFunction);
-            function reloadFunction() {
-                // if the JMX tree is reloaded its probably because a new MBean has been added or removed
-                // so lets reload, asynchronously just in case
-                setTimeout(loadData, 50);
-            }
-            function loadData() {
-                console.log("Loading Karaf data...");
-                jolokia.search("org.apache.karaf:type=admin,*", Core.onSuccess(render));
-            }
-            function render(response) {
-                // grab the first mbean as there should ideally only be one karaf in the JVM
-                if (angular.isArray(response)) {
-                    var mbean = response[0];
-                    if (mbean) {
-                        jolokia.getAttribute(mbean, "Instances", Core.onSuccess(function (response) {
-                            onInstances(response, mbean);
-                        }));
-                    }
-                }
-            }
-            function onInstances(instances, mbean) {
-                if (instances) {
-                    var parsedMBean = Core.parseMBean(mbean);
-                    var instanceName = 'root';
-                    if ('attributes' in parsedMBean) {
-                        if ('name' in parsedMBean['attributes']) {
-                            instanceName = parsedMBean['attributes']['name'];
-                        }
-                    }
-                    //log.debug("mbean: ", Core.parseMBean(mbean));
-                    //log.debug("Instances: ", instances);
-                    // the name is the first child
-                    var rootInstance = instances[instanceName];
-                    $scope.data.name = rootInstance.Name;
-                    $scope.data.state = rootInstance.State;
-                    $scope.data.root = rootInstance["Is Root"];
-                    $scope.data.location = rootInstance.Location;
-                    $scope.data.sshPort = rootInstance["SSH Port"];
-                    $scope.data.rmiRegistryPort = rootInstance["RMI Registry Port"];
-                    $scope.data.rmiServerPort = rootInstance["RMI Server Port"];
-                    $scope.data.pid = rootInstance.Pid;
-                    // we need to get these data from the system mbean
-                    $scope.data.version = "?";
-                    $scope.data.startLevel = "?";
-                    $scope.data.framework = "?";
-                    $scope.data.frameworkVersion = "?";
-                    var systemMbean = "org.apache.karaf:type=system,name=" + rootInstance.Name;
-                    // get more data, and its okay to do this synchronously
-                    var response = jolokia.request({ type: "read", mbean: systemMbean,
-                        attribute: ["StartLevel", "Framework", "Version"] }, Core.onSuccess(null));
-                    var obj = response.value;
-                    if (obj) {
-                        $scope.data.version = obj.Version;
-                        $scope.data.startLevel = obj.StartLevel;
-                        $scope.data.framework = obj.Framework;
-                    }
-                    // and the osgi framework version is the bundle version
-                    var response2 = jolokia.search("osgi.core:type=bundleState,*", Core.onSuccess(null));
-                    if (angular.isArray(response2)) {
-                        var mbean = response2[0];
-                        if (mbean) {
-                            // get more data, and its okay to do this synchronously
-                            var response3 = jolokia.request({ type: 'exec', mbean: mbean, operation: 'getVersion(long)', arguments: [0] }, Core.onSuccess(null));
-                            var obj3 = response3.value;
-                            if (obj3) {
-                                $scope.data.frameworkVersion = obj3;
-                            }
-                        }
-                    }
-                }
-                // ensure web page is updated
-                Core.$apply($scope);
-            }
-        }]);
-})(Karaf || (Karaf = {}));
-
 /// <reference path="../../includes.ts"/>
 /**
  * @module Osgi
@@ -8754,7 +7762,6 @@ var Osgi;
     }
     Osgi.removeFactoryPidPrefix = removeFactoryPidPrefix;
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -8827,7 +7834,365 @@ var Osgi;
     }());
     Osgi.OsgiDataService = OsgiDataService;
 })(Osgi || (Osgi = {}));
-
+/// <reference path="../../includes.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf.log = Logger.get("Karaf");
+    function setSelect(selection, group) {
+        if (!angular.isDefined(selection)) {
+            return group[0];
+        }
+        var answer = group.findIndex(function (item) {
+            return item.id === selection.id;
+        });
+        if (answer !== -1) {
+            return group[answer];
+        }
+        else {
+            return group[0];
+        }
+    }
+    Karaf.setSelect = setSelect;
+    function installRepository(workspace, jolokia, uri, success, error) {
+        Karaf.log.info("installing URI: ", uri);
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'addRepository(java.lang.String)',
+            arguments: [uri]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.installRepository = installRepository;
+    function uninstallRepository(workspace, jolokia, uri, success, error) {
+        Karaf.log.info("uninstalling URI: ", uri);
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'removeRepository(java.lang.String)',
+            arguments: [uri]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.uninstallRepository = uninstallRepository;
+    function installFeature(workspace, jolokia, feature, version, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'installFeature(java.lang.String, java.lang.String)',
+            arguments: [feature, version]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.installFeature = installFeature;
+    function uninstallFeature(workspace, jolokia, feature, version, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'uninstallFeature(java.lang.String, java.lang.String)',
+            arguments: [feature, version]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.uninstallFeature = uninstallFeature;
+    // TODO move to core?
+    function toCollection(values) {
+        var collection = values;
+        if (!angular.isArray(values)) {
+            collection = [values];
+        }
+        return collection;
+    }
+    Karaf.toCollection = toCollection;
+    function featureLinks(workspace, name, version) {
+        return "<a href='" + Core.url("#/karaf/feature/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
+    }
+    Karaf.featureLinks = featureLinks;
+    function extractFeature(attributes, name, version) {
+        var features = [];
+        var repos = [];
+        populateFeaturesAndRepos(attributes, features, repos);
+        return _.find(features, function (feature) { return feature.Name == name && feature.Version == version; });
+    }
+    Karaf.extractFeature = extractFeature;
+    var platformBundlePatterns = [
+        "^org.apache.aries",
+        "^org.apache.karaf",
+        "^activemq-karaf",
+        "^org.apache.commons",
+        "^org.apache.felix",
+        "^io.fabric8",
+        "^io.fabric8.fab",
+        "^io.fabric8.insight",
+        "^io.fabric8.mq",
+        "^io.fabric8.patch",
+        "^io.fabric8.runtime",
+        "^io.fabric8.security",
+        "^org.apache.geronimo.specs",
+        "^org.apache.servicemix.bundles",
+        "^org.objectweb.asm",
+        "^io.hawt",
+        "^javax.mail",
+        "^javax",
+        "^org.jvnet",
+        "^org.mvel2",
+        "^org.apache.mina.core",
+        "^org.apache.sshd.core",
+        "^org.apache.neethi",
+        "^org.apache.servicemix.specs",
+        "^org.apache.xbean",
+        "^org.apache.santuario.xmlsec",
+        "^biz.aQute.bndlib",
+        "^groovy-all",
+        "^com.google.guava",
+        "jackson-\\w+-asl",
+        "^com.fasterxml.jackson",
+        "^org.ops4j",
+        "^org.springframework",
+        "^bcprov$",
+        "^jline$",
+        "scala-library$",
+        "^org.scala-lang",
+        "^stax2-api$",
+        "^woodstox-core-asl",
+        "^org.jboss.amq.mq-fabric",
+        "^gravia-",
+        "^joda-time$",
+        "^org.apache.ws",
+        "-commands$",
+        "patch.patch",
+        "org.fusesource.insight",
+        "activeio-core",
+        "activemq-osgi",
+        "^org.eclipse.jetty",
+        "org.codehaus.jettison.jettison",
+        "org.jledit.core",
+        "org.fusesource.jansi",
+        "org.eclipse.equinox.region"
+    ];
+    var platformBundleRegex = new RegExp(platformBundlePatterns.join('|'));
+    var camelBundlePatterns = ["^org.apache.camel", "camel-karaf-commands$", "activemq-camel$"];
+    var camelBundleRegex = new RegExp(camelBundlePatterns.join('|'));
+    var cxfBundlePatterns = ["^org.apache.cxf"];
+    var cxfBundleRegex = new RegExp(cxfBundlePatterns.join('|'));
+    var activemqBundlePatterns = ["^org.apache.activemq", "activemq-camel$"];
+    var activemqBundleRegex = new RegExp(activemqBundlePatterns.join('|'));
+    function isPlatformBundle(symbolicName) {
+        return platformBundleRegex.test(symbolicName);
+    }
+    Karaf.isPlatformBundle = isPlatformBundle;
+    function isActiveMQBundle(symbolicName) {
+        return activemqBundleRegex.test(symbolicName);
+    }
+    Karaf.isActiveMQBundle = isActiveMQBundle;
+    function isCamelBundle(symbolicName) {
+        return camelBundleRegex.test(symbolicName);
+    }
+    Karaf.isCamelBundle = isCamelBundle;
+    function isCxfBundle(symbolicName) {
+        return cxfBundleRegex.test(symbolicName);
+    }
+    Karaf.isCxfBundle = isCxfBundle;
+    function populateFeaturesAndRepos(attributes, features, repositories) {
+        var fullFeatures = attributes["Features"];
+        angular.forEach(attributes["Repositories"], function (repo) {
+            repositories.push({
+                id: repo["Name"],
+                uri: repo["Uri"]
+            });
+            if (!fullFeatures) {
+                return;
+            }
+            angular.forEach(repo["Features"], function (feature) {
+                angular.forEach(feature, function (entry) {
+                    if (fullFeatures[entry['Name']] !== undefined) {
+                        var f = _.cloneDeep(fullFeatures[entry['Name']][entry['Version']]);
+                        f["Id"] = entry["Name"] + "/" + entry["Version"];
+                        f["RepositoryName"] = repo["Name"];
+                        f["RepositoryURI"] = repo["Uri"];
+                        features.push(f);
+                    }
+                });
+            });
+        });
+    }
+    Karaf.populateFeaturesAndRepos = populateFeaturesAndRepos;
+    function createScrComponentsView(workspace, jolokia, components) {
+        var result = [];
+        angular.forEach(components, function (component) {
+            result.push({
+                Name: component,
+                State: getComponentStateDescription(getComponentState(workspace, jolokia, component))
+            });
+        });
+        return result;
+    }
+    Karaf.createScrComponentsView = createScrComponentsView;
+    function getComponentStateDescription(state) {
+        switch (state) {
+            case 2:
+                return "Enabled";
+            case 4:
+                return "Unsatisfied";
+            case 8:
+                return "Activating";
+            case 16:
+                return "Active";
+            case 32:
+                return "Registered";
+            case 64:
+                return "Factory";
+            case 128:
+                return "Deactivating";
+            case 256:
+                return "Destroying";
+            case 1024:
+                return "Disabling";
+            case 2048:
+                return "Disposing";
+        }
+        return "Unknown";
+    }
+    Karaf.getComponentStateDescription = getComponentStateDescription;
+    ;
+    function getAllComponents(workspace, jolokia) {
+        var scrMBean = getSelectionScrMBean(workspace);
+        var response = jolokia.request({
+            type: 'read', mbean: scrMBean,
+            arguments: []
+        });
+        //Check if the MBean provides the Components attribute.
+        if (!('Components' in response.value)) {
+            response = jolokia.request({
+                type: 'exec', mbean: scrMBean, operation: 'listComponents()'
+            });
+            return createScrComponentsView(workspace, jolokia, response.value);
+        }
+        return response.value['Components'].values;
+    }
+    Karaf.getAllComponents = getAllComponents;
+    function getComponentByName(workspace, jolokia, componentName) {
+        var components = getAllComponents(workspace, jolokia);
+        return components.find(function (c) {
+            return c.Name == componentName;
+        });
+    }
+    Karaf.getComponentByName = getComponentByName;
+    function isComponentActive(workspace, jolokia, component) {
+        var response = jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'isComponentActive(java.lang.String)',
+            arguments: [component]
+        });
+        return response.value;
+    }
+    Karaf.isComponentActive = isComponentActive;
+    function getComponentState(workspace, jolokia, component) {
+        var response = jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'componentState(java.lang.String)',
+            arguments: [component]
+        });
+        return response.value;
+    }
+    Karaf.getComponentState = getComponentState;
+    function activateComponent(workspace, jolokia, component, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'activateComponent(java.lang.String)',
+            arguments: [component]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.activateComponent = activateComponent;
+    function deactivateComponent(workspace, jolokia, component, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'deactiveateComponent(java.lang.String)',
+            arguments: [component]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.deactivateComponent = deactivateComponent;
+    function populateDependencies(attributes, dependencies, features) {
+        angular.forEach(dependencies, function (feature) {
+            angular.forEach(feature, function (entry) {
+                var enhancedFeature = extractFeature(attributes, entry["Name"], entry["Version"]);
+                enhancedFeature["id"] = entry["Name"] + "/" + entry["Version"];
+                //enhancedFeature["repository"] = repo["Name"];
+                features.push(enhancedFeature);
+            });
+        });
+    }
+    Karaf.populateDependencies = populateDependencies;
+    function getSelectionFeaturesMBean(workspace) {
+        if (workspace) {
+            var featuresStuff = workspace.mbeanTypesToDomain["features"] || workspace.mbeanTypesToDomain['feature'] || {};
+            var karaf = featuresStuff["org.apache.karaf"] || {};
+            var mbean = karaf.objectName;
+            if (mbean) {
+                return mbean;
+            }
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("org.apache.karaf", "features");
+            if (!folder) {
+                // sometimes the features mbean is inside the 'root' folder
+                folder = workspace.tree.navigate("org.apache.karaf");
+                if (folder) {
+                    var children = folder.children;
+                    folder = null;
+                    angular.forEach(children, function (child) {
+                        if (!folder) {
+                            folder = child.navigate("features");
+                        }
+                    });
+                }
+            }
+            if (folder) {
+                var children = folder.children;
+                if (children) {
+                    var node = children[0];
+                    if (node) {
+                        return node.objectName;
+                    }
+                }
+                return folder.objectName;
+            }
+        }
+        return null;
+    }
+    Karaf.getSelectionFeaturesMBean = getSelectionFeaturesMBean;
+    function getSelectionScrMBean(workspace) {
+        if (workspace) {
+            var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
+            var karaf = scrStuff["org.apache.karaf"] || {};
+            var mbean = karaf.objectName;
+            if (mbean) {
+                return mbean;
+            }
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("org.apache.karaf", "scr");
+            if (!folder) {
+                // sometimes the features mbean is inside the 'root' folder
+                folder = workspace.tree.navigate("org.apache.karaf");
+                if (folder) {
+                    var children = folder.children;
+                    folder = null;
+                    angular.forEach(children, function (child) {
+                        if (!folder) {
+                            folder = child.navigate("scr");
+                        }
+                    });
+                }
+            }
+            if (folder) {
+                var children = folder.children;
+                if (children) {
+                    var node = children[0];
+                    if (node) {
+                        return node.objectName;
+                    }
+                }
+                return folder.objectName;
+            }
+        }
+        return null;
+    }
+    Karaf.getSelectionScrMBean = getSelectionScrMBean;
+})(Karaf || (Karaf = {}));
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiData.ts"/>
 /// <reference path="osgiHelpers.ts"/>
@@ -8933,7 +8298,6 @@ var Osgi;
         }]);
     hawtioPluginLoader.addModule(Osgi.pluginName);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -9151,7 +8515,6 @@ var Osgi;
             }, Core.onSuccess(processResponse));
         }]);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -9442,7 +8805,8 @@ var Osgi;
                     }
                     jolokia.request({
                         type: 'exec', mbean: Osgi.getSelectionServiceMBean(workspace),
-                        operation: 'getProperties', arguments: [id] }, Core.onSuccess(function (svcId, regEl, usesEl) {
+                        operation: 'getProperties', arguments: [id]
+                    }, Core.onSuccess(function (svcId, regEl, usesEl) {
                         return function (resp) {
                             var props = resp.value;
                             var sortedKeys = Object.keys(props).sort();
@@ -9482,7 +8846,6 @@ var Osgi;
             }
         }]);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -9639,7 +9002,6 @@ var Osgi;
             }, Core.onSuccess(render));
         }]);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -9965,7 +9327,6 @@ var Osgi;
             updateTableContents();
         }]);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -10018,7 +9379,6 @@ var Osgi;
             updateContents();
         }]);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -10129,7 +9489,6 @@ var Osgi;
         }
     };
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -10333,7 +9692,6 @@ var Osgi;
     }());
     Osgi.OsgiGraphBuilder = OsgiGraphBuilder;
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -10352,7 +9710,6 @@ var Osgi;
             $scope.featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
         }]);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -10439,7 +9796,6 @@ var Osgi;
             }
         }]);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -10909,7 +10265,6 @@ var Osgi;
             updateTableContents();
         }]);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -11026,7 +10381,6 @@ var Osgi;
             }
         }]);
 })(Osgi || (Osgi = {}));
-
 /// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -11156,7 +10510,598 @@ var Osgi;
             $scope.updateGraph();
         }]);
 })(Osgi || (Osgi = {}));
-
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/**
+ * @module Karaf
+ * @main Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    var pluginName = 'karaf';
+    Karaf._module = angular.module(pluginName, ['hawtio-core']);
+    Karaf._module.config(["$routeProvider", function ($routeProvider) {
+            $routeProvider.
+                when('/osgi/server', { templateUrl: 'plugins/karaf/html/server.html' }).
+                when('/osgi/features', { templateUrl: 'plugins/karaf/html/features.html', reloadOnSearch: false }).
+                when('/osgi/scr-components', { templateUrl: 'plugins/karaf/html/scr-components.html' }).
+                when('/osgi/scr-component/:name', { templateUrl: 'plugins/karaf/html/scr-component.html' }).
+                when('/osgi/feature/:name/:version', { templateUrl: 'plugins/karaf/html/feature.html' });
+        }]);
+    Karaf._module.run(["workspace", "viewRegistry", "helpRegistry", function (workspace, viewRegistry, helpRegistry) {
+            helpRegistry.addUserDoc('karaf', 'plugins/karaf/doc/help.md', function () {
+                return workspace.treeContainsDomainAndProperties('org.apache.karaf');
+            });
+        }]);
+    hawtioPluginLoader.addModule(pluginName);
+})(Karaf || (Karaf = {}));
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.FeatureController", ["$scope", "jolokia", "workspace", "$routeParams", function ($scope, jolokia, workspace, $routeParams) {
+            $scope.name = $routeParams['name'];
+            $scope.version = $routeParams['version'];
+            $scope.bundlesByLocation = {};
+            $scope.props = "properties";
+            updateTableContents();
+            $scope.install = function () {
+                Karaf.installFeature(workspace, jolokia, $scope.name, $scope.version, function () {
+                    Core.notification('success', 'Installed feature ' + $scope.name);
+                }, function (response) {
+                    Core.notification('error', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
+                });
+            };
+            $scope.uninstall = function () {
+                Karaf.uninstallFeature(workspace, jolokia, $scope.name, $scope.version, function () {
+                    Core.notification('success', 'Uninstalled feature ' + $scope.name);
+                }, function (response) {
+                    Core.notification('error', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
+                });
+            };
+            $scope.toProperties = function (elements) {
+                var answer = '';
+                angular.forEach(elements, function (value, name) {
+                    answer += value['Key'] + " = " + value['Value'] + "\n";
+                });
+                return answer.trim();
+            };
+            function populateTable(response) {
+                $scope.row = Karaf.extractFeature(response.value, $scope.name, $scope.version);
+                if ($scope.row) {
+                    addBundleDetails($scope.row);
+                    var dependencies = [];
+                    //TODO - if the version isn't set or is 0.0.0 then maybe we show the highest available?
+                    angular.forEach($scope.row.Dependencies, function (version, name) {
+                        angular.forEach(version, function (data, version) {
+                            dependencies.push({
+                                Name: name,
+                                Version: version
+                            });
+                        });
+                    });
+                    $scope.row.Dependencies = dependencies;
+                }
+                Core.$apply($scope);
+            }
+            function setBundles(response) {
+                var bundleMap = {};
+                Osgi.defaultBundleValues(workspace, $scope, response.values);
+                angular.forEach(response.value, function (bundle) {
+                    var location = bundle["Location"];
+                    $scope.bundlesByLocation[location] = bundle;
+                });
+            }
+            function updateTableContents() {
+                var featureMbean = Karaf.getSelectionFeaturesMBean(workspace);
+                var bundleMbean = Osgi.getSelectionBundleMBean(workspace);
+                var jolokia = workspace.jolokia;
+                if (bundleMbean) {
+                    setBundles(jolokia.request({ type: 'exec', mbean: bundleMbean, operation: 'listBundles()' }));
+                }
+                if (featureMbean) {
+                    jolokia.request({ type: 'read', mbean: featureMbean }, Core.onSuccess(populateTable));
+                }
+            }
+            function addBundleDetails(feature) {
+                var bundleDetails = [];
+                angular.forEach(feature["Bundles"], function (bundleLocation) {
+                    var bundle = $scope.bundlesByLocation[bundleLocation];
+                    if (bundle) {
+                        bundle["Installed"] = true;
+                        bundleDetails.push(bundle);
+                    }
+                    else {
+                        bundleDetails.push({
+                            "Location": bundleLocation,
+                            "Installed": false
+                        });
+                    }
+                });
+                feature["BundleDetails"] = bundleDetails;
+            }
+        }]);
+})(Karaf || (Karaf = {}));
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.FeaturesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            $scope.responseJson = '';
+            $scope.filter = '';
+            $scope.installedFeatures = [];
+            $scope.features = [];
+            $scope.repositories = [];
+            $scope.selectedRepositoryId = '';
+            $scope.selectedRepository = {};
+            $scope.newRepositoryURI = '';
+            $scope.init = function () {
+                var selectedRepositoryId = $location.search()['repositoryId'];
+                if (selectedRepositoryId) {
+                    $scope.selectedRepositoryId = selectedRepositoryId;
+                }
+                var filter = $location.search()['filter'];
+                if (filter) {
+                    $scope.filter = filter;
+                }
+            };
+            $scope.init();
+            $scope.$watch('selectedRepository', function (newValue, oldValue) {
+                //log.debug("selectedRepository: ", $scope.selectedRepository);
+                if (newValue !== oldValue) {
+                    if (!newValue) {
+                        $scope.selectedRepositoryId = '';
+                    }
+                    else {
+                        $scope.selectedRepositoryId = newValue['repository'];
+                    }
+                    $location.search('repositoryId', $scope.selectedRepositoryId);
+                }
+            }, true);
+            $scope.$watch('filter', function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    $location.search('filter', newValue);
+                }
+            });
+            var featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
+            Karaf.log.debug("Features mbean: ", featuresMBean);
+            if (featuresMBean) {
+                Core.register(jolokia, $scope, {
+                    type: 'read', mbean: featuresMBean
+                }, Core.onSuccess(render));
+            }
+            $scope.inSelectedRepository = function (feature) {
+                if (!$scope.selectedRepository || !('repository' in $scope.selectedRepository)) {
+                    return "";
+                }
+                if (!feature || !('RepositoryName' in feature)) {
+                    return "";
+                }
+                if (feature['RepositoryName'] === $scope.selectedRepository['repository']) {
+                    return "in-selected-repository";
+                }
+                return "";
+            };
+            $scope.isValidRepository = function () {
+                return Core.isBlank($scope.newRepositoryURI);
+            };
+            $scope.installRepository = function () {
+                var repoURL = $scope.newRepositoryURI;
+                Core.notification('info', 'Adding feature repository URL');
+                Karaf.installRepository(workspace, jolokia, repoURL, function () {
+                    Core.notification('success', 'Added feature repository URL');
+                    $scope.selectedRepository = {};
+                    $scope.selectedRepositoryId = '';
+                    $scope.responseJson = null;
+                    $scope.triggerRefresh();
+                }, function (response) {
+                    Karaf.log.error('Failed to add feature repository URL ', repoURL, ' due to ', response.error);
+                    Karaf.log.info('stack trace: ', response.stacktrace);
+                    Core.$apply($scope);
+                });
+            };
+            $scope.uninstallRepository = function () {
+                var repoURI = $scope.selectedRepository['uri'];
+                Core.notification('info', 'Removing feature repository ' + repoURI);
+                Karaf.uninstallRepository(workspace, jolokia, repoURI, function () {
+                    Core.notification('success', 'Removed feature repository ' + repoURI);
+                    $scope.responseJson = null;
+                    $scope.selectedRepositoryId = '';
+                    $scope.selectedRepository = {};
+                    $scope.triggerRefresh();
+                }, function (response) {
+                    Karaf.log.error('Failed to remove feature repository ', repoURI, ' due to ', response.error);
+                    Karaf.log.info('stack trace: ', response.stacktrace);
+                    Core.$apply($scope);
+                });
+            };
+            $scope.triggerRefresh = function () {
+                jolokia.request({
+                    type: 'read',
+                    method: 'POST',
+                    mbean: featuresMBean
+                }, Core.onSuccess(render));
+            };
+            $scope.install = function (feature) {
+                //$('.popover').remove();
+                Core.notification('info', 'Installing feature ' + feature.Name);
+                Karaf.installFeature(workspace, jolokia, feature.Name, feature.Version, function () {
+                    Core.notification('success', 'Installed feature ' + feature.Name);
+                    $scope.installedFeatures.add(feature);
+                    $scope.responseJson = null;
+                    $scope.triggerRefresh();
+                    //Core.$apply($scope);
+                }, function (response) {
+                    Karaf.log.error('Failed to install feature ', feature.Name, ' due to ', response.error);
+                    Karaf.log.info('stack trace: ', response.stacktrace);
+                    Core.$apply($scope);
+                });
+            };
+            $scope.uninstall = function (feature) {
+                //$('.popover').remove();
+                Core.notification('info', 'Uninstalling feature ' + feature.Name);
+                Karaf.uninstallFeature(workspace, jolokia, feature.Name, feature.Version, function () {
+                    Core.notification('success', 'Uninstalled feature ' + feature.Name);
+                    $scope.installedFeatures.remove(feature);
+                    $scope.responseJson = null;
+                    $scope.triggerRefresh();
+                    //Core.$apply($scope);
+                }, function (response) {
+                    Karaf.log.error('Failed to uninstall feature ', feature.Name, ' due to ', response.error);
+                    Karaf.log.info('stack trace: ', response.stacktrace);
+                    Core.$apply($scope);
+                });
+            };
+            $scope.filteredRows = ['Bundles', 'Configurations', 'Configuration Files', 'Dependencies'];
+            $scope.showRow = function (key, value) {
+                if ($scope.filteredRows.indexOf(key) !== -1) {
+                    return false;
+                }
+                if (angular.isArray(value)) {
+                    if (value.length === 0) {
+                        return false;
+                    }
+                }
+                if (angular.isString(value)) {
+                    if (Core.isBlank(value)) {
+                        return false;
+                    }
+                }
+                if (angular.isObject(value)) {
+                    if (!value || angular.equals(value, {})) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+            $scope.installed = function (installed) {
+                var answer = Core.parseBooleanValue(installed);
+                return answer;
+            };
+            $scope.showValue = function (value) {
+                if (angular.isArray(value)) {
+                    var answer = ['<ul class="zebra-list">'];
+                    value.forEach(function (v) { answer.push('<li>' + v + '</li>'); });
+                    answer.push('</ul>');
+                    return answer.join('\n');
+                }
+                if (angular.isObject(value)) {
+                    var answer = ['<table class="table">', '<tbody>'];
+                    angular.forEach(value, function (value, key) {
+                        answer.push('<tr>');
+                        answer.push('<td>' + key + '</td>');
+                        answer.push('<td>' + value + '</td>');
+                        answer.push('</tr>');
+                    });
+                    answer.push('</tbody>');
+                    answer.push('</table>');
+                    return answer.join('\n');
+                }
+                return "" + value;
+            };
+            $scope.getStateStyle = function (feature) {
+                if (Core.parseBooleanValue(feature.Installed)) {
+                    return "badge badge-success";
+                }
+                return "badge";
+            };
+            $scope.filterFeature = function (feature) {
+                if (Core.isBlank($scope.filter)) {
+                    return true;
+                }
+                if (feature.Id.has($scope.filter)) {
+                    return true;
+                }
+                return false;
+            };
+            function render(response) {
+                var responseJson = angular.toJson(response.value);
+                if ($scope.responseJson !== responseJson) {
+                    $scope.responseJson = responseJson;
+                    //log.debug("Got response: ", response.value);
+                    if (response['value']['Features'] === null) {
+                        $scope.featuresError = true;
+                    }
+                    else {
+                        $scope.featuresError = false;
+                    }
+                    $scope.features = [];
+                    $scope.repositories = [];
+                    var features = [];
+                    var repositories = [];
+                    Karaf.populateFeaturesAndRepos(response.value, features, repositories);
+                    var installedFeatures = features.filter(function (f) { return Core.parseBooleanValue(f.Installed); });
+                    var uninstalledFeatures = features.filter(function (f) { return !Core.parseBooleanValue(f.Installed); });
+                    //log.debug("repositories: ", repositories);
+                    $scope.installedFeatures = _.sortBy(installedFeatures, function (f) { return f['Name']; });
+                    uninstalledFeatures = _.sortBy(uninstalledFeatures, function (f) { return f['Name']; });
+                    _.sortBy(repositories, 'id').forEach(function (repo) {
+                        $scope.repositories.push({
+                            repository: repo['id'],
+                            uri: repo['uri'],
+                            features: _.filter(uninstalledFeatures, function (f) { return f['RepositoryName'] === repo['id']; })
+                        });
+                    });
+                    if (!Core.isBlank($scope.newRepositoryURI)) {
+                        var selectedRepo = _.find(repositories, function (r) { return r['uri'] === $scope.newRepositoryURI; });
+                        if (selectedRepo) {
+                            $scope.selectedRepositoryId = selectedRepo['id'];
+                        }
+                        $scope.newRepositoryURI = '';
+                    }
+                    if (Core.isBlank($scope.selectedRepositoryId)) {
+                        $scope.selectedRepository = _.first($scope.repositories);
+                    }
+                    else {
+                        $scope.selectedRepository = _.find($scope.repositories, function (r) { return r.repository === $scope.selectedRepositoryId; });
+                    }
+                    Core.$apply($scope);
+                }
+            }
+        }]);
+})(Karaf || (Karaf = {}));
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.NavBarController", ["$scope", "workspace", function ($scope, workspace) {
+            $scope.hash = workspace.hash();
+            $scope.isKarafEnabled = workspace.treeContainsDomainAndProperties("org.apache.karaf");
+            $scope.isFeaturesEnabled = Karaf.getSelectionFeaturesMBean(workspace);
+            $scope.isScrEnabled = Karaf.getSelectionScrMBean(workspace);
+            $scope.$on('$routeChangeSuccess', function () {
+                $scope.hash = workspace.hash();
+            });
+            $scope.isActive = function (nav) {
+                return workspace.isLinkActive(nav);
+            };
+            $scope.isPrefixActive = function (nav) {
+                return workspace.isLinkPrefixActive(nav);
+            };
+        }]);
+})(Karaf || (Karaf = {}));
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.ScrComponentController", ["$scope", "$location", "workspace", "jolokia", "$routeParams", function ($scope, $location, workspace, jolokia, $routeParams) {
+            $scope.srcComponentsUrl = Core.url('/osgi/scr-components' + workspace.hash());
+            $scope.name = $routeParams['name'];
+            populateTable();
+            function populateTable() {
+                $scope.row = Karaf.getComponentByName(workspace, jolokia, $scope.name);
+                Core.$apply($scope);
+            }
+            $scope.activate = function () {
+                Karaf.activateComponent(workspace, jolokia, $scope.row['Name'], function () {
+                    console.log("Activated!");
+                }, function () {
+                    console.log("Failed to activate!");
+                });
+            };
+            $scope.deactivate = function () {
+                Karaf.deactivateComponent(workspace, jolokia, $scope.row['Name'], function () {
+                    console.log("Deactivated!");
+                }, function () {
+                    console.log("Failed to deactivate!");
+                });
+            };
+        }]);
+})(Karaf || (Karaf = {}));
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            $scope.component = empty();
+            // caches last jolokia result
+            $scope.result = [];
+            // rows in components table
+            $scope.components = [];
+            // selected components
+            $scope.selectedComponents = [];
+            $scope.scrOptions = {
+                data: 'components',
+                sortInfo: { "sortBy": "Name", "ascending": true },
+                selectedItems: $scope.selectedComponents,
+                columnDefs: [
+                    {
+                        field: 'Name',
+                        displayName: 'Name',
+                        cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.Name}}</a></div>'
+                    },
+                    {
+                        field: 'State',
+                        displayName: 'State',
+                        cellTemplate: '{{row.entity.State}}'
+                    }
+                ],
+                primaryKeyFn: function (entity) { return entity.Name; }
+            };
+            var scrMBean = Karaf.getSelectionScrMBean(workspace);
+            if (scrMBean) {
+                var components = Karaf.getAllComponents(workspace, jolokia);
+                addUrlField(components);
+                render(components);
+            }
+            function addUrlField(components) {
+                components.forEach(function (component) {
+                    return component.Url = Core.url("/osgi/scr-component/" + component.Name + workspace.hash());
+                });
+            }
+            $scope.activate = function () {
+                $scope.selectedComponents.forEach(function (component) {
+                    Karaf.activateComponent(workspace, jolokia, component.Name, function () {
+                        console.log("Activated!");
+                    }, function () {
+                        console.log("Failed to activate!");
+                    });
+                });
+            };
+            $scope.deactivate = function () {
+                $scope.selectedComponents.forEach(function (component) {
+                    Karaf.deactivateComponent(workspace, jolokia, component.Name, function () {
+                        console.log("Deactivated!");
+                    }, function () {
+                        console.log("Failed to deactivate!");
+                    });
+                });
+            };
+            function empty() {
+                return [
+                    {
+                        Name: "",
+                        Status: false
+                    }
+                ];
+            }
+            function render(components) {
+                if (!angular.equals($scope.result, components)) {
+                    $scope.components = components;
+                    $scope.result = $scope.components;
+                    Core.$apply($scope);
+                }
+            }
+        }]);
+})(Karaf || (Karaf = {}));
+/// <reference path="../../includes.ts"/>
+/// <reference path="karafHelpers.ts"/>
+/// <reference path="karafPlugin.ts"/>
+/**
+ * @module Karaf
+ */
+var Karaf;
+(function (Karaf) {
+    Karaf._module.controller("Karaf.ServerController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            $scope.data = {
+                name: "",
+                version: "",
+                state: "",
+                root: "",
+                startLevel: "",
+                framework: "",
+                frameworkVersion: "",
+                location: "",
+                sshPort: "",
+                rmiRegistryPort: "",
+                rmiServerPort: "",
+                pid: ""
+            };
+            $scope.$on('jmxTreeUpdated', reloadFunction);
+            $scope.$watch('workspace.tree', reloadFunction);
+            function reloadFunction() {
+                // if the JMX tree is reloaded its probably because a new MBean has been added or removed
+                // so lets reload, asynchronously just in case
+                setTimeout(loadData, 50);
+            }
+            function loadData() {
+                console.log("Loading Karaf data...");
+                jolokia.search("org.apache.karaf:type=admin,*", Core.onSuccess(render));
+            }
+            function render(response) {
+                // grab the first mbean as there should ideally only be one karaf in the JVM
+                if (angular.isArray(response)) {
+                    var mbean = response[0];
+                    if (mbean) {
+                        jolokia.getAttribute(mbean, "Instances", Core.onSuccess(function (response) {
+                            onInstances(response, mbean);
+                        }));
+                    }
+                }
+            }
+            function onInstances(instances, mbean) {
+                if (instances) {
+                    var parsedMBean = Core.parseMBean(mbean);
+                    var instanceName = 'root';
+                    if ('attributes' in parsedMBean) {
+                        if ('name' in parsedMBean['attributes']) {
+                            instanceName = parsedMBean['attributes']['name'];
+                        }
+                    }
+                    //log.debug("mbean: ", Core.parseMBean(mbean));
+                    //log.debug("Instances: ", instances);
+                    // the name is the first child
+                    var rootInstance = instances[instanceName];
+                    $scope.data.name = rootInstance.Name;
+                    $scope.data.state = rootInstance.State;
+                    $scope.data.root = rootInstance["Is Root"];
+                    $scope.data.location = rootInstance.Location;
+                    $scope.data.sshPort = rootInstance["SSH Port"];
+                    $scope.data.rmiRegistryPort = rootInstance["RMI Registry Port"];
+                    $scope.data.rmiServerPort = rootInstance["RMI Server Port"];
+                    $scope.data.pid = rootInstance.Pid;
+                    // we need to get these data from the system mbean
+                    $scope.data.version = "?";
+                    $scope.data.startLevel = "?";
+                    $scope.data.framework = "?";
+                    $scope.data.frameworkVersion = "?";
+                    var systemMbean = "org.apache.karaf:type=system,name=" + rootInstance.Name;
+                    // get more data, and its okay to do this synchronously
+                    var response = jolokia.request({ type: "read", mbean: systemMbean,
+                        attribute: ["StartLevel", "Framework", "Version"] }, Core.onSuccess(null));
+                    var obj = response.value;
+                    if (obj) {
+                        $scope.data.version = obj.Version;
+                        $scope.data.startLevel = obj.StartLevel;
+                        $scope.data.framework = obj.Framework;
+                    }
+                    // and the osgi framework version is the bundle version
+                    var response2 = jolokia.search("osgi.core:type=bundleState,*", Core.onSuccess(null));
+                    if (angular.isArray(response2)) {
+                        var mbean = response2[0];
+                        if (mbean) {
+                            // get more data, and its okay to do this synchronously
+                            var response3 = jolokia.request({ type: 'exec', mbean: mbean, operation: 'getVersion(long)', arguments: [0] }, Core.onSuccess(null));
+                            var obj3 = response3.value;
+                            if (obj3) {
+                                $scope.data.frameworkVersion = obj3;
+                            }
+                        }
+                    }
+                }
+                // ensure web page is updated
+                Core.$apply($scope);
+            }
+        }]);
+})(Karaf || (Karaf = {}));
 var Camel;
 (function (Camel) {
     var Context = (function () {
@@ -11177,7 +11122,6 @@ var Camel;
     }());
     Camel.Context = Context;
 })(Camel || (Camel = {}));
-
 /// <reference path="context.ts"/>
 var Camel;
 (function (Camel) {
@@ -11257,7 +11201,6 @@ var Camel;
     }());
     Camel.ContextsService = ContextsService;
 })(Camel || (Camel = {}));
-
 /// <reference path="context.ts"/>
 /// <reference path="contexts.service.ts"/>
 var Camel;
@@ -11372,7 +11315,6 @@ var Camel;
         controller: ContextsController
     };
 })(Camel || (Camel = {}));
-
 /// <reference path="contexts.component.ts"/>
 /// <reference path="contexts.service.ts"/>
 var Camel;
@@ -11382,7 +11324,6 @@ var Camel;
         .component('contexts', Camel.contextsComponent)
         .service('contextsService', Camel.ContextsService);
 })(Camel || (Camel = {}));
-
 /// <reference path="../camelPlugin.ts"/>
 var Camel;
 (function (Camel) {
@@ -11512,7 +11453,6 @@ var Camel;
             loadBlockedData();
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../../../includes.ts"/>
 /// <reference path="../camelPlugin.ts"/>
 var Camel;
@@ -11621,7 +11561,6 @@ var Camel;
             loadData();
         }]);
 })(Camel || (Camel = {}));
-
 var Camel;
 (function (Camel) {
     var Property = (function () {
@@ -11641,7 +11580,6 @@ var Camel;
     }());
     Camel.Property = Property;
 })(Camel || (Camel = {}));
-
 /// <reference path="../camelPlugin.ts"/>
 /// <reference path="property.ts"/>
 var Camel;
@@ -11686,7 +11624,6 @@ var Camel;
     Camel.PropertiesService = PropertiesService;
     Camel._module.service('propertiesService', PropertiesService);
 })(Camel || (Camel = {}));
-
 /// <reference path="../camelPlugin.ts"/>
 /// <reference path="properties.service.ts"/>
 var Camel;
@@ -11740,7 +11677,6 @@ var Camel;
             }, 1000);
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../camelPlugin.ts"/>
 /// <reference path="properties.service.ts"/>
 var Camel;
@@ -11786,7 +11722,6 @@ var Camel;
             }, 1000);
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../camelPlugin.ts"/>
 /// <reference path="properties.service.ts"/>
 var Camel;
@@ -11850,7 +11785,6 @@ var Camel;
             }, 1000);
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../camelPlugin.ts"/>
 /// <reference path="properties.service.ts"/>
 var Camel;
@@ -11895,7 +11829,6 @@ var Camel;
             }, 1000);
         }]);
 })(Camel || (Camel = {}));
-
 /// <reference path="../camelPlugin.ts"/>
 var Camel;
 (function (Camel) {
@@ -11947,6 +11880,13 @@ $templateCache.put('plugins/activemq/html/durableSubscribers.html','<div ng-cont
 $templateCache.put('plugins/activemq/html/jobs.html','<div ng-controller="ActiveMQ.JobSchedulerController">\n\n    <div class="row">\n      <div class="col-md-12">\n        <div class="pull-right">\n            <form class="form-inline">\n                <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length"\n                        hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeJob"\n                        ng-click="deleteJobsDialog.open()"\n                        title="Delete the selected jobs">\n                  <i class="fa fa-remove"></i> Delete\n                </button>\n                <button class="btn btn-default" ng-click="refresh()"\n                        title="Refreshes the list of subscribers">\n                    <i class="fa fa-refresh"></i>\n                </button>\n            </form>\n        </div>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="gridStyle" ng-grid="gridOptions"></div>\n    </div>\n\n    <div hawtio-confirm-dialog="deleteJobsDialog.show" ok-button-text="Yes" cancel-button-text="No" on-ok="deleteJobs()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the jobs</p>\n      </div>\n    </div>\n\n</div>');
 $templateCache.put('plugins/activemq/html/layoutActiveMQTree.html','<div class="tree-nav-layout">\n\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n    <div class="tree-nav-sidebar-header" ng-controller="ActiveMQ.TreeHeaderController">\n      <div class="pull-right">\n        <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>\n        <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>\n      </div>\n    </div>\n    <div id="activemqtree" class="tree-nav-sidebar-content" ng-controller="ActiveMQ.TreeController"></div>\n  </div>\n\n  <div class="tree-nav-main">\n    <jmx-header></jmx-header>\n    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="ActiveMQ.TabsController">\n      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">\n        <a ng-href="{{tab.href}}">{{tab.title}}</a>\n      </li>\n      <li class="dropdown overflow">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          More <span class="caret"></span>\n        </a>\n        <ul class="dropdown-menu" role="menu"></ul>\n      </li>\n    </ul>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/preferences.html','<div ng-controller="ActiveMQ.PreferencesController">\n  <div hawtio-form-2="config" entity="entity"></div>\n</div>\n');
+$templateCache.put('plugins/karaf/html/feature-details.html','<div>\n    <table class="overviewSection">\n        <tr ng-hide="hasFabric">\n            <td></td>\n            <td class="less-big">\n                <div class="btn-group">\n                  <button ng-click="uninstall(name,version)" \n                          class="btn btn-default" \n                          title="uninstall" \n                          hawtio-show\n                          object-name="{{featuresMBean}}"\n                          method-name="uninstallFeature">\n                    <i class="fa fa-power-off"></i>\n                  </button>\n                  <button ng-click="install(name,version)" \n                          class="btn btn-default" \n                          title="install" \n                          hawtio-show\n                          object-name="{{featuresMBean}}"\n                          method-name="installFeature">\n                    <i class="fa fa-play-circle"></i>\n                  </button>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>Name:</strong></td>\n            <td class="less-big">{{row.Name}}</td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>Version:</strong></td>\n            <td class="less-big">{{row.Version}}</td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>Repository:</strong></td>\n            <td class="less-big">{{row.RepositoryName}}</td>\n        </tr>\n        <tr>\n          <td class="pull-right"><strong>Repository URI:</strong></td>\n          <td class="less-big">{{row.RepositoryURI}}</td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>State:</strong></td>\n            <td class="wrap">\n                <div ng-switch="row.Installed">\n                    <p style="display: inline;" ng-switch-when="true">Installed</p>\n\n                    <p style="display: inline;" ng-switch-default>Not Installed</p>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionFeatures">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionFeatures"\n                               href="collapseFeatures">\n                                Features\n                            </a>\n                        </div>\n                        <div id="collapseFeatures" class="accordion-body collapse in">\n                            <ul class="accordion-inner">\n                                <li ng-repeat="feature in row.Dependencies">\n                                    <a href=\'#/osgi/feature/{{feature.Name}}/{{feature.Version}}?p=container\'>{{feature.Name}}/{{feature.Version}}</a>\n                                </li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionBundles">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionBundles"\n                               href="collapseBundles">\n                                Bundles\n                            </a>\n                        </div>\n                        <div id="collapseBundles" class="accordion-body collapse in">\n                            <ul class="accordion-inner">\n                                <li ng-repeat="bundle in row.BundleDetails">\n                                    <div ng-switch="bundle.Installed">\n                                        <p style="display: inline;" ng-switch-when="true">\n                                            <a href=\'#/osgi/bundle/{{bundle.Identifier}}?p=container\'>{{bundle.Location}}</a></p>\n\n                                        <p style="display: inline;" ng-switch-default>{{bundle.Location}}</p>\n                                    </div>\n                                </li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionConfigurations">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionConfigurations"\n                               href="collapsConfigurations">\n                                Configurations\n                            </a>\n                        </div>\n                        <div id="collapsConfigurations" class="accordion-body collapse in">\n                            <table class="accordion-inner">\n                                <tr ng-repeat="(pid, value) in row.Configurations">\n                                    <td>\n                                      <p>{{value.Pid}}</p>\n                                      <div hawtio-editor="toProperties(value.Elements)" mode="props"></div></td>\n                                </tr>\n                            </table>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionConfigurationFiles">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionConfigurationFiles"\n                               href="collapsConfigurationFiles">\n                                Configuration Files\n                            </a>\n                        </div>\n                        <div id="collapsConfigurationFiles" class="accordion-body collapse in">\n                            <table class="accordion-inner">\n                                <tr ng-repeat="file in row.Files">\n                                    <td>{{file.Files}}</td>\n                                </tr>\n                            </table>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n    </table>\n</div>\n');
+$templateCache.put('plugins/karaf/html/feature.html','<div class="controller-section" ng-controller="Karaf.FeatureController">\n  <div class="row">\n    <div class="col-md-4">\n      <h1>{{row.id}}</h1>\n    </div>\n  </div>\n\n  <div ng-include src="\'plugins/karaf/html/feature-details.html\'"></div>\n\n</div>\n\n');
+$templateCache.put('plugins/karaf/html/features.html','<div class="controller-section" ng-controller="Karaf.FeaturesController">\n\n  <div class="row section-filter centered">\n    <input type="text" class="search-query" placeholder="Filter..." ng-model="filter">\n    <i class="fa fa-remove clickable" title="Clear filter" ng-click="filter = \'\'"></i>\n  </div>\n\n  <script type="text/ng-template" id="popoverTemplate">\n    <small>\n      <table class="table">\n        <tbody>\n        <tr ng-repeat="(k, v) in feature track by $index" ng-show="showRow(k, v)">\n          <td class="property-name">{{k}}</td>\n          <td class="property-value" ng-bind="showValue(v)"></td>\n        </tr>\n        </tbody>\n      </table>\n    </small>\n  </script>\n\n  <p></p>\n  <div class="row">\n    <div class="col-md-6">\n      <h3 class="centered">Installed Features</h3>\n      <div ng-show="featuresError" class="alert alert-warning">\n        The feature list returned by the server was null, please check the logs and Karaf console for errors.\n      </div>\n      <div class="bundle-list"\n           hawtio-auto-columns=".bundle-item">\n        <div ng-repeat="feature in installedFeatures"\n             class="bundle-item"\n             ng-show="filterFeature(feature)"\n             ng-class="inSelectedRepository(feature)">\n          <a ng-href="/osgi/feature/{{feature.Id}}?p=container"\n             hawtio-template-popover title="Feature details">\n            <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>\n          </a>\n          <span ng-hide="hasFabric">\n            <a class="toggle-action"\n               href=""\n               ng-show="installed(feature.Installed)"\n               ng-click="uninstall(feature)"\n               hawtio-show\n               object-name="{{featuresMBean}"\n               method-name="uninstallFeature">\n              <i class="fa fa-power-off"></i>\n            </a>\n            <a class="toggle-action"\n               href=""\n               ng-hide="installed(feature.Installed)"\n               ng-click="install(feature)"\n               hawtio-show\n               object-name="{{featuresMBean}"\n               method-name="installFeature">\n              <i class="fa fa-play-circle"></i>\n            </a>\n          </span>\n        </div>\n      </div>\n    </div>\n\n    <div class="col-md-6">\n      <h3 class="centered">Available Features</h3>\n      <div class="row repository-browser-toolbar centered">\n        <select id="repos"\n                class="input-xlarge"\n                title="Feature repositories"\n                ng-model="selectedRepository"\n                ng-options="r.repository for r in repositories"></select>\n        <button class="btn btn-default"\n                title="Remove selected feature repository"\n                ng-click="uninstallRepository()"\n                ng-hide="hasFabric"\n                hawtio-show\n                object-name="{{featuresMBean}}"\n                method-name="removeRepository"><i class="fa fa-minus"></i></button>\n        <input type="text"\n               class="input-xlarge"\n               placeholder="mvn:foo/bar/1.0/xml/features"\n               title="New feature repository URL"\n               ng-model="newRepositoryURI"\n               ng-hide="hasFabric"\n               hawtio-show\n               object-name="{{featuresMBean}}"\n               method-name="addRepository">\n        <button class="btn btn-default"\n                title="Add feature repository URL"\n                ng-hide="hasFabric"\n                ng-click="installRepository()"\n                ng-disabled="isValidRepository()"\n                hawtio-show\n                object-name="{{featuresMBean}}"\n                method-name="addRepository"><i class="fa fa-plus"></i></button>\n      </div>\n      <div class="row">\n        <div class="bundle-list"\n             hawtio-auto-columns=".bundle-item">\n          <div ng-repeat="feature in selectedRepository.features"\n               class="bundle-item"\n               ng-show="filterFeature(feature)"\n               hawtio-template-popover title="Feature details">\n            <a ng-href="/osgi/feature/{{feature.Id}}?p=container">\n              <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>\n            </a >\n            <span ng-hide="hasFabric">\n              <a class="toggle-action"\n                 href=""\n                 ng-show="installed(feature.Installed)"\n                 ng-click="uninstall(feature)"\n                 hawtio-show\n                 object-name="{{featuresMBean}"\n                 method-name="uninstallFeature">\n                <i class="fa fa-power-off"></i>\n              </a>\n              <a class="toggle-action"\n                 href=""\n                 ng-hide="installed(feature.Installed)"\n                 ng-click="install(feature)"\n                 hawtio-show\n                 object-name="{{featuresMBean}"\n                 method-name="installFeature">\n                <i class="fa fa-play-circle"></i>\n              </a>\n            </span>\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n\n</div>\n');
+$templateCache.put('plugins/karaf/html/scr-component-details.html','<div class="row toolbar-pf" ng-hide="hasFabric">\n  <div class="col-sm-12">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button class="btn btn-default" ng-click="activate()" hawtio-show object-name="{{scrMBean}}"\n                method-name="activateComponent">\n          <span class="fa fa-play-circle"></span> Activate\n        </button>\n        <button class="btn btn-default" ng-click="deactivate()" hawtio-show object-name="{{scrMBean}}"\n                method-name="deactiveateComponent">\n          <span class="fa fa-stop-circle"></span> Deactivate\n        </button>\n      </div>\n    </form>\n  </div>\n</div>\n\n<h2>Details</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal src-component-details">\n      <dt>Id</dt>\n      <dd>{{row.Id}}</dd>\n      <dt>Name</dt>\n      <dd>{{row.Name}}</dd>\n      <dt>State</dt>\n      <dd>{{row.State}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>Properties</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal src-component-details">\n      <dt ng-repeat-start="(key, value) in row.Properties">{{key}}</dt>\n      <dd ng-repeat-end ng-repeat="v in value">{{v.Value}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>References</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <table class="table">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Availability</th>\n          <th>Cardinality</th>\n          <th>Policy</th>\n          <th>Bound Services</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(key, value) in row.References.values">\n          <td>{{value.Name}}</td>\n          <td>{{value.Availability}}</td>\n          <td>{{value.Cardinality}}</td>\n          <td>{{value.Policy}}</td>\n          <td>\n            <ul class="src-component-bound-services">\n              <li ng-repeat="id in value[\'Bound Services\']">\n                <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>\n              </li>\n            </ul>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n');
+$templateCache.put('plugins/karaf/html/scr-component.html','<div class="controller-section" ng-controller="Karaf.ScrComponentController">\n\n  <h1>{{row.Id}}</h1>\n\n  <div class="breadcrumb">\n    <a ng-href="{{srcComponentsUrl}}"><span class="fa fa-angle-left"></span> Back to Declarative Services</a>\n  </div>\n\n  <div ng-include src="\'plugins/karaf/html/scr-component-details.html\'"></div>\n\n</div>');
+$templateCache.put('plugins/karaf/html/scr-components.html','<h1>Declarative Services</h1>\n\n<div class="controller-section" ng-controller="Karaf.ScrComponentsController">\n\n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="search1" class="sr-only">Filter</label>\n            <input id="search1" type="search" class="form-control" ng-model="scrOptions.filterOptions.filterText" placeholder="Filter...">\n            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group">\n          <button ng-disabled="selectedComponents.length == 0" \n                  class="btn btn-default" \n                  ng-click="activate()"\n                  hawtio-show\n                  object-name="{{scrMBean}}"\n                  method-name="activateComponent"><i\n                  class="fa fa-play-circle"></i> Activate\n          </button>\n          <button ng-disabled="selectedComponents.length == 0" \n                  class="btn btn-default" \n                  ng-click="deactivate()"\n                  hawtio-show\n                  object-name="{{scrMBean}}"\n                  method-name="deactiveateComponent"><i\n                  class="fa fa-stop-circle"></i> Deactivate\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-md-12">\n      <table class="table table-striped table-src-components" hawtio-simple-table="scrOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
+$templateCache.put('plugins/karaf/html/server.html','<h1>Server</h1>\n\n<div class="controller-section" ng-controller="Karaf.ServerController">\n\n  <div class="row">\n    <div class="col-md-12">\n      <dl class="dl-horizontal server-details">\n        <dt>Name</dt>\n        <dd>{{data.name}}</dd>\n        <dt>Version</dt>\n        <dd>{{data.version}}</dd>\n        <dt>State</dt>\n        <dd>{{data.state}}</dd>\n        <dt>Is root</dt>\n        <dd>{{data.root}}</dd>\n        <dt>Start Level</dt>\n        <dd>{{data.startLevel}}</dd>\n        <dt>Framework</dt>\n        <dd>{{data.framework}}</dd>\n        <dt>Framework Version</dt>\n        <dd>{{data.frameworkVersion}}</dd>\n        <dt>Location</dt>\n        <dd>{{data.location}}</dd>\n        <dt>SSH Port</dt>\n        <dd>{{data.sshPort}}</dd>\n        <dt>RMI Registry Port</dt>\n        <dd>{{data.rmiRegistryPort}}</dd>\n        <dt>RMI Server Port</dt>\n        <dd>{{data.rmiServerPort}}</dd>\n        <dt>PID</dt>\n        <dd>{{data.pid}}</dd>\n      </dl>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/bundle-list.html','<h1>Bundles</h1>\n\n<div class="bundles-container cards-pf controller-section" ng-controller="Osgi.BundleListController">\n\n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions">\n        <div class="form-group">\n          <label class="sr-only" for="filter">Install Bundle</label>\n          <div class="input-group" hawtio-show object-name="{{frameworkMBean}}" method-name="installBundle">\n            <input type="text" class="form-control" placeholder="Install Bundle..." ng-model="bundleUrl">\n            <div class="input-group-btn">\n              <button type="button" class="btn btn-default" ng-disabled="installDisabled()" ng-click="install()"\n                      title="Install">\n                <i class="fa fa-download"></i>\n              </button>\n            </div>\n          </div>\n        </div>\n        <div class="form-group">\n          <input type="text" class="form-control" ng-model="display.bundleFilter" placeholder="Filter by keyword..." autocomplete="off">\n        </div>\n        <div class="toolbar-pf-action-right">\n          <div class="form-group toolbar-pf-view-selector">\n            <a ng-href="{{listViewUrl}}" class="btn btn-link" title="Grid view">\n              <i class="fa fa-th"></i>\n            </a>\n            <a ng-href="{{tableViewUrl}}" class="btn btn-link" title="Table view">\n              <i class="fa fa-table"></i>\n            </a>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n  \n  <div id="toolbar-row-2" class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions form-inline">\n        <div class="form-group">\n          <label class="sr-only" for="service-filter">Service</label>\n          <select pf-select id="service-filter" title="Filter by service..." ng-model="display.showBundleGroups"\n                  ng-options="service.name for service in availableServices track by service.id" multiple>\n          </select>\n        </div>\n        <div class="form-group">\n          <label for="sortField">Sort by</label>\n          <select id="sortField" class="form-control btn btn-default" ng-model="display.sortField">\n            <option value="Identifier">ID</option>\n            <option value="Name">Name</option>\n            <option value="SymbolicName">Symbolic Name</option>\n          </select>\n        </div>\n        <div class="form-group">\n          <label for="displayField">Display</label>\n          <select id="displayField" class="form-control btn btn-default" ng-model="display.bundleField">\n            <option value="Name">Name</option>\n            <option value="SymbolicName">Symbolic Name</option>\n          </select>\n        </div>\n        <div class="form-group">\n          <label for="startLevelFilter">Start Level</label>\n          <input id="startLevelFilter" type="number" min="0" class="form-control" ng-model="display.startLevelFilter">\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="container-fluid container-cards-pf bundle-cards">\n    <div class="row row-cards-pf">\n      <div ng-repeat="bundle in bundles" ng-show="filterBundle(bundle)">\n        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">\n          <div class="card-pf card-pf-view card-pf-view-select" hawtio-template-popover title="Bundle details" ng-click="showDetails(bundle)">\n            <div class="content">\n              <table>\n                <tr>\n                  <td><span class="bundle-state" ng-class="bundle.State.toLowerCase()"></span></td>\n                  <td>{{getLabel(bundle)}}</td>\n                </tr>\n              </table>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <script type="text/ng-template" id="popoverTemplate">\n    <small>\n      <table class="table">\n        <tbody>\n        <tr ng-repeat="(k, v) in bundle track by $index">\n          <td class="property-name">{{k}}</td>\n          <td class="property-value">{{v}}</td>\n        </tr>\n        </tbody>\n      </table>\n    </small>\n  </script>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/bundle.html','<div class="controller-section" ng-controller="Osgi.BundleController">\n\n  <h1>{{row.Headers[\'Bundle-Name\'].Value}}</h1>\n\n  <div class="breadcrumb">\n    <a href="#" onclick="window.history.back()"><span class="fa fa-angle-left"></span> Back to Bundles</a>\n  </div>\n\n  <div class="toolbar-pf">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button ng-click="startBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="startBundle">Start</button>\n        <button ng-click="stopBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="stopBundle">Stop</button>\n        <button ng-click="refreshBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="refreshBundle">Refresh</button>\n        <button ng-click="updateBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="updateBundle">Update</button>\n        <button ng-click="uninstallBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="uninstallBundle">Uninstall</button>\n      </div>\n    </form>\n  </div>\n\n  <h2>Details</h2>\n\n  <dl class="dl-horizontal osgi-bundle-details-dl">\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Fragment&nbsp;ID</span>\n      <span ng-switch-default>Bundle&nbsp;ID</span>\n    </dt>\n    <dd>\n      {{row.Identifier}}\n    </dd>\n    <dt>\n      Bundle&nbsp;Name\n    </dt>\n    <dd>\n      {{row.Headers[\'Bundle-Name\'].Value}}\n    </dd>\n    <dt>\n      Symbolic&nbsp;Name\n    </dt>\n    <dd>\n      <span class="label label-default">{{row.SymbolicName}}</span>\n    </dd>\n    <dt>\n      Version\n    </dt>\n    <dd>\n      {{row.Version}}\n    </dd>\n    <dt>\n      Start&nbsp;Level\n    </dt>\n    <dd>\n      {{row.StartLevel}}\n    </dd>\n    <dt>\n      Location\n    </dt>\n    <dd>\n      {{row.Location}}\n    </dd>\n    <dt>\n      State\n    </dt>\n    <dd>\n      <span class="label" ng-class="row.StateStyle">{{row.State.toLowerCase()}}</span>\n    </dd>\n    <dt>\n      Last&nbsp;Modified\n    </dt>\n    <dd>\n      {{row.LastModified | date:\'medium\'}}\n    </dd>\n    <div>\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Hosts</span>\n      <span ng-switch-default>Fragments</span>\n    </dt>\n    <dd ng-switch="row.Fragment">\n      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"/>\n      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"/>\n    </dd>\n  </dl>\n\n  <h2>Inspect Classloading</h2>\n\n  <div class="alert alert-dismissable" ng-class="\'alert-\' + classLoadingAlert.type" ng-if="classLoadingAlert">\n    <span class="pficon" ng-class="classLoadingAlert.icon"></span>\n    <button type="button" class="close" aria-hidden="true" ng-click="dismissClassLoadingAlert()">\n      <span class="pficon pficon-close"></span>\n    </button>\n    <span ng-bind-html="classLoadingAlert.message"></span>\n  </div>\n\n  <form class="form-inline inspect-classloading">\n    <div class="form-group">\n      <label class="control-label" for="exampleInput">Class Name</label>\n      <input type="text" class="form-control" ng-model="classToLoad">\n      <button class="btn btn-default" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">\n        Load Class\n      </button>\n    </div>\n  </form>\n\n  <form class="form-inline inspect-classloading">\n    <div class="form-group">\n      <label class="control-label" for="exampleInput">Resource Name</label>\n      <input type="text" class="form-control" ng-model="resourceToLoad">\n      <button class="btn btn-default" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">\n        Get Resource\n      </button>\n    </div>\n  </form>\n\n  <h2>Imported Packages</h2>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="(package, data) in row.ImportData">\n      <span id="import.{{package}}" class="label label-info">{{package}}</span>\n    </li>\n  </ul>\n\n  <div class="row">\n    <div id="unsatisfiedOptionalImports" class="col-md-12">\n    </div>\n  </div>\n\n  <h2>Exported Packages</h2>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="(package, data) in row.ExportData">\n      <span id="export.{{package}}" class="label label-success">{{package}}</span>\n    </li>\n  </ul>\n\n  <h2>Services</h2>\n\n  <h3>Registered Services</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.RegisteredServices">\n      <span id="registers.service.{{id}}" class="fa fa-cog text-success">{{id}}</span>\n    </li>\n  </ul>\n\n  <h3>Services used by this Bundle</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.ServicesInUse">\n      <span id="uses.service.{{id}}" class="fa fa-cog text-info">{{id}}</span>\n    </li>\n  </ul>\n\n  <h2>Other Bundles using this Bundle</h2>\n\n  <div class="row requiring-bundles">\n    <div class="col-md-12" ng-bind-html="row.RequiringBundles"></div>\n  </div>\n\n  <h2>Headers</h2>\n\n  <dl class="dl-horizontal osgi-bundle-headers-dl">\n    <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>\n    <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>\n  </dl>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/bundles.html','<div class="table-view" ng-controller="Osgi.BundlesController">\n\n  <h1>Bundles</h1>\n\n  <div class="row toolbar-pf table-view-pf-toolbar">\n    <div class="col-sm-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n            <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n            <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group">\n          <button type="button" class="btn btn-default" ng-disabled="selected.length == 0" ng-click="start()">\n            Start\n          </button>\n          <button type="button" class="btn btn-default" ng-disabled="selected.length == 0" ng-click="stop()">\n            Stop\n          </button>\n          <button type="button" class="btn btn-default" ng-disabled="selected.length == 0" ng-click="refresh()">\n            Refresh\n          </button>\n          <div class="dropdown btn-group dropdown-kebab-pf">\n            <button type="button" class="btn btn-link dropdown-toggle" id="dropdownKebab" data-toggle="dropdown"\n              aria-haspopup="true" aria-expanded="true" ng-disabled="selected.length == 0">\n              <span class="fa fa-ellipsis-v"></span>\n            </button>\n            <ul class="dropdown-menu" aria-labelledby="dropdownKebab">\n              <li><a href="#" ng-click="update()">Update</a></li>\n              <li><a href="#" ng-click="uninstall()">Uninstall</a></li>\n            </ul>\n          </div>        \n        </div>\n        <div class="form-group">\n          <label class="sr-only" for="filter">Install Bundle</label>\n          <div class="input-group" hawtio-show object-name="{{frameworkMBean}}" method-name="installBundle">\n            <input type="text" class="form-control" placeholder="Install Bundle..." ng-model="bundleUrl">\n            <div class="input-group-btn">\n              <button type="button" class="btn btn-default" ng-disabled="installDisabled()" ng-click="install()"\n                      title="Install">\n                <i class="fa fa-download"></i>\n              </button>\n            </div>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n  \n  <table class="table table-striped table-bordered osgi-bundles-table" hawtio-simple-table="gridOptions"></table>\n  \n  <div class="spinner spinner-lg loading-page" ng-if="loading"></div>\n\n</div>\n');
@@ -11957,14 +11897,7 @@ $templateCache.put('plugins/osgi/html/packages.html','<h1>Packages</h1>\n\n<div 
 $templateCache.put('plugins/osgi/html/pid-details.html','<div class="pid-details">\n  \n  <h1>{{zkPid || metaType.name || pid}}</h1>\n\n  <div class="breadcrumb">\n    <a ng-href="{{configurationUrl}}"><span class="fa fa-angle-left"></span> Back to Configuration</a>\n  </div>\n\n  <div class="row toolbar-pf">\n    <div class="col-sm-12">\n      <form class="toolbar-pf-actions">\n        <div class="form-group">\n          <button class="btn btn-default" ng-click="openAddPropertyDialog()" title="Add a new property value to this configuration">\n            Add property\n          </button>\n          <button class="btn btn-default" ng-click="setEditMode(true)" title="Edit this configuration" hawtio-show\n                  object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate">\n            Edit configuration\n          </button>\n        </div>\n        <div class="toolbar-pf-action-right">\n          <div class="form-group">\n            <button class="btn btn-default hawtio-btn-danger" ng-click="openDeletePidDialog()" title="Delete this configuration"\n                    hawtio-show object-name="{{configAdminMBean}}" method-name="delete">\n              Delete configuration\n            </button>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div ng-hide="editMode">\n    <div class="row config-admin-form view">\n      <div class="col-sm-12">\n        <div simple-form name="pidEditor" mode=\'view\' entity=\'entity\' data=\'schema\' schema="fullSchema"></div>\n      </div>\n    </div>\n  </div>\n  \n  <div ng-show="editMode">\n    <div class="row config-admin-form edit">\n      <div ng-show="newPid" class="col-sm-12 new-config-name-form">\n        <form class="form-horizontal" action="">\n          <fieldset>\n            <div class="spacer"></div>\n            <div class="form-group">\n              <label class="col-sm-2 control-label" title="The name of the configuration file">\n                Configuration name\n              </label>\n              <div class="col-sm-10">\n                <input type="text" title="The name of the configuration file" ng-required="true"\n                       ng-model="createForm.pidInstanceName" name="path" autofocus>\n              </div>\n            </div>\n          </fieldset>\n        </form>\n      </div>\n      <div class="col-sm-12">\n        <div simple-form name="pidEditor" mode=\'edit\' entity=\'entity\' data=\'schema\' schema="fullSchema" onSubmit="pidSave()"></div>\n      </div>\n    </div>\n    <div class="row">\n      <div class="col-sm-2"></div>\n      <div class="col-sm-10">\n        <button class="btn btn-primary" ng-show="newPid" ng-disabled="!canSave || !createForm.pidInstanceName" ng-click="pidSave()">Create</button>\n        <button class="btn btn-primary" ng-hide="newPid" ng-disabled="!canSave" ng-click="pidSave()">Save</button>\n        <button class="btn btn-default" ng-click="setEditMode(false)">Cancel</button>\n      </div>\n    </div>\n  </div>\n\n  <script type="text/ng-template" id="deletePropDialog.html">\n    <form name="deleteProperty" class="form-horizontal no-bottom-margin" ng-submit="deletePidPropConfirmed()">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Delete property \'{{deleteKey}}\'</h4>\n      </div>\n      <div class="modal-body">\n        <p class="lead">Are you sure?</p>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n        <button type="submit" class="btn btn-danger">Delete</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="deletePidDialog.html">\n    <form name="deletePid" class="form-horizontal" ng-submit="deletePidConfirmed()">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Delete configuration</h4>\n      </div>\n      <div class="modal-body">\n        <p>Delete {{pid}}?</p>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n        <button type="submit" class="btn btn-danger">Delete</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="addPropertyDialog.html">\n    <form name="addProperty" class="form-horizontal"\n          ng-submit="addPropertyConfirmed(addPropKey, addPropValue)">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Add property</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-2 control-label" for="propKey">Key</label>\n          <div class="col-sm-10">\n            <input type="text" class="form-control" id="propKey" placeholder="Key" ng-model="addPropKey" required>\n          </div>\n        </div>\n        <div class="form-group">\n          <label class="col-sm-2 control-label" for="propValue">Value</label>\n          <div class="col-sm-10">\n            <input type="text" class="form-control" id="propValue" placeholder="Value" ng-model="addPropValue"/>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n        <button type="submit" class="btn btn-primary">Add</button>\n      </div>\n    </form>\n  </script>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/pid.html','<div class="controller-section" ng-controller="Osgi.PidController">\n  <div ng-include src="\'plugins/osgi/html/pid-details.html\'"></div>\n</div>\n');
 $templateCache.put('plugins/osgi/html/services.html','<h1>Services</h1>\n\n<div class="controller-section" ng-controller="Osgi.ServiceController">\n\n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="search1" class="sr-only">Filter</label>\n            <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">\n            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="toolbar-pf-action-right" ng-show="services !== null">\n          {{filteredServices.length}} of {{services.length}}\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="spinner spinner-lg loading-page" ng-if="services === null"></div>\n\n  <div class="list-group list-view-pf list-view-pf-view">\n    <div class="list-group-item" ng-class="{\'list-view-pf-expand-active\': service.expanded}"\n         ng-repeat="service in services | filter:filterText as filteredServices">\n      <div class="list-group-item-header" ng-click="service.expanded = !service.expanded">\n        <div class="list-view-pf-expand">\n          <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': service.expanded}"></span>\n        </div>\n        <div class="list-view-pf-main-info">\n          <div class="list-view-pf-body">\n            <div class="list-view-pf-description">\n              <div class="list-group-item-heading">\n                ID {{service.Identifier}}\n              </div>\n              <div class="list-group-item-text" ng-bind-html="service.BundleIdentifier">\n              </div>\n            </div>\n            <div class="list-view-pf-additional-info">\n              <div class="list-view-pf-additional-info-item" title="Object Classes">\n                {{service.objectClass[0]}}{{service.objectClass.length > 1 ? \'...\' : \'\'}}\n              </div>\n            </div>              \n          </div>\n        </div>\n      </div>\n      <div class="list-group-item-container" ng-if="service.expanded">\n        <div class="close" ng-click="service.expanded = false">\n          <span class="pficon pficon-close"></span>\n        </div>\n        <div class="col-md-5">\n          <dl>\n            <dt>Using Bundles</dt>\n            <dd>\n              <ul class="service-bundles-list">\n                <li ng-repeat="bundle in service.UsingBundles">\n                  <a ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n        <div class="col-md-5">\n          <dl>\n            <dt>Object Classes</dt>\n            <dd>\n              <ul class="service-object-classes-list">\n                <li ng-repeat="clazz in service.objectClass">\n                  {{clazz}}\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/osgi/html/svc-dependencies.html','<style type="text/css">\n\n  div#pop-up {\n    display: none;\n    position:absolute;\n    color: white;\n    font-size: 14px;\n    background: rgba(0,0,0,0.6);\n    padding: 5px 10px 5px 10px;\n    -moz-border-radius: 8px 8px;\n    border-radius: 8px 8px;\n  }\n\n  div#pop-up-title {\n    font-size: 15px;\n    margin-bottom: 4px;\n    font-weight: bolder;\n  }\n  div#pop-up-content {\n    font-size: 12px;\n  }\n\n  rect.graphbox {\n    fill: #DDD;\n  }\n\n  rect.graphbox.frame {\n    stroke: #222;\n    stroke-width: 2px\n  }\n\n  path.link {\n    fill: none;\n    stroke: #666;\n    stroke-width: 1.5px;\n  }\n\n  path.link.registered {\n    stroke: #444;\n  }\n\n  path.link.inuse {\n    stroke-dasharray: 0,2 1;\n  }\n\n  circle {\n    fill: #black;\n  }\n\n  circle.service {\n    fill: blue;\n  }\n\n  circle.bundle {\n    fill: black;\n  }\n\n  circle.package {\n    fill: gray;\n  }\n\n  text {\n    font: 10px sans-serif;\n    pointer-events: none;\n  }\n\n  text.shadow {\n    stroke: #fff;\n    stroke-width: 3px;\n    stroke-opacity: .8;\n  }\n\n</style>\n\n<div ng-controller="Osgi.ServiceDependencyController">\n  <div class="row">\n    <form class="form-inline no-bottom-margin inline-block">\n      <fieldset>\n        <div class="control-group">\n          <input type="text" class="search-query" placeholder="Filter Bundle Symbolic Name..." ng-model="bundleFilter">\n          <input type="text" class="search-query" placeholder="Filter Package Name..." ng-model="packageFilter" ng-change="updatePkgFilter()">\n          <label class="radio" for="showServices">\n            <input id="showServices" type="radio" value="services" ng-model="selectView"> Show Services\n          </label>\n          <label class="radio" for="showPackages">\n            <input id="showPackages" type="radio" value="packages" ng-model="selectView" ng-disabled="disablePkg"> Show Packages\n          </label>\n          <label class="checkbox" for="hideUnused">\n            <input id="hideUnused" type="checkbox" ng-model="hideUnused"> Hide Unused\n          </label>\n          <button class="btn btn-primary" ng-click="updateGraph()" title="Apply the selected criteria to the Graph.">Apply</button>\n        </div>\n      </fieldset>\n    </form>\n    <!-- a ng-hide="inDashboard" class="pull-right btn btn-default" ng-href="{{addToDashboardLink()}}" title="Add this view to a Dashboard"><i class="fa fa-share"></i></a -->\n  </div>\n\n  <div id="pop-up">\n    <div id="pop-up-title"></div>\n    <div id="pop-up-content"></div>\n  </div>\n\n  <div class="row">\n    <div class="col-md-12 canvas" style="min-height: 800px">\n      <div hawtio-force-graph graph="graph" link-distance="100" charge="-300" nodesize="6"></div>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/karaf/html/feature-details.html','<div>\n    <table class="overviewSection">\n        <tr ng-hide="hasFabric">\n            <td></td>\n            <td class="less-big">\n                <div class="btn-group">\n                  <button ng-click="uninstall(name,version)" \n                          class="btn btn-default" \n                          title="uninstall" \n                          hawtio-show\n                          object-name="{{featuresMBean}}"\n                          method-name="uninstallFeature">\n                    <i class="fa fa-power-off"></i>\n                  </button>\n                  <button ng-click="install(name,version)" \n                          class="btn btn-default" \n                          title="install" \n                          hawtio-show\n                          object-name="{{featuresMBean}}"\n                          method-name="installFeature">\n                    <i class="fa fa-play-circle"></i>\n                  </button>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>Name:</strong></td>\n            <td class="less-big">{{row.Name}}</td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>Version:</strong></td>\n            <td class="less-big">{{row.Version}}</td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>Repository:</strong></td>\n            <td class="less-big">{{row.RepositoryName}}</td>\n        </tr>\n        <tr>\n          <td class="pull-right"><strong>Repository URI:</strong></td>\n          <td class="less-big">{{row.RepositoryURI}}</td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>State:</strong></td>\n            <td class="wrap">\n                <div ng-switch="row.Installed">\n                    <p style="display: inline;" ng-switch-when="true">Installed</p>\n\n                    <p style="display: inline;" ng-switch-default>Not Installed</p>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionFeatures">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionFeatures"\n                               href="collapseFeatures">\n                                Features\n                            </a>\n                        </div>\n                        <div id="collapseFeatures" class="accordion-body collapse in">\n                            <ul class="accordion-inner">\n                                <li ng-repeat="feature in row.Dependencies">\n                                    <a href=\'#/osgi/feature/{{feature.Name}}/{{feature.Version}}?p=container\'>{{feature.Name}}/{{feature.Version}}</a>\n                                </li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionBundles">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionBundles"\n                               href="collapseBundles">\n                                Bundles\n                            </a>\n                        </div>\n                        <div id="collapseBundles" class="accordion-body collapse in">\n                            <ul class="accordion-inner">\n                                <li ng-repeat="bundle in row.BundleDetails">\n                                    <div ng-switch="bundle.Installed">\n                                        <p style="display: inline;" ng-switch-when="true">\n                                            <a href=\'#/osgi/bundle/{{bundle.Identifier}}?p=container\'>{{bundle.Location}}</a></p>\n\n                                        <p style="display: inline;" ng-switch-default>{{bundle.Location}}</p>\n                                    </div>\n                                </li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionConfigurations">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionConfigurations"\n                               href="collapsConfigurations">\n                                Configurations\n                            </a>\n                        </div>\n                        <div id="collapsConfigurations" class="accordion-body collapse in">\n                            <table class="accordion-inner">\n                                <tr ng-repeat="(pid, value) in row.Configurations">\n                                    <td>\n                                      <p>{{value.Pid}}</p>\n                                      <div hawtio-editor="toProperties(value.Elements)" mode="props"></div></td>\n                                </tr>\n                            </table>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionConfigurationFiles">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionConfigurationFiles"\n                               href="collapsConfigurationFiles">\n                                Configuration Files\n                            </a>\n                        </div>\n                        <div id="collapsConfigurationFiles" class="accordion-body collapse in">\n                            <table class="accordion-inner">\n                                <tr ng-repeat="file in row.Files">\n                                    <td>{{file.Files}}</td>\n                                </tr>\n                            </table>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n    </table>\n</div>\n');
-$templateCache.put('plugins/karaf/html/feature.html','<div class="controller-section" ng-controller="Karaf.FeatureController">\n  <div class="row">\n    <div class="col-md-4">\n      <h1>{{row.id}}</h1>\n    </div>\n  </div>\n\n  <div ng-include src="\'plugins/karaf/html/feature-details.html\'"></div>\n\n</div>\n\n');
-$templateCache.put('plugins/karaf/html/features.html','<div class="controller-section" ng-controller="Karaf.FeaturesController">\n\n  <div class="row section-filter centered">\n    <input type="text" class="search-query" placeholder="Filter..." ng-model="filter">\n    <i class="fa fa-remove clickable" title="Clear filter" ng-click="filter = \'\'"></i>\n  </div>\n\n  <script type="text/ng-template" id="popoverTemplate">\n    <small>\n      <table class="table">\n        <tbody>\n        <tr ng-repeat="(k, v) in feature track by $index" ng-show="showRow(k, v)">\n          <td class="property-name">{{k}}</td>\n          <td class="property-value" ng-bind="showValue(v)"></td>\n        </tr>\n        </tbody>\n      </table>\n    </small>\n  </script>\n\n  <p></p>\n  <div class="row">\n    <div class="col-md-6">\n      <h3 class="centered">Installed Features</h3>\n      <div ng-show="featuresError" class="alert alert-warning">\n        The feature list returned by the server was null, please check the logs and Karaf console for errors.\n      </div>\n      <div class="bundle-list"\n           hawtio-auto-columns=".bundle-item">\n        <div ng-repeat="feature in installedFeatures"\n             class="bundle-item"\n             ng-show="filterFeature(feature)"\n             ng-class="inSelectedRepository(feature)">\n          <a ng-href="/osgi/feature/{{feature.Id}}?p=container"\n             hawtio-template-popover title="Feature details">\n            <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>\n          </a>\n          <span ng-hide="hasFabric">\n            <a class="toggle-action"\n               href=""\n               ng-show="installed(feature.Installed)"\n               ng-click="uninstall(feature)"\n               hawtio-show\n               object-name="{{featuresMBean}"\n               method-name="uninstallFeature">\n              <i class="fa fa-power-off"></i>\n            </a>\n            <a class="toggle-action"\n               href=""\n               ng-hide="installed(feature.Installed)"\n               ng-click="install(feature)"\n               hawtio-show\n               object-name="{{featuresMBean}"\n               method-name="installFeature">\n              <i class="fa fa-play-circle"></i>\n            </a>\n          </span>\n        </div>\n      </div>\n    </div>\n\n    <div class="col-md-6">\n      <h3 class="centered">Available Features</h3>\n      <div class="row repository-browser-toolbar centered">\n        <select id="repos"\n                class="input-xlarge"\n                title="Feature repositories"\n                ng-model="selectedRepository"\n                ng-options="r.repository for r in repositories"></select>\n        <button class="btn btn-default"\n                title="Remove selected feature repository"\n                ng-click="uninstallRepository()"\n                ng-hide="hasFabric"\n                hawtio-show\n                object-name="{{featuresMBean}}"\n                method-name="removeRepository"><i class="fa fa-minus"></i></button>\n        <input type="text"\n               class="input-xlarge"\n               placeholder="mvn:foo/bar/1.0/xml/features"\n               title="New feature repository URL"\n               ng-model="newRepositoryURI"\n               ng-hide="hasFabric"\n               hawtio-show\n               object-name="{{featuresMBean}}"\n               method-name="addRepository">\n        <button class="btn btn-default"\n                title="Add feature repository URL"\n                ng-hide="hasFabric"\n                ng-click="installRepository()"\n                ng-disabled="isValidRepository()"\n                hawtio-show\n                object-name="{{featuresMBean}}"\n                method-name="addRepository"><i class="fa fa-plus"></i></button>\n      </div>\n      <div class="row">\n        <div class="bundle-list"\n             hawtio-auto-columns=".bundle-item">\n          <div ng-repeat="feature in selectedRepository.features"\n               class="bundle-item"\n               ng-show="filterFeature(feature)"\n               hawtio-template-popover title="Feature details">\n            <a ng-href="/osgi/feature/{{feature.Id}}?p=container">\n              <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>\n            </a >\n            <span ng-hide="hasFabric">\n              <a class="toggle-action"\n                 href=""\n                 ng-show="installed(feature.Installed)"\n                 ng-click="uninstall(feature)"\n                 hawtio-show\n                 object-name="{{featuresMBean}"\n                 method-name="uninstallFeature">\n                <i class="fa fa-power-off"></i>\n              </a>\n              <a class="toggle-action"\n                 href=""\n                 ng-hide="installed(feature.Installed)"\n                 ng-click="install(feature)"\n                 hawtio-show\n                 object-name="{{featuresMBean}"\n                 method-name="installFeature">\n                <i class="fa fa-play-circle"></i>\n              </a>\n            </span>\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/karaf/html/scr-component-details.html','<div class="row toolbar-pf" ng-hide="hasFabric">\n  <div class="col-sm-12">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button class="btn btn-default" ng-click="activate()" hawtio-show object-name="{{scrMBean}}"\n                method-name="activateComponent">\n          <span class="fa fa-play-circle"></span> Activate\n        </button>\n        <button class="btn btn-default" ng-click="deactivate()" hawtio-show object-name="{{scrMBean}}"\n                method-name="deactiveateComponent">\n          <span class="fa fa-stop-circle"></span> Deactivate\n        </button>\n      </div>\n    </form>\n  </div>\n</div>\n\n<h2>Details</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal src-component-details">\n      <dt>Id</dt>\n      <dd>{{row.Id}}</dd>\n      <dt>Name</dt>\n      <dd>{{row.Name}}</dd>\n      <dt>State</dt>\n      <dd>{{row.State}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>Properties</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal src-component-details">\n      <dt ng-repeat-start="(key, value) in row.Properties">{{key}}</dt>\n      <dd ng-repeat-end ng-repeat="v in value">{{v.Value}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>References</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <table class="table">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Availability</th>\n          <th>Cardinality</th>\n          <th>Policy</th>\n          <th>Bound Services</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(key, value) in row.References.values">\n          <td>{{value.Name}}</td>\n          <td>{{value.Availability}}</td>\n          <td>{{value.Cardinality}}</td>\n          <td>{{value.Policy}}</td>\n          <td>\n            <ul class="src-component-bound-services">\n              <li ng-repeat="id in value[\'Bound Services\']">\n                <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>\n              </li>\n            </ul>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n');
-$templateCache.put('plugins/karaf/html/scr-component.html','<div class="controller-section" ng-controller="Karaf.ScrComponentController">\n\n  <h1>{{row.Id}}</h1>\n\n  <div class="breadcrumb">\n    <a ng-href="{{srcComponentsUrl}}"><span class="fa fa-angle-left"></span> Back to Declarative Services</a>\n  </div>\n\n  <div ng-include src="\'plugins/karaf/html/scr-component-details.html\'"></div>\n\n</div>');
-$templateCache.put('plugins/karaf/html/scr-components.html','<h1>Declarative Services</h1>\n\n<div class="controller-section" ng-controller="Karaf.ScrComponentsController">\n\n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="search1" class="sr-only">Filter</label>\n            <input id="search1" type="search" class="form-control" ng-model="scrOptions.filterOptions.filterText" placeholder="Filter...">\n            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group">\n          <button ng-disabled="selectedComponents.length == 0" \n                  class="btn btn-default" \n                  ng-click="activate()"\n                  hawtio-show\n                  object-name="{{scrMBean}}"\n                  method-name="activateComponent"><i\n                  class="fa fa-play-circle"></i> Activate\n          </button>\n          <button ng-disabled="selectedComponents.length == 0" \n                  class="btn btn-default" \n                  ng-click="deactivate()"\n                  hawtio-show\n                  object-name="{{scrMBean}}"\n                  method-name="deactiveateComponent"><i\n                  class="fa fa-stop-circle"></i> Deactivate\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-md-12">\n      <table class="table table-striped table-src-components" hawtio-simple-table="scrOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/karaf/html/server.html','<h1>Server</h1>\n\n<div class="controller-section" ng-controller="Karaf.ServerController">\n\n  <div class="row">\n    <div class="col-md-12">\n      <dl class="dl-horizontal server-details">\n        <dt>Name</dt>\n        <dd>{{data.name}}</dd>\n        <dt>Version</dt>\n        <dd>{{data.version}}</dd>\n        <dt>State</dt>\n        <dd>{{data.state}}</dd>\n        <dt>Is root</dt>\n        <dd>{{data.root}}</dd>\n        <dt>Start Level</dt>\n        <dd>{{data.startLevel}}</dd>\n        <dt>Framework</dt>\n        <dd>{{data.framework}}</dd>\n        <dt>Framework Version</dt>\n        <dd>{{data.frameworkVersion}}</dd>\n        <dt>Location</dt>\n        <dd>{{data.location}}</dd>\n        <dt>SSH Port</dt>\n        <dd>{{data.sshPort}}</dd>\n        <dt>RMI Registry Port</dt>\n        <dd>{{data.rmiRegistryPort}}</dd>\n        <dt>RMI Server Port</dt>\n        <dd>{{data.rmiServerPort}}</dd>\n        <dt>PID</dt>\n        <dd>{{data.pid}}</dd>\n      </dl>\n    </div>\n  </div>\n\n</div>\n');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");
+$templateCache.put('plugins/osgi/html/svc-dependencies.html','<style type="text/css">\n\n  div#pop-up {\n    display: none;\n    position:absolute;\n    color: white;\n    font-size: 14px;\n    background: rgba(0,0,0,0.6);\n    padding: 5px 10px 5px 10px;\n    -moz-border-radius: 8px 8px;\n    border-radius: 8px 8px;\n  }\n\n  div#pop-up-title {\n    font-size: 15px;\n    margin-bottom: 4px;\n    font-weight: bolder;\n  }\n  div#pop-up-content {\n    font-size: 12px;\n  }\n\n  rect.graphbox {\n    fill: #DDD;\n  }\n\n  rect.graphbox.frame {\n    stroke: #222;\n    stroke-width: 2px\n  }\n\n  path.link {\n    fill: none;\n    stroke: #666;\n    stroke-width: 1.5px;\n  }\n\n  path.link.registered {\n    stroke: #444;\n  }\n\n  path.link.inuse {\n    stroke-dasharray: 0,2 1;\n  }\n\n  circle {\n    fill: #black;\n  }\n\n  circle.service {\n    fill: blue;\n  }\n\n  circle.bundle {\n    fill: black;\n  }\n\n  circle.package {\n    fill: gray;\n  }\n\n  text {\n    font: 10px sans-serif;\n    pointer-events: none;\n  }\n\n  text.shadow {\n    stroke: #fff;\n    stroke-width: 3px;\n    stroke-opacity: .8;\n  }\n\n</style>\n\n<div ng-controller="Osgi.ServiceDependencyController">\n  <div class="row">\n    <form class="form-inline no-bottom-margin inline-block">\n      <fieldset>\n        <div class="control-group">\n          <input type="text" class="search-query" placeholder="Filter Bundle Symbolic Name..." ng-model="bundleFilter">\n          <input type="text" class="search-query" placeholder="Filter Package Name..." ng-model="packageFilter" ng-change="updatePkgFilter()">\n          <label class="radio" for="showServices">\n            <input id="showServices" type="radio" value="services" ng-model="selectView"> Show Services\n          </label>\n          <label class="radio" for="showPackages">\n            <input id="showPackages" type="radio" value="packages" ng-model="selectView" ng-disabled="disablePkg"> Show Packages\n          </label>\n          <label class="checkbox" for="hideUnused">\n            <input id="hideUnused" type="checkbox" ng-model="hideUnused"> Hide Unused\n          </label>\n          <button class="btn btn-primary" ng-click="updateGraph()" title="Apply the selected criteria to the Graph.">Apply</button>\n        </div>\n      </fieldset>\n    </form>\n    <!-- a ng-hide="inDashboard" class="pull-right btn btn-default" ng-href="{{addToDashboardLink()}}" title="Add this view to a Dashboard"><i class="fa fa-share"></i></a -->\n  </div>\n\n  <div id="pop-up">\n    <div id="pop-up-title"></div>\n    <div id="pop-up-content"></div>\n  </div>\n\n  <div class="row">\n    <div class="col-md-12 canvas" style="min-height: 800px">\n      <div hawtio-force-graph graph="graph" link-distance="100" charge="-300" nodesize="6"></div>\n    </div>\n  </div>\n\n</div>\n');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");
 var _apacheCamelModelVersion = '2.18.1';
 
 var _apacheCamelModel ={
