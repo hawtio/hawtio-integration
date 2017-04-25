@@ -5,13 +5,25 @@
 module ActiveMQ {
 
   _module.controller("ActiveMQ.TreeHeaderController", ["$scope", ($scope) => {
-    $scope.expandAll = () => {
-      (<any>$('#activemqtree')).treeview('expandAll', { silent: true });
-    };
+    // TODO: the tree should ideally be initialised synchronously
+    const tree = () => (<any>$('#activemqtree')).treeview(true);
 
-    $scope.contractAll = () => {
-      (<any>$('#activemqtree')).treeview('collapseAll', { silent: true });
-    };
+    $scope.expandAll = () => tree().expandAll({ silent: true });
+    $scope.contractAll = () => tree().collapseAll({ silent: true });
+
+    const search = _.debounce(filter => tree().search(filter, {
+      ignoreCase: true,
+      exactMatch: false,
+      revealResults: true
+    }), 300, { leading: false, trailing: true });
+
+    $scope.filter = '';
+    $scope.$watch('filter', (filter, previous) => {
+      if (filter !== previous) {
+        // TODO: display a badge with the search result count
+        search(filter);
+      }
+    });
   }]);
 
   _module.controller("ActiveMQ.TreeController", ["$scope", "$location", "workspace", "localStorage", (
