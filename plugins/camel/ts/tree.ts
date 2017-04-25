@@ -3,27 +3,18 @@
 
 module Camel {
 
-  _module.controller("Camel.TreeHeaderController", ["$scope", "$location", (
-    $scope, $location: ng.ILocationService) => {
+  _module.controller("Camel.TreeHeaderController", ["$scope", "$location", ($scope, $location: ng.ILocationService) => {
+    // TODO: the tree should ideally be initialised synchronously
+    const tree = () => (<any>$('#cameltree')).treeview(true);
 
-    $scope.expandAll = () => {
-      (<any>$('#cameltree')).treeview('expandAll', { silent: true });
-    };
+    $scope.expandAll = () => tree().expandAll({ silent: true });
+    $scope.contractAll = () => tree().collapseAll({ silent: true });
 
-    $scope.contractAll = () => {
-      (<any>$('#cameltree')).treeview('collapseAll', { silent: true });
-    };
-
-    const treeElement: any = $('#cameltree');
-    const search = _.debounce(
-      filter => treeElement.treeview('search', [
-        filter,
-        {
-          ignoreCase: true,
-          exactMatch: false,
-          revealResults: true
-        }
-      ]), 300, { leading: false, trailing: true });
+    const search = _.debounce(filter => tree().search(filter, {
+      ignoreCase: true,
+      exactMatch: false,
+      revealResults: true
+    }), 300, { leading: false, trailing: true });
 
     $scope.filter = '';
     $scope.$watch('filter', (filter, previous) => {
@@ -32,7 +23,6 @@ module Camel {
         search(filter);
       }
     });
-
   }]);
 
   _module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", "$rootScope", (
