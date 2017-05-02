@@ -1785,11 +1785,9 @@ var ActiveMQ;
             function updateSelectionFromURL() {
                 Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $("#activemqtree"), function (first) {
                     // use function to auto select the queue folder on the 1st broker
-                    var queues = first.getChildren()[0];
-                    if (queues && queues.data.title === 'Queue') {
-                        first = queues;
-                        first.expand(true);
-                        return first;
+                    var queues = first.children[0];
+                    if (queues && queues.text === 'Queue') {
+                        return queues;
                     }
                     return null;
                 }, true);
