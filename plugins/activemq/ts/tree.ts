@@ -11,16 +11,21 @@ module ActiveMQ {
     $scope.expandAll = () => tree().expandAll({ silent: true });
     $scope.contractAll = () => tree().collapseAll({ silent: true });
 
-    const search = _.debounce(filter => tree().search(filter, {
-      ignoreCase: true,
-      exactMatch: false,
-      revealResults: true
-    }), 300, { leading: false, trailing: true });
+    const search = _.debounce(filter => {
+      const result = tree().search(filter, {
+        ignoreCase: true,
+        exactMatch: false,
+        revealResults: true
+      });
+      $scope.result.length = 0;
+      $scope.result.push(...result);
+      Core.$apply($scope);
+    }, 300, { leading: false, trailing: true });
 
     $scope.filter = '';
+    $scope.result = [];
     $scope.$watch('filter', (filter, previous) => {
       if (filter !== previous) {
-        // TODO: display a badge with the search result count
         search(filter);
       }
     });
