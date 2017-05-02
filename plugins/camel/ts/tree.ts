@@ -100,23 +100,19 @@ module Camel {
     }
 
     function updateSelectionFromURL() {
-      Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $("#cameltree"), (first) => {
+      Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $("#cameltree"), (first: Jmx.Folder) => {
         // use function to auto select first Camel context routes if there is only one Camel context
-        var contexts = first.getChildren();
+        const contexts = first.children;
         if (contexts && contexts.length === 1) {
-          first = contexts[0];
-          first.expand(true);
-          var children = first.getChildren();
+          const first = contexts[0];
+          const children = first.children;
           if (children && children.length) {
-            var routes = children[0];
-            if (routes.data.typeName === 'routes') {
-              first = routes;
-              //Core.$apply($scope);
-              return first;
+            const routes = children[0];
+            if (routes.typeName === 'routes') {
+              return routes;
             }
           }
         }
-        //Core.$apply($scope);
         return null;
       }, true);
       $scope.fullScreenViewLink = Camel.linkToFullScreenView(workspace);
