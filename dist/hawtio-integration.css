@@ -254,6 +254,10 @@ div.camel-properties {
   margin: 0;
 }
 
+.org-apache-camel-context span.node-icon:before {
+  content: url("../img/icons/camel/camel_context_icon.png");
+}
+
 .camel-type-converters-dl {
   margin-top: 15px;
 }
