@@ -20,10 +20,7 @@ namespace Camel {
         id: 'camel-contexts',
         title: 'Contexts',
         href: "/camel/contexts" + workspace.hash(),
-        show: () => {
-          let selection = workspace.selection;
-          return selection && selection.children.length > 0 && selection.children[0].typeName === 'context';
-        }
+        show: () => workspace.findChildMBeanWithProperties(workspace.selection, { typeName: 'context' })
       },
       {
         id: 'camel-route-diagram',
