@@ -254,6 +254,17 @@ div.camel-properties {
   margin: 0;
 }
 
+.org-apache-camel span.node-icon:before,
+.org-apache-camel-context-folder span.node-icon:before {
+  display: inline-block;
+  background: url("../img/icons/camel.svg");
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 18px 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+  content: "" !important;
+}
 .org-apache-camel-context span.node-icon:before {
   content: url("../img/icons/camel/camel_context_icon.png");
 }
