@@ -21,6 +21,127 @@
   line-height: 1;
 }
 
+.table-src-components th:nth-child(3) {
+  width: 30%;
+}
+dl.src-component-details dt {
+  text-align: left;
+}
+ul.src-component-bound-services {
+  list-style-type: none;
+  padding-left: 0;
+}
+dl.server-details dt {
+  text-align: left;
+  width: 120px;
+}
+dl.server-details dd {
+  margin-left: 140px;
+}
+
+.bundles-container {
+  margin-left: -20px;
+  margin-right: -20px;
+}
+.bundles-container .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+.bundles-container .container-cards-pf {
+  padding-bottom: 20px;
+}
+.bundle-cards .card-pf {
+  cursor: pointer;
+}
+.bundle-cards .content {
+  height: 5em;
+  display: table-cell;
+  vertical-align: middle;
+}
+.list-group-item.child {
+  padding-left: 65px;
+}
+#startLevelFilter {
+  width: 54px;
+}
+.overviewSection td {
+  vertical-align: top;
+}
+.osgi-bundles-table th:nth-child(1) {
+  width: 30px;
+}
+.osgi-bundles-table th:nth-child(2) {
+  width: 55px;
+}
+.osgi-bundles-table th:nth-child(3) {
+  width: 65px;
+}
+.osgi-bundles-table th:nth-child(4) {
+  width: auto;
+}
+.osgi-bundles-table th:nth-child(5) {
+  width: auto;
+}
+.osgi-bundles-table th:nth-child(6) {
+  width: 120px;
+}
+#toolbar-row-2 .form-inline label:not(:first-child) {
+  margin-left: 1em;
+}
+.inspect-classloading .form-group {
+  width: 100%;
+}
+.inspect-classloading .form-group:first-child {
+  margin-bottom: 10px;
+}
+.inspect-classloading .control-label {
+  display: block;
+}
+.inspect-classloading .form-control {
+  width: 50%;
+}
+.list-group.labels .list-group-item {
+  padding: 2px 0;
+}
+.requiring-bundles .label {
+  display: inline-block;
+  margin-bottom: 2px;
+}
+.osgi-bundle-details-dl dd {
+  word-break: break-all;
+}
+.osgi-bundle-details-dl dd .label {
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+.osgi-bundle-headers-dl dd {
+  word-break: break-all;
+}
+.list-packages .list-view-pf-description,
+.list-packages .list-group-item-heading,
+.list-packages .list-group-item-text,
+.list-packages .list-view-pf-additional-info {
+  width: auto;
+}
+.package-bundles-list,
+.service-bundles-list,
+.service-object-classes-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+.framework-configuration {
+  margin-top: 20px;
+}
+.framework-configuration dt {
+  width: 190px;
+  margin-bottom: 10px;
+}
+.framework-configuration dd {
+  margin-left: 210px;
+  width: 50px;
+  text-align: right;
+}
+
 .form-inline.camel-forward-message {
   margin-bottom: 20px;
 }
@@ -288,125 +409,28 @@ div.camel-properties {
   width: 15%;
 }
 
-.table-src-components th:nth-child(3) {
-  width: 30%;
-}
-dl.src-component-details dt {
-  text-align: left;
-}
-ul.src-component-bound-services {
-  list-style-type: none;
-  padding-left: 0;
-}
-dl.server-details dt {
-  text-align: left;
-  width: 120px;
-}
-dl.server-details dd {
-  margin-left: 140px;
-}
-
-.bundles-container {
-  margin-left: -20px;
-  margin-right: -20px;
-}
-.bundles-container .row {
-  margin-left: 0;
-  margin-right: 0;
-}
-.bundles-container .container-cards-pf {
-  padding-bottom: 20px;
-}
-.bundle-cards .card-pf {
-  cursor: pointer;
-}
-.bundle-cards .content {
-  height: 5em;
-  display: table-cell;
-  vertical-align: middle;
-}
-.list-group-item.child {
-  padding-left: 65px;
-}
-#startLevelFilter {
-  width: 54px;
-}
-.overviewSection td {
-  vertical-align: top;
-}
-.osgi-bundles-table th:nth-child(1) {
-  width: 30px;
-}
-.osgi-bundles-table th:nth-child(2) {
-  width: 55px;
-}
-.osgi-bundles-table th:nth-child(3) {
-  width: 65px;
-}
-.osgi-bundles-table th:nth-child(4) {
-  width: auto;
-}
-.osgi-bundles-table th:nth-child(5) {
-  width: auto;
-}
-.osgi-bundles-table th:nth-child(6) {
-  width: 120px;
-}
-#toolbar-row-2 .form-inline label:not(:first-child) {
-  margin-left: 1em;
-}
-.inspect-classloading .form-group {
-  width: 100%;
-}
-.inspect-classloading .form-group:first-child {
-  margin-bottom: 10px;
-}
-.inspect-classloading .control-label {
-  display: block;
-}
-.inspect-classloading .form-control {
-  width: 50%;
-}
-.list-group.labels .list-group-item {
-  padding: 2px 0;
-}
-.requiring-bundles .label {
+.org-apache-activemq span.node-icon:before,
+.org-apache-activemq-Broker span.node-icon:before {
   display: inline-block;
-  margin-bottom: 2px;
+  background: url("../img/icons/messagebroker.svg");
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 18px 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+  content: "" !important;
 }
-.osgi-bundle-details-dl dd {
-  word-break: break-all;
+.org-apache-activemq-Queue span.node-icon:before {
+  content: url("../img/icons/activemq/queue.png");
 }
-.osgi-bundle-details-dl dd .label {
-  padding-top: 1px;
-  padding-bottom: 1px;
+.org-apache-activemq-Queue-folder span.node-icon:before {
+  content: url("../img/icons/activemq/queue_folder.png");
 }
-.osgi-bundle-headers-dl dd {
-  word-break: break-all;
+.org-apache-activemq-Topic span.node-icon:before {
+  content: url("../img/icons/activemq/topic.png");
 }
-.list-packages .list-view-pf-description,
-.list-packages .list-group-item-heading,
-.list-packages .list-group-item-text,
-.list-packages .list-view-pf-additional-info {
-  width: auto;
-}
-.package-bundles-list,
-.service-bundles-list,
-.service-object-classes-list {
-  list-style-type: none;
-  padding-left: 0;
-}
-.framework-configuration {
-  margin-top: 20px;
-}
-.framework-configuration dt {
-  width: 190px;
-  margin-bottom: 10px;
-}
-.framework-configuration dd {
-  margin-left: 210px;
-  width: 50px;
-  text-align: right;
+.org-apache-activemq-Topic-folder span.node-icon:before {
+  content: url("../img/icons/activemq/topic_folder.png");
 }
 
 /* org.apache.camel */
