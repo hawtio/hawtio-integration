@@ -99,25 +99,13 @@ module ActiveMQ {
       {field: 'LogDirectory', displayName: 'Log Directory', width: "**"}
     ];
 
-    const myUrl = '/jmx/attributes';
-    const builder = nav.builder();
-    const tab     = builder.id('activemq')
+    const tab = nav.builder().id('activemq')
       .title(() => 'ActiveMQ')
       .defaultPage({
-        rank   : 15,
-        isValid: (yes, no) => {
-          const name = 'ActiveMQDefaultPage';
-          workspace.addNamedTreePostProcessor(name, (tree) => {
-            workspace.removeNamedTreePostProcessor(name);
-            if (workspace.treeContainsDomainAndProperties(jmxDomain)) {
-              yes();
-            } else {
-              no();
-            }
-          });
-        }
+        rank: 15,
+        isValid: (yes, no) => workspace.treeContainsDomainAndProperties(jmxDomain) ? yes() : no()
       })
-      .href(() => myUrl)
+      .href(() => '/jmx/attributes')
       .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
       .isSelected(() => workspace.isMainTabActive('activemq'))
       .build();

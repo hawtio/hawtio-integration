@@ -245,18 +245,8 @@ module Camel {
     const tab = nav.builder().id('camel')
       .title(() => 'Camel')
       .defaultPage({
-        rank   : 20,
-        isValid: (yes, no) => {
-          const name = 'CamelDefaultPage';
-          workspace.addNamedTreePostProcessor(name, (tree) => {
-            workspace.removeNamedTreePostProcessor(name);
-            if (workspace.treeContainsDomainAndProperties(jmxDomain)) {
-              yes();
-            } else {
-              no();
-            }
-          });
-        }
+        rank: 20,
+        isValid: (yes, no) => workspace.treeContainsDomainAndProperties(jmxDomain) ? yes() : no()
       })
       .href(() => '/jmx/attributes?main-tab=camel')
       .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
