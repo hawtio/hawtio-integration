@@ -1,5 +1,7 @@
-.org-apache-camel span.node-icon:before,
-.org-apache-camel-context-folder span.node-icon:before {
+span.node-icon:before {
+
+  .org-apache-camel &,
+  .org-apache-camel-context-folder & {
     display: inline-block;
     background: url("../img/icons/camel.svg");
     min-width: 16px;
@@ -8,16 +10,16 @@
     background-position: center;
     background-repeat: no-repeat;
     content: "" !important;
-}
-
-.org-apache-camel-context span.node-icon:before {
+  }
+  .org-apache-camel-context & {
     content: url("../img/icons/camel/camel_context_icon.png");
-}
+  }
 
-.org-apache-camel-endpoints span.node-icon:before {
+  .org-apache-camel-endpoints & {
     content: url("../img/icons/camel/endpoint_node.png");
-}
+  }
 
-.org-apache-camel-routes span.node-icon:before {
+  .org-apache-camel-routes & {
     content: url("../img/icons/camel/camel_route.png");
+  }
 }
