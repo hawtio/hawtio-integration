@@ -119,6 +119,7 @@ module ActiveMQ {
       })
       .href(() => myUrl)
       .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
+      .isSelected(() => workspace.isMainTabActive('activemq'))
       .build();
 
     nav.add(tab);
