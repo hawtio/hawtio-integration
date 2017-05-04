@@ -21,31 +21,6 @@
   line-height: 1;
 }
 
-.activemq-browse-table th:nth-child(1) {
-  width: 5%;
-}
-.activemq-browse-table th:nth-child(2) {
-  width: 30%;
-}
-.activemq-browse-table th:nth-child(3) {
-  width: 5%;
-}
-.activemq-browse-table th:nth-child(4) {
-  width: 10%;
-}
-.activemq-browse-table th:nth-child(5) {
-  width: 15%;
-}
-.activemq-browse-table th:nth-child(6) {
-  width: 10%;
-}
-.activemq-browse-table th:nth-child(7) {
-  width: 10%;
-}
-.activemq-browse-table th:nth-child(8) {
-  width: 15%;
-}
-
 .form-inline.camel-forward-message {
   margin-bottom: 20px;
 }
@@ -268,6 +243,12 @@ div.camel-properties {
 .org-apache-camel-context span.node-icon:before {
   content: url("../img/icons/camel/camel_context_icon.png");
 }
+.org-apache-camel-endpoints span.node-icon:before {
+  content: url("../img/icons/camel/endpoint_node.png");
+}
+.org-apache-camel-routes span.node-icon:before {
+  content: url("../img/icons/camel/camel_route.png");
+}
 
 .camel-type-converters-dl {
   margin-top: 15px;
@@ -280,6 +261,31 @@ div.camel-properties {
 }
 .camel-type-converters-enable-statistics-button {
   width: 111px;
+}
+
+.activemq-browse-table th:nth-child(1) {
+  width: 5%;
+}
+.activemq-browse-table th:nth-child(2) {
+  width: 30%;
+}
+.activemq-browse-table th:nth-child(3) {
+  width: 5%;
+}
+.activemq-browse-table th:nth-child(4) {
+  width: 10%;
+}
+.activemq-browse-table th:nth-child(5) {
+  width: 15%;
+}
+.activemq-browse-table th:nth-child(6) {
+  width: 10%;
+}
+.activemq-browse-table th:nth-child(7) {
+  width: 10%;
+}
+.activemq-browse-table th:nth-child(8) {
+  width: 15%;
 }
 
 .table-src-components th:nth-child(3) {
