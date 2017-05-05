@@ -7,12 +7,14 @@
  */
 module Osgi {
 
-  _module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia", (
+  _module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia",
+    "$uibModal", (
       $scope,
       $routeParams: angular.route.IRouteParamsService,
       $location: ng.ILocationService,
       workspace: Jmx.Workspace,
-      jolokia: Jolokia.IJolokia) => {
+      jolokia: Jolokia.IJolokia,
+      $uibModal) => {
 
     /** the kinds of config */
     let configKinds = {
@@ -30,23 +32,26 @@ module Osgi {
       }
     };
 
-    $scope.addPidDialog = new UI.Dialog();
-
-    $scope.addPid = (newPid) => {
-      if ($scope.configurations.some((c) => c['pid'] == newPid)) {
-        Core.notification("error", "pid \"" + newPid + "\" already exists.");
-        return;
-      }
-      $scope.addPidDialog.close();
-      var mbean = getHawtioConfigAdminMBean(workspace);
-      if (mbean && newPid) {
-        var json = JSON.stringify({});
-        jolokia.execute(mbean, "configAdminUpdate", newPid, json, Core.onSuccess(response => {
-          Core.notification("success", "Successfully created pid: " + newPid);
-          updateTableContents();
-        }));
-      }
-    };
+    $scope.openAddPidDialog = () => {
+      $uibModal.open({
+        templateUrl: 'addPidDialog.html',
+        scope: $scope
+      })
+      .result.then((newPid) => {
+        if ($scope.configurations.some((c) => c['pid'] == newPid)) {
+          Core.notification("error", "pid \"" + newPid + "\" already exists.");
+          return;
+        }
+        var mbean = getHawtioConfigAdminMBean(workspace);
+        if (mbean && newPid) {
+          var json = JSON.stringify({});
+          jolokia.execute(mbean, "configAdminUpdate", newPid, json, Core.onSuccess(response => {
+            Core.notification("success", "Successfully created pid: " + newPid);
+            updateTableContents();
+          }));
+        }
+      });
+    }
 
     $scope.$on("$routeChangeSuccess", function (event, current, previous) {
       // lets do this asynchronously to avoid Error: $digest already in progress

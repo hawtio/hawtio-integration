@@ -108,15 +108,28 @@
   padding-left: 0;
 }
 
-.framework-configuration {
-  margin-top: 20px;
-  dt {
-    width: 190px;
-    margin-bottom: 10px;
+.osgi-nav-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+
+  .nav-tabs {
+    flex: 0 0 auto;
+    padding-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
   }
-  dd {
-    margin-left: 210px;
-    width: 50px;
-    text-align: right;
+
+  .contents {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    position: relative;
+    padding-left: 20px;
+    padding-right: 20px;
   }
+}
+
+.framework-main h1 {
+  margin-bottom: 20px;
 }

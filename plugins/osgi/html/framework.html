@@ -1,26 +1,26 @@
-<h1>Framework Configuration</h1>
+<div class="framework-main" ng-controller="Osgi.FrameworkController">
 
-<div class="container" ng-controller="Osgi.FrameworkController">
+  <h1>Framework Configuration</h1>
 
-  <div class="row">
-    <div class="col-md-12">
-      <dl class="dl-horizontal framework-configuration">
-        <dt>
-          Current Framework Start Level
-        </dt>
-        <dd>
-          <editable-property ng-model="config" property="startLevel" type="number" min="0" max="100"
-                             on-save="startLevelChanged()"></editable-property>
-        </dd>
-        <dt>
-          Initial Bundle Start Level
-        </dt>
-        <dd>
-          <editable-property ng-model="config" property="initialBundleStartLevel" type="number" min="0" max="100"
-                             on-save="initialBundleStartLevelChanged()"></editable-property>
-        </dd>
-      </dl>
+  <form class="form-horizontal framework-form" ng-submit="save()">
+    <div class="form-group">
+      <label class="col-sm-3 control-label" for="startLevel">Current Framework Start Level</label>
+      <div class="col-sm-2">
+        <input id="startLevel" class="form-control" type="number" min="0" max="100" ng-model="config.startLevel">
+      </div>
     </div>
-  </div>
+    <div class="form-group">
+      <label class="col-sm-3 control-label" for="initialBundleStartLevel">Initial Bundle Start Level</label>
+      <div class="col-sm-2">
+        <input id="initialBundleStartLevel" class="form-control" type="number" min="0" max="100"
+          ng-model="config.initialBundleStartLevel">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-2">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </form>
 
 </div>

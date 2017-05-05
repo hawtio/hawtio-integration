@@ -10,31 +10,33 @@ module Osgi {
       $scope,
       workspace: Jmx.Workspace) => {
 
-    $scope.startLevelChanged = function () {
-      if ($scope.config.startLevel) {
-        if (parseInt($scope.config.startLevel) < parseInt($scope.config.initialBundleStartLevel)) {
-          Core.notification("error", "Can't set Framework Start Level below Initial Bundle Start Level");
-        } else {
-          updateMbeanAttribute('FrameworkStartLevel', $scope.config.startLevel);
+    let showNotification: boolean;
+
+    $scope.save = function() {
+      if (parseInt($scope.config.startLevel) < parseInt($scope.config.initialBundleStartLevel)) {
+        Core.notification("error", "Can't set Framework Start Level below Initial Bundle Start Level");
+      } else {
+        var mbean = getSelectionFrameworkMBean(workspace);
+        if (mbean) {
+          showNotification = true;
+          workspace.jolokia.request([
+            { type: 'write', mbean: mbean, attribute: 'FrameworkStartLevel', value: $scope.config.startLevel },
+            { type: 'write', mbean: mbean, attribute: 'InitialBundleStartLevel', value: $scope.config.initialBundleStartLevel }
+          ], {
+            error: response => {
+              if (showNotification) {
+                Core.notification("error", response.error);
+                showNotification = false;
+              }
+            },              
+            success: response => {
+              if (showNotification) {
+                Core.notification("success", "Configuration updated");
+                showNotification = false;
+              }
+            }
+          });
         }
-      }
-    };
-
-    $scope.initialBundleStartLevelChanged = function () {
-      if ($scope.config.initialBundleStartLevel) {
-        updateMbeanAttribute('InitialBundleStartLevel', $scope.config.initialBundleStartLevel);
-      }
-    };
-
-    function updateMbeanAttribute(name, value) {
-      var mbean = getSelectionFrameworkMBean(workspace);
-      if (mbean) {
-        workspace.jolokia.request({
-          type: 'write', mbean: mbean, attribute: name, value: value
-        }, {
-          error: response => Core.notification("error", response.error),
-          success: response => Core.notification("success", "Configuration updated")
-        });
       }
     }
 
@@ -44,16 +46,15 @@ module Osgi {
         var jolokia = workspace.jolokia;
         jolokia.request(
           { type: 'read', mbean: mbean },
-          Core.onSuccess(populatePage));
+          { success: response => {
+              $scope.config = {
+                startLevel: response.value.FrameworkStartLevel,
+                initialBundleStartLevel: response.value.InitialBundleStartLevel
+              }
+              Core.$apply($scope);
+            }
+          });
       }
-    }
-
-    function populatePage(response) {
-      $scope.config = {
-        startLevel: response.value.FrameworkStartLevel,
-        initialBundleStartLevel: response.value.InitialBundleStartLevel
-      }
-      Core.$apply($scope);
     }
 
     updateContents();

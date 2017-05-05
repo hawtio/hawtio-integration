@@ -313,6 +313,10 @@ div.camel-properties {
   width: 111px;
 }
 
+.table-src-components th:nth-child(3) {
+  width: 30%;
+}
+
 .bundles-container {
   margin-left: -20px;
   margin-right: -20px;
@@ -403,35 +407,27 @@ div.camel-properties {
   list-style-type: none;
   padding-left: 0;
 }
-.framework-configuration {
-  margin-top: 20px;
+.osgi-nav-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
 }
-.framework-configuration dt {
-  width: 190px;
-  margin-bottom: 10px;
+.osgi-nav-main .nav-tabs {
+  flex: 0 0 auto;
+  padding-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
-.framework-configuration dd {
-  margin-left: 210px;
-  width: 50px;
-  text-align: right;
+.osgi-nav-main .contents {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  position: relative;
+  padding-left: 20px;
+  padding-right: 20px;
 }
-
-.table-src-components th:nth-child(3) {
-  width: 30%;
-}
-dl.src-component-details dt {
-  text-align: left;
-}
-ul.src-component-bound-services {
-  list-style-type: none;
-  padding-left: 0;
-}
-dl.server-details dt {
-  text-align: left;
-  width: 120px;
-}
-dl.server-details dd {
-  margin-left: 140px;
+.framework-main h1 {
+  margin-bottom: 20px;
 }
 
 /* org.apache.camel */

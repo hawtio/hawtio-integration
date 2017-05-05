@@ -6,7 +6,7 @@
     <div class="col-md-12">
       <form class="toolbar-pf-actions search-pf">
         <div class="form-group">
-          <button class="btn btn-default" ng-click="addPidDialog.open()" title="Add a new configuration" hawtio-show object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate">
+          <button class="btn btn-default" ng-click="openAddPidDialog()" title="Add a new configuration" hawtio-show object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate">
             Add configuration
           </button>
         </div>
@@ -65,26 +65,25 @@
     </div>
   </div>
 
-  <div modal="addPidDialog.show" close="addPidDialog.close()" options="addPidDialog.options">
-    <form name="addPidDialogForm" class="form-horizontal no-bottom-margin" ng-submit="addPid(newPid)">
+  <script type="text/ng-template" id="addPidDialog.html">
+    <form name="deletePid" class="form-horizontal" ng-submit="$close(newPid)">
       <div class="modal-header">
-        <button type="button" class="close" aria-label="Close" ng-click="addPidDialog.close()">
+        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">
           <span class="pficon pficon-close" aria-hidden="true"></span>
         </button>
-        <h4>Add Configuration</h4>
+        <h4>Add configuration</h4>
       </div>
       <div class="modal-body">
         <div class="form-group">
           <label class="col-sm-3 control-label" for="newPid">Configuration ID</label>
           <div class="col-sm-9">
-            <input type="text" id="newPid" class="form-control" ng-model="newPid"/>
+            <input type="text" id="newPid" class="form-control" ng-model="newPid" required/>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" ng-click="addPidDialog.close()">Cancel</button>
+        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>
         <button type="submit" class="btn btn-primary" ng-disabled="!(newPid !== '' && newPid !== undefined)">Add</button>
       </div>
     </form>
-  </div>
-</div>
+  </script>

@@ -3,12 +3,12 @@
     <form class="toolbar-pf-actions">
       <div class="form-group">
         <button class="btn btn-default" ng-click="activate()" hawtio-show object-name="{{scrMBean}}"
-                method-name="activateComponent">
-          <span class="fa fa-play-circle"></span> Activate
+                method-name="activateComponent" ng-disabled="row.State === 'Active' || row.State === 'Unsatisfied'">
+          Activate
         </button>
         <button class="btn btn-default" ng-click="deactivate()" hawtio-show object-name="{{scrMBean}}"
-                method-name="deactiveateComponent">
-          <span class="fa fa-stop-circle"></span> Deactivate
+                method-name="deactiveateComponent" ng-disabled="row.State === 'Disabled'">
+          Deactivate
         </button>
       </div>
     </form>
@@ -19,7 +19,7 @@
 
 <div class="row">
   <div class="col-md-12">
-    <dl class="dl-horizontal src-component-details">
+    <dl class="dl-horizontal">
       <dt>Id</dt>
       <dd>{{row.Id}}</dd>
       <dt>Name</dt>
@@ -34,7 +34,7 @@
 
 <div class="row">
   <div class="col-md-12">
-    <dl class="dl-horizontal src-component-details">
+    <dl class="dl-horizontal">
       <dt ng-repeat-start="(key, value) in row.Properties">{{key}}</dt>
       <dd ng-repeat-end ng-repeat="v in value">{{v.Value}}</dd>
     </dl>
@@ -62,7 +62,7 @@
           <td>{{value.Cardinality}}</td>
           <td>{{value.Policy}}</td>
           <td>
-            <ul class="src-component-bound-services">
+            <ul class="list-unstyled">
               <li ng-repeat="id in value['Bound Services']">
                 <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>
               </li>
