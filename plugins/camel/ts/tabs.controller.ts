@@ -14,18 +14,24 @@ namespace Camel {
         id: 'jmx-attributes',
         title: 'Attributes',
         href: "/jmx/attributes" + workspace.hash(),
-        show: () => true
+        show: () => !isContextsFolder(workspace) && !workspace.isRoutesFolder()
       },
       {
         id: 'camel-contexts',
         title: 'Contexts',
         href: "/camel/contexts" + workspace.hash(),
-        show: () => workspace.findChildMBeanWithProperties(workspace.selection, { typeName: 'context' })
+        show: () => isContextsFolder(workspace)
+      },
+      {
+        id: 'camel-routes',
+        title: 'Routes',
+        href: "/camel/routes" + workspace.hash(),
+        show: () => workspace.isRoutesFolder()
       },
       {
         id: 'camel-route-diagram',
         title: 'Route Diagram',
-        href: "/camel/routes" + workspace.hash(),
+        href: "/camel/routeDiagram" + workspace.hash(),
         show: () => (workspace.isRoute() || workspace.isRoutesFolder())
           && workspace.hasInvokeRightsForName(getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml")
       },
@@ -181,18 +187,22 @@ namespace Camel {
         id: 'jmx-operations',
         title: 'Operations',
         href: "/jmx/operations" + workspace.hash(),
-        show: () => true
+        show: () => !isContextsFolder(workspace) && !workspace.isRoutesFolder()
       },
       {
         id: 'jmx-charts',
         title: 'Chart',
         href: "/jmx/charts" + workspace.hash(),
-        show: () => true
+        show: () => !isContextsFolder(workspace) && !workspace.isRoutesFolder()
       }
     ];
 
     $scope.isActive = tab => workspace.isLinkActive(tab.href);
 
   }]);
+
+  function isContextsFolder(workspace) {
+    return workspace.selection && workspace.selection.id === 'camelContexts';
+  }
 
 }

@@ -10,24 +10,23 @@ module Camel {
 
   export var pluginName = 'camel';
 
-  var routeToolBar = "plugins/camel/html/attributeToolBarRoutes.html";
-  var contextToolBar = "plugins/camel/html/attributeToolBarContext.html";
-
   export var _module = angular.module(pluginName, [
     'patternfly',
     'patternfly.table',
     'angularResizable',
-    'hawtio-camel-contexts'
+    'hawtio-camel-contexts',
+    'hawtio-camel-routes'
   ]);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
             .when('/camel/contexts', {template: '<contexts></contexts>'})
+            .when('/camel/routes', {template: '<routes></routes>'})
             .when('/camel/browseEndpoint', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
             .when('/camel/endpoint/browse/:contextId/*endpointPath', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
             .when('/camel/createEndpoint', {templateUrl: 'plugins/camel/html/createEndpoint.html'})
             .when('/camel/route/diagram/:contextId/:routeId', {templateUrl: 'plugins/camel/html/routes.html'})
-            .when('/camel/routes', {templateUrl: 'plugins/camel/html/routes.html'})
+            .when('/camel/routeDiagram', {templateUrl: 'plugins/camel/html/routeDiagram.html'})
             .when('/camel/typeConverter', {templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false})
             .when('/camel/restServices', {templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false})
             .when('/camel/endpointRuntimeRegistry', {templateUrl: 'plugins/camel/html/endpointRuntimeRegistry.html', reloadOnSearch: false})
@@ -90,23 +89,6 @@ module Camel {
     });
     preferencesRegistry.addTab('Camel', 'plugins/camel/html/preferences.html', () => {
       return workspace.treeContainsDomainAndProperties(jmxDomain); 
-    });
-
-    // TODO should really do this via a service that the JMX plugin exposes
-    Jmx.addAttributeToolBar(pluginName, jmxDomain, (selection: Jmx.NodeSelection) => {
-      // TODO there should be a nicer way to do this!
-      var typeName = selection.typeName;
-      if (typeName) {
-        if (_.startsWith(typeName, "context")) return contextToolBar;
-        if (_.startsWith(typeName, "route")) return routeToolBar;
-      }
-      var folderNames = selection.folderNames;
-      if (folderNames && selection.domain === jmxDomain) {
-        var last = _.last(folderNames);
-        if ("routes" === last)  return routeToolBar;
-        if ("context" === last)  return contextToolBar;
-      }
-      return null;
     });
 
     // register default attribute views
@@ -248,7 +230,7 @@ module Camel {
         rank: 20,
         isValid: (yes, no) => workspace.treeContainsDomainAndProperties(jmxDomain) ? yes() : no()
       })
-      .href(() => '/jmx/attributes?main-tab=camel')
+      .href(() => '/camel/contexts?main-tab=camel')
       .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
       .isSelected(() => workspace.isMainTabActive('camel'))
       .build();

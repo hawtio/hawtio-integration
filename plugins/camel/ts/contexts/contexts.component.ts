@@ -5,52 +5,54 @@ namespace Camel {
 
   export class ContextsController {
 
+    private startAction = {
+      name: 'Start',
+      actionFn: action => {
+        let selectedContexts = this.getSelectedContexts();
+        this.contextsService.startContexts(selectedContexts)
+          .then(response => this.updateContexts());
+      },
+      isDisabled: true
+    };
+    private suspendAction = {
+      name: 'Suspend',
+      actionFn: action => {
+        let selectedContexts = this.getSelectedContexts();
+        this.contextsService.suspendContexts(selectedContexts)
+          .then(response => this.updateContexts());
+      },
+      isDisabled: true
+    }
+    private deleteAction = {
+      name: 'Delete',
+      actionFn: action => {
+        this.$uibModal.open({
+          templateUrl: 'deleteContextModal.html'
+        })
+        .result.then(() => {
+          let selectedContexts = this.getSelectedContexts();
+          this.contextsService.stopContexts(selectedContexts)
+            .then(response => this.removeSelectedContexts());
+        });
+      },
+      isDisabled: true
+    };
+
     toolbarConfig = {
       actionsConfig: {
         primaryActions: [
-          {
-            name: 'Start',
-            actionFn: action => {
-              let selectedContexts = this.getSelectedContexts();
-              if (selectedContexts.length > 0) {
-                this.contextsService.startContexts(selectedContexts)
-                  .then(response => this.updateContexts());
-              }
-            }
-          },
-          {
-            name: 'Suspend',
-            actionFn: action => {
-              let selectedContexts = this.getSelectedContexts();
-              if (selectedContexts.length > 0) {
-                this.contextsService.suspendContexts(selectedContexts)
-                  .then(response => this.updateContexts());
-              }
-            }
-          }
+          this.startAction,
+          this.suspendAction
         ],
         moreActions: [
-          {
-            name: 'Delete',
-            actionFn: action => {
-              let selectedContexts = this.getSelectedContexts();
-              if (selectedContexts.length > 0) {
-                this.$uibModal.open({
-                  templateUrl: 'deleteContextModal.html'
-                })
-                .result.then(() => {
-                  this.contextsService.deleteContexts(selectedContexts)
-                    .then(response => this.removeSelectedContexts());
-                });
-              }
-            }
-          }
+          this.deleteAction
         ]
       }
     };
 
     tableConfig = {
-      selectionMatchProp: "name"
+      selectionMatchProp: "name",
+      onCheckBoxChange: item => this.enableDisableActions()
     };
 
     tableColummns = [
@@ -74,6 +76,13 @@ namespace Camel {
       return this.tableItems
         .map((tableItem, i) => angular.extend(this.contexts[i], { selected: tableItem['selected'] }))
         .filter(context => context.selected);
+    }
+
+    private enableDisableActions() {
+      let selectedContexts = this.getSelectedContexts();
+      this.startAction.isDisabled = !selectedContexts.some((route: Route) => route.state === 'Suspended');
+      this.suspendAction.isDisabled = !selectedContexts.some((route: Route) => route.state === 'Started');
+      this.deleteAction.isDisabled = selectedContexts.length === 0;
     }
 
     private loadContexts() {
@@ -100,6 +109,7 @@ namespace Camel {
         .then(contexts => {
           this.contexts = contexts;
           contexts.forEach((context, i) => this.tableItems[i].state = context.state);
+          this.enableDisableActions();
         });
     }
 
@@ -108,6 +118,7 @@ namespace Camel {
       _.remove(this.contexts, context => context.selected);
       _.remove(this.tableItems, tableItem => tableItem['selected']);
       this.workspace.loadTree();
+      this.enableDisableActions();
     }
 
   }

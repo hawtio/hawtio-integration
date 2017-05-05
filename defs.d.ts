@@ -1324,71 +1324,6 @@ declare module Osgi {
  */
 declare module Osgi {
 }
-declare namespace Camel {
-    class Context {
-        name: string;
-        state: string;
-        managementName: string;
-        selected: boolean;
-        constructor(name: string, state: string, managementName: string);
-        readonly mbean: string;
-    }
-}
-declare namespace Camel {
-    class ContextsService {
-        private $q;
-        private jolokia;
-        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia);
-        getContexts(mbeans: string[]): ng.IPromise<Context[]>;
-        startContexts(contexts: Context[]): ng.IPromise<Context[]>;
-        suspendContexts(contexts: Context[]): ng.IPromise<Context[]>;
-        deleteContexts(contexts: Context[]): ng.IPromise<Context[]>;
-        executeOperationOnContexts(operation: string, contexts: Context[]): ng.IPromise<Context[]>;
-    }
-}
-declare namespace Camel {
-    class ContextsController {
-        private $uibModal;
-        private workspace;
-        private contextsService;
-        toolbarConfig: {
-            actionsConfig: {
-                primaryActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                }[];
-                moreActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                }[];
-            };
-        };
-        tableConfig: {
-            selectionMatchProp: string;
-        };
-        tableColummns: {
-            header: string;
-            itemField: string;
-        }[];
-        tableItems: {
-            name: any;
-            state: any;
-        }[];
-        contexts: Context[];
-        constructor($uibModal: any, workspace: Jmx.Workspace, contextsService: ContextsService);
-        $onInit(): void;
-        private getSelectedContexts();
-        private loadContexts();
-        private updateContexts();
-        private removeSelectedContexts();
-    }
-    const contextsComponent: {
-        templateUrl: string;
-        controller: typeof ContextsController;
-    };
-}
-declare namespace Camel {
-}
 declare module Camel {
 }
 declare module Camel {
@@ -1421,4 +1356,148 @@ interface JQuery {
 declare module Camel {
 }
 declare module Camel {
+}
+declare namespace Camel {
+    class Route {
+        name: string;
+        state: string;
+        managementName: string;
+        selected: boolean;
+        constructor(name: string, state: string, managementName: string);
+        readonly mbean: string;
+    }
+}
+declare namespace Camel {
+    class RoutesService {
+        private $q;
+        private jolokia;
+        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia);
+        getRoutes(mbeans: string[]): ng.IPromise<Route[]>;
+        startRoutes(routes: Route[]): ng.IPromise<Route[]>;
+        stopRoutes(routes: Route[]): ng.IPromise<Route[]>;
+        removeRoutes(routes: Route[]): ng.IPromise<Route[]>;
+        executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<Route[]>;
+    }
+}
+declare namespace Camel {
+    class RoutesController {
+        private $uibModal;
+        private workspace;
+        private routesService;
+        private startAction;
+        private stopAction;
+        private deleteAction;
+        toolbarConfig: {
+            actionsConfig: {
+                primaryActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+                moreActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+            };
+        };
+        tableConfig: {
+            selectionMatchProp: string;
+            onCheckBoxChange: (item: any) => void;
+        };
+        tableColummns: {
+            header: string;
+            itemField: string;
+        }[];
+        tableItems: {
+            name: any;
+            state: any;
+        }[];
+        routes: Route[];
+        constructor($uibModal: any, workspace: Jmx.Workspace, routesService: RoutesService);
+        $onInit(): void;
+        private getSelectedRoutes();
+        private enableDisableActions();
+        private loadRoutes();
+        private updateRoutes();
+        private removeSelectedRoutes();
+    }
+    const routesComponent: {
+        templateUrl: string;
+        controller: typeof RoutesController;
+    };
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+    class Context {
+        name: string;
+        state: string;
+        managementName: string;
+        selected: boolean;
+        constructor(name: string, state: string, managementName: string);
+        readonly mbean: string;
+    }
+}
+declare namespace Camel {
+    class ContextsService {
+        private $q;
+        private jolokia;
+        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia);
+        getContexts(mbeans: string[]): ng.IPromise<Context[]>;
+        startContexts(contexts: Context[]): ng.IPromise<Context[]>;
+        suspendContexts(contexts: Context[]): ng.IPromise<Context[]>;
+        stopContexts(contexts: Context[]): ng.IPromise<Context[]>;
+        executeOperationOnContexts(operation: string, contexts: Context[]): ng.IPromise<Context[]>;
+    }
+}
+declare namespace Camel {
+    class ContextsController {
+        private $uibModal;
+        private workspace;
+        private contextsService;
+        private startAction;
+        private suspendAction;
+        private deleteAction;
+        toolbarConfig: {
+            actionsConfig: {
+                primaryActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+                moreActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+            };
+        };
+        tableConfig: {
+            selectionMatchProp: string;
+            onCheckBoxChange: (item: any) => void;
+        };
+        tableColummns: {
+            header: string;
+            itemField: string;
+        }[];
+        tableItems: {
+            name: any;
+            state: any;
+        }[];
+        contexts: Context[];
+        constructor($uibModal: any, workspace: Jmx.Workspace, contextsService: ContextsService);
+        $onInit(): void;
+        private getSelectedContexts();
+        private enableDisableActions();
+        private loadContexts();
+        private updateContexts();
+        private removeSelectedContexts();
+    }
+    const contextsComponent: {
+        templateUrl: string;
+        controller: typeof ContextsController;
+    };
+}
+declare namespace Camel {
 }

@@ -1,14 +1,15 @@
-/// <reference path="context.ts"/>
+/// <reference path="../../../includes.ts"/>
+/// <reference path="route.ts"/>
 
 namespace Camel {
 
-  export class ContextsService {
+  export class RoutesService {
     
     constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia) {
       'ngInject';
     }
 
-    getContexts(mbeans: string[]): ng.IPromise<Context[]> {
+    getRoutes(mbeans: string[]): ng.IPromise<Route[]> {
       if (mbeans.length === 0) {
         return this.$q.resolve([]);
       }
@@ -20,50 +21,48 @@ namespace Camel {
       }));
 
       return this.$q((resolve, reject) => {
-        let contexts = [];
+        let routes = [];
         this.jolokia.request(requests, {
           success: function(response) {
             let object = response.value;
-            let context = new Context(object.CamelId, object.State, object.ManagementName);
-            contexts.push(context);
-            if (contexts.length === requests.length) {
-              resolve(contexts);
+            let route = new Route(object.RouteId, object.State, object.CamelManagementName);
+            routes.push(route);
+            if (routes.length === requests.length) {
+              resolve(routes);
             }
           }
         }, {
           error: (response) => {
-            log.debug('ContextsService.getContexts() failed: ' + response.error);
             reject(response.error);
           }
         });
       });
     }
 
-    startContexts(contexts: Context[]): ng.IPromise<Context[]> {
-      return this.executeOperationOnContexts('start()', contexts);
+    startRoutes(routes: Route[]): ng.IPromise<Route[]> {
+      return this.executeOperationOnRoutes('start()', routes);
     }
 
-    suspendContexts(contexts: Context[]): ng.IPromise<Context[]> {
-      return this.executeOperationOnContexts('suspend()', contexts);
+    stopRoutes(routes: Route[]): ng.IPromise<Route[]> {
+      return this.executeOperationOnRoutes('stop()', routes);
     }
 
-    stopContexts(contexts: Context[]): ng.IPromise<Context[]> {
-      return this.executeOperationOnContexts('stop()', contexts);
+    removeRoutes(routes: Route[]): ng.IPromise<Route[]> {
+      return this.executeOperationOnRoutes('remove()', routes);
     }
 
-    executeOperationOnContexts(operation: string, contexts: Context[]): ng.IPromise<Context[]> {
-      if (contexts.length === 0) {
+    executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<Route[]> {
+      if (routes.length === 0) {
         return this.$q.resolve([]);
       }
 
-      let requests = contexts.map(context => ({
+      let requests = routes.map(route => ({
         type: 'exec',
         operation: operation,
-        mbean: context.mbean
+        mbean: route.mbean
       }));
       
       return this.$q((resolve, reject) => {
-        let contexts = [];
         let responseCount = 0;
         this.jolokia.request(requests, {
           success: function(response) {
@@ -74,7 +73,6 @@ namespace Camel {
           }
         }, {
           error: (response) => {
-            log.debug('ContextsService.executeOperationOnContexts() failed: ' + response.error);
             reject(response.error);
           }
         });
