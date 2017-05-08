@@ -2,10 +2,6 @@
 
   <h1>{{row.Headers['Bundle-Name'].Value}}</h1>
 
-  <div class="breadcrumb">
-    <a href="#" onclick="window.history.back()"><span class="fa fa-angle-left"></span> Back to Bundles</a>
-  </div>
-
   <div class="toolbar-pf">
     <form class="toolbar-pf-actions">
       <div class="form-group">
@@ -58,7 +54,7 @@
       Symbolic&nbsp;Name
     </dt>
     <dd>
-      <span class="label label-default">{{row.SymbolicName}}</span>
+      {{row.SymbolicName}}
     </dd>
     <dt>
       Version
@@ -82,7 +78,7 @@
       State
     </dt>
     <dd>
-      <span class="label" ng-class="row.StateStyle">{{row.State.toLowerCase()}}</span>
+      {{row.State.toLowerCase()}}
     </dd>
     <dt>
       Last&nbsp;Modified
@@ -111,46 +107,96 @@
     <span ng-bind-html="classLoadingAlert.message"></span>
   </div>
 
-  <form class="form-inline inspect-classloading">
+  <form class="form-horizontal">
     <div class="form-group">
-      <label class="control-label" for="exampleInput">Class Name</label>
-      <input type="text" class="form-control" ng-model="classToLoad">
-      <button class="btn btn-default" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">
-        Load Class
-      </button>
+      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>
+      <div class="col-sm-10">
+        <input type="text" id="classToLoad" class="form-control" ng-model="classToLoad">
+      </div>
     </div>
-  </form>
-
-  <form class="form-inline inspect-classloading">
     <div class="form-group">
-      <label class="control-label" for="exampleInput">Resource Name</label>
-      <input type="text" class="form-control" ng-model="resourceToLoad">
-      <button class="btn btn-default" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">
-        Get Resource
-      </button>
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="button" class="btn btn-primary" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">
+          Load Class
+        </button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>
+      <div class="col-sm-10">
+        <input type="text" id="resourceToLoad" class="form-control" ng-model="resourceToLoad">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="button" class="btn btn-primary" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">
+          Get Resource
+        </button>
+      </div>
     </div>
   </form>
 
   <h2>Imported Packages</h2>
 
-  <ul class="list-group labels">
-    <li class="list-group-item" ng-repeat="(package, data) in row.ImportData">
-      <span id="import.{{package}}" class="label label-info">{{package}}</span>
-    </li>
-  </ul>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Imported Version</th>
+        <th>Version</th>
+        <th>Resolution</th>
+        <th>Dynamic Import</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="(package, data) in row.ImportData">
+        <td>{{package}}</td>
+        <td>{{data.ReportedVersion}}</td>
+        <td>{{data.headers.Aversion}}</td>
+        <td>{{data.headers.Dresolution}}</td>
+        <td>{{data.headers.reason}}</td>
+      </tr>
+    </tbody>
+  </table>
 
-  <div class="row">
-    <div id="unsatisfiedOptionalImports" class="col-md-12">
-    </div>
+  <div ng-if="thereAreUnsatisfiedPackages()">
+    <h3>Imports not satisfied</h3>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Version</th>
+          <th>Resolution</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="(package, data) in unsatisfiedPackages">
+          <td>{{package}}</td>
+          <td>{{data.Aversion}}</td>
+          <td>{{data.Dresolution}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <h2>Exported Packages</h2>
 
-  <ul class="list-group labels">
-    <li class="list-group-item" ng-repeat="(package, data) in row.ExportData">
-      <span id="export.{{package}}" class="label label-success">{{package}}</span>
-    </li>
-  </ul>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Exported Version</th>
+        <th>Uses</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="(package, data) in row.ExportData">
+        <td>{{package}}</td>
+        <td>{{data.ReportedVersion}}</td>
+        <td class="osgi-bundle-exported-package-uses">{{data.headers.Duses}}</td>
+      </tr>
+    </tbody>
+  </table>
 
   <h2>Services</h2>
 
@@ -158,7 +204,7 @@
 
   <ul class="list-group labels">
     <li class="list-group-item" ng-repeat="id in row.RegisteredServices">
-      <span id="registers.service.{{id}}" class="fa fa-cog text-success">{{id}}</span>
+      <span id="registers.service.{{id}}" class="text-success">{{id}}</span>
     </li>
   </ul>
 
@@ -166,14 +212,16 @@
 
   <ul class="list-group labels">
     <li class="list-group-item" ng-repeat="id in row.ServicesInUse">
-      <span id="uses.service.{{id}}" class="fa fa-cog text-info">{{id}}</span>
+      <span id="uses.service.{{id}}" class="text-info">{{id}}</span>
     </li>
   </ul>
 
-  <h2>Other Bundles using this Bundle</h2>
+  <div ng-if="row.RequiringBundles.length > 0">
+    <h2>Other Bundles using this Bundle</h2>
 
-  <div class="row requiring-bundles">
-    <div class="col-md-12" ng-bind-html="row.RequiringBundles"></div>
+    <ul class="list-unstyled">
+      <li ng-repeat="bundle in row.RequiringBundles"><a ng-href="{{bundle.url}}">{{bundle.label}}</a></li>
+    </ul>
   </div>
 
   <h2>Headers</h2>

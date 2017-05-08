@@ -195,16 +195,13 @@ module Osgi {
   }
 
   export function labelBundleLinks(workspace, values, allValues) {
-    var answer = "";
+    let answer = [];
     var sorted = toCollection(values).sort((a,b) => {return a-b});
     angular.forEach(sorted, function (value, key) {
-      var prefix = "";
-      if (answer.length > 0) {
-        prefix = " ";
-      }
-      var info = allValues[value] || {};
-      var labelText = info.SymbolicName;
-      answer += prefix + "<a class='label label-default' href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + labelText + "</a>";
+      answer.push({
+        label: allValues[value].SymbolicName,
+        url: Core.url("/osgi/bundle/" + value + workspace.hash())
+      });
     });
     return answer;
   }

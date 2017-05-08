@@ -1042,7 +1042,7 @@ declare module Osgi {
     function parseActualPackages(packages: string[]): {};
     function parseManifestHeader(headers: {}, name: string): {};
     function toCollection(values: any): any;
-    function labelBundleLinks(workspace: any, values: any, allValues: any): string;
+    function labelBundleLinks(workspace: any, values: any, allValues: any): any[];
     function bundleLinks(workspace: any, values: any): string;
     function bundleUrls(workspace: any, values: any): any[];
     function pidLinks(workspace: any, values: any): string;
@@ -1115,7 +1115,6 @@ declare module Osgi {
  * @module Osgi
  */
 declare module Osgi {
-    function formatAttributesAndDirectivesForPopover(data: {}, skipVersion: boolean): string;
     function formatServiceName(objClass: any): string;
 }
 /**

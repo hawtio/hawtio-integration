@@ -7,46 +7,6 @@
  */
 module Osgi {
 
-  // These functions are exported independently to facilitate unit testing
-  export function formatAttributesAndDirectivesForPopover(data:{}, skipVersion:boolean):string {
-    var str = "";
-    if (!data) {
-      return str;
-    }
-    var sortedKeys = Object.keys(data).sort();
-    for (var i = 0; i < sortedKeys.length; i++) {
-      var da:any = sortedKeys[i];
-      var type = da.charAt(0);
-
-      var separator = "";
-      var txtClass;
-      if (type === "A") {
-        separator = "=";
-        txtClass = "text-info";
-      }
-      if (type === "D") {
-        separator = ":=";
-        txtClass = "muted";
-      }
-
-      if (separator !== "") {
-        if (skipVersion) {
-          if (da === "Aversion") {
-            // We're using the 'ReportedVersion' as it comes from PackageAdmin
-            continue;
-          }
-        }
-
-        var value = data[da];
-        if (value.length > 15) {
-          value = value.replace(/[,]/g, ",<br/>&nbsp;&nbsp;");
-        }
-        str += "<tr><td><strong class='" + txtClass + "'>" + da.substring(1) + "</strong>" + separator + value + "</td></tr>";
-      }
-    }
-    return str;
-  }
-
   export function formatServiceName(objClass:any):string {
     if (angular.isArray(objClass)) {
       return formatServiceNameArray(objClass);
@@ -91,6 +51,10 @@ module Osgi {
           return true;
       }
     };
+
+    $scope.unsatisfiedPackages = {};
+
+    $scope.thereAreUnsatisfiedPackages = () => Object.keys($scope.unsatisfiedPackages).length > 0;
 
     $scope.dismissClassLoadingAlert = () => $scope.classLoadingAlert = null;
 
@@ -228,90 +192,49 @@ module Osgi {
       // now find the row based on the selection ui
       Osgi.defaultBundleValues(workspace, $scope, values);
       $scope.row = Osgi.findBundle($scope.bundleId, values);
-      Core.$apply($scope);
 
       createImportPackageSection();
       createExportPackageSection();
       populateServicesSection();
+
+      Core.$apply($scope);
     }
 
     function createImportPackageSection():void {
-      // setup popovers
       var importPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Import-Package");
+      
       for (var pkg in $scope.row.ImportData) {
         var data = importPackageHeaders[pkg];
-        var po = "<small><table>" +
-                "<tr><td><strong>Imported Version=</strong>" + $scope.row.ImportData[pkg].ReportedVersion + "</td></tr>";
         if (data !== undefined) {
-          // This happens in case the package was imported due to a DynamicImport-Package
-          po += formatAttributesAndDirectivesForPopover(data, false);
-          if (importPackageHeaders[pkg]["Dresolution"] === "optional") {
-            $(document.getElementById("import." + pkg)).removeClass('label-info').addClass("label-default");
-          }
+          $scope.row.ImportData[pkg].headers = data;
         } else {
-          // This is a dynamic import
-          $(document.getElementById("import." + pkg)).removeClass('label-info').addClass("label-danger");
           var reason = $scope.row.Headers["DynamicImport-Package"];
           if (reason !== undefined) {
             reason = reason.Value;
-            po += "<tr><td>Dynamic Import. Imported due to:</td></tr>";
-            po += "<tr><td><strong>DynamicImport-Package=</strong>" + reason + "</td></tr>";
+            $scope.row.ImportData[pkg].headers = { reason: 'Imported due to ' + reason.Value };
           }
         }
-        po += "</table></small>";
-
-        (<any> $)(document.getElementById("import." + pkg)).
-          popover({title: "attributes and directives", content: po, trigger: "hover", html: true });
-
-        // Unset the value so that we can see whether there are any unbound optional imports left...
-        importPackageHeaders[pkg] = undefined;
+        // Delete data so we can see whether there are any unbound optional imports left...
+        delete importPackageHeaders[pkg];
       }
 
-      let unsatisfied = "";
       for (let pkg in importPackageHeaders) {
-        if (importPackageHeaders[pkg] === undefined) {
-          continue;
+        // Ignore imported packages that are also exported because they are satisfied from the bundle
+        // itself and should not be listed as unsatisfied.
+        if ($scope.row.ExportData[pkg] === undefined) {
+          $scope.unsatisfiedPackages[pkg] = importPackageHeaders[pkg];
         }
-        if ($scope.row.ExportData[pkg] !== undefined) {
-          // The bundle exports this package and also imports it. In this case it is satisfied from the bundle
-          // itself so it should not be listed as unsatisfied.
-          continue;
-        }
-        unsatisfied += `<li class="list-group-item"><span id="unsatisfied.${pkg}" class="label label-warning">${pkg}</span></li>`;
-      }
-
-      if (unsatisfied !== "") {
-        unsatisfied = `
-          <p class='text-warning'><strong>The following optional imports were not satisfied:</strong></p>
-          <ul class="list-group labels">
-            ${unsatisfied}
-          </ul>
-          `;
-        document.getElementById("unsatisfiedOptionalImports").innerHTML = unsatisfied;
-      }
-
-      for (var pkg in importPackageHeaders) {
-        if (importPackageHeaders[pkg] === undefined) {
-          continue;
-        }
-        var po = "<small><table>";
-        po += formatAttributesAndDirectivesForPopover(importPackageHeaders[pkg], false);
-        po += "</table></small>";
-        (<any> $)(document.getElementById("unsatisfied." + pkg)).
-                popover({title: "attributes and directives", content: po, trigger: "hover", html: true });
       }
     }
 
     function createExportPackageSection():void {
-      // setup popovers
       var exportPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Export-Package");
       for (var pkg in $scope.row.ExportData) {
-        var po = "<small><table>" +
-                "<tr><td><strong>Exported Version=</strong>" + $scope.row.ExportData[pkg].ReportedVersion + "</td></tr>";
-        po += formatAttributesAndDirectivesForPopover(exportPackageHeaders[pkg], true);
-        po += "</table></small>";
-        (<any> $)(document.getElementById("export." + pkg)).
-                popover({title: "attributes and directives", content: po, trigger: "hover", html: true });
+        // replace commas with comma + whitespace so names wrap nicely in the UI
+        if (exportPackageHeaders[pkg] && exportPackageHeaders[pkg].Duses) {
+          exportPackageHeaders[pkg].Duses = exportPackageHeaders[pkg].Duses.replace(/,/g, ', ');
+        }
+        $scope.row.ExportData[pkg].headers = exportPackageHeaders[pkg];
       }
     }
 
