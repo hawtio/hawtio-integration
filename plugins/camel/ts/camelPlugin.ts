@@ -237,7 +237,7 @@ module Camel {
 
     nav.add(tab);
 
-    workspace.addNamedTreePostProcessor('camel', (tree) => {
+    workspace.addNamedTreePostProcessor('camel', (tree: Jmx.Folder) => {
       var domainName = Camel.jmxDomain;
       if (tree) {
         var rootFolder = new Jmx.Folder("Camel Contexts");
@@ -255,7 +255,7 @@ module Camel {
         var folder = tree.get(domainName);
         if (folder) {
           angular.forEach(folder.children, (value, key) => {
-            var entries = value.map;
+            var entries = (<Jmx.Folder>value).map;
             if (entries) {
               var contextsFolder = entries["context"];
               var routesNode = entries["routes"];
@@ -265,7 +265,7 @@ module Camel {
               if (contextsFolder) {
                 var contextNode = contextsFolder.children[0];
                 if (contextNode) {
-                  var title = contextNode.title;
+                  var title = contextNode.text;
                   var match = true;
                   if (match) {
                     var folder = new Jmx.Folder(title);
@@ -289,13 +289,13 @@ module Camel {
                     if (routesNode) {
                       folder.moveChild(routesNode);
                       routesNode.typeName = "routes";
-                      routesNode.addClass = "org-apache-camel-routes-folder";
+                      routesNode.class = "org-apache-camel-routes-folder";
                       angular.forEach(routesNode.children, (n: Jmx.Folder) => n.addClass = "org-apache-camel-routes");
                     }
                     if (endpointsNode) {
                       folder.moveChild(endpointsNode);
                       endpointsNode.typeName = "endpoints";
-                      endpointsNode.addClass = "org-apache-camel-endpoints-folder";
+                      endpointsNode.class = "org-apache-camel-endpoints-folder";
                       angular.forEach(endpointsNode.children, (n: Jmx.Folder) => {
                         n.addClass = "org-apache-camel-endpoints";
                         /* TODO doesn't compile, is getContextId(workspace:Workspace)
@@ -307,7 +307,7 @@ module Camel {
                     }
                     if (componentsNode) {
                       folder.moveChild(componentsNode);
-                      componentsNode.addClass = "org-apache-camel-components-folder";
+                      componentsNode.class = "org-apache-camel-components-folder";
                       angular.forEach(componentsNode.children, (n: Jmx.Folder) => {
                         n.addClass = "org-apache-camel-components";
                         /* TODO doesn't compile, is getContextId(workspace:Workspace)
@@ -320,7 +320,7 @@ module Camel {
                     }
                     if (dataFormatsNode) {
                       folder.moveChild(dataFormatsNode);
-                      dataFormatsNode .addClass = "org-apache-camel-dataformats-folder";
+                      dataFormatsNode.class = "org-apache-camel-dataformats-folder";
                       angular.forEach(dataFormatsNode.children, (n: Jmx.Folder) => {
                         n.addClass = "org-apache-camel-dataformats";
                         /* TODO doesn't compile, is getContextId(workspace:Workspace)
