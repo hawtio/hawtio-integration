@@ -238,12 +238,11 @@ module Camel {
     nav.add(tab);
 
     workspace.addNamedTreePostProcessor('camel', (tree) => {
-      var children = [];
       var domainName = Camel.jmxDomain;
       if (tree) {
         var rootFolder = new Jmx.Folder("Camel Contexts");
         rootFolder.addClass = "org-apache-camel-context-folder";
-        rootFolder.children = children;
+        rootFolder.children = [];
         rootFolder.typeName = "context";
         rootFolder.key = "camelContexts";
         rootFolder.domain = domainName;
@@ -286,23 +285,18 @@ module Camel {
                       contextNode.version = response.value;
                       Core.$apply($rootScope);
                     }));
+
                     if (routesNode) {
-                      var routesFolder = new Jmx.Folder("Routes");
-                      routesFolder.addClass = "org-apache-camel-routes-folder";
-                      routesFolder.parent = contextsFolder;
-                      routesFolder.children = routesNode.children;
-                      angular.forEach(routesFolder.children, (n: Jmx.Folder) => n.addClass = "org-apache-camel-routes");
-                      folder.children.push(routesFolder);
-                      routesFolder.typeName = "routes";
-                      routesFolder.key = routesNode.key;
-                      routesFolder.domain = routesNode.domain;
+                      folder.moveChild(routesNode);
+                      routesNode.typeName = "routes";
+                      routesNode.addClass = "org-apache-camel-routes-folder";
+                      angular.forEach(routesNode.children, (n: Jmx.Folder) => n.addClass = "org-apache-camel-routes");
                     }
                     if (endpointsNode) {
-                      var endpointsFolder = new Jmx.Folder("Endpoints");
-                      endpointsFolder.addClass = "org-apache-camel-endpoints-folder";
-                      endpointsFolder.parent = contextsFolder;
-                      endpointsFolder.children = endpointsNode.children;
-                      angular.forEach(endpointsFolder.children, (n: Jmx.Folder) => {
+                      folder.moveChild(endpointsNode);
+                      endpointsNode.typeName = "endpoints";
+                      endpointsNode.addClass = "org-apache-camel-endpoints-folder";
+                      angular.forEach(endpointsNode.children, (n: Jmx.Folder) => {
                         n.addClass = "org-apache-camel-endpoints";
                         /* TODO doesn't compile, is getContextId(workspace:Workspace)
                         if (!getContextId(n)) {
@@ -310,18 +304,11 @@ module Camel {
                         }
                         */
                       });
-                      folder.children.push(endpointsFolder);
-                      endpointsFolder.entries = contextNode.entries;
-                      endpointsFolder.typeName = "endpoints";
-                      endpointsFolder.key = endpointsNode.key;
-                      endpointsFolder.domain = endpointsNode.domain;
                     }
                     if (componentsNode) {
-                      var componentsFolder = new Jmx.Folder("Components");
-                      componentsFolder.addClass = "org-apache-camel-components-folder";
-                      componentsFolder.parent = contextsFolder;
-                      componentsFolder.children = componentsNode.children;
-                      angular.forEach(componentsFolder.children, (n: Jmx.Folder) => {
+                      folder.moveChild(componentsNode);
+                      componentsNode.addClass = "org-apache-camel-components-folder";
+                      angular.forEach(componentsNode.children, (n: Jmx.Folder) => {
                         n.addClass = "org-apache-camel-components";
                         /* TODO doesn't compile, is getContextId(workspace:Workspace)
                         if (!getContextId(n)) {
@@ -329,18 +316,12 @@ module Camel {
                         }
                         */
                       });
-                      folder.children.push(componentsFolder);
-                      componentsFolder.entries = contextNode.entries;
-                      componentsFolder.typeName = "components";
-                      componentsFolder.key = componentsNode.key;
-                      componentsFolder.domain = componentsNode.domain;
+                      componentsNode.typeName = "components";
                     }
                     if (dataFormatsNode) {
-                      var dataFormatsFolder = new Jmx.Folder("Dataformats");
-                      dataFormatsFolder.addClass = "org-apache-camel-dataformats-folder";
-                      dataFormatsFolder.parent = contextsFolder;
-                      dataFormatsFolder.children = dataFormatsNode.children;
-                      angular.forEach(dataFormatsFolder.children, (n: Jmx.Folder) => {
+                      folder.moveChild(dataFormatsNode);
+                      dataFormatsNode .addClass = "org-apache-camel-dataformats-folder";
+                      angular.forEach(dataFormatsNode.children, (n: Jmx.Folder) => {
                         n.addClass = "org-apache-camel-dataformats";
                         /* TODO doesn't compile, is getContextId(workspace:Workspace)
                         if (!getContextId(n)) {
@@ -348,11 +329,7 @@ module Camel {
                         }
                         */
                       });
-                      folder.children.push(dataFormatsFolder);
-                      dataFormatsFolder.entries = contextNode.entries;
-                      dataFormatsFolder.typeName = "dataformats";
-                      dataFormatsFolder.key = dataFormatsNode.key;
-                      dataFormatsFolder.domain = dataFormatsNode.domain;
+                      dataFormatsNode.typeName = "dataformats";
                     }
 
                     var jmxNode = new Jmx.Folder("MBeans");
@@ -360,17 +337,15 @@ module Camel {
                     // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
                     angular.forEach(entries, (jmxChild, name) => {
                       if (name !== "context" && name !== "routes" && name !== "endpoints" && name !== "components" && name !== "dataformats") {
-                        jmxNode.children.push(jmxChild);
+                        jmxNode.moveChild(jmxChild);
                       }
                     });
 
                     if (jmxNode.children.length > 0) {
                       jmxNode.sortChildren(false);
-                      folder.children.push(jmxNode);
+                      folder.moveChild(jmxNode);
                     }
-                    folder.parent = rootFolder;
-                    children.push(folder);
-
+                    rootFolder.moveChild(folder);
                   }
                 }
               }
