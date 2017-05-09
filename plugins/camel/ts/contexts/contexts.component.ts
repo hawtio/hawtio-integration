@@ -73,8 +73,7 @@ namespace Camel {
     }
 
     private getSelectedContexts() {
-      return this.tableItems
-        .map((tableItem, i) => angular.extend(this.contexts[i], { selected: tableItem['selected'] }))
+      return _.map(this.tableItems, (tableItem, i) => angular.extend(this.contexts[i], { selected: tableItem['selected'] }))
         .filter(context => context.selected);
     }
 
@@ -91,10 +90,10 @@ namespace Camel {
         if (typeNames.length > 1) {
           console.error("Child nodes aren't of the same type. Found types: " + typeNames);
         }
-        let mbeans = this.workspace.selection.children.map(node => node.objectName);
+        let mbeans = _.map(this.workspace.selection.children, node => node.objectName);
         this.contextsService.getContexts(mbeans)
           .then(contexts => {
-            this.tableItems = contexts.map(context => ({
+            this.tableItems = _.map(contexts, context => ({
               name: context.name,
               state: context.state
             }));
@@ -104,7 +103,7 @@ namespace Camel {
     }
 
     private updateContexts() {
-      let mbeans = this.contexts.map(context => context.mbean);
+      let mbeans = _.map(this.contexts, context => context.mbean);
       this.contextsService.getContexts(mbeans)
         .then(contexts => {
           this.contexts = contexts;

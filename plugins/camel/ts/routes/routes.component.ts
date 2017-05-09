@@ -76,8 +76,7 @@ namespace Camel {
     }
 
     private getSelectedRoutes() {
-      return this.tableItems
-        .map((tableItem, i) => angular.extend(this.routes[i], { selected: tableItem['selected'] }))
+      return _.map(this.tableItems, (tableItem, i) => angular.extend(this.routes[i], { selected: tableItem['selected'] }))
         .filter(route => route.selected);
     }
 
@@ -94,10 +93,10 @@ namespace Camel {
         if (typeNames.length > 1) {
           console.error("Child nodes aren't of the same type. Found types: " + typeNames);
         }
-        let mbeans = this.workspace.selection.children.map(node => node.objectName);
+        let mbeans = _.map(this.workspace.selection.children, node => node.objectName);
         this.routesService.getRoutes(mbeans)
           .then(routes => {
-            this.tableItems = routes.map(route => ({
+            this.tableItems = _.map(routes, route => ({
               name: route.name,
               state: route.state
             }));
@@ -108,7 +107,7 @@ namespace Camel {
     }
 
     private updateRoutes() {
-      let mbeans = this.routes.map(route => route.mbean);
+      let mbeans = _.map(this.routes, route => route.mbean);
       this.routesService.getRoutes(mbeans)
         .then(routes => {
           this.routes = routes;
