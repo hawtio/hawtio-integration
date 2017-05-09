@@ -7,12 +7,8 @@
  */
 module Osgi {
 
-  export var PackagesController = _module.controller("Osgi.PackagesController", ["$scope", "$filter", "workspace", "$templateCache", "$compile", (
-      $scope,
-      $filter: ng.IFilterService,
-      workspace: Jmx.Workspace,
-      $templateCache: ng.ITemplateCacheService,
-      $compile: ng.IAttributes) => {
+  export var PackagesController = _module.controller("Osgi.PackagesController", ["$scope", "workspace", (
+      $scope, workspace: Jmx.Workspace) => {
 
     $scope.packages = null;
 

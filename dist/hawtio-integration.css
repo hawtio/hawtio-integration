@@ -381,9 +381,11 @@ div.camel-properties {
 }
 .list-packages .list-view-pf-description,
 .list-packages .list-group-item-heading,
-.list-packages .list-group-item-text,
-.list-packages .list-view-pf-additional-info {
+.list-packages .list-group-item-text {
   width: auto;
+}
+.list-packages .list-group-item-container {
+  padding: 10px 20px;
 }
 .package-bundles-list,
 .service-bundles-list,
