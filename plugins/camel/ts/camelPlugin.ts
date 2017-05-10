@@ -258,68 +258,64 @@ module Camel {
             if (contextsFolder) {
               const contextNode = contextsFolder.children[0];
               if (contextNode) {
-                var title = contextNode.text;
-                var match = true;
-                if (match) {
-                  var folder = new Jmx.Folder(title);
-                  folder.class = 'org-apache-camel-context';
-                  folder.domain = domainName;
-                  folder.objectName = contextNode.objectName;
-                  folder.entries = contextNode.entries;
-                  folder.typeName = contextNode.typeName;
-                  folder.key = contextNode.key;
-                  folder.version = contextNode.version;
-                  // fetch the camel version and add it to the tree here to avoid making a blocking call elsewhere
-                  jolokia.request({
-                    'type': 'read',
-                    'mbean': contextNode.objectName,
-                    'attribute': 'CamelVersion'
-                  }, Core.onSuccess((response) => {
-                    contextNode.version = response.value;
-                    Core.$apply($rootScope);
-                  }));
+                const folder = new Jmx.Folder(contextNode.text);
+                folder.class = 'org-apache-camel-context';
+                folder.domain = domainName;
+                folder.objectName = contextNode.objectName;
+                folder.entries = contextNode.entries;
+                folder.typeName = contextNode.typeName;
+                folder.key = contextNode.key;
+                folder.version = contextNode.version;
+                // fetch the camel version and add it to the tree here to avoid making a blocking call elsewhere
+                jolokia.request({
+                  'type': 'read',
+                  'mbean': contextNode.objectName,
+                  'attribute': 'CamelVersion'
+                }, Core.onSuccess((response) => {
+                  contextNode.version = response.value;
+                  Core.$apply($rootScope);
+                }));
 
-                  if (routesNode) {
-                    folder.moveChild(routesNode);
-                    routesNode.typeName = 'routes';
-                    routesNode.class = 'org-apache-camel-routes-folder';
-                    angular.forEach(routesNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-routes');
-                  }
-                  if (endpointsNode) {
-                    folder.moveChild(endpointsNode);
-                    endpointsNode.typeName = 'endpoints';
-                    endpointsNode.class = 'org-apache-camel-endpoints-folder';
-                    angular.forEach(endpointsNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-endpoints');
-                  }
-                  if (componentsNode) {
-                    folder.moveChild(componentsNode);
-                    componentsNode.typeName = 'components';
-                    componentsNode.class = 'org-apache-camel-components-folder';
-                    angular.forEach(componentsNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-components');
-                  }
-                  if (dataFormatsNode) {
-                    folder.moveChild(dataFormatsNode);
-                    dataFormatsNode.class = 'org-apache-camel-dataformats-folder';
-                    angular.forEach(dataFormatsNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-dataformats');
-                    dataFormatsNode.typeName = 'dataformats';
-                  }
-
-                  const jmxNode = new Jmx.Folder('MBeans');
-
-                  // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
-                  node.children.forEach(child => {
-                    const name = child.key;
-                    if (name !== 'context' && name !== 'routes' && name !== 'endpoints' && name !== 'components' && name !== 'dataformats') {
-                      jmxNode.moveChild(child);
-                    }
-                  });
-
-                  if (jmxNode.children.length > 0) {
-                    jmxNode.sortChildren(false);
-                    folder.moveChild(jmxNode);
-                  }
-                  rootFolder.moveChild(folder);
+                if (routesNode) {
+                  folder.moveChild(routesNode);
+                  routesNode.typeName = 'routes';
+                  routesNode.class = 'org-apache-camel-routes-folder';
+                  angular.forEach(routesNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-routes');
                 }
+                if (endpointsNode) {
+                  folder.moveChild(endpointsNode);
+                  endpointsNode.typeName = 'endpoints';
+                  endpointsNode.class = 'org-apache-camel-endpoints-folder';
+                  angular.forEach(endpointsNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-endpoints');
+                }
+                if (componentsNode) {
+                  folder.moveChild(componentsNode);
+                  componentsNode.typeName = 'components';
+                  componentsNode.class = 'org-apache-camel-components-folder';
+                  angular.forEach(componentsNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-components');
+                }
+                if (dataFormatsNode) {
+                  folder.moveChild(dataFormatsNode);
+                  dataFormatsNode.class = 'org-apache-camel-dataformats-folder';
+                  angular.forEach(dataFormatsNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-dataformats');
+                  dataFormatsNode.typeName = 'dataformats';
+                }
+
+                const jmxNode = new Jmx.Folder('MBeans');
+
+                // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
+                node.children.forEach(child => {
+                  const name = child.key;
+                  if (name !== 'context' && name !== 'routes' && name !== 'endpoints' && name !== 'components' && name !== 'dataformats') {
+                    jmxNode.moveChild(child);
+                  }
+                });
+
+                if (jmxNode.children.length > 0) {
+                  jmxNode.sortChildren(false);
+                  folder.moveChild(jmxNode);
+                }
+                rootFolder.moveChild(folder);
               }
             }
           });
