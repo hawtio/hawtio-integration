@@ -7,8 +7,8 @@ module Camel {
     // TODO: the tree should ideally be initialised synchronously
     const tree = () => (<any>$('#cameltree')).treeview(true);
 
-    $scope.expandAll = () => tree().expandAll({ silent: true });
-    $scope.contractAll = () => tree().collapseAll({ silent: true });
+    $scope.expandAll = () => tree().expandNode(tree().getNodes(), { levels: 1, silent: true });
+    $scope.contractAll = () => tree().collapseNode(tree().getNodes(), { ignoreChildren: true, silent: true });
 
     const search = _.debounce(filter => {
       const result = tree().search(filter, {
@@ -82,12 +82,10 @@ module Camel {
       // lets pull out each context
       var tree = workspace.tree;
       if (tree) {
-        var rootFolder = tree.findDescendant((node) => {
-          return node.id === 'camelContexts';
-        });
+        const rootFolder = tree.findDescendant(node => node.id === 'camelContexts');
         if (rootFolder) {
           $timeout(() => {
-            var treeElement = $("#cameltree");
+            const treeElement = $("#cameltree");
             Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
             // lets do this asynchronously to avoid Error: $digest already in progress
             updateSelectionFromURL();
