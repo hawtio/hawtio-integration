@@ -8,8 +8,8 @@ module ActiveMQ {
     // TODO: the tree should ideally be initialised synchronously
     const tree = () => (<any>$('#activemqtree')).treeview(true);
 
-    $scope.expandAll = () => tree().expandAll({ silent: true });
-    $scope.contractAll = () => tree().collapseAll({ silent: true });
+    $scope.expandAll = () => tree().expandNode(tree().getNodes(), { levels: 1, silent: true });
+    $scope.contractAll = () => tree().collapseNode(tree().getNodes(), { ignoreChildren: true, silent: true });
 
     const search = _.debounce(filter => {
       const result = tree().search(filter, {
