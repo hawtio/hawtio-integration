@@ -108,7 +108,7 @@ module Camel {
               });
             }
           }
-          $scope.graphView = "plugins/camel/html/routes.html";
+          $scope.graphView = "plugins/camel/html/routeDiagram.html";
           // must include the tableView directly to have it working with the slider
         } else {
           tracerStatus.messages = [];

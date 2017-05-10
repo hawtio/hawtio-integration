@@ -83,13 +83,92 @@
   margin-bottom: 10px;
 }
 
-#camel-debug .debug-toolbar {
+.camel-debug-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: hidden;
+}
+.camel-debug-main h2 {
+  flex: 0 0 auto;
+}
+.camel-debug-main .camel-debug-toolbar {
+  flex: 0 0 auto;
   margin-bottom: 10px;
 }
-#camel-debug .debug-icon-buttons button {
+.camel-debug-main .camel-debug-diagram-wrapper {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  position: relative;
+}
+.camel-debug-main .camel-debug-bottom-panel.camel-debug-panel-show {
+  height: 200px;
+}
+.camel-debug-main .camel-debug-bottom-panel {
+  flex: 0 0 auto;
+  height: 0;
+  border-top: 1px solid #d1d1d1;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.camel-debug-main .camel-debug-bottom-panel .camel-debug-bottom-panel-left {
+  flex: 1 1 auto;
+  width: calc(-100%);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.camel-debug-main .camel-debug-bottom-panel .camel-debug-bottom-panel-left .camel-debug-body-contents,
+.camel-debug-main .camel-debug-bottom-panel .camel-debug-bottom-panel-left .camel-debug-headers-contents {
+  padding: 10px 10px 0 10px;
+  overflow: auto;
+}
+.camel-debug-main .camel-debug-bottom-panel .camel-debug-bottom-panel-left pre {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  white-space: pre-wrap;
+}
+.camel-debug-main .camel-debug-bottom-panel .camel-debug-bottom-panel-left label {
+  margin-bottom: 0;
+}
+.camel-debug-main .camel-debug-bottom-panel .camel-debug-bottom-panel-left .camel-debug-no-body-text {
+  color: #72767b;
+}
+.camel-debug-main .camel-debug-bottom-panel .camel-debug-bottom-panel-right {
+  flex: 0 0 200px;
+  border-left: 1px solid #d1d1d1;
+}
+.camel-debug-main .camel-debug-bottom-panel .camel-debug-bottom-panel-right .camel-debug-breakpoints-list-item {
+  padding-left: 10px;
+  padding-right: 10px;
+  border-bottom: 1px solid #ededed;
+}
+.camel-debug-main .camel-debug-bottom-panel .nav-tabs {
+  padding-top: 0;
+  margin-left: 0;
+  margin-right: 0;
+  font-size: inherit;
+  background-color: #fafafa;
+}
+.camel-debug-main .camel-debug-bottom-panel .nav-tabs > li > a {
+  border-top: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.camel-debug-main .rg-top {
+  margin-top: -8px;
+}
+.camel-debug-main .rg-top span {
+  border-width: 1px;
+  background-color: white;
+  width: 30px;
+}
+.camel-debug-icon-buttons button {
   width: 26px;
 }
-#camel-debug .breakpoint-list {
+.camel-breakpoint-list {
   float: left;
   margin-right: 10px;
 }
@@ -232,7 +311,15 @@ div.camel-properties {
 .camel-diagram .node > *:hover,
 .camel-diagram rect > *:hover {
   cursor: pointer;
-  opacity: 0.6;
+}
+.camel-diagram .node.selected > rect {
+  stroke: orange;
+}
+.camel-diagram .node.breakpoint > rect {
+  stroke: red;
+}
+.camel-diagram .node.stopped > rect {
+  fill: #ff9999;
 }
 .camel-diagram path.edge {
   fill: none;
@@ -242,9 +329,6 @@ div.camel-properties {
 .camel-diagram .edge:hover {
   cursor: pointer;
   opacity: 0.4;
-}
-.camel-diagram text.counter {
-  stroke: #080;
 }
 .camel-diagram text.inflight {
   stroke: #08f;

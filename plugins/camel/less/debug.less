@@ -1,16 +1,109 @@
-#camel-debug {
 
-  .debug-toolbar {
+.camel-debug-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: hidden;
+
+  h2 {
+    flex: 0 0 auto;
+  }
+
+  .camel-debug-toolbar {
+    flex: 0 0 auto;
     margin-bottom: 10px;
   }
 
-  .debug-icon-buttons button {
-    width: 26px;
+  .camel-debug-diagram-wrapper {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    position: relative;
   }
 
-  .breakpoint-list {
-    float: left;
-    margin-right: 10px;
+  .camel-debug-bottom-panel.camel-debug-panel-show {
+    height: 200px;
   }
 
+  .camel-debug-bottom-panel {
+    flex: 0 0 auto;
+    height: 0;
+    border-top: 1px solid #d1d1d1;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    .camel-debug-bottom-panel-left {
+      flex: 1 1 auto;
+      width: calc(100% - 200px);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      .camel-debug-body-contents, .camel-debug-headers-contents {
+        padding: 10px 10px 0 10px;
+        overflow: auto;
+      }
+
+      pre {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        white-space: pre-wrap;
+      }
+
+      label {
+        margin-bottom: 0;
+      }
+
+      .camel-debug-no-body-text {
+        color: #72767b;
+      }
+    }
+
+    .camel-debug-bottom-panel-right {
+      flex: 0 0 200px;
+      border-left: 1px solid #d1d1d1;
+
+      .camel-debug-breakpoints-list-item {
+        padding-left: 10px;
+        padding-right: 10px;
+        border-bottom: 1px solid #ededed;
+      }
+    }
+
+    .nav-tabs {
+      padding-top: 0;
+      margin-left: 0;
+      margin-right: 0;
+      font-size: inherit;
+      background-color: #fafafa;
+    }
+
+    .nav-tabs > li > a {
+      border-top: 0;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+  }
+
+  .rg-top {
+    margin-top: -8px;
+  }
+
+  .rg-top span {
+    border-width: 1px;
+    background-color: white;
+    width: 30px;
+  }
+
+}
+
+.camel-debug-icon-buttons button {
+  width: 26px;
+}
+
+.camel-breakpoint-list {
+  float: left;
+  margin-right: 10px;
 }

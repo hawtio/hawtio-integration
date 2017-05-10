@@ -1621,7 +1621,7 @@ module Camel {
    */
   export function highlightSelectedNode(nodes, toNode) {
     // lets clear the selected node first
-    nodes.attr("class", "node");
+    nodes.classed("selected", false);
 
     nodes.filter(function (item) {
       if (item) {
@@ -1651,7 +1651,7 @@ module Camel {
         }
       }
       return null;
-    }).attr("class", "node selected");
+    }).classed("selected", true);
   }
 
   /**

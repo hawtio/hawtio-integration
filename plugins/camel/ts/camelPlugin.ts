@@ -25,7 +25,7 @@ module Camel {
             .when('/camel/browseEndpoint', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
             .when('/camel/endpoint/browse/:contextId/*endpointPath', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
             .when('/camel/createEndpoint', {templateUrl: 'plugins/camel/html/createEndpoint.html'})
-            .when('/camel/route/diagram/:contextId/:routeId', {templateUrl: 'plugins/camel/html/routes.html'})
+            .when('/camel/route/diagram/:contextId/:routeId', {templateUrl: 'plugins/camel/html/routeDiagram.html'})
             .when('/camel/routeDiagram', {templateUrl: 'plugins/camel/html/routeDiagram.html'})
             .when('/camel/typeConverter', {templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false})
             .when('/camel/restServices', {templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false})

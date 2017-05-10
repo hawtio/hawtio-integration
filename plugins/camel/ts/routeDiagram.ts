@@ -1,6 +1,6 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
-/// <reference path="routesDiagram.ts"/>
+/// <reference path="routeDiagramHelpers.ts"/>
 
 module Camel {
 

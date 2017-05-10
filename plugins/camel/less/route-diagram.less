@@ -22,7 +22,18 @@
   .node > *:hover,
   rect > *:hover {
     cursor: pointer;
-    opacity: 0.6;
+  }
+
+  .node.selected > rect {
+    stroke: orange;
+  }
+
+  .node.breakpoint > rect {
+    stroke: red;
+  }
+
+  .node.stopped > rect {
+    fill: #ff9999;
   }
 
   path.edge {
@@ -34,10 +45,6 @@
   .edge:hover {
     cursor: pointer;
     opacity: 0.4;
-  }
-
-  text.counter {
-    stroke: #080;
   }
 
   text.inflight {
