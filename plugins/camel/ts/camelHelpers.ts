@@ -434,7 +434,7 @@ module Camel {
     // TODO get id from camelContext
     var id = "camelContext";
     var folder = new Jmx.Folder(id);
-    folder.addClass = "org-apache-camel-context";
+    folder.class = "org-apache-camel-context";
     folder.domain = Camel.jmxDomain;
     folder.typeName = "context";
 
@@ -455,7 +455,7 @@ module Camel {
           route.setAttribute("id", id);
         }
         var routeFolder = new Jmx.Folder(id);
-        routeFolder.addClass = "org-apache-camel-route";
+        routeFolder.class = "org-apache-camel-route";
         routeFolder.typeName = "routes";
         routeFolder.domain = Camel.jmxDomain;
         routeFolder.key = folder.key + "_" + Core.toSafeDomID(id);
