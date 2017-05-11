@@ -72,15 +72,15 @@ namespace Camel {
       this.loadContexts();
     }
 
-    private getSelectedContexts() {
+    private getSelectedContexts(): Context[] {
       return _.map(this.tableItems, (tableItem, i) => angular.extend(this.contexts[i], { selected: tableItem['selected'] }))
         .filter(context => context.selected);
     }
 
     private enableDisableActions() {
       let selectedContexts = this.getSelectedContexts();
-      this.startAction.isDisabled = !selectedContexts.some((route: Route) => route.state === 'Suspended');
-      this.suspendAction.isDisabled = !selectedContexts.some((route: Route) => route.state === 'Started');
+      this.startAction.isDisabled = !selectedContexts.some(context => context.state === 'Suspended');
+      this.suspendAction.isDisabled = !selectedContexts.some(context => context.state === 'Started');
       this.deleteAction.isDisabled = selectedContexts.length === 0;
     }
 
