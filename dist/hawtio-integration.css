@@ -20,6 +20,14 @@
 .modal-header div[hawtio-pager] {
   line-height: 1;
 }
+.pf-toolbar-unstyled .toolbar-pf {
+  border-bottom: none;
+  box-shadow: unset;
+}
+.pf-toolbar-unstyled .form-group {
+  border-right: none;
+  padding: 0;
+}
 
 .activemq-browse-table th:nth-child(1) {
   width: 5%;
@@ -81,15 +89,6 @@
   font-size: larger;
   font-weight: 600;
   margin-bottom: 10px;
-}
-
-.camel-context-toolbar .toolbar-pf {
-  border-bottom: none;
-  box-shadow: unset;
-}
-.camel-context-toolbar .form-group {
-  border-right: none;
-  padding: 0;
 }
 
 @media screen and (max-width: 767px) {

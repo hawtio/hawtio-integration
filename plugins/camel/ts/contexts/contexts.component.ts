@@ -1,3 +1,4 @@
+/// <reference path="../includes.ts"/>
 /// <reference path="context.ts"/>
 /// <reference path="contexts.service.ts"/>
 
@@ -27,7 +28,7 @@ namespace Camel {
       name: 'Delete',
       actionFn: action => {
         this.$uibModal.open({
-          templateUrl: 'deleteContextModal.html'
+          templateUrl: 'plugins/camel/html/deleteContextModal.html'
         })
         .result.then(() => {
           let selectedContexts = this.getSelectedContexts();
@@ -123,7 +124,10 @@ namespace Camel {
   }
 
   export const contextsComponent = {
-    templateUrl: 'plugins/camel/html/contexts.html',
+    template: `
+      <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+      <pf-table-view config="$ctrl.tableConfig" colummns="$ctrl.tableColummns" items="$ctrl.tableItems"></pf-table-view>
+    `,
     controller: ContextsController
   };
 

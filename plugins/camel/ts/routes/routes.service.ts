@@ -1,4 +1,4 @@
-/// <reference path="../../../includes.ts"/>
+/// <reference path="../includes.ts"/>
 /// <reference path="route.ts"/>
 
 namespace Camel {
@@ -7,6 +7,28 @@ namespace Camel {
     
     constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia) {
       'ngInject';
+    }
+
+    getRoute(mbean: string): ng.IPromise<Route> {
+      let request = {
+        type: "read",
+        mbean: mbean,
+        ignoreErrors: true
+      };
+
+      return this.$q((resolve, reject) => {
+        this.jolokia.request(request, {
+          success: function(response) {
+            let object = response.value;
+            let route = new Route(object.RouteId, object.State, response.request.mbean);
+            resolve(route);
+          }
+        }, {
+          error: (response) => {
+            reject(response.error);
+          }
+        });
+      });
     }
 
     getRoutes(mbeans: string[]): ng.IPromise<Route[]> {
@@ -39,21 +61,33 @@ namespace Camel {
       });
     }
 
-    startRoutes(routes: Route[]): ng.IPromise<Route[]> {
+    startRoute(route: Route): ng.IPromise<String> {
+      return this.startRoutes([route]);
+    }
+
+    startRoutes(routes: Route[]): ng.IPromise<String> {
       return this.executeOperationOnRoutes('start()', routes);
     }
 
-    stopRoutes(routes: Route[]): ng.IPromise<Route[]> {
+    stopRoute(route: Route): ng.IPromise<String> {
+      return this.stopRoutes([route]);
+    }
+
+    stopRoutes(routes: Route[]): ng.IPromise<String> {
       return this.executeOperationOnRoutes('stop()', routes);
     }
 
-    removeRoutes(routes: Route[]): ng.IPromise<Route[]> {
+    removeRoute(route: Route): ng.IPromise<String> {
+      return this.removeRoutes([route]);
+    }
+
+    removeRoutes(routes: Route[]): ng.IPromise<String> {
       return this.executeOperationOnRoutes('remove()', routes);
     }
 
-    executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<Route[]> {
+    executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<String> {
       if (routes.length === 0) {
-        return this.$q.resolve([]);
+        return this.$q.resolve('success');
       }
 
       let requests = routes.map(route => ({

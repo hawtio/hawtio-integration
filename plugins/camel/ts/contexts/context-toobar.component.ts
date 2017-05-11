@@ -1,3 +1,4 @@
+/// <reference path="../includes.ts"/>
 /// <reference path="contexts.service.ts"/>
 /// <reference path="context.ts"/>
 
@@ -27,7 +28,7 @@ namespace Camel {
       name: 'Delete',
       actionFn: action => {
         this.$uibModal.open({
-          templateUrl: 'deleteContextModal.html'
+          templateUrl: 'plugins/camel/html/deleteContextModal.html'
         })
         .result.then(() => {
           this.contextsService.stopContext(this.context)
@@ -52,7 +53,7 @@ namespace Camel {
         private contextsService: ContextsService) {
       'ngInject';
       $rootScope.$on('jmxTreeClicked', (event, selectedNode) => {
-        if (selectedNode.typeName === 'context' && selectedNode.id !== 'camelContexts') {
+        if (this.workspace.isCamelContext()) {
           this.contextsService.getContext(selectedNode.objectName)
             .then(context => {
               this.context = context;
@@ -84,7 +85,9 @@ namespace Camel {
   }
 
   export const contextToolbarComponent = {
-    template: `<pf-toolbar class="camel-context-toolbar" config="$ctrl.toolbarConfig" ng-show="$ctrl.isVisible()"></pf-toolbar>`,
+    template: `
+      <pf-toolbar class="pf-toolbar-unstyled" config="$ctrl.toolbarConfig" ng-show="$ctrl.isVisible()"></pf-toolbar>
+    `,
     controller: ContextToolbarController
   };
 

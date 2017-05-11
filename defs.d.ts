@@ -3,6 +3,72 @@
 /// <reference path="libs/hawtio-preferences/defs.d.ts" />
 /// <reference path="libs/hawtio-ui/defs.d.ts" />
 /// <reference path="libs/hawtio-utilities/defs.d.ts" />
+declare module ActiveMQ {
+    var pluginName: string;
+    var log: Logging.Logger;
+    var jmxDomain: string;
+    function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): any;
+    function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): any;
+    function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): any;
+    function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): any;
+    /**
+     * Sets $scope.row to currently selected JMS message.
+     * Used in:
+     *  - activemq/js/browse.ts
+     *  - camel/js/browseEndpoint.ts
+     *
+     * TODO: remove $scope argument and operate directly on other variables. but it's too much side effects here...
+     *
+     * @param message
+     * @param key unique key inside message that distinguishes between values
+     * @param $scope
+     */
+    function selectCurrentMessage(message: any, key: string, $scope: any): void;
+    /**
+     * - Adds functions needed for message browsing with details
+     * - Adds a watch to deselect all rows after closing the slideout with message details
+     * TODO: export these functions too?
+     *
+     * @param $scope
+     * @param fn optional function to call if the selected row was changed
+     */
+    function decorate($scope: any, fn?: any): void;
+    function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
+}
+/**
+ * @module ActiveMQ
+ * @main ActiveMQ
+ */
+declare module ActiveMQ {
+    var _module: ng.IModule;
+    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
+    function isQueue(workspace: Jmx.Workspace): boolean;
+    function isTopic(workspace: Jmx.Workspace): boolean;
+    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
+    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
+    function isJobScheduler(workspace: Jmx.Workspace): boolean;
+    function isBroker(workspace: Jmx.Workspace): boolean;
+}
+declare module ActiveMQ {
+    var BrowseQueueController: ng.IModule;
+}
+declare module ActiveMQ {
+}
+declare module ActiveMQ {
+}
+declare module ActiveMQ {
+}
+declare module ActiveMQ {
+}
+/**
+ * @module ActiveMQ
+ */
+declare module ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare module ActiveMQ {
+}
 declare var _apacheCamelModel: any;
 /**
  * @module Camel
@@ -339,38 +405,6 @@ declare module Camel {
 declare module Camel {
 }
 declare module Camel {
-}
-declare module ActiveMQ {
-    var pluginName: string;
-    var log: Logging.Logger;
-    var jmxDomain: string;
-    function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): any;
-    function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): any;
-    function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): any;
-    function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): any;
-    /**
-     * Sets $scope.row to currently selected JMS message.
-     * Used in:
-     *  - activemq/js/browse.ts
-     *  - camel/js/browseEndpoint.ts
-     *
-     * TODO: remove $scope argument and operate directly on other variables. but it's too much side effects here...
-     *
-     * @param message
-     * @param key unique key inside message that distinguishes between values
-     * @param $scope
-     */
-    function selectCurrentMessage(message: any, key: string, $scope: any): void;
-    /**
-     * - Adds functions needed for message browsing with details
-     * - Adds a watch to deselect all rows after closing the slideout with message details
-     * TODO: export these functions too?
-     *
-     * @param $scope
-     * @param fn optional function to call if the selected row was changed
-     */
-    function decorate($scope: any, fn?: any): void;
-    function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
 }
 declare module Camel {
     var BrowseEndpointController: ng.IModule;
@@ -929,40 +963,6 @@ declare module Camel {
 declare module Camel {
 }
 /**
- * @module ActiveMQ
- * @main ActiveMQ
- */
-declare module ActiveMQ {
-    var _module: ng.IModule;
-    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
-    function isQueue(workspace: Jmx.Workspace): boolean;
-    function isTopic(workspace: Jmx.Workspace): boolean;
-    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
-    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
-    function isJobScheduler(workspace: Jmx.Workspace): boolean;
-    function isBroker(workspace: Jmx.Workspace): boolean;
-}
-declare module ActiveMQ {
-    var BrowseQueueController: ng.IModule;
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-/**
- * @module ActiveMQ
- */
-declare module ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare module ActiveMQ {
-}
-/**
  * @module Karaf
  */
 declare module Karaf {
@@ -1421,7 +1421,7 @@ declare namespace Camel {
         private removeSelectedContexts();
     }
     const contextsComponent: {
-        templateUrl: string;
+        template: string;
         controller: typeof ContextsController;
     };
 }
@@ -1464,10 +1464,9 @@ declare namespace Camel {
     class Route {
         name: string;
         state: string;
-        managementName: string;
+        mbean: string;
         selected: boolean;
-        constructor(name: string, state: string, managementName: string);
-        readonly mbean: string;
+        constructor(name: string, state: string, mbean: string);
     }
 }
 declare namespace Camel {
@@ -1475,12 +1474,50 @@ declare namespace Camel {
         private $q;
         private jolokia;
         constructor($q: ng.IQService, jolokia: Jolokia.IJolokia);
+        getRoute(mbean: string): ng.IPromise<Route>;
         getRoutes(mbeans: string[]): ng.IPromise<Route[]>;
-        startRoutes(routes: Route[]): ng.IPromise<Route[]>;
-        stopRoutes(routes: Route[]): ng.IPromise<Route[]>;
-        removeRoutes(routes: Route[]): ng.IPromise<Route[]>;
-        executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<Route[]>;
+        startRoute(route: Route): ng.IPromise<String>;
+        startRoutes(routes: Route[]): ng.IPromise<String>;
+        stopRoute(route: Route): ng.IPromise<String>;
+        stopRoutes(routes: Route[]): ng.IPromise<String>;
+        removeRoute(route: Route): ng.IPromise<String>;
+        removeRoutes(routes: Route[]): ng.IPromise<String>;
+        executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<String>;
     }
+}
+declare namespace Camel {
+    class RouteToolbarController {
+        private $uibModal;
+        private $timeout;
+        private workspace;
+        private routesService;
+        private route;
+        private startAction;
+        private stopAction;
+        private deleteAction;
+        toolbarConfig: {
+            actionsConfig: {
+                primaryActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+                moreActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+            };
+        };
+        constructor($rootScope: any, $uibModal: any, $timeout: any, workspace: Jmx.Workspace, routesService: RoutesService);
+        isVisible(): boolean;
+        private enableDisableActions();
+        private updateRoute();
+    }
+    const routeToolbarComponent: {
+        template: string;
+        controller: typeof RouteToolbarController;
+    };
 }
 declare namespace Camel {
     class RoutesController {
@@ -1526,7 +1563,7 @@ declare namespace Camel {
         private removeSelectedRoutes();
     }
     const routesComponent: {
-        templateUrl: string;
+        template: string;
         controller: typeof RoutesController;
     };
 }

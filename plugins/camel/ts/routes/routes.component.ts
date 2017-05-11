@@ -1,3 +1,4 @@
+/// <reference path="../includes.ts"/>
 /// <reference path="route.ts"/>
 /// <reference path="routes.service.ts"/>
 
@@ -30,7 +31,7 @@ namespace Camel {
       actionFn: action => {
         let selectedRoutes = this.getSelectedRoutes();
         this.$uibModal.open({
-          templateUrl: 'deleteRouteModal.html'
+          templateUrl: 'plugins/camel/html/deleteRouteModal.html'
         })
         .result.then(() => {
           this.routesService.removeRoutes(selectedRoutes)
@@ -128,7 +129,10 @@ namespace Camel {
   }
 
   export const routesComponent = {
-    templateUrl: 'plugins/camel/html/routes.html',
+    template: `
+      <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+      <pf-table-view config="$ctrl.tableConfig" colummns="$ctrl.tableColummns" items="$ctrl.tableItems"></pf-table-view>
+    `,
     controller: RoutesController
   };
 
