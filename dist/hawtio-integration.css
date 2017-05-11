@@ -105,7 +105,7 @@
   width: calc(100% - 2*20px);
   display: flex;
   flex-direction: column;
-  overflow-y: hidden;
+  overflow: visible;
 }
 .camel-debug-main h2 {
   flex: 0 0 auto;
@@ -115,8 +115,12 @@
 }
 .camel-debug-main .camel-debug-diagram-wrapper {
   flex: 1 1 auto;
-  overflow-y: auto;
   position: relative;
+  overflow: visible;
+}
+.camel-debug-main .camel-debug-diagram-wrapper .camel-route-diagram-canvas {
+  left: -20px;
+  width: calc(100% + 2*20px);
 }
 .camel-debug-main .camel-debug-bottom-panel.camel-debug-panel-show {
   height: 200px;

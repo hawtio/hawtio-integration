@@ -6,7 +6,7 @@
   width: ~"calc(100% - 2*@{pf-padding})";
   display: flex;
   flex-direction: column;
-  overflow-y: hidden;
+  overflow: visible;
 
   h2 {
     flex: 0 0 auto;
@@ -18,8 +18,13 @@
 
   .camel-debug-diagram-wrapper {
     flex: 1 1 auto;
-    overflow-y: auto;
     position: relative;
+    overflow: visible;
+
+    .camel-route-diagram-canvas {
+      left: -@pf-padding;
+      width: ~"calc(100% + 2*@{pf-padding})";
+    }
   }
 
   .camel-debug-bottom-panel.camel-debug-panel-show {
