@@ -1,8 +1,9 @@
+@import (reference) "global.less";
 
 .camel-debug-main {
   position: absolute;
   height: 100%;
-  width: 100%;
+  width: ~"calc(100% - 2*@{pf-padding})";
   display: flex;
   flex-direction: column;
   overflow-y: hidden;
