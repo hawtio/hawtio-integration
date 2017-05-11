@@ -84,9 +84,11 @@
 }
 
 .camel-debug-main {
+  position: absolute;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
   overflow-y: hidden;
 }
 .camel-debug-main h2 {
