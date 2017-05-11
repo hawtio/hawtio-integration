@@ -257,7 +257,6 @@ module Camel {
     $scope.isSuspendedAt = (nodeId) => containsNodeId($scope.suspendedBreakpoints, nodeId);
 
     function onBreakpoints(response) {
-      console.log(response);
       $scope.breakpoints = response;
       updateBreakpointFlag();
 

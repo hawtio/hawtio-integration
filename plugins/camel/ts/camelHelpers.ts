@@ -1557,7 +1557,6 @@ module Camel {
    */
   export function traceOrDebugIncludeStreams(localStorage) {
     var value = localStorage["camelTraceOrDebugIncludeStreams"];
-    console.log('localStorage["camelTraceOrDebugIncludeStreams"] = ' + value);
     return Core.parseBooleanValue(value, Camel.defaultCamelTraceOrDebugIncludeStreams);
   }
 

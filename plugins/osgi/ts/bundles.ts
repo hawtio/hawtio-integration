@@ -125,8 +125,7 @@ module Osgi {
       },
       {
         success: function(response) {
-          console.log("Got: ", response);
-          $scope.bundleUrl = ""
+          $scope.bundleUrl = '';
           jolokia.request({
                 type: 'exec',
                 mbean: getSelectionFrameworkMBean(workspace),
@@ -139,7 +138,7 @@ module Osgi {
               });
         },
         error: function(response) {
-          $scope.bundleUrl = ""
+          $scope.bundleUrl = '';
           $scope.onResponse();
         }
       });
