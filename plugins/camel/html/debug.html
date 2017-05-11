@@ -44,7 +44,7 @@
   <div class="camel-debug-diagram-wrapper" ng-include src="graphView" ng-if="debugging"></div>
 
   <div class="camel-debug-bottom-panel" resizable r-directions="['top']" r-flex="true" ng-if="debugging"
-    ng-class="{'camel-debug-panel-show': showDebugPanel}">
+    ng-show="showDebugPanel">
     <div class="camel-debug-bottom-panel-left">
       <ul class="nav nav-tabs" ng-init="activeTab = 'body'">
         <li ng-class="{'active': activeTab === 'headers' && stopped}">

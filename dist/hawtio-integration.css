@@ -130,12 +130,8 @@
   left: -20px;
   width: calc(100% + 2*20px);
 }
-.camel-debug-main .camel-debug-bottom-panel.camel-debug-panel-show {
-  height: 200px;
-}
 .camel-debug-main .camel-debug-bottom-panel {
-  flex: 0 0 auto;
-  height: 0;
+  flex: 0 0 200px;
   border-top: 1px solid #d1d1d1;
   display: flex;
   flex-direction: row;
@@ -349,6 +345,7 @@ div.camel-properties {
 }
 .camel-diagram .node.stopped > rect {
   fill: #ff9999;
+  stroke-width: 4px;
 }
 .camel-diagram path.edge {
   fill: none;
@@ -424,10 +421,6 @@ div.camel-properties {
 }
 .camel-type-converters-enable-statistics-button {
   width: 111px;
-}
-
-.table-src-components th:nth-child(3) {
-  width: 30%;
 }
 
 .bundles-container {
@@ -527,6 +520,10 @@ div.camel-properties {
 }
 .framework-main h1 {
   margin-bottom: 20px;
+}
+
+.table-src-components th:nth-child(3) {
+  width: 30%;
 }
 
 .metricsWatcher .panel-group:first-child {

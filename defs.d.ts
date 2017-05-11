@@ -1427,39 +1427,6 @@ declare namespace Camel {
 }
 declare namespace Camel {
 }
-declare module Camel {
-}
-declare module Camel {
-}
-declare module Camel {
-    class Property {
-        name: string;
-        value: string;
-        description: string;
-        constructor(name: string, value: string, description: string);
-        static sortByName(a: any, b: any): 1 | -1 | 0;
-    }
-}
-declare module Camel {
-    class PropertiesService {
-        getDefinedProperties(schemaProperties: {}): Property[];
-        getDefaultProperties(schemaProperties: {}): Property[];
-        getUndefinedProperties(schemaProperties: {}): Property[];
-    }
-}
-declare module Camel {
-}
-declare module Camel {
-}
-declare module Camel {
-}
-interface JQuery {
-    tooltip(): JQuery;
-}
-declare module Camel {
-}
-declare module Camel {
-}
 declare namespace Camel {
     class Route {
         name: string;
@@ -1568,4 +1535,37 @@ declare namespace Camel {
     };
 }
 declare namespace Camel {
+}
+declare module Camel {
+    class Property {
+        name: string;
+        value: string;
+        description: string;
+        constructor(name: string, value: string, description: string);
+        static sortByName(a: any, b: any): 1 | -1 | 0;
+    }
+}
+declare module Camel {
+    class PropertiesService {
+        getDefinedProperties(schemaProperties: {}): Property[];
+        getDefaultProperties(schemaProperties: {}): Property[];
+        getUndefinedProperties(schemaProperties: {}): Property[];
+    }
+}
+declare module Camel {
+}
+declare module Camel {
+}
+declare module Camel {
+}
+interface JQuery {
+    tooltip(): JQuery;
+}
+declare module Camel {
+}
+declare module Camel {
+}
+declare module Camel {
+}
+declare module Camel {
 }
