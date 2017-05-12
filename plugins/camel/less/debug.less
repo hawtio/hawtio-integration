@@ -64,13 +64,34 @@
 
     .camel-debug-bottom-panel-right {
       flex: 0 0 200px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
       border-left: 1px solid #d1d1d1;
 
-      .camel-debug-breakpoints-list-item {
-        padding-left: 10px;
-        padding-right: 10px;
-        border-bottom: 1px solid #ededed;
+      .camel-debug-breakpoints-list {
+        overflow: auto;
+        margin-bottom: 0;
+        height: 100%;
+
+        li {
+          padding-left: 10px;
+          padding-right: 10px;
+          border-bottom: 1px solid #ededed;
+          height: 20px;
+
+          span {
+            display: inline-block;
+            max-width: calc(100% - 14px);
+            .text-overflow();
+          }
+        }
+
+        li.suspended {
+          background-color: @color-pf-blue-50;
+        }
       }
+
     }
 
     .nav-tabs {

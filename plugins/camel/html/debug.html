@@ -68,10 +68,10 @@
           <a>Breakpoints</a>
         </li>
       </ul>
-      <ul class="list-unstyled">
-        <li class="camel-debug-breakpoints-list-item" ng-class="{'bg-warning': isSuspendedAt(b)}"
+      <ul class="camel-debug-breakpoints-list list-unstyled">
+        <li ng-class="{'suspended': isSuspendedAt(b)}"
           ng-repeat="b in breakpoints">
-          {{b}}
+          <span>{{b}}</span>
           <button type="button" class="close" aria-label="Close" title="Remove breakpoint"
             ng-click="removeBreakpointById(b)">
             <span aria-hidden="true">&times;</span>

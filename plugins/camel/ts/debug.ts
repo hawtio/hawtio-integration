@@ -3,14 +3,15 @@
 
 module Camel {
   _module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", (
-      $scope,
-      $element,
-      workspace: Jmx.Workspace,
-      jolokia: Jolokia.IJolokia,
-      localStorage: WindowLocalStorage,
-      documentBase: string) => {
+    $scope,
+    $element,
+    workspace: Jmx.Workspace,
+    jolokia: Jolokia.IJolokia,
+    localStorage: WindowLocalStorage,
+    documentBase: string) => {
 
-    var log: Logging.Logger = Logger.get("CamelDebugger");
+    const log: Logging.Logger = Logger.get("CamelDebugger");
+    const breakpointImageUrl = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint.png");    
 
     // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
     $scope.debugging = false;
@@ -43,7 +44,7 @@ module Camel {
     });
 
     $scope.$on("camel.diagram.layoutComplete", (event, value) => {
-      updateBreakpointBorders();
+      updateBreakpointNodes();
 
       $($element).find("g.node").dblclick(function (n) {
         var id = this.getAttribute("data-cid");
@@ -132,7 +133,8 @@ module Camel {
 
           Core.register(jolokia, $scope, {
             type: 'exec', mbean: mbean,
-            operation: 'getDebugCounter'}, Core.onSuccess(onBreakpointCounter));
+            operation: 'getDebugCounter'
+          }, Core.onSuccess(onBreakpointCounter));
         } else {
           $scope.graphView = null;
           $scope.tableView = null;
@@ -171,7 +173,7 @@ module Camel {
         // lets update the diagram selection to the newly stopped node
         $scope.selectedDiagramNodeId = stopNodeId;
       }
-      updateBreakpointBorders();
+      updateBreakpointNodes();
       Core.$apply($scope);
     }
 
@@ -190,7 +192,7 @@ module Camel {
           }
 
           allMessages.each((idx, message) => {
-            var messageData:any = Camel.createMessageFromXml(message);
+            var messageData: any = Camel.createMessageFromXml(message);
             var toNode = $(message).find("toNode").text();
             if (toNode) {
               messageData["toNode"] = toNode;
@@ -206,7 +208,7 @@ module Camel {
 
       // lets update the selection and selected row for the message detail view
       updateMessageSelection();
-      updateBreakpointBorders();
+      updateBreakpointNodes();
       onSelectionChanged();
       log.debug("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
       Core.$apply($scope);
@@ -230,7 +232,7 @@ module Camel {
       $scope.suspendedBreakpoints = [];
       $scope.stopped = false;
       updateMessageSelection();
-      updateBreakpointBorders();
+      updateBreakpointNodes();
       onSelectionChanged();
       Core.$apply($scope);
     }
@@ -263,7 +265,7 @@ module Camel {
       // update the breakpoint borders...
       var nodes = getDiagramNodes();
       if (nodes.length) {
-        updateBreakpointBorders(nodes);
+        updateBreakpointNodes(nodes);
       }
       Core.$apply($scope);
     }
@@ -288,11 +290,32 @@ module Camel {
       return svg.selectAll("g .node");
     }
 
-    function updateBreakpointBorders(nodes = getDiagramNodes()) {
+    function updateBreakpointNodes(nodes = getDiagramNodes()) {
       nodes.each(function (object) {
         var nodeId = object.cid;
         var thisNode = d3.select(this);
-        thisNode.classed('breakpoint', isBreakpointSet(nodeId));
+        let icons = thisNode.selectAll("image.breakpoint");
+        
+        if (isBreakpointSet(nodeId)) {
+          if (!icons.length || !icons[0].length) {
+            thisNode.append("image")
+              .attr("xlink:href", function (d) {
+                return breakpointImageUrl;
+              })
+              .attr("class", "breakpoint")
+              .attr("x", d => -(d.bbox.width / 2) - 6)
+              .attr("y", -20)
+              .attr("height", 12)
+              .attr("width", 12);
+          } else {
+            icons.attr("xlink:href", function (d) {
+              return breakpointImageUrl;
+            });
+          }
+        } else {
+          icons.remove();
+        }
+
         thisNode.classed('stopped', $scope.isSuspendedAt(nodeId));
       });
     }
@@ -302,7 +325,7 @@ module Camel {
       Core.$apply($scope);
     }
 
-    function setDebugging(flag:Boolean) {
+    function setDebugging(flag: Boolean) {
       var mbean = getSelectionCamelDebugMBean(workspace);
       if (mbean) {
         var method = flag ? "enableDebugger" : "disableDebugger";

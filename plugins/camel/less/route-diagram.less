@@ -12,40 +12,41 @@
 .camel-diagram {
 
   padding: @pf-padding;
+  background-color: white;
 
-  #node-CLOSED rect {
+  .node > rect {
+    stroke: @color-pf-black-500;
     stroke-width: 1px;
-    fill: #f88;
+    border-radius: 4px;
+    fill: @color-pf-black-100;
   }
 
-  .node:hover,
-  .node > *:hover,
-  rect > *:hover {
+  .node:hover {
     cursor: pointer;
   }
 
   .node.selected > rect {
-    stroke: orange;
-  }
-
-  .node.breakpoint > rect {
-    stroke: red;
+    stroke: @color-pf-blue-300;
+    stroke-width: 2px;
   }
 
   .node.stopped > rect {
-    fill: #ff9999;
-    stroke-width: 4px;
+    stroke: red;
+    stroke-width: 2px;
   }
 
   path.edge {
     fill: none;
-    stroke: #666;
-    stroke-width: 3px;
+    stroke: @color-pf-black-500;
+    stroke-width: 2px;
+  }
+
+  #arrowhead {
+    fill: @color-pf-black-500;
   }
 
   .edge:hover {
     cursor: pointer;
-    opacity: 0.4;
   }
 
   text.inflight {

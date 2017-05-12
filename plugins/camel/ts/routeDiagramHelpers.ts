@@ -148,7 +148,7 @@ module Camel {
       rects.on("click", onClick);
     }
 
-    images.attr("x", d => -(d.bbox.width) / 2);
+    images.attr("x", d => -(d.bbox.width) / 3);
 
     labels
       .attr("x", d => -d.bbox.width / 2)
