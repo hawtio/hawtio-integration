@@ -395,6 +395,8 @@ var ActiveMQ;
                         cellTemplate: '<div class="ngCellText"><a href="" ng-click="row.entity.openMessageDialog(row)">{{row.entity.JMSMessageID}}</a></div>',
                         // for ng-grid
                         width: '34%'
+                        // for hawtio-datatable
+                        // width: "22em"
                     },
                     {
                         field: 'JMSType',
@@ -2028,6 +2030,7 @@ var Camel;
                 else {
                     if (value) {
                         if (_.startsWith(key, "_")) {
+                            // ignore
                         }
                         else {
                             var text = value.toString();
@@ -2384,6 +2387,7 @@ var Camel;
                 if ("routes" === type) {
                     return linkToRouteDiagramFullScreen(contextId, name);
                 }
+                // TODO a default page for a context?
             }
         }
         return answer;
@@ -3548,6 +3552,7 @@ var Camel;
                 maxWidth: 56,
                 resizable: false,
                 defaultSort: false
+                // we do not want to default sort the state column
             };
             var attributes = workspace.attributeColumnDefs;
             attributes[Camel.jmxDomain + "/context/folder"] = [
@@ -5818,6 +5823,7 @@ var Camel;
                 transitions.push(edge);
                 source.edges.push(edge);
                 target.edges.push(edge);
+                // TODO should we add the edge to the target?
             }
         });
         return states;
@@ -6269,6 +6275,7 @@ var Camel;
                         type: 'exec', mbean: $scope.mbean,
                         operation: 'dumpRoutesStatsAsXml',
                         arguments: [true, true]
+                        // the dumpRoutesStatsAsXml is not available in all Camel versions so do not barf on errors
                     }, Core.onSuccess(statsCallback, { silent: true, error: false }));
                 }
                 $scope.$emit("camel.diagram.layoutComplete");
@@ -6326,6 +6333,7 @@ var Camel;
                             node["tooltip"] = tooltip;
                         }
                         else {
+                            // we are probably not showing the route for these stats
                         }
                     }
                 }
@@ -6715,32 +6723,32 @@ var Camel;
                 {
                     id: 'jmx-attributes',
                     title: 'Attributes',
-                    href: "/jmx/attributes" + workspace.hash(),
+                    path: "/jmx/attributes",
                     show: function () { return !isContextsFolder(workspace) && !workspace.isRoutesFolder(); }
                 },
                 {
                     id: 'camel-contexts',
                     title: 'Contexts',
-                    href: "/camel/contexts" + workspace.hash(),
+                    path: "/camel/contexts",
                     show: function () { return isContextsFolder(workspace); }
                 },
                 {
                     id: 'camel-routes',
                     title: 'Routes',
-                    href: "/camel/routes" + workspace.hash(),
+                    path: "/camel/routes",
                     show: function () { return workspace.isRoutesFolder(); }
                 },
                 {
                     id: 'camel-route-diagram',
                     title: 'Route Diagram',
-                    href: "/camel/routeDiagram" + workspace.hash(),
+                    path: "/camel/routeDiagram",
                     show: function () { return (workspace.isRoute() || workspace.isRoutesFolder())
                         && workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"); }
                 },
                 {
                     id: 'camel-route-source',
                     title: 'Source',
-                    href: "/camel/source" + workspace.hash(),
+                    path: "/camel/source",
                     show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
                         && (workspace.isRoute() || workspace.isRoutesFolder())
                         && workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"); },
@@ -6749,13 +6757,13 @@ var Camel;
                 {
                     id: 'camel-route-properties',
                     title: 'Properties',
-                    href: "/camel/propertiesRoute" + workspace.hash(),
+                    path: "/camel/propertiesRoute",
                     show: function () { return Camel.isRouteNode(workspace); }
                 },
                 {
                     id: 'camel-endpoint-properties',
                     title: 'Properties',
-                    href: "/camel/propertiesEndpoint" + workspace.hash(),
+                    path: "/camel/propertiesEndpoint",
                     show: function () { return workspace.isEndpoint()
                         && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
                         && workspace.hasInvokeRights(workspace.selection, "explainEndpointJson"); }
@@ -6763,7 +6771,7 @@ var Camel;
                 {
                     id: 'camel-component-properties',
                     title: 'Properties',
-                    href: "/camel/propertiesComponent" + workspace.hash(),
+                    path: "/camel/propertiesComponent",
                     show: function () { return workspace.isComponent()
                         && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
                         && workspace.hasInvokeRights(workspace.selection, "explainComponentJson"); }
@@ -6771,7 +6779,7 @@ var Camel;
                 {
                     id: 'camel-dataformat-properties',
                     title: 'Properties',
-                    href: "/camel/propertiesDataFormat" + workspace.hash(),
+                    path: "/camel/propertiesDataFormat",
                     show: function () { return workspace.isDataformat()
                         && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
                         && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson"); }
@@ -6779,7 +6787,7 @@ var Camel;
                 {
                     id: 'camel-exchanges',
                     title: 'Exchanges',
-                    href: "/camel/exchanges" + workspace.hash(),
+                    path: "/camel/exchanges",
                     show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
                         && !workspace.isComponentsFolder() && !workspace.isComponent()
                         && (workspace.isCamelContext() || workspace.isRoutesFolder() || workspace.isRoute())
@@ -6789,7 +6797,7 @@ var Camel;
                 // {
                 //   id: 'camel-blocked-exchanges',
                 //   title: 'Blocked',
-                //   href: "/camel/blocked" + workspace.hash(),
+                //   path: "/camel/blocked",
                 //   show: () => !workspace.isEndpointsFolder()
                 //     && (workspace.isRoute() || workspace.isRoutesFolder())
                 //     && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
@@ -6798,7 +6806,7 @@ var Camel;
                 {
                     id: 'camel-route-metrics',
                     title: 'Route Metrics',
-                    href: "/camel/routeMetrics" + workspace.hash(),
+                    path: "/camel/routeMetrics",
                     show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
                         && (workspace.isCamelContext() || workspace.isRoutesFolder())
                         && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
@@ -6808,7 +6816,7 @@ var Camel;
                 {
                     id: 'camel-rest-services',
                     title: 'REST Services',
-                    href: "/camel/restServices" + workspace.hash(),
+                    path: "/camel/restServices",
                     show: function () { return !Camel.getSelectedRouteNode(workspace)
                         && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
                         && !workspace.isComponentsFolder() && !workspace.isComponent()
@@ -6821,7 +6829,7 @@ var Camel;
                 {
                     id: 'camel-endpoint-runtime-registry',
                     title: 'Endpoints (in/out)',
-                    href: "/camel/endpointRuntimeRegistry" + workspace.hash(),
+                    path: "/camel/endpointRuntimeRegistry",
                     show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
                         && !workspace.isComponentsFolder() && !workspace.isComponent()
                         && (workspace.isCamelContext() || workspace.isRoutesFolder())
@@ -6832,7 +6840,7 @@ var Camel;
                 {
                     id: 'camel-type-converters',
                     title: 'Type Converters',
-                    href: "/camel/typeConverter" + workspace.hash(),
+                    path: "/camel/typeConverter",
                     show: function () { return !Camel.getSelectedRouteNode(workspace)
                         && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
                         && !workspace.isComponentsFolder() && !workspace.isComponent()
@@ -6843,7 +6851,7 @@ var Camel;
                 {
                     id: 'camel-route-profile',
                     title: 'Profile',
-                    href: "/camel/profileRoute" + workspace.hash(),
+                    path: "/camel/profileRoute",
                     show: function () { return workspace.isRoute()
                         && Camel.getSelectionCamelTraceMBean(workspace)
                         && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"); }
@@ -6851,7 +6859,7 @@ var Camel;
                 {
                     id: 'camel-route-debug',
                     title: 'Debug',
-                    href: "/camel/debugRoute" + workspace.hash(),
+                    path: "/camel/debugRoute",
                     show: function () { return workspace.isRoute()
                         && Camel.getSelectionCamelDebugMBean(workspace)
                         && workspace.hasInvokeRightsForName(Camel.getSelectionCamelDebugMBean(workspace), "getBreakpoints"); }
@@ -6859,7 +6867,7 @@ var Camel;
                 {
                     id: 'camel-route-trace',
                     title: 'Trace',
-                    href: "/camel/traceRoute" + workspace.hash(),
+                    path: "/camel/traceRoute",
                     show: function () { return workspace.isRoute()
                         && Camel.getSelectionCamelTraceMBean(workspace)
                         && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"); }
@@ -6867,38 +6875,41 @@ var Camel;
                 {
                     id: 'camel-endpoint-browser',
                     title: 'Browse',
-                    href: "/camel/browseEndpoint" + workspace.hash(),
+                    path: "/camel/browseEndpoint",
                     show: function () { return workspace.isEndpoint()
                         && workspace.hasInvokeRights(workspace.selection, "browseAllMessagesAsXml"); }
                 },
                 {
                     id: 'camel-endpoint-send',
                     title: 'Send',
-                    href: "/camel/sendMessage" + workspace.hash(),
+                    path: "/camel/sendMessage",
                     show: function () { return workspace.isEndpoint()
                         && workspace.hasInvokeRights(workspace.selection, workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage"); }
                 },
                 {
                     id: 'camel-endpoint-create',
                     title: 'Endpoint',
-                    href: "/camel/createEndpoint" + workspace.hash(),
+                    path: "/camel/createEndpoint",
                     show: function () { return workspace.isEndpointsFolder()
                         && workspace.hasInvokeRights(workspace.selection, "createEndpoint"); }
                 },
                 {
                     id: 'jmx-operations',
                     title: 'Operations',
-                    href: "/jmx/operations" + workspace.hash(),
+                    path: "/jmx/operations",
                     show: function () { return !isContextsFolder(workspace) && !workspace.isRoutesFolder(); }
                 },
                 {
                     id: 'jmx-charts',
                     title: 'Chart',
-                    href: "/jmx/charts" + workspace.hash(),
+                    path: "/jmx/charts",
                     show: function () { return !isContextsFolder(workspace) && !workspace.isRoutesFolder(); }
                 }
             ];
             $scope.isActive = function (tab) { return workspace.isLinkActive(tab.href); };
+            $scope.goto = function (path) {
+                $location.path(path);
+            };
         }]);
     function isContextsFolder(workspace) {
         return workspace.selection && workspace.selection.id === 'camelContexts';
@@ -6997,6 +7008,7 @@ var Camel;
                             }
                         }
                         $scope.graphView = "plugins/camel/html/routeDiagram.html";
+                        // must include the tableView directly to have it working with the slider
                     }
                     else {
                         tracerStatus.messages = [];
@@ -12163,7 +12175,7 @@ $templateCache.put('plugins/camel/html/deleteRouteModal.html','<div class="modal
 $templateCache.put('plugins/camel/html/endpointRuntimeRegistry.html','<div class="table-view" ng-controller="Camel.EndpointRuntimeRegistryController">\n\n  <h2>Endpoints (in/out)</h2>\n  \n  <div ng-if="!selectedMBean" class="spinner spinner-lg loading-page"></div>\n  \n  <div ng-if="selectedMBean">\n    <div class="loading-message" ng-if="data.length === 0">\n      There are no endpoints currently in use in this CamelContext.\n    </div>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-endpoints-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/exchanges.html','<h2>Exchanges</h2>\n<div ng-include src="\'plugins/camel/html/inflight.html\'"></div>\n<div ng-include src="\'plugins/camel/html/blocked.html\'"></div>');
 $templateCache.put('plugins/camel/html/inflight.html','<div class="table-view" ng-controller="Camel.InflightExchangesController">\n\n  <h3>Inflight</h3>\n  \n  <p ng-if="!initDone">\n    <span class="spinner spinner-xs spinner-inline"></span> Loading...\n  </p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No inflight exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-inflight-exchanges-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/camel/html/layoutCamelTree.html','<div class="tree-nav-layout">\n\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n\n    <div class="tree-nav-sidebar-header" ng-controller="Camel.TreeHeaderController">\n      <form role="form" class="search-pf has-button">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="input-search" class="sr-only">Search Tree:</label>\n            <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n              ng-model="filter">\n            <button type="button" class="clear" aria-hidden="true"\n              ng-hide="filter.length === 0"\n              ng-click="filter = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group tree-nav-buttons">\n          <span class="badge" ng-class="{positive: result.length > 0}"\n            ng-show="filter.length > 0">\n            {{result.length}}\n          </span>\n          <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>\n          <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>\n        </div>\n      </form>\n    </div>\n\n    <div id="cameltree" class="tree-nav-sidebar-content treeview-pf-hover treeview-pf-select"\n      ng-controller="Camel.TreeController"></div>\n\n  </div>\n\n  <div class="tree-nav-main">\n    <jmx-header></jmx-header>\n    <context-toolbar></context-toolbar>\n    <route-toolbar></route-toolbar>\n    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">\n      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">\n        <a ng-href="{{tab.href}}">{{tab.title}}</a>\n      </li>\n      <li class="dropdown overflow">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          More <span class="caret"></span>\n        </a>\n        <ul class="dropdown-menu" role="menu"></ul>\n      </li>\n    </ul>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
+$templateCache.put('plugins/camel/html/layoutCamelTree.html','<div class="tree-nav-layout">\n\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n\n    <div class="tree-nav-sidebar-header" ng-controller="Camel.TreeHeaderController">\n      <form role="form" class="search-pf has-button">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="input-search" class="sr-only">Search Tree:</label>\n            <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n              ng-model="filter">\n            <button type="button" class="clear" aria-hidden="true"\n              ng-hide="filter.length === 0"\n              ng-click="filter = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group tree-nav-buttons">\n          <span class="badge" ng-class="{positive: result.length > 0}"\n            ng-show="filter.length > 0">\n            {{result.length}}\n          </span>\n          <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>\n          <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>\n        </div>\n      </form>\n    </div>\n\n    <div id="cameltree" class="tree-nav-sidebar-content treeview-pf-hover treeview-pf-select"\n      ng-controller="Camel.TreeController"></div>\n\n  </div>\n\n  <div class="tree-nav-main">\n    <jmx-header></jmx-header>\n    <context-toolbar></context-toolbar>\n    <route-toolbar></route-toolbar>\n    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">\n      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">\n        <a href="#" ng-click="goto(tab.path)">{{tab.title}}</a>\n      </li>\n      <li class="dropdown overflow">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          More <span class="caret"></span>\n        </a>\n        <ul class="dropdown-menu" role="menu"></ul>\n      </li>\n    </ul>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/camel/html/nodePropertiesEdit.html','<div class="row-fluid">\n\n  <!-- the label and input fields needs to be wider -->\n  <style>\n    input, textarea, .uneditable-input {\n      width: 600px;\n    }\n    input, textarea, .editable-input {\n      width: 600px;\n    }\n\n    .form-horizontal .control-label {\n      width: 180px;\n    }\n\n    .form-horizontal .controls {\n      margin-left: 200px;\n    }\n  </style>\n\n  <h3>\n    <img src="{{icon}}" width="48" height="48" ng-show="icon"/> {{model.title}}\n    <span style="margin-left: 10px" ng-repeat="label in labels track by $index" class="pod-label badge" title="{{label}}">{{label}}</span>\n  </h3>\n\n  <div simple-form name="formViewer" mode=\'edit\' entity=\'nodeData\' data=\'model\' schema="schema"\n       showhelp="!hideHelp"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/nodePropertiesView.html','<header class="camel-properties-header">\n  <h2>Properties</h2>\n  <h3>\n    <img ng-src="{{icon}}" width="24" height="24" ng-show="icon"/>\n    <span>{{title}}</span>\n  </h3>\n  <em><span ng-repeat="label in labels track by $index">{{$first ? \'\' : \' / \'}}{{label}}<span></em>\n</header>\n<p>{{description}}</p>\n<property-list title="Defined Properties" properties="definedProperties"></property-list>\n<property-list title="Default Properties" properties="defaultProperties"></property-list>\n<property-list title="Undefined Properties" properties="undefinedProperties"></property-list>\n<div class="camel-properties-empty-space-for-tooltip"></div>');
 $templateCache.put('plugins/camel/html/preferences.html','<div ng-controller="Camel.PreferencesController">\n  <div hawtio-form-2="config" entity="entity"></div>\n</div>\n');

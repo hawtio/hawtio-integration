@@ -13,32 +13,32 @@ namespace Camel {
       {
         id: 'jmx-attributes',
         title: 'Attributes',
-        href: "/jmx/attributes" + workspace.hash(),
+        path: "/jmx/attributes",
         show: () => !isContextsFolder(workspace) && !workspace.isRoutesFolder()
       },
       {
         id: 'camel-contexts',
         title: 'Contexts',
-        href: "/camel/contexts" + workspace.hash(),
+        path: "/camel/contexts",
         show: () => isContextsFolder(workspace)
       },
       {
         id: 'camel-routes',
         title: 'Routes',
-        href: "/camel/routes" + workspace.hash(),
+        path: "/camel/routes",
         show: () => workspace.isRoutesFolder()
       },
       {
         id: 'camel-route-diagram',
         title: 'Route Diagram',
-        href: "/camel/routeDiagram" + workspace.hash(),
+        path: "/camel/routeDiagram",
         show: () => (workspace.isRoute() || workspace.isRoutesFolder())
           && workspace.hasInvokeRightsForName(getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml")
       },
       {
         id: 'camel-route-source',
         title: 'Source',
-        href: "/camel/source" + workspace.hash(),
+        path: "/camel/source",
         show: () => !workspace.isEndpointsFolder() && !workspace.isEndpoint()
           && (workspace.isRoute() || workspace.isRoutesFolder())
           && workspace.hasInvokeRightsForName(getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"),
@@ -47,13 +47,13 @@ namespace Camel {
       {
         id: 'camel-route-properties',
         title: 'Properties',
-        href: "/camel/propertiesRoute" + workspace.hash(),
+        path: "/camel/propertiesRoute",
         show: () => isRouteNode(workspace)
       },
       {
         id: 'camel-endpoint-properties',
         title: 'Properties',
-        href: "/camel/propertiesEndpoint" + workspace.hash(),
+        path: "/camel/propertiesEndpoint",
         show: () => workspace.isEndpoint()
           && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
           && workspace.hasInvokeRights(workspace.selection, "explainEndpointJson")
@@ -61,7 +61,7 @@ namespace Camel {
       {
         id: 'camel-component-properties',
         title: 'Properties',
-        href: "/camel/propertiesComponent" + workspace.hash(),
+        path: "/camel/propertiesComponent",
         show: () => workspace.isComponent()
           && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
           && workspace.hasInvokeRights(workspace.selection, "explainComponentJson")
@@ -69,7 +69,7 @@ namespace Camel {
       {
         id: 'camel-dataformat-properties',
         title: 'Properties',
-        href: "/camel/propertiesDataFormat" + workspace.hash(),
+        path: "/camel/propertiesDataFormat",
         show: () => workspace.isDataformat()
           && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
           && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson")
@@ -77,7 +77,7 @@ namespace Camel {
       {
         id: 'camel-exchanges',
         title: 'Exchanges',
-        href: "/camel/exchanges" + workspace.hash(),
+        path: "/camel/exchanges",
         show: () => !workspace.isEndpointsFolder() && !workspace.isEndpoint()
           && !workspace.isComponentsFolder() && !workspace.isComponent()
           && (workspace.isCamelContext() || workspace.isRoutesFolder() || workspace.isRoute())
@@ -87,7 +87,7 @@ namespace Camel {
       // {
       //   id: 'camel-blocked-exchanges',
       //   title: 'Blocked',
-      //   href: "/camel/blocked" + workspace.hash(),
+      //   path: "/camel/blocked",
       //   show: () => !workspace.isEndpointsFolder()
       //     && (workspace.isRoute() || workspace.isRoutesFolder())
       //     && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
@@ -96,7 +96,7 @@ namespace Camel {
       {
         id: 'camel-route-metrics',
         title: 'Route Metrics',
-        href: "/camel/routeMetrics" + workspace.hash(),
+        path: "/camel/routeMetrics",
         show: () => !workspace.isEndpointsFolder() && !workspace.isEndpoint()
           && (workspace.isCamelContext() || workspace.isRoutesFolder())
           && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
@@ -106,7 +106,7 @@ namespace Camel {
       {
         id: 'camel-rest-services',
         title: 'REST Services',
-        href: "/camel/restServices" + workspace.hash(),
+        path: "/camel/restServices",
         show: () => !getSelectedRouteNode(workspace)
           && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
           && !workspace.isComponentsFolder() && !workspace.isComponent()
@@ -119,7 +119,7 @@ namespace Camel {
       {
         id: 'camel-endpoint-runtime-registry',
         title: 'Endpoints (in/out)',
-        href: "/camel/endpointRuntimeRegistry" + workspace.hash(),
+        path: "/camel/endpointRuntimeRegistry",
         show: () => !workspace.isEndpointsFolder() && !workspace.isEndpoint()
           && !workspace.isComponentsFolder() && !workspace.isComponent()
           && (workspace.isCamelContext() || workspace.isRoutesFolder())
@@ -130,7 +130,7 @@ namespace Camel {
       {
         id: 'camel-type-converters',
         title: 'Type Converters',
-        href: "/camel/typeConverter" + workspace.hash(),
+        path: "/camel/typeConverter",
         show: () => !getSelectedRouteNode(workspace)
           && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
           && !workspace.isComponentsFolder() && !workspace.isComponent()
@@ -141,7 +141,7 @@ namespace Camel {
       {
         id: 'camel-route-profile',
         title: 'Profile',
-        href: "/camel/profileRoute" + workspace.hash(),
+        path: "/camel/profileRoute",
         show: () => workspace.isRoute()
           && Camel.getSelectionCamelTraceMBean(workspace)
           && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml")
@@ -149,7 +149,7 @@ namespace Camel {
       {
         id: 'camel-route-debug',
         title: 'Debug',
-        href: "/camel/debugRoute" + workspace.hash(),
+        path: "/camel/debugRoute",
         show: () => workspace.isRoute()
           && Camel.getSelectionCamelDebugMBean(workspace)
           && workspace.hasInvokeRightsForName(Camel.getSelectionCamelDebugMBean(workspace), "getBreakpoints")
@@ -157,7 +157,7 @@ namespace Camel {
       {
         id: 'camel-route-trace',
         title: 'Trace',
-        href: "/camel/traceRoute" + workspace.hash(),
+        path: "/camel/traceRoute",
         show: () => workspace.isRoute()
           && Camel.getSelectionCamelTraceMBean(workspace)
           && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml")
@@ -165,39 +165,43 @@ namespace Camel {
       {
         id: 'camel-endpoint-browser',
         title: 'Browse',
-        href: "/camel/browseEndpoint" + workspace.hash(),
+        path: "/camel/browseEndpoint",
         show: () => workspace.isEndpoint()
           && workspace.hasInvokeRights(workspace.selection, "browseAllMessagesAsXml")
       },
       {
         id: 'camel-endpoint-send',
         title: 'Send',
-        href: "/camel/sendMessage" + workspace.hash(),
+        path: "/camel/sendMessage",
         show: () => workspace.isEndpoint()
           && workspace.hasInvokeRights(workspace.selection, workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage")
       },
       {
         id: 'camel-endpoint-create',
         title: 'Endpoint',
-        href: "/camel/createEndpoint" + workspace.hash(),
+        path: "/camel/createEndpoint",
         show: () => workspace.isEndpointsFolder()
           && workspace.hasInvokeRights(workspace.selection, "createEndpoint")
       },
       {
         id: 'jmx-operations',
         title: 'Operations',
-        href: "/jmx/operations" + workspace.hash(),
+        path: "/jmx/operations",
         show: () => !isContextsFolder(workspace) && !workspace.isRoutesFolder()
       },
       {
         id: 'jmx-charts',
         title: 'Chart',
-        href: "/jmx/charts" + workspace.hash(),
+        path: "/jmx/charts",
         show: () => !isContextsFolder(workspace) && !workspace.isRoutesFolder()
       }
     ];
 
     $scope.isActive = tab => workspace.isLinkActive(tab.href);
+
+    $scope.goto = (path: string) => {
+      $location.path(path);
+    };    
 
   }]);
 
