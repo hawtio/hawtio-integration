@@ -395,8 +395,6 @@ var ActiveMQ;
                         cellTemplate: '<div class="ngCellText"><a href="" ng-click="row.entity.openMessageDialog(row)">{{row.entity.JMSMessageID}}</a></div>',
                         // for ng-grid
                         width: '34%'
-                        // for hawtio-datatable
-                        // width: "22em"
                     },
                     {
                         field: 'JMSType',
@@ -2030,7 +2028,6 @@ var Camel;
                 else {
                     if (value) {
                         if (_.startsWith(key, "_")) {
-                            // ignore
                         }
                         else {
                             var text = value.toString();
@@ -2387,7 +2384,6 @@ var Camel;
                 if ("routes" === type) {
                     return linkToRouteDiagramFullScreen(contextId, name);
                 }
-                // TODO a default page for a context?
             }
         }
         return answer;
@@ -3552,7 +3548,6 @@ var Camel;
                 maxWidth: 56,
                 resizable: false,
                 defaultSort: false
-                // we do not want to default sort the state column
             };
             var attributes = workspace.attributeColumnDefs;
             attributes[Camel.jmxDomain + "/context/folder"] = [
@@ -5823,7 +5818,6 @@ var Camel;
                 transitions.push(edge);
                 source.edges.push(edge);
                 target.edges.push(edge);
-                // TODO should we add the edge to the target?
             }
         });
         return states;
@@ -6275,7 +6269,6 @@ var Camel;
                         type: 'exec', mbean: $scope.mbean,
                         operation: 'dumpRoutesStatsAsXml',
                         arguments: [true, true]
-                        // the dumpRoutesStatsAsXml is not available in all Camel versions so do not barf on errors
                     }, Core.onSuccess(statsCallback, { silent: true, error: false }));
                 }
                 $scope.$emit("camel.diagram.layoutComplete");
@@ -6333,7 +6326,6 @@ var Camel;
                             node["tooltip"] = tooltip;
                         }
                         else {
-                            // we are probably not showing the route for these stats
                         }
                     }
                 }
@@ -7005,7 +6997,6 @@ var Camel;
                             }
                         }
                         $scope.graphView = "plugins/camel/html/routeDiagram.html";
-                        // must include the tableView directly to have it working with the slider
                     }
                     else {
                         tracerStatus.messages = [];
@@ -12176,7 +12167,7 @@ $templateCache.put('plugins/camel/html/layoutCamelTree.html','<div class="tree-n
 $templateCache.put('plugins/camel/html/nodePropertiesEdit.html','<div class="row-fluid">\n\n  <!-- the label and input fields needs to be wider -->\n  <style>\n    input, textarea, .uneditable-input {\n      width: 600px;\n    }\n    input, textarea, .editable-input {\n      width: 600px;\n    }\n\n    .form-horizontal .control-label {\n      width: 180px;\n    }\n\n    .form-horizontal .controls {\n      margin-left: 200px;\n    }\n  </style>\n\n  <h3>\n    <img src="{{icon}}" width="48" height="48" ng-show="icon"/> {{model.title}}\n    <span style="margin-left: 10px" ng-repeat="label in labels track by $index" class="pod-label badge" title="{{label}}">{{label}}</span>\n  </h3>\n\n  <div simple-form name="formViewer" mode=\'edit\' entity=\'nodeData\' data=\'model\' schema="schema"\n       showhelp="!hideHelp"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/nodePropertiesView.html','<header class="camel-properties-header">\n  <h2>Properties</h2>\n  <h3>\n    <img ng-src="{{icon}}" width="24" height="24" ng-show="icon"/>\n    <span>{{title}}</span>\n  </h3>\n  <em><span ng-repeat="label in labels track by $index">{{$first ? \'\' : \' / \'}}{{label}}<span></em>\n</header>\n<p>{{description}}</p>\n<property-list title="Defined Properties" properties="definedProperties"></property-list>\n<property-list title="Default Properties" properties="defaultProperties"></property-list>\n<property-list title="Undefined Properties" properties="undefinedProperties"></property-list>\n<div class="camel-properties-empty-space-for-tooltip"></div>');
 $templateCache.put('plugins/camel/html/preferences.html','<div ng-controller="Camel.PreferencesController">\n  <div hawtio-form-2="config" entity="entity"></div>\n</div>\n');
-$templateCache.put('plugins/camel/html/profileRoute.html','<div ng-controller="Camel.ProfileRouteController">\n  \n  <h2>Profile</h2>\n  \n  <div ng-if="!initDone" class="spinner spinner-lg loading-page"></div>\n  \n  <div ng-if="initDone">\n    <div class="loading-message" ng-if="data.length === 0">\n      No profile data\n    </div>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-profile-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n  \n</div>\n');
+$templateCache.put('plugins/camel/html/profileRoute.html','<div class="table-view" ng-controller="Camel.ProfileRouteController">\n  \n  <h2>Profile</h2>\n  \n  <div ng-if="!initDone" class="spinner spinner-lg loading-page"></div>\n  \n  <div ng-if="initDone">\n    <div class="loading-message" ng-if="data.length === 0">\n      No profile data\n    </div>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-profile-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n  \n</div>\n');
 $templateCache.put('plugins/camel/html/propertiesComponent.html','<div class="camel-properties" ng-controller="Camel.PropertiesComponentController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/propertiesDataFormat.html','<div class="camel-properties" ng-controller="Camel.PropertiesDataFormatController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/propertiesEndpoint.html','<div class="camel-properties" ng-controller="Camel.PropertiesEndpointController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
