@@ -395,8 +395,6 @@ var ActiveMQ;
                         cellTemplate: '<div class="ngCellText"><a href="" ng-click="row.entity.openMessageDialog(row)">{{row.entity.JMSMessageID}}</a></div>',
                         // for ng-grid
                         width: '34%'
-                        // for hawtio-datatable
-                        // width: "22em"
                     },
                     {
                         field: 'JMSType',
@@ -2030,7 +2028,6 @@ var Camel;
                 else {
                     if (value) {
                         if (_.startsWith(key, "_")) {
-                            // ignore
                         }
                         else {
                             var text = value.toString();
@@ -2387,7 +2384,6 @@ var Camel;
                 if ("routes" === type) {
                     return linkToRouteDiagramFullScreen(contextId, name);
                 }
-                // TODO a default page for a context?
             }
         }
         return answer;
@@ -3552,7 +3548,6 @@ var Camel;
                 maxWidth: 56,
                 resizable: false,
                 defaultSort: false
-                // we do not want to default sort the state column
             };
             var attributes = workspace.attributeColumnDefs;
             attributes[Camel.jmxDomain + "/context/folder"] = [
@@ -5823,7 +5818,6 @@ var Camel;
                 transitions.push(edge);
                 source.edges.push(edge);
                 target.edges.push(edge);
-                // TODO should we add the edge to the target?
             }
         });
         return states;
@@ -6275,7 +6269,6 @@ var Camel;
                         type: 'exec', mbean: $scope.mbean,
                         operation: 'dumpRoutesStatsAsXml',
                         arguments: [true, true]
-                        // the dumpRoutesStatsAsXml is not available in all Camel versions so do not barf on errors
                     }, Core.onSuccess(statsCallback, { silent: true, error: false }));
                 }
                 $scope.$emit("camel.diagram.layoutComplete");
@@ -6333,7 +6326,6 @@ var Camel;
                             node["tooltip"] = tooltip;
                         }
                         else {
-                            // we are probably not showing the route for these stats
                         }
                     }
                 }
@@ -6906,10 +6898,8 @@ var Camel;
                     show: function () { return !isContextsFolder(workspace) && !workspace.isRoutesFolder(); }
                 }
             ];
-            $scope.isActive = function (tab) { return workspace.isLinkActive(tab.href); };
-            $scope.goto = function (path) {
-                $location.path(path);
-            };
+            $scope.isActive = function (tab) { return workspace.isLinkActive(tab.path); };
+            $scope.goto = function (path) { return $location.path(path); };
         }]);
     function isContextsFolder(workspace) {
         return workspace.selection && workspace.selection.id === 'camelContexts';
@@ -7008,7 +6998,6 @@ var Camel;
                             }
                         }
                         $scope.graphView = "plugins/camel/html/routeDiagram.html";
-                        // must include the tableView directly to have it working with the slider
                     }
                     else {
                         tracerStatus.messages = [];

@@ -197,11 +197,9 @@ namespace Camel {
       }
     ];
 
-    $scope.isActive = tab => workspace.isLinkActive(tab.href);
+    $scope.isActive = tab => workspace.isLinkActive(tab.path);
 
-    $scope.goto = (path: string) => {
-      $location.path(path);
-    };    
+    $scope.goto = (path: string) => $location.path(path);
 
   }]);
 
