@@ -1319,6 +1319,10 @@ declare module Osgi {
  */
 declare module Osgi {
 }
+declare module Camel {
+}
+declare module Camel {
+}
 declare namespace Camel {
     class Context {
         name: string;
@@ -1426,10 +1430,6 @@ declare namespace Camel {
     };
 }
 declare namespace Camel {
-}
-declare module Camel {
-}
-declare module Camel {
 }
 declare module Camel {
     class Property {

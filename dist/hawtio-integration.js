@@ -1595,19 +1595,19 @@ var ActiveMQ;
                 {
                     id: 'jmx-attributes',
                     title: 'Attributes',
-                    href: "/jmx/attributes" + workspace.hash(),
+                    path: "/jmx/attributes",
                     show: function () { return true; }
                 },
                 {
                     id: 'jmx-operations',
                     title: 'Operations',
-                    href: "/jmx/operations" + workspace.hash(),
+                    path: "/jmx/operations",
                     show: function () { return true; }
                 },
                 {
                     id: 'jmx-charts',
                     title: 'Chart',
-                    href: "/jmx/charts" + workspace.hash(),
+                    path: "/jmx/charts",
                     show: function () { return true; }
                 },
                 {
@@ -1615,66 +1615,67 @@ var ActiveMQ;
                     title: 'Browse',
                     tooltip: "Browse the messages on the queue",
                     show: function () { return ActiveMQ.isQueue(workspace) && workspace.hasInvokeRights(workspace.selection, 'browse()'); },
-                    href: '/activemq/browseQueue' + workspace.hash()
+                    path: '/activemq/browseQueue'
                 },
                 {
                     id: 'activemq-send',
                     title: 'Send',
                     tooltip: 'Send a message to this destination',
                     show: function () { return (ActiveMQ.isQueue(workspace) || ActiveMQ.isTopic(workspace)) && workspace.hasInvokeRights(workspace.selection, 'sendTextMessage(java.util.Map,java.lang.String,java.lang.String,java.lang.String)'); },
-                    href: '/activemq/sendMessage' + workspace.hash()
+                    path: '/activemq/sendMessage'
                 },
                 {
                     id: 'activemq-durable-subscribers',
                     title: 'Durable Subscribers',
                     tooltip: 'Manage durable subscribers',
                     show: function () { return ActiveMQ.isBroker(workspace); },
-                    href: '/activemq/durableSubscribers' + workspace.hash()
+                    path: '/activemq/durableSubscribers'
                 },
                 {
                     id: 'activemq-jobs',
                     title: 'Jobs',
                     tooltip: 'Manage jobs',
                     show: function () { return ActiveMQ.isJobScheduler(workspace); },
-                    href: '/activemq/jobs' + workspace.hash()
+                    path: '/activemq/jobs'
                 },
                 {
                     id: 'activemq-create-destination',
                     title: 'Create',
                     tooltip: 'Create a new destination',
                     show: function () { return (ActiveMQ.isBroker(workspace) || ActiveMQ.isQueuesFolder(workspace) || ActiveMQ.isTopicsFolder(workspace) || ActiveMQ.isQueue(workspace) || ActiveMQ.isTopic(workspace)) && workspace.hasInvokeRights(ActiveMQ.getBroker(workspace), 'addQueue', 'addTopic'); },
-                    href: '/activemq/createDestination' + workspace.hash()
+                    path: '/activemq/createDestination'
                 },
                 {
                     id: 'activemq-delete-topic',
                     title: 'Delete',
                     tooltip: 'Delete this topic',
                     show: function () { return ActiveMQ.isTopic(workspace) && workspace.hasInvokeRights(ActiveMQ.getBroker(workspace), 'removeTopic'); },
-                    href: '/activemq/deleteTopic' + workspace.hash()
+                    path: '/activemq/deleteTopic'
                 },
                 {
                     id: 'activemq-delete-queue',
                     title: 'Delete',
                     tooltip: 'Delete or purge this queue',
                     show: function () { return ActiveMQ.isQueue(workspace) && workspace.hasInvokeRights(ActiveMQ.getBroker(workspace), 'removeQueue'); },
-                    href: '/activemq/deleteQueue' + workspace.hash()
+                    path: '/activemq/deleteQueue'
                 },
                 {
                     id: 'activemq-queues',
                     title: 'Queues',
                     tooltip: 'View Queues',
                     show: function () { return ActiveMQ.isBroker(workspace); },
-                    href: '/activemq/queues' + workspace.hash()
+                    path: '/activemq/queues'
                 },
                 {
                     id: 'activemq-topics',
                     title: 'Topics',
                     tooltip: 'View Topics',
                     show: function () { return ActiveMQ.isBroker(workspace); },
-                    href: '/activemq/topics' + workspace.hash()
+                    path: '/activemq/topics'
                 }
             ];
-            $scope.isActive = function (tab) { return workspace.isLinkActive(tab.href); };
+            $scope.isActive = function (tab) { return workspace.isLinkActive(tab.path); };
+            $scope.goto = function (path) { return $location.path(path); };
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
 /// <reference path="../../includes.ts"/>
@@ -10926,6 +10927,243 @@ var Osgi;
             $scope.updateGraph();
         }]);
 })(Osgi || (Osgi = {}));
+/// <reference path="../camelPlugin.ts"/>
+var Camel;
+(function (Camel) {
+    Camel._module.controller("Camel.BlockedExchangesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            var log = Logger.get("Camel");
+            $scope.data = [];
+            $scope.initDone = false;
+            $scope.mbeanAttributes = {};
+            var columnDefs = [
+                {
+                    field: 'exchangeId',
+                    displayName: 'Exchange Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'routeId',
+                    displayName: 'Route Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'nodeId',
+                    displayName: 'Node Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'duration',
+                    displayName: 'Duration (ms)',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'threadId',
+                    displayName: 'Thread id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'threadName',
+                    displayName: 'Thread name',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                }
+            ];
+            $scope.gridOptions = {
+                data: 'data',
+                displayFooter: true,
+                displaySelectionCheckbox: true,
+                multiSelect: false,
+                canSelectRows: true,
+                enableSorting: true,
+                columnDefs: columnDefs,
+                selectedItems: [],
+                filterOptions: {
+                    filterText: ''
+                },
+                primaryKeyFn: function (entity) { return entity.exchangeId; }
+            };
+            $scope.doUnblock = function () {
+                var mbean = Camel.getSelectionCamelBlockedExchanges(workspace);
+                var selectedItems = $scope.gridOptions.selectedItems;
+                if (mbean && selectedItems && selectedItems.length === 1) {
+                    var exchangeId = selectedItems[0].exchangeId;
+                    var threadId = selectedItems[0].threadId;
+                    var threadName = selectedItems[0].threadName;
+                    log.info("Unblocking thread (" + threadId + "/" + threadName + ") for exchangeId: " + exchangeId);
+                    jolokia.execute(mbean, "interrupt(java.lang.String)", exchangeId, Core.onSuccess(onUnblocked));
+                }
+            };
+            function onUnblocked() {
+                Core.notification("success", "Thread unblocked");
+            }
+            function onBlocked(response) {
+                var obj = response.value;
+                if (obj) {
+                    // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
+                    var arr = [];
+                    for (var key in obj) {
+                        var entry = obj[key];
+                        console.log('blocked: ' + JSON.stringify(entry));
+                        arr.push({
+                            exchangeId: entry.exchangeId,
+                            routeId: entry.routeId,
+                            nodeId: entry.nodeId,
+                            duration: entry.duration,
+                            threadId: entry.id,
+                            threadName: entry.name
+                        });
+                    }
+                    arr = _.sortBy(arr, "exchangeId");
+                    $scope.data = arr;
+                    // okay we have the data then set the selected mbean which allows UI to display data
+                    $scope.selectedMBean = response.request.mbean;
+                }
+                else {
+                    // clear data
+                    $scope.data = [];
+                }
+                $scope.initDone = "true";
+                // ensure web page is updated
+                Core.$apply($scope);
+            }
+            function loadBlockedData() {
+                log.info("Loading blocked exchanges data...");
+                // pre-select filter if we have selected a route
+                var routeId = Camel.getSelectedRouteId(workspace);
+                if (routeId != null) {
+                    $scope.gridOptions.filterOptions.filterText = routeId;
+                }
+                var mbean = Camel.getSelectionCamelBlockedExchanges(workspace);
+                if (mbean) {
+                    // grab blocked in real time
+                    var query = { type: "exec", mbean: mbean, operation: 'browse()' };
+                    jolokia.request(query, Core.onSuccess(onBlocked));
+                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(Core.onSuccess(onBlocked), query));
+                }
+            }
+            // load data
+            loadBlockedData();
+        }]);
+})(Camel || (Camel = {}));
+/// <reference path="../../../includes.ts"/>
+/// <reference path="../camelPlugin.ts"/>
+var Camel;
+(function (Camel) {
+    Camel._module.controller("Camel.InflightExchangesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            $scope.data = [];
+            $scope.initDone = false;
+            $scope.mbeanAttributes = {};
+            var columnDefs = [
+                {
+                    field: 'exchangeId',
+                    displayName: 'Exchange Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'routeId',
+                    displayName: 'Route Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'nodeId',
+                    displayName: 'Node Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'duration',
+                    displayName: 'Duration (ms)',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'elapsed',
+                    displayName: 'Elapsed (ms)',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                }
+            ];
+            $scope.gridOptions = {
+                data: 'data',
+                displayFooter: true,
+                displaySelectionCheckbox: false,
+                canSelectRows: false,
+                enableSorting: true,
+                columnDefs: columnDefs,
+                selectedItems: [],
+                filterOptions: {
+                    filterText: ''
+                },
+                primaryKeyFn: function (entity) { return entity.exchangeId; }
+            };
+            function onInflight(response) {
+                var obj = response.value;
+                if (obj) {
+                    // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
+                    var arr = [];
+                    for (var key in obj) {
+                        var entry = obj[key];
+                        console.log('inflight: ' + JSON.stringify(entry));
+                        arr.push({
+                            exchangeId: entry.exchangeId,
+                            routeId: entry.routeId,
+                            nodeId: entry.nodeId,
+                            duration: entry.duration,
+                            elapsed: entry.elapsed
+                        });
+                    }
+                    arr = _.sortBy(arr, "exchangeId");
+                    $scope.data = arr;
+                    // okay we have the data then set the selected mbean which allows UI to display data
+                    $scope.selectedMBean = response.request.mbean;
+                }
+                else {
+                    // clear data
+                    $scope.data = [];
+                }
+                $scope.initDone = "true";
+                // ensure web page is updated
+                Core.$apply($scope);
+            }
+            $scope.renderIcon = function (state) {
+                return Camel.iconClass(state);
+            };
+            function loadData() {
+                console.log("Loading inflight data...");
+                // pre-select filter if we have selected a route
+                var routeId = Camel.getSelectedRouteId(workspace);
+                if (routeId != null) {
+                    $scope.gridOptions.filterOptions.filterText = routeId;
+                }
+                var mbean = Camel.getSelectionCamelInflightRepository(workspace);
+                if (mbean) {
+                    // grab inflight in real time
+                    var query = { type: "exec", mbean: mbean, operation: 'browse()' };
+                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onInflight, query));
+                }
+            }
+            // load data
+            loadData();
+        }]);
+})(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
     var Context = (function () {
@@ -11272,243 +11510,6 @@ var Camel;
         .component('contexts', Camel.contextsComponent)
         .component('contextToolbar', Camel.contextToolbarComponent)
         .service('contextsService', Camel.ContextsService);
-})(Camel || (Camel = {}));
-/// <reference path="../camelPlugin.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.BlockedExchangesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            var log = Logger.get("Camel");
-            $scope.data = [];
-            $scope.initDone = false;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'exchangeId',
-                    displayName: 'Exchange Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'routeId',
-                    displayName: 'Route Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'nodeId',
-                    displayName: 'Node Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'duration',
-                    displayName: 'Duration (ms)',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'threadId',
-                    displayName: 'Thread id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'threadName',
-                    displayName: 'Thread name',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: true,
-                multiSelect: false,
-                canSelectRows: true,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                },
-                primaryKeyFn: function (entity) { return entity.exchangeId; }
-            };
-            $scope.doUnblock = function () {
-                var mbean = Camel.getSelectionCamelBlockedExchanges(workspace);
-                var selectedItems = $scope.gridOptions.selectedItems;
-                if (mbean && selectedItems && selectedItems.length === 1) {
-                    var exchangeId = selectedItems[0].exchangeId;
-                    var threadId = selectedItems[0].threadId;
-                    var threadName = selectedItems[0].threadName;
-                    log.info("Unblocking thread (" + threadId + "/" + threadName + ") for exchangeId: " + exchangeId);
-                    jolokia.execute(mbean, "interrupt(java.lang.String)", exchangeId, Core.onSuccess(onUnblocked));
-                }
-            };
-            function onUnblocked() {
-                Core.notification("success", "Thread unblocked");
-            }
-            function onBlocked(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var entry = obj[key];
-                        console.log('blocked: ' + JSON.stringify(entry));
-                        arr.push({
-                            exchangeId: entry.exchangeId,
-                            routeId: entry.routeId,
-                            nodeId: entry.nodeId,
-                            duration: entry.duration,
-                            threadId: entry.id,
-                            threadName: entry.name
-                        });
-                    }
-                    arr = _.sortBy(arr, "exchangeId");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
-                }
-                else {
-                    // clear data
-                    $scope.data = [];
-                }
-                $scope.initDone = "true";
-                // ensure web page is updated
-                Core.$apply($scope);
-            }
-            function loadBlockedData() {
-                log.info("Loading blocked exchanges data...");
-                // pre-select filter if we have selected a route
-                var routeId = Camel.getSelectedRouteId(workspace);
-                if (routeId != null) {
-                    $scope.gridOptions.filterOptions.filterText = routeId;
-                }
-                var mbean = Camel.getSelectionCamelBlockedExchanges(workspace);
-                if (mbean) {
-                    // grab blocked in real time
-                    var query = { type: "exec", mbean: mbean, operation: 'browse()' };
-                    jolokia.request(query, Core.onSuccess(onBlocked));
-                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(Core.onSuccess(onBlocked), query));
-                }
-            }
-            // load data
-            loadBlockedData();
-        }]);
-})(Camel || (Camel = {}));
-/// <reference path="../../../includes.ts"/>
-/// <reference path="../camelPlugin.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.InflightExchangesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = [];
-            $scope.initDone = false;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'exchangeId',
-                    displayName: 'Exchange Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'routeId',
-                    displayName: 'Route Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'nodeId',
-                    displayName: 'Node Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'duration',
-                    displayName: 'Duration (ms)',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'elapsed',
-                    displayName: 'Elapsed (ms)',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: false,
-                canSelectRows: false,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                },
-                primaryKeyFn: function (entity) { return entity.exchangeId; }
-            };
-            function onInflight(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var entry = obj[key];
-                        console.log('inflight: ' + JSON.stringify(entry));
-                        arr.push({
-                            exchangeId: entry.exchangeId,
-                            routeId: entry.routeId,
-                            nodeId: entry.nodeId,
-                            duration: entry.duration,
-                            elapsed: entry.elapsed
-                        });
-                    }
-                    arr = _.sortBy(arr, "exchangeId");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
-                }
-                else {
-                    // clear data
-                    $scope.data = [];
-                }
-                $scope.initDone = "true";
-                // ensure web page is updated
-                Core.$apply($scope);
-            }
-            $scope.renderIcon = function (state) {
-                return Camel.iconClass(state);
-            };
-            function loadData() {
-                console.log("Loading inflight data...");
-                // pre-select filter if we have selected a route
-                var routeId = Camel.getSelectedRouteId(workspace);
-                if (routeId != null) {
-                    $scope.gridOptions.filterOptions.filterText = routeId;
-                }
-                var mbean = Camel.getSelectionCamelInflightRepository(workspace);
-                if (mbean) {
-                    // grab inflight in real time
-                    var query = { type: "exec", mbean: mbean, operation: 'browse()' };
-                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onInflight, query));
-                }
-            }
-            // load data
-            loadData();
-        }]);
 })(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
@@ -12149,7 +12150,7 @@ $templateCache.put('plugins/activemq/html/deleteTopic.html','<div ng-controller=
 $templateCache.put('plugins/activemq/html/destinations.html','<div ng-controller="ActiveMQ.QueuesController">\n\n    <div class="row-fluid">\n        <div class="span24">\n            <div class="section-filter">\n                <input class="search-query span12" type="text" ng-model="gridOptions.filterOptions.filterText"\n                       placeholder="{{destinationFilterPlaceholder}}">\n                <i class="icon-remove clickable"\n                   title="Clear filter"\n                   ng-click="gridOptions.filterOptions.filterText = \'\'"></i>\n            </div>\n            <div class="control-group inline-block">\n                <form class="form-inline no-bottom-margin">\n                    <label>&nbsp;&nbsp;&nbsp;Filter: </label>\n                    <select ng-model="destinationFilter.filter" id="destinationFilter">\n                        <option value="" selected="selected">None...</option>\n                        <option ng-repeat="option in destinationFilterOptions" value="{{option.id}}">{{option.name}}\n                        </option>\n                    </select>\n                    <button class="btn" ng-click="refresh()"\n                            title="Filter">\n                        <i class="icon-refresh"></i>\n                    </button>\n                </form>\n            </div>\n        </div>\n    </div>\n\n\n    <div class="row-fluid">\n        <div class="gridStyle" ng-grid="gridOptions" ui-grid-resize-columns></div>\n    </div>\n\n</div>');
 $templateCache.put('plugins/activemq/html/durableSubscribers.html','<div ng-controller="ActiveMQ.DurableSubscriberController">\n\n    <div class="row">\n      <div class="col-md-12">\n        <div class="pull-right">\n            <form class="form-inline">\n                <button class="btn btn-default" ng-click="createSubscriberDialog.open()"\n                        hawtio-show object-name="{{workspace.selection.objectName}}" method-name="createDurableSubscriber"\n                        title="Create durable subscriber">\n                    <i class="fa fa-plus"></i> Create\n                </button>\n                <button class="btn btn-default" ng-click="deleteSubscriberDialog.open()"\n                        hawtio-show object-name="{{$scope.gridOptions.selectedItems[0]._id}}" method-name="destroy"\n                        title="Destroy durable subscriber" ng-disabled="gridOptions.selectedItems.length != 1">\n                    <i class="fa fa-exclamation"></i> Destroy\n                </button>\n                <button class="btn btn-default" ng-click="refresh()"\n                        title="Refreshes the list of subscribers">\n                    <i class="fa fa-refresh"></i>\n                </button>\n            </form>\n        </div>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="gridStyle" ng-grid="gridOptions"></div>\n    </div>\n\n    <div modal="createSubscriberDialog.show">\n      <form name="createSubscriber" class="form-horizontal no-bottom-margin" ng-submit="doCreateSubscriber(clientId, subscriberName, topicName, subSelector)">\n        <div class="modal-header"><h4>Create Durable Subscriber</h4></div>\n        <div class="modal-body">\n          <label>Client Id: </label>\n          <input name="clientId" class="input-xlarge" type="text" ng-model="clientId" required>\n          <label>Subscriber name: </label>\n          <input name="subscriberName" class="input-xlarge" type="text" ng-model="subscriberName" required>\n          <label>Topic name: </label>\n          <input name="topicName" class="input-xlarge" type="text" ng-model="topicName" required uib-typeahead="title for title in topicNames($viewValue) | filter:$viewValue">\n          <label>Selector: </label>\n          <input name="subSelector" class="input-xlarge" type="text" ng-model="subSelector">\n        </div>\n        <div class="modal-footer">\n          <input class="btn btn-success" type="submit" value="Create">\n          <input class="btn btn-primary" type="button" ng-click="createSubscriberDialog.close()" value="Cancel">\n        </div>\n      </form>\n    </div>\n\n    <div hawtio-slideout="showSubscriberDialog.show" title="Details">\n      <div class="dialog-body">\n\n        <div class="row">\n          <div class="pull-right">\n            <form class="form-inline">\n\n              <button class="btn btn-danger" ng-disabled="showSubscriberDialog.subscriber.Status == \'Active\'"\n                      ng-click="deleteSubscriberDialog.open()"\n                      title="Delete subscriber">\n                <i class="fa fa-remove"></i> Delete\n              </button>\n\n              <button class="btn btn-default" ng-click="showSubscriberDialog.close()" title="Close this dialog">\n                <i class="fa fa-remove"></i> Close\n              </button>\n\n            </form>\n          </div>\n        </div>\n\n          <div class="row">\n              <div class="expandable-body well">\n                <table class="table table-condensed table-striped">\n                  <thead>\n                  <tr>\n                    <th>Property</th>\n                    <th>Value</th>\n                  </tr>\n                  </thead>\n                  <tbody>\n                  <tr>\n                    <td class="property-name">Client Id</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["ClientId"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Subscription Name</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["SubscriptionName"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Topic Name</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["DestinationName"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Selector</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["Selector"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Status</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber.Status}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Enqueue Counter</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["EnqueueCounter"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Dequeue Counter</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["DequeueCounter"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Dispatched Counter</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["DispatchedCounter"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Pending Size</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["PendingQueueSize"]}}</td>\n                  </tr>\n                  </tbody>\n                </table>\n              </div>\n            </div>\n\n      </div>\n\n    </div>\n\n    <div hawtio-confirm-dialog="deleteSubscriberDialog.show" ok-button-text="Yes" cancel-button-text="No" on-ok="deleteSubscribers()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the subscriber</p>\n      </div>\n    </div>\n\n</div>');
 $templateCache.put('plugins/activemq/html/jobs.html','<div ng-controller="ActiveMQ.JobSchedulerController">\n\n    <div class="row">\n      <div class="col-md-12">\n        <div class="pull-right">\n            <form class="form-inline">\n                <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length"\n                        hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeJob"\n                        ng-click="deleteJobsDialog.open()"\n                        title="Delete the selected jobs">\n                  <i class="fa fa-remove"></i> Delete\n                </button>\n                <button class="btn btn-default" ng-click="refresh()"\n                        title="Refreshes the list of subscribers">\n                    <i class="fa fa-refresh"></i>\n                </button>\n            </form>\n        </div>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="gridStyle" ng-grid="gridOptions"></div>\n    </div>\n\n    <div hawtio-confirm-dialog="deleteJobsDialog.show" ok-button-text="Yes" cancel-button-text="No" on-ok="deleteJobs()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the jobs</p>\n      </div>\n    </div>\n\n</div>');
-$templateCache.put('plugins/activemq/html/layoutActiveMQTree.html','<div class="tree-nav-layout">\n\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n\n    <div class="tree-nav-sidebar-header" ng-controller="ActiveMQ.TreeHeaderController">\n      <form role="form" class="search-pf has-button">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="input-search" class="sr-only">Search Tree:</label>\n            <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n              ng-model="filter">\n            <button type="button" class="clear" aria-hidden="true"\n              ng-hide="filter.length === 0"\n              ng-click="filter = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group tree-nav-buttons">\n          <span class="badge" ng-class="{positive: result.length > 0}"\n            ng-show="filter.length > 0">\n            {{result.length}}\n          </span>\n          <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>\n          <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>\n        </div>\n      </form>\n    </div>\n\n    <div id="activemqtree" class="tree-nav-sidebar-content treeview-pf-hover treeview-pf-select"\n      ng-controller="ActiveMQ.TreeController"></div>\n  </div>\n\n  <div class="tree-nav-main">\n    <jmx-header></jmx-header>\n    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="ActiveMQ.TabsController">\n      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">\n        <a ng-href="{{tab.href}}">{{tab.title}}</a>\n      </li>\n      <li class="dropdown overflow">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          More <span class="caret"></span>\n        </a>\n        <ul class="dropdown-menu" role="menu"></ul>\n      </li>\n    </ul>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
+$templateCache.put('plugins/activemq/html/layoutActiveMQTree.html','<div class="tree-nav-layout">\n\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n\n    <div class="tree-nav-sidebar-header" ng-controller="ActiveMQ.TreeHeaderController">\n      <form role="form" class="search-pf has-button">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="input-search" class="sr-only">Search Tree:</label>\n            <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n              ng-model="filter">\n            <button type="button" class="clear" aria-hidden="true"\n              ng-hide="filter.length === 0"\n              ng-click="filter = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group tree-nav-buttons">\n          <span class="badge" ng-class="{positive: result.length > 0}"\n            ng-show="filter.length > 0">\n            {{result.length}}\n          </span>\n          <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>\n          <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>\n        </div>\n      </form>\n    </div>\n\n    <div id="activemqtree" class="tree-nav-sidebar-content treeview-pf-hover treeview-pf-select"\n      ng-controller="ActiveMQ.TreeController"></div>\n  </div>\n\n  <div class="tree-nav-main">\n    <jmx-header></jmx-header>\n    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="ActiveMQ.TabsController">\n      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">\n        <a ng-href="#" ng-click="goto(tab.path)">{{tab.title}}</a>\n      </li>\n      <li class="dropdown overflow">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          More <span class="caret"></span>\n        </a>\n        <ul class="dropdown-menu" role="menu"></ul>\n      </li>\n    </ul>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/preferences.html','<div ng-controller="ActiveMQ.PreferencesController">\n  <div hawtio-form-2="config" entity="entity"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/blocked.html','<div class="table-view" ng-controller="Camel.BlockedExchangesController">\n\n  <h3>Blocked</h3>\n  \n  <p ng-if="!initDone">\n    <span class="spinner spinner-xs spinner-inline"></span> Loading...\n  </p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No blocked exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n            <div class="form-group">\n              <button type="button" class="btn btn-default" ng-disabled="gridOptions.selectedItems.length === 0"\n                ng-click="unblockDialog = true" data-placement="bottom">Unblock</button>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="unblockDialog" ok-button-text="Unblock" cancel-button-text="Cancel" on-ok="doUnblock()"\n       title="Unblock Exchange">\n    <div class="dialog-body">\n      <p>You are about to unblock the selected thread.</p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/breadcrumbBar.html','<div ng-hide="inDashboard" class="logbar logbar-wiki" ng-controller="Camel.BreadcrumbBarController">\n  <div class="wiki logbar-container">\n    <ul class="nav nav-tabs">\n      <li class="" >\n        <a class="breadcrumb-link">\n          <span class="contained c-medium">Camel Contexts</span>\n        </a>\n      </li>\n        <li class="dropdown" ng-repeat="breadcrumb in breadcrumbs">\n          <a ng-show="breadcrumb.items.length > 0" href="#" class="breadcrumb-link dropdown-toggle" data-toggle="dropdown"\n             data-placement="bottom" title="{{breadcrumb.tooltip}}">\n            {{breadcrumb.name}}\n            <span class="caret"></span>\n          </a>\n          <ul class="dropdown-menu">\n            <li ng-repeat="item in breadcrumb.items">\n              <a ng-href="{{item.link}}{{hash}}"\n                 title="Switch to {{item.name}} "\n                 data-placement="bottom">\n                {{item.name}}</a>\n            </li>\n          </ul>\n        </li>\n      <li class="pull-right" ng-show="treeViewLink" title="Switch to the tree based explorer view">\n        <a href="{{treeViewLink}}"><i class="fa fa-resize-full"></i></a>\n      </li>\n      </ul>\n  </div>\n</div>\n');

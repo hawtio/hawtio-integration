@@ -35,7 +35,7 @@
     <jmx-header></jmx-header>
     <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="ActiveMQ.TabsController">
       <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
-        <a ng-href="{{tab.href}}">{{tab.title}}</a>
+        <a ng-href="#" ng-click="goto(tab.path)">{{tab.title}}</a>
       </li>
       <li class="dropdown overflow">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
