@@ -330,17 +330,14 @@ module Camel {
   // register the jmx lazy loader here as it won't have been invoked in the run method
   hawtioPluginLoader.registerPreBootstrapTask((task) => {
     Jmx.registerLazyLoadHandler(jmxDomain, (folder: Jmx.Folder) => {
-      if (jmxDomain === folder.domain && "routes" === folder.typeName) {
-        return (workspace, folder, onComplete) => {
-          if ("routes" === folder.typeName) {
-            processRouteXml(workspace, workspace.jolokia, folder, (route) => {
-              if (route) {
-                addRouteChildren(folder, route);
-              }
-              onComplete();
-            });
+      if (jmxDomain === folder.domain && 'routes' === folder.typeName) {
+        return (workspace, parent: Jmx.Folder, onComplete: (children: Jmx.NodeSelection[]) => void) => {
+          if ('routes' === parent.typeName) {
+            processRouteXml(workspace, workspace.jolokia, parent, route => onComplete(route ?
+              loadRouteChildren(parent, route) :
+              new Array<Jmx.NodeSelection>()));
           } else {
-            onComplete();
+            onComplete(new Array<Jmx.NodeSelection>());
           }
         }
       }

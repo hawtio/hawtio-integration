@@ -2259,7 +2259,8 @@ var Camel;
                     routeFolder.icon = imageUrl;
                 }
                 folder.children.push(routeFolder);
-                addRouteChildren(routeFolder, route);
+                // FIXME
+                // loadRouteChildren(routeFolder, route);
             });
         }
         return folder;
@@ -2269,20 +2270,20 @@ var Camel;
      * Adds the route children to the given folder for each step in the route
      * @method
      */
-    function addRouteChildren(folder, route) {
+    function loadRouteChildren(folder, route) {
         folder.children = [];
-        folder["routeXmlNode"] = route;
-        route.setAttribute("_cid", folder.key);
-        $(route).children("*").each(function (idx, n) {
-            addRouteChild(folder, n);
-        });
+        folder['routeXmlNode'] = route;
+        route.setAttribute('_cid', folder.key);
+        var children = [];
+        $(route).children('*').each(function (idx, n) { return children.push(loadRouteChild(folder, n)); });
+        return children;
     }
-    Camel.addRouteChildren = addRouteChildren;
+    Camel.loadRouteChildren = loadRouteChildren;
     /**
      * Adds a child to the given folder / route
      * @method
      */
-    function addRouteChild(folder, n) {
+    function loadRouteChild(folder, n) {
         var nodeName = n.localName;
         if (nodeName) {
             var nodeSettings = getCamelSchema(nodeName);
@@ -2290,13 +2291,13 @@ var Camel;
                 var imageUrl = getRouteNodeIcon(nodeSettings);
                 var child = new Jmx.Folder(nodeName);
                 child.domain = Camel.jmxDomain;
-                child.typeName = "routeNode";
+                child.typeName = 'routeNode';
                 updateRouteNodeLabelAndTooltip(child, n, nodeSettings);
                 // TODO should maybe auto-generate these?
-                child.parent = folder;
+                // child.parent = folder;
                 child.folderNames = folder.folderNames;
-                var id = n.getAttribute("id") || nodeName;
-                var key = folder.key + "_" + Core.toSafeDomID(id);
+                var id = n.getAttribute('id') || nodeName;
+                var key = folder.key + '_' + Core.toSafeDomID(id);
                 // lets find the next key thats unique
                 var counter = 1;
                 var notFound = true;
@@ -2311,19 +2312,16 @@ var Camel;
                     }
                 }
                 child.key = key;
-                child.icon = imageUrl;
-                child["routeXmlNode"] = n;
-                if (!folder.children) {
-                    folder.children = [];
-                }
-                folder.children.push(child);
-                addRouteChildren(child, n);
+                // FIXME
+                // child.icon = imageUrl;
+                child['routeXmlNode'] = n;
+                // FIXME
+                // addRouteChildren(child, n);
                 return child;
             }
         }
         return null;
     }
-    Camel.addRouteChild = addRouteChild;
     /**
      * Returns the root JMX Folder of the camel mbeans
      */
@@ -3766,18 +3764,15 @@ var Camel;
     // register the jmx lazy loader here as it won't have been invoked in the run method
     hawtioPluginLoader.registerPreBootstrapTask(function (task) {
         Jmx.registerLazyLoadHandler(Camel.jmxDomain, function (folder) {
-            if (Camel.jmxDomain === folder.domain && "routes" === folder.typeName) {
-                return function (workspace, folder, onComplete) {
-                    if ("routes" === folder.typeName) {
-                        Camel.processRouteXml(workspace, workspace.jolokia, folder, function (route) {
-                            if (route) {
-                                Camel.addRouteChildren(folder, route);
-                            }
-                            onComplete();
-                        });
+            if (Camel.jmxDomain === folder.domain && 'routes' === folder.typeName) {
+                return function (workspace, parent, onComplete) {
+                    if ('routes' === parent.typeName) {
+                        Camel.processRouteXml(workspace, workspace.jolokia, parent, function (route) { return onComplete(route ?
+                            Camel.loadRouteChildren(parent, route) :
+                            new Array()); });
                     }
                     else {
-                        onComplete();
+                        onComplete(new Array());
                     }
                 };
             }
@@ -6165,7 +6160,8 @@ var Camel;
                             if (!routeFolder.children.length) {
                                 Camel.processRouteXml(workspace, workspace.jolokia, routeFolder, function (route) {
                                     console.log('loaded route');
-                                    Camel.addRouteChildren(routeFolder, route);
+                                    // FIXME
+                                    // loadRouteChildren(routeFolder, route);
                                     updateRouteProperties(node, route, routeFolder);
                                 });
                             }
@@ -10927,243 +10923,6 @@ var Osgi;
             $scope.updateGraph();
         }]);
 })(Osgi || (Osgi = {}));
-/// <reference path="../camelPlugin.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.BlockedExchangesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            var log = Logger.get("Camel");
-            $scope.data = [];
-            $scope.initDone = false;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'exchangeId',
-                    displayName: 'Exchange Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'routeId',
-                    displayName: 'Route Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'nodeId',
-                    displayName: 'Node Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'duration',
-                    displayName: 'Duration (ms)',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'threadId',
-                    displayName: 'Thread id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'threadName',
-                    displayName: 'Thread name',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: true,
-                multiSelect: false,
-                canSelectRows: true,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                },
-                primaryKeyFn: function (entity) { return entity.exchangeId; }
-            };
-            $scope.doUnblock = function () {
-                var mbean = Camel.getSelectionCamelBlockedExchanges(workspace);
-                var selectedItems = $scope.gridOptions.selectedItems;
-                if (mbean && selectedItems && selectedItems.length === 1) {
-                    var exchangeId = selectedItems[0].exchangeId;
-                    var threadId = selectedItems[0].threadId;
-                    var threadName = selectedItems[0].threadName;
-                    log.info("Unblocking thread (" + threadId + "/" + threadName + ") for exchangeId: " + exchangeId);
-                    jolokia.execute(mbean, "interrupt(java.lang.String)", exchangeId, Core.onSuccess(onUnblocked));
-                }
-            };
-            function onUnblocked() {
-                Core.notification("success", "Thread unblocked");
-            }
-            function onBlocked(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var entry = obj[key];
-                        console.log('blocked: ' + JSON.stringify(entry));
-                        arr.push({
-                            exchangeId: entry.exchangeId,
-                            routeId: entry.routeId,
-                            nodeId: entry.nodeId,
-                            duration: entry.duration,
-                            threadId: entry.id,
-                            threadName: entry.name
-                        });
-                    }
-                    arr = _.sortBy(arr, "exchangeId");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
-                }
-                else {
-                    // clear data
-                    $scope.data = [];
-                }
-                $scope.initDone = "true";
-                // ensure web page is updated
-                Core.$apply($scope);
-            }
-            function loadBlockedData() {
-                log.info("Loading blocked exchanges data...");
-                // pre-select filter if we have selected a route
-                var routeId = Camel.getSelectedRouteId(workspace);
-                if (routeId != null) {
-                    $scope.gridOptions.filterOptions.filterText = routeId;
-                }
-                var mbean = Camel.getSelectionCamelBlockedExchanges(workspace);
-                if (mbean) {
-                    // grab blocked in real time
-                    var query = { type: "exec", mbean: mbean, operation: 'browse()' };
-                    jolokia.request(query, Core.onSuccess(onBlocked));
-                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(Core.onSuccess(onBlocked), query));
-                }
-            }
-            // load data
-            loadBlockedData();
-        }]);
-})(Camel || (Camel = {}));
-/// <reference path="../../../includes.ts"/>
-/// <reference path="../camelPlugin.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.InflightExchangesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = [];
-            $scope.initDone = false;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'exchangeId',
-                    displayName: 'Exchange Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'routeId',
-                    displayName: 'Route Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'nodeId',
-                    displayName: 'Node Id',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'duration',
-                    displayName: 'Duration (ms)',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'elapsed',
-                    displayName: 'Elapsed (ms)',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: false,
-                canSelectRows: false,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                },
-                primaryKeyFn: function (entity) { return entity.exchangeId; }
-            };
-            function onInflight(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var entry = obj[key];
-                        console.log('inflight: ' + JSON.stringify(entry));
-                        arr.push({
-                            exchangeId: entry.exchangeId,
-                            routeId: entry.routeId,
-                            nodeId: entry.nodeId,
-                            duration: entry.duration,
-                            elapsed: entry.elapsed
-                        });
-                    }
-                    arr = _.sortBy(arr, "exchangeId");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
-                }
-                else {
-                    // clear data
-                    $scope.data = [];
-                }
-                $scope.initDone = "true";
-                // ensure web page is updated
-                Core.$apply($scope);
-            }
-            $scope.renderIcon = function (state) {
-                return Camel.iconClass(state);
-            };
-            function loadData() {
-                console.log("Loading inflight data...");
-                // pre-select filter if we have selected a route
-                var routeId = Camel.getSelectedRouteId(workspace);
-                if (routeId != null) {
-                    $scope.gridOptions.filterOptions.filterText = routeId;
-                }
-                var mbean = Camel.getSelectionCamelInflightRepository(workspace);
-                if (mbean) {
-                    // grab inflight in real time
-                    var query = { type: "exec", mbean: mbean, operation: 'browse()' };
-                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onInflight, query));
-                }
-            }
-            // load data
-            loadData();
-        }]);
-})(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
     var Context = (function () {
@@ -11510,6 +11269,243 @@ var Camel;
         .component('contexts', Camel.contextsComponent)
         .component('contextToolbar', Camel.contextToolbarComponent)
         .service('contextsService', Camel.ContextsService);
+})(Camel || (Camel = {}));
+/// <reference path="../camelPlugin.ts"/>
+var Camel;
+(function (Camel) {
+    Camel._module.controller("Camel.BlockedExchangesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            var log = Logger.get("Camel");
+            $scope.data = [];
+            $scope.initDone = false;
+            $scope.mbeanAttributes = {};
+            var columnDefs = [
+                {
+                    field: 'exchangeId',
+                    displayName: 'Exchange Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'routeId',
+                    displayName: 'Route Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'nodeId',
+                    displayName: 'Node Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'duration',
+                    displayName: 'Duration (ms)',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'threadId',
+                    displayName: 'Thread id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'threadName',
+                    displayName: 'Thread name',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                }
+            ];
+            $scope.gridOptions = {
+                data: 'data',
+                displayFooter: true,
+                displaySelectionCheckbox: true,
+                multiSelect: false,
+                canSelectRows: true,
+                enableSorting: true,
+                columnDefs: columnDefs,
+                selectedItems: [],
+                filterOptions: {
+                    filterText: ''
+                },
+                primaryKeyFn: function (entity) { return entity.exchangeId; }
+            };
+            $scope.doUnblock = function () {
+                var mbean = Camel.getSelectionCamelBlockedExchanges(workspace);
+                var selectedItems = $scope.gridOptions.selectedItems;
+                if (mbean && selectedItems && selectedItems.length === 1) {
+                    var exchangeId = selectedItems[0].exchangeId;
+                    var threadId = selectedItems[0].threadId;
+                    var threadName = selectedItems[0].threadName;
+                    log.info("Unblocking thread (" + threadId + "/" + threadName + ") for exchangeId: " + exchangeId);
+                    jolokia.execute(mbean, "interrupt(java.lang.String)", exchangeId, Core.onSuccess(onUnblocked));
+                }
+            };
+            function onUnblocked() {
+                Core.notification("success", "Thread unblocked");
+            }
+            function onBlocked(response) {
+                var obj = response.value;
+                if (obj) {
+                    // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
+                    var arr = [];
+                    for (var key in obj) {
+                        var entry = obj[key];
+                        console.log('blocked: ' + JSON.stringify(entry));
+                        arr.push({
+                            exchangeId: entry.exchangeId,
+                            routeId: entry.routeId,
+                            nodeId: entry.nodeId,
+                            duration: entry.duration,
+                            threadId: entry.id,
+                            threadName: entry.name
+                        });
+                    }
+                    arr = _.sortBy(arr, "exchangeId");
+                    $scope.data = arr;
+                    // okay we have the data then set the selected mbean which allows UI to display data
+                    $scope.selectedMBean = response.request.mbean;
+                }
+                else {
+                    // clear data
+                    $scope.data = [];
+                }
+                $scope.initDone = "true";
+                // ensure web page is updated
+                Core.$apply($scope);
+            }
+            function loadBlockedData() {
+                log.info("Loading blocked exchanges data...");
+                // pre-select filter if we have selected a route
+                var routeId = Camel.getSelectedRouteId(workspace);
+                if (routeId != null) {
+                    $scope.gridOptions.filterOptions.filterText = routeId;
+                }
+                var mbean = Camel.getSelectionCamelBlockedExchanges(workspace);
+                if (mbean) {
+                    // grab blocked in real time
+                    var query = { type: "exec", mbean: mbean, operation: 'browse()' };
+                    jolokia.request(query, Core.onSuccess(onBlocked));
+                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(Core.onSuccess(onBlocked), query));
+                }
+            }
+            // load data
+            loadBlockedData();
+        }]);
+})(Camel || (Camel = {}));
+/// <reference path="../../../includes.ts"/>
+/// <reference path="../camelPlugin.ts"/>
+var Camel;
+(function (Camel) {
+    Camel._module.controller("Camel.InflightExchangesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
+            $scope.data = [];
+            $scope.initDone = false;
+            $scope.mbeanAttributes = {};
+            var columnDefs = [
+                {
+                    field: 'exchangeId',
+                    displayName: 'Exchange Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'routeId',
+                    displayName: 'Route Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'nodeId',
+                    displayName: 'Node Id',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'duration',
+                    displayName: 'Duration (ms)',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                },
+                {
+                    field: 'elapsed',
+                    displayName: 'Elapsed (ms)',
+                    cellFilter: null,
+                    width: "*",
+                    resizable: true
+                }
+            ];
+            $scope.gridOptions = {
+                data: 'data',
+                displayFooter: true,
+                displaySelectionCheckbox: false,
+                canSelectRows: false,
+                enableSorting: true,
+                columnDefs: columnDefs,
+                selectedItems: [],
+                filterOptions: {
+                    filterText: ''
+                },
+                primaryKeyFn: function (entity) { return entity.exchangeId; }
+            };
+            function onInflight(response) {
+                var obj = response.value;
+                if (obj) {
+                    // the JMX tabular data has 1 index so we need to dive 1 levels down to grab the data
+                    var arr = [];
+                    for (var key in obj) {
+                        var entry = obj[key];
+                        console.log('inflight: ' + JSON.stringify(entry));
+                        arr.push({
+                            exchangeId: entry.exchangeId,
+                            routeId: entry.routeId,
+                            nodeId: entry.nodeId,
+                            duration: entry.duration,
+                            elapsed: entry.elapsed
+                        });
+                    }
+                    arr = _.sortBy(arr, "exchangeId");
+                    $scope.data = arr;
+                    // okay we have the data then set the selected mbean which allows UI to display data
+                    $scope.selectedMBean = response.request.mbean;
+                }
+                else {
+                    // clear data
+                    $scope.data = [];
+                }
+                $scope.initDone = "true";
+                // ensure web page is updated
+                Core.$apply($scope);
+            }
+            $scope.renderIcon = function (state) {
+                return Camel.iconClass(state);
+            };
+            function loadData() {
+                console.log("Loading inflight data...");
+                // pre-select filter if we have selected a route
+                var routeId = Camel.getSelectedRouteId(workspace);
+                if (routeId != null) {
+                    $scope.gridOptions.filterOptions.filterText = routeId;
+                }
+                var mbean = Camel.getSelectionCamelInflightRepository(workspace);
+                if (mbean) {
+                    // grab inflight in real time
+                    var query = { type: "exec", mbean: mbean, operation: 'browse()' };
+                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onInflight, query));
+                }
+            }
+            // load data
+            loadData();
+        }]);
 })(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {

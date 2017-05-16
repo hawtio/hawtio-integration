@@ -468,7 +468,8 @@ module Camel {
         }
         folder.children.push(routeFolder);
 
-        addRouteChildren(routeFolder, route);
+        // FIXME
+        // loadRouteChildren(routeFolder, route);
       });
     }
     return folder;
@@ -478,20 +479,20 @@ module Camel {
    * Adds the route children to the given folder for each step in the route
    * @method
    */
-  export function addRouteChildren(folder: Jmx.Folder, route) {
+  export function loadRouteChildren(folder: Jmx.Folder, route): Jmx.NodeSelection[] {
     folder.children = [];
-    folder["routeXmlNode"] = route;
-    route.setAttribute("_cid", folder.key);
-    $(route).children("*").each((idx, n) => {
-      addRouteChild(folder, n);
-    });
+    folder['routeXmlNode'] = route;
+    route.setAttribute('_cid', folder.key);
+    const children = [];
+    $(route).children('*').each((idx, n) => children.push(loadRouteChild(folder, n)));
+    return children;
   }
 
   /**
    * Adds a child to the given folder / route
    * @method
    */
-  export function addRouteChild(folder: Jmx.Folder, n) {
+  function loadRouteChild(folder: Jmx.Folder, n): Jmx.NodeSelection {
     var nodeName = n.localName;
     if (nodeName) {
       var nodeSettings = getCamelSchema(nodeName);
@@ -500,14 +501,14 @@ module Camel {
 
         var child = new Jmx.Folder(nodeName);
         child.domain = jmxDomain;
-        child.typeName = "routeNode";
+        child.typeName = 'routeNode';
         updateRouteNodeLabelAndTooltip(child, n, nodeSettings);
 
         // TODO should maybe auto-generate these?
-        child.parent = folder;
+        // child.parent = folder;
         child.folderNames = folder.folderNames;
-        var id = n.getAttribute("id") || nodeName;
-        var key = folder.key + "_" + Core.toSafeDomID(id);
+        var id = n.getAttribute('id') || nodeName;
+        var key = folder.key + '_' + Core.toSafeDomID(id);
 
         // lets find the next key thats unique
         var counter = 1;
@@ -522,13 +523,11 @@ module Camel {
           }
         }
         child.key = key;
-        child.icon = imageUrl;
-        child["routeXmlNode"] = n;
-        if (!folder.children) {
-          folder.children = [];
-        }
-        folder.children.push(child);
-        addRouteChildren(child, n);
+        // FIXME
+        // child.icon = imageUrl;
+        child['routeXmlNode'] = n;
+        // FIXME
+        // addRouteChildren(child, n);
         return child;
       }
     }

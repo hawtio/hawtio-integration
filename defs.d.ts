@@ -188,12 +188,7 @@ declare module Camel {
      * Adds the route children to the given folder for each step in the route
      * @method
      */
-    function addRouteChildren(folder: Jmx.Folder, route: any): void;
-    /**
-     * Adds a child to the given folder / route
-     * @method
-     */
-    function addRouteChild(folder: Jmx.Folder, n: any): Jmx.Folder;
+    function loadRouteChildren(folder: Jmx.Folder, route: any): Jmx.NodeSelection[];
     /**
      * Returns the root JMX Folder of the camel mbeans
      */
@@ -1319,10 +1314,6 @@ declare module Osgi {
  */
 declare module Osgi {
 }
-declare module Camel {
-}
-declare module Camel {
-}
 declare namespace Camel {
     class Context {
         name: string;
@@ -1430,6 +1421,10 @@ declare namespace Camel {
     };
 }
 declare namespace Camel {
+}
+declare module Camel {
+}
+declare module Camel {
 }
 declare module Camel {
     class Property {

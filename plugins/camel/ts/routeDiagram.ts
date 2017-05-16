@@ -195,7 +195,8 @@ module Camel {
             if (!routeFolder.children.length) {
               processRouteXml(workspace, workspace.jolokia, routeFolder, (route) => {
                 console.log('loaded route')
-                addRouteChildren(routeFolder, route);
+                // FIXME
+                // loadRouteChildren(routeFolder, route);
                 updateRouteProperties(node, route, routeFolder)
               });
             } else {
