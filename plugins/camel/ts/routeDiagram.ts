@@ -267,16 +267,17 @@ namespace Camel {
         // But we don't want smaller diagrams to be scaled up so we set the viewBox to
         // the diagram bounding box only for diagrams that overflow the SVG viewport,
         // so that they scale down with preserved aspect ratio
-        if (render.graph().width > canvasDiv.width() || render.graph().height > canvasDiv.height()) {
-          container.attr('viewBox', `0 0 ${render.graph().width} ${render.graph().height}`);
+        const graph = render.graph();
+        if (graph.width > canvasDiv.width() || graph.height > canvasDiv.height()) {
+          container.attr('viewBox', `0 0 ${graph.width} ${graph.height}`);
         } else {
           // For diagrams smaller than the SVG viewport size, we still want them to be centered
           // with the 'preserveAspectRatio' attribute set to 'xMidYMid'
-          container.attr('viewBox', `${(render.graph().width - canvasDiv.width()) / 2} ${(render.graph().height - canvasDiv.height()) / 2} ${canvasDiv.width()} ${canvasDiv.height()}`);
+          container.attr('viewBox', `${(graph.width - canvasDiv.width()) / 2} ${(graph.height - canvasDiv.height()) / 2} ${canvasDiv.width()} ${canvasDiv.height()}`);
         }
       }
       // We need to adapt the viewBox for smaller diagrams as it depends on the SVG viewport size
-      const resizeViewBox = _.debounce(viewBox,  250, { leading: true, trailing: true });
+      const resizeViewBox = _.debounce(viewBox,  200, { leading: true, trailing: true });
       window.addEventListener('resize', resizeViewBox);
       $scope.$on('$destroy', () => window.removeEventListener('resize', resizeViewBox));
       // Lastly, we need to do it once at initialisation

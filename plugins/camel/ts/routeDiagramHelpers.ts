@@ -3,8 +3,6 @@
 
 namespace Camel {
 
-  declare var dagre: any;
-
   export function createGraphStates(nodes, links, transitions) {
     var stateKeys = {};
     nodes.forEach((node) => {
@@ -156,9 +154,8 @@ namespace Camel {
 
     counters.attr("x", d => d.bbox.width / 2);
 
-    var g = new dagre.graphlib.Graph()
-      .setGraph({})
-      .setDefaultEdgeLabel(Function.prototype);
+    var g = new graphlib.Graph()
+      .setGraph({});
 
     states.forEach(node => g.setNode(node.id, node));
     transitions.forEach(edge => g.setEdge(edge.source.id, edge.target.id, edge));
