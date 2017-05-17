@@ -13,6 +13,15 @@
 
   padding: @pf-padding;
   background-color: white;
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+  cursor: grab;
+
+  &:active {
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
+    cursor: grabbing;
+  }
 
   .node > rect {
     stroke: @color-pf-black-500;
