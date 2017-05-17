@@ -4,29 +4,45 @@
 
 namespace Camel {
 
+  export interface Action {
+    name: string,
+    run: () => void
+  }
+
   export class ContextToolbarController {
 
     private context: Context;
-
-    private startAction = {
+    private startAction: Action = {
       name: 'Start',
-      actionFn: action => {
+      run: () => {
         this.contextsService.startContext(this.context)
-          .then(response => this.updateContext());
-      },
-      isDisabled: true
+          .then(response => {
+            this.contextsService.getContext(this.context.mbean)
+              .then(context => {
+                this.context = context;
+                this.actions[0] = this.suspendAction;
+                this.selected = null;
+              });
+          });
+      }
     };
-    private suspendAction = {
+    private suspendAction: Action = {
       name: 'Suspend',
-      actionFn: action => {
+      run: () => {
         this.contextsService.suspendContext(this.context)
-          .then(response => this.updateContext());
-      },
-      isDisabled: true
-    }
-    private deleteAction = {
+          .then(response => {
+            this.contextsService.getContext(this.context.mbean)
+              .then(context => {
+                this.context = context;
+                this.actions[0] = this.startAction;
+                this.selected = null;
+              });
+          });
+      }
+    };
+    private deleteAction: Action = {
       name: 'Delete',
-      actionFn: action => {
+      run: () => {
         this.$uibModal.open({
           templateUrl: 'plugins/camel/html/deleteContextModal.html'
         })
@@ -37,17 +53,9 @@ namespace Camel {
       }
     };
 
-    toolbarConfig = {
-      actionsConfig: {
-        primaryActions: [
-          this.startAction,
-          this.suspendAction
-        ],
-        moreActions: [
-          this.deleteAction
-        ]
-      }
-    };
+    selected = null;
+
+    actions: Action[];
 
     constructor($rootScope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
         private contextsService: ContextsService) {
@@ -57,7 +65,10 @@ namespace Camel {
           this.contextsService.getContext(selectedNode.objectName)
             .then(context => {
               this.context = context;
-              this.enableDisableActions();
+              this.actions = [
+                context.state === 'Started' ? this.suspendAction : this.startAction,
+                this.deleteAction
+              ];
             });
         } else {
           this.context = null;
@@ -69,24 +80,18 @@ namespace Camel {
       return this.context !== null;
     }
 
-    private enableDisableActions() {
-      this.startAction.isDisabled = this.context.state !== 'Suspended';
-      this.suspendAction.isDisabled = this.context.state !== 'Started';
-    }
-
-    private updateContext() {
-      this.contextsService.getContext(this.context.mbean)
-        .then(context => {
-          this.context = context;
-          this.enableDisableActions();
-        });
+    onActionSelection(action) {
+      action.run();
     }
 
   }
 
   export const contextToolbarComponent = {
     template: `
-      <pf-toolbar class="pf-toolbar-right" config="$ctrl.toolbarConfig" ng-show="$ctrl.isVisible()"></pf-toolbar>
+      <pf-select selected="$ctrl.selected" options="$ctrl.actions" display-field="name"
+        empty-value="{{$ctrl.context.state}}" on-select="$ctrl.onActionSelection" ng-show="$ctrl.isVisible()"
+        class="camel-main-actions">
+      </pf-select>
     `,
     controller: ContextToolbarController
   };

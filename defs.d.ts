@@ -3,6 +3,72 @@
 /// <reference path="libs/hawtio-preferences/defs.d.ts" />
 /// <reference path="libs/hawtio-ui/defs.d.ts" />
 /// <reference path="libs/hawtio-utilities/defs.d.ts" />
+declare module ActiveMQ {
+    var pluginName: string;
+    var log: Logging.Logger;
+    var jmxDomain: string;
+    function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): any;
+    function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): any;
+    function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): any;
+    function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): any;
+    /**
+     * Sets $scope.row to currently selected JMS message.
+     * Used in:
+     *  - activemq/js/browse.ts
+     *  - camel/js/browseEndpoint.ts
+     *
+     * TODO: remove $scope argument and operate directly on other variables. but it's too much side effects here...
+     *
+     * @param message
+     * @param key unique key inside message that distinguishes between values
+     * @param $scope
+     */
+    function selectCurrentMessage(message: any, key: string, $scope: any): void;
+    /**
+     * - Adds functions needed for message browsing with details
+     * - Adds a watch to deselect all rows after closing the slideout with message details
+     * TODO: export these functions too?
+     *
+     * @param $scope
+     * @param fn optional function to call if the selected row was changed
+     */
+    function decorate($scope: any, fn?: any): void;
+    function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
+}
+/**
+ * @module ActiveMQ
+ * @main ActiveMQ
+ */
+declare module ActiveMQ {
+    var _module: ng.IModule;
+    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
+    function isQueue(workspace: Jmx.Workspace): boolean;
+    function isTopic(workspace: Jmx.Workspace): boolean;
+    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
+    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
+    function isJobScheduler(workspace: Jmx.Workspace): boolean;
+    function isBroker(workspace: Jmx.Workspace): boolean;
+}
+declare module ActiveMQ {
+    var BrowseQueueController: ng.IModule;
+}
+declare module ActiveMQ {
+}
+declare module ActiveMQ {
+}
+declare module ActiveMQ {
+}
+declare module ActiveMQ {
+}
+/**
+ * @module ActiveMQ
+ */
+declare module ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare module ActiveMQ {
+}
 declare var _apacheCamelModel: any;
 declare namespace Camel {
     var log: Logging.Logger;
@@ -321,38 +387,6 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Camel {
-}
-declare module ActiveMQ {
-    var pluginName: string;
-    var log: Logging.Logger;
-    var jmxDomain: string;
-    function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): any;
-    function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): any;
-    function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): any;
-    function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): any;
-    /**
-     * Sets $scope.row to currently selected JMS message.
-     * Used in:
-     *  - activemq/js/browse.ts
-     *  - camel/js/browseEndpoint.ts
-     *
-     * TODO: remove $scope argument and operate directly on other variables. but it's too much side effects here...
-     *
-     * @param message
-     * @param key unique key inside message that distinguishes between values
-     * @param $scope
-     */
-    function selectCurrentMessage(message: any, key: string, $scope: any): void;
-    /**
-     * - Adds functions needed for message browsing with details
-     * - Adds a watch to deselect all rows after closing the slideout with message details
-     * TODO: export these functions too?
-     *
-     * @param $scope
-     * @param fn optional function to call if the selected row was changed
-     */
-    function decorate($scope: any, fn?: any): void;
-    function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
 }
 declare namespace Camel {
     var BrowseEndpointController: ng.IModule;
@@ -884,7 +918,7 @@ declare namespace Camel {
     function createGraphStates(nodes: any, links: any, transitions: any): any;
     function dagreLayoutGraph(nodes: any, links: any, svgElement: any, allowDrag?: boolean, onClick?: any): {
         nodes: any;
-        graph: graphlib.Graph;
+        graph: any;
     };
     function dagreUpdateGraphData(): void;
 }
@@ -903,40 +937,6 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Camel {
-}
-/**
- * @module ActiveMQ
- * @main ActiveMQ
- */
-declare module ActiveMQ {
-    var _module: ng.IModule;
-    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
-    function isQueue(workspace: Jmx.Workspace): boolean;
-    function isTopic(workspace: Jmx.Workspace): boolean;
-    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
-    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
-    function isJobScheduler(workspace: Jmx.Workspace): boolean;
-    function isBroker(workspace: Jmx.Workspace): boolean;
-}
-declare module ActiveMQ {
-    var BrowseQueueController: ng.IModule;
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-/**
- * @module ActiveMQ
- */
-declare module ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare module ActiveMQ {
 }
 /**
  * @module Karaf
@@ -1321,6 +1321,10 @@ declare namespace Camel {
     }
 }
 declare namespace Camel {
+    interface Action {
+        name: string;
+        run: () => void;
+    }
     class ContextToolbarController {
         private $uibModal;
         private $timeout;
@@ -1330,23 +1334,11 @@ declare namespace Camel {
         private startAction;
         private suspendAction;
         private deleteAction;
-        toolbarConfig: {
-            actionsConfig: {
-                primaryActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                    isDisabled: boolean;
-                }[];
-                moreActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                }[];
-            };
-        };
+        selected: any;
+        actions: Action[];
         constructor($rootScope: any, $uibModal: any, $timeout: any, workspace: Jmx.Workspace, contextsService: ContextsService);
         isVisible(): boolean;
-        private enableDisableActions();
-        private updateContext();
+        onActionSelection(action: any): void;
     }
     const contextToolbarComponent: {
         template: string;
