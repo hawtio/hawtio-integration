@@ -180,11 +180,6 @@ declare module Camel {
     function camelLanguageSettings(nodeName: any): any;
     function isCamelLanguage(nodeName: any): boolean;
     /**
-     * Converts the XML string or DOM node to a camel tree
-     * @method
-     */
-    function loadCamelTree(xml: any, key: string): Jmx.Folder;
-    /**
      * Adds the route children to the given folder for each step in the route
      * @method
      */

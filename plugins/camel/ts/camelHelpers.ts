@@ -422,60 +422,6 @@ module Camel {
   }
 
   /**
-   * Converts the XML string or DOM node to a camel tree
-   * @method
-   */
-  export function loadCamelTree(xml, key: string) {
-    var doc = xml;
-    if (angular.isString(xml)) {
-      doc = $.parseXML(xml);
-    }
-
-    // TODO get id from camelContext
-    var id = "camelContext";
-    var folder = new Jmx.Folder(id);
-    folder.class = "org-apache-camel-context";
-    folder.domain = Camel.jmxDomain;
-    folder.typeName = "context";
-
-    folder.key = Core.toSafeDomID(key);
-
-    var context = $(doc).find("camelContext");
-    if (!context || !context.length) {
-      context = $(doc).find("routes");
-    }
-
-    if (context && context.length) {
-      folder["xmlDocument"] = doc;
-      folder["routeXmlNode"] = context;
-      $(context).children("route").each((idx, route) => {
-        var id = route.getAttribute("id");
-        if (!id) {
-          id = "route" + idx;
-          route.setAttribute("id", id);
-        }
-        var routeFolder = new Jmx.Folder(id);
-        routeFolder.class = "org-apache-camel-route";
-        routeFolder.typeName = "routes";
-        routeFolder.domain = Camel.jmxDomain;
-        routeFolder.key = folder.key + "_" + Core.toSafeDomID(id);
-        routeFolder.parent = folder;
-        var nodeSettings = getCamelSchema("route");
-        if (nodeSettings) {
-          var imageUrl = getRouteNodeIcon(nodeSettings);
-          routeFolder.tooltip = nodeSettings["tooltip"] || nodeSettings["description"] || id;
-          routeFolder.icon = imageUrl;
-        }
-        folder.children.push(routeFolder);
-
-        // FIXME
-        // loadRouteChildren(routeFolder, route);
-      });
-    }
-    return folder;
-  }
-
-  /**
    * Adds the route children to the given folder for each step in the route
    * @method
    */
