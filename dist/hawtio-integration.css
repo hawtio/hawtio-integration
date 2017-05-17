@@ -28,6 +28,10 @@
   border-right: none;
   padding: 0;
 }
+.toolbar-pf-unstyled {
+  border-bottom: none;
+  box-shadow: unset;
+}
 
 .activemq-browse-table th:nth-child(1) {
   width: 5%;
@@ -396,17 +400,121 @@ div.camel-properties {
   vertical-align: middle;
 }
 
-.camel-trace-alert {
-  background-color: transparent;
-  border-color: #8b8d8f;
-  padding-left: 14px;
+@media screen and (max-width: 767px) {
 }
-.camel-trace-pager {
+@media (min-width: 768px) {
+}
+@media (min-width: 768px) {
+}
+@media (max-width: 767px) {
+}
+@media (min-width: 768px) {
+}
+@media (min-width: 768px) {
+}
+@media (max-width: 767px) {
+}
+@media (max-width: 767px) {
+}
+.camel-trace-main {
+  position: absolute;
+  height: 100%;
+  width: calc(100% - 2*20px);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+.camel-trace-main .camel-trace-header {
+  flex: 0 0 auto;
+}
+.camel-trace-main .camel-trace-header button {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+.camel-trace-main .camel-trace-toolbar {
+  flex: 0 0 auto;
+}
+.camel-trace-main .camel-trace-diagram-wrapper {
+  flex: 1 1 auto;
+  position: relative;
+  overflow: visible;
+}
+.camel-trace-main .camel-trace-diagram-wrapper .camel-route-diagram-canvas {
+  left: -20px;
+  width: calc(100% + 2*20px);
+}
+.camel-trace-main .camel-trace-bottom-panel {
+  flex: 0 0 50%;
+  border-top: 1px solid #d1d1d1;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  text-align: center;
 }
-.camel-trace-pager .pagination {
-  margin: 0;
+.camel-trace-main .camel-trace-bottom-panel .table {
+  table-layout: fixed;
+  border-top: none;
+  margin-bottom: 0;
+}
+.camel-trace-main .camel-trace-bottom-panel .table th:nth-child(1),
+.camel-trace-main .camel-trace-bottom-panel .table td:nth-child(1) {
+  width: 400px;
+}
+.camel-trace-main .camel-trace-bottom-panel .table th:nth-child(2),
+.camel-trace-main .camel-trace-bottom-panel .table td:nth-child(2) {
+  width: auto;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-messages-table-header th {
+  border-bottom-width: 1px;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-messages-table-body-container {
+  overflow: auto;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-messages-table-body-container tr:first-child td {
+  border-top: none;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-message-details .nav-tabs {
+  padding-top: 0;
+  margin-left: 0;
+  margin-right: 0;
+  font-size: inherit;
+  background-color: #fafafa;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-message-details .nav-tabs > li > a {
+  border-top: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-message-details .pagination {
+  float: right;
+  margin: 2px 30px 2px 0px;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-message-details .close {
+  padding: 5px 10px;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-message-details .camel-trace-body-contents,
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-message-details .camel-trace-headers-contents {
+  padding: 10px 10px 0 10px;
+  overflow: auto;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-message-details pre {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  white-space: pre-wrap;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-message-details label {
+  margin-bottom: 0;
+}
+.camel-trace-main .camel-trace-bottom-panel .camel-trace-message-details .camel-trace-no-body-text {
+  color: #72767b;
+}
+.camel-trace-main .rg-top {
+  margin-top: -8px;
+}
+.camel-trace-main .rg-top span {
+  border-width: 1px;
+  background-color: white;
+  width: 30px;
 }
 
 .org-apache-camel span.node-icon:before,

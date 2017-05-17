@@ -46,7 +46,7 @@
   <div class="camel-debug-bottom-panel" resizable r-directions="['top']" r-flex="true" ng-if="debugging"
     ng-show="showDebugPanel">
     <div class="camel-debug-bottom-panel-left">
-      <ul class="nav nav-tabs" ng-init="activeTab = 'body'">
+      <ul class="nav nav-tabs" ng-init="activeTab = 'headers'">
         <li ng-class="{'active': activeTab === 'headers' && stopped}">
           <a href="" ng-click="activeTab = 'headers'" ng-class="{'disabled': !stopped}">Headers</a>
         </li>

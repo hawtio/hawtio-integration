@@ -1,14 +1,127 @@
-.camel-trace-alert {
-  background-color: transparent;
-  border-color: #8b8d8f;
-  padding-left: 14px;
-}
+@import (reference) "global.less";
 
-.camel-trace-pager {
-  width: 100%;
-  text-align: center;
+.camel-trace-main {
+  position: absolute;
+  height: 100%;
+  width: ~"calc(100% - 2*@{pf-padding})";
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
 
-  .pagination {
-    margin: 0;
+  .camel-trace-header {
+    flex: 0 0 auto;
+
+    button {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
   }
+
+  .camel-trace-toolbar {
+    flex: 0 0 auto;
+  }
+
+  .camel-trace-diagram-wrapper {
+    flex: 1 1 auto;
+    position: relative;
+    overflow: visible;
+
+    .camel-route-diagram-canvas {
+      left: -@pf-padding;
+      width: ~"calc(100% + 2*@{pf-padding})";
+    }
+  }
+
+  .camel-trace-bottom-panel {
+    flex: 0 0 50%;
+    border-top: 1px solid @color-pf-black-300;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .table {
+      table-layout: fixed;
+      border-top: none;
+      margin-bottom: 0;
+
+      th:nth-child(1), td:nth-child(1) {
+        width: 400px;
+      }
+      th:nth-child(2), td:nth-child(2) {
+        width: auto;
+      }
+    }
+
+    .camel-trace-messages-table-header {
+      th {
+        border-bottom-width: 1px;
+      }
+    }
+
+    .camel-trace-messages-table-body-container {
+      overflow: auto;
+
+      tr:first-child td {
+        border-top: none;
+      }
+    }
+
+    .camel-trace-message-details {
+      
+      .nav-tabs {
+        padding-top: 0;
+        margin-left: 0;
+        margin-right: 0;
+        font-size: inherit;
+        background-color: #fafafa;
+      }
+
+      .nav-tabs > li > a {
+        border-top: 0;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .pagination {
+        float: right;
+        margin: 2px 30px 2px 0px;        
+      }
+
+      .close {
+        padding: 5px 10px;
+      }
+
+      .camel-trace-body-contents, .camel-trace-headers-contents {
+        padding: 10px 10px 0 10px;
+        overflow: auto;
+      }
+
+      pre {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        white-space: pre-wrap;
+      }
+
+      label {
+        margin-bottom: 0;
+      }
+
+      .camel-trace-no-body-text {
+        color: #72767b;
+      }
+    }
+    
+  }
+
+  .rg-top {
+    margin-top: -8px;
+  }
+
+  .rg-top span {
+    border-width: 1px;
+    background-color: white;
+    width: 30px;
+  }
+
 }

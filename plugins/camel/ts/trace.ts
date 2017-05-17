@@ -3,22 +3,17 @@
 /// <reference path="camelPlugin.ts"/>
 
 module Camel {
-  _module.controller("Camel.TraceRouteController", ["$scope", "workspace", "jolokia", "localStorage", "tracerStatus", (
-      $scope,
-      workspace: Jmx.Workspace,
-      jolokia: Jolokia.IJolokia,
-      localStorage: WindowLocalStorage,
-      tracerStatus) => {
+  _module.controller("Camel.TraceRouteController", ["$scope", "$timeout", "workspace", "jolokia", "localStorage", "tracerStatus",
+    ($scope, $timeout, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, localStorage: WindowLocalStorage, tracerStatus) => {
 
-    var log: Logging.Logger = Logger.get("CamelTracer");
-
-    $scope.workspace = workspace;
+    const log: Logging.Logger = Logger.get("CamelTracer");
+    const MESSAGES_LIMIT = 500;
 
     $scope.tracing = false;
     $scope.messages = [];
-    $scope.graphView = null;
-    $scope.mode = 'text';
-    $scope.showMessageDetails = false;
+    $scope.message = null;
+    $scope.messageIndex = -1;
+    $scope.graphView = "plugins/camel/html/routeDiagram.html";
 
     $scope.gridOptions = Camel.createBrowseGridOptions();
     $scope.gridOptions.selectWithCheckboxOnly = false;
@@ -40,15 +35,11 @@ module Camel {
       setTracing(false);
     };
 
-    $scope.closeMessageDetails = () => {
-      $scope.showMessageDetails = false;
-    };
-
     $scope.clear = () => {
       log.debug("Clear messages");
       tracerStatus.messages = [];
       $scope.messages = [];
-      if ($scope.row) {
+      if ($scope.message) {
         $scope.messageDialog.close();
       }
       Core.$apply($scope);
@@ -63,21 +54,31 @@ module Camel {
     });
 
     // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
-    $scope.openMessageDialog = (message) => {
-      ActiveMQ.selectCurrentMessage(message, "id", $scope);
-      if ($scope.row) {
-        var body = $scope.row.body;
-        $scope.mode = angular.isString(body) ? CodeEditor.detectTextFormat(body) : "text";
-        // it may detect wrong as javascript, so use text instead
-        if ("javascript" == $scope.mode) {
-          $scope.mode = "text";
-        }
-        $scope.showMessageDetails = true;
-      } else {
-        $scope.showMessageDetails = false;
-      }
-      Core.$apply($scope);
+    $scope.openMessageDialog = (message, index) => {
+      console.log(message, index);
+      $scope.message = message;
+      $scope.messageIndex = index;
+      highlightToNode(message.toNode);
     };
+
+    $scope.closeMessageDetails = () => {
+      $scope.message = null;
+      $scope.messageIndex = -1;
+      highlightToNode(null);
+    };
+
+    function highlightToNode(toNode) {
+      var nodes = d3.select("svg").selectAll("g .node");
+      Camel.highlightSelectedNode(nodes, toNode);
+    }
+
+    $scope.changeMessage = (index) => {
+      if (index >= 0 && index <= $scope.messages.length - 1 && index !== $scope.messageIndex) {
+        $scope.messageIndex = index;
+        $scope.message = $scope.messages[$scope.messageIndex];
+        highlightToNode($scope.message.toNode);
+      }
+    }
 
     ActiveMQ.decorate($scope, onSelectionChanged);
 
@@ -108,13 +109,9 @@ module Camel {
               });
             }
           }
-          $scope.graphView = "plugins/camel/html/routeDiagram.html";
-          // must include the tableView directly to have it working with the slider
         } else {
           tracerStatus.messages = [];
           $scope.messages = [];
-          $scope.graphView = null;
-          $scope.showMessageDetails = false;
         }
       }
     }
@@ -136,6 +133,8 @@ module Camel {
           allMessages = $(doc).find("backlogTracerEventMessage");
         }
 
+        let tableScrolled = isTableScrolled();
+
         allMessages.each((idx, message) => {
           var routeId = $(message).find("routeId").text();
           if (routeId === selectedRouteId) {
@@ -144,16 +143,39 @@ module Camel {
             if (toNode) {
               messageData["toNode"] = toNode;
             }
-            // attach the open dialog to make it work
-            messageData.openMessageDialog = $scope.openMessageDialog;
             log.debug("Adding new message to trace table with id " + messageData["id"]);
             $scope.messages.push(messageData);
           }
         });
+        
+        limitMessagesArray();
+
         // keep state of the traced messages on tracerStatus
         tracerStatus.messages = $scope.messages;
+        
+        if (tableScrolled) {
+          scrollTable();
+        }
+        
         Core.$apply($scope);
       }
+    }
+
+    function limitMessagesArray() {
+      // remove messages when the array reaches its limit and the user isn't looking at a message details
+      if ($scope.messages.length > MESSAGES_LIMIT && $scope.message === null) {
+        $scope.messages.splice(0, $scope.messages.length - MESSAGES_LIMIT);
+      }
+    }
+
+    function isTableScrolled() {
+      let scrollableTable = document.querySelector('.camel-trace-messages-table-body-container');
+      return scrollableTable.scrollHeight - scrollableTable.scrollTop === scrollableTable.clientHeight;
+    }
+
+    function scrollTable() {
+      let scrollableTable = document.querySelector('.camel-trace-messages-table-body-container');
+      $timeout(() => scrollableTable.scrollTop = scrollableTable.scrollHeight - scrollableTable.clientHeight, 0);
     }
 
     function onSelectionChanged() {
