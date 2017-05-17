@@ -95,7 +95,7 @@ declare module Camel {
      * @param {Folder} folder
      * @param {Function} onRoute
      */
-    function processRouteXml(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, folder: Jmx.Folder, onRoute: (string) => void): void;
+    function processRouteXml(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, folder: Jmx.Folder, onRoute: (route: Element) => void): void;
     /**
      * Returns the URI string for the given EIP pattern node or null if it is not applicable
      * @method getRouteNodeUri
@@ -188,7 +188,7 @@ declare module Camel {
      * Adds the route children to the given folder for each step in the route
      * @method
      */
-    function loadRouteChildren(folder: Jmx.Folder, route: any): Jmx.NodeSelection[];
+    function loadRouteChildren(folder: Jmx.Folder, route: Element): Jmx.NodeSelection[];
     /**
      * Returns the root JMX Folder of the camel mbeans
      */

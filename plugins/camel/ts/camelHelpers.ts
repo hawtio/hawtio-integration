@@ -65,7 +65,7 @@ module Camel {
    * @param {Folder} folder
    * @param {Function} onRoute
    */
-  export function processRouteXml(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, folder: Jmx.Folder, onRoute: (string) => void) {
+  export function processRouteXml(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, folder: Jmx.Folder, onRoute: (route: Element) => void) {
     var selectedRouteId = getSelectedRouteId(workspace, folder);
     var mbean = getExpandingFolderCamelContextMBean(workspace, folder) || getSelectionCamelContextMBean(workspace);
 
@@ -479,59 +479,55 @@ module Camel {
    * Adds the route children to the given folder for each step in the route
    * @method
    */
-  export function loadRouteChildren(folder: Jmx.Folder, route): Jmx.NodeSelection[] {
+  export function loadRouteChildren(folder: Jmx.Folder, route: Element): Jmx.NodeSelection[] {
     folder.children = [];
     folder['routeXmlNode'] = route;
     route.setAttribute('_cid', folder.key);
     const children = [];
-    $(route).children('*').each((idx, n) => children.push(loadRouteChild(folder, n)));
-    return children;
+    $(route).children('*').each((idx, node) => children.push(loadRouteChild(folder, node)));
+    return _.compact(children);
   }
 
   /**
    * Adds a child to the given folder / route
    * @method
    */
-  function loadRouteChild(folder: Jmx.Folder, n): Jmx.NodeSelection {
-    var nodeName = n.localName;
-    if (nodeName) {
-      var nodeSettings = getCamelSchema(nodeName);
-      if (nodeSettings) {
-        var imageUrl = getRouteNodeIcon(nodeSettings);
+  function loadRouteChild(parent: Jmx.Folder, route: Element): Jmx.NodeSelection | void {
+    const nodeName = route.localName;
+    var nodeSettings = getCamelSchema(nodeName);
+    if (nodeSettings) {
+      var imageUrl = getRouteNodeIcon(nodeSettings);
 
-        var child = new Jmx.Folder(nodeName);
-        child.domain = jmxDomain;
-        child.typeName = 'routeNode';
-        updateRouteNodeLabelAndTooltip(child, n, nodeSettings);
+      var node = new Jmx.Folder(nodeName);
+      node.domain = jmxDomain;
+      node.typeName = 'routeNode';
+      updateRouteNodeLabelAndTooltip(node, route, nodeSettings);
 
-        // TODO should maybe auto-generate these?
-        // child.parent = folder;
-        child.folderNames = folder.folderNames;
-        var id = n.getAttribute('id') || nodeName;
-        var key = folder.key + '_' + Core.toSafeDomID(id);
+      // TODO should maybe auto-generate these?
+      node.folderNames = parent.folderNames;
+      var id = route.getAttribute('id') || nodeName;
+      var key = parent.key + '_' + Core.toSafeDomID(id);
 
-        // lets find the next key thats unique
-        var counter = 1;
-        var notFound = true;
-        while (notFound) {
-          var tmpKey = key + counter;
-          if (_.find(folder.children, { key: tmpKey })) {
-            counter += 1;
-          } else {
-            notFound = false;
-            key = tmpKey;
-          }
+      // lets find the next key thats unique
+      var counter = 1;
+      var notFound = true;
+      while (notFound) {
+        var tmpKey = key + counter;
+        if (_.find(parent.children, { key: tmpKey })) {
+          counter += 1;
+        } else {
+          notFound = false;
+          key = tmpKey;
         }
-        child.key = key;
-        // FIXME
-        // child.icon = imageUrl;
-        child['routeXmlNode'] = n;
-        const children = loadRouteChildren(child, n);
-        children.forEach(c => child.moveChild(c));
-        return child;
       }
+      node.key = key;
+      // FIXME
+      // child.icon = imageUrl;
+      node['routeXmlNode'] = route;
+      const children = loadRouteChildren(node, route);
+      children.forEach(child => node.moveChild(child));
+      return node;
     }
-    return null;
   }
 
   /**
