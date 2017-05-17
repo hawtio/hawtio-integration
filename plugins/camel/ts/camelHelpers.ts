@@ -521,8 +521,7 @@ module Camel {
         }
       }
       node.key = key;
-      // FIXME
-      // child.icon = imageUrl;
+      node.icon = imageUrl;
       node['routeXmlNode'] = route;
       const children = loadRouteChildren(node, route);
       children.forEach(child => node.moveChild(child));
