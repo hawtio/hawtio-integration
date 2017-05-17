@@ -20,17 +20,18 @@
 .modal-header div[hawtio-pager] {
   line-height: 1;
 }
-.pf-toolbar-unstyled .toolbar-pf {
+.pf-toolbar-right .toolbar-pf {
   border-bottom: none;
   box-shadow: unset;
+  padding-top: 0;
+  float: right;
 }
-.pf-toolbar-unstyled .form-group {
+.pf-toolbar-right .toolbar-pf-actions {
+  margin: 20px 0 10px 0;
+}
+.pf-toolbar-right .form-group {
   border-right: none;
   padding: 0;
-}
-.toolbar-pf-unstyled {
-  border-bottom: none;
-  box-shadow: unset;
 }
 
 .activemq-browse-table th:nth-child(1) {
@@ -119,8 +120,12 @@
   flex-direction: column;
   overflow: visible;
 }
-.camel-debug-main h2 {
+.camel-debug-main .camel-debug-header {
   flex: 0 0 auto;
+}
+.camel-debug-main .camel-debug-header button {
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 .camel-debug-main .camel-debug-toolbar {
   flex: 0 0 auto;

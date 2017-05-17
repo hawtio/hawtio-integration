@@ -90,7 +90,7 @@ namespace Camel {
 
   export const routeToolbarComponent = {
     template: `
-      <pf-toolbar class="pf-toolbar-unstyled" config="$ctrl.toolbarConfig" ng-show="$ctrl.isVisible()"></pf-toolbar>
+      <pf-toolbar class="pf-toolbar-right" config="$ctrl.toolbarConfig" ng-show="$ctrl.isVisible()"></pf-toolbar>
     `,
     controller: RouteToolbarController
   };

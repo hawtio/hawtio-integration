@@ -1,6 +1,15 @@
 <div class="camel-debug-main" ng-controller="Camel.DebugRouteController">
   
-  <h2>Debug</h2>
+  <div class="row camel-debug-header">
+    <div class="col-sm-6">
+      <h2>Debug</h2>
+    </div>
+    <div class="col-sm-6">
+      <button type="button" class="btn btn-primary pull-right" ng-if="debugging" ng-click="stopDebugging()">
+        Stop debugging
+      </button>
+    </div>
+  </div>
   
   <div ng-if="!debugging">
     <p>Debugging allows you to step through camel routes to diagnose issues.</p>
@@ -34,9 +43,6 @@
                 title="Suspend all threads in this route">
           <i class="fa fa-pause" aria-hidden="true"></i>
         </button>
-      </div>
-      <div class="form-group">
-        <button type="button" class="btn btn-default" ng-click="stopDebugging()">Stop debugging</button>
       </div>
     </form>
   </div>
