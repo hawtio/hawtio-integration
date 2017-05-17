@@ -1,10 +1,6 @@
 /// <reference path="../camelPlugin.ts"/>
 /// <reference path="properties.service.ts"/>
 
-interface JQuery {
-  tooltip(): JQuery;
-}
-
 namespace Camel {
 
   _module.controller("Camel.PropertiesRouteController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia", "propertiesService", (

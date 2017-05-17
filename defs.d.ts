@@ -1429,9 +1429,6 @@ declare namespace Camel {
 }
 declare namespace Camel {
 }
-interface JQuery {
-    tooltip(): JQuery;
-}
 declare namespace Camel {
 }
 declare namespace Camel {
