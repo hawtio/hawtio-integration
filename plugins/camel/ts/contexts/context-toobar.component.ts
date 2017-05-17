@@ -4,15 +4,9 @@
 
 namespace Camel {
 
-  export interface Action {
-    name: string,
-    run: () => void
-  }
-
   export class ContextToolbarController {
 
-    private context: Context;
-    private startAction: Action = {
+    private startAction = {
       name: 'Start',
       run: () => {
         this.contextsService.startContext(this.context)
@@ -26,7 +20,7 @@ namespace Camel {
           });
       }
     };
-    private suspendAction: Action = {
+    private suspendAction = {
       name: 'Suspend',
       run: () => {
         this.contextsService.suspendContext(this.context)
@@ -40,22 +34,27 @@ namespace Camel {
           });
       }
     };
-    private deleteAction: Action = {
+    private deleteAction = {
       name: 'Delete',
       run: () => {
         this.$uibModal.open({
-          templateUrl: 'plugins/camel/html/deleteContextModal.html'
+          templateUrl: 'plugins/camel/html/deleteContextWarningModal.html'
         })
-        .result.then(() => {
-          this.contextsService.stopContext(this.context)
-            .then(response => this.workspace.removeAndSelectParentNode());
-        });
+        .result
+          .then(() => {
+            this.contextsService.stopContext(this.context)
+              .then(response => {
+                this.context = null;
+                this.workspace.removeAndSelectParentNode();
+              });
+          })
+          .catch(() => this.selected = null);
       }
     };
 
+    context: Context;
     selected = null;
-
-    actions: Action[];
+    actions = [];
 
     constructor($rootScope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
         private contextsService: ContextsService) {
@@ -80,7 +79,7 @@ namespace Camel {
       return this.context !== null;
     }
 
-    onActionSelection(action) {
+    onSelect(action) {
       action.run();
     }
 
@@ -89,7 +88,7 @@ namespace Camel {
   export const contextToolbarComponent = {
     template: `
       <pf-select selected="$ctrl.selected" options="$ctrl.actions" display-field="name"
-        empty-value="{{$ctrl.context.state}}" on-select="$ctrl.onActionSelection" ng-show="$ctrl.isVisible()"
+        empty-value="{{$ctrl.context.state}}" on-select="$ctrl.onSelect" ng-show="$ctrl.isVisible()"
         class="camel-main-actions">
       </pf-select>
     `,

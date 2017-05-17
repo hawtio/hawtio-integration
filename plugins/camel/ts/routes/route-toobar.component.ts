@@ -6,51 +6,64 @@ namespace Camel {
 
   export class RouteToolbarController {
 
-    private route: Route;
-
     private startAction = {
       name: 'Start',
-      actionFn: action => {
+      run: action => {
         this.routesService.startRoute(this.route)
-          .then(response => this.updateRoute());
-      },
-      isDisabled: true
+          .then(response => {
+            this.routesService.getRoute(this.route.mbean)
+              .then(route => {
+                this.route = route;
+                this.actions[0] = this.stopAction;
+                this.selected = null;
+              });
+          });
+      }
     };
     private stopAction = {
       name: 'Stop',
-      actionFn: action => {
+      run: action => {
         this.routesService.stopRoute(this.route)
-          .then(response => this.updateRoute());
-      },
-      isDisabled: true
+          .then(response => {
+            this.routesService.getRoute(this.route.mbean)
+              .then(route => {
+                this.route = route;
+                this.actions[0] = this.startAction;
+                this.selected = null;
+              });
+          });
+      }
     }
     private deleteAction = {
       name: 'Delete',
-      actionFn: action => {
-        this.$uibModal.open({
-          templateUrl: 'plugins/camel/html/deleteRouteModal.html'
-        })
-        .result.then(() => {
-          this.routesService.removeRoute(this.route)
-            .then(response => {
-              this.workspace.loadTree();
-            });
-        });
-      },
-      isDisabled: true
-    };
-
-    toolbarConfig = {
-      actionsConfig: {
-        primaryActions: [
-          this.startAction,
-          this.stopAction
-        ],
-        moreActions: [
-          this.deleteAction
-        ]
+      run: action => {
+        if (this.route.state === 'Started') {
+          this.$uibModal.open({
+            templateUrl: 'plugins/camel/html/deleteRouteErrorModal.html'
+          })
+          .result.then(() => {
+            this.selected = null;
+          });
+        } else {
+          this.$uibModal.open({
+            templateUrl: 'plugins/camel/html/deleteRouteWarningModal.html'
+          })
+          .result
+            .then(() => {
+              this.routesService.removeRoute(this.route)
+                .then(response => {
+                  this.route = null;
+                  this.workspace.loadTree();
+                });
+            })
+            .catch(() => this.selected = null);
+        }
       }
     };
+
+    route: Route;
+    selected = null;
+    actions = [];
 
     constructor($rootScope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
         private routesService: RoutesService) {
@@ -60,7 +73,11 @@ namespace Camel {
           this.routesService.getRoute(selectedNode.objectName)
             .then(route => {
               this.route = route;
-              this.enableDisableActions();
+              this.actions = [
+                route.state === 'Started' ? this.stopAction : this.startAction,
+                this.deleteAction
+              ];
+              this.selected = null;
             });
         } else {
           this.route = null;
@@ -72,25 +89,18 @@ namespace Camel {
       return this.route !== null;
     }
 
-    private enableDisableActions() {
-      this.startAction.isDisabled = this.route.state !== 'Stopped';
-      this.stopAction.isDisabled = this.route.state !== 'Started';
-      this.deleteAction.isDisabled = this.route.state !== 'Stopped';
-    }
-
-    private updateRoute() {
-      this.routesService.getRoute(this.route.mbean)
-        .then(route => {
-          this.route = route;
-          this.enableDisableActions();
-        });
+    onSelect(action) {
+      action.run();
     }
 
   }
 
   export const routeToolbarComponent = {
     template: `
-      <pf-toolbar class="pf-toolbar-right" config="$ctrl.toolbarConfig" ng-show="$ctrl.isVisible()"></pf-toolbar>
+      <pf-select selected="$ctrl.selected" options="$ctrl.actions" display-field="name"
+        empty-value="{{$ctrl.route.state}}" on-select="$ctrl.onSelect" ng-show="$ctrl.isVisible()"
+        class="camel-main-actions">
+      </pf-select>
     `,
     controller: RouteToolbarController
   };
