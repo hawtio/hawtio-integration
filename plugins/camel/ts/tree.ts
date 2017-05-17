@@ -1,7 +1,7 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
-module Camel {
+namespace Camel {
 
   _module.controller("Camel.TreeHeaderController", ["$scope", "$location", ($scope, $location: ng.ILocationService) => {
     // TODO: the tree should ideally be initialised synchronously

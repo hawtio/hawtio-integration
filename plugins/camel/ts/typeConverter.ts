@@ -1,7 +1,7 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
-module Camel {
+namespace Camel {
 
   _module.controller("Camel.TypeConverterController", ["$scope", "$location", "$timeout", "workspace", "jolokia", (
       $scope,

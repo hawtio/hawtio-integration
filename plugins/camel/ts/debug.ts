@@ -1,7 +1,8 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
-module Camel {
+namespace Camel {
+
   _module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", (
     $scope,
     $element,

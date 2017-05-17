@@ -1798,9 +1798,6 @@ var ActiveMQ;
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
 /// <reference path="../../includes.ts"/>
-/**
- * @module Camel
- */
 var Camel;
 (function (Camel) {
     Camel.log = Logger.get("Camel");
@@ -3414,11 +3411,6 @@ var Camel;
 })(Camel || (Camel = {}));
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelHelpers.ts"/>
-/**
- *
- * @module Camel
- * @main Camel
- */
 var Camel;
 (function (Camel) {
     Camel.pluginName = 'camel';
@@ -4733,9 +4725,6 @@ var Camel;
         }]);
 })(Camel || (Camel = {}));
 /// <reference path="../../includes.ts"/>
-/**
- * @module Camel
- */
 var Camel;
 (function (Camel) {
     /**
@@ -5307,9 +5296,6 @@ var Camel;
 })(Camel || (Camel = {}));
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
-/**
- * @module Camel
- */
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.PreferencesController", ["$scope", "localStorage", function ($scope, localStorage) {

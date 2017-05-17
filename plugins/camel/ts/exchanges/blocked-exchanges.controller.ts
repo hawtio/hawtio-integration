@@ -1,5 +1,6 @@
 /// <reference path="../camelPlugin.ts"/>
-module Camel {
+
+namespace Camel {
 
   _module.controller("Camel.BlockedExchangesController", ["$scope", "$location", "workspace", "jolokia", (
       $scope,

@@ -1,7 +1,7 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
-module Camel {
+namespace Camel {
 
   declare var dagre: any;
 

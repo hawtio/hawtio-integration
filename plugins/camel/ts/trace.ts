@@ -2,7 +2,8 @@
 /// <reference path="../../activemq/ts/activemqHelpers.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
-module Camel {
+namespace Camel {
+
   _module.controller("Camel.TraceRouteController", ["$scope", "$timeout", "workspace", "jolokia", "localStorage", "tracerStatus",
     ($scope, $timeout, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, localStorage: WindowLocalStorage, tracerStatus) => {
 

@@ -5,7 +5,7 @@ interface JQuery {
   tooltip(): JQuery;
 }
 
-module Camel {
+namespace Camel {
 
   _module.controller("Camel.PropertiesRouteController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia", "propertiesService", (
       $scope,

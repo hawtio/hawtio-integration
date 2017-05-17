@@ -2,7 +2,8 @@
 /// <reference path="camelPlugin.ts"/>
 /// <reference path="endpointChooser.ts"/>
 
-module Camel {
+namespace Camel {
+
   _module.controller("Camel.EndpointController", ["$scope", "$location", "localStorage", "workspace", "jolokia", (
       $scope,
       $location: ng.ILocationService,

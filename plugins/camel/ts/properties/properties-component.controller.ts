@@ -1,7 +1,7 @@
 /// <reference path="../camelPlugin.ts"/>
 /// <reference path="properties.service.ts"/>
 
-module Camel {
+namespace Camel {
 
   _module.controller("Camel.PropertiesComponentController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', (
       $scope,

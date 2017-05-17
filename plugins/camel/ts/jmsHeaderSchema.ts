@@ -1,4 +1,5 @@
-module Camel {
+namespace Camel {
+
   export var jmsHeaderSchema = {
     definitions: {
       headers: {

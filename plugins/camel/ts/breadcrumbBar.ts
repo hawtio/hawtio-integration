@@ -1,7 +1,7 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
-module Camel {
+namespace Camel {
 
   _module.controller("Camel.BreadcrumbBarController", ["$scope", "$routeParams", "workspace", "jolokia", (
       $scope,

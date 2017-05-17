@@ -1,6 +1,6 @@
 /// <reference path="../camelPlugin.ts"/>
 
-module Camel {
+namespace Camel {
 
   _module.component('propertyList', {
     template: `

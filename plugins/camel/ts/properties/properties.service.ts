@@ -1,7 +1,7 @@
 /// <reference path="../camelPlugin.ts"/>
 /// <reference path="property.ts"/>
 
-module Camel {
+namespace Camel {
 
   export class PropertiesService {
     

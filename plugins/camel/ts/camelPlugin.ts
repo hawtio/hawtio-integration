@@ -1,12 +1,7 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelHelpers.ts"/>
 
-/**
- *
- * @module Camel
- * @main Camel
- */
-module Camel {
+namespace Camel {
 
   export var pluginName = 'camel';
 

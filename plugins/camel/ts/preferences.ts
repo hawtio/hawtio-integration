@@ -1,10 +1,8 @@
 /// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
-/**
- * @module Camel
- */
-module Camel {
+namespace Camel {
+
   _module.controller("Camel.PreferencesController", ["$scope", "localStorage", (
       $scope,
       localStorage: WindowLocalStorage) => {

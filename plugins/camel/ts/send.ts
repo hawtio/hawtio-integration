@@ -3,7 +3,7 @@
 /// <reference path="camelHeaderSchema.ts"/>
 /// <reference path="jmsHeaderSchema.ts"/>
 
-module Camel {
+namespace Camel {
 
    var DELIVERY_PERSISTENT = "2";
 

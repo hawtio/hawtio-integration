@@ -1,9 +1,6 @@
 /// <reference path="../../includes.ts"/>
 
-/**
- * @module Camel
- */
-module Camel {
+namespace Camel {
 
   /**
    * Define the default categories for endpoints and map them to endpoint names
@@ -200,7 +197,6 @@ module Camel {
     }
     return schema;
   }
-
 
   export function initEndpointChooserScope($scope, $location, localStorage:WindowLocalStorage, workspace: Jmx.Workspace, jolokia) {
     $scope.selectedComponentName = null;

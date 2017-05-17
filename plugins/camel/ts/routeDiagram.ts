@@ -2,7 +2,7 @@
 /// <reference path="camelPlugin.ts"/>
 /// <reference path="routeDiagramHelpers.ts"/>
 
-module Camel {
+namespace Camel {
 
   _module.controller("Camel.RouteController", ["$scope", "$routeParams", "$element", "$timeout", "workspace", "$location", "jolokia", "localStorage", (
       $scope,

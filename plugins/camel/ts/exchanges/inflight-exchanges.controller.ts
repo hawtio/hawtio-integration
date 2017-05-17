@@ -1,6 +1,7 @@
 /// <reference path="../../../includes.ts"/>
 /// <reference path="../camelPlugin.ts"/>
-module Camel {
+
+namespace Camel {
 
   _module.controller("Camel.InflightExchangesController", ["$scope", "$location", "workspace", "jolokia", (
       $scope,

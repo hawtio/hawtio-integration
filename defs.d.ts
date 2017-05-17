@@ -70,10 +70,7 @@ declare namespace ActiveMQ {
 declare module ActiveMQ {
 }
 declare var _apacheCamelModel: any;
-/**
- * @module Camel
- */
-declare module Camel {
+declare namespace Camel {
     var log: Logging.Logger;
     var jmxDomain: string;
     var defaultMaximumLabelWidth: number;
@@ -383,23 +380,18 @@ declare module Camel {
      */
     function isCamelVersionEQGT(major: any, minor: any, workspace: any, jolokia: any): boolean;
 }
-/**
- *
- * @module Camel
- * @main Camel
- */
-declare module Camel {
+declare namespace Camel {
     var pluginName: string;
     var _module: ng.IModule;
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
     var BrowseEndpointController: ng.IModule;
 }
-declare module Camel {
+declare namespace Camel {
     var camelHeaderSchema: {
         definitions: {
             headers: {
@@ -736,12 +728,9 @@ declare module Camel {
         };
     };
 }
-declare module Camel {
+declare namespace Camel {
 }
-/**
- * @module Camel
- */
-declare module Camel {
+declare namespace Camel {
     /**
      * Define the default categories for endpoints and map them to endpoint names
      * @property
@@ -865,11 +854,11 @@ declare module Camel {
     function getConfiguredCamelModel(): any;
     function initEndpointChooserScope($scope: any, $location: any, localStorage: WindowLocalStorage, workspace: Jmx.Workspace, jolokia: any): void;
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
     var jmsHeaderSchema: {
         definitions: {
             headers: {
@@ -919,16 +908,13 @@ declare module Camel {
         };
     };
 }
-/**
- * @module Camel
- */
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
     function createGraphStates(nodes: any, links: any, transitions: any): any;
     function dagreLayoutGraph(nodes: any, links: any, svgElement: any, allowDrag?: boolean, onClick?: any): {
         nodes: any;
@@ -936,21 +922,21 @@ declare module Camel {
     };
     function dagreUpdateGraphData(): void;
 }
-declare module Camel {
-}
-declare module Camel {
-}
-declare module Camel {
-}
-declare module Camel {
+declare namespace Camel {
 }
 declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
 }
 /**
  * @module Karaf
@@ -1417,11 +1403,11 @@ declare namespace Camel {
 }
 declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
     class Property {
         name: string;
         value: string;
@@ -1430,25 +1416,25 @@ declare module Camel {
         static sortByName(a: any, b: any): 1 | -1 | 0;
     }
 }
-declare module Camel {
+declare namespace Camel {
     class PropertiesService {
         getDefinedProperties(schemaProperties: {}): Property[];
         getDefaultProperties(schemaProperties: {}): Property[];
         getUndefinedProperties(schemaProperties: {}): Property[];
     }
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
 interface JQuery {
     tooltip(): JQuery;
 }
-declare module Camel {
+declare namespace Camel {
 }
-declare module Camel {
+declare namespace Camel {
 }
 declare namespace Camel {
     class Route {

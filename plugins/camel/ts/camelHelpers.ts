@@ -2,10 +2,7 @@
 
 declare var _apacheCamelModel:any;
 
-/**
- * @module Camel
- */
-module Camel {
+namespace Camel {
 
   export var log: Logging.Logger = Logger.get("Camel");
 
