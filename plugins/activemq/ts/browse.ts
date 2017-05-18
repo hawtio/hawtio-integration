@@ -18,6 +18,8 @@ module ActiveMQ {
 
     var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
 
+    // all the queue names from the tree
+    $scope.queueNames = [];
     // selected queue name in move dialog
     $scope.queueName = $routeParams["queueName"];
 
@@ -225,7 +227,7 @@ module ActiveMQ {
       if ($scope.queueNames.length === 0) {
         var queueNames = retrieveQueueNames(workspace, true);
         var selectedQueue = workspace.selection.key;
-        $scope.queueNames = queueNames.exclude((child) => { return child.key == selectedQueue });
+        $scope.queueNames = queueNames.filter((name) => { return name !== selectedQueue });
       }
 
       var data = response.value;
