@@ -117,7 +117,6 @@ namespace Camel {
       Core.$apply($scope);
     };
 
-
     var postfix = " selected";
 
     function isSelected(node) {
@@ -150,9 +149,6 @@ namespace Camel {
 
     var onClickGraphNode = function (node) {
       log.debug("Clicked on Camel Route Diagram node: " + node.cid);
-
-      console.log('test: ', workspace.isRoutesFolder());
-
       if (workspace.isRoutesFolder()) {
         // Handle nodes selection from a diagram displaying multiple routes
         handleGraphNode(node);
@@ -163,7 +159,6 @@ namespace Camel {
 
     function navigateToNodeProperties(cid) {
       $location.path('/camel/propertiesRoute').search({"main-tab": "camel", "nid": cid});
-      console.log('$location: ', $location.search());
       Core.$apply($scope);
     }
 
@@ -194,7 +189,6 @@ namespace Camel {
             // Populate route folder child nodes for the context tree
             if (!routeFolder.children.length) {
               processRouteXml(workspace, workspace.jolokia, routeFolder, (route) => {
-                console.log('loaded route')
                 // FIXME
                 // loadRouteChildren(routeFolder, route);
                 updateRouteProperties(node, route, routeFolder)
@@ -225,8 +219,6 @@ namespace Camel {
       if (routeChild) {
         cid = routeChild.key;
       }
-
-      console.log('updateRouteProperties: ', cid);
 
       // Setup the properties tab view for the selected diagram node
       $scope.model = getCamelSchema("route");
