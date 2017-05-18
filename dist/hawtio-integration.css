@@ -537,11 +537,29 @@ div.camel-properties {
 .org-apache-camel-context span.node-icon:before {
   content: url("../img/icons/camel/camel_context_icon.png");
 }
+.org-apache-camel-components span.node-icon:before {
+  content: url("../img/icons/camel/endpoint_node.png");
+}
+.org-apache-camel-components-folder span.node-icon:before {
+  content: url("../img/icons/camel/endpoint_folder.png");
+}
+.org-apache-camel-dataformats span.node-icon:before {
+  content: url("../img/icons/camel/endpoint_node.png");
+}
+.org-apache-camel-dataformats-folder span.node-icon:before {
+  content: url("../img/icons/camel/endpoint_folder.png");
+}
 .org-apache-camel-endpoints span.node-icon:before {
   content: url("../img/icons/camel/endpoint_node.png");
 }
+.org-apache-camel-endpoints-folder span.node-icon:before {
+  content: url("../img/icons/camel/endpoint_folder.png");
+}
 .org-apache-camel-routes span.node-icon:before {
   content: url("../img/icons/camel/camel_route.png");
+}
+.org-apache-camel-routes-folder span.node-icon:before {
+  content: url("../img/icons/camel/camel_route_folder.png");
 }
 
 .camel-type-converters-dl {

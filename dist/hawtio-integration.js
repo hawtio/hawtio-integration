@@ -363,6 +363,8 @@ var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ.BrowseQueueController = ActiveMQ._module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$routeParams", "$dialog", "$templateCache", function ($scope, workspace, jolokia, localStorage, $location, activeMQMessage, $timeout, $routeParams, $dialog, $templateCache) {
             var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
+            // all the queue names from the tree
+            $scope.queueNames = [];
             // selected queue name in move dialog
             $scope.queueName = $routeParams["queueName"];
             $scope.searchText = '';
@@ -395,8 +397,6 @@ var ActiveMQ;
                         cellTemplate: '<div class="ngCellText"><a href="" ng-click="row.entity.openMessageDialog(row)">{{row.entity.JMSMessageID}}</a></div>',
                         // for ng-grid
                         width: '34%'
-                        // for hawtio-datatable
-                        // width: "22em"
                     },
                     {
                         field: 'JMSType',
@@ -554,7 +554,7 @@ var ActiveMQ;
                 if ($scope.queueNames.length === 0) {
                     var queueNames = ActiveMQ.retrieveQueueNames(workspace, true);
                     var selectedQueue = workspace.selection.key;
-                    $scope.queueNames = queueNames.exclude(function (child) { return child.key == selectedQueue; });
+                    $scope.queueNames = queueNames.filter(function (name) { return name !== selectedQueue; });
                 }
                 var data = response.value;
                 if (!angular.isArray(data)) {
@@ -2028,7 +2028,6 @@ var Camel;
                 else {
                     if (value) {
                         if (_.startsWith(key, "_")) {
-                            // ignore
                         }
                         else {
                             var text = value.toString();
@@ -2329,7 +2328,6 @@ var Camel;
                 if ("routes" === type) {
                     return linkToRouteDiagramFullScreen(contextId, name);
                 }
-                // TODO a default page for a context?
             }
         }
         return answer;
@@ -3489,7 +3487,6 @@ var Camel;
                 maxWidth: 56,
                 resizable: false,
                 defaultSort: false
-                // we do not want to default sort the state column
             };
             var attributes = workspace.attributeColumnDefs;
             attributes[Camel.jmxDomain + "/context/folder"] = [
@@ -5751,7 +5748,6 @@ var Camel;
                 transitions.push(edge);
                 source.edges.push(edge);
                 target.edges.push(edge);
-                // TODO should we add the edge to the target?
             }
         });
         return states;
@@ -6204,7 +6200,6 @@ var Camel;
                         type: 'exec', mbean: $scope.mbean,
                         operation: 'dumpRoutesStatsAsXml',
                         arguments: [true, true]
-                        // the dumpRoutesStatsAsXml is not available in all Camel versions so do not barf on errors
                     }, Core.onSuccess(statsCallback, { silent: true, error: false }));
                 }
                 $scope.$emit("camel.diagram.layoutComplete");
@@ -6262,7 +6257,6 @@ var Camel;
                             node["tooltip"] = tooltip;
                         }
                         else {
-                            // we are probably not showing the route for these stats
                         }
                     }
                 }
@@ -7060,10 +7054,6 @@ var Camel;
             });
         }]);
     Camel._module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", "$rootScope", function ($scope, $location, $timeout, workspace, $rootScope) {
-            $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-                // lets do this asynchronously to avoid Error: $digest already in progress
-                $timeout(updateSelectionFromURL, 50, false);
-            });
             $scope.$watch('workspace.tree', function () {
                 reloadFunction();
             });

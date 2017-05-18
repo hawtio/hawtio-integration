@@ -37,11 +37,6 @@ namespace Camel {
     workspace: Jmx.Workspace,
     $rootScope: ng.IRootScopeService) => {
 
-    $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-      // lets do this asynchronously to avoid Error: $digest already in progress
-      $timeout(updateSelectionFromURL, 50, false);
-    });
-
     $scope.$watch('workspace.tree', function () {
       reloadFunction();
     });
