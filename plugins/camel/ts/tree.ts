@@ -45,20 +45,15 @@ namespace Camel {
       reloadFunction();
     });
 
-    function reloadFunction(afterSelectionFn = null) {
+    function reloadFunction() {
       var tree = workspace.tree;
       if (tree) {
         const rootFolder = tree.findDescendant(node => node.id === 'camelContexts');
         if (rootFolder) {
-          $timeout(() => {
-            const treeElement = $("#cameltree");
-            Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
-            // lets do this asynchronously to avoid Error: $digest already in progress
-            updateSelectionFromURL();
-            if (angular.isFunction(afterSelectionFn)) {
-              afterSelectionFn();
-            }
-          }, 10);
+          const treeElement = $("#cameltree");
+          Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
+          // lets do this asynchronously to avoid Error: $digest already in progress
+          updateSelectionFromURL();
         }
       }
     }
