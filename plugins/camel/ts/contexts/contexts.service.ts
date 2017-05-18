@@ -4,6 +4,8 @@
 namespace Camel {
 
   export class ContextsService {
+
+    private log: Logging.Logger = Logger.get("Camel");
     
     constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia) {
       'ngInject';
@@ -26,7 +28,7 @@ namespace Camel {
           }
         }, {
           error: (response) => {
-            log.debug('ContextsService.getContext() failed: ' + response.error);
+            this.log.debug('ContextsService.getContext() failed: ' + response.error);
             reject(response.error);
           }
         });
@@ -57,7 +59,7 @@ namespace Camel {
           }
         }, {
           error: (response) => {
-            log.debug('ContextsService.getContexts() failed: ' + response.error);
+            this.log.debug('ContextsService.getContexts() failed: ' + response.error);
             reject(response.error);
           }
         });
@@ -111,7 +113,7 @@ namespace Camel {
           }
         }, {
           error: (response) => {
-            log.debug('ContextsService.executeOperationOnContexts() failed: ' + response.error);
+            this.log.debug('ContextsService.executeOperationOnContexts() failed: ' + response.error);
             reject(response.error);
           }
         });

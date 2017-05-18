@@ -4,7 +4,9 @@
 namespace Camel {
 
   export class RoutesService {
-    
+
+    private log: Logging.Logger = Logger.get("Camel");
+
     constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia) {
       'ngInject';
     }
@@ -25,6 +27,7 @@ namespace Camel {
           }
         }, {
           error: (response) => {
+            this.log.debug('RoutesService.getRoute() failed: ' + response.error);
             reject(response.error);
           }
         });
@@ -55,6 +58,7 @@ namespace Camel {
           }
         }, {
           error: (response) => {
+            this.log.debug('RoutesService.getRoutes() failed: ' + response.error);
             reject(response.error);
           }
         });
@@ -107,6 +111,7 @@ namespace Camel {
           }
         }, {
           error: (response) => {
+            this.log.debug('RoutesService.executeOperationOnRoutes() failed: ' + response.error);
             reject(response.error);
           }
         });
