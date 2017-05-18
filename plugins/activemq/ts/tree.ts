@@ -37,12 +37,6 @@ module ActiveMQ {
       workspace: Jmx.Workspace,
       localStorage: WindowLocalStorage) => {
 
-    $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-      // lets do this asynchronously to avoid Error: $digest already in progress
-      setTimeout(updateSelectionFromURL, 50);
-    });
-
-
     $scope.$watch('workspace.tree', function () {
       reloadTree();
     });
