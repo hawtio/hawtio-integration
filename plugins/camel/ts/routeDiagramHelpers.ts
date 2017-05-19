@@ -70,6 +70,10 @@ namespace Camel {
     // lets add a tooltip
     nodes.append("title").text(d => d.tooltip || "");
 
+    if (onClick != null) {
+      nodes.on("click", onClick);
+    }
+
     var edges = svgGroup
       .selectAll("path .edge")
       .data(transitions)
@@ -141,10 +145,6 @@ namespace Camel {
       .attr("y", d => -(d.bbox.height / 2 + nodePadding + (labelPadding / 2)))
       .attr("width", d => d.width)
       .attr("height", d => d.height);
-
-    if (onClick != null) {
-      rects.on("click", onClick);
-    }
 
     images.attr("x", d => -(d.bbox.width) / 3);
 
