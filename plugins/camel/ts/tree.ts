@@ -37,6 +37,8 @@ namespace Camel {
     workspace: Jmx.Workspace,
     $rootScope: ng.IRootScopeService) => {
 
+    $scope.$on('$routeChangeSuccess', () => Jmx.updateTreeSelectionFromURL($location, $('#cameltree')));
+
     $scope.$watch('workspace.tree', function () {
       reloadFunction();
     });
@@ -50,7 +52,7 @@ namespace Camel {
       if (tree) {
         const rootFolder = tree.findDescendant(node => node.key === 'camelContexts');
         if (rootFolder) {
-          const treeElement = $("#cameltree");
+          const treeElement = $('#cameltree');
           Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
           // lets do this asynchronously to avoid Error: $digest already in progress
           updateSelectionFromURL();
@@ -59,7 +61,7 @@ namespace Camel {
     }
 
     function updateSelectionFromURL() {
-      Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $("#cameltree"), (first: Jmx.Folder) => {
+      Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $('#cameltree'), (first: Jmx.Folder) => {
         // use function to auto select first Camel context routes if there is only one Camel context
         const contexts = first.children;
         if (contexts && contexts.length === 1) {

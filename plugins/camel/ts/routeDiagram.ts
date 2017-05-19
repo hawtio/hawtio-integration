@@ -194,7 +194,6 @@ namespace Camel {
               const plugin = <(workspace: Jmx.Workspace, folder: Jmx.Folder, onComplete: (children: Jmx.NodeSelection[]) => void) => void>Jmx.findLazyLoadingFunction(workspace, routeFolder);
               if (plugin) {
                 plugin(workspace, routeFolder, children => {
-                  tree.revealNode(routeFolder, { silent: true });
                   tree.addNode(children, routeFolder, { silent: true });
                   updateRouteProperties(node, route, routeFolder);
                 });
@@ -202,7 +201,6 @@ namespace Camel {
               // We've forced lazy loading so let's turn it off
               routeFolder.lazyLoad = false;
             } else {
-              tree.expandNode(routeFolder, { levels: 1, silent: true });
               updateRouteProperties(node, route, routeFolder);
             }
           }
