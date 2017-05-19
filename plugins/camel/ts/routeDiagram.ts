@@ -187,13 +187,22 @@ namespace Camel {
 
           if (routeFolder) {
             // Populate route folder child nodes for the context tree
-            if (!routeFolder.children.length) {
-              processRouteXml(workspace, workspace.jolokia, routeFolder, (route) => {
-                // FIXME
-                // loadRouteChildren(routeFolder, route);
-                updateRouteProperties(node, route, routeFolder)
-              });
+            const tree = (<any>$('#cameltree')).treeview(true);
+            if (!routeFolder.children || !routeFolder.children.length) {
+              // Ideally, we want to trigger lazy loading via node expansion
+              // though there is no callback to hook into to update the view
+              const plugin = <(workspace: Jmx.Workspace, folder: Jmx.Folder, onComplete: (children: Jmx.NodeSelection[]) => void) => void>Jmx.findLazyLoadingFunction(workspace, routeFolder);
+              if (plugin) {
+                plugin(workspace, routeFolder, children => {
+                  tree.revealNode(routeFolder, { silent: true });
+                  tree.addNode(children, routeFolder, { silent: true });
+                  updateRouteProperties(node, route, routeFolder);
+                });
+              }
+              // We've forced lazy loading so let's turn it off
+              routeFolder.lazyLoad = false;
             } else {
+              tree.expandNode(routeFolder, { levels: 1, silent: true });
               updateRouteProperties(node, route, routeFolder);
             }
           }
@@ -203,10 +212,8 @@ namespace Camel {
       }
     }
 
-    function updateRouteProperties(node, route, routeFolder) {
+    function updateRouteProperties(node, route: Element, routeFolder: Jmx.Folder) {
       var cid = node.cid;
-
-      (<any>$("#cameltree")).dynatree("getTree").getNodeByKey(routeFolder.key).expand("true");
 
       // Get the 'real' cid of the selected diagram node
       var routeChild = routeFolder.findDescendant((d) => {
@@ -378,6 +385,3 @@ namespace Camel {
     }
   }]);
 }
-
-
-
