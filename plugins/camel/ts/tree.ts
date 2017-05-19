@@ -47,6 +47,25 @@ namespace Camel {
       reloadFunction();
     });
 
+    $rootScope.$on('jmxTreeClicked',
+      (event, selection: Jmx.NodeSelection) => navigateToDefaultTab(selection));
+
+    function navigateToDefaultTab(selection: Jmx.NodeSelection) {
+      let path;
+      if (workspace.isRoutesFolder()) {
+        path = '/camel/routes';
+      } else if (workspace.isRoute()) {
+          if (workspace.hasInvokeRightsForName(getSelectionCamelContextMBean(workspace), 'dumpRoutesAsXml')) {
+            path = '/camel/routeDiagram';
+          } else {
+            path = '/jmx/attributes';
+          }
+      }
+      if (path) {
+        $location.path(path);
+      }
+    }
+
     function reloadFunction() {
       var tree = workspace.tree;
       if (tree) {
@@ -91,5 +110,9 @@ namespace Camel {
       // Then call the tree clean-up method
       tree.remove();
     });
+
+    if (workspace.selection) {
+      navigateToDefaultTab(workspace.selection);
+    }
   }]);
 }
