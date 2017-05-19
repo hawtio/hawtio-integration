@@ -3,72 +3,6 @@
 /// <reference path="libs/hawtio-preferences/defs.d.ts" />
 /// <reference path="libs/hawtio-ui/defs.d.ts" />
 /// <reference path="libs/hawtio-utilities/defs.d.ts" />
-declare module ActiveMQ {
-    var pluginName: string;
-    var log: Logging.Logger;
-    var jmxDomain: string;
-    function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection;
-    function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): string[];
-    function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection;
-    function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): string[];
-    /**
-     * Sets $scope.row to currently selected JMS message.
-     * Used in:
-     *  - activemq/js/browse.ts
-     *  - camel/js/browseEndpoint.ts
-     *
-     * TODO: remove $scope argument and operate directly on other variables. but it's too much side effects here...
-     *
-     * @param message
-     * @param key unique key inside message that distinguishes between values
-     * @param $scope
-     */
-    function selectCurrentMessage(message: any, key: string, $scope: any): void;
-    /**
-     * - Adds functions needed for message browsing with details
-     * - Adds a watch to deselect all rows after closing the slideout with message details
-     * TODO: export these functions too?
-     *
-     * @param $scope
-     * @param fn optional function to call if the selected row was changed
-     */
-    function decorate($scope: any, fn?: any): void;
-    function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
-}
-/**
- * @module ActiveMQ
- * @main ActiveMQ
- */
-declare module ActiveMQ {
-    var _module: ng.IModule;
-    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
-    function isQueue(workspace: Jmx.Workspace): boolean;
-    function isTopic(workspace: Jmx.Workspace): boolean;
-    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
-    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
-    function isJobScheduler(workspace: Jmx.Workspace): boolean;
-    function isBroker(workspace: Jmx.Workspace): boolean;
-}
-declare module ActiveMQ {
-    var BrowseQueueController: ng.IModule;
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-/**
- * @module ActiveMQ
- */
-declare module ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare module ActiveMQ {
-}
 declare namespace Camel {
     /**
      * Define the default categories for endpoints and map them to endpoint names
@@ -512,6 +446,38 @@ declare namespace Camel {
 }
 declare namespace Camel {
 }
+declare module ActiveMQ {
+    var pluginName: string;
+    var log: Logging.Logger;
+    var jmxDomain: string;
+    function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection;
+    function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): string[];
+    function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection;
+    function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): string[];
+    /**
+     * Sets $scope.row to currently selected JMS message.
+     * Used in:
+     *  - activemq/js/browse.ts
+     *  - camel/js/browseEndpoint.ts
+     *
+     * TODO: remove $scope argument and operate directly on other variables. but it's too much side effects here...
+     *
+     * @param message
+     * @param key unique key inside message that distinguishes between values
+     * @param $scope
+     */
+    function selectCurrentMessage(message: any, key: string, $scope: any): void;
+    /**
+     * - Adds functions needed for message browsing with details
+     * - Adds a watch to deselect all rows after closing the slideout with message details
+     * TODO: export these functions too?
+     *
+     * @param $scope
+     * @param fn optional function to call if the selected row was changed
+     */
+    function decorate($scope: any, fn?: any): void;
+    function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
+}
 declare namespace Camel {
     var BrowseEndpointController: ng.IModule;
 }
@@ -939,71 +905,38 @@ declare namespace Camel {
 declare namespace Camel {
 }
 /**
- * @module Karaf
+ * @module ActiveMQ
+ * @main ActiveMQ
  */
-declare module Karaf {
-    var log: Logging.Logger;
-    function setSelect(selection: any, group: any): any;
-    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function toCollection(values: any): any;
-    function featureLinks(workspace: any, name: any, version: any): string;
-    function extractFeature(attributes: any, name: any, version: any): any;
-    function isPlatformBundle(symbolicName: string): boolean;
-    function isActiveMQBundle(symbolicName: string): boolean;
-    function isCamelBundle(symbolicName: string): boolean;
-    function isCxfBundle(symbolicName: string): boolean;
-    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
-    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
-    function getComponentStateDescription(state: any): "Active" | "Enabled" | "Unsatisfied" | "Activating" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
-    function getAllComponents(workspace: any, jolokia: any): any;
-    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
-    function isComponentActive(workspace: any, jolokia: any, component: any): any;
-    function getComponentState(workspace: any, jolokia: any, component: any): any;
-    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function populateDependencies(attributes: any, dependencies: any, features: any): void;
-    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
-    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
-}
-/**
- * @module Karaf
- * @main Karaf
- */
-declare module Karaf {
+declare module ActiveMQ {
     var _module: ng.IModule;
+    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
+    function isQueue(workspace: Jmx.Workspace): boolean;
+    function isTopic(workspace: Jmx.Workspace): boolean;
+    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
+    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
+    function isJobScheduler(workspace: Jmx.Workspace): boolean;
+    function isBroker(workspace: Jmx.Workspace): boolean;
+}
+declare module ActiveMQ {
+    var BrowseQueueController: ng.IModule;
+}
+declare module ActiveMQ {
+}
+declare module ActiveMQ {
+}
+declare module ActiveMQ {
+}
+declare module ActiveMQ {
 }
 /**
- * @module Karaf
+ * @module ActiveMQ
  */
-declare module Karaf {
+declare module ActiveMQ {
 }
-/**
- * @module Karaf
- */
-declare module Karaf {
+declare namespace ActiveMQ {
 }
-/**
- * @module Karaf
- */
-declare module Karaf {
-}
-/**
- * @module Karaf
- */
-declare module Karaf {
-}
-/**
- * @module Karaf
- */
-declare module Karaf {
-}
-/**
- * @module Karaf
- */
-declare module Karaf {
+declare module ActiveMQ {
 }
 /**
  * @module Osgi
@@ -1077,6 +1010,36 @@ declare module Osgi {
         getServices(): {};
         getPackages(): {};
     }
+}
+/**
+ * @module Karaf
+ */
+declare module Karaf {
+    var log: Logging.Logger;
+    function setSelect(selection: any, group: any): any;
+    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function toCollection(values: any): any;
+    function featureLinks(workspace: any, name: any, version: any): string;
+    function extractFeature(attributes: any, name: any, version: any): any;
+    function isPlatformBundle(symbolicName: string): boolean;
+    function isActiveMQBundle(symbolicName: string): boolean;
+    function isCamelBundle(symbolicName: string): boolean;
+    function isCxfBundle(symbolicName: string): boolean;
+    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
+    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
+    function getComponentStateDescription(state: any): "Active" | "Enabled" | "Unsatisfied" | "Activating" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
+    function getAllComponents(workspace: any, jolokia: any): any;
+    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
+    function isComponentActive(workspace: any, jolokia: any, component: any): any;
+    function getComponentState(workspace: any, jolokia: any, component: any): any;
+    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function populateDependencies(attributes: any, dependencies: any, features: any): void;
+    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
+    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
 }
 declare module Osgi {
     var pluginName: string;
@@ -1295,6 +1258,43 @@ declare module Osgi {
  */
 declare module Osgi {
 }
+/**
+ * @module Karaf
+ * @main Karaf
+ */
+declare module Karaf {
+    var _module: ng.IModule;
+}
+/**
+ * @module Karaf
+ */
+declare module Karaf {
+}
+/**
+ * @module Karaf
+ */
+declare module Karaf {
+}
+/**
+ * @module Karaf
+ */
+declare module Karaf {
+}
+/**
+ * @module Karaf
+ */
+declare module Karaf {
+}
+/**
+ * @module Karaf
+ */
+declare module Karaf {
+}
+/**
+ * @module Karaf
+ */
+declare module Karaf {
+}
 declare namespace Camel {
     class Context {
         name: string;
@@ -1330,7 +1330,7 @@ declare namespace Camel {
         private workspace;
         private contextsService;
         context: Context;
-        constructor($rootScope: any, $uibModal: any, $timeout: any, workspace: Jmx.Workspace, contextsService: ContextsService);
+        constructor($scope: any, $uibModal: any, $timeout: any, workspace: Jmx.Workspace, contextsService: ContextsService);
         isVisible(): boolean;
         start(): void;
         suspend(): void;
@@ -1456,7 +1456,7 @@ declare namespace Camel {
         private workspace;
         private routesService;
         route: Route;
-        constructor($rootScope: any, $uibModal: any, $timeout: any, workspace: Jmx.Workspace, routesService: RoutesService);
+        constructor($scope: any, $uibModal: any, $timeout: any, workspace: Jmx.Workspace, routesService: RoutesService);
         isVisible(): boolean;
         start(): void;
         stop(): void;

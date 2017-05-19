@@ -8,10 +8,10 @@ namespace Camel {
 
     route: Route;
 
-    constructor($rootScope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
+    constructor($scope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
         private routesService: RoutesService) {
       'ngInject';
-      $rootScope.$on('jmxTreeClicked', (event, selectedNode) => {
+      $scope.$on('jmxTreeClicked', (event, selectedNode) => {
         if (this.workspace.isRoute()) {
           this.routesService.getRoute(selectedNode.objectName)
             .then(route => this.route = route);
@@ -32,7 +32,7 @@ namespace Camel {
             .then(route => this.route = route);
         });
     }
-    
+
     stop() {
       this.routesService.stopRoute(this.route)
         .then(response => {
@@ -53,8 +53,6 @@ namespace Camel {
           });
       });
     }
-
-
   }
 
   export const routeActionsComponent = {

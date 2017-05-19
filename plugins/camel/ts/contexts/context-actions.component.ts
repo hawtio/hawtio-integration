@@ -8,10 +8,10 @@ namespace Camel {
 
     context: Context;
 
-    constructor($rootScope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
+    constructor($scope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
         private contextsService: ContextsService) {
       'ngInject';
-      $rootScope.$on('jmxTreeClicked', (event, selectedNode) => {
+      $scope.$on('jmxTreeClicked', (event, selectedNode) => {
         if (this.workspace.isCamelContext()) {
           this.contextsService.getContext(selectedNode.objectName)
             .then(context => this.context = context);
@@ -54,7 +54,6 @@ namespace Camel {
             });
         });
     }
-
   }
 
   export const contextActionsComponent = {

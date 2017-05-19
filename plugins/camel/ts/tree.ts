@@ -30,12 +30,8 @@ namespace Camel {
     });
   }]);
 
-  _module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", "$rootScope", (
-    $scope,
-    $location: ng.ILocationService,
-    $timeout: ng.ITimeoutService,
-    workspace: Jmx.Workspace,
-    $rootScope: ng.IRootScopeService) => {
+  _module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace",
+    ($scope, $location: ng.ILocationService, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace) => {
 
     $scope.$on('$routeChangeSuccess', () => Jmx.updateTreeSelectionFromURL($location, $('#cameltree')));
 
@@ -47,7 +43,7 @@ namespace Camel {
       reloadFunction();
     });
 
-    $rootScope.$on('jmxTreeClicked',
+    $scope.$on('jmxTreeClicked',
       (event, selection: Jmx.NodeSelection) => navigateToDefaultTab(selection));
 
     function navigateToDefaultTab(selection: Jmx.NodeSelection) {
