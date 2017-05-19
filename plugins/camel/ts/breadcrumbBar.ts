@@ -111,11 +111,11 @@ namespace Camel {
     }
 
     // lets find all the endpoints for the given context id
-    function findEndpoints(contextId) {
+    function findEndpoints(contextId: string): any {
       var answer = [];
       var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
       if (contextFolder) {
-        var endpoints = (contextFolder["children"] || []).find((n) => "endpoints" === n.title);
+        var endpoints = (contextFolder.children || []).find((n) => "endpoints" === n.text);
         if (endpoints) {
           angular.forEach(endpoints.children, (endpointFolder) => {
             var entries = endpointFolder ? endpointFolder.entries : null;
@@ -141,11 +141,11 @@ namespace Camel {
     }
 
     // lets find all the routes for the given context id
-    function findRoutes(contextId) {
+    function findRoutes(contextId: string): any {
       var answer = [];
       var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
       if (contextFolder) {
-        var folders = (contextFolder["children"] || []).find((n) => "routes" === n.title);
+        var folders = (contextFolder.children || []).find((n) => "routes" === n.text);
         if (folders) {
           angular.forEach(folders.children, (folder) => {
             var entries = folder ? folder.entries : null;

@@ -7,10 +7,10 @@ declare module ActiveMQ {
     var pluginName: string;
     var log: Logging.Logger;
     var jmxDomain: string;
-    function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): any;
-    function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): any;
-    function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): any;
-    function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): any;
+    function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection;
+    function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): string[];
+    function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection;
+    function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): string[];
     /**
      * Sets $scope.row to currently selected JMS message.
      * Used in:
@@ -68,6 +68,130 @@ declare module ActiveMQ {
 declare namespace ActiveMQ {
 }
 declare module ActiveMQ {
+}
+declare namespace Camel {
+    /**
+     * Define the default categories for endpoints and map them to endpoint names
+     * @property
+     * @for Camel
+     * @type {Object}
+     */
+    var endpointCategories: {
+        bigdata: {
+            label: string;
+            endpoints: string[];
+            endpointIcon: string;
+        };
+        database: {
+            label: string;
+            endpoints: string[];
+            endpointIcon: string;
+        };
+        cloud: {
+            label: string;
+            endpoints: string[];
+        };
+        core: {
+            label: string;
+            endpoints: string[];
+        };
+        messaging: {
+            label: string;
+            endpoints: string[];
+            endpointIcon: string;
+        };
+        mobile: {
+            label: string;
+            endpoints: string[];
+        };
+        sass: {
+            label: string;
+            endpoints: string[];
+        };
+        social: {
+            label: string;
+            endpoints: string[];
+        };
+        storage: {
+            label: string;
+            endpointIcon: string;
+            endpoints: string[];
+        };
+        template: {
+            label: string;
+            endpoints: string[];
+        };
+    };
+    /**
+     * Maps endpoint names to a category object
+     * @property
+     * @for Camel
+     * @type {Object}
+     */
+    var endpointToCategory: {};
+    var endpointIcon: string;
+    /**
+     *  specify custom label & icon properties for endpoint names
+     * @property
+     * @for Camel
+     * @type {Object}
+     */
+    var endpointConfigurations: {
+        drools: {
+            icon: string;
+        };
+        quartz: {
+            icon: string;
+        };
+        facebook: {
+            icon: string;
+        };
+        salesforce: {
+            icon: string;
+        };
+        sap: {
+            icon: string;
+        };
+        "sap-netweaver": {
+            icon: string;
+        };
+        timer: {
+            icon: string;
+        };
+        twitter: {
+            icon: string;
+        };
+        weather: {
+            icon: string;
+        };
+    };
+    /**
+     * Define the default form configurations
+     * @property
+     * @for Camel
+     * @type {Object}
+     */
+    var endpointForms: {
+        file: {
+            tabs: {
+                'Options': string[];
+            };
+        };
+        activemq: {
+            tabs: {
+                'Connection': string[];
+                'Producer': string[];
+                'Consumer': string[];
+                'Reply': string[];
+                'Options': string[];
+            };
+        };
+    };
+    function getEndpointIcon(endpointName: any): any;
+    function getEndpointConfig(endpointName: any, category: any): any;
+    function getEndpointCategory(endpointName: string): any;
+    function getConfiguredCamelModel(): any;
+    function initEndpointChooserScope($scope: any, $location: any, localStorage: WindowLocalStorage, workspace: Jmx.Workspace, jolokia: any): void;
 }
 declare var _apacheCamelModel: any;
 declare namespace Camel {
@@ -184,15 +308,15 @@ declare namespace Camel {
     /**
      * Returns the root JMX Folder of the camel mbeans
      */
-    function getRootCamelFolder(workspace: Jmx.Workspace): Jmx.NodeSelection;
+    function getRootCamelFolder(workspace: Jmx.Workspace): Jmx.Folder;
     /**
      * Returns the JMX folder for the camel context
      */
-    function getCamelContextFolder(workspace: Jmx.Workspace, camelContextId: any): any;
+    function getCamelContextFolder(workspace: Jmx.Workspace, camelContextId: string): Jmx.Folder;
     /**
      * Returns the mbean for the given camel context ID or null if it cannot be found
      */
-    function getCamelContextMBean(workspace: Jmx.Workspace, camelContextId: any): any;
+    function getCamelContextMBean(workspace: Jmx.Workspace, camelContextId: any): string;
     /**
      * Given a selection in the workspace try figure out the URL to the
      * full screen view
@@ -729,130 +853,6 @@ declare namespace Camel {
     };
 }
 declare namespace Camel {
-}
-declare namespace Camel {
-    /**
-     * Define the default categories for endpoints and map them to endpoint names
-     * @property
-     * @for Camel
-     * @type {Object}
-     */
-    var endpointCategories: {
-        bigdata: {
-            label: string;
-            endpoints: string[];
-            endpointIcon: string;
-        };
-        database: {
-            label: string;
-            endpoints: string[];
-            endpointIcon: string;
-        };
-        cloud: {
-            label: string;
-            endpoints: string[];
-        };
-        core: {
-            label: string;
-            endpoints: string[];
-        };
-        messaging: {
-            label: string;
-            endpoints: string[];
-            endpointIcon: string;
-        };
-        mobile: {
-            label: string;
-            endpoints: string[];
-        };
-        sass: {
-            label: string;
-            endpoints: string[];
-        };
-        social: {
-            label: string;
-            endpoints: string[];
-        };
-        storage: {
-            label: string;
-            endpointIcon: string;
-            endpoints: string[];
-        };
-        template: {
-            label: string;
-            endpoints: string[];
-        };
-    };
-    /**
-     * Maps endpoint names to a category object
-     * @property
-     * @for Camel
-     * @type {Object}
-     */
-    var endpointToCategory: {};
-    var endpointIcon: string;
-    /**
-     *  specify custom label & icon properties for endpoint names
-     * @property
-     * @for Camel
-     * @type {Object}
-     */
-    var endpointConfigurations: {
-        drools: {
-            icon: string;
-        };
-        quartz: {
-            icon: string;
-        };
-        facebook: {
-            icon: string;
-        };
-        salesforce: {
-            icon: string;
-        };
-        sap: {
-            icon: string;
-        };
-        "sap-netweaver": {
-            icon: string;
-        };
-        timer: {
-            icon: string;
-        };
-        twitter: {
-            icon: string;
-        };
-        weather: {
-            icon: string;
-        };
-    };
-    /**
-     * Define the default form configurations
-     * @property
-     * @for Camel
-     * @type {Object}
-     */
-    var endpointForms: {
-        file: {
-            tabs: {
-                'Options': string[];
-            };
-        };
-        activemq: {
-            tabs: {
-                'Connection': string[];
-                'Producer': string[];
-                'Consumer': string[];
-                'Reply': string[];
-                'Options': string[];
-            };
-        };
-    };
-    function getEndpointIcon(endpointName: any): any;
-    function getEndpointConfig(endpointName: any, category: any): any;
-    function getEndpointCategory(endpointName: string): any;
-    function getConfiguredCamelModel(): any;
-    function initEndpointChooserScope($scope: any, $location: any, localStorage: WindowLocalStorage, workspace: Jmx.Workspace, jolokia: any): void;
 }
 declare namespace Camel {
 }

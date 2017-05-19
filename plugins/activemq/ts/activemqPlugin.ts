@@ -112,7 +112,7 @@ module ActiveMQ {
 
     nav.add(tab);
 
-    function postProcessTree(tree) {
+    function postProcessTree(tree: Jmx.Folder) {
       var activemq = tree.get("org.apache.activemq");
       setConsumerType(activemq);
 
@@ -125,7 +125,7 @@ module ActiveMQ {
             if (grandChildren) {
               var names = ["Topic", "Queue"];
               angular.forEach(names, (name) => {
-                var idx = grandChildren.findIndex(n => n.title === name);
+                var idx = grandChildren.findIndex(n => n.text === name);
                 if (idx > 0) {
                   var old = grandChildren[idx];
                   grandChildren.splice(idx, 1);
@@ -138,14 +138,13 @@ module ActiveMQ {
       }
     }
 
-    function setConsumerType(node: Jmx.Folder) {
+    function setConsumerType(node: Jmx.NodeSelection) {
       if (node) {
         var parent = node.parent;
         var entries = node.entries;
         if (parent && !parent.typeName && entries) {
           var endpoint = entries["endpoint"];
           if (endpoint === "Consumer" || endpoint === "Producer") {
-            //console.log("Setting the typeName on " + parent.title + " to " + endpoint);
             parent.typeName = endpoint;
           }
           var connectorName = entries["connectorName"];
@@ -154,7 +153,7 @@ module ActiveMQ {
             node.icon = UrlHelpers.join(documentBase, "/img/icons/activemq/connector.png");
           }
         }
-        angular.forEach(node.children, (child: Jmx.Folder) => setConsumerType(child));
+        angular.forEach(node.children, (child: Jmx.NodeSelection) => setConsumerType(child));
       }
     }
   }]);

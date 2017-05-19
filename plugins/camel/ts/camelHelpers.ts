@@ -1,4 +1,5 @@
 /// <reference path="../../includes.ts"/>
+/// <reference path="endpointChooser.ts"/>
 
 declare var _apacheCamelModel:any;
 
@@ -475,10 +476,10 @@ namespace Camel {
   /**
    * Returns the root JMX Folder of the camel mbeans
    */
-  export function getRootCamelFolder(workspace: Jmx.Workspace) {
+  export function getRootCamelFolder(workspace: Jmx.Workspace): Jmx.Folder {
     var tree = workspace ? workspace.tree : null;
     if (tree) {
-      return tree.get(jmxDomain);
+      return tree.get(jmxDomain) as Jmx.Folder;
     }
     return null;
   }
@@ -486,7 +487,7 @@ namespace Camel {
   /**
    * Returns the JMX folder for the camel context
    */
-  export function getCamelContextFolder(workspace: Jmx.Workspace, camelContextId) {
+  export function getCamelContextFolder(workspace: Jmx.Workspace, camelContextId: string): Jmx.Folder {
     var answer = null;
     var root = getRootCamelFolder(workspace);
     if (root && camelContextId) {
@@ -919,9 +920,9 @@ namespace Camel {
       // find the camel context and find ancestors in the tree until we find the camel context selection
       // this is either if the title is 'context' or 'Camel Contexts', or if the parent title is 'org.apache.camel'
       // (the Camel tree is a bit special)
-      selection = selection.findAncestor(s =>
-        s.title === 'context' || s.title === 'Camel Contexts'
-        || s.parent != null && s.parent.title === 'org.apache.camel');
+      selection = selection.findAncestor((s: Jmx.NodeSelection) =>
+        s.text === 'context' || s.text === 'Camel Contexts'
+        || s.parent != null && s.parent.text === 'org.apache.camel');
       if (selection) {
         var tree = workspace.tree;
         var folderNames = selection.folderNames;
