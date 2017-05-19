@@ -115,7 +115,7 @@ namespace Camel {
       var answer = [];
       var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
       if (contextFolder) {
-        var endpoints = (contextFolder.children || []).find((n) => "endpoints" === n.text);
+        var endpoints = _.find(contextFolder.children || [], node => 'endpoints' === node.text);
         if (endpoints) {
           angular.forEach(endpoints.children, (endpointFolder) => {
             var entries = endpointFolder ? endpointFolder.entries : null;
@@ -145,7 +145,7 @@ namespace Camel {
       var answer = [];
       var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
       if (contextFolder) {
-        var folders = (contextFolder.children || []).find((n) => "routes" === n.text);
+        var folders = _.find(contextFolder.children || [], node => 'routes' === node.text);
         if (folders) {
           angular.forEach(folders.children, (folder) => {
             var entries = folder ? folder.entries : null;
