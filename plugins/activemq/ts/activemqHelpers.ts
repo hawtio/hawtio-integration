@@ -6,13 +6,13 @@ module ActiveMQ {
   export var log: Logging.Logger = Logger.get("activemq");
   export var jmxDomain: string = 'org.apache.activemq';
 
-  function findFolder(node, titles:string[], ascend:boolean) {
+  function findFolder(node: Jmx.NodeSelection, titles:string[], ascend:boolean): Jmx.NodeSelection {
     if (!node) {
       return null;
     }
-    var answer = null;
+    var answer: Jmx.NodeSelection = null;
     angular.forEach(titles, (title) => {
-      if (node.title === title) {
+      if (node.text === title) {
         answer = node;
       }
     });
@@ -26,7 +26,7 @@ module ActiveMQ {
         // retrieves only one level down for children
         angular.forEach(node.children, (child) => {
           angular.forEach(titles, (title) => {
-            if (child.title === title) {
+            if (child.text === title) {
               answer = node;
             }
           });
@@ -36,7 +36,7 @@ module ActiveMQ {
     return answer;
   }
 
-  export function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean) {
+  export function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection {
     var selection = workspace.selection;
     if (selection) {
       return findFolder(selection, ["Queues", "Queue"], ascend);
@@ -44,15 +44,15 @@ module ActiveMQ {
     return null;
   }
 
-  export function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean) {
+  export function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): string[] {
     var queuesFolder = getSelectionQueuesFolder(workspace, ascend);
     if (queuesFolder) {
-      return queuesFolder.children.map(n => n.title);
+      return queuesFolder.children.map(n => n.text);
     }
     return [];
   }
 
-  export function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean) {
+  export function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection {
     var selection = workspace.selection;
     if (selection) {
       return findFolder(selection, ["Topics", "Topic"], ascend);
@@ -60,10 +60,10 @@ module ActiveMQ {
     return null;
   }
 
-  export function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean) {
+  export function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): string[] {
     var topicsFolder = getSelectionTopicsFolder(workspace, ascend);
     if (topicsFolder) {
-      return topicsFolder.children.map(n => n.title);
+      return topicsFolder.children.map(n => n.text);
     }
     return [];
   }
