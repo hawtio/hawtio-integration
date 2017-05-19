@@ -32,6 +32,9 @@ module ActiveMQ {
     $scope.mode = 'text';
     $scope.showButtons = true;
 
+    $scope.deleteDialog = false;
+    $scope.moveDialog = false;
+
     $scope.gridOptions = {
       selectedItems: [],
       data: 'messages',
@@ -123,40 +126,19 @@ module ActiveMQ {
     $scope.moveMessages = () => {
         var selection = workspace.selection;
         var mbean = selection.objectName;
-        if (!mbean || !selection) {
+        if (!mbean || !selection || !$scope.queueName) {
           return;
         }
         var selectedItems = $scope.gridOptions.selectedItems;
-        $dialog.dialog({
-          resolve: {
-            selectedItems: () => selectedItems,
-            gridOptions: () => $scope.gridOptions,
-            queueNames: () => $scope.queueNames,
-            parent: () => $scope
-          },
-          template: $templateCache.get("activemqMoveMessageDialog.html"),
-          controller: ["$scope", "dialog", "selectedItems", "gridOptions", "queueNames", "parent", ($scope, dialog, selectedItems, gridOptions, queueNames, parent) => {
-            $scope.selectedItems = selectedItems;
-            $scope.gridOptions = gridOptions;
-            $scope.queueNames = queueNames;
-            $scope.queueName = '';
-            $scope.close = (result) => {
-              dialog.close();
-              if (result) {
-                parent.message = "Moved " + Core.maybePlural(selectedItems.length, "message") + " to " + $scope.queueName;
-                var operation = "moveMessageTo(java.lang.String, java.lang.String)";
-                angular.forEach(selectedItems, (item, idx) => {
-                  var id = item.JMSMessageID;
-                  if (id) {
-                    var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
-                    jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
-                  }
-                });
-              }
-            }
-          }]
-        }).open();
-
+        $scope.message = "Moved " + Core.maybePlural(selectedItems.length, "message") + " to " + $scope.queueName;
+        var operation = "moveMessageTo(java.lang.String, java.lang.String)";
+        angular.forEach(selectedItems, (item, idx) => {
+          var id = item.JMSMessageID;
+          if (id) {
+            var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
+            jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
+          }
+        });
     };
 
     $scope.resendMessage = () => {
@@ -176,33 +158,19 @@ module ActiveMQ {
       if (!mbean || !selection) {
         return;
       }
-      var selected = $scope.gridOptions.selectedItems;
-      if (!selected || selected.length === 0) {
+      var selectedItems = $scope.gridOptions.selectedItems;
+      if (!selectedItems || selectedItems.length === 0) {
         return;
       }
-      UI.multiItemConfirmActionDialog(<UI.MultiItemConfirmActionOptions> {
-        collection: selected,
-        index: 'JMSMessageID',
-        onClose: (result:boolean) => {
-          if (result) {
-            $scope.message = "Deleted " + Core.maybePlural(selected.length, "message");
-            var operation = "removeMessage(java.lang.String)";
-            _.forEach(selected, (item:any, idx) => {
-              var id = item.JMSMessageID;
-              if (id) {
-                var callback = (idx + 1 < selected.length) ? intermediateResult : operationSuccess;
-                jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
-              }
-            });
-          }
-        },
-        title: 'Delete messages?',
-        action: 'The following messages will be deleted:',
-        okText: 'Delete',
-        okClass: 'btn-danger',
-        custom: "This operation is permanent once completed!",
-        customClass: "alert alert-warning"
-      }).open();
+      $scope.message = "Deleted " + Core.maybePlural(selectedItems.length, "message");
+      var operation = "removeMessage(java.lang.String)";
+      angular.forEach(selectedItems, (item: any, idx) => {
+        var id = item.JMSMessageID;
+        if (id) {
+          var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
+          jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
+        }
+      });
     };
 
     $scope.retryMessages = () => {
@@ -360,7 +328,6 @@ module ActiveMQ {
     }
 
     function createHeaders(row) {
-      //log.debug("headers: ", row);
       var answer = {};
       angular.forEach(row, (value, key) => {
         if (!_.some(ignoreColumns, (k) => k === key) && !_.some(flattenColumns, (k) => k === key)) {
@@ -371,7 +338,6 @@ module ActiveMQ {
     }
     
     function createProperties(row) {
-      //log.debug("properties: ", row);
       var answer = {};
       angular.forEach(row, (value, key) => {
         if (!_.some(ignoreColumns, (k) => k === key) && _.some(flattenColumns, (k) => k === key)) {
@@ -390,9 +356,18 @@ module ActiveMQ {
         $scope.showButtons = false;
         $scope.dlq = false;
         var mbean = getBrokerMBean(workspace, jolokia, amqJmxDomain);
+        // browseQueue(java.lang.String) is not available until ActiveMQ 5.15.0
+        // https://issues.apache.org/jira/browse/AMQ-6435
         jolokia.request(
             {type: 'exec', mbean: mbean, operation: 'browseQueue(java.lang.String)', arguments: [$scope.queueName]},
-            Core.onSuccess(populateTable));
+            Core.onSuccess(populateTable, {
+              error: (response) => {
+                // try again with the old ActiveMQ API
+                $scope.queueName = null;
+                $scope.showButtons = true;
+                loadTable();
+              }
+            }));
         $scope.queueName = null;
       } else {
         if (workspace.selection) {
@@ -423,7 +398,7 @@ module ActiveMQ {
     }
 
     function operationSuccess() {
-      $scope.gridOptions.selectedItems.splice(0);
+      deselectAll();
       Core.notification("success", $scope.message);
       setTimeout(loadTable, 50);
     }
@@ -525,6 +500,10 @@ module ActiveMQ {
         }
       }
       return searchConditions;
+    }
+
+    function deselectAll() {
+      $scope.gridOptions.selectedItems = [];
     }
 
   }]);

@@ -20,21 +20,22 @@
             <div class="form-group">
               <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="dlq" ng-click="retryMessages()"
                 title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">
-                <i class="fa fa-reply"></i> Retry
+                Retry
               </button>
               <button class="btn btn-default" ng-disabled="gridOptions.selectedItems.length !== 1" ng-show="showButtons" ng-click="resendMessage()"
                 title="Edit the message to resend it" data-placement="bottom">
-                <i class="fa fa-share-alt"></i> Resend
+                Resend
               </button>
 
-              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons" ng-click="moveMessages()"
+              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"
+                ng-click="moveDialog = true"
                 title="Move the selected messages to another destination" data-placement="bottom">
-                <i class="fa fa-share-alt"></i> Move
+                Move
               </button>
               <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"
-                ng-click="deleteMessages()"
+                ng-click="deleteDialog = true"
                 title="Delete the selected messages">
-                <i class="fa fa-remove"></i> Delete
+                Delete
               </button>
               <button class="btn btn-default" ng-click="refresh()"
                 title="Refreshes the list of messages">
@@ -53,19 +54,22 @@
       <div class="col-sm-12">
         <form class="toolbar-pf-actions">
           <div class="form-group">
-            <button class="btn btn-primary" ng-click="showMessageDetails = false"><i class="fa fa-arrow-left"></i> Back</button>
+            <button class="btn btn-primary" ng-click="showMessageDetails = false">
+              Back
+            </button>
           </div>
 
           <div class="toolbar-pf-action-right">
             <div class="form-group">
-              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons" ng-click="moveMessages()"
+              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"
+                ng-click="moveDialog = true"
                 title="Move the selected messages to another destination" data-placement="bottom">
-                <i class="fa fa-share-alt"></i> Move
+                Move
               </button>
               <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"
-                ng-click="deleteMessages()"
+                ng-click="deleteDialog = true"
                 title="Delete the selected messages">
-                <i class="fa fa-remove"></i> Delete
+                Delete
               </button>
             </div>
           </div>
@@ -97,31 +101,43 @@
 
   </div>
 
-  <script type="text/ng-template" id="activemqMoveMessageDialog.html">
-    <div class="modal-header">
-      <span>Move messages?</span>
-    </div>
-    <div class="modal-body">
-      <p>Move
+  <div hawtio-confirm-dialog="deleteDialog" title="Delete messages?"
+       ok-button-text="Delete"
+       cancel-button-text="Cancel"
+       on-ok="deleteMessages()">
+    <div class="dialog-body">
+      <p class="alert alert-warning">
+        <span class="pficon pficon-warning-triangle-o"></span>
+        This operation cannot be undone so please be careful.
+      </p>
+      <p>You are about to delete
         <ng-pluralize count="gridOptions.selectedItems.length"
-                      when="{'1': 'message', 'other': '{} messages'}"></ng-pluralize>
-        to: <input type="text" ng-model="queueName" placeholder="Queue name"
-                   uib-typeahead="title.unescapeHTML() for title in queueNames($viewValue) | filter:$viewValue"></p>
-      <p>
-        You cannot undo this operation.<br>
+                      when="{'1': 'a message!', 'other': '{} messages!'}">
+        </ng-pluralize>
+      </p>
+    </div>
+  </div>
+
+  <div hawtio-confirm-dialog="moveDialog" title="Move messages?"
+       ok-button-text="Move"
+       cancel-button-text="Cancel"
+       on-ok="moveMessages()">
+    <div class="dialog-body">
+      <p class="alert alert-warning">
+        <span class="pficon pficon-warning-triangle-o"></span>
+        You cannot undo this operation.<br/>
         Though after the move you can always move the
         <ng-pluralize count="gridOptions.selectedItems.length"
                       when="{'1': 'message', 'other': 'messages'}"></ng-pluralize>
         back again.
       </p>
+      <p>Move
+        <ng-pluralize count="gridOptions.selectedItems.length"
+                      when="{'1': 'message', 'other': '{} messages'}"></ng-pluralize>
+        to: <select ng-model="queueName" ng-options="qn for qn in queueNames" ng-init="queueName=queueNames[0]"></select>
+      </p>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-info" 
-              ng-click="close(true)">Move</button>
-      <button class="btn btn-default" 
-              ng-click="close(false)">Cancel</button>
-    </div>
-  </script>
+  </div>
 
 </div>
 
