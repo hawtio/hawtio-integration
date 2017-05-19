@@ -48,7 +48,7 @@ namespace Camel {
     function reloadFunction() {
       var tree = workspace.tree;
       if (tree) {
-        const rootFolder = tree.findDescendant(node => node.id === 'camelContexts');
+        const rootFolder = tree.findDescendant(node => node.key === 'camelContexts');
         if (rootFolder) {
           const treeElement = $("#cameltree");
           Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);

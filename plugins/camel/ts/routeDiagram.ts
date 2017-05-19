@@ -216,12 +216,12 @@ namespace Camel {
       var cid = node.cid;
 
       // Get the 'real' cid of the selected diagram node
-      var routeChild = routeFolder.findDescendant((d) => {
+      var routeChild = routeFolder.findDescendant(child => {
         var uri = node.uri;
         if (uri && uri.indexOf('?') > 0) {
           uri = uri.substring(0, uri.indexOf('?'))
         }
-        return d.title === node.cid || (d.routeXmlNode.nodeName === node.type && d.title === uri);
+        return child.text === node.cid || ((<any>child).routeXmlNode.nodeName === node.type && child.text === uri);
       });
       if (routeChild) {
         cid = routeChild.key;

@@ -6091,12 +6091,12 @@ var Camel;
             function updateRouteProperties(node, route, routeFolder) {
                 var cid = node.cid;
                 // Get the 'real' cid of the selected diagram node
-                var routeChild = routeFolder.findDescendant(function (d) {
+                var routeChild = routeFolder.findDescendant(function (child) {
                     var uri = node.uri;
                     if (uri && uri.indexOf('?') > 0) {
                         uri = uri.substring(0, uri.indexOf('?'));
                     }
-                    return d.title === node.cid || (d.routeXmlNode.nodeName === node.type && d.title === uri);
+                    return child.text === node.cid || (child.routeXmlNode.nodeName === node.type && child.text === uri);
                 });
                 if (routeChild) {
                     cid = routeChild.key;
@@ -7041,7 +7041,7 @@ var Camel;
             function reloadFunction() {
                 var tree = workspace.tree;
                 if (tree) {
-                    var rootFolder = tree.findDescendant(function (node) { return node.id === 'camelContexts'; });
+                    var rootFolder = tree.findDescendant(function (node) { return node.key === 'camelContexts'; });
                     if (rootFolder) {
                         var treeElement = $("#cameltree");
                         Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
