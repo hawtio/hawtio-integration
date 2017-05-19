@@ -153,7 +153,8 @@ namespace Camel {
         // Handle nodes selection from a diagram displaying multiple routes
         handleGraphNode(node);
       } else {
-        navigateToNodeProperties(node.cid);
+        // navigateToNodeProperties(node.cid);
+        updateRouteProperties(node, workspace.selection);
       }
     };
 
@@ -210,7 +211,7 @@ namespace Camel {
       }
     }
 
-    function updateRouteProperties(node, routeFolder: Jmx.Folder) {
+    function updateRouteProperties(node, routeFolder: Jmx.NodeSelection) {
       var cid = node.cid;
 
       // Get the 'real' cid of the selected diagram node
@@ -219,11 +220,12 @@ namespace Camel {
         if (uri && uri.indexOf('?') > 0) {
           uri = uri.substring(0, uri.indexOf('?'))
         }
-        return child.text === node.cid || ((<any>child).routeXmlNode.nodeName === node.type && child.text === uri);
+        return child.text === node.cid || ((<any>child).routeXmlNode && (<any>child).routeXmlNode.nodeName === node.type && child.text === uri);
       });
       if (routeChild) {
         cid = routeChild.key;
       }
+      console.log('test: ', cid);
 
       navigateToNodeProperties(cid);
     }

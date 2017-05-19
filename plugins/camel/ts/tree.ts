@@ -30,8 +30,8 @@ namespace Camel {
     });
   }]);
 
-  _module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace",
-    ($scope, $location: ng.ILocationService, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace) => {
+  _module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", 'jolokia',
+    ($scope, $location: ng.ILocationService, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia) => {
 
     $scope.$on('$routeChangeSuccess', () => Jmx.updateTreeSelectionFromURL($location, $('#cameltree')));
 
@@ -46,8 +46,9 @@ namespace Camel {
     $scope.$on('jmxTreeClicked',
       (event, selection: Jmx.NodeSelection) => navigateToDefaultTab(selection));
 
+    // TODO: the logic should ideally be factorized with that of the visible tabs
     function navigateToDefaultTab(selection: Jmx.NodeSelection) {
-      let path;
+      let path = '/jmx/attributes';
       if (workspace.isRoutesFolder()) {
         path = '/camel/routes';
       } else if (workspace.isRoute()) {
@@ -56,10 +57,24 @@ namespace Camel {
           } else {
             path = '/jmx/attributes';
           }
+      } else if (workspace.selection && workspace.selection.key === 'camelContexts') {
+        path = '/camel/contexts';
+      } else if (isRouteNode(workspace)) {
+        path = 'camel/propertiesRoute';
+      } else if (workspace.isComponent()
+          && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
+          && workspace.hasInvokeRights(workspace.selection, 'explainComponentJson')) {
+        path = '/camel/propertiesComponent';
+      } else if (workspace.isEndpoint()
+          && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
+          && workspace.hasInvokeRights(workspace.selection, 'explainEndpointJson')) {
+        path = '/camel/propertiesEndpoint';
+      } else if (workspace.isDataformat()
+          && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
+          && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson")) {
+        path = '/camel/propertiesDataFormat';
       }
-      if (path) {
-        $location.path(path);
-      }
+      $location.path(path);
     }
 
     function reloadFunction() {
