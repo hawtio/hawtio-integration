@@ -6799,7 +6799,7 @@ var Camel;
             $scope.goto = function (path) { return $location.path(path); };
         }]);
     function isContextsFolder(workspace) {
-        return workspace.selection && workspace.selection.id === 'camelContexts';
+        return workspace.selection && workspace.selection.key === 'camelContexts';
     }
 })(Camel || (Camel = {}));
 /// <reference path="../../includes.ts"/>

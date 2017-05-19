@@ -203,8 +203,8 @@ namespace Camel {
 
   }]);
 
-  function isContextsFolder(workspace) {
-    return workspace.selection && workspace.selection.id === 'camelContexts';
+  function isContextsFolder(workspace: Jmx.Workspace) {
+    return workspace.selection && workspace.selection.key === 'camelContexts';
   }
 
 }
