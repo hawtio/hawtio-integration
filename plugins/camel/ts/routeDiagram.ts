@@ -195,13 +195,13 @@ namespace Camel {
               if (plugin) {
                 plugin(workspace, routeFolder, children => {
                   tree.addNode(children, routeFolder, { silent: true });
-                  updateRouteProperties(node, route, routeFolder);
+                  updateRouteProperties(node, routeFolder);
                 });
               }
               // We've forced lazy loading so let's turn it off
               routeFolder.lazyLoad = false;
             } else {
-              updateRouteProperties(node, route, routeFolder);
+              updateRouteProperties(node, routeFolder);
             }
           }
         } else {
@@ -210,7 +210,7 @@ namespace Camel {
       }
     }
 
-    function updateRouteProperties(node, route: Element, routeFolder: Jmx.Folder) {
+    function updateRouteProperties(node, routeFolder: Jmx.Folder) {
       var cid = node.cid;
 
       // Get the 'real' cid of the selected diagram node
@@ -223,20 +223,6 @@ namespace Camel {
       });
       if (routeChild) {
         cid = routeChild.key;
-      }
-
-      // Setup the properties tab view for the selected diagram node
-      $scope.model = getCamelSchema("route");
-      if ($scope.model) {
-        var labels = [];
-        if ($scope.model.group) {
-          labels = $scope.model.group.split(",");
-        }
-
-        $scope.labels = labels;
-        $scope.nodeData = getRouteNodeJSON(route[0]);
-        $scope.icon = getRouteNodeIcon(routeFolder);
-        $scope.viewTemplate = "app/camel/html/nodePropertiesView.html";
       }
 
       navigateToNodeProperties(cid);
