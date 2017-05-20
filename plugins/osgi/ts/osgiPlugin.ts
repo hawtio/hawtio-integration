@@ -6,7 +6,10 @@
 module Osgi {
 
   export var pluginName = 'osgi';
-  export var _module = angular.module(pluginName, ['patternfly']);
+  export var _module = angular.module(pluginName, [
+    'patternfly',
+    'infinite-scroll'
+  ]);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider

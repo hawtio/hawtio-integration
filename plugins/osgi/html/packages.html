@@ -1,98 +1,86 @@
 <h1>Packages</h1>
 
-<div class="controller-section" ng-controller="Osgi.PackagesController">
+<div class="osgi-packages-main" ng-controller="Osgi.PackagesController">
 
-  <div class="row toolbar-pf">
-    <div class="col-md-12">
-      <form class="toolbar-pf-actions search-pf">
-        <div class="form-group has-clear">
-          <div class="search-pf-input-group">
-            <label for="search1" class="sr-only">Filter</label>
-            <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">
-            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''"><span class="pficon pficon-close"></span></button>
-          </div>
-        </div>
-        <div class="toolbar-pf-action-right" ng-show="packages !== null">
-          {{filteredPackages.length}} of {{packages.length}}
-        </div>
-      </form>
+  <div class="spinner spinner-lg loading-page" ng-if="!packages"></div>
+
+  <div ng-if="packages">
+    <pf-toolbar config="toolbarConfig"></pf-toolbar>
     </div>
-  </div>
-
-  <div class="spinner spinner-lg loading-page" ng-if="packages === null"></div>
-
-  <div class="list-group list-view-pf list-view-pf-view list-packages">
-    <div class="list-group-item" ng-repeat="package in packages | filter:{Name: filterText} as filteredPackages"
-      ng-class="{'list-view-pf-expand-active': package.exportsExpanded || package.importsExpanded}">
-      <div class="list-view-pf-main-info">
-        <div class="list-view-pf-body">
-          <div class="list-view-pf-description">
-            <div class="list-group-item-heading" title="{{package.Name}}">
-              {{package.Name}}
+    <div class="list-group list-view-pf list-view-pf-view osgi-packages-list" infinite-scroll="appendItems()"
+      infinite-scroll-distance="2" infinite-scroll-container='".osgi-nav-main .contents"'>
+      <div class="list-group-item" ng-repeat="package in scrollablePackages"
+        ng-class="{'list-view-pf-expand-active': package.exportsExpanded || package.importsExpanded}">
+        <div class="list-view-pf-main-info">
+          <div class="list-view-pf-body">
+            <div class="list-view-pf-description">
+              <div class="list-group-item-heading" title="{{package.Name}}">
+                {{package.Name}}
+              </div>
+              <div class="list-group-item-text">
+                {{package.Version}}
+              </div>
             </div>
-            <div class="list-group-item-text">
-              {{package.Version}}
-            </div>
+            <div class="list-view-pf-additional-info">
+              <div class="list-view-pf-additional-info-item">
+                <div class="list-view-pf-expand" ng-class="{'active': package.exportsExpanded}"
+                  ng-click="package.exportsExpanded = !package.exportsExpanded; package.importsExpanded = false;">
+                  <span class="fa fa-angle-right" ng-class="{'fa-angle-down': package.exportsExpanded}"></span>
+                  <span class="pficon pficon-export"></span>
+                  <strong>{{package.ExportingBundles.length}}</strong>
+                  Exporting Bundle{{package.ExportingBundles.length !== 1 ? 's' : ''}}
+                </div>
+              </div>
+              <div class="list-view-pf-additional-info-item">
+                <div class="list-view-pf-expand" ng-class="{'active': package.importsExpanded}"
+                  ng-click="package.importsExpanded = !package.importsExpanded; package.exportsExpanded = false;">
+                  <span class="fa fa-angle-right" ng-class="{'fa-angle-down': package.importsExpanded}"></span>
+                  <span class="pficon pficon-import"></span>
+                  <strong>{{package.ImportingBundles.length}}</strong>
+                  Importing Bundle{{package.ImportingBundles.length !== 1 ? 's' : ''}}
+                </div>
+              </div>
+              <div class="list-view-pf-additional-info-item">
+                <div class="list-view-pf-expand">
+                  <span ng-show="package.RemovalPending">
+                    <span class="pficon pficon-warning-triangle-o"></span>
+                    Removal Pending
+                  </span>
+                </div>
+              </div>
+            </div>              
           </div>
-          <div class="list-view-pf-additional-info">
-            <div class="list-view-pf-additional-info-item">
-              <div class="list-view-pf-expand" ng-class="{'active': package.exportsExpanded}"
-                ng-click="package.exportsExpanded = !package.exportsExpanded; package.importsExpanded = false;">
-                <span class="fa fa-angle-right" ng-class="{'fa-angle-down': package.exportsExpanded}"></span>
-                <span class="pficon pficon-export"></span>
-                <strong>{{package.ExportingBundles.length}}</strong>
-                Exporting Bundle{{package.ExportingBundles.length !== 1 ? 's' : ''}}
-              </div>
-            </div>
-            <div class="list-view-pf-additional-info-item">
-              <div class="list-view-pf-expand" ng-class="{'active': package.importsExpanded}"
-                ng-click="package.importsExpanded = !package.importsExpanded; package.exportsExpanded = false;">
-                <span class="fa fa-angle-right" ng-class="{'fa-angle-down': package.importsExpanded}"></span>
-                <span class="pficon pficon-import"></span>
-                <strong>{{package.ImportingBundles.length}}</strong>
-                Importing Bundle{{package.ImportingBundles.length !== 1 ? 's' : ''}}
-              </div>
-            </div>
-            <div class="list-view-pf-additional-info-item">
-              <div class="list-view-pf-expand">
-                <span ng-show="package.RemovalPending">
-                  <span class="pficon pficon-warning-triangle-o"></span>
-                  Removal Pending
-                </span>
-              </div>
-            </div>
-          </div>              
         </div>
-      </div>
-      <div class="list-group-item-container" ng-if="package.exportsExpanded">
-        <div class="close" ng-click="package.exportsExpanded = false">
-          <span class="pficon pficon-close"></span>
+        <div class="list-group-item-container" ng-if="package.exportsExpanded">
+          <div class="close" ng-click="package.exportsExpanded = false">
+            <span class="pficon pficon-close"></span>
+          </div>
+          <dl>
+            <dt>Exporting Bundles</dt>
+            <dd>
+              <ul class="package-bundles-list">
+                <li ng-repeat="bundle in package.ExportingBundles">
+                  <a title="Exported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
+                </li>
+              </ul>
+            </dd>
+          </dl>
         </div>
-        <dl>
-          <dt>Exporting Bundles</dt>
-          <dd>
-            <ul class="package-bundles-list">
-              <li ng-repeat="bundle in package.ExportingBundles">
-                <a title="Exported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
-              </li>
-            </ul>
-          </dd>
-        </dl>
-      </div>
-      <div class="list-group-item-container" ng-if="package.importsExpanded">
-        <div class="close" ng-click="package.importsExpanded = false">
-          <span class="pficon pficon-close"></span>
+        <div class="list-group-item-container" ng-if="package.importsExpanded">
+          <div class="close" ng-click="package.importsExpanded = false">
+            <span class="pficon pficon-close"></span>
+          </div>
+          <dl>
+            <dt>Importing Bundles</dt>
+            <dd>
+              <ul class="package-bundles-list">
+                <li ng-repeat="bundle in package.ImportingBundles">
+                  <a title="Imported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
+                </li>
+              </ul>
+            </dd>
+          </dl>
         </div>
-        <dl>
-          <dt>Importing Bundles</dt>
-          <dd>
-            <ul class="package-bundles-list">
-              <li ng-repeat="bundle in package.ImportingBundles">
-                <a title="Imported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
-              </li>
-            </ul>
-          </dd>
-        </dl>
       </div>
     </div>
   </div>
