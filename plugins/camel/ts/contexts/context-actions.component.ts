@@ -6,14 +6,14 @@ namespace Camel {
 
   export class ContextActionsController {
 
-    context: Context;
+    context: Context = null;
 
     constructor($scope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
         private contextsService: ContextsService) {
       'ngInject';
       $scope.$on('jmxTreeClicked', (event, selectedNode) => {
-        if (this.workspace.isCamelContext()) {
-          this.contextsService.getContext(selectedNode.objectName)
+        if (workspace.isCamelContext()) {
+          contextsService.getContext(selectedNode.objectName)
             .then(context => this.context = context);
         } else {
           this.context = null;
@@ -61,7 +61,10 @@ namespace Camel {
       <div class="dropdown camel-main-actions" ng-show="$ctrl.isVisible()">
         <button type="button" id="dropdownMenu1" class="btn btn-default dropdown-toggle"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <span class="fa" ng-class="{'fa-play': $ctrl.context.isStarted(), 'fa-pause': $ctrl.context.isSuspended()}"></span>
+          &nbsp;
           {{$ctrl.context.state}}
+          &nbsp;
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
