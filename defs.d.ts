@@ -1296,6 +1296,10 @@ declare module Osgi {
 declare module Osgi {
 }
 declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
     class Context {
         name: string;
         state: string;
@@ -1388,10 +1392,6 @@ declare namespace Camel {
         template: string;
         controller: typeof ContextsController;
     };
-}
-declare namespace Camel {
-}
-declare namespace Camel {
 }
 declare namespace Camel {
 }
