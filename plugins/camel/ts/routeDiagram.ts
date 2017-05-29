@@ -153,6 +153,7 @@ namespace Camel {
         // Handle nodes selection from a diagram displaying multiple routes
         handleGraphNode(node);
       } else {
+        // FIXME
         // navigateToNodeProperties(node.cid);
         updateRouteProperties(node, workspace.selection);
       }
@@ -225,7 +226,6 @@ namespace Camel {
       if (routeChild) {
         cid = routeChild.key;
       }
-      console.log('test: ', cid);
 
       navigateToNodeProperties(cid);
     }
