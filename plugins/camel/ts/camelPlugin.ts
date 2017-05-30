@@ -297,6 +297,7 @@ namespace Camel {
                 }
 
                 const jmxNode = new Jmx.Folder('MBeans');
+                workspace.configureFolder(jmxNode, domainName, 'org-apache-camel', _.clone(node.folderNames).concat('mbeans'), 'mbeans');
 
                 // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
                 node.children.forEach(child => {
