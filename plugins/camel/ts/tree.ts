@@ -32,6 +32,7 @@ namespace Camel {
 
   _module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", 'jolokia',
     ($scope, $location: ng.ILocationService, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia) => {
+    $scope.treeFetched = () => workspace.treeFetched;
 
     $scope.$on('$routeChangeSuccess', () => Jmx.updateTreeSelectionFromURL($location, $('#cameltree')));
 

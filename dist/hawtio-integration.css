@@ -28,54 +28,111 @@
   min-width: 100%;
 }
 
-.activemq-browse-table th:nth-child(1) {
-  width: 5%;
-}
-.activemq-browse-table th:nth-child(2) {
+.table-src-components th:nth-child(3) {
   width: 30%;
 }
-.activemq-browse-table th:nth-child(3) {
-  width: 5%;
+
+.bundles-container {
+  margin-left: -20px;
+  margin-right: -20px;
 }
-.activemq-browse-table th:nth-child(4) {
-  width: 10%;
+.bundles-container .row {
+  margin-left: 0;
+  margin-right: 0;
 }
-.activemq-browse-table th:nth-child(5) {
-  width: 15%;
+.bundles-container .container-cards-pf {
+  padding-bottom: 20px;
 }
-.activemq-browse-table th:nth-child(6) {
-  width: 10%;
+.bundle-cards .card-pf {
+  cursor: pointer;
 }
-.activemq-browse-table th:nth-child(7) {
-  width: 10%;
+.bundle-cards .content {
+  height: 5em;
+  display: table-cell;
+  vertical-align: middle;
 }
-.activemq-browse-table th:nth-child(8) {
-  width: 15%;
+.list-group-item.child {
+  padding-left: 65px;
+}
+#startLevelFilter {
+  width: 54px;
+}
+.overviewSection td {
+  vertical-align: top;
+}
+.osgi-bundles-table th:nth-child(1) {
+  width: 30px;
+}
+.osgi-bundles-table th:nth-child(2) {
+  width: 55px;
+}
+.osgi-bundles-table th:nth-child(3) {
+  width: 65px;
+}
+.osgi-bundles-table th:nth-child(4) {
+  width: auto;
+}
+.osgi-bundles-table th:nth-child(5) {
+  width: auto;
+}
+.osgi-bundles-table th:nth-child(6) {
+  width: 120px;
+}
+#toolbar-row-2 .form-inline label:not(:first-child) {
+  margin-left: 1em;
+}
+.list-group.labels .list-group-item {
+  padding: 2px 0;
+}
+.osgi-bundle-details-dl dd {
+  word-break: break-all;
+}
+.osgi-bundle-details-dl dd .label {
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+.osgi-bundle-headers-dl dd {
+  word-break: break-all;
+}
+.package-bundles-list,
+.service-bundles-list,
+.service-object-classes-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+.osgi-nav-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
+.osgi-nav-main .nav-tabs {
+  flex: 0 0 auto;
+  padding-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+.osgi-nav-main .contents {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  position: relative;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.framework-main h1 {
+  margin-bottom: 20px;
 }
 
-.org-apache-activemq span.node-icon:before,
-.org-apache-activemq-Broker span.node-icon:before,
-.org-apache-activemq-Broker-folder span.node-icon:before {
-  display: inline-block;
-  background: url("../img/icons/messagebroker.svg");
-  min-width: 16px;
-  min-height: 16px;
-  background-size: 18px 18px;
-  background-position: center;
-  background-repeat: no-repeat;
-  content: "" !important;
+.osgi-packages-main .pf-table-view-selected-label {
+  display: none;
 }
-.org-apache-activemq-Queue span.node-icon:before {
-  content: url("../img/icons/activemq/queue.png");
+.osgi-packages-main .osgi-packages-list .list-view-pf-description,
+.osgi-packages-main .osgi-packages-list .list-group-item-heading,
+.osgi-packages-main .osgi-packages-list .list-group-item-text {
+  width: auto;
 }
-.org-apache-activemq-Queue-folder span.node-icon:before {
-  content: url("../img/icons/activemq/queue_folder.png");
-}
-.org-apache-activemq-Topic span.node-icon:before {
-  content: url("../img/icons/activemq/topic.png");
-}
-.org-apache-activemq-Topic-folder span.node-icon:before {
-  content: url("../img/icons/activemq/topic_folder.png");
+.osgi-packages-main .osgi-packages-list .list-group-item-container {
+  padding: 10px 20px;
 }
 
 .form-inline.camel-forward-message {
@@ -575,111 +632,54 @@ div.camel-properties {
   width: 111px;
 }
 
-.table-src-components th:nth-child(3) {
+.activemq-browse-table th:nth-child(1) {
+  width: 5%;
+}
+.activemq-browse-table th:nth-child(2) {
   width: 30%;
 }
-
-.bundles-container {
-  margin-left: -20px;
-  margin-right: -20px;
+.activemq-browse-table th:nth-child(3) {
+  width: 5%;
 }
-.bundles-container .row {
-  margin-left: 0;
-  margin-right: 0;
+.activemq-browse-table th:nth-child(4) {
+  width: 10%;
 }
-.bundles-container .container-cards-pf {
-  padding-bottom: 20px;
+.activemq-browse-table th:nth-child(5) {
+  width: 15%;
 }
-.bundle-cards .card-pf {
-  cursor: pointer;
+.activemq-browse-table th:nth-child(6) {
+  width: 10%;
 }
-.bundle-cards .content {
-  height: 5em;
-  display: table-cell;
-  vertical-align: middle;
+.activemq-browse-table th:nth-child(7) {
+  width: 10%;
 }
-.list-group-item.child {
-  padding-left: 65px;
-}
-#startLevelFilter {
-  width: 54px;
-}
-.overviewSection td {
-  vertical-align: top;
-}
-.osgi-bundles-table th:nth-child(1) {
-  width: 30px;
-}
-.osgi-bundles-table th:nth-child(2) {
-  width: 55px;
-}
-.osgi-bundles-table th:nth-child(3) {
-  width: 65px;
-}
-.osgi-bundles-table th:nth-child(4) {
-  width: auto;
-}
-.osgi-bundles-table th:nth-child(5) {
-  width: auto;
-}
-.osgi-bundles-table th:nth-child(6) {
-  width: 120px;
-}
-#toolbar-row-2 .form-inline label:not(:first-child) {
-  margin-left: 1em;
-}
-.list-group.labels .list-group-item {
-  padding: 2px 0;
-}
-.osgi-bundle-details-dl dd {
-  word-break: break-all;
-}
-.osgi-bundle-details-dl dd .label {
-  padding-top: 1px;
-  padding-bottom: 1px;
-}
-.osgi-bundle-headers-dl dd {
-  word-break: break-all;
-}
-.package-bundles-list,
-.service-bundles-list,
-.service-object-classes-list {
-  list-style-type: none;
-  padding-left: 0;
-}
-.osgi-nav-main {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: auto;
-}
-.osgi-nav-main .nav-tabs {
-  flex: 0 0 auto;
-  padding-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-.osgi-nav-main .contents {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  position: relative;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-.framework-main h1 {
-  margin-bottom: 20px;
+.activemq-browse-table th:nth-child(8) {
+  width: 15%;
 }
 
-.osgi-packages-main .pf-table-view-selected-label {
-  display: none;
+.org-apache-activemq span.node-icon:before,
+.org-apache-activemq-Broker span.node-icon:before,
+.org-apache-activemq-Broker-folder span.node-icon:before {
+  display: inline-block;
+  background: url("../img/icons/messagebroker.svg");
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 18px 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+  content: "" !important;
 }
-.osgi-packages-main .osgi-packages-list .list-view-pf-description,
-.osgi-packages-main .osgi-packages-list .list-group-item-heading,
-.osgi-packages-main .osgi-packages-list .list-group-item-text {
-  width: auto;
+.org-apache-activemq-Queue span.node-icon:before {
+  content: url("../img/icons/activemq/queue.png");
 }
-.osgi-packages-main .osgi-packages-list .list-group-item-container {
-  padding: 10px 20px;
+.org-apache-activemq-Queue-folder span.node-icon:before {
+  content: url("../img/icons/activemq/queue_folder.png");
+}
+.org-apache-activemq-Topic span.node-icon:before {
+  content: url("../img/icons/activemq/topic.png");
+}
+.org-apache-activemq-Topic-folder span.node-icon:before {
+  content: url("../img/icons/activemq/topic_folder.png");
 }
 
 .metricsWatcher .panel-group:first-child {

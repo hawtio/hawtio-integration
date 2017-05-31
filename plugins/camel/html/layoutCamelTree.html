@@ -27,8 +27,10 @@
       </form>
     </div>
 
-    <div id="cameltree" class="tree-nav-sidebar-content treeview-pf-hover treeview-pf-select"
-      ng-controller="Camel.TreeController"></div>
+    <div class="tree-nav-sidebar-content" ng-controller="Camel.TreeController">
+      <div class="spinner spinner-lg" ng-hide="treeFetched()"></div>
+      <div id="cameltree" class="treeview-pf-hover treeview-pf-select"></div>
+    </div>
 
   </div>
 
