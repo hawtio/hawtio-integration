@@ -32,10 +32,8 @@ module ActiveMQ {
   }]);
 
   _module.controller("ActiveMQ.TreeController", ["$scope", "$location", "workspace", "localStorage", (
-      $scope,
-      $location: ng.ILocationService,
-      workspace: Jmx.Workspace,
-      localStorage: WindowLocalStorage) => {
+    $scope, $location: ng.ILocationService, workspace: Jmx.Workspace, localStorage: WindowLocalStorage) => {
+    $scope.treeFetched = () => workspace.treeFetched;
 
     $scope.$watch('workspace.tree', function () {
       reloadTree();

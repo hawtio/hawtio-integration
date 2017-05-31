@@ -27,8 +27,11 @@
       </form>
     </div>
 
-    <div id="activemqtree" class="tree-nav-sidebar-content treeview-pf-hover treeview-pf-select"
-      ng-controller="ActiveMQ.TreeController"></div>
+    <div class="tree-nav-sidebar-content" ng-controller="ActiveMQ.TreeController">
+      <div class="spinner spinner-lg" ng-hide="treeFetched()"></div>
+      <div id="activemqtree" class="treeview-pf-hover treeview-pf-select"></div>
+    </div>
+
   </div>
 
   <div class="tree-nav-main">
