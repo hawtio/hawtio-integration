@@ -307,6 +307,7 @@ namespace Camel {
                 }
                 rootFolder.moveChild(folder);
               }
+              node.detach();
             }
           });
           domain.children.splice(0, 0, rootFolder);
