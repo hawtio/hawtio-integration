@@ -253,14 +253,7 @@ namespace Camel {
             if (contextsFolder) {
               const contextNode = contextsFolder.children[0];
               if (contextNode) {
-                const folder = new Jmx.Folder(contextNode.text);
-                folder.class = 'org-apache-camel-context';
-                folder.domain = domainName;
-                folder.objectName = contextNode.objectName;
-                folder.entries = contextNode.entries;
-                folder.typeName = contextNode.typeName;
-                folder.key = contextNode.key;
-                folder.version = contextNode.version;
+                const folder = <Jmx.Folder>contextNode;
                 // fetch the camel version and add it to the tree here to avoid making a blocking call elsewhere
                 jolokia.request({
                   'type': 'read',
