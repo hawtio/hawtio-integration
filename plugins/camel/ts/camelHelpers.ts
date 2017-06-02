@@ -679,26 +679,32 @@ namespace Camel {
   }
 
   /**
-   * Returns the selected camel context mbean for the given selection or null if it cannot be found
+   * Returns the selected camel context object name for the given selection or null if it cannot be found
    * @method
    */
-    // TODO should be a service
-  export function getSelectionCamelContextMBean(workspace: Jmx.Workspace) : string {
+  export function getSelectionCamelContextMBean(workspace: Jmx.Workspace): string {
+    const context = getSelectionCamelContext(workspace);
+    if (context) {
+      return context.objectName;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the selected camel context object name for the given selection or null if it cannot be found
+   * @method
+   */
+  export function getSelectionCamelContext(workspace: Jmx.Workspace): Jmx.NodeSelection {
     if (workspace) {
-      var contextId = getContextId(workspace);
-      var selection = workspace.selection;
-      var tree = workspace.tree;
+      const contextId = getContextId(workspace);
+      const selection = workspace.selection;
+      const tree = workspace.tree;
       if (tree && selection) {
-        var domain = selection.domain;
+        const domain = selection.domain;
         if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "context");
-          if (result && result.children) {
-            var contextBean = _.first(result.children);
-            if (contextBean.text) {
-              var contextName = contextBean.text;
-              return "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
-            }
-          }
+          return tree.findDescendant(node => node.typeName === 'context'
+            && node.domain === domain
+            && node.text === contextId);
         }
       }
     }
@@ -712,13 +718,12 @@ namespace Camel {
    * @param {Folder} folder
    */
   export function getExpandingFolderCamelContextMBean(workspace: Jmx.Workspace, folder: Jmx.Folder) : string {
-    if (folder.entries && folder.entries["type"] === "routes") {
-      var result = workspace.tree.navigate("org.apache.camel", folder.entries["context"], "context");
-      if (result && result.children) {
-        var contextBean: any = result.children[0];
-        if (contextBean.objectName) {
-          return contextBean.objectName;
-        }
+    if (folder.entries && folder.entries['type'] === 'routes') {
+      const context = workspace.tree.findDescendant(node => node.typeName === 'context'
+        && node.domain === 'org.apache.camel'
+        && node.text === folder.entries['context']);
+      if (context.objectName) {
+        return context.objectName;
       }
     }
     return null;
@@ -1009,33 +1014,13 @@ namespace Camel {
   }
 
   export function getCamelVersion(workspace: Jmx.Workspace, jolokia) {
-    if (workspace) {
-      var contextId = getContextId(workspace);
-      var selection = workspace.selection;
-      var tree = workspace.tree;
-      if (tree && selection) {
-        var domain = selection.domain;
-        if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "context");
-          if (result && result.children) {
-            var contextBean = _.first(result.children);
-            if (contextBean.version) {
-              // read the cached version
-              return contextBean.version;
-            }
-            if (contextBean.text) {
-              // okay no version cached, so need to get the version using jolokia
-              var contextName = contextBean.text;
-              var mbean = "" + domain + ":context=" + contextId + ',type=context,name="' + contextName + '"';
-              // must use onSuccess(null) that means sync as we need the version asap
-              var version = jolokia.getAttribute(mbean, "CamelVersion", Core.onSuccess(null));
-              // cache version so we do not need to read it again using jolokia
-              contextBean.version = version;
-              return version;
-            }
-          }
-        }
-      }
+    const context = getSelectionCamelContext(workspace);
+    if (context) {
+      // must use onSuccess(null) that means sync as we need the version asap
+      const version = jolokia.getAttribute(context.objectName, 'CamelVersion', Core.onSuccess(null));
+      // cache version so we do not need to read it again using jolokia
+      context.version = version;
+      return version;
     }
     return null;
   }
