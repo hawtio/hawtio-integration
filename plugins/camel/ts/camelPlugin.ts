@@ -242,9 +242,9 @@ namespace Camel {
         rootFolder.key = 'camelContexts';
         rootFolder.domain = domainName;
 
-        const folder = tree.get(domainName);
-        if (folder) {
-          angular.forEach(folder.children, (node, key) => {
+        const domain = tree.get(domainName);
+        if (domain) {
+          angular.forEach(domain.children, (node, key) => {
             const contextsFolder = node.get('context');
             const routesNode = node.get('routes');
             const endpointsNode = node.get('endpoints');
@@ -300,12 +300,13 @@ namespace Camel {
                 workspace.configureFolder(jmxNode, domainName, 'org-apache-camel', _.clone(node.folderNames).concat('mbeans'), 'mbeans');
 
                 // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
-                node.children.forEach(child => {
-                  const name = child.key;
-                  if (name !== 'context' && name !== 'routes' && name !== 'endpoints' && name !== 'components' && name !== 'dataformats') {
-                    jmxNode.moveChild(child);
-                  }
-                });
+                node.children
+                  .filter(child => !(child.text === 'context'
+                    || child.text === 'routes'
+                    || child.text === 'endpoints'
+                    || child.text === 'components'
+                    || child.text === 'dataformats'))
+                  .forEach(child => jmxNode.moveChild(child));
 
                 if (jmxNode.children.length > 0) {
                   jmxNode.sortChildren(false);
@@ -315,7 +316,7 @@ namespace Camel {
               }
             }
           });
-          folder.children.splice(0, 0, rootFolder);
+          domain.children.splice(0, 0, rootFolder);
         }
       }
     });
