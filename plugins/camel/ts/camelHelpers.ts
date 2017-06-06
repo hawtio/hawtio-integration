@@ -717,7 +717,7 @@ namespace Camel {
    * @param {Workspace} workspace
    * @param {Folder} folder
    */
-  export function getExpandingFolderCamelContextMBean(workspace: Jmx.Workspace, folder: Jmx.Folder) : string {
+  export function getExpandingFolderCamelContextMBean(workspace: Jmx.Workspace, folder: Jmx.Folder): string {
     if (folder.entries && folder.entries['type'] === 'routes') {
       const context = workspace.tree.findDescendant(node => node.typeName === 'context'
         && node.domain === 'org.apache.camel'
@@ -729,7 +729,7 @@ namespace Camel {
     return null;
   }
 
-  export function getSelectionCamelContextEndpoints(workspace: Jmx.Workspace) : Jmx.NodeSelection {
+  export function getSelectionCamelContextEndpoints(workspace: Jmx.Workspace): Jmx.NodeSelection {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -737,7 +737,7 @@ namespace Camel {
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
-          return tree.navigate(domain, contextId, "endpoints");
+          return tree.navigate(domain, 'Camel Contexts', contextId, 'endpoints');
         }
       }
     }
@@ -749,7 +749,7 @@ namespace Camel {
    * @method
    */
     // TODO Should be a service
-  export function getSelectionCamelTraceMBean(workspace: Jmx.Workspace) : string {
+  export function getSelectionCamelTraceMBean(workspace: Jmx.Workspace): string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -758,9 +758,9 @@ namespace Camel {
         var domain = selection.domain;
         if (domain && contextId) {
           // look for the Camel 2.11 mbean which we prefer
-          var result = tree.navigate(domain, contextId, "tracer");
+          var result = tree.navigate(domain, 'Camel Contexts', contextId, 'MBeans', 'tracer');
           if (result && result.children) {
-            var mbean = _.find(result.children, m => _.startsWith(m.text, "BacklogTracer"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, 'BacklogTracer'));
             if (mbean) {
               return mbean.objectName;
             }
@@ -771,7 +771,7 @@ namespace Camel {
     return null;
   }
 
-  export function getSelectionCamelDebugMBean(workspace: Jmx.Workspace) : string {
+  export function getSelectionCamelDebugMBean(workspace: Jmx.Workspace): string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -779,9 +779,9 @@ namespace Camel {
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "tracer");
+          var result = tree.navigate(domain, 'Camel Contexts', contextId, 'MBeans', 'tracer');
           if (result && result.children) {
-            var mbean = _.find(result.children, m => _.startsWith(m.text, "BacklogDebugger"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, 'BacklogDebugger'));
             if (mbean) {
               return mbean.objectName;
             }
@@ -792,7 +792,7 @@ namespace Camel {
     return null;
   }
 
-  export function getSelectionCamelTypeConverter(workspace: Jmx.Workspace) : string {
+  export function getSelectionCamelTypeConverter(workspace: Jmx.Workspace): string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -800,9 +800,9 @@ namespace Camel {
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "services");
+          var result = tree.navigate(domain, 'Camel Contexts', contextId, 'MBeans', 'services');
           if (result && result.children) {
-            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultTypeConverter"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, 'DefaultTypeConverter'));
             if (mbean) {
               return mbean.objectName;
             }
@@ -813,7 +813,7 @@ namespace Camel {
     return null;
   }
 
-  export function getSelectionCamelRestRegistry(workspace: Jmx.Workspace) : string {
+  export function getSelectionCamelRestRegistry(workspace: Jmx.Workspace): string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -821,9 +821,9 @@ namespace Camel {
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "services");
+          var result = tree.navigate(domain, 'Camel Contexts', contextId, 'MBeans', 'services');
           if (result && result.children) {
-            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultRestRegistry"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, 'DefaultRestRegistry'));
             if (mbean) {
               return mbean.objectName;
             }
@@ -842,9 +842,9 @@ namespace Camel {
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "services");
+          var result = tree.navigate(domain, 'Camel Contexts', contextId, 'MBeans', 'services');
           if (result && result.children) {
-            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultRuntimeEndpointRegistry"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, 'DefaultRuntimeEndpointRegistry'));
             if (mbean) {
               return mbean.objectName;
             }
@@ -855,7 +855,7 @@ namespace Camel {
     return null;
   }
 
-  export function getSelectionCamelInflightRepository(workspace: Jmx.Workspace) : string {
+  export function getSelectionCamelInflightRepository(workspace: Jmx.Workspace): string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -863,9 +863,9 @@ namespace Camel {
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "services");
+          var result = tree.navigate(domain, 'Camel Contexts', contextId, 'MBeans', 'services');
           if (result && result.children) {
-            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultInflightRepository"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, 'DefaultInflightRepository'));
             if (mbean) {
               return mbean.objectName;
             }
@@ -876,7 +876,7 @@ namespace Camel {
     return null;
   }
 
-  export function getSelectionCamelBlockedExchanges(workspace: Jmx.Workspace) : string {
+  export function getSelectionCamelBlockedExchanges(workspace: Jmx.Workspace): string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -884,9 +884,9 @@ namespace Camel {
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "services");
+          var result = tree.navigate(domain, 'Camel Contexts', contextId, 'MBeans', 'services');
           if (result && result.children) {
-            var mbean = _.find(result.children, m => _.startsWith(m.text, "DefaultAsyncProcessorAwaitManager"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, 'DefaultAsyncProcessorAwaitManager'));
             if (mbean) {
               return mbean.objectName;
             }
@@ -897,7 +897,7 @@ namespace Camel {
     return null;
   }
 
-  export function getSelectionCamelRouteMetrics(workspace: Jmx.Workspace) : string {
+  export function getSelectionCamelRouteMetrics(workspace: Jmx.Workspace): string {
     if (workspace) {
       var contextId = getContextId(workspace);
       var selection = workspace.selection;
@@ -905,9 +905,9 @@ namespace Camel {
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "services");
+          var result = tree.navigate(domain, 'Camel Contexts', contextId, 'MBeans', 'services');
           if (result && result.children) {
-            var mbean = _.find(result.children, m => _.startsWith(m.text, "MetricsRegistryService"));
+            var mbean = _.find(result.children, m => _.startsWith(m.text, 'MetricsRegistryService'));
             if (mbean) {
               return mbean.objectName;
             }
@@ -937,7 +937,7 @@ namespace Camel {
           if (folderNames && folderNames.length > 1) {
             contextId = folderNames[1];
           } else if (children && children.length > 0 && children[0].entries) {
-            contextId = children[0].entries["context"];
+            contextId = children[0].entries['context'];
           }
         }
       }
@@ -1000,7 +1000,7 @@ namespace Camel {
       if (tree && selection) {
         var domain = selection.domain;
         if (domain && contextId) {
-          var result = tree.navigate(domain, contextId, "routes");
+          var result = tree.navigate(domain, 'Camel Contexts', contextId, 'routes');
           if (result && result.children) {
             var mbean = _.find(result.children, m => m.text === routeId);
             if (mbean) {
