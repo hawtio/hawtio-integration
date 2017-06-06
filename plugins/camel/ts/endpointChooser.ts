@@ -289,8 +289,7 @@ namespace Camel {
       if (!profileWorkspace) {
         var remoteJolokia = $scope.jolokia;
         if (remoteJolokia) {
-          profileWorkspace = Jmx.createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location,
-            localStorage);
+          profileWorkspace = Jmx.createRemoteWorkspace(remoteJolokia, $location, localStorage);
           $scope.profileWorkspace = profileWorkspace;
         }
       }
