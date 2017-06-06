@@ -410,11 +410,6 @@ declare namespace Camel {
      */
     function camelContextMBeansByRouteId(workspace: Jmx.Workspace): {};
     /**
-     * Returns an object for the given processor from the Camel tree
-     * @method
-     */
-    function camelProcessorMBeansById(workspace: Jmx.Workspace): {};
-    /**
      * Returns true if we should ignore ID values for labels in camel diagrams
      * @method
      */

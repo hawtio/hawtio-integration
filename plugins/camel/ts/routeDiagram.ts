@@ -75,7 +75,6 @@ namespace Camel {
         $scope.nodes = {};
         var nodes = [];
         var links = [];
-        $scope.processorTree = camelProcessorMBeansById(workspace);
         Camel.addRouteXmlChildren($scope, routeXmlNode, nodes, links, null, 0, 0);
         showGraph(nodes, links);
       } else if ($scope.mbean) {
@@ -102,7 +101,6 @@ namespace Camel {
       }
       if (data) {
         var doc = $.parseXML(data);
-        $scope.processorTree = camelProcessorMBeansById(workspace);
         Camel.loadRouteXmlNodes($scope, doc, selectedRouteId, nodes, links, $element.width());
         showGraph(nodes, links);
       } else {
