@@ -303,7 +303,7 @@ declare namespace Camel {
     /**
      * Returns the mbean for the given camel context ID or null if it cannot be found
      */
-    function getCamelContextMBean(workspace: Jmx.Workspace, camelContextId: any): string;
+    function getCamelContextMBean(workspace: Jmx.Workspace, camelContextId: any): string | null;
     /**
      * Returns the link to browse the endpoint full screen
      */

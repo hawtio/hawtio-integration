@@ -450,11 +450,7 @@ namespace Camel {
     var answer = null;
     var root = getRootCamelFolder(workspace);
     if (root && camelContextId) {
-        angular.forEach(root.children, (contextFolder) => {
-          if (!answer && camelContextId === contextFolder.text) {
-            answer = contextFolder;
-          }
-        });
+        return root.findDescendant(node => camelContextId === node.text) as Jmx.Folder;
     }
     return answer;
   }
@@ -462,14 +458,10 @@ namespace Camel {
   /**
    * Returns the mbean for the given camel context ID or null if it cannot be found
    */
-  export function getCamelContextMBean(workspace: Jmx.Workspace, camelContextId) {
-    var contextsFolder = getCamelContextFolder(workspace, camelContextId);
+  export function getCamelContextMBean(workspace: Jmx.Workspace, camelContextId): string | null {
+    const contextsFolder = getCamelContextFolder(workspace, camelContextId);
     if (contextsFolder) {
-      var contextFolder = contextsFolder.navigate("context");
-      if (contextFolder && contextFolder.children && contextFolder.children.length) {
-        var contextItem = contextFolder.children[0];
-        return contextItem.objectName;
-      }
+      return contextsFolder.objectName;
     }
     return null;
   }
@@ -1183,21 +1175,17 @@ namespace Camel {
    * @method
    */
   export function camelContextMBeansById(workspace: Jmx.Workspace) {
-    var answer = {};
-    var tree = workspace.tree;
+    const answer = {};
+    const tree = workspace.tree;
     if (tree) {
-      var camelTree = tree.navigate(Camel.jmxDomain);
-      if (camelTree) {
-        angular.forEach(camelTree.children, (contextsFolder: Jmx.Folder) => {
-          var contextFolder = contextsFolder.navigate("context");
-          if (contextFolder && contextFolder.children && contextFolder.children.length) {
-            var contextItem = contextFolder.children[0];
-            var id = Core.pathGet(contextItem, ["entries", "name"]) || contextItem.key;
-            if (id) {
-              answer[id] = {
-                folder: contextItem,
-                mbean: contextItem.objectName
-              }
+      const contexts = tree.navigate(Camel.jmxDomain, 'Camel Contexts');
+      if (contexts) {
+        angular.forEach(contexts.children, (context: Jmx.Folder) => {
+          const id = Core.pathGet(context, ['entries', 'name']) || context.key;
+          if (id) {
+            answer[id] = {
+              folder: context,
+              mbean: context.objectName
             }
           }
         });
@@ -1206,13 +1194,12 @@ namespace Camel {
     return answer;
   }
 
-
   /**
    * Returns an object of all the CamelContext MBeans keyed by the component name
    * @method
    */
   export function camelContextMBeansByComponentName(workspace: Jmx.Workspace) {
-    return camelContextMBeansByRouteOrComponentId(workspace, "components")
+    return camelContextMBeansByRouteOrComponentId(workspace, 'components')
   }
 
   /**
@@ -1220,28 +1207,26 @@ namespace Camel {
    * @method
    */
   export function camelContextMBeansByRouteId(workspace: Jmx.Workspace) {
-    return camelContextMBeansByRouteOrComponentId(workspace, "routes")
+    return camelContextMBeansByRouteOrComponentId(workspace, 'routes')
   }
 
   function camelContextMBeansByRouteOrComponentId(workspace: Jmx.Workspace, componentsOrRoutes: string) {
-    var answer = {};
-    var tree = workspace.tree;
+    const answer = {};
+    const tree = workspace.tree;
     if (tree) {
-      var camelTree = tree.navigate(Camel.jmxDomain);
-      if (camelTree) {
-        angular.forEach(camelTree.children, (contextsFolder: Jmx.Folder) => {
-          var contextFolder = contextsFolder.navigate("context");
-          var componentsFolder = contextsFolder.navigate(componentsOrRoutes);
-          if (contextFolder && componentsFolder && contextFolder.children && contextFolder.children.length) {
-            var contextItem = contextFolder.children[0];
-            var mbean = contextItem.objectName;
+      const contexts = tree.navigate(Camel.jmxDomain, 'Camel Contexts');
+      if (contexts) {
+        angular.forEach(contexts.children, (context: Jmx.Folder) => {
+          const components = context.navigate(componentsOrRoutes);
+          if (context && components && context.children && context.children.length) {
+            const mbean = context.objectName;
             if (mbean) {
-              var contextValues = {
-                folder: contextItem,
+              const contextValues = {
+                folder: context,
                 mbean: mbean
               };
-              angular.forEach(componentsFolder.children, (componentFolder) => {
-                var id = componentFolder.text;
+              angular.forEach(components.children, componentFolder => {
+                const id = componentFolder.text;
                 if (id) {
                   answer[id] = contextValues;
                 }
