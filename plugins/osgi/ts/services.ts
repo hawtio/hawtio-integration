@@ -17,56 +17,6 @@ module Osgi {
     $scope.workspace = workspace;
     $scope.services = null;
 
-    /*
-        {
-          field: 'Identifier',
-          displayName: 'ID'
-          //width: "***"
-          //width: 300
-        },
-        {
-          field: 'BundleIdentifier',
-          displayName: 'Bundle',
-          cellTemplate: `
-            <div class="ngCellText">
-              <a ng-href="{{row.entity.Url}}">{{row.entity.Identifier}}</a>
-            </div>`
-          //width: "***"
-          //width: 300
-        },
-        {
-          field: 'objectClass',
-          displayName: 'Object Class(es)',
-          cellTemplate: `
-            <div class="ngCellText">
-              <div ng-repeat="clazz in row.entity.objectClass">
-                <span>
-                  {{clazz}}
-                </span>
-              </div>
-            </div>`
-
-          //width: "***"
-          //width: 300
-        },
-        {
-          field: 'UsingBundles',
-          displayName: 'Used by',
-          cellTemplate: `
-            <div class="ngCellText">
-              <div ng-repeat="bundle in row.entity.UsingBundles">
-                <a ng-href="{{bundle.Url}}">{{bundle.Name || bundle.SymbolicName || bundle.Identifier}}</a>
-                <!--
-                <pre>
-                  {{bundle}}
-                </pre>
-                  -->
-              </div>
-            </div>`
-        }
-      ],
-        */
-
     var populateTable = function(response) {
       var services = Osgi.defaultServiceValues(workspace, $scope, response.value);
       augmentServicesInfo(services);
