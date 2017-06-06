@@ -42,12 +42,6 @@ namespace Camel {
       //$timeout(updateRoutes, delayUpdatingRoutes, false);
     });
 
-    $scope.$watch('workspace.selection', function () {
-      if ($scope.isJmxTab && workspace.moveIfViewInvalid()) return;
-      updateRoutes();
-      //$timeout(updateRoutes, delayUpdatingRoutes, false);
-    });
-
     $scope.$on('jmxTreeUpdated', function () {
       updateRoutes();
       //$timeout(updateRoutes, delayUpdatingRoutes, false);

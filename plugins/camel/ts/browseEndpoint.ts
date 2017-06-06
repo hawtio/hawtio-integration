@@ -19,11 +19,6 @@ namespace Camel {
     $scope.endpointPath = $routeParams["endpointPath"];
     $scope.isJmxTab = !$routeParams["contextId"] || !$routeParams["endpointPath"];
 
-    $scope.$watch('workspace.selection', function () {
-      if ($scope.isJmxTab && workspace.moveIfViewInvalid()) return;
-      loadData();
-    });
-
     // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
     $scope.openMessageDialog = (message) => {
       ActiveMQ.selectCurrentMessage(message, "id", $scope);

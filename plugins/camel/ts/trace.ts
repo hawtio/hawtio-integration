@@ -46,14 +46,6 @@ namespace Camel {
       Core.$apply($scope);
     };
 
-    $scope.$watch('workspace.selection', function () {
-      if (workspace.moveIfViewInvalid()) {
-        return;
-      }
-      $scope.messages = tracerStatus.messages;
-      reloadTracingFlag();
-    });
-
     // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
     $scope.openMessageDialog = (message, index) => {
       console.log(message, index);

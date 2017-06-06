@@ -53,13 +53,6 @@ namespace Camel {
       });
     });
 
-    $scope.$watch('workspace.selection', function () {
-      if (workspace.moveIfViewInvalid()) {
-        return;
-      }
-      reloadData();
-    });
-
     $scope.toggleBreakpoint = (id) => {
       log.info("Toggle breakpoint");
       var mbean = getSelectionCamelDebugMBean(workspace);

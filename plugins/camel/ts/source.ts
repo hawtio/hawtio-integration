@@ -14,11 +14,6 @@ namespace Camel {
       setTimeout(updateRoutes, 50);
     });
 
-    $scope.$watch('workspace.selection', function () {
-      if (workspace.moveIfViewInvalid()) return;
-      updateRoutes();
-    });
-    
     function getSource(routeXmlNode) {
       function removeCrappyHeaders(idx, e) {
         var answer = e.getAttribute("customId");

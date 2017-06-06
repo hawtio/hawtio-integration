@@ -67,19 +67,6 @@ module Osgi {
       ],
         */
 
-    $scope.$watch('workspace.selection', function() {
-      var mbean = getSelectionServiceMBean(workspace);
-      if (mbean) {
-        var jolokia = workspace.jolokia;
-        jolokia.request({
-              type: 'exec',
-              mbean: mbean,
-              operation: 'listServices()'
-            },
-            Core.onSuccess(populateTable));
-      }
-    });
-
     var populateTable = function(response) {
       var services = Osgi.defaultServiceValues(workspace, $scope, response.value);
       augmentServicesInfo(services);

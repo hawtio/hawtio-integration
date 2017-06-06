@@ -98,12 +98,6 @@ namespace Camel {
       return answer;
     };
 
-
-    $scope.$watch('workspace.selection', function () {
-      // if the current JMX selection does not support sending messages then lets redirect the page
-      workspace.moveIfViewInvalid();
-    });
-
     /* save the sourceFormat in preferences for later
      * Note, this would be controller specific preferences and not the global, overriding, preferences */
       // TODO Use ng-selected="changeSourceFormat()" - Although it seemed to fire multiple times..

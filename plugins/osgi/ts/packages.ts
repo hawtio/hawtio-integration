@@ -40,10 +40,6 @@ module Osgi {
       }
     };
 
-    $scope.$watch('workspace.selection', function() {
-      updateTableContents();
-    });
-
     $scope.appendItems = function() {
       let numRemainingItems = $scope.filteredPackages.length - $scope.scrollablePackages.length;
       if (numRemainingItems > 0) {
@@ -152,18 +148,5 @@ module Osgi {
       $scope.scrollablePackages = $scope.filteredPackages.slice(0, INFINITE_SCROLL_INITIAL_SIZE);
     }
 
-    function updateTableContents() {
-      var mbean = getSelectionPackageMBean(workspace);
-      if (mbean) {
-        var jolokia = workspace.jolokia;
-        // bundles first:
-        jolokia.request({
-              type: 'exec',
-              mbean: mbean,
-              operation: 'listPackages'
-            },
-            Core.onSuccess(populateTable));
-      }
-    }
   }]);
 }

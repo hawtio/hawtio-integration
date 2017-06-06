@@ -102,11 +102,6 @@ module ActiveMQ {
     var flattenColumns = ["BooleanProperties", "ByteProperties", "ShortProperties", "IntProperties", "LongProperties", "FloatProperties",
       "DoubleProperties", "StringProperties"];
 
-    $scope.$watch('workspace.selection', function () {
-      // lets defer execution as we may not have the selection just yet
-      setTimeout(loadTable, 50);
-    });
-
     $scope.$watch('gridOptions.filterOptions.filterText', (filterText) => {
       filterMessages(filterText);
     });

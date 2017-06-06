@@ -118,17 +118,7 @@ module ActiveMQ {
       }));
     };
 
-    $scope.topicNames = (completionText) => {
-      return retrieveTopicNames(workspace, false);
-    };
-
-
-    $scope.$watch('workspace.selection', function () {
-      if (workspace.moveIfViewInvalid()) return;
-
-      // lets defer execution as we may not have the selection just yet
-      setTimeout(loadTable, 50);
-    });
+    $scope.topicNames = (completionText) => retrieveTopicNames(workspace, false);
 
     function loadTable() {
       var mbean = getBrokerMBean(workspace, jolokia, amqJmxDomain);

@@ -64,13 +64,6 @@ module ActiveMQ {
       primaryKeyFn: entity => entity.jobId
     };
 
-    $scope.$watch('workspace.selection', function () {
-      if (workspace.moveIfViewInvalid()) return;
-
-      // lets defer execution as we may not have the selection just yet
-      setTimeout(loadTable, 50);
-    });
-
     function loadTable() {
       var selection = workspace.selection;
       if (selection) {

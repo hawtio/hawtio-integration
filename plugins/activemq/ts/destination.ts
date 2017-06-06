@@ -30,12 +30,6 @@ module ActiveMQ {
       updateQueueType();
     });
 
-    $scope.$watch('workspace.selection', function () {
-      workspace.moveIfViewInvalid();
-      $scope.queueType = (isTopicsFolder(workspace) || isTopic(workspace)) ? "false" : "true";
-      $scope.name = Core.pathGet(workspace, ['selection', 'title']);
-    });
-
     function operationSuccess() {
       $scope.destinationName = "";
       $scope.workspace.operationCounter += 1;

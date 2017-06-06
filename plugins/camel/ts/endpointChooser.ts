@@ -212,10 +212,6 @@ namespace Camel {
 
     var silentOptions = {silent: true};
 
-    $scope.$watch('workspace.selection', function () {
-      $scope.loadEndpointNames();
-    });
-
     $scope.$watch('selectedComponentName', () => {
       if ($scope.selectedComponentName !== $scope.loadedComponentName) {
         $scope.endpointParameters = {};
