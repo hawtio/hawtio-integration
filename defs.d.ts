@@ -271,12 +271,6 @@ declare namespace Camel {
      */
     function isRouteNode(workspace: Jmx.Workspace): boolean;
     /**
-     * Flushes the cached Camel XML route node stored in the selected tree Folder
-     * @method
-     * @param workspace
-     */
-    function clearSelectedRouteNode(workspace: Jmx.Workspace): void;
-    /**
      * Looks up the given node name in the Camel schema
      * @method
      */
@@ -287,13 +281,6 @@ declare namespace Camel {
      * @method
      */
     function isCamelPattern(nodeId: any): boolean;
-    /**
-     * Returns true if the given node type prefers adding the next sibling as a child
-     * @method
-     */
-    function isNextSiblingAddedAsChild(nodeIdOrDefinition: any): any;
-    function acceptInput(nodeIdOrDefinition: any): any;
-    function acceptOutput(nodeIdOrDefinition: any): any;
     /**
      * Looks up the Camel language settings for the given language name
      * @method
@@ -317,11 +304,6 @@ declare namespace Camel {
      * Returns the mbean for the given camel context ID or null if it cannot be found
      */
     function getCamelContextMBean(workspace: Jmx.Workspace, camelContextId: any): string;
-    /**
-     * Given a selection in the workspace try figure out the URL to the
-     * full screen view
-     */
-    function linkToFullScreenView(workspace: Jmx.Workspace): string;
     /**
      * Returns the link to browse the endpoint full screen
      */
@@ -373,13 +355,6 @@ declare namespace Camel {
     function getSelectionCamelBlockedExchanges(workspace: Jmx.Workspace): string;
     function getSelectionCamelRouteMetrics(workspace: Jmx.Workspace): string;
     function getContextId(workspace: Jmx.Workspace): any;
-    /**
-     * Returns true if the state of the item begins with the given state - or one of the given states
-     * @method
-     * @param item the item which has a State
-     * @param state a value or an array of states
-     */
-    function isState(item: any, state: any): boolean;
     function iconClass(state: string): "green fa fa-play-circle" | "fa fa-pause" | "orange fa fa-off";
     function getSelectedRouteId(workspace: Jmx.Workspace, folder?: Jmx.NodeSelection): any;
     /**
@@ -419,16 +394,6 @@ declare namespace Camel {
     };
     function loadRouteXmlNodes($scope: any, doc: any, selectedRouteId: any, nodes: any, links: any, width: any): void;
     function addRouteXmlChildren($scope: any, parent: any, nodes: any, links: any, parentId: any, parentX: any, parentY: any, parentNode?: any): any[];
-    /**
-     * Recursively add all the folders which have a cid value into the given map
-     * @method
-     */
-    function addFoldersToIndex(folder: Jmx.Folder, map?: {}): {};
-    /**
-     * Re-generates the XML document using the given Tree widget Node or Folder as the source
-     * @method
-     */
-    function generateXmlFromFolder(treeNode: any): any;
     /**
      * Returns an object of all the CamelContext MBeans keyed by their id
      * @method

@@ -26,7 +26,6 @@ namespace Camel {
     next();
   });
 
-
   /**
    * Returns if the given CamelContext has any rest services
    *
@@ -351,18 +350,6 @@ namespace Camel {
   }
 
   /**
-   * Flushes the cached Camel XML route node stored in the selected tree Folder
-   * @method
-   * @param workspace
-   */
-  export function clearSelectedRouteNode(workspace: Jmx.Workspace) {
-    var selection = workspace.selection;
-    if (selection && jmxDomain === selection.domain) {
-      delete selection["routeXmlNode"];
-    }
-  }
-
-  /**
    * Looks up the given node name in the Camel schema
    * @method
    */
@@ -377,34 +364,6 @@ namespace Camel {
    */
   export function isCamelPattern(nodeId) {
     return Forms.lookupDefinition(nodeId, _apacheCamelModel) != null;
-  }
-
-  /**
-   * Returns true if the given node type prefers adding the next sibling as a child
-   * @method
-   */
-  export function isNextSiblingAddedAsChild(nodeIdOrDefinition) {
-    var definition = getCamelSchema(nodeIdOrDefinition);
-    if (definition) {
-      return definition["nextSiblingAddedAsChild"] || false
-    }
-    return null;
-  }
-
-  export function acceptInput(nodeIdOrDefinition) {
-    var definition = getCamelSchema(nodeIdOrDefinition);
-    if (definition) {
-      return definition["acceptInput"] || false
-    }
-    return null;
-  }
-
-  export function acceptOutput(nodeIdOrDefinition) {
-    var definition = getCamelSchema(nodeIdOrDefinition);
-    if (definition) {
-      return definition["acceptOutput"] || false
-    }
-    return null;
   }
 
   /**
@@ -515,32 +474,6 @@ namespace Camel {
     return null;
   }
 
-
-  /**
-   * Given a selection in the workspace try figure out the URL to the
-   * full screen view
-   */
-  export function linkToFullScreenView(workspace: Jmx.Workspace) {
-    var answer: string = null;
-    var selection = workspace.selection;
-    if (selection) {
-      var entries = selection.entries;
-      if (entries) {
-        var contextId = entries["context"];
-        var name = entries["name"];
-        var type = entries["type"];
-        if ("endpoints" === type) {
-          return linkToBrowseEndpointFullScreen(contextId, name);
-        }
-        if ("routes" === type) {
-          return linkToRouteDiagramFullScreen(contextId, name);
-        }
-        // TODO a default page for a context?
-      }
-    }
-    return answer;
-  }
-
   /**
    * Returns the link to browse the endpoint full screen
    */
@@ -551,7 +484,6 @@ namespace Camel {
     }
     return answer;
   }
-
 
   /**
    * Returns the link to the route diagram full screen
@@ -945,21 +877,6 @@ namespace Camel {
     return contextId;
   }
 
-  /**
-   * Returns true if the state of the item begins with the given state - or one of the given states
-   * @method
-   * @param item the item which has a State
-   * @param state a value or an array of states
-   */
-  export function isState(item, state) {
-    var value = (item.State || "").toLowerCase();
-    if (angular.isArray(state)) {
-      return state.some((stateText) => _.startsWith(value, stateText));
-    } else {
-      return _.startsWith(value, state);
-    }
-  }
-
   export function iconClass(state:string) {
     if (state) {
       switch (state.toLowerCase()) {
@@ -1259,74 +1176,6 @@ namespace Camel {
       }
     });
     return siblingNodes;
-  }
-
-  /**
-   * Recursively add all the folders which have a cid value into the given map
-   * @method
-   */
-  export function addFoldersToIndex(folder: Jmx.Folder, map = {}) {
-    if (folder) {
-      var key = folder.key
-      if (key) {
-        map[key] = folder;
-      }
-      angular.forEach(folder.children, (child: Jmx.Folder) => addFoldersToIndex(child, map));
-    }
-    return map;
-  }
-
-
-
-  /**
-   * Re-generates the XML document using the given Tree widget Node or Folder as the source
-   * @method
-   */
-  export function generateXmlFromFolder(treeNode) {
-    var folder = (treeNode && treeNode.data) ? treeNode.data : treeNode;
-    if (!folder) return null;
-    var doc = folder["xmlDocument"];
-    var context = folder["routeXmlNode"];
-
-    if (context && context.length) {
-      var element = context[0];
-      var children = element.childNodes;
-      var routeIndices = [];
-      for (var i = 0; i < children.length; i++) {
-        var node = children[i];
-        var name = node.localName;
-        if ("route" === name && parent) {
-          routeIndices.push(i);
-        }
-      }
-
-      // lets go backwards removing all the text nodes on either side of each route along with the route
-      while (routeIndices.length) {
-        var idx = routeIndices.pop();
-        var nextIndex = idx + 1;
-        while (true) {
-          var node = element.childNodes[nextIndex];
-          if (Core.isTextNode(node)) {
-            element.removeChild(node);
-          } else {
-            break;
-          }
-        }
-        if (idx < element.childNodes.length) {
-          element.removeChild(element.childNodes[idx]);
-        }
-        for (var i = idx - 1; i >= 0; i--) {
-          var node = element.childNodes[i];
-          if (Core.isTextNode(node)) {
-            element.removeChild(node);
-          } else {
-            break;
-          }
-        }
-      }
-      Camel.createFolderXmlTree(treeNode, context[0]);
-    }
-    return doc;
   }
 
   /**
