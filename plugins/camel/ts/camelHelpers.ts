@@ -466,28 +466,6 @@ namespace Camel {
     return null;
   }
 
-  /**
-   * Returns the link to browse the endpoint full screen
-   */
-  export function linkToBrowseEndpointFullScreen(contextId, endpointPath) {
-    var answer: string = null;
-    if (contextId && endpointPath) {
-      answer = "#/camel/endpoint/browse/" + contextId + "/" + endpointPath;
-    }
-    return answer;
-  }
-
-  /**
-   * Returns the link to the route diagram full screen
-   */
-  export function linkToRouteDiagramFullScreen(contextId, routeId) {
-    var answer: string = null;
-    if (contextId && routeId) {
-      answer = "#/camel/route/diagram/" + contextId + "/" + routeId;
-    }
-    return answer;
-  }
-
   export function getFolderCamelNodeId(folder) {
     var answer = Core.pathGet(folder, ["routeXmlNode", "localName"]);
     return ("from" === answer || "to" === answer) ? "endpoint" : answer;

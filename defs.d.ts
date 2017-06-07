@@ -304,14 +304,6 @@ declare namespace Camel {
      * Returns the mbean for the given camel context ID or null if it cannot be found
      */
     function getCamelContextMBean(workspace: Jmx.Workspace, camelContextId: any): string | null;
-    /**
-     * Returns the link to browse the endpoint full screen
-     */
-    function linkToBrowseEndpointFullScreen(contextId: any, endpointPath: any): string;
-    /**
-     * Returns the link to the route diagram full screen
-     */
-    function linkToRouteDiagramFullScreen(contextId: any, routeId: any): string;
     function getFolderCamelNodeId(folder: any): any;
     /**
      * Rebuilds the DOM tree from the tree node and performs all the various hacks
@@ -1357,32 +1349,6 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Camel {
-    class Property {
-        name: string;
-        value: string;
-        description: string;
-        constructor(name: string, value: string, description: string);
-        static sortByName(a: any, b: any): 1 | -1 | 0;
-    }
-}
-declare namespace Camel {
-    class PropertiesService {
-        getDefinedProperties(schemaProperties: {}): Property[];
-        getDefaultProperties(schemaProperties: {}): Property[];
-        getUndefinedProperties(schemaProperties: {}): Property[];
-    }
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
     class Route {
         name: string;
         state: string;
@@ -1475,6 +1441,32 @@ declare namespace Camel {
         template: string;
         controller: typeof RoutesController;
     };
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+    class Property {
+        name: string;
+        value: string;
+        description: string;
+        constructor(name: string, value: string, description: string);
+        static sortByName(a: any, b: any): 1 | -1 | 0;
+    }
+}
+declare namespace Camel {
+    class PropertiesService {
+        getDefinedProperties(schemaProperties: {}): Property[];
+        getDefaultProperties(schemaProperties: {}): Property[];
+        getUndefinedProperties(schemaProperties: {}): Property[];
+    }
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
 }
 declare namespace Camel {
 }
