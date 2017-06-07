@@ -474,8 +474,6 @@ declare namespace Camel {
     var _module: ng.IModule;
 }
 declare namespace Camel {
-}
-declare namespace Camel {
     var BrowseEndpointController: ng.IModule;
 }
 declare namespace Camel {
