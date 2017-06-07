@@ -12,6 +12,7 @@ namespace Camel {
       jolokia: Jolokia.IJolokia) => {
 
     Camel.initEndpointChooserScope($scope, $location, localStorage, workspace, jolokia);
+    $scope.loadEndpointNames();
 
     $scope.workspace = workspace;
     $scope.message = "";

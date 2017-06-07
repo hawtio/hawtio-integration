@@ -4496,6 +4496,7 @@ var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.EndpointController", ["$scope", "$location", "localStorage", "workspace", "jolokia", function ($scope, $location, localStorage, workspace, jolokia) {
             Camel.initEndpointChooserScope($scope, $location, localStorage, workspace, jolokia);
+            $scope.loadEndpointNames();
             $scope.workspace = workspace;
             $scope.message = "";
             $scope.createEndpoint = function (name) {
