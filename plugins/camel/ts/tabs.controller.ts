@@ -207,4 +207,12 @@ namespace Camel {
     return workspace.selection && workspace.selection.key === 'camelContexts';
   }
 
+  let _hasRestServices: boolean = null;
+
+  function hasRestServices(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia) {
+    if (_hasRestServices === null) {
+       _hasRestServices = Camel.hasRestServices(workspace, jolokia);
+    }
+    return _hasRestServices;
+  }
 }

@@ -18,7 +18,6 @@ namespace Camel {
   export var defaultHideOptionUnusedValue = false;
 
   export var _apacheCamelModel: any = undefined;
-  export declare var _jsonSchema: any;
 
   hawtioPluginLoader.registerPreBootstrapTask((next) => {
     Camel._apacheCamelModel = window['_apacheCamelModel'];
@@ -33,24 +32,13 @@ namespace Camel {
    * @param jolokia
    * @returns {boolean}
    */
-  var _hasRestServices: boolean = null;
   export function hasRestServices(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia): boolean {
-    if (_hasRestServices !== null) {
-      return _hasRestServices;
-    } 
-    var mbean = getSelectionCamelRestRegistry(workspace);
+    const mbean = getSelectionCamelRestRegistry(workspace);
     if (mbean) {
-      // TODO replace blocking call with kludgy workaround for now
-      jolokia.request({ 
-        type: "read", 
-        mbean: mbean, 
-        attribute: "NumberOfRestServices"
-      }, Core.onSuccess((response) => {
-        var num:number = response.value;
-        _hasRestServices = num > 0;
-      }));
+      const numberOfRestServices = jolokia.getAttribute(mbean, 'NumberOfRestServices');
+      return numberOfRestServices > 0;
     }
-    return true;
+    return false;
   }
 
   /**

@@ -205,7 +205,13 @@ declare namespace Camel {
     var defaultHideOptionDefaultValue: boolean;
     var defaultHideOptionUnusedValue: boolean;
     var _apacheCamelModel: any;
-    var _jsonSchema: any;
+    /**
+     * Returns if the given CamelContext has any rest services
+     *
+     * @param workspace
+     * @param jolokia
+     * @returns {boolean}
+     */
     function hasRestServices(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia): boolean;
     /**
      * Looks up the route XML for the given context and selected route and
@@ -1349,6 +1355,32 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Camel {
+    class Property {
+        name: string;
+        value: string;
+        description: string;
+        constructor(name: string, value: string, description: string);
+        static sortByName(a: any, b: any): 1 | -1 | 0;
+    }
+}
+declare namespace Camel {
+    class PropertiesService {
+        getDefinedProperties(schemaProperties: {}): Property[];
+        getDefaultProperties(schemaProperties: {}): Property[];
+        getUndefinedProperties(schemaProperties: {}): Property[];
+    }
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
     class Route {
         name: string;
         state: string;
@@ -1441,32 +1473,6 @@ declare namespace Camel {
         template: string;
         controller: typeof RoutesController;
     };
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-    class Property {
-        name: string;
-        value: string;
-        description: string;
-        constructor(name: string, value: string, description: string);
-        static sortByName(a: any, b: any): 1 | -1 | 0;
-    }
-}
-declare namespace Camel {
-    class PropertiesService {
-        getDefinedProperties(schemaProperties: {}): Property[];
-        getDefaultProperties(schemaProperties: {}): Property[];
-        getUndefinedProperties(schemaProperties: {}): Property[];
-    }
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
 }
 declare namespace Camel {
 }
