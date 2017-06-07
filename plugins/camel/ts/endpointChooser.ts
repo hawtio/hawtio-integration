@@ -198,7 +198,7 @@ namespace Camel {
     return schema;
   }
 
-  export function initEndpointChooserScope($scope, $location, localStorage:WindowLocalStorage, workspace: Jmx.Workspace, jolokia) {
+  export function initEndpointChooserScope($scope, $location, localStorage: WindowLocalStorage, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia) {
     $scope.selectedComponentName = null;
     $scope.endpointParameters = {};
     $scope.endpointPath = "";
@@ -209,8 +209,9 @@ namespace Camel {
     };
 
     $scope.jolokia = jolokia;
+    $scope.profileWorkspace = workspace;
 
-    var silentOptions = {silent: true};
+    const silentOptions = { silent: true };
 
     $scope.$watch('selectedComponentName', () => {
       if ($scope.selectedComponentName !== $scope.loadedComponentName) {
@@ -222,7 +223,7 @@ namespace Camel {
 
     $scope.endpointCompletions = (completionText) => {
       var answer = null;
-      var mbean = findCamelContextMBean();
+      const mbean = findCamelContextMBean();
       var componentName = $scope.selectedComponentName;
       var endpointParameters = {};
       if (mbean && componentName && completionText) {
@@ -233,16 +234,16 @@ namespace Camel {
 
     $scope.loadEndpointNames = () => {
       $scope.componentNames = null;
-      var mbean = findCamelContextMBean();
+      const mbean = findCamelContextMBean();
       if (mbean) {
-        $scope.jolokia.execute(mbean, 'findComponentNames', Core.onSuccess(onComponents, {silent: true}));
+        $scope.jolokia.execute(mbean, 'findComponentNames', Core.onSuccess(onComponents, silentOptions));
       } else {
-        console.log("WARNING: No camel context mbean so cannot load component names");
+        console.log('WARNING: No camel context mbean so cannot load component names');
       }
     };
 
     $scope.loadEndpointSchema = (componentName) => {
-      var mbean = findCamelContextMBean();
+      const mbean = findCamelContextMBean();
       if (mbean && componentName && componentName !== $scope.loadedEndpointSchema) {
         $scope.selectedComponentName = componentName;
         $scope.jolokia.execute(mbean, 'componentParameterJsonSchema', componentName, Core.onSuccess(onEndpointSchema, silentOptions));
@@ -259,7 +260,6 @@ namespace Camel {
     function onEndpointSchema(response) {
       if (response) {
         try {
-          //console.log("got JSON: " + response);
           var json = JSON.parse(response);
           var endpointName = $scope.selectedComponentName;
           configureEndpointSchema(endpointName, json);
@@ -275,7 +275,6 @@ namespace Camel {
     }
 
     function configureEndpointSchema(endpointName, json) {
-      console.log("======== configuring schema for " + endpointName);
       var config = Camel.endpointForms[endpointName];
       if (config && json) {
         if (config.tabs) {
@@ -285,7 +284,7 @@ namespace Camel {
     }
 
     function findCamelContextMBean() {
-      var profileWorkspace = $scope.profileWorkspace;
+      let profileWorkspace = $scope.profileWorkspace;
       if (!profileWorkspace) {
         var remoteJolokia = $scope.jolokia;
         if (remoteJolokia) {
@@ -307,56 +306,31 @@ namespace Camel {
         selectedRouteId = $scope.camelSelectionDetails.selectedRouteId;
       }
 
-      console.log("==== componentName " + componentName +
-              " selectedCamelContextId: " + selectedCamelContextId +
-              " selectedRouteId: " + selectedRouteId);
-
-      var contextsById = Camel.camelContextMBeansById(profileWorkspace);
+      const contextsById = Camel.camelContextMBeansById(profileWorkspace);
       if (selectedCamelContextId) {
-        var mbean = Core.pathGet(contextsById, [selectedCamelContextId, "mbean"]);
+        const mbean = Core.pathGet(contextsById, [selectedCamelContextId, 'mbean']);
         if (mbean) {
           return mbean;
         }
       }
       if (selectedRouteId) {
-        var map = Camel.camelContextMBeansByRouteId(profileWorkspace);
-        var mbean = Core.pathGet(map, [selectedRouteId, "mbean"]);
+        const map = Camel.camelContextMBeansByRouteId(profileWorkspace);
+        const mbean = Core.pathGet(map, [selectedRouteId, 'mbean']);
         if (mbean) {
           return mbean;
         }
       }
       if (componentName) {
-        var map = Camel.camelContextMBeansByComponentName(profileWorkspace);
-        var mbean = Core.pathGet(map, [componentName, "mbean"]);
+        const map = Camel.camelContextMBeansByComponentName(profileWorkspace);
+        const mbean = Core.pathGet(map, [componentName, 'mbean']);
         if (mbean) {
           return mbean;
         }
       }
 
       // NOTE we don't really know which camel context to pick, so lets just find the first one?
-      var answer = null;
-      angular.forEach(contextsById, (details, id) => {
-        var mbean = details['mbean'];
-        if (!answer && mbean) answer = mbean;
-      });
-      return answer;
-/*
-      // we could be remote to lets query jolokia
-      var results = $scope.jolokia.search("org.apache.camel:*,type=context", Core.onSuccess(null));
-      //var results = $scope.jolokia.search("org.apache.camel:*", Core.onSuccess(null));
-      if (results && results.length) {
-        console.log("===== Got results: " + results);
-        return results[0];
-      }
-
-      var mbean = Camel.getSelectionCamelContextMBean(profileWorkspace);
-      if (!mbean && $scope.findProfileCamelContext) {
-        // TODO as a hack for now lets just find any camel context we can
-        var folder = Core.getMBeanTypeFolder(profileWorkspace, Camel.jmxDomain, "context");
-        mbean = Core.pathGet(folder, ["objectName"]);
-      }
-      return mbean;
-*/
+      return _.find(_.values(contextsById).map((c: any) => c.folder),
+        (context: Jmx.Folder) => _.isString(context.objectName)).objectName;
     }
   }
 }

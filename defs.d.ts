@@ -191,7 +191,7 @@ declare namespace Camel {
     function getEndpointConfig(endpointName: any, category: any): any;
     function getEndpointCategory(endpointName: string): any;
     function getConfiguredCamelModel(): any;
-    function initEndpointChooserScope($scope: any, $location: any, localStorage: WindowLocalStorage, workspace: Jmx.Workspace, jolokia: any): void;
+    function initEndpointChooserScope($scope: any, $location: any, localStorage: WindowLocalStorage, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia): void;
 }
 declare var _apacheCamelModel: any;
 declare namespace Camel {
