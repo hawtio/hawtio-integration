@@ -306,11 +306,11 @@ namespace Camel {
         selectedRouteId = $scope.camelSelectionDetails.selectedRouteId;
       }
 
-      const contextsById = Camel.camelContextMBeansById(profileWorkspace);
+      const contexts = Camel.camelContextMBeansById(profileWorkspace);
       if (selectedCamelContextId) {
-        const mbean = Core.pathGet(contextsById, [selectedCamelContextId, 'mbean']);
-        if (mbean) {
-          return mbean;
+        const context = contexts[selectedCamelContextId];
+        if (context) {
+          return context.objectName;
         }
       }
       if (selectedRouteId) {
@@ -329,8 +329,7 @@ namespace Camel {
       }
 
       // NOTE we don't really know which camel context to pick, so lets just find the first one?
-      return _.find(_.values(contextsById).map((c: any) => c.folder),
-        (context: Jmx.Folder) => _.isString(context.objectName)).objectName;
+      return _.first(_.values(contexts)).objectName;
     }
   }
 }

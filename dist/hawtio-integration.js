@@ -2039,11 +2039,11 @@ var Camel;
                 selectedCamelContextId = $scope.camelSelectionDetails.selectedCamelContextId;
                 selectedRouteId = $scope.camelSelectionDetails.selectedRouteId;
             }
-            var contextsById = Camel.camelContextMBeansById(profileWorkspace);
+            var contexts = Camel.camelContextMBeansById(profileWorkspace);
             if (selectedCamelContextId) {
-                var mbean = Core.pathGet(contextsById, [selectedCamelContextId, 'mbean']);
-                if (mbean) {
-                    return mbean;
+                var context = contexts[selectedCamelContextId];
+                if (context) {
+                    return context.objectName;
                 }
             }
             if (selectedRouteId) {
@@ -2061,7 +2061,7 @@ var Camel;
                 }
             }
             // NOTE we don't really know which camel context to pick, so lets just find the first one?
-            return _.find(_.values(contextsById).map(function (c) { return c.folder; }), function (context) { return _.isString(context.objectName); }).objectName;
+            return _.first(_.values(contexts)).objectName;
         }
     }
     Camel.initEndpointChooserScope = initEndpointChooserScope;
@@ -3222,10 +3222,7 @@ var Camel;
                 angular.forEach(contexts.children, function (context) {
                     var id = Core.pathGet(context, ['entries', 'name']) || context.key;
                     if (id) {
-                        answer[id] = {
-                            folder: context,
-                            mbean: context.objectName
-                        };
+                        answer[id] = context;
                     }
                 });
             }
@@ -6502,7 +6499,6 @@ var Camel;
                     if (rootFolder) {
                         var treeElement = $('#cameltree');
                         Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
-                        // lets do this asynchronously to avoid Error: $digest already in progress
                         updateSelectionFromURL();
                     }
                 }

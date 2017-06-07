@@ -1140,7 +1140,7 @@ namespace Camel {
    * Returns an object of all the CamelContext MBeans keyed by their id
    * @method
    */
-  export function camelContextMBeansById(workspace: Jmx.Workspace) {
+  export function camelContextMBeansById(workspace: Jmx.Workspace): { [id: string]: Jmx.Folder } {
     const answer = {};
     const tree = workspace.tree;
     if (tree) {
@@ -1149,10 +1149,7 @@ namespace Camel {
         angular.forEach(contexts.children, (context: Jmx.Folder) => {
           const id = Core.pathGet(context, ['entries', 'name']) || context.key;
           if (id) {
-            answer[id] = {
-              folder: context,
-              mbean: context.objectName
-            }
+            answer[id] = context;
           }
         });
       }

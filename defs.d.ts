@@ -396,7 +396,9 @@ declare namespace Camel {
      * Returns an object of all the CamelContext MBeans keyed by their id
      * @method
      */
-    function camelContextMBeansById(workspace: Jmx.Workspace): {};
+    function camelContextMBeansById(workspace: Jmx.Workspace): {
+        [id: string]: Jmx.Folder;
+    };
     /**
      * Returns an object of all the CamelContext MBeans keyed by the component name
      * @method

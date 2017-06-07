@@ -85,7 +85,6 @@ namespace Camel {
         if (rootFolder) {
           const treeElement = $('#cameltree');
           Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
-          // lets do this asynchronously to avoid Error: $digest already in progress
           updateSelectionFromURL();
         }
       }
