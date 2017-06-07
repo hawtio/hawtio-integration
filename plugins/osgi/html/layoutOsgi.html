@@ -1,28 +1,28 @@
 <div class="osgi-nav-main">
   <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Karaf.NavBarController">
     <li ng-class='{active : isActive("/osgi/bundle")}'>
-        <a ng-href="/osgi/bundles{{hash}}">Bundles</a>
+        <a href="" ng-click="goto('/osgi/bundles')">Bundles</a>
     </li>
     <li ng-class='{active : isActive("/osgi/features") || isActive("/osgi/feature")}' ng-show="isFeaturesEnabled">
-      <a ng-href="/osgi/features{{hash}}">Features</a>
+      <a href="" ng-click="goto('/osgi/features')">Features</a>
     </li>
     <li ng-class='{active : isActive("/osgi/package")}'>
-        <a ng-href="/osgi/packages{{hash}}">Packages</a>
+      <a href="" ng-click="goto('/osgi/packages')">Packages</a>
     </li>
     <li ng-class='{active : isActive("/osgi/service")}'>
-        <a ng-href="/osgi/services{{hash}}">Services</a>
+      <a href="" ng-click="goto('/osgi/services')">Services</a>
     </li>
     <li ng-class='{active : isActive("/osgi/scr-components")}' ng-show="isScrEnabled">
-      <a ng-href="/osgi/scr-components{{hash}}">Declarative Services</a>
+      <a href="" ng-click="goto('/osgi/scr-components')">Declarative Services</a>
     </li>
     <li ng-class='{active : isActive("/osgi/server")}'>
-      <a ng-href="/osgi/server{{hash}}">Server</a>
+      <a href="" ng-click="goto('/osgi/server')">Server</a>
     </li>
     <li ng-class='{active : isActive("/osgi/fwk")}'>
-        <a ng-href="/osgi/fwk{{hash}}">Framework</a>
+      <a href="" ng-click="goto('/osgi/fwk')">Framework</a>
     </li>
     <li ng-class='{active : isActive("/osgi/configuration") || isPrefixActive("/osgi/pid")}'>
-        <a ng-href="/osgi/configurations{{hash}}">Configuration</a>
+      <a href="" ng-click="goto('/osgi/configurations')">Configuration</a>
     </li>
     <li class="dropdown overflow">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown">

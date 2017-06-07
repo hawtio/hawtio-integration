@@ -7,7 +7,8 @@
  */
 module Karaf {
 
-  _module.controller("Karaf.NavBarController", ["$scope", "workspace", ($scope, workspace: Jmx.Workspace) => {
+  _module.controller("Karaf.NavBarController", ["$scope", "$location", "workspace", ($scope, $location,
+    workspace: Jmx.Workspace) => {
 
     $scope.hash = workspace.hash();
 
@@ -19,12 +20,10 @@ module Karaf {
       $scope.hash = workspace.hash();
     });
 
-    $scope.isActive = (nav) => {
-      return workspace.isLinkActive(nav);
-    };
+    $scope.isActive = (path: string) => workspace.isLinkActive(path);
 
-    $scope.isPrefixActive = (nav) => {
-      return workspace.isLinkPrefixActive(nav);
-    };
+    $scope.isPrefixActive = (path: string) => workspace.isLinkPrefixActive(path);
+
+    $scope.goto = (path: string) => $location.path(path);
   }]);
 }
