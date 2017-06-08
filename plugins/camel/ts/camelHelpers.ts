@@ -612,7 +612,7 @@ namespace Camel {
       const context = workspace.tree.findDescendant(node => node.typeName === 'context'
         && node.domain === 'org.apache.camel'
         && node.text === folder.entries['context']);
-      if (context.objectName) {
+      if (context) {
         return context.objectName;
       }
     }
