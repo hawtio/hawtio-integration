@@ -371,7 +371,6 @@ namespace Camel {
    * @method
    */
   export function loadRouteChildren(folder: Jmx.Folder, route: Element): Jmx.NodeSelection[] {
-    folder.children = [];
     folder['routeXmlNode'] = route;
     route.setAttribute('_cid', folder.key);
     const children = [];
