@@ -139,20 +139,18 @@ namespace Camel {
       return answer;
     }
 
-    var onClickGraphNode = function (node) {
+    function onClickGraphNode(node) {
       log.debug("Clicked on Camel Route Diagram node: " + node.cid);
       if (workspace.isRoutesFolder()) {
         // Handle nodes selection from a diagram displaying multiple routes
         handleGraphNode(node);
       } else {
-        // FIXME
-        // navigateToNodeProperties(node.cid);
         updateRouteProperties(node, workspace.selection);
       }
     };
 
     function navigateToNodeProperties(cid) {
-      $location.path('/camel/propertiesRoute').search({"main-tab": "camel", "nid": cid});
+      $location.path('/camel/propertiesRoute').search({'main-tab': 'camel', 'nid': cid});
       Core.$apply($scope);
     }
 
@@ -181,12 +179,12 @@ namespace Camel {
 
           if (routeFolder) {
             // Populate route folder child nodes for the context tree
-            const tree = (<any>$('#cameltree')).treeview(true);
             if (!routeFolder.children || !routeFolder.children.length) {
               // Ideally, we want to trigger lazy loading via node expansion
               // though there is no callback to hook into to update the view
               const plugin = <(workspace: Jmx.Workspace, folder: Jmx.Folder, onComplete: (children: Jmx.NodeSelection[]) => void) => void>Jmx.findLazyLoadingFunction(workspace, routeFolder);
               if (plugin) {
+                const tree = (<any>$('#cameltree')).treeview(true);
                 plugin(workspace, routeFolder, children => {
                   tree.addNode(children, routeFolder, { silent: true });
                   updateRouteProperties(node, routeFolder);
