@@ -255,6 +255,14 @@
   width: 80px;
 }
 
+context-actions,
+route-actions {
+  float: right;
+}
+jmx-header {
+  width: 100%;
+}
+
 .camel-profile-table th:nth-child(1) {
   width: 20%;
 }

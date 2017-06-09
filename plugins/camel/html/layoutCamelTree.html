@@ -35,14 +35,10 @@
   </div>
 
   <div class="tree-nav-main">
-    <div class="row">
-      <div class="col-md-8">
-        <jmx-header></jmx-header>
-      </div>
-      <div class="col-md-4">
-        <context-actions></context-actions>
-        <route-actions></route-actions>
-      </div>
+    <div>
+      <context-actions></context-actions>
+      <route-actions></route-actions>
+      <jmx-header></jmx-header>
     </div>
     <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">
       <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
