@@ -411,7 +411,7 @@ namespace Camel {
         }
       }
       node.key = key;
-      node.icon = imageUrl;
+      node.image = imageUrl;
       node['routeXmlNode'] = route;
       const children = loadRouteChildren(node, route);
       children.forEach(child => node.moveChild(child));
