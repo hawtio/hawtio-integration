@@ -1,4 +1,3 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="../../activemq/ts/activemqHelpers.ts"/>
 /// <reference path="camelPlugin.ts"/>
 

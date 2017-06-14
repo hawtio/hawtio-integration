@@ -1,31 +1,27 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
 
-/**
- * @module Osgi
- */
-module Osgi {
+namespace Osgi {
 
   export var ServiceController = _module.controller("Osgi.ServiceController", ["$scope", "$filter", "workspace", "$templateCache", "$compile", (
-      $scope,
-      $filter: ng.IFilterService,
-      workspace: Jmx.Workspace,
-      $templateCache: ng.ITemplateCacheService,
-      $compile: ng.IAttributes) => {
+    $scope,
+    $filter: ng.IFilterService,
+    workspace: Jmx.Workspace,
+    $templateCache: ng.ITemplateCacheService,
+    $compile: ng.IAttributes) => {
 
     $scope.workspace = workspace;
     $scope.services = null;
 
-    var populateTable = function(response) {
+    var populateTable = function (response) {
       var services = Osgi.defaultServiceValues(workspace, $scope, response.value);
       augmentServicesInfo(services);
     };
 
     function augmentServicesInfo(services) {
       var bundleMap = {};
-      var createBundleMap = function(response) {
-        angular.forEach(response.value, function(value, key) {
+      var createBundleMap = function (response) {
+        angular.forEach(response.value, function (value, key) {
           var obj = {
             Identifier: value.Identifier,
             Name: "",
@@ -42,9 +38,9 @@ module Osgi {
           bundleMap[obj.Identifier] = obj;
         });
         var servicesArray = [];
-        angular.forEach(services, function(s, key) {
+        angular.forEach(services, function (s, key) {
           s.Url = Core.url("/osgi/bundle/" + s.Identifier + workspace.hash())
-          angular.forEach(s["UsingBundles"], function(b, key) {
+          angular.forEach(s["UsingBundles"], function (b, key) {
             s["UsingBundles"][key] = bundleMap[b];
           });
           servicesArray.push(s);
@@ -53,15 +49,35 @@ module Osgi {
         Core.$apply($scope);
       };
       workspace.jolokia.request({
-            type: 'exec',
-            mbean: getSelectionBundleMBean(workspace),
-            operation: 'listBundles()'
-          },
-          {
-            success: createBundleMap,
-            error: createBundleMap
-          });
+        type: 'exec',
+        mbean: getSelectionBundleMBean(workspace),
+        operation: 'listBundles()'
+      }, {
+        success: createBundleMap,
+        error: (response) => {
+          log.debug('Osgi.ServiceController.augmentServicesInfo() failed: ' + response.error);
+        }
+      });
     }
+
+    function loadServices() {
+      var mbean = getSelectionServiceMBean(workspace);
+      if (mbean) {
+        var jolokia = workspace.jolokia;
+        jolokia.request({
+          type: 'exec',
+          mbean: mbean,
+          operation: 'listServices()'
+        }, {
+          success: populateTable,
+          error: (response) => {
+            log.debug('Osgi.ServiceController.loadServices() failed: ' + response.error);
+          }
+        });
+      }
+    }
+
+    loadServices();
 
   }]);
 }

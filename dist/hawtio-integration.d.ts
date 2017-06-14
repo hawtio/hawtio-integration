@@ -1,9 +1,6 @@
-/// <reference path="libs/hawtio-forms/defs.d.ts" />
-/// <reference path="libs/hawtio-jmx/defs.d.ts" />
-/// <reference path="libs/hawtio-preferences/defs.d.ts" />
-/// <reference path="libs/hawtio-ui/defs.d.ts" />
-/// <reference path="libs/hawtio-utilities/defs.d.ts" />
-declare module ActiveMQ {
+/// <reference types="jmx" />
+/// <reference types="angular" />
+declare namespace ActiveMQ {
     var pluginName: string;
     var log: Logging.Logger;
     var jmxDomain: string;
@@ -34,40 +31,6 @@ declare module ActiveMQ {
      */
     function decorate($scope: any, fn?: any): void;
     function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
-}
-/**
- * @module ActiveMQ
- * @main ActiveMQ
- */
-declare module ActiveMQ {
-    var _module: ng.IModule;
-    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
-    function isQueue(workspace: Jmx.Workspace): boolean;
-    function isTopic(workspace: Jmx.Workspace): boolean;
-    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
-    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
-    function isJobScheduler(workspace: Jmx.Workspace): boolean;
-    function isBroker(workspace: Jmx.Workspace): boolean;
-}
-declare module ActiveMQ {
-    var BrowseQueueController: ng.IModule;
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare module ActiveMQ {
-}
-/**
- * @module ActiveMQ
- */
-declare module ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare module ActiveMQ {
 }
 declare namespace Camel {
     /**
@@ -471,10 +434,10 @@ declare namespace Camel {
 }
 declare namespace Camel {
     var pluginName: string;
-    var _module: ng.IModule;
+    var _module: angular.IModule;
 }
 declare namespace Camel {
-    var BrowseEndpointController: ng.IModule;
+    var BrowseEndpointController: angular.IModule;
 }
 declare namespace Camel {
     var camelHeaderSchema: {
@@ -899,10 +862,34 @@ declare namespace Camel {
 }
 declare namespace Camel {
 }
-/**
- * @module Karaf
- */
-declare module Karaf {
+declare namespace ActiveMQ {
+    var _module: angular.IModule;
+    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
+    function isQueue(workspace: Jmx.Workspace): boolean;
+    function isTopic(workspace: Jmx.Workspace): boolean;
+    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
+    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
+    function isJobScheduler(workspace: Jmx.Workspace): boolean;
+    function isBroker(workspace: Jmx.Workspace): boolean;
+}
+declare namespace ActiveMQ {
+    var BrowseQueueController: angular.IModule;
+}
+declare namespace ActiveMQ {
+}
+declare module ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace Karaf {
     var log: Logging.Logger;
     function setSelect(selection: any, group: any): any;
     function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
@@ -929,47 +916,22 @@ declare module Karaf {
     function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
     function getSelectionScrMBean(workspace: Jmx.Workspace): string;
 }
-/**
- * @module Karaf
- * @main Karaf
- */
-declare module Karaf {
-    var _module: ng.IModule;
+declare namespace Karaf {
+    var _module: angular.IModule;
 }
-/**
- * @module Karaf
- */
-declare module Karaf {
+declare namespace Karaf {
 }
-/**
- * @module Karaf
- */
-declare module Karaf {
+declare namespace Karaf {
 }
-/**
- * @module Karaf
- */
-declare module Karaf {
+declare namespace Karaf {
 }
-/**
- * @module Karaf
- */
-declare module Karaf {
+declare namespace Karaf {
 }
-/**
- * @module Karaf
- */
-declare module Karaf {
+declare namespace Karaf {
 }
-/**
- * @module Karaf
- */
-declare module Karaf {
+declare namespace Karaf {
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
     var log: Logging.Logger;
     function defaultBundleValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
     function getStateStyle(prefix: string, state: string): string;
@@ -1026,10 +988,7 @@ declare module Osgi {
      */
     function removeFactoryPidPrefix(pid: any, factoryPid: any): any;
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
     class OsgiDataService {
         private jolokia;
         private workspace;
@@ -1039,40 +998,22 @@ declare module Osgi {
         getPackages(): {};
     }
 }
-declare module Osgi {
+declare namespace Osgi {
     var pluginName: string;
-    var _module: ng.IModule;
+    var _module: angular.IModule;
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
     function formatServiceName(objClass: any): string;
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
     var configuration: {
         pidMetadata: {
             "io.fabric8.container.java": {
@@ -1162,10 +1103,7 @@ declare module Osgi {
         };
     };
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
     class OsgiGraphBuilder {
         private osgiDataService;
         private workspace;
@@ -1231,30 +1169,18 @@ declare module Osgi {
         };
     }
 }
-declare module Osgi {
-    var TopLevelController: ng.IModule;
+declare namespace Osgi {
+    var TopLevelController: angular.IModule;
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
-    var PackagesController: ng.IModule;
+declare namespace Osgi {
+    var PackagesController: angular.IModule;
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
-    var ServiceController: ng.IModule;
+declare namespace Osgi {
+    var ServiceController: angular.IModule;
 }
-/**
- * @module Osgi
- */
-declare module Osgi {
+declare namespace Osgi {
 }
 declare namespace Camel {
     class Context {
@@ -1297,10 +1223,7 @@ declare namespace Camel {
         suspend(): void;
         delete(): void;
     }
-    const contextActionsComponent: {
-        template: string;
-        controller: typeof ContextActionsController;
-    };
+    const contextActionsComponent: angular.IComponentOptions;
 }
 declare namespace Camel {
     class ContextsController {
@@ -1345,10 +1268,7 @@ declare namespace Camel {
         private updateContexts();
         private removeSelectedContexts();
     }
-    const contextsComponent: {
-        template: string;
-        controller: typeof ContextsController;
-    };
+    const contextsComponent: angular.IComponentOptions;
 }
 declare namespace Camel {
 }
@@ -1362,7 +1282,7 @@ declare namespace Camel {
         value: string;
         description: string;
         constructor(name: string, value: string, description: string);
-        static sortByName(a: any, b: any): 1 | -1 | 0;
+        static sortByName(a: any, b: any): 0 | 1 | -1;
     }
 }
 declare namespace Camel {
@@ -1423,10 +1343,7 @@ declare namespace Camel {
         stop(): void;
         delete(): void;
     }
-    const routeActionsComponent: {
-        template: string;
-        controller: typeof RouteActionsController;
-    };
+    const routeActionsComponent: angular.IComponentOptions;
 }
 declare namespace Camel {
     class RoutesController {
@@ -1471,10 +1388,7 @@ declare namespace Camel {
         private updateRoutes();
         private removeSelectedRoutes();
     }
-    const routesComponent: {
-        template: string;
-        controller: typeof RoutesController;
-    };
+    const routesComponent: angular.IComponentOptions;
 }
 declare namespace Camel {
 }

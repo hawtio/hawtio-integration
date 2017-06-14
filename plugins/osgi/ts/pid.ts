@@ -1,12 +1,8 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
 /// <reference path="metadata.ts"/>
 
-/**
- * @module Osgi
- */
-module Osgi {
+namespace Osgi {
 
   _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia", "$uibModal", (
       $scope,

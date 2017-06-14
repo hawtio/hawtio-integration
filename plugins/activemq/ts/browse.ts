@@ -1,8 +1,7 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="activemqPlugin.ts"/>
 
-module ActiveMQ {
+namespace ActiveMQ {
 
   export var BrowseQueueController = _module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$routeParams", "$dialog", "$templateCache", (
       $scope,

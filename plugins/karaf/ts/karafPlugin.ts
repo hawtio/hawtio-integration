@@ -1,11 +1,6 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="karafHelpers.ts"/>
 
-/**
- * @module Karaf
- * @main Karaf
- */
-module Karaf {
+namespace Karaf {
 
   var pluginName = 'karaf';
 

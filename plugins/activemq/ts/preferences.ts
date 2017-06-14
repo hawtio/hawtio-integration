@@ -1,11 +1,7 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="activemqPlugin.ts"/>
 
-/**
- * @module ActiveMQ
- */
-module ActiveMQ {
+namespace ActiveMQ {
 
   _module.controller("ActiveMQ.PreferencesController", ["$scope", "localStorage", "userDetails", "$rootScope", (
       $scope,

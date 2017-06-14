@@ -1,5 +1,3 @@
-/// <reference path="../../includes.ts"/>
-
 namespace Camel {
 
   /**

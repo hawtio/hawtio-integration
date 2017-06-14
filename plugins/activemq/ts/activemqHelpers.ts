@@ -1,6 +1,4 @@
-/// <reference path="../../includes.ts"/>
-
-module ActiveMQ {
+namespace ActiveMQ {
 
   export var pluginName: string = 'activemq';
   export var log: Logging.Logger = Logger.get("activemq");

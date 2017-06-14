@@ -1,4 +1,3 @@
-/// <reference path="../includes.ts"/>
 /// <reference path="contexts.service.ts"/>
 /// <reference path="context.ts"/>
 
@@ -56,7 +55,7 @@ namespace Camel {
     }
   }
 
-  export const contextActionsComponent = {
+  export const contextActionsComponent = <angular.IComponentOptions>{
     template: `
       <div class="dropdown camel-main-actions" ng-show="$ctrl.isVisible()">
         <button type="button" id="dropdownMenu1" class="btn btn-default dropdown-toggle"

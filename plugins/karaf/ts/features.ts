@@ -1,10 +1,6 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="karafPlugin.ts"/>
 
-/**
- * @module Karaf
- */
-module Karaf {
+namespace Karaf {
 
   _module.controller("Karaf.FeaturesController", ["$scope", "$location", "workspace", "jolokia", (
       $scope,

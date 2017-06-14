@@ -1,4 +1,4 @@
-/// <reference path="../../includes.ts"/>
+
 /// <reference path="camelPlugin.ts"/>
 
 namespace Camel {

@@ -1,11 +1,7 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
 
-/**
- * @module Osgi
- */
-module Osgi {
+namespace Osgi {
 
   _module.controller("Osgi.BundlesController", ["$scope", "workspace", "jolokia", (
       $scope,

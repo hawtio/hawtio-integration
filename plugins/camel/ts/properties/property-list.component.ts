@@ -11,7 +11,7 @@ namespace Camel {
             {{property.name}}
           </dt>
           <dd class="camel-properties-value" title="" ng-repeat-end>
-            <span class="fa fa-info-circle camel-properties-info-circle" data-toggle="tooltip" data-placement="bottom" title="{{property.description}}"></span>
+            <span class="fa fa-info-circle camel-properties-info-circle" data-toggle="tooltip" data-placement="top" title="{{property.description}}"></span>
             <samp>{{property.value}}</samp>
           </dd>
         </dl>

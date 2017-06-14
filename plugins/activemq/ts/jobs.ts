@@ -1,8 +1,8 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="activemqPlugin.ts"/>
 
-module ActiveMQ {
+namespace ActiveMQ {
+  
   _module.controller("ActiveMQ.JobSchedulerController", ["$scope", "workspace", "jolokia", ($scope, workspace: Jmx.Workspace, jolokia) => {
 
     $scope.refresh = loadTable;

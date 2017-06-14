@@ -1,5 +1,4 @@
 var gulp = require('gulp'),
-    wiredep = require('wiredep').stream,
     eventStream = require('event-stream'),
     gulpLoadPlugins = require('gulp-load-plugins'),
     del = require('del'),
@@ -12,53 +11,30 @@ var gulp = require('gulp'),
     hawtio = require('hawtio-node-backend');
 
 var plugins = gulpLoadPlugins({});
-var pkg = require('./package.json');
 
 var config = {
   proxyPort: argv.port || 8181,
   targetPath: argv.path || '/jolokia',
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
-  main: '.',
   ts: ['plugins/**/*.ts'],
   templates: ['plugins/**/*.html'],
   less: ['plugins/**/*.less', 'vendor/**/*.less', 'vendor/**/*.css'],
-  templateModule: pkg.name + '-templates',
+  templateModule: 'hawtio-integration-templates',
   dist: argv.out || './dist/',
-  js: pkg.name + '.js',
-  css: pkg.name + '.css',
-  tsProject: plugins.typescript.createProject({
-    target: 'ES5',
-    outFile: 'compiled.js',
-    declaration: true,
-    noResolve: false
-  }),
-  sourceMap: argv.sourcemap
+  js: 'hawtio-integration.js',
+  dts: 'hawtio-integration.d.ts',
+  css: 'hawtio-integration.css',
+  tsProject: plugins.typescript.createProject('tsconfig.json'),
+  sourceMap: argv.sourcemap,
+  vendorJs: './vendor/**/*.js',
+  vendorCss: './vendor/**/*.css'
 };
 
-gulp.task('bower', function() {
-  return gulp.src('index.html')
-    .pipe(wiredep({}))
-    .pipe(gulp.dest('.'));
-});
-
-/** Adjust the reference path of any typescript-built plugin this project depends on */
-gulp.task('path-adjust', function() {
-  return eventStream.merge(
-    gulp.src('libs/**/includes.d.ts')
-      .pipe(plugins.replace(/"\.\.\/libs/gm, '"../../../libs'))
-      .pipe(gulp.dest('libs')),
-    gulp.src('libs/**/defs.d.ts')
-      .pipe(plugins.replace(/"libs/gm, '"../../libs'))
-      .pipe(gulp.dest('libs'))
-  );
-});
-
 gulp.task('clean-defs', function() {
-  return del('defs.d.ts');
+  return del(config.dist + '*.d.ts');
 });
 
 gulp.task('tsc', ['clean-defs'], function() {
-  var cwd = process.cwd();
   var tsResult = gulp.src(config.ts)
     .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
     .pipe(config.tsProject());
@@ -69,8 +45,8 @@ gulp.task('tsc', ['clean-defs'], function() {
       .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.write()))
       .pipe(gulp.dest('.')),
     tsResult.dts
-      .pipe(plugins.rename('defs.d.ts'))
-      .pipe(gulp.dest('.')));
+      .pipe(plugins.rename(config.dts))
+      .pipe(gulp.dest(config.dist)));
 });
 
 gulp.task('template', ['tsc'], function() {
@@ -86,7 +62,7 @@ gulp.task('template', ['tsc'], function() {
 });
 
 gulp.task('concat', ['template'], function() {
-  return gulp.src(['compiled.js', 'templates.js', 'vendor/**/*.js'])
+  return gulp.src([config.vendorJs, 'compiled.js', 'templates.js'])
     .pipe(plugins.concat(config.js))
     .pipe(gulp.dest(config.dist));
 });
@@ -96,27 +72,26 @@ gulp.task('clean', ['concat'], function() {
 });
 
 gulp.task('less', function () {
-  return gulp.src(config.less)
+  let pluginsCss = gulp.src(config.less)
     .pipe(plugins.less({
-      paths: [path.join(__dirname, 'plugins'), path.join(__dirname, 'libs')]
-    }))
+      paths: [
+        path.join(__dirname, 'plugins'),
+        path.join(__dirname, 'node_modules')
+      ]
+    }));
+  let vendorCss = gulp.src(config.vendorCss);
+  return eventStream.merge(pluginsCss, vendorCss)
     .pipe(plugins.concat(config.css))
     .pipe(gulp.dest(config.dist));
 });
 
 gulp.task('watch-less', function() {
-  plugins.watch(config.less, function() {
-    gulp.start('less');
-  });
+  gulp.watch(config.less, ['less']);
 });
 
 gulp.task('watch', ['build', 'watch-less'], function() {
-  plugins.watch(['libs/**/*.js', 'libs/**/*.css', 'index.html', urljoin(config.dist, '*')], function() {
-    gulp.start('reload');
-  });
-  plugins.watch(['libs/**/*.d.ts', config.ts, config.templates], function() {
-    gulp.start(['tsc', 'template', 'concat', 'clean']);
-  });
+  gulp.watch(['index.html', urljoin(config.dist, '*')], ['reload']);
+  gulp.watch([config.ts, config.templates], ['tsc', 'template', 'concat', 'clean']);
 });
 
 gulp.task('connect', ['watch'], function() {
@@ -166,7 +141,7 @@ gulp.task('reload', function() {
     .pipe(hawtio.reload());
 });
 
-gulp.task('build', ['bower', 'path-adjust', 'tsc', 'less', 'template', 'concat', 'clean']);
+gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean']);
 
 gulp.task('default', ['connect']);
 

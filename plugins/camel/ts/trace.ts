@@ -1,4 +1,3 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="../../activemq/ts/activemqHelpers.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
@@ -48,7 +47,6 @@ namespace Camel {
 
     // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
     $scope.openMessageDialog = (message, index) => {
-      console.log(message, index);
       $scope.message = message;
       $scope.messageIndex = index;
       highlightToNode(message.toNode);

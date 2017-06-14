@@ -1,9 +1,4 @@
-/// <reference path="../../includes.ts"/>
-
-/**
- * @module Karaf
- */
-module Karaf {
+namespace Karaf {
 
   export var log: Logging.Logger = Logger.get("Karaf");
 

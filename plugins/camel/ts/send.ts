@@ -1,4 +1,3 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="camelPlugin.ts"/>
 /// <reference path="camelHeaderSchema.ts"/>
 /// <reference path="jmsHeaderSchema.ts"/>

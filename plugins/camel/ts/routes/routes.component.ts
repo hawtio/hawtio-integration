@@ -1,4 +1,3 @@
-/// <reference path="../includes.ts"/>
 /// <reference path="route.ts"/>
 /// <reference path="routes.service.ts"/>
 
@@ -128,7 +127,7 @@ namespace Camel {
 
   }
 
-  export const routesComponent = {
+  export const routesComponent = <angular.IComponentOptions>{
     template: `
       <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
       <pf-table-view config="$ctrl.tableConfig" colummns="$ctrl.tableColummns" items="$ctrl.tableItems"></pf-table-view>

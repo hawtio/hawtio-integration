@@ -1,9 +1,8 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="osgiData.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="../../karaf/ts/karafHelpers.ts"/>
 
-module Osgi {
+namespace Osgi {
 
   export var pluginName = 'osgi';
   export var _module = angular.module(pluginName, [

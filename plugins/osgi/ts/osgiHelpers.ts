@@ -1,9 +1,4 @@
-/// <reference path="../../includes.ts"/>
-
-/**
- * @module Osgi
- */
-module Osgi {
+namespace Osgi {
 
   export var log: Logging.Logger = Logger.get("OSGi");
 

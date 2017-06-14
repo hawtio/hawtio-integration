@@ -1,4 +1,3 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="activemqPlugin.ts"/>
 
 namespace ActiveMQ {

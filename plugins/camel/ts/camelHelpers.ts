@@ -1,4 +1,3 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="endpointChooser.ts"/>
 
 declare var _apacheCamelModel:any;
@@ -374,7 +373,9 @@ namespace Camel {
     folder['routeXmlNode'] = route;
     route.setAttribute('_cid', folder.key);
     const children = [];
-    $(route).children('*').each((idx, node) => children.push(loadRouteChild(folder, node)));
+    $(route).children('*').each((idx, node) => {
+      children.push(loadRouteChild(folder, node))
+    });
     return _.compact(children);
   }
 

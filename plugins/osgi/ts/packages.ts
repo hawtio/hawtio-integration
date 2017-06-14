@@ -1,18 +1,14 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
 
-/**
- * @module Osgi
- */
-module Osgi {
+namespace Osgi {
 
   export var PackagesController = _module.controller("Osgi.PackagesController", ["$scope", "workspace", (
-      $scope, workspace: Jmx.Workspace) => {
+    $scope, workspace: Jmx.Workspace) => {
 
     const INFINITE_SCROLL_INITIAL_SIZE = 50;
     const INFINITE_SCROLL_APPEND_SIZE = 10;
-    
+
     $scope.packages = null;
     $scope.filteredPackages = [];
     $scope.scrollablePackages = [];
@@ -22,13 +18,13 @@ module Osgi {
         fields: [
           {
             id: 'name',
-            title:  'Name',
+            title: 'Name',
             placeholder: 'Filter by name...',
             filterType: 'text'
           },
           {
             id: 'version',
-            title:  'Version',
+            title: 'Version',
             placeholder: 'Filter by version...',
             filterType: 'text'
           }
@@ -40,7 +36,7 @@ module Osgi {
       }
     };
 
-    $scope.appendItems = function() {
+    $scope.appendItems = function () {
       let numRemainingItems = $scope.filteredPackages.length - $scope.scrollablePackages.length;
       if (numRemainingItems > 0) {
         let startIndex = $scope.scrollablePackages.length;
@@ -56,8 +52,8 @@ module Osgi {
 
     function augmentPackagesInfo(packages) {
       var bundleMap = {};
-      var createBundleMap = function(response) {
-        angular.forEach(response.value, function(value, key) {
+      var createBundleMap = function (response) {
+        angular.forEach(response.value, function (value, key) {
           var obj = {
             Identifier: value.Identifier,
             Name: "",
@@ -73,42 +69,42 @@ module Osgi {
           }
           bundleMap[obj.Identifier] = obj;
         });
-        angular.forEach(packages, function(p, key) {
-          angular.forEach(p["ExportingBundles"], function(b, key) {
+        angular.forEach(packages, function (p, key) {
+          angular.forEach(p["ExportingBundles"], function (b, key) {
             p["ExportingBundles"][key] = bundleMap[b];
           });
-          angular.forEach(p["ImportingBundles"], function(b, key) {
+          angular.forEach(p["ImportingBundles"], function (b, key) {
             p["ImportingBundles"][key] = bundleMap[b];
           });
           p["ExportingBundles"].sort(sortBy('SymbolicName'));
           p["ImportingBundles"].sort(sortBy('SymbolicName'));
         });
-        
+
         packages.sort(sortBy('Name'));
-        
+
         $scope.packages = packages;
         $scope.toolbarConfig.filterConfig.totalCount = packages.length;
 
         applyFilters($scope.toolbarConfig.filterConfig.appliedFilters);
         updateResultCount();
-        
+
         initScrollableItems();
-        
+
         Core.$apply($scope);
-       };
+      };
       workspace.jolokia.request({
-            type: 'exec',
-            mbean: getSelectionBundleMBean(workspace),
-            operation: 'listBundles()'
-          },
-          {
-            success: createBundleMap,
-            error: createBundleMap
-          });
+        type: 'exec',
+        mbean: getSelectionBundleMBean(workspace),
+        operation: 'listBundles()'
+      },
+        {
+          success: createBundleMap,
+          error: createBundleMap
+        });
     }
 
     function sortBy(fieldName: string) {
-      return function(a, b) {
+      return function (a, b) {
         var valueA = a[fieldName].toLowerCase();
         var valueB = b[fieldName].toLowerCase();
         if (valueA < valueB) {
@@ -147,6 +143,26 @@ module Osgi {
     function initScrollableItems() {
       $scope.scrollablePackages = $scope.filteredPackages.slice(0, INFINITE_SCROLL_INITIAL_SIZE);
     }
+
+    function loadTableContents() {
+      var mbean = getSelectionPackageMBean(workspace);
+      if (mbean) {
+        var jolokia = workspace.jolokia;
+        // bundles first:
+        jolokia.request({
+          type: 'exec',
+          mbean: mbean,
+          operation: 'listPackages'
+        }, {
+          success: populateTable,
+          error: (response) => {
+            log.debug('Osgi.PackagesController.loadTableContents() failed: ' + response.error);
+          }
+        });
+      }
+    }
+
+    loadTableContents();
 
   }]);
 }

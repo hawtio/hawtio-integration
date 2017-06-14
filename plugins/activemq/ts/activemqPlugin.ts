@@ -1,11 +1,7 @@
-/// <reference path="../../includes.ts"/>
 /// <reference path="activemqHelpers.ts"/>
 
-/**
- * @module ActiveMQ
- * @main ActiveMQ
- */
-module ActiveMQ {
+namespace ActiveMQ {
+  
   export var _module = angular.module(pluginName, ['angularResizable']);
 
   _module.config(["$routeProvider", ($routeProvider) => {
