@@ -32,6 +32,33 @@ declare namespace ActiveMQ {
     function decorate($scope: any, fn?: any): void;
     function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
 }
+declare namespace ActiveMQ {
+    var _module: angular.IModule;
+    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
+    function isQueue(workspace: Jmx.Workspace): boolean;
+    function isTopic(workspace: Jmx.Workspace): boolean;
+    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
+    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
+    function isJobScheduler(workspace: Jmx.Workspace): boolean;
+    function isBroker(workspace: Jmx.Workspace): boolean;
+}
+declare namespace ActiveMQ {
+    var BrowseQueueController: angular.IModule;
+}
+declare namespace ActiveMQ {
+}
+declare module ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
 declare namespace Camel {
     /**
      * Define the default categories for endpoints and map them to endpoint names
@@ -861,33 +888,6 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Camel {
-}
-declare namespace ActiveMQ {
-    var _module: angular.IModule;
-    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
-    function isQueue(workspace: Jmx.Workspace): boolean;
-    function isTopic(workspace: Jmx.Workspace): boolean;
-    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
-    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
-    function isJobScheduler(workspace: Jmx.Workspace): boolean;
-    function isBroker(workspace: Jmx.Workspace): boolean;
-}
-declare namespace ActiveMQ {
-    var BrowseQueueController: angular.IModule;
-}
-declare namespace ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
 }
 declare namespace Karaf {
     var log: Logging.Logger;

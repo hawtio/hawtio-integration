@@ -8,7 +8,7 @@ var gulp = require('gulp'),
     argv = require('yargs').argv,
     urljoin = require('url-join'),
     logger = require('js-logger'),
-    hawtio = require('hawtio-node-backend');
+    hawtio = require('@hawtio/node-backend');
 
 var plugins = gulpLoadPlugins({});
 
