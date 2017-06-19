@@ -1,7 +1,6 @@
 machine:
-  node:
-    version: 0.10.33
-  services:
+  environment:
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
 branches:
   ignore:
@@ -9,12 +8,13 @@ branches:
 
 dependencies:
   pre:
-    - npm install -g bower gulp
-    - npm install
-    - bower install
+    - rm -rf ~/.yarn
+    - npm install --global yarn
   override:
-    - gulp build
+    - yarn run install:dev
+  cache_directories:
+    - ~/.cache/yarn
 
 test:
   override:
-    - echo yes
+    - yarn test

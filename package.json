@@ -9,12 +9,12 @@
   "scripts": {
     "start": "gulp",
     "build": "gulp build",
-    "install:dev": "yarn install --flat --prod && yarn install"
+    "install:dev": "yarn install --flat --prod && yarn install",
+    "test": "gulp build"
   },
   "dependencies": {
     "@hawtio/jmx": "~3.0.0",
     "dagre": "hawtio/dagre#3825485552cb2ebc79afab24f9a90f14c7e1e2df",
-    "jquery": "^2",
     "ng-infinite-scroll": "^1.3.0"
   },
   "devDependencies": {
@@ -42,16 +42,16 @@
     "url-join": "1.0.0",
     "yargs": "^6.0.0"
   },
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:hawtio/hawtio-integration.git"
-  },
   "resolutions": {
     "angular": "1.6.4",
     "angular-sanitize": "1.6.4",
     "angular-ui-bootstrap": "2.5.0",
     "bootstrap-select": "1.12.2",
     "jquery": "2.2.4"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:hawtio/hawtio-integration.git"
   }
 }
