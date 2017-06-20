@@ -1115,9 +1115,9 @@ namespace Camel {
           var text = route.textContent;
           if (text) {
             parentNode["tooltip"] = parentNode["label"] + " " + name + " " + text;
-            parentNode["label"] = text;
+            parentNode["label"] += ": " + appendLabel(route, text, true);
           } else {
-            parentNode["label"] = parentNode["label"] + " " + name;
+            parentNode["label"] += ": " + appendLabel(route, name, false);
           }
         }
       }
@@ -1134,6 +1134,27 @@ namespace Camel {
       }
     });
     return siblingNodes;
+  }
+
+  function appendLabel(route: Element, label: string, text: boolean): string {
+    switch (route.localName) {
+      case "method":
+        if (!text) {
+          if (route.getAttribute("bean")) {
+            label += " " + route.getAttribute("bean");
+          } else if (route.getAttribute("ref")) {
+            label += " " + route.getAttribute("ref");
+          } else if (route.getAttribute("beanType")) {
+            label += " " + route.getAttribute("beanType");
+          }
+        }
+        if (route.getAttribute("method")) {
+          label += " " + route.getAttribute("method");
+        }
+        break;
+      default:
+    }
+    return label;
   }
 
   /**
