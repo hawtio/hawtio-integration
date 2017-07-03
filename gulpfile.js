@@ -27,7 +27,9 @@ var config = {
   tsProject: plugins.typescript.createProject('tsconfig.json'),
   sourceMap: argv.sourcemap,
   vendorJs: './vendor/**/*.js',
-  vendorCss: './vendor/**/*.css'
+  vendorCss: './vendor/**/*.css',
+  srcImg: './img/**/*',
+  distImg: './dist/img'
 };
 
 gulp.task('clean-defs', function() {
@@ -83,6 +85,11 @@ gulp.task('less', function () {
   return eventStream.merge(pluginsCss, vendorCss)
     .pipe(plugins.concat(config.css))
     .pipe(gulp.dest(config.dist));
+});
+
+gulp.task('copy-images', function() {
+  return gulp.src(config.srcImg)
+    .pipe(gulp.dest(config.distImg));
 });
 
 gulp.task('watch-less', function() {
@@ -141,7 +148,7 @@ gulp.task('reload', function() {
     .pipe(hawtio.reload());
 });
 
-gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean']);
+gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean', 'copy-images']);
 
 gulp.task('default', ['connect']);
 

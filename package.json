@@ -4,8 +4,7 @@
   "main": "dist/hawtio-integration.js",
   "types": "dist/hawtio-integration.d.ts",
   "files": [
-    "dist",
-    "img"
+    "dist"
   ],
   "scripts": {
     "start": "gulp",
