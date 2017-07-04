@@ -114,56 +114,6 @@ caption {
   min-width: 100%;
 }
 
-.activemq-browse-table th:nth-child(1) {
-  width: 5%;
-}
-.activemq-browse-table th:nth-child(2) {
-  width: 30%;
-}
-.activemq-browse-table th:nth-child(3) {
-  width: 5%;
-}
-.activemq-browse-table th:nth-child(4) {
-  width: 10%;
-}
-.activemq-browse-table th:nth-child(5) {
-  width: 15%;
-}
-.activemq-browse-table th:nth-child(6) {
-  width: 10%;
-}
-.activemq-browse-table th:nth-child(7) {
-  width: 10%;
-}
-.activemq-browse-table th:nth-child(8) {
-  width: 15%;
-}
-
-.org-apache-activemq span.node-icon:before,
-.org-apache-activemq-Broker span.node-icon:before,
-.org-apache-activemq-Broker-folder span.node-icon:before {
-  display: inline-block;
-  background: url("../img/icons/messagebroker.svg");
-  min-width: 16px;
-  min-height: 16px;
-  background-size: 18px 18px;
-  background-position: center;
-  background-repeat: no-repeat;
-  content: "" !important;
-}
-.org-apache-activemq-Queue span.node-icon:before {
-  content: url("../img/icons/activemq/queue.png");
-}
-.org-apache-activemq-Queue-folder span.node-icon:before {
-  content: url("../img/icons/activemq/queue_folder.png");
-}
-.org-apache-activemq-Topic span.node-icon:before {
-  content: url("../img/icons/activemq/topic.png");
-}
-.org-apache-activemq-Topic-folder span.node-icon:before {
-  content: url("../img/icons/activemq/topic_folder.png");
-}
-
 .form-inline.camel-forward-message {
   margin-bottom: 20px;
 }
@@ -620,7 +570,7 @@ div.camel-properties {
 .org-apache-camel span.node-icon:before,
 .org-apache-camel-context-folder span.node-icon:before {
   display: inline-block;
-  background: url("../img/icons/camel.svg");
+  background: url("img/icons/camel.svg");
   min-width: 16px;
   min-height: 16px;
   background-size: 18px 18px;
@@ -629,31 +579,31 @@ div.camel-properties {
   content: "" !important;
 }
 .org-apache-camel-context span.node-icon:before {
-  content: url("../img/icons/camel/camel_context_icon.png");
+  content: url("img/icons/camel/camel_context_icon.png");
 }
 .org-apache-camel-components span.node-icon:before {
-  content: url("../img/icons/camel/endpoint_node.png");
+  content: url("img/icons/camel/endpoint_node.png");
 }
 .org-apache-camel-components-folder span.node-icon:before {
-  content: url("../img/icons/camel/endpoint_folder.png");
+  content: url("img/icons/camel/endpoint_folder.png");
 }
 .org-apache-camel-dataformats span.node-icon:before {
-  content: url("../img/icons/camel/endpoint_node.png");
+  content: url("img/icons/camel/endpoint_node.png");
 }
 .org-apache-camel-dataformats-folder span.node-icon:before {
-  content: url("../img/icons/camel/endpoint_folder.png");
+  content: url("img/icons/camel/endpoint_folder.png");
 }
 .org-apache-camel-endpoints span.node-icon:before {
-  content: url("../img/icons/camel/endpoint_node.png");
+  content: url("img/icons/camel/endpoint_node.png");
 }
 .org-apache-camel-endpoints-folder span.node-icon:before {
-  content: url("../img/icons/camel/endpoint_folder.png");
+  content: url("img/icons/camel/endpoint_folder.png");
 }
 .org-apache-camel-routes span.node-icon:before {
-  content: url("../img/icons/camel/camel_route.png");
+  content: url("img/icons/camel/camel_route.png");
 }
 .org-apache-camel-routes-folder span.node-icon:before {
-  content: url("../img/icons/camel/camel_route_folder.png");
+  content: url("img/icons/camel/camel_route_folder.png");
 }
 
 .camel-type-converters-dl {
@@ -774,6 +724,56 @@ div.camel-properties {
 }
 .osgi-packages-main .osgi-packages-list .list-group-item-container {
   padding: 10px 20px;
+}
+
+.activemq-browse-table th:nth-child(1) {
+  width: 5%;
+}
+.activemq-browse-table th:nth-child(2) {
+  width: 30%;
+}
+.activemq-browse-table th:nth-child(3) {
+  width: 5%;
+}
+.activemq-browse-table th:nth-child(4) {
+  width: 10%;
+}
+.activemq-browse-table th:nth-child(5) {
+  width: 15%;
+}
+.activemq-browse-table th:nth-child(6) {
+  width: 10%;
+}
+.activemq-browse-table th:nth-child(7) {
+  width: 10%;
+}
+.activemq-browse-table th:nth-child(8) {
+  width: 15%;
+}
+
+.org-apache-activemq span.node-icon:before,
+.org-apache-activemq-Broker span.node-icon:before,
+.org-apache-activemq-Broker-folder span.node-icon:before {
+  display: inline-block;
+  background: url("img/icons/messagebroker.svg");
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 18px 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+  content: "" !important;
+}
+.org-apache-activemq-Queue span.node-icon:before {
+  content: url("img/icons/activemq/queue.png");
+}
+.org-apache-activemq-Queue-folder span.node-icon:before {
+  content: url("img/icons/activemq/queue_folder.png");
+}
+.org-apache-activemq-Topic span.node-icon:before {
+  content: url("img/icons/activemq/topic.png");
+}
+.org-apache-activemq-Topic-folder span.node-icon:before {
+  content: url("img/icons/activemq/topic_folder.png");
 }
 
 .metricsWatcher .panel-group:first-child {
