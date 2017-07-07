@@ -810,29 +810,13 @@ namespace Camel {
 
   // TODO should be a service
   export function getContextId(workspace: Jmx.Workspace) {
-    var selection = workspace.selection;
+    const selection = workspace.selection;
     if (selection) {
-      // find the camel context and find ancestors in the tree until we find the camel context selection
-      // this is either if the title is 'context' or 'Camel Contexts', or if the parent title is 'org.apache.camel'
-      // (the Camel tree is a bit special)
-      selection = selection.findAncestor((s: Jmx.NodeSelection) =>
-        s.text === 'context' || s.text === 'Camel Contexts'
-        || s.parent != null && s.parent.text === 'org.apache.camel');
-      if (selection) {
-        var tree = workspace.tree;
-        var folderNames = selection.folderNames;
-        var children = selection.children;
-        var contextId;
-        if (tree) {
-          if (folderNames && folderNames.length > 1) {
-            contextId = folderNames[1];
-          } else if (children && children.length > 0 && children[0].entries) {
-            contextId = children[0].entries['context'];
-          }
-        }
+      const context = selection.findAncestor(ancestor => ancestor.typeName === 'context');
+      if (context) {
+        return context.text;
       }
     }
-    return contextId;
   }
 
   export function iconClass(state:string) {

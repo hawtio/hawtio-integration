@@ -342,7 +342,7 @@ declare namespace Camel {
     function getSelectionCamelInflightRepository(workspace: Jmx.Workspace): string;
     function getSelectionCamelBlockedExchanges(workspace: Jmx.Workspace): string;
     function getSelectionCamelRouteMetrics(workspace: Jmx.Workspace): string;
-    function getContextId(workspace: Jmx.Workspace): any;
+    function getContextId(workspace: Jmx.Workspace): string;
     function iconClass(state: string): "green fa fa-play-circle" | "fa fa-pause" | "orange fa fa-off";
     function getSelectedRouteId(workspace: Jmx.Workspace, folder?: Jmx.NodeSelection): any;
     /**
