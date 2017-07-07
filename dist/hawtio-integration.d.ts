@@ -1183,10 +1183,6 @@ declare namespace Osgi {
 declare namespace Osgi {
 }
 declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
     class Context {
         name: string;
         state: string;
@@ -1273,6 +1269,10 @@ declare namespace Camel {
         private removeSelectedContexts();
     }
     const contextsComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+}
+declare namespace Camel {
 }
 declare namespace Camel {
 }

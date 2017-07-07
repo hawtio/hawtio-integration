@@ -243,16 +243,16 @@ namespace Camel {
 
         const domain = tree.get(domainName);
         if (domain) {
-          angular.forEach(domain.children, (node, key) => {
-            const contextsFolder = node.get('context');
-            const routesNode = node.get('routes');
-            const endpointsNode = node.get('endpoints');
-            const componentsNode = node.get('components');
-            const dataFormatsNode = node.get('dataformats');
+          const children = [];
+          angular.forEach(domain.children, (child, key) => {
+            const contextsFolder = child.get('context');
+            const routesNode = child.get('routes');
+            const endpointsNode = child.get('endpoints');
+            const componentsNode = child.get('components');
+            const dataFormatsNode = child.get('dataformats');
             if (contextsFolder) {
-              const contextNode = contextsFolder.children[0];
+              const contextNode = contextsFolder.children[0] as Jmx.Folder;
               if (contextNode) {
-                const folder = <Jmx.Folder>contextNode;
                 // fetch the camel version and add it to the tree here to avoid making a blocking call elsewhere
                 jolokia.request({
                   'type': 'read',
@@ -264,35 +264,35 @@ namespace Camel {
                 }));
 
                 if (routesNode) {
-                  folder.moveChild(routesNode);
+                  contextNode.moveChild(routesNode);
                   routesNode.typeName = 'routes';
                   routesNode.class = 'org-apache-camel-routes-folder';
                   angular.forEach(routesNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-routes');
                 }
                 if (endpointsNode) {
-                  folder.moveChild(endpointsNode);
+                  contextNode.moveChild(endpointsNode);
                   endpointsNode.typeName = 'endpoints';
                   endpointsNode.class = 'org-apache-camel-endpoints-folder';
                   angular.forEach(endpointsNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-endpoints');
                 }
                 if (componentsNode) {
-                  folder.moveChild(componentsNode);
+                  contextNode.moveChild(componentsNode);
                   componentsNode.typeName = 'components';
                   componentsNode.class = 'org-apache-camel-components-folder';
                   angular.forEach(componentsNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-components');
                 }
                 if (dataFormatsNode) {
-                  folder.moveChild(dataFormatsNode);
+                  contextNode.moveChild(dataFormatsNode);
                   dataFormatsNode.class = 'org-apache-camel-dataformats-folder';
                   angular.forEach(dataFormatsNode.children, (n: Jmx.Folder) => n.class = 'org-apache-camel-dataformats');
                   dataFormatsNode.typeName = 'dataformats';
                 }
 
                 const jmxNode = new Jmx.Folder('MBeans');
-                workspace.configureFolder(jmxNode, domainName, 'org-apache-camel', _.clone(node.folderNames).concat('mbeans'), 'mbeans');
+                workspace.configureFolder(jmxNode, domainName, 'org-apache-camel', _.clone(child.folderNames).concat('mbeans'), 'mbeans');
 
                 // lets add all the entries which are not one context/routes/endpoints/components/dataformats as MBeans
-                node.children
+                child.children
                   .filter(child => !(child.text === 'context'
                     || child.text === 'routes'
                     || child.text === 'endpoints'
@@ -302,13 +302,14 @@ namespace Camel {
 
                 if (jmxNode.children.length > 0) {
                   jmxNode.sortChildren(false);
-                  folder.moveChild(jmxNode);
+                  contextNode.moveChild(jmxNode);
                 }
-                rootFolder.moveChild(folder);
+                rootFolder.moveChild(contextNode);
               }
-              node.detach();
+              children.push(child);
             }
           });
+          children.forEach(child => child.detach());
           domain.children.splice(0, 0, rootFolder);
         }
       }
