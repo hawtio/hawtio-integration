@@ -17,7 +17,7 @@ var config = {
   targetPath: argv.path || '/jolokia',
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
   ts: ['plugins/**/*.ts'],
-  templates: ['plugins/**/*.html'],
+  templates: ['plugins/**/*.html', 'plugins/**/doc/*.md'],
   less: ['plugins/**/*.less', 'vendor/**/*.less', 'vendor/**/*.css'],
   templateModule: 'hawtio-integration-templates',
   dist: argv.out || './dist/',
