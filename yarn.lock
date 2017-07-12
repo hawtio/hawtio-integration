@@ -19,7 +19,7 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@hawtio/core-dts@~3.0.11", "@hawtio/core-dts@~3.0.12", "@hawtio/core-dts@~3.0.14":
+"@hawtio/core-dts@^3.0.15", "@hawtio/core-dts@~3.0.11", "@hawtio/core-dts@~3.0.12", "@hawtio/core-dts@~3.0.14":
   version "3.0.16"
   resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.0.16.tgz#c8b532612d38c2e516f27e87524fdba0540dfc84"
   dependencies:
@@ -174,12 +174,6 @@
 "@types/jquery@*", "@types/jquery@~2.0.0", "@types/jquery@~2.0.46":
   version "2.0.48"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-2.0.48.tgz#3e90d8cde2d29015e5583017f7830cb3975b2eef"
-
-"@types/jqueryui@~1.11.34":
-  version "1.11.34"
-  resolved "https://registry.yarnpkg.com/@types/jqueryui/-/jqueryui-1.11.34.tgz#0caff65df8f9ae930f87a53fa35093ab683d995d"
-  dependencies:
-    "@types/jquery" "*"
 
 "@types/jqueryui@~1.11.34":
   version "1.11.34"
@@ -2182,11 +2176,7 @@ isobject@^2.0.0, isobject@^2.1.0:
   dependencies:
     isarray "1.0.0"
 
-<<<<<<< HEAD
-isobject@^3.0.0:
-=======
 isobject@^3.0.0, isobject@^3.0.1:
->>>>>>> change dependencies version prefix from ^ to ~
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
 
