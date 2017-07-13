@@ -1,298 +1,5 @@
 /// <reference types="jmx" />
 /// <reference types="angular" />
-declare namespace Karaf {
-    var log: Logging.Logger;
-    function setSelect(selection: any, group: any): any;
-    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function toCollection(values: any): any;
-    function featureLinks(workspace: any, name: any, version: any): string;
-    function extractFeature(attributes: any, name: any, version: any): any;
-    function isPlatformBundle(symbolicName: string): boolean;
-    function isActiveMQBundle(symbolicName: string): boolean;
-    function isCamelBundle(symbolicName: string): boolean;
-    function isCxfBundle(symbolicName: string): boolean;
-    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
-    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
-    function getComponentStateDescription(state: any): "Enabled" | "Unsatisfied" | "Activating" | "Active" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
-    function getAllComponents(workspace: any, jolokia: any): any;
-    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
-    function isComponentActive(workspace: any, jolokia: any, component: any): any;
-    function getComponentState(workspace: any, jolokia: any, component: any): any;
-    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function populateDependencies(attributes: any, dependencies: any, features: any): void;
-    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
-    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
-}
-declare namespace Karaf {
-    var _module: angular.IModule;
-}
-declare namespace Karaf {
-}
-declare namespace Karaf {
-}
-declare namespace Karaf {
-}
-declare namespace Karaf {
-}
-declare namespace Karaf {
-}
-declare namespace Karaf {
-}
-declare namespace Osgi {
-    var log: Logging.Logger;
-    function defaultBundleValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
-    function getStateStyle(prefix: string, state: string): string;
-    function defaultServiceValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
-    function defaultPackageValues(workspace: Jmx.Workspace, $scope: any, values: any): any[];
-    function defaultConfigurationValues(workspace: Jmx.Workspace, $scope: any, values: any): any[];
-    function parseActualPackages(packages: string[]): {};
-    function parseManifestHeader(headers: {}, name: string): {};
-    function toCollection(values: any): any;
-    function labelBundleLinks(workspace: any, values: any, allValues: any): any[];
-    function bundleLinks(workspace: any, values: any): string;
-    function bundleUrls(workspace: any, values: any): any[];
-    function pidLinks(workspace: any, values: any): string;
-    /**
-     * Finds a bundle by id
-     *
-     * @method findBundle
-     * @for Osgi
-     * @param {String} bundleId
-     * @param {Array} values
-     * @return {any}
-     *
-     */
-    function findBundle(bundleId: any, values: any): string;
-    function getSelectionBundleMBean(workspace: Jmx.Workspace): string;
-    /**
-     * Walks the tree looking in the first child all the way down until we find an objectName
-     * @method findFirstObjectName
-     * @for Osgi
-     * @param {Folder} node
-     * @return {String}
-     *
-     */
-    function findFirstObjectName(node: any): any;
-    function getSelectionFrameworkMBean(workspace: Jmx.Workspace): string;
-    function getSelectionServiceMBean(workspace: Jmx.Workspace): string;
-    function getSelectionPackageMBean(workspace: Jmx.Workspace): string;
-    function getSelectionConfigAdminMBean(workspace: Jmx.Workspace): string;
-    function getMetaTypeMBean(workspace: Jmx.Workspace): string;
-    function getProfileMetadataMBean(workspace: Jmx.Workspace): string;
-    function getHawtioOSGiToolsMBean(workspace: Jmx.Workspace): string;
-    function getHawtioConfigAdminMBean(workspace: Jmx.Workspace): string;
-    /**
-     * Creates a link to the given configuration pid and/or factoryPid
-     */
-    function createConfigPidLink($scope: any, workspace: any, pid: any, isFactory?: boolean): string;
-    /**
-     * Creates a path to the given configuration pid and/or factoryPid
-     */
-    function createConfigPidPath($scope: any, pid: any, isFactory?: boolean): string;
-    function getConfigurationProperties(workspace: any, jolokia: any, pid: any, onDataFn: any): any;
-    /**
-     * For a pid of the form "foo.generatedId" for a pid "foo" or "foo.bar" remove the "foo." prefix
-     */
-    function removeFactoryPidPrefix(pid: any, factoryPid: any): any;
-}
-declare namespace Osgi {
-    class OsgiDataService {
-        private jolokia;
-        private workspace;
-        constructor(workspace: Jmx.Workspace, jolokia: any);
-        getBundles(): {};
-        getServices(): {};
-        getPackages(): {};
-    }
-}
-declare namespace Osgi {
-    var pluginName: string;
-    var _module: angular.IModule;
-}
-declare namespace Osgi {
-}
-declare namespace Osgi {
-    function formatServiceName(objClass: any): string;
-}
-declare namespace Osgi {
-}
-declare namespace Osgi {
-}
-declare namespace Osgi {
-}
-declare namespace Osgi {
-    var configuration: {
-        pidMetadata: {
-            "io.fabric8.container.java": {
-                name: string;
-            };
-            "io.fabric8.container.process": {
-                name: string;
-            };
-            "io.fabric8.container.process.overlay.resources": {
-                name: string;
-                description: string;
-                schemaExtensions: {
-                    disableHumanizeLabel: boolean;
-                };
-            };
-            "io.fabric8.dosgi": {
-                name: string;
-                description: string;
-            };
-            "io.fabric8.environment": {
-                name: string;
-                description: string;
-                schemaExtensions: {
-                    disableHumanizeLabel: boolean;
-                };
-            };
-            "io.fabric8.fab.osgi.url": {
-                name: string;
-                description: string;
-            };
-            "io.fabric8.mq.fabric.server": {
-                name: string;
-                description: string;
-            };
-            "io.fabric8.openshift": {
-                name: string;
-            };
-            "io.fabric8.ports": {
-                name: string;
-                description: string;
-                schemaExtensions: {
-                    disableHumanizeLabel: boolean;
-                };
-            };
-            "io.fabric8.system": {
-                name: string;
-                description: string;
-                schemaExtensions: {
-                    disableHumanizeLabel: boolean;
-                };
-            };
-            "io.fabric8.version": {
-                name: string;
-                schemaExtensions: {
-                    disableHumanizeLabel: boolean;
-                };
-            };
-            "org.ops4j.pax.logging": {
-                name: string;
-                description: string;
-            };
-            "org.ops4j.pax.url.mvn": {
-                name: string;
-                description: string;
-            };
-            "org.ops4j.pax.url.war": {
-                name: string;
-                description: string;
-            };
-            "org.ops4j.pax.url.wrap": {
-                name: string;
-                description: string;
-            };
-        };
-        ignorePids: string[];
-        tabs: {
-            "fabric8": {
-                label: string;
-                description: string;
-                pids: string[];
-            };
-            "karaf": {
-                label: string;
-                description: string;
-                pids: string[];
-            };
-        };
-    };
-}
-declare namespace Osgi {
-    class OsgiGraphBuilder {
-        private osgiDataService;
-        private workspace;
-        private bundleFilter;
-        private packageFilter;
-        private showServices;
-        private showPackages;
-        private hideUnused;
-        private graphBuilder;
-        private filteredBundles;
-        private bundles;
-        private services;
-        private packages;
-        private PREFIX_BUNDLE;
-        private PREFIX_SVC;
-        private PREFIX_PKG;
-        constructor(osgiDataService: OsgiDataService, workspace: Jmx.Workspace, bundleFilter: String, packageFilter: String, showServices: boolean, showPackages: boolean, hideUnused: boolean);
-        getBundles(): any;
-        getServices(): any;
-        getPackages(): any;
-        bundleNodeId(bundle: any): string;
-        serviceNodeId(service: any): string;
-        pkgNodeId(pkg: any): string;
-        buildSvcNode(service: any): {
-            id: string;
-            name: string;
-            type: string;
-            used: boolean;
-            popup: {
-                title: string;
-                content: () => string;
-            };
-        };
-        buildBundleNode(bundle: any): {
-            id: string;
-            name: any;
-            type: string;
-            used: boolean;
-            navUrl: string;
-            popup: {
-                title: string;
-                content: string;
-            };
-        };
-        buildPackageNode(pkg: any): {
-            id: string;
-            name: any;
-            type: string;
-            used: boolean;
-            popup: {
-                title: string;
-                content: string;
-            };
-        };
-        exportingBundle(pkg: any): any;
-        addFilteredBundles(): void;
-        addFilteredServices(): void;
-        addFilteredPackages(): void;
-        buildGraph(): {
-            nodes: any[];
-            links: any[];
-            linktypes: any;
-        };
-    }
-}
-declare namespace Osgi {
-    var TopLevelController: angular.IModule;
-}
-declare namespace Osgi {
-    var PackagesController: angular.IModule;
-}
-declare namespace Osgi {
-}
-declare namespace Osgi {
-    var ServiceController: angular.IModule;
-}
-declare namespace Osgi {
-}
 declare namespace ActiveMQ {
     var pluginName: string;
     var log: Logging.Logger;
@@ -1181,6 +888,299 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Camel {
+}
+declare namespace Karaf {
+    var log: Logging.Logger;
+    function setSelect(selection: any, group: any): any;
+    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function toCollection(values: any): any;
+    function featureLinks(workspace: any, name: any, version: any): string;
+    function extractFeature(attributes: any, name: any, version: any): any;
+    function isPlatformBundle(symbolicName: string): boolean;
+    function isActiveMQBundle(symbolicName: string): boolean;
+    function isCamelBundle(symbolicName: string): boolean;
+    function isCxfBundle(symbolicName: string): boolean;
+    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
+    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
+    function getComponentStateDescription(state: any): "Active" | "Enabled" | "Unsatisfied" | "Activating" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
+    function getAllComponents(workspace: any, jolokia: any): any;
+    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
+    function isComponentActive(workspace: any, jolokia: any, component: any): any;
+    function getComponentState(workspace: any, jolokia: any, component: any): any;
+    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function populateDependencies(attributes: any, dependencies: any, features: any): void;
+    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
+    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
+}
+declare namespace Karaf {
+    var _module: angular.IModule;
+}
+declare namespace Karaf {
+}
+declare namespace Karaf {
+}
+declare namespace Karaf {
+}
+declare namespace Karaf {
+}
+declare namespace Karaf {
+}
+declare namespace Karaf {
+}
+declare namespace Osgi {
+    var log: Logging.Logger;
+    function defaultBundleValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
+    function getStateStyle(prefix: string, state: string): string;
+    function defaultServiceValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
+    function defaultPackageValues(workspace: Jmx.Workspace, $scope: any, values: any): any[];
+    function defaultConfigurationValues(workspace: Jmx.Workspace, $scope: any, values: any): any[];
+    function parseActualPackages(packages: string[]): {};
+    function parseManifestHeader(headers: {}, name: string): {};
+    function toCollection(values: any): any;
+    function labelBundleLinks(workspace: any, values: any, allValues: any): any[];
+    function bundleLinks(workspace: any, values: any): string;
+    function bundleUrls(workspace: any, values: any): any[];
+    function pidLinks(workspace: any, values: any): string;
+    /**
+     * Finds a bundle by id
+     *
+     * @method findBundle
+     * @for Osgi
+     * @param {String} bundleId
+     * @param {Array} values
+     * @return {any}
+     *
+     */
+    function findBundle(bundleId: any, values: any): string;
+    function getSelectionBundleMBean(workspace: Jmx.Workspace): string;
+    /**
+     * Walks the tree looking in the first child all the way down until we find an objectName
+     * @method findFirstObjectName
+     * @for Osgi
+     * @param {Folder} node
+     * @return {String}
+     *
+     */
+    function findFirstObjectName(node: any): any;
+    function getSelectionFrameworkMBean(workspace: Jmx.Workspace): string;
+    function getSelectionServiceMBean(workspace: Jmx.Workspace): string;
+    function getSelectionPackageMBean(workspace: Jmx.Workspace): string;
+    function getSelectionConfigAdminMBean(workspace: Jmx.Workspace): string;
+    function getMetaTypeMBean(workspace: Jmx.Workspace): string;
+    function getProfileMetadataMBean(workspace: Jmx.Workspace): string;
+    function getHawtioOSGiToolsMBean(workspace: Jmx.Workspace): string;
+    function getHawtioConfigAdminMBean(workspace: Jmx.Workspace): string;
+    /**
+     * Creates a link to the given configuration pid and/or factoryPid
+     */
+    function createConfigPidLink($scope: any, workspace: any, pid: any, isFactory?: boolean): string;
+    /**
+     * Creates a path to the given configuration pid and/or factoryPid
+     */
+    function createConfigPidPath($scope: any, pid: any, isFactory?: boolean): string;
+    function getConfigurationProperties(workspace: any, jolokia: any, pid: any, onDataFn: any): any;
+    /**
+     * For a pid of the form "foo.generatedId" for a pid "foo" or "foo.bar" remove the "foo." prefix
+     */
+    function removeFactoryPidPrefix(pid: any, factoryPid: any): any;
+}
+declare namespace Osgi {
+    class OsgiDataService {
+        private jolokia;
+        private workspace;
+        constructor(workspace: Jmx.Workspace, jolokia: any);
+        getBundles(): {};
+        getServices(): {};
+        getPackages(): {};
+    }
+}
+declare namespace Osgi {
+    var pluginName: string;
+    var _module: angular.IModule;
+}
+declare namespace Osgi {
+}
+declare namespace Osgi {
+    function formatServiceName(objClass: any): string;
+}
+declare namespace Osgi {
+}
+declare namespace Osgi {
+}
+declare namespace Osgi {
+}
+declare namespace Osgi {
+    var configuration: {
+        pidMetadata: {
+            "io.fabric8.container.java": {
+                name: string;
+            };
+            "io.fabric8.container.process": {
+                name: string;
+            };
+            "io.fabric8.container.process.overlay.resources": {
+                name: string;
+                description: string;
+                schemaExtensions: {
+                    disableHumanizeLabel: boolean;
+                };
+            };
+            "io.fabric8.dosgi": {
+                name: string;
+                description: string;
+            };
+            "io.fabric8.environment": {
+                name: string;
+                description: string;
+                schemaExtensions: {
+                    disableHumanizeLabel: boolean;
+                };
+            };
+            "io.fabric8.fab.osgi.url": {
+                name: string;
+                description: string;
+            };
+            "io.fabric8.mq.fabric.server": {
+                name: string;
+                description: string;
+            };
+            "io.fabric8.openshift": {
+                name: string;
+            };
+            "io.fabric8.ports": {
+                name: string;
+                description: string;
+                schemaExtensions: {
+                    disableHumanizeLabel: boolean;
+                };
+            };
+            "io.fabric8.system": {
+                name: string;
+                description: string;
+                schemaExtensions: {
+                    disableHumanizeLabel: boolean;
+                };
+            };
+            "io.fabric8.version": {
+                name: string;
+                schemaExtensions: {
+                    disableHumanizeLabel: boolean;
+                };
+            };
+            "org.ops4j.pax.logging": {
+                name: string;
+                description: string;
+            };
+            "org.ops4j.pax.url.mvn": {
+                name: string;
+                description: string;
+            };
+            "org.ops4j.pax.url.war": {
+                name: string;
+                description: string;
+            };
+            "org.ops4j.pax.url.wrap": {
+                name: string;
+                description: string;
+            };
+        };
+        ignorePids: string[];
+        tabs: {
+            "fabric8": {
+                label: string;
+                description: string;
+                pids: string[];
+            };
+            "karaf": {
+                label: string;
+                description: string;
+                pids: string[];
+            };
+        };
+    };
+}
+declare namespace Osgi {
+    class OsgiGraphBuilder {
+        private osgiDataService;
+        private workspace;
+        private bundleFilter;
+        private packageFilter;
+        private showServices;
+        private showPackages;
+        private hideUnused;
+        private graphBuilder;
+        private filteredBundles;
+        private bundles;
+        private services;
+        private packages;
+        private PREFIX_BUNDLE;
+        private PREFIX_SVC;
+        private PREFIX_PKG;
+        constructor(osgiDataService: OsgiDataService, workspace: Jmx.Workspace, bundleFilter: String, packageFilter: String, showServices: boolean, showPackages: boolean, hideUnused: boolean);
+        getBundles(): any;
+        getServices(): any;
+        getPackages(): any;
+        bundleNodeId(bundle: any): string;
+        serviceNodeId(service: any): string;
+        pkgNodeId(pkg: any): string;
+        buildSvcNode(service: any): {
+            id: string;
+            name: string;
+            type: string;
+            used: boolean;
+            popup: {
+                title: string;
+                content: () => string;
+            };
+        };
+        buildBundleNode(bundle: any): {
+            id: string;
+            name: any;
+            type: string;
+            used: boolean;
+            navUrl: string;
+            popup: {
+                title: string;
+                content: string;
+            };
+        };
+        buildPackageNode(pkg: any): {
+            id: string;
+            name: any;
+            type: string;
+            used: boolean;
+            popup: {
+                title: string;
+                content: string;
+            };
+        };
+        exportingBundle(pkg: any): any;
+        addFilteredBundles(): void;
+        addFilteredServices(): void;
+        addFilteredPackages(): void;
+        buildGraph(): {
+            nodes: any[];
+            links: any[];
+            linktypes: any;
+        };
+    }
+}
+declare namespace Osgi {
+    var TopLevelController: angular.IModule;
+}
+declare namespace Osgi {
+    var PackagesController: angular.IModule;
+}
+declare namespace Osgi {
+}
+declare namespace Osgi {
+    var ServiceController: angular.IModule;
+}
+declare namespace Osgi {
 }
 declare namespace Camel {
     class Context {
