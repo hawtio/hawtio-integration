@@ -13,11 +13,6 @@ namespace Camel {
     
     var log: Logging.Logger = Logger.get("Camel");
 
-    $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-      // lets do this asynchronously to avoid Error: $digest already in progress
-      setTimeout(updateData, 50);
-    });
-
     function updateData() {
       var contextMBean = getSelectionCamelContextMBean(workspace);
 
@@ -75,6 +70,8 @@ namespace Camel {
     setTimeout(function() {
       $('[data-toggle=tooltip]').tooltip();
     }, 1000);
+
+    updateData();
 
   }]);
 

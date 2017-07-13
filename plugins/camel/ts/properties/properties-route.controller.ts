@@ -13,35 +13,26 @@ namespace Camel {
 
       var log: Logging.Logger = Logger.get("Camel");
 
-      $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-        // lets do this asynchronously to avoid Error: $digest already in progress
-        setTimeout(updateData, 50);
-      });
+      let routeXmlNode = getSelectedRouteNode(workspace);
 
-      function updateData() {
-        let routeXmlNode = getSelectedRouteNode(workspace);
-
-        if (routeXmlNode) {
-          let data = getRouteNodeJSON(routeXmlNode);
-          let schema = getCamelSchema(routeXmlNode.nodeName);
-          addValueToProperties(data, schema);
-          
-          if (log.enabledFor(Logger.DEBUG)) {
-            log.debug("Properties - data: " + JSON.stringify(data, null, "  "));
-            log.debug("Properties - schema: " + JSON.stringify(schema, null, "  "));
-          }
-
-          $scope.icon = getRouteNodeIcon(routeXmlNode);
-          $scope.title = schema.title;
-          $scope.labels = schema.group ? schema.group.split(',') : [];
-          $scope.description = schema.description;
-          $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
-          $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
-          $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
-          $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
-
-          Core.$apply($scope);
+      if (routeXmlNode) {
+        let data = getRouteNodeJSON(routeXmlNode);
+        let schema = getCamelSchema(routeXmlNode.nodeName);
+        addValueToProperties(data, schema);
+        
+        if (log.enabledFor(Logger.DEBUG)) {
+          log.debug("Properties - data: " + JSON.stringify(data, null, "  "));
+          log.debug("Properties - schema: " + JSON.stringify(schema, null, "  "));
         }
+
+        $scope.icon = getRouteNodeIcon(routeXmlNode);
+        $scope.title = schema.title;
+        $scope.labels = schema.group ? schema.group.split(',') : [];
+        $scope.description = schema.description;
+        $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
+        $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
+        $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
+        $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
       }
 
       function addValueToProperties(data, schema) {

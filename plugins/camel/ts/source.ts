@@ -8,11 +8,6 @@ namespace Camel {
 
     $scope.showUpdateButton = true;
 
-    $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-      // lets do this asynchronously to avoid Error: $digest already in progress
-      setTimeout(updateRoutes, 50);
-    });
-
     function getSource(routeXmlNode) {
       function removeCrappyHeaders(idx, e) {
         var answer = e.getAttribute("customId");
@@ -113,7 +108,9 @@ namespace Camel {
           Core.notification("error", "Could not find CamelContext MBean!");
         }
       }
-    };  
+    };
+
+    updateRoutes();
   }]);
 }
 

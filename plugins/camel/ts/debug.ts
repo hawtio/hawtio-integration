@@ -33,11 +33,6 @@ namespace Camel {
       setDebugging(false);
     };
 
-    $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-      // lets do this asynchronously to avoid Error: $digest already in progress
-      setTimeout(reloadData, 50);
-    });
-
     $scope.$on("camel.diagram.selectedNodeId", (event, value) => {
       $scope.selectedDiagramNodeId = value;
       updateBreakpointFlag();

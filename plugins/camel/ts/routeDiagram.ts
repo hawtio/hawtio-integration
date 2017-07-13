@@ -29,27 +29,19 @@ namespace Camel {
     $scope.camelMaximumLabelWidth = Camel.maximumLabelWidth(localStorage);
     $scope.camelShowInflightCounter = Camel.showInflightCounter(localStorage);
 
-    var updateRoutes = _.debounce(doUpdateRoutes, 300, { trailing: true});
+    const updateRoutes = _.debounce(doUpdateRoutes, 300, { trailing: true});
 
     // lets delay a little updating the routes to avoid timing issues where we've not yet
     // fully loaded the workspace and/or the XML model
-    var delayUpdatingRoutes = 300;
-
-    $scope.$on("$routeChangeSuccess", function (event, current, previous) {
-      // lets do this asynchronously to avoid Error: $digest already in progress
-      updateRoutes();
-      //$timeout(updateRoutes, delayUpdatingRoutes, false);
-    });
+    const delayUpdatingRoutes = 300;
 
     $scope.$on('jmxTreeUpdated', function () {
       updateRoutes();
-      //$timeout(updateRoutes, delayUpdatingRoutes, false);
     });
 
     $scope.$watch('nodeXmlNode', function () {
       if ($scope.isJmxTab && workspace.moveIfViewInvalid()) return;
       updateRoutes();
-      //$timeout(updateRoutes, delayUpdatingRoutes, false);
     });
 
     function doUpdateRoutes() {
