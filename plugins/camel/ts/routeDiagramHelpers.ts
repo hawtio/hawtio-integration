@@ -153,8 +153,13 @@ namespace Camel {
 
     counters.attr("x", d => d.bbox.width / 2);
 
-    var g = new graphlib.Graph()
-      .setGraph({});
+    var g = new graphlib.Graph({
+        multigraph: false,
+        compound: false
+      })
+      .setGraph({
+        ranker: 'longest-path',
+      });
 
     states.forEach(node => g.setNode(node.id, node));
     transitions.forEach(edge => g.setEdge(edge.source.id, edge.target.id, edge));
