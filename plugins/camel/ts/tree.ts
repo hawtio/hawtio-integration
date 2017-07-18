@@ -34,7 +34,7 @@ namespace Camel {
     ($scope, $location: ng.ILocationService, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia) => {
     $scope.treeFetched = () => workspace.treeFetched;
 
-    $scope.$on('$routeChangeSuccess', () => Jmx.updateTreeSelectionFromURL($location, $('#cameltree')));
+    $scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL($location, $('#cameltree')));
 
     $scope.$watch('workspace.tree', function () {
       reloadFunction();
