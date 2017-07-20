@@ -19301,6 +19301,10 @@ var Camel;
                 }
                 var render = Camel.dagreLayoutGraph(nodes, links, svg, false, onClick).graph;
                 var container = d3.select(svg);
+                var zoom = d3.behavior.zoom()
+                    .on('zoom', function () { return container.select('g')
+                    .attr('transform', "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")"); });
+                container.call(zoom);
                 // We want to have the diagram to be uniformally scaled and centered within the SVG viewport
                 function viewBox() {
                     // But we don't want smaller diagrams to be scaled up so we set the viewBox to
@@ -19309,11 +19313,18 @@ var Camel;
                     var graph = render.graph();
                     if (graph.width > canvasDiv.width() || graph.height > canvasDiv.height()) {
                         container.attr('viewBox', "0 0 " + graph.width + " " + graph.height);
+                        // Bound maximum scale to nominal size
+                        zoom.scaleExtent([1, 1 / Math.min(canvasDiv.width() / graph.width, canvasDiv.height() / graph.height)]);
                     }
                     else {
                         // For diagrams smaller than the SVG viewport size, we still want them to be centered
                         // with the 'preserveAspectRatio' attribute set to 'xMidYMid'
                         container.attr('viewBox', (graph.width - canvasDiv.width()) / 2 + " " + (graph.height - canvasDiv.height()) / 2 + " " + canvasDiv.width() + " " + canvasDiv.height());
+                        // Reset the zoom scale and disable scaling
+                        zoom.scale(1);
+                        zoom.scaleExtent([1, 1]);
+                        // TODO: smooth transitioning from scaled down state
+                        container.call(zoom.event);
                     }
                 }
                 // We need to adapt the viewBox for smaller diagrams as it depends on the SVG viewport size
@@ -19322,11 +19333,6 @@ var Camel;
                 $scope.$on('$destroy', function () { return window.removeEventListener('resize', resizeViewBox); });
                 // Lastly, we need to do it once at initialisation
                 viewBox();
-                var zoom = d3.behavior.zoom()
-                    .scaleExtent([1, 5])
-                    .on('zoom', function () { return container.select('g')
-                    .attr('transform', "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")"); });
-                container.call(zoom);
                 // Only apply node selection behavior if debugging or tracing
                 if (_.startsWith(path, "/camel/debugRoute") || _.startsWith(path, "/camel/traceRoute")) {
                     var gNodes = canvasDiv.find("g.node");

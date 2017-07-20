@@ -669,6 +669,10 @@ div.camel-properties {
   width: 111px;
 }
 
+.table-src-components th:nth-child(3) {
+  width: 30%;
+}
+
 .bundles-container {
   margin-left: -20px;
   margin-right: -20px;
@@ -770,10 +774,6 @@ div.camel-properties {
 }
 .osgi-packages-main .osgi-packages-list .list-group-item-container {
   padding: 10px 20px;
-}
-
-.table-src-components th:nth-child(3) {
-  width: 30%;
 }
 
 .metricsWatcher .panel-group:first-child {
