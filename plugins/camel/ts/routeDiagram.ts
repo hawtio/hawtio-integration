@@ -235,6 +235,7 @@ namespace Camel {
       container.call(zoom);
 
       // We want to have the diagram to be uniformally scaled and centered within the SVG viewport
+      // TODO: set translate extent
       function viewBox() {
         // But we don't want smaller diagrams to be scaled up so we set the viewBox to
         // the diagram bounding box only for diagrams that overflow the SVG viewport,
