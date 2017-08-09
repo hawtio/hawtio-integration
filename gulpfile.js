@@ -1,19 +1,21 @@
-var gulp = require('gulp'),
-    eventStream = require('event-stream'),
-    gulpLoadPlugins = require('gulp-load-plugins'),
-    del = require('del'),
-    fs = require('fs'),
-    path = require('path'),
-    s = require('underscore.string'),
-    argv = require('yargs').argv,
-    urljoin = require('url-join'),
-    logger = require('js-logger'),
-    hawtio = require('@hawtio/node-backend');
+let angularTemplatecache = require('gulp-angular-templatecache');
+let argv = require('yargs').argv;
+let concat = require('gulp-concat');
+let del = require('del');
+let eventStream = require('event-stream');
+let gulp = require('gulp');
+let gulpif = require('gulp-if');
+let hawtio = require('@hawtio/node-backend');
+let less = require('gulp-less');
+let logger = require('js-logger');
+let ngAnnotate = require('gulp-ng-annotate');
+let path = require('path');
+let rename = require("gulp-rename");
+let sourcemaps = require('gulp-sourcemaps');
+let typescript = require('gulp-typescript');
 
-var plugins = gulpLoadPlugins({});
-
-var config = {
-  proxyPort: argv.port || 8181,
+let config = {
+  proxyPort: argv.port || 8080,
   targetPath: argv.path || '/jolokia',
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
   ts: ['plugins/**/*.ts'],
@@ -24,7 +26,7 @@ var config = {
   js: 'hawtio-integration.js',
   dts: 'hawtio-integration.d.ts',
   css: 'hawtio-integration.css',
-  tsProject: plugins.typescript.createProject('tsconfig.json'),
+  tsProject: typescript.createProject('tsconfig.json'),
   sourceMap: argv.sourcemap,
   vendorJs: './vendor/**/*.js',
   vendorCss: './vendor/**/*.css',
@@ -38,22 +40,22 @@ gulp.task('clean-defs', function() {
 
 gulp.task('tsc', ['clean-defs'], function() {
   var tsResult = gulp.src(config.ts)
-    .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
+    .pipe(gulpif(config.sourceMap, sourcemaps.init()))
     .pipe(config.tsProject());
 
   return eventStream.merge(
     tsResult.js
-      .pipe(plugins.ngAnnotate())
-      .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.write()))
+      .pipe(ngAnnotate())
+      .pipe(gulpif(config.sourceMap, sourcemaps.write()))
       .pipe(gulp.dest('.')),
     tsResult.dts
-      .pipe(plugins.rename(config.dts))
+      .pipe(rename(config.dts))
       .pipe(gulp.dest(config.dist)));
 });
 
 gulp.task('template', ['tsc'], function() {
   return gulp.src(config.templates)
-    .pipe(plugins.angularTemplatecache({
+    .pipe(angularTemplatecache({
       filename: 'templates.js',
       root: 'plugins/',
       standalone: true,
@@ -65,7 +67,7 @@ gulp.task('template', ['tsc'], function() {
 
 gulp.task('concat', ['template'], function() {
   return gulp.src([config.vendorJs, 'compiled.js', 'templates.js'])
-    .pipe(plugins.concat(config.js))
+    .pipe(concat(config.js))
     .pipe(gulp.dest(config.dist));
 });
 
@@ -75,7 +77,7 @@ gulp.task('clean', ['concat'], function() {
 
 gulp.task('less', function () {
   let pluginsCss = gulp.src(config.less)
-    .pipe(plugins.less({
+    .pipe(less({
       paths: [
         path.join(__dirname, 'plugins'),
         path.join(__dirname, 'node_modules')
@@ -83,7 +85,7 @@ gulp.task('less', function () {
     }));
   let vendorCss = gulp.src(config.vendorCss);
   return eventStream.merge(pluginsCss, vendorCss)
-    .pipe(plugins.concat(config.css))
+    .pipe(concat(config.css))
     .pipe(gulp.dest(config.dist));
 });
 
@@ -97,7 +99,7 @@ gulp.task('watch-less', function() {
 });
 
 gulp.task('watch', ['build', 'watch-less'], function() {
-  gulp.watch(['index.html', urljoin(config.dist, '*')], ['reload']);
+  gulp.watch(['index.html', config.dist + '*'], ['reload']);
   gulp.watch([config.ts, config.templates], ['tsc', 'template', 'concat', 'clean']);
 });
 
@@ -121,21 +123,21 @@ gulp.task('connect', ['watch'], function() {
     }
   });
   hawtio.use('/', function(req, res, next) {
-          var path = req.originalUrl;
-          // avoid returning these files, they should get pulled from js
-          if (s.startsWith(path, '/plugins/') && s.endsWith(path, 'html')) {
-            if (argv.debug) {
-              console.log("returning 404 for: ", path);
-            }
-            res.statusCode = 404;
-            res.end();
-          } else {
-            if (argv.debug) {
-              console.log("allowing: ", path);
-            }
-            next();
-          }
-        });
+    var path = req.originalUrl;
+    // avoid returning these files, they should get pulled from js
+    if (path.startsWith('/plugins/') && path.endsWith('html')) {
+      if (argv.debug) {
+        console.log("returning 404 for: ", path);
+      }
+      res.statusCode = 404;
+      res.end();
+    } else {
+      if (argv.debug) {
+        console.log("allowing: ", path);
+      }
+      next();
+    }
+  });
   hawtio.listen(function(server) {
     var host = server.address().address;
     var port = server.address().port;
@@ -151,6 +153,3 @@ gulp.task('reload', function() {
 gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean', 'copy-images']);
 
 gulp.task('default', ['connect']);
-
-
-
