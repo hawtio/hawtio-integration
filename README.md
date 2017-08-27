@@ -28,20 +28,20 @@ cd hawtio-integration
 ### Install project dependencies
 
 ```
-yarn install:dev
+yarn install
 ```
 
 ### Run the web application
 
 ```
-gulp
+yarn start
 ```
 
 ### Change the default proxy port
 
 To proxy to a local JVM running on a different port than `8282` specify the `--port` CLI arguement to gulp:
 ```
-gulp --port=8181
+yarn start -- --port=8181
 ```
 
 ### Output build to a different directory
