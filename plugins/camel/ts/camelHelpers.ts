@@ -790,9 +790,9 @@ module Camel {
           // look for the Camel 2.11 mbean which we prefer
           var result = tree.navigate(domain, contextId, "tracer");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.title, "BacklogTracer"));
+            var mbean = findByTitleStartingWith(result.children, 'BacklogTracer');
             if (mbean) {
-              return mbean.objectName;
+              return mbean['objectName'];
             }
           }
         }
@@ -811,9 +811,9 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "tracer");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.title, "BacklogDebugger"));
+            var mbean = findByTitleStartingWith(result.children, 'BacklogDebugger');
             if (mbean) {
-              return mbean.objectName;
+              return mbean['objectName'];
             }
           }
         }
@@ -832,9 +832,9 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.title, "DefaultTypeConverter"));
+            var mbean = findByTitleStartingWith(result.children, 'DefaultTypeConverter');
             if (mbean) {
-              return mbean.objectName;
+              return mbean['objectName'];
             }
           }
         }
@@ -853,9 +853,9 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.title, "DefaultRestRegistry"));
+            var mbean = findByTitleStartingWith(result.children, 'DefaultRestRegistry');
             if (mbean) {
-              return mbean.objectName;
+              return mbean['objectName'];
             }
           }
         }
@@ -874,9 +874,9 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.title, "DefaultRuntimeEndpointRegistry"));
+            var mbean = findByTitleStartingWith(result.children, 'DefaultRuntimeEndpointRegistry');
             if (mbean) {
-              return mbean.objectName;
+              return mbean['objectName'];
             }
           }
         }
@@ -895,9 +895,9 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.title, "DefaultInflightRepository"));
+            var mbean = findByTitleStartingWith(result.children, 'DefaultInflightRepository');
             if (mbean) {
-              return mbean.objectName;
+              return mbean['objectName'];
             }
           }
         }
@@ -916,9 +916,9 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.title, "DefaultAsyncProcessorAwaitManager"));
+            var mbean = findByTitleStartingWith(result.children, 'DefaultAsyncProcessorAwaitManager');
             if (mbean) {
-              return mbean.objectName;
+              return mbean['objectName'];
             }
           }
         }
@@ -937,9 +937,9 @@ module Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, contextId, "services");
           if (result && result.children) {
-            var mbean = result.children.find(m => _.startsWith(m.title, "MetricsRegistryService"));
+            var mbean = findByTitleStartingWith(result.children, 'MetricsRegistryService');
             if (mbean) {
-              return mbean.objectName;
+              return mbean['objectName'];
             }
           }
         }
@@ -1646,6 +1646,12 @@ module Camel {
       }
     }
     return false;
+  }
+
+  function findByTitleStartingWith(arr, str) {
+    return _.find(arr, function(obj) {
+      return _.startsWith(obj['title'], str);
+    });
   }
 
 }

@@ -110,9 +110,9 @@ module Camel {
       var answer = [];
       var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
       if (contextFolder) {
-        var endpoints = (contextFolder["children"] || []).find((n) => "endpoints" === n.title);
+        var endpoints = _.find(contextFolder["children"] || [], {'title': 'endpoints'});
         if (endpoints) {
-          angular.forEach(endpoints.children, (endpointFolder) => {
+          angular.forEach(endpoints['children'], (endpointFolder) => {
             var entries = endpointFolder ? endpointFolder.entries : null;
             if (entries) {
               var endpointPath = entries["name"];
@@ -140,9 +140,9 @@ module Camel {
       var answer = [];
       var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
       if (contextFolder) {
-        var folders = (contextFolder["children"] || []).find((n) => "routes" === n.title);
+        var folders = _.find(contextFolder["children"] || [], {'title': 'routes'});
         if (folders) {
-          angular.forEach(folders.children, (folder) => {
+          angular.forEach(folders['children'], (folder) => {
             var entries = folder ? folder.entries : null;
             if (entries) {
               var routeId = entries["name"];

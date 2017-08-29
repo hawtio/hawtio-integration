@@ -237,12 +237,12 @@ module Osgi {
             var name = pid.substring(idx + 1, pid.length);
             var factoryConfig = pids[factoryPid];
             if (!factoryConfig) {
-              var bundle = config.bundle;
+              var bundle = config['bundle'];
               factoryConfig = getOrCreatePidConfig(factoryPid, bundle, pids);
             }
             if (factoryConfig) {
               configureFactoryPidConfig(pid, factoryConfig, config, factoryPid);
-              config.name = name;
+              config['name'] = name;
               pids[factoryPid] = factoryConfig;
 
               // lets remove the pid instance as its now a child of the factory

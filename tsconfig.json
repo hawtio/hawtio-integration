@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "outFile": "compiled.js",
+    "typeRoots": [
+      "libs/hawtio-core-dts/types"
+    ]
+  },
+  "include": [
+    "plugins/**/*.ts"
+  ]
+}
