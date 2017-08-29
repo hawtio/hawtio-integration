@@ -91,7 +91,7 @@ namespace ActiveMQ {
     var selected = $scope.gridOptions.selectedItems;
     selected.splice(0, selected.length);
     if (idx >= 0 && idx < $scope.messages.length) {
-      $scope.row = $scope.messages.find((msg) => msg[key] === jmsMessageID);
+      $scope.row = _.find($scope.messages, msg => msg[key] === jmsMessageID);
       if ($scope.row) {
         selected.push($scope.row);
       }

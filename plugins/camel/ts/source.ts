@@ -71,7 +71,7 @@ namespace Camel {
           if (routeParent && routeParent.nodeName === 'routes') {
             if (routeParent.attributes) {
               angular.forEach(routeParent.attributes, (attr) => {
-                if (attr.name.startsWith("xmlns")) {
+                if (_.startsWith(attr.name, "xmlns")) {
                   var attrCopy = doc.createAttribute(attr.name);
                   attrCopy.value = attr.value;
                   selectedRoute.attributes.setNamedItem(attrCopy);

@@ -6,9 +6,7 @@ namespace Karaf {
     if (!angular.isDefined(selection)) {
       return group[0];
     }
-    var answer = group.findIndex(function (item) {
-      return item.id === selection.id
-    });
+    var answer = _.findIndex(group, item => item.id === selection.id);
     if (answer !== -1) {
       return group[answer];
     } else {
@@ -246,10 +244,7 @@ namespace Karaf {
 
     export function getComponentByName(workspace, jolokia, componentName) {
         var components = getAllComponents(workspace, jolokia)
-        return components.find((c) => {
-            return c.Name == componentName;
-        });
-
+        return _.find(components, c => c.Name == componentName);
     }
 
     export function isComponentActive(workspace, jolokia, component) {
