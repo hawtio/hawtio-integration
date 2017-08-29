@@ -2,6 +2,7 @@
 /// <reference path="../libs/hawtio-jmx/defs.d.ts"/>
 /// <reference path="../libs/hawtio-ui/defs.d.ts"/>
 /// <reference path="../libs/hawtio-utilities/defs.d.ts"/>
+/// <reference path="../libs/hawtio-core-dts/defs.d.ts"/>
 
 /// <reference path="../../includes.ts"/>
 var ActiveMQ;
@@ -79,7 +80,7 @@ var ActiveMQ;
         var selected = $scope.gridOptions.selectedItems;
         selected.splice(0, selected.length);
         if (idx >= 0 && idx < $scope.messages.length) {
-            $scope.row = $scope.messages.find(function (msg) { return msg[key] === jmsMessageID; });
+            $scope.row = _.find($scope.messages, function (msg) { return msg[key] === jmsMessageID; });
             if ($scope.row) {
                 selected.push($scope.row);
             }
@@ -7031,7 +7032,7 @@ var Camel;
                         if (routeParent && routeParent.nodeName === 'routes') {
                             if (routeParent.attributes) {
                                 angular.forEach(routeParent.attributes, function (attr) {
-                                    if (attr.name.startsWith("xmlns")) {
+                                    if (_.startsWith(attr.name, "xmlns")) {
                                         var attrCopy = doc.createAttribute(attr.name);
                                         attrCopy.value = attr.value;
                                         selectedRoute.attributes.setNamedItem(attrCopy);
@@ -7445,9 +7446,7 @@ var Karaf;
         if (!angular.isDefined(selection)) {
             return group[0];
         }
-        var answer = group.findIndex(function (item) {
-            return item.id === selection.id;
-        });
+        var answer = _.findIndex(group, function (item) { return item.id === selection.id; });
         if (answer !== -1) {
             return group[answer];
         }
@@ -7668,9 +7667,7 @@ var Karaf;
     Karaf.getAllComponents = getAllComponents;
     function getComponentByName(workspace, jolokia, componentName) {
         var components = getAllComponents(workspace, jolokia);
-        return components.find(function (c) {
-            return c.Name == componentName;
-        });
+        return _.find(components, function (c) { return c.Name == componentName; });
     }
     Karaf.getComponentByName = getComponentByName;
     function isComponentActive(workspace, jolokia, component) {
