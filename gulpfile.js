@@ -33,11 +33,8 @@ gulp.task('bower', function() {
 });
 
 gulp.task('tsc', function() {
-  var cwd = process.cwd();
-  var tsResult = gulp.src(config.ts)
+  return gulp.src(config.ts)
     .pipe(config.tsProject())
-    .js
-    .pipe(plugins.concat('compiled.js'))
     .pipe(gulp.dest('.'));
 });
 
