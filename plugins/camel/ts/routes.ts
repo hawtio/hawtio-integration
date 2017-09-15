@@ -113,7 +113,7 @@ module Camel {
     function isSelected(node) {
       if (node) {
         var className = node.getAttribute("class");
-        return className && className.endsWith(postfix);
+        return className && _.endsWith(className, postfix);
       }
       return false;
     }
@@ -122,7 +122,7 @@ module Camel {
       var answer = false;
       if (node) {
         var className = node.getAttribute("class");
-        var selected = className && className.endsWith(postfix);
+        var selected = className && _.endsWith(className, postfix);
         if (selected) {
           className = className.substring(0, className.length - postfix.length);
         } else {
@@ -153,7 +153,7 @@ module Camel {
       // do not allow clicking on node to show properties if debugging or tracing as that is for selecting the node instead
       var onClick;
       var path = $location.path();
-      if (path.startsWith("/camel/debugRoute") || path.startsWith("/camel/traceRoute")) {
+      if (_.startsWith(path, "/camel/debugRoute") || _.startsWith(path, "/camel/traceRoute")) {
         onClick = null;
       } else {
         onClick = onClickGraphNode;

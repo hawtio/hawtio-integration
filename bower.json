@@ -1,6 +1,5 @@
 {
   "name": "hawtio-integration",
-  "version": "2.0.22",
   "keywords": [
     "hawtio"
   ],
@@ -20,25 +19,30 @@
     "plugins"
   ],
   "dependencies": {
-    "hawtio-core": "~2.0.0",
-    "hawtio-core-navigation": "~2.0.0",
-    "hawtio-forms": "~2.0.0",
-    "hawtio-jmx": "~2.0.55",
-    "hawtio-ui": "~2.0.0",
-    "hawtio-utilities": "~2.0.0",
-    "angular-resource": "~1.3.9",
-    "hawtio-template-cache": "*"
+    "hawtio-core": "2.0.36",
+    "hawtio-core-dts": "2.0.28",
+    "hawtio-core-navigation": "2.0.58",
+    "hawtio-extension-service": "2.0.3",
+    "hawtio-forms": "2.0.40",
+    "hawtio-jmx": "2.0.78",
+    "hawtio-preferences": "2.0.9",
+    "hawtio-template-cache": "2.0.6",
+    "hawtio-ui": "2.0.108",
+    "hawtio-utilities": "2.0.39",
+    "angular": "1.5.8",
+    "angular-resource": "1.5.8",
+    "angular-route": "1.5.8",
+    "angular-sanitize": "1.5.8",
+    "bootstrap": "3.3.7",
+    "lodash": "3.10.1",
+    "patternfly": "2.7.0"
   },
   "devDependencies": {
-    "bootstrap": "~3.3.6",
-    "patternfly": "~2.7.0",
-    "hawtio-core-dts": "~2.0.0",
     "angular-mocks": "~1.3.7",
-    "hawtio-dashboard": "~2.0.3",
-    "hawtio-preferences": "~2.0.1",
-    "hawtio-extension-service": "~2.0.1"
+    "hawtio-dashboard": "~2.0.3"
   },
   "resolutions": {
-    "lodash": "~3.2.0"
+    "angular": "1.5.8",
+    "angular-route": "1.5.8"
   }
 }

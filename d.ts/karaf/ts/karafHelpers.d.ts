@@ -20,7 +20,7 @@ declare module Karaf {
     function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
     function getComponentStateDescription(state: any): string;
     function getAllComponents(workspace: any, jolokia: any): any;
-    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
+    function getComponentByName(workspace: any, jolokia: any, componentName: any): {};
     function isComponentActive(workspace: any, jolokia: any, component: any): any;
     function getComponentState(workspace: any, jolokia: any, component: any): any;
     function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;

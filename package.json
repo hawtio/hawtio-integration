@@ -1,6 +1,10 @@
 {
   "name": "hawtio-integration",
   "version": "2.0.0",
+  "scripts": {
+    "start": "gulp",
+    "build": "gulp build"
+  },
   "devDependencies": {
     "bower": "^1.3.12",
     "del": "^2.2.0",
@@ -13,19 +17,16 @@
     "gulp-filter": "^3.0.1",
     "gulp-less": "^3.0.5",
     "gulp-load-plugins": "^0.8.0",
-    "gulp-notify": "^2.1.0",
     "gulp-replace": "^0.5.4",
     "gulp-typescript": "^2.4.2",
     "gulp-watch": "^3.0.0",
+    "hawtio-node-backend": "^2.0.5",
     "proxy-middleware": "^0.9.0",
     "through2": "^0.6.3",
     "underscore.string": "^2.4.0",
     "url-join": "0.0.1",
     "which": "^1.0.8",
-    "wiredep": "^2.2.2"
-  },
-  "dependencies": {
-    "hawtio-node-backend": "^2.0.5",
+    "wiredep": "^2.2.2",
     "yargs": "^3.32.0"
   }
 }

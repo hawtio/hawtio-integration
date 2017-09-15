@@ -11,7 +11,7 @@ module Karaf {
     if (!angular.isDefined(selection)) {
       return group[0];
     }
-    var answer = group.findIndex(function (item) {
+    var answer = _.findIndex(group, function (item) {
       return item.id === selection.id
     });
     if (answer !== -1) {
@@ -251,7 +251,7 @@ module Karaf {
 
     export function getComponentByName(workspace, jolokia, componentName) {
         var components = getAllComponents(workspace, jolokia)
-        return components.find((c) => {
+        return _.find(components, (c) => {
             return c.Name == componentName;
         });
 

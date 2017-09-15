@@ -262,7 +262,7 @@ module Osgi {
 
     function trimUnnecessaryPrefixes(name) {
       angular.forEach(["Fabric8 ", "Apache "], (prefix) => {
-        if (name && name.startsWith(prefix) && name.length > prefix.length) {
+        if (name && _.startsWith(name, prefix) && name.length > prefix.length) {
           name = name.substring(prefix.length);
         }
       });
@@ -291,7 +291,7 @@ module Osgi {
     function ignorePid(pid) {
       var answer = false;
       angular.forEach(Osgi.configuration.ignorePids, (pattern) => {
-        if (pid.startsWith(pattern)) {
+        if (_.startsWith(pid, pattern)) {
           answer = true;
         }
       });

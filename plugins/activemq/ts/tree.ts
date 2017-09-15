@@ -60,7 +60,7 @@ module ActiveMQ {
           var grandChildren = broker.children;
           if (grandChildren) {
             Tree.sanitize(grandChildren);
-            var idx = grandChildren.findIndex(n => n.title === "Topic");
+            var idx = _.findIndex(grandChildren, n => n.title === "Topic");
             if (idx > 0) {
               var old = grandChildren[idx];
 
@@ -73,7 +73,7 @@ module ActiveMQ {
               var filter = Core.parseBooleanValue(localStorage["activemqFilterAdvisoryTopics"]);
               if (filter) {
                 if (old && old.children) {
-                  var filteredTopics = _.filter(old.children, (c:any) => !c.title.startsWith("ActiveMQ.Advisory"));
+                  var filteredTopics = _.filter(old.children, (c:any) => !_.startsWith(c.title, "ActiveMQ.Advisory"));
                   old.children = filteredTopics;
                 }
               } else if (allTopics) {
