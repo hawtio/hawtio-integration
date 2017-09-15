@@ -1,0 +1,3 @@
+branches:
+  ignore:
+    - openshift-3.5

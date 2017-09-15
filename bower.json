@@ -19,22 +19,27 @@
     "plugins"
   ],
   "dependencies": {
-    "hawtio-core": "~2.0.0",
-    "hawtio-core-navigation": "~2.0.0",
-    "hawtio-forms": "~2.0.0",
-    "hawtio-jmx": "~2.0.0",
-    "hawtio-ui": "~2.0.0",
-    "hawtio-utilities": "~2.0.0",
-    "angular-resource": "~1.5.0",
-    "hawtio-template-cache": "~2.0.0"
+    "bootstrap": "3.3.7",
+    "patternfly": "3.19.0",
+    "hawtio-core": "2.0.37",
+    "hawtio-core-dts": "2.0.29",
+    "hawtio-core-navigation": "2.0.59",
+    "hawtio-extension-service": "2.0.3",
+    "hawtio-forms": "2.0.41",
+    "hawtio-jmx": "2.0.79",
+    "hawtio-preferences": "2.0.10",
+    "hawtio-template-cache": "2.0.7",
+    "hawtio-ui": "2.0.113",
+    "hawtio-utilities": "2.0.39",
+    "angular": "1.5.11",
+    "angular-resource": "1.5.11",
+    "angular-route": "1.5.11",
+    "angular-sanitize": "1.5.11",
+    "lodash": "3.10.1"
   },
-  "devDependencies": {
-    "bootstrap": "~3.3.0",
-    "patternfly": "~2.7.0",
-    "hawtio-core-dts": "~2.0.0",
-    "angular-mocks": "~1.5.0",
-    "hawtio-dashboard": "~2.0.0",
-    "hawtio-preferences": "~2.0.0",
-    "hawtio-extension-service": "~2.0.0"
+  "resolutions": {
+    "angular": "1.5.11",
+    "angular-route": "1.5.11",
+    "jquery": "2.1.4"
   }
 }

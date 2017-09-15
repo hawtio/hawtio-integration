@@ -173,7 +173,7 @@ module ActiveMQ {
             if (grandChildren) {
               var names = ["Topic", "Queue"];
               angular.forEach(names, (name) => {
-                var idx = grandChildren.findIndex(n => n.title === name);
+                var idx = _.findIndex(grandChildren, (n: any) => n.title === name);
                 if (idx > 0) {
                   var old = grandChildren[idx];
                   grandChildren.splice(idx, 1);

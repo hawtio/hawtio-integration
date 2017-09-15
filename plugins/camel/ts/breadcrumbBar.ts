@@ -110,7 +110,7 @@ module Camel {
       var answer = [];
       var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
       if (contextFolder) {
-        var endpoints = (contextFolder["children"] || []).find((n) => "endpoints" === n.title);
+        var endpoints = _.find((contextFolder["children"] || []), (n: any) => "endpoints" === n.title);
         if (endpoints) {
           angular.forEach(endpoints.children, (endpointFolder) => {
             var entries = endpointFolder ? endpointFolder.entries : null;
@@ -140,7 +140,7 @@ module Camel {
       var answer = [];
       var contextFolder = Camel.getCamelContextFolder(workspace, contextId);
       if (contextFolder) {
-        var folders = (contextFolder["children"] || []).find((n) => "routes" === n.title);
+        var folders = _.find((contextFolder["children"] || []), (n: any) => "routes" === n.title);
         if (folders) {
           angular.forEach(folders.children, (folder) => {
             var entries = folder ? folder.entries : null;
