@@ -15,8 +15,8 @@ let sourcemaps = require('gulp-sourcemaps');
 let typescript = require('gulp-typescript');
 
 let config = {
-  proxyPort: argv.port || 8080,
-  targetPath: argv.path || '/jolokia',
+  proxyPort: argv.port || 8181,
+  targetPath: argv.path || '/hawtio/jolokia',
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
   ts: ['plugins/**/*.ts'],
   templates: ['plugins/**/*.html', 'plugins/**/doc/*.md'],

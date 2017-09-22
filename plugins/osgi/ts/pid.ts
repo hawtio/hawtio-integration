@@ -164,44 +164,11 @@ namespace Osgi {
       });      
     };
 
-    $scope.openDeletePidDialog = () => {
-      uibModalInstance = $uibModal.open({
-        templateUrl: 'deletePidDialog.html',
-        scope: $scope
-      });      
-    }
-
     $scope.deletePidPropConfirmed = () => {
       uibModalInstance.close();
       var cell:any = document.getElementById("pid." + $scope.deleteKey);
       cell.parentElement.remove();
       enableCanSave();
-    };
-
-    $scope.deletePidConfirmed = () => {
-      uibModalInstance.close();
-
-      function errorFn(response) {
-        Core.notification("error", response.error);
-      }
-
-      function successFn(response) {
-        Core.notification("success", "Successfully deleted pid: " + $scope.pid);
-        $scope.goToConfigurationsPage();
-      }
-
-      var mbean = getSelectionConfigAdminMBean(workspace);
-      if (mbean) {
-        jolokia.request({
-          type: "exec",
-          mbean: mbean,
-          operation: 'delete',
-          arguments: [$scope.pid]
-        }, {
-          error: errorFn,
-          success: successFn
-        });
-      }
     };
 
     $scope.goToConfigurationsPage = () => $location.path('/osgi/configurations');

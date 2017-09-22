@@ -673,6 +673,10 @@ div.camel-properties {
   width: 30%;
 }
 
+.osgi-configuration-factory-instance {
+  margin-left: 50px;
+}
+
 .bundles-container {
   margin-left: -20px;
   margin-right: -20px;
@@ -774,6 +778,15 @@ div.camel-properties {
 }
 .osgi-packages-main .osgi-packages-list .list-group-item-container {
   padding: 10px 20px;
+}
+
+.pid-view {
+  margin-bottom: 20px;
+}
+.pid-form .form-control:read-only {
+  color: inherit;
+  background-color: inherit;
+  border: none;
 }
 
 .metricsWatcher .panel-group:first-child {
