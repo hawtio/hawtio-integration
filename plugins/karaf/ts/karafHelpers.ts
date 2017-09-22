@@ -281,7 +281,7 @@ namespace Karaf {
         jolokia.request(
             {
                 type: 'exec', mbean: getSelectionScrMBean(workspace),
-                operation: 'deactiveateComponent(java.lang.String)',
+                operation: 'deactivateComponent(java.lang.String)',
                 arguments: [component]
             },
             Core.onSuccess(success, { error: error }));

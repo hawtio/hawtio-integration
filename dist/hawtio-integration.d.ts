@@ -1180,8 +1180,6 @@ declare namespace Osgi {
 declare namespace Osgi {
     var ServiceController: angular.IModule;
 }
-declare namespace Osgi {
-}
 declare namespace Camel {
     class Context {
         name: string;
