@@ -58,7 +58,7 @@ namespace ActiveMQ {
         id     : 'activemq-create-destination',
         title  : 'Create',
         tooltip: 'Create a new destination',
-        show   : () => (isBroker(workspace) || isQueuesFolder(workspace) || isTopicsFolder(workspace) || isQueue(workspace) || isTopic(workspace)) && workspace.hasInvokeRights(getBroker(workspace), 'addQueue', 'addTopic'),
+        show   : () => isBroker(workspace) && workspace.hasInvokeRights(getBroker(workspace), 'addQueue', 'addTopic'),
         path   : '/activemq/createDestination'
       },
       {

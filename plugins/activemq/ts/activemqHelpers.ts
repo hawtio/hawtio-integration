@@ -4,11 +4,11 @@ namespace ActiveMQ {
   export var log: Logging.Logger = Logger.get("activemq");
   export var jmxDomain: string = 'org.apache.activemq';
 
-  function findFolder(node: Jmx.NodeSelection, titles:string[], ascend:boolean): Jmx.NodeSelection {
+  function findFolder(node: Jmx.NodeSelection, titles: string[], ascend: boolean): Jmx.NodeSelection {
     if (!node) {
       return null;
     }
-    var answer: Jmx.NodeSelection = null;
+    var answer = null;
     angular.forEach(titles, (title) => {
       if (node.text === title) {
         answer = node;
@@ -34,36 +34,16 @@ namespace ActiveMQ {
     return answer;
   }
 
-  export function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection {
-    var selection = workspace.selection;
-    if (selection) {
-      return findFolder(selection, ["Queues", "Queue"], ascend);
-    }
-    return null;
-  }
-
   export function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): string[] {
-    var queuesFolder = getSelectionQueuesFolder(workspace, ascend);
-    if (queuesFolder) {
-      return queuesFolder.children.map(n => n.text);
-    }
-    return [];
-  }
-
-  export function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection {
-    var selection = workspace.selection;
-    if (selection) {
-      return findFolder(selection, ["Topics", "Topic"], ascend);
-    }
-    return null;
+    let selection = workspace.selection;
+    let queueFolder = selection ? findFolder(selection, ["Queues", "Queue"], ascend) : null;
+    return queueFolder ? queueFolder.children.map(n => n.text) : [];
   }
 
   export function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): string[] {
-    var topicsFolder = getSelectionTopicsFolder(workspace, ascend);
-    if (topicsFolder) {
-      return topicsFolder.children.map(n => n.text);
-    }
-    return [];
+    let selection = workspace.selection;
+    let topicFolder =  selection ? findFolder(selection, ["Topics", "Topic"], ascend) : null;
+    return topicFolder ? topicFolder.children.map(n => n.text) : [];
   }
 
   /**

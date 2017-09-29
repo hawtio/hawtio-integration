@@ -79,10 +79,10 @@ namespace ActiveMQ {
         var operation;
         if (isQueue(destinationType)) {
           operation = "addQueue(java.lang.String)";
-          $scope.message = "Created queue " + name;
+          $scope.message = `Created queue "${ name }"`;
         } else {
           operation = "addTopic(java.lang.String)";
-          $scope.message = "Created topic " + name;
+          $scope.message = `Created topic "${ name }"`;
         }
         if (mbean) {
           jolokia.execute(mbean, operation, name, Core.onSuccess(operationSuccess));
@@ -114,10 +114,10 @@ namespace ActiveMQ {
         var operation;
         if (isQueue(entries["Type"] || entries["destinationType"])) {
           operation = "removeQueue(java.lang.String)";
-          $scope.message = "Deleted queue " + name;
+          $scope.message = `Deleted queue "${ name }"`;
         } else {
           operation = "removeTopic(java.lang.String)";
-          $scope.message = "Deleted topic " + name;
+          $scope.message = `Deleted topic "${ name }"`;
         }
         name = restoreRealDestinationName(name);
         // do not unescape name for destination deletion
@@ -132,7 +132,7 @@ namespace ActiveMQ {
       if (mbean && selection && jolokia && entries) {
         var name = entries["Destination"] || entries["destinationName"] || selection.text;
         var operation = "purge()";
-        $scope.message = "Purged queue " + name;
+        $scope.message = `Purged queue "${ name }"`;
         // unescape should be done right before invoking jolokia
         name = _.unescape(name);
         jolokia.execute(mbean, operation, Core.onSuccess(operationSuccess));

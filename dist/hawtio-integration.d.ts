@@ -4,9 +4,7 @@ declare namespace ActiveMQ {
     var pluginName: string;
     var log: Logging.Logger;
     var jmxDomain: string;
-    function getSelectionQueuesFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection;
     function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): string[];
-    function getSelectionTopicsFolder(workspace: Jmx.Workspace, ascend: boolean): Jmx.NodeSelection;
     function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): string[];
     /**
      * Sets $scope.row to currently selected JMS message.
@@ -31,33 +29,6 @@ declare namespace ActiveMQ {
      */
     function decorate($scope: any, fn?: any): void;
     function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
-}
-declare namespace ActiveMQ {
-    var _module: angular.IModule;
-    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
-    function isQueue(workspace: Jmx.Workspace): boolean;
-    function isTopic(workspace: Jmx.Workspace): boolean;
-    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
-    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
-    function isJobScheduler(workspace: Jmx.Workspace): boolean;
-    function isBroker(workspace: Jmx.Workspace): boolean;
-}
-declare namespace ActiveMQ {
-    var BrowseQueueController: angular.IModule;
-}
-declare namespace ActiveMQ {
-}
-declare module ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
 }
 declare namespace Camel {
     /**
@@ -888,6 +859,33 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Camel {
+}
+declare namespace ActiveMQ {
+    var _module: angular.IModule;
+    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
+    function isQueue(workspace: Jmx.Workspace): boolean;
+    function isTopic(workspace: Jmx.Workspace): boolean;
+    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
+    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
+    function isJobScheduler(workspace: Jmx.Workspace): boolean;
+    function isBroker(workspace: Jmx.Workspace): boolean;
+}
+declare namespace ActiveMQ {
+    var BrowseQueueController: angular.IModule;
+}
+declare namespace ActiveMQ {
+}
+declare module ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
 }
 declare namespace Karaf {
     var log: Logging.Logger;
