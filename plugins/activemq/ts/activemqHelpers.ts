@@ -25,7 +25,7 @@ namespace ActiveMQ {
         angular.forEach(node.children, (child) => {
           angular.forEach(titles, (title) => {
             if (child.text === title) {
-              answer = node;
+              answer = child;
             }
           });
         });
