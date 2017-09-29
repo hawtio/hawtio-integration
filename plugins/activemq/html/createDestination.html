@@ -1,17 +1,20 @@
+<p>
+  <div class="alert alert-info">
+    <span class="pficon pficon-info"></span>The JMS API does not define a standard
+    address syntax. Although a standard address syntax was considered, it was decided
+    that the differences in address semantics between existing message-oriented
+    middleware (MOM) products were too wide to bridge with a single syntax.
+  </div>
+</p>
+
 <form class="form-horizontal" ng-controller="ActiveMQ.DestinationController">
 
-  <div class="alert alert-info">
-    <span class="pficon pficon-info"></span>The JMS API does not define a standard address syntax. Although a
-    standard address syntax was considered, it was decided that the differences in address semantics between existing
-    message-oriented middleware (MOM) products were too wide to bridge with a single syntax.
-  </div>
-
   <div class="form-group">
-    <label class="col-sm-2 control-label" for="name-markup">{{destinationTypeName}} name</label>
+    <label class="col-sm-2 control-label" for="name-markup">{{destinationType}} name</label>
 
     <div class="col-sm-10">
       <input id="name-markup" class="form-control" type="text" maxlength="300"
-             name="destinationName" ng-model="destinationName" placeholder="{{destinationTypeName}} name"/>
+             name="destinationName" ng-model="destinationName" placeholder="{{destinationType}} name"/>
     </div>
   </div>
   <div class="form-group">
@@ -19,18 +22,19 @@
 
     <div class="col-sm-10">
       <label class="checkbox">
-        <input type="radio" ng-model="queueType" value="true"> Queue
+        <input type="radio" ng-model="destinationType" value="Queue"> Queue
       </label>
       <label class="checkbox">
-        <input type="radio" ng-model="queueType" value="false"> Topic
+        <input type="radio" ng-model="destinationType" value="Topic"> Topic
       </label>
     </div>
   </div>
 
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
-      <button type="submit" class="btn btn-primary" ng-click="validateAndCreateDestination(destinationName, queueType)"
-              ng-disabled="!destinationName">Create {{destinationTypeName}}
+      <button type="submit" class="btn btn-primary"
+              ng-click="validateAndCreateDestination(destinationName, destinationType)"
+              ng-disabled="!destinationName">Create {{destinationType}}
       </button>
     </div>
   </div>
@@ -38,10 +42,10 @@
   <div hawtio-confirm-dialog="createDialog"
         ok-button-text="Create"
         cancel-button-text="Cancel"
-        on-ok="createDestination(destinationName, queueType)">
+        on-ok="createDestination(destinationName, destinationType)">
     <div class="dialog-body">
-      <p>{{destinationTypeName}} name <b>{{destinationName}}</b> contains unrecommended characters: ":"</p>
-      <p>This may cause unexpected problems. Are you really sure to create this {{destinationTypeName.charAt(0).toLowerCase() + destinationTypeName.substring(1)}}?</p>
+      <p>{{destinationType}} name <b>{{destinationName}}</b> contains unrecommended characters: <code>:</code></p>
+      <p>This may cause unexpected problems. Are you really sure to create this {{uncapitalisedDestinationType()}}?</p>
     </div>
   </div>
 

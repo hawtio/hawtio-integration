@@ -3,32 +3,24 @@
 
 namespace ActiveMQ {
   
-  _module.controller("ActiveMQ.DestinationController", ["$scope", "workspace", "$location", "jolokia", (
+  _module.controller("ActiveMQ.DestinationController", ["$scope", "workspace", "$location", "jolokia", "localStorage", (
       $scope,
       workspace: Jmx.Workspace,
       $location: ng.ILocationService,
-      jolokia: Jolokia.IJolokia) => {
+      jolokia: Jolokia.IJolokia,
+      localStorage: WindowLocalStorage) => {
 
     var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
 
     $scope.workspace = workspace;
     $scope.message = "";
+
     $scope.destinationName = "";
-    $scope.destinationTypeName = $scope.queueType ? "Queue" : "Topic";
+    $scope.destinationType = "Queue";
 
     $scope.createDialog = false;
     $scope.deleteDialog = false;
     $scope.purgeDialog = false;
-
-    updateQueueType();
-
-    function updateQueueType() {
-      $scope.destinationTypeName = $scope.queueType  === "true" ? "Queue" : "Topic";
-    }
-
-    $scope.$watch('queueType', function () {
-      updateQueueType();
-    });
 
     function operationSuccess() {
       $scope.destinationName = "";
@@ -49,13 +41,17 @@ namespace ActiveMQ {
       Core.$apply($scope);
     }
 
-    function validateDestinationName(name:string):boolean {
+    function validateDestinationName(name: string): boolean {
       return name.indexOf(":") === -1;
     }
 
-    function checkIfDestinationExists(name:string, isQueue:boolean):boolean {
+    function isQueue(destinationType: string): boolean {
+      return destinationType === "Queue";
+    }
+
+    function checkIfDestinationExists(name: string, destinationType: string): boolean {
       var answer = false;
-      var destinations = isQueue ? retrieveQueueNames(workspace, false) : retrieveTopicNames(workspace, false);
+      var destinations = isQueue(destinationType) ? retrieveQueueNames(workspace, false) : retrieveTopicNames(workspace, false);
       angular.forEach(destinations, (destination) => {
         if (name === destination) {
           answer = true;
@@ -64,24 +60,24 @@ namespace ActiveMQ {
       return answer;
     }
 
-    $scope.validateAndCreateDestination = (name:string, isQueue:boolean) => {
+    $scope.validateAndCreateDestination = (name: string, destinationType: string) => {
       if (!validateDestinationName(name)) {
         $scope.createDialog = true;
         return;
       }
-      if (checkIfDestinationExists(name, isQueue)) {
-        Core.notification("error", "The " + (isQueue ? "queue" : "topic") + " \"" + name + "\" already exists");
+      if (checkIfDestinationExists(name, destinationType)) {
+        Core.notification("error", `The ${ $scope.uncapitalisedDestinationType() } "${ name }" already exists`);
         return;
       }
-      $scope.createDestination(name, isQueue);
+      $scope.createDestination(name, destinationType);
     }
 
-    $scope.createDestination = (name:string, isQueue:boolean) => {
+    $scope.createDestination = (name: string, destinationType: string) => {
       var mbean = getBrokerMBean(workspace, jolokia, amqJmxDomain);
       name = Core.escapeHtml(name);
       if (mbean) {
         var operation;
-        if (isQueue) {
+        if (isQueue(destinationType)) {
           operation = "addQueue(java.lang.String)";
           $scope.message = "Created queue " + name;
         } else {
@@ -101,7 +97,7 @@ namespace ActiveMQ {
      * "aaa_bbb" or "aaa:bbb", so the actual name needs to be checked before removal.
      * @param name destination name
      */
-    function restoreRealDestinationName(name:string):string {
+    function restoreRealDestinationName(name: string): string {
       if (name.indexOf("_") === -1) {
         return name;
       }
@@ -115,9 +111,8 @@ namespace ActiveMQ {
       if (mbean && selection && jolokia && entries) {
         var domain = selection.domain;
         var name = entries["Destination"] || entries["destinationName"] || selection.text;
-        var isQueue = "Topic" !== (entries["Type"] || entries["destinationType"]);
         var operation;
-        if (isQueue) {
+        if (isQueue(entries["Type"] || entries["destinationType"])) {
           operation = "removeQueue(java.lang.String)";
           $scope.message = "Deleted queue " + name;
         } else {
@@ -143,6 +138,10 @@ namespace ActiveMQ {
         jolokia.execute(mbean, operation, Core.onSuccess(operationSuccess));
       }
     };
+
+    $scope.uncapitalisedDestinationType = () => {
+      return $scope.destinationType.charAt(0).toLowerCase() + $scope.destinationType.substring(1);
+    }
 
   }]);
 }
