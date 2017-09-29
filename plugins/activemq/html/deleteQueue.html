@@ -9,7 +9,7 @@
   <div class="col-md-6">
     <div class="control-group">
       <button type="submit" class="btn btn-warning" ng-click="$ctrl.deleteDialog = true">
-        Delete queue '{{$ctrl.selectedName()}}'
+        Delete queue '{{$ctrl.selectedShortName()}}'
       </button>
       <label>Removes the queue completely.</label>
     </div>
@@ -17,7 +17,7 @@
   <div class="col-md-6">
     <div class="control-group">
       <button type="submit" class="btn btn-warning" ng-click="$ctrl.purgeDialog = true">
-        Purge queue '{{$ctrl.selectedName()}}'
+        Purge queue '{{$ctrl.selectedShortName()}}'
       </button>
       <label>Purges all the current messages on the queue.</label>
     </div>
