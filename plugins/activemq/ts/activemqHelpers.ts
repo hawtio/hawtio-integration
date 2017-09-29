@@ -1,8 +1,8 @@
 namespace ActiveMQ {
 
-  export var pluginName: string = 'activemq';
-  export var log: Logging.Logger = Logger.get("activemq");
-  export var jmxDomain: string = 'org.apache.activemq';
+  export const log: Logging.Logger = Logger.get("ActiveMQ");
+
+  export const jmxDomain: string = 'org.apache.activemq';
 
   function findFolder(node: Jmx.NodeSelection, titles: string[], ascend: boolean): Jmx.NodeSelection {
     if (!node) {

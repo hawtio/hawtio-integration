@@ -1,20 +1,26 @@
 /// <reference path="activemqHelpers.ts"/>
+/// <reference path="destination/destination.module.ts"/>
 
 namespace ActiveMQ {
+
+  export const pluginName: string = 'activemq';
   
-  export var _module = angular.module(pluginName, ['angularResizable']);
+  export const _module = angular.module(pluginName, [
+    'angularResizable',
+    destinationModule
+  ]);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider.
-            when('/activemq/browseQueue', {templateUrl: 'plugins/activemq/html/browseQueue.html'}).
-            when('/activemq/createDestination', {templateUrl: 'plugins/activemq/html/createDestination.html'}).
-            when('/activemq/deleteQueue', {templateUrl: 'plugins/activemq/html/deleteQueue.html'}).
-            when('/activemq/deleteTopic', {templateUrl: 'plugins/activemq/html/deleteTopic.html'}).
-            when('/activemq/sendMessage', {templateUrl: 'plugins/camel/html/sendMessage.html'}).
-            when('/activemq/durableSubscribers', {templateUrl: 'plugins/activemq/html/durableSubscribers.html'}).
-            when('/activemq/jobs', {templateUrl: 'plugins/activemq/html/jobs.html'}).
-            when('/activemq/queues', {templateUrl: 'app/activemq/html/destinations.html'}).
-            when('/activemq/topics', {templateUrl: 'app/activemq/html/destinations.html', controller: 'topicsController'})
+        when('/activemq/browseQueue',        {templateUrl: 'plugins/activemq/html/browseQueue.html'}).
+        when('/activemq/createDestination',  {template:    '<create-destination></create-destination>'}).
+        when('/activemq/deleteQueue',        {template:    '<delete-queue></delete-queue>'}).
+        when('/activemq/deleteTopic',        {template:    '<delete-topic></delete-topic>'}).
+        when('/activemq/sendMessage',        {templateUrl: 'plugins/camel/html/sendMessage.html'}).
+        when('/activemq/durableSubscribers', {templateUrl: 'plugins/activemq/html/durableSubscribers.html'}).
+        when('/activemq/jobs',               {templateUrl: 'plugins/activemq/html/jobs.html'}).
+        when('/activemq/queues',             {templateUrl: 'app/activemq/html/destinations.html'}).
+        when('/activemq/topics',             {templateUrl: 'app/activemq/html/destinations.html', controller: 'topicsController'})
   }]);
 
   _module.controller('topicsController', function($scope) {

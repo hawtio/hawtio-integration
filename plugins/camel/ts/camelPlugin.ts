@@ -1,15 +1,17 @@
 /// <reference path="camelHelpers.ts"/>
+/// <reference path="contexts/contexts.module.ts"/>
+/// <reference path="routes/routes.module.ts"/>
 
 namespace Camel {
 
-  export var pluginName = 'camel';
+  export const pluginName: string = 'camel';
 
-  export var _module = angular.module(pluginName, [
+  export const _module = angular.module(pluginName, [
     'patternfly',
     'patternfly.table',
     'angularResizable',
-    'hawtio-camel-contexts',
-    'hawtio-camel-routes'
+    contextsModule,
+    routesModule
   ]);
 
   _module.config(["$routeProvider", ($routeProvider) => {

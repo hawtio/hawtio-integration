@@ -4,10 +4,11 @@
 
 namespace Camel {
 
-  angular
+  export const contextsModule = angular
     .module('hawtio-camel-contexts', [])
     .component('contexts', contextsComponent)
     .component('contextActions', contextActionsComponent)
-    .service('contextsService', ContextsService);
+    .service('contextsService', ContextsService)
+    .name;
 
 }

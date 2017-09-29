@@ -4,17 +4,17 @@ declare var _apacheCamelModel:any;
 
 namespace Camel {
 
-  export var log: Logging.Logger = Logger.get("Camel");
+  export const log: Logging.Logger = Logger.get("Camel");
 
-  export var jmxDomain: string = 'org.apache.camel';
+  export const jmxDomain: string = 'org.apache.camel';
 
-  export var defaultMaximumLabelWidth = 34;
-  export var defaultCamelMaximumTraceOrDebugBodyLength = 5000;
-  export var defaultCamelTraceOrDebugIncludeStreams = false;
-  export var defaultCamelRouteMetricMaxSeconds = 10;
-  export var defaultHideOptionDocumentation = false;
-  export var defaultHideOptionDefaultValue = false;
-  export var defaultHideOptionUnusedValue = false;
+  export const defaultMaximumLabelWidth = 34;
+  export const defaultCamelMaximumTraceOrDebugBodyLength = 5000;
+  export const defaultCamelTraceOrDebugIncludeStreams = false;
+  export const defaultCamelRouteMetricMaxSeconds = 10;
+  export const defaultHideOptionDocumentation = false;
+  export const defaultHideOptionDefaultValue = false;
+  export const defaultHideOptionUnusedValue = false;
 
   export var _apacheCamelModel: any = undefined;
 

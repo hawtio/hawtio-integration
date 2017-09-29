@@ -1,30 +1,28 @@
-<div ng-controller="ActiveMQ.DestinationController">
+<p>
+  <div class="alert alert-warning">
+    <span class="pficon pficon-warning-triangle-o"></span>
+    This operation cannot be undone. Please be careful!
+  </div>
+</p>
 
-  <p>
-    <div class="alert alert-warning">
-      <span class="pficon pficon-warning-triangle-o"></span>
-      This operation cannot be undone. Please be careful!
-    </div>
-  </p>
-
-  <div class="row">
-    <div class="col-md-12">
-      <div class="control-group">
-        <button type="submit" class="btn btn-warning" ng-click="deleteDialog = true">Delete topic '{{name}}'</button>
-        <label>This will remove the topic completely.</label>
-      </div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="control-group">
+      <button type="submit" class="btn btn-warning" ng-click="$ctrl.deleteDialog = true">
+        Delete topic '{{$ctrl.destinationName}}'
+      </button>
+      <label>Removes the topic completely.</label>
     </div>
   </div>
+</div>
 
-  <div hawtio-confirm-dialog="deleteDialog"
-       title="Confirm delete topic"
-       ok-button-text="Delete"
-       cancel-button-text="Cancel"
-       on-ok="deleteDestination()">
-    <div class="dialog-body">
-      <p>You are about to delete the <b>{{name}}</b> topic</p>
-      <p>This operation cannot be undone so please be careful.</p>
-    </div>
+<div hawtio-confirm-dialog="$ctrl.deleteDialog"
+     title="Confirm delete topic"
+     ok-button-text="Delete"
+     cancel-button-text="Cancel"
+     on-ok="$ctrl.deleteDestination()">
+  <div class="dialog-body">
+    <p>You are about to delete the <b>{{$ctrl.destinationName}}</b> topic.</p>
+    <p>This operation cannot be undone so please be careful.</p>
   </div>
-
 </div>

@@ -1,47 +1,47 @@
-<div ng-controller="ActiveMQ.DestinationController">
+<p>
+  <div class="alert alert-warning">
+    <span class="pficon pficon-warning-triangle-o"></span>
+    These operations cannot be undone. Please be careful!
+  </div>
+</p>
 
-  <p>
-    <div class="alert alert-warning">
-      <span class="pficon pficon-warning-triangle-o"></span>
-      These operations cannot be undone. Please be careful!
-    </div>
-  </p>
-
-  <div class="row">
-    <div class="col-md-6">
-      <div class="control-group">
-        <button type="submit" class="btn btn-warning" ng-click="deleteDialog = true">Delete queue '{{name}}'</button>
-        <label>This will remove the queue completely.</label>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="control-group">
-        <button type="submit" class="btn btn-warning" ng-click="purgeDialog = true">Purge queue '{{name}}'</button>
-        <label>Purges all the current messages on the queue.</label>
-      </div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="control-group">
+      <button type="submit" class="btn btn-warning" ng-click="$ctrl.deleteDialog = true">
+        Delete queue '{{$ctrl.destinationName}}'
+      </button>
+      <label>Removes the queue completely.</label>
     </div>
   </div>
-
-  <div hawtio-confirm-dialog="deleteDialog"
-       title="Confirm delete queue"
-       ok-button-text="Delete"
-       cancel-button-text="Cancel"
-       on-ok="deleteDestination()">
-    <div class="dialog-body">
-      <p>You are about to delete the <b>{{name}}</b> queue</p>
-      <p>This operation cannot be undone so please be careful.</p>
+  <div class="col-md-6">
+    <div class="control-group">
+      <button type="submit" class="btn btn-warning" ng-click="$ctrl.purgeDialog = true">
+        Purge queue '{{$ctrl.destinationName}}'
+      </button>
+      <label>Purges all the current messages on the queue.</label>
     </div>
   </div>
+</div>
 
-  <div hawtio-confirm-dialog="purgeDialog"
-       title="Confirm purge queue"
-       ok-button-text="Purge"
-       cancel-button-text="Cancel"
-       on-ok="purgeDestination()">
-    <div class="dialog-body">
-      <p>You are about to purge the <b>{{name}}</b> queue</p>
-      <p>This operation cannot be undone so please be careful.</p>
-    </div>
+<div hawtio-confirm-dialog="$ctrl.deleteDialog"
+     title="Confirm delete queue"
+     ok-button-text="Delete"
+     cancel-button-text="Cancel"
+     on-ok="$ctrl.deleteDestination()">
+  <div class="dialog-body">
+    <p>You are about to delete the <b>{{$ctrl.destinationName}}</b> queue.</p>
+    <p>This operation cannot be undone so please be careful.</p>
   </div>
+</div>
 
+<div hawtio-confirm-dialog="$ctrl.purgeDialog"
+     title="Confirm purge queue"
+     ok-button-text="Purge"
+     cancel-button-text="Cancel"
+     on-ok="$ctrl.purgeDestination()">
+  <div class="dialog-body">
+    <p>You are about to purge the <b>{{$ctrl.destinationName}}</b> queue</p>
+    <p>This operation cannot be undone so please be careful.</p>
+  </div>
 </div>

@@ -7,14 +7,14 @@
   </div>
 </p>
 
-<form class="form-horizontal" ng-controller="ActiveMQ.DestinationController">
+<form class="form-horizontal">
 
   <div class="form-group">
-    <label class="col-sm-2 control-label" for="name-markup">{{destinationType}} name</label>
+    <label class="col-sm-2 control-label" for="name-markup">{{$ctrl.destinationType}} name</label>
 
     <div class="col-sm-10">
       <input id="name-markup" class="form-control" type="text" maxlength="300"
-             name="destinationName" ng-model="destinationName" placeholder="{{destinationType}} name"/>
+             name="destinationName" ng-model="$ctrl.destinationName" placeholder="{{$ctrl.destinationType}} name"/>
     </div>
   </div>
   <div class="form-group">
@@ -22,10 +22,10 @@
 
     <div class="col-sm-10">
       <label class="checkbox">
-        <input type="radio" ng-model="destinationType" value="Queue"> Queue
+        <input type="radio" ng-model="$ctrl.destinationType" value="Queue"> Queue
       </label>
       <label class="checkbox">
-        <input type="radio" ng-model="destinationType" value="Topic"> Topic
+        <input type="radio" ng-model="$ctrl.destinationType" value="Topic"> Topic
       </label>
     </div>
   </div>
@@ -33,19 +33,19 @@
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <button type="submit" class="btn btn-primary"
-              ng-click="validateAndCreateDestination(destinationName, destinationType)"
-              ng-disabled="!destinationName">Create {{destinationType}}
+              ng-click="$ctrl.validateAndCreateDestination($ctrl.destinationName, $ctrl.destinationType)"
+              ng-disabled="!$ctrl.destinationName">Create {{$ctrl.destinationType}}
       </button>
     </div>
   </div>
 
-  <div hawtio-confirm-dialog="createDialog"
+  <div hawtio-confirm-dialog="$ctrl.createDialog"
         ok-button-text="Create"
         cancel-button-text="Cancel"
-        on-ok="createDestination(destinationName, destinationType)">
+        on-ok="$ctrl.createDestination($ctrl.destinationName, $ctrl.destinationType)">
     <div class="dialog-body">
-      <p>{{destinationType}} name <b>{{destinationName}}</b> contains unrecommended characters: <code>:</code></p>
-      <p>This may cause unexpected problems. Are you really sure to create this {{uncapitalisedDestinationType()}}?</p>
+      <p>{{$ctrl.destinationType}} name <b>{{$ctrl.destinationName}}</b> contains unrecommended characters: <code>:</code></p>
+      <p>This may cause unexpected problems. Are you really sure to create this {{$ctrl.uncapitalisedDestinationType()}}?</p>
     </div>
   </div>
 

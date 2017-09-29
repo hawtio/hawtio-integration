@@ -4,10 +4,11 @@
 
 namespace Camel {
 
-  angular
+  export const routesModule = angular
     .module('hawtio-camel-routes', [])
     .component('routes', routesComponent)
     .component('routeActions', routeActionsComponent)
-    .service('routesService', RoutesService);
+    .service('routesService', RoutesService)
+    .name;
 
 }
