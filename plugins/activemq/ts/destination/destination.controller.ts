@@ -147,6 +147,11 @@ namespace ActiveMQ {
       }
     }
 
+    selectedName(): string {
+      let selection = this.workspace.selection;
+      return selection ? _.unescape(selection.text) : null;
+    }
+
     uncapitalisedDestinationType(): string {
       return this.destinationType.charAt(0).toLowerCase() + this.destinationType.substring(1);
     }

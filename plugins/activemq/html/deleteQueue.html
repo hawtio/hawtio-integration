@@ -9,7 +9,7 @@
   <div class="col-md-6">
     <div class="control-group">
       <button type="submit" class="btn btn-warning" ng-click="$ctrl.deleteDialog = true">
-        Delete queue '{{$ctrl.destinationName}}'
+        Delete queue '{{$ctrl.selectedName()}}'
       </button>
       <label>Removes the queue completely.</label>
     </div>
@@ -17,7 +17,7 @@
   <div class="col-md-6">
     <div class="control-group">
       <button type="submit" class="btn btn-warning" ng-click="$ctrl.purgeDialog = true">
-        Purge queue '{{$ctrl.destinationName}}'
+        Purge queue '{{$ctrl.selectedName()}}'
       </button>
       <label>Purges all the current messages on the queue.</label>
     </div>
@@ -30,7 +30,7 @@
      cancel-button-text="Cancel"
      on-ok="$ctrl.deleteDestination()">
   <div class="dialog-body">
-    <p>You are about to delete the <b>{{$ctrl.destinationName}}</b> queue.</p>
+    <p>You are about to delete the <b>{{$ctrl.selectedName()}}</b> queue.</p>
     <p>This operation cannot be undone so please be careful.</p>
   </div>
 </div>
@@ -41,7 +41,7 @@
      cancel-button-text="Cancel"
      on-ok="$ctrl.purgeDestination()">
   <div class="dialog-body">
-    <p>You are about to purge the <b>{{$ctrl.destinationName}}</b> queue</p>
+    <p>You are about to purge the <b>{{$ctrl.selectedName()}}</b> queue</p>
     <p>This operation cannot be undone so please be careful.</p>
   </div>
 </div>
