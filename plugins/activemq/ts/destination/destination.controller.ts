@@ -151,6 +151,9 @@ namespace ActiveMQ {
 
     selectedShortName(): string {
       let name = this.selectedName();
+      if (name === null) {
+        return null;
+      }
       let ellipsis = name.length > this.buttonNameLimit ? "..." : ""
       return name ? name.substring(0, this.buttonNameLimit) + ellipsis : null;
     }
