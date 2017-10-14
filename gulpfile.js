@@ -14,7 +14,7 @@ var plugins = gulpLoadPlugins({});
 var pkg = require('./package.json');
 
 var config = {
-  proxyPort: argv.port || 8282,
+  proxyPort: argv.port || 8181,
   main: '.',
   ts: ['plugins/**/*.ts'],
   templates: ['plugins/**/*.html'],
