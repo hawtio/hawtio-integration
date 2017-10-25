@@ -26,8 +26,12 @@ namespace Osgi {
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
         this.bundlesService.startBundles(selectedBundles)
-          .then(response => this.loadBundles());
-      },
+          .then(response => {
+            Core.notification('success', response);
+            this.loadBundles();
+          })
+          .catch(error => Core.notification('error', error));
+        },
       isDisabled: true
     }
 
@@ -36,7 +40,11 @@ namespace Osgi {
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
         this.bundlesService.stopBundles(selectedBundles)
-          .then(response => this.loadBundles());
+          .then(response => {
+            Core.notification('success', response);
+            this.loadBundles();
+          })
+          .catch(error => Core.notification('error', error));
       },
       isDisabled: true
     }
@@ -46,7 +54,11 @@ namespace Osgi {
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
         this.bundlesService.refreshBundles(selectedBundles)
-          .then(response => this.loadBundles());
+          .then(response => {
+            Core.notification('success', response);
+            this.loadBundles();
+          })
+          .catch(error => Core.notification('error', error));
       },
       isDisabled: true
     }
@@ -56,7 +68,11 @@ namespace Osgi {
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
         this.bundlesService.updateBundles(selectedBundles)
-          .then(response => this.loadBundles());
+          .then(response => {
+            Core.notification('success', response);
+            this.loadBundles();
+          })
+          .catch(error => Core.notification('error', error));
       },
       isDisabled: true
     }
@@ -66,7 +82,11 @@ namespace Osgi {
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
         this.bundlesService.uninstallBundles(selectedBundles)
-          .then(response => this.loadBundles());
+          .then(response => {
+            Core.notification('success', response);
+            this.loadBundles();
+          })
+          .catch(error => Core.notification('error', error));
       },
       isDisabled: true
     }
@@ -198,7 +218,7 @@ namespace Osgi {
       <div class="table-view">
         <h1>Bundles</h1>
         <div ng-if="!$ctrl.loading">
-          <install-bundle></install-bundle>
+          <install-bundle on-install="$ctrl.loadBundles()"></install-bundle>
           <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
           <pf-table-view config="$ctrl.tableConfig"
                          colummns="$ctrl.tableColumns"

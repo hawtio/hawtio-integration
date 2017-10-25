@@ -8,9 +8,12 @@ namespace Osgi {
       'ngInject';
     }  
 
-    install(bundleLocation: string) {
-      this.bundlesService.installBundle(bundleLocation)
-        .then(value => Core.notification('success', 'Bundle installed successfully'))
+    install(bundleUrl: string) {
+      this.bundlesService.installBundle(bundleUrl)
+        .then(response => {
+          Core.notification('success', response);
+          this['onInstall']();
+        })
         .catch(error => Core.notification('error', error));
     }
 
@@ -23,9 +26,9 @@ namespace Osgi {
         </div>
         <div class="col-lg-6">
           <div class="input-group">
-            <input type="text" class="form-control" placeholder="Bundle location..." ng-model="bundleLocation">
+            <input type="text" class="form-control" placeholder="Bundle URL..." ng-model="bundleUrl">
             <span class="input-group-btn">
-              <button type="button" class="btn btn-default" ng-click="$ctrl.install(bundleLocation)">
+              <button type="button" class="btn btn-default" ng-click="$ctrl.install(bundleUrl)">
                 Install
               </button>
             </span>
@@ -33,7 +36,10 @@ namespace Osgi {
         </div>
       </div>
     `,
-    controller: InstallBundleController
+    controller: InstallBundleController,
+    bindings: {
+      onInstall: '&'
+    }    
   };
 
 }

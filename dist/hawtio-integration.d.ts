@@ -1238,13 +1238,14 @@ declare namespace Osgi {
         private log;
         constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
         getBundles(): ng.IPromise<Bundle[]>;
-        stopBundles(bundles: Bundle[]): ng.IPromise<string>;
         startBundles(bundles: Bundle[]): ng.IPromise<string>;
+        stopBundles(bundles: Bundle[]): ng.IPromise<string>;
         updateBundles(bundles: Bundle[]): ng.IPromise<string>;
         refreshBundles(bundles: Bundle[]): ng.IPromise<string>;
         uninstallBundles(bundles: Bundle[]): ng.IPromise<string>;
-        private execute(operation, bundles);
         installBundle(bundleUrl: string): ng.IPromise<string>;
+        private execute(mbean, operation, args?);
+        private handleResponse(response);
     }
 }
 declare namespace Osgi {
@@ -1275,7 +1276,7 @@ declare namespace Osgi {
     class InstallBundleController {
         private bundlesService;
         constructor(bundlesService: BundlesService);
-        install(bundleLocation: string): void;
+        install(bundleUrl: string): void;
     }
     const installBundleComponent: angular.IComponentOptions;
 }
