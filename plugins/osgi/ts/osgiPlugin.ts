@@ -1,19 +1,21 @@
 /// <reference path="osgiData.ts"/>
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="../../karaf/ts/karafHelpers.ts"/>
+/// <reference path="bundles/bundles.module.ts"/>
 
 namespace Osgi {
 
   export var pluginName = 'osgi';
   export var _module = angular.module(pluginName, [
     'patternfly',
-    'infinite-scroll'
+    'infinite-scroll',
+    bundlesModule
   ]);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
             .when('/osgi', { redirectTo: '/osgi/bundles' })
-            .when('/osgi/bundles', {templateUrl: 'plugins/osgi/html/bundles.html'})
+            .when('/osgi/bundles', {template: '<bundles></bundles>'})
             .when('/osgi/bundle/:bundleId', {templateUrl: 'plugins/osgi/html/bundle.html'})
             .when('/osgi/services', {templateUrl: 'plugins/osgi/html/services.html'})
             .when('/osgi/packages', {templateUrl: 'plugins/osgi/html/packages.html'})

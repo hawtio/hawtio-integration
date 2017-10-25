@@ -673,6 +673,10 @@ div.camel-properties {
   width: 30%;
 }
 
+.install-bundle {
+  margin-bottom: 10px;
+}
+
 .osgi-configuration-factory-instance {
   margin-left: 50px;
 }
