@@ -38,11 +38,10 @@ namespace Osgi {
 
   export function defaultServiceValues(workspace: Jmx.Workspace, $scope, values) {
     angular.forEach(values, (row) => {
-      row["BundleIdentifier"] = bundleLinks(workspace, row["BundleIdentifier"]);
+      row["BundleLinks"] = bundleLinks(workspace, row["BundleIdentifier"]);
     });
     return values;
   }
-
 
   export function defaultPackageValues(workspace: Jmx.Workspace, $scope, values) {
     var packages = [];

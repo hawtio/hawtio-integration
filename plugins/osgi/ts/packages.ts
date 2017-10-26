@@ -27,6 +27,18 @@ namespace Osgi {
             title: 'Version',
             placeholder: 'Filter by version...',
             filterType: 'text'
+          },
+          {
+            id: 'exporting-bundle',
+            title: 'Exporting Bundle',
+            placeholder: 'Filter by exporting bundle...',
+            filterType: 'text'
+          },
+          {
+            id: 'importing-bundle',
+            title: 'Importing Bundle',
+            placeholder: 'Filter by importing bundle...',
+            filterType: 'text'
           }
         ],
         resultsCount: 0,
@@ -126,11 +138,15 @@ namespace Osgi {
     function applyFilters(filters) {
       let filteredPackages = $scope.packages;
       filters.forEach(filter => {
-        var re = new RegExp(filter.value, 'i');
+        const regExp = new RegExp(filter.value, 'i');
         if (filter.id === 'name') {
-          filteredPackages = filteredPackages.filter(package => re.test(package.Name));
+          filteredPackages = filteredPackages.filter(package => regExp.test(package.Name));
         } else if (filter.id === 'version') {
-          filteredPackages = filteredPackages.filter(package => re.test(package.Version));
+          filteredPackages = filteredPackages.filter(package => regExp.test(package.Version));
+        } else if (filter.id === 'exporting-bundle') {
+          filteredPackages = filteredPackages.filter(package => package.ExportingBundles.some(bundle => regExp.test(bundle.SymbolicName)));
+        } else if (filter.id === 'importing-bundle') {
+          filteredPackages = filteredPackages.filter(package => package.ImportingBundles.some(bundle => regExp.test(bundle.SymbolicName)));
         }
       });
       $scope.filteredPackages = filteredPackages;

@@ -2,78 +2,63 @@
 
 <div class="controller-section" ng-controller="Osgi.ServiceController">
 
-  <div class="row toolbar-pf">
-    <div class="col-md-12">
-      <form class="toolbar-pf-actions search-pf">
-        <div class="form-group has-clear">
-          <div class="search-pf-input-group">
-            <label for="search1" class="sr-only">Filter</label>
-            <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">
-            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''">
-              <span class="pficon pficon-close"></span>
-            </button>
+  <div class="spinner spinner-lg loading-page" ng-if="!services"></div>
+
+  <div ng-if="services">
+    <pf-toolbar config="toolbarConfig"></pf-toolbar>
+
+    <div class="list-group list-view-pf list-view-pf-view">
+      <div class="list-group-item" ng-class="{'list-view-pf-expand-active': service.expanded}"
+          ng-repeat="service in filteredServices">
+        <div class="list-group-item-header" ng-click="service.expanded = !service.expanded">
+          <div class="list-view-pf-expand">
+            <span class="fa fa-angle-right" ng-class="{'fa-angle-down': service.expanded}"></span>
           </div>
-        </div>
-        <div class="toolbar-pf-action-right" ng-show="services !== null">
-          {{filteredServices.length}} of {{services.length}}
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="spinner spinner-lg loading-page" ng-if="services === null"></div>
-
-  <div class="list-group list-view-pf list-view-pf-view">
-    <div class="list-group-item" ng-class="{'list-view-pf-expand-active': service.expanded}"
-         ng-repeat="service in services | filter:filterText as filteredServices">
-      <div class="list-group-item-header" ng-click="service.expanded = !service.expanded">
-        <div class="list-view-pf-expand">
-          <span class="fa fa-angle-right" ng-class="{'fa-angle-down': service.expanded}"></span>
-        </div>
-        <div class="list-view-pf-main-info">
-          <div class="list-view-pf-body">
-            <div class="list-view-pf-description">
-              <div class="list-group-item-heading">
-                ID {{service.Identifier}}
+          <div class="list-view-pf-main-info">
+            <div class="list-view-pf-body">
+              <div class="list-view-pf-description">
+                <div class="list-group-item-heading">
+                  ID {{service.Identifier}}
+                </div>
+                <div class="list-group-item-text" ng-bind-html="service.BundleLinks">
+                </div>
               </div>
-              <div class="list-group-item-text" ng-bind-html="service.BundleIdentifier">
-              </div>
+              <div class="list-view-pf-additional-info">
+                <div class="list-view-pf-additional-info-item" title="Object Classes">
+                  {{service.objectClass[0]}}{{service.objectClass.length > 1 ? '...' : ''}}
+                </div>
+              </div>              
             </div>
-            <div class="list-view-pf-additional-info">
-              <div class="list-view-pf-additional-info-item" title="Object Classes">
-                {{service.objectClass[0]}}{{service.objectClass.length > 1 ? '...' : ''}}
-              </div>
-            </div>              
           </div>
         </div>
-      </div>
-      <div class="list-group-item-container" ng-if="service.expanded">
-        <div class="close" ng-click="service.expanded = false">
-          <span class="pficon pficon-close"></span>
-        </div>
-        <div class="col-md-5">
-          <dl>
-            <dt>Using Bundles</dt>
-            <dd>
-              <ul class="service-bundles-list">
-                <li ng-repeat="bundle in service.UsingBundles">
-                  <a ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
-                </li>
-              </ul>
-            </dd>
-          </dl>
-        </div>
-        <div class="col-md-5">
-          <dl>
-            <dt>Object Classes</dt>
-            <dd>
-              <ul class="service-object-classes-list">
-                <li ng-repeat="clazz in service.objectClass">
-                  {{clazz}}
-                </li>
-              </ul>
-            </dd>
-          </dl>
+        <div class="list-group-item-container" ng-if="service.expanded">
+          <div class="close" ng-click="service.expanded = false">
+            <span class="pficon pficon-close"></span>
+          </div>
+          <div class="col-md-5">
+            <dl>
+              <dt>Using Bundles</dt>
+              <dd>
+                <ul class="service-bundles-list">
+                  <li ng-repeat="bundle in service.UsingBundles">
+                    <a ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>
+                  </li>
+                </ul>
+              </dd>
+            </dl>
+          </div>
+          <div class="col-md-5">
+            <dl>
+              <dt>Object Classes</dt>
+              <dd>
+                <ul class="service-object-classes-list">
+                  <li ng-repeat="clazz in service.objectClass">
+                    {{clazz}}
+                  </li>
+                </ul>
+              </dd>
+            </dl>
+          </div>
         </div>
       </div>
     </div>
