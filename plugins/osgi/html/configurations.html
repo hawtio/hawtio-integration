@@ -2,42 +2,28 @@
 
 <div class="controller-section" ng-controller="Osgi.ConfigurationsController">
 
-  <div class="row toolbar-pf">
-    <div class="col-md-12">
-      <form class="toolbar-pf-actions search-pf">
-        <div class="form-group">
-          <button class="btn btn-default" ng-click="openAddPidDialog()" title="Add a new configuration" hawtio-show object-name="{{hawtioConfigAdminMBean}}"
-            method-name="configAdminUpdate">
-            Add configuration
-          </button>
-        </div>
-        <div class="form-group has-clear">
-          <div class="search-pf-input-group">
-            <label for="search1" class="sr-only">Filter</label>
-            <input id="search1" type="search" class="form-control" ng-model="filterText" placeholder="Filter...">
-            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''"><span class="pficon pficon-close"></span></button>
+  <div class="spinner spinner-lg loading-page" ng-if="!configurations"></div>
+  
+  <div ng-if="configurations">
+    <pf-toolbar config="toolbarConfig"></pf-toolbar>
+
+    <pf-list-view items="filteredConfigurations" config="listViewConfig" action-buttons="listViewActionButtons" menu-actions="listViewMenuItems">
+      <div class="list-view-pf-left" ng-class="{'osgi-configuration-factory-instance': item.isFactoryInstance}">
+        <span class="list-view-pf-icon-sm" ng-class="item.kind.class" title="{{item.kind.title}}"></span>
+      </div>
+      <div class="list-view-pf-body">
+        <div class="list-view-pf-description">
+          <div class="list-group-item-heading" title="{{item.name}}">
+            {{item.name}}
+          </div>
+          <div class="list-group-item-text">
+            {{item.description}}
           </div>
         </div>
-      </form>
-    </div>
-  </div>
-
-  <pf-list-view items="configurations" config="listViewConfig" action-buttons="listViewActionButtons" menu-actions="listViewMenuItems">
-    <div class="list-view-pf-left" ng-class="{'osgi-configuration-factory-instance': item.isFactoryInstance}">
-      <span class="list-view-pf-icon-sm" ng-class="item.kind.class" title="{{item.kind.title}}"></span>
-    </div>
-    <div class="list-view-pf-body">
-      <div class="list-view-pf-description">
-        <div class="list-group-item-heading" title="{{item.name}}">
-          {{item.name}}
-        </div>
-        <div class="list-group-item-text">
-          {{item.description}}
-        </div>
       </div>
-    </div>
-  </pf-list-view>
-
+    </pf-list-view>
+  </div>
+  
   <script type="text/ng-template" id="addPidDialog.html">
     <form class="form-horizontal" ng-submit="$close(newPid)">
       <div class="modal-header">

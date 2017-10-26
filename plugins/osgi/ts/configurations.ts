@@ -12,6 +12,9 @@ namespace Osgi {
       jolokia: Jolokia.IJolokia,
       $uibModal) => {
 
+      $scope.configurations = null;
+      $scope.filteredConfigurations = [];
+            
       /** the kinds of config */
       const configKinds = {
         factory: {
@@ -28,6 +31,40 @@ namespace Osgi {
         }
       };
 
+      $scope.toolbarConfig = {
+        filterConfig: {
+          fields: [
+            {
+              id: 'name',
+              title: 'Name',
+              placeholder: 'Filter by name...',
+              filterType: 'text'
+            },
+            {
+              id: 'description',
+              title: 'Description',
+              placeholder: 'Filter by description...',
+              filterType: 'text'
+            }
+          ],
+          resultsCount: 0,
+          totalCount: 0,
+          appliedFilters: [],
+          onFilterChange: filters => {
+            applyFilters(filters);
+            updateResultCount();
+          }
+        },
+        actionsConfig: {
+          primaryActions: [
+            {
+              name: 'Add configuration',
+              actionFn: openAddPidDialog
+            }
+          ]
+        }
+      };
+        
       $scope.listViewConfig = {
         showSelectBox: false
       }
@@ -75,7 +112,25 @@ namespace Osgi {
         }
       ]
 
-      $scope.openAddPidDialog = () => {
+      function applyFilters(filters) {
+        let filteredConfigurations = $scope.configurations;
+        filters.forEach(filter => {
+          const regExp = new RegExp(filter.value, 'i');
+          if (filter.id === 'name') {
+            filteredConfigurations = filteredConfigurations.filter(configuration => regExp.test(configuration.name));
+          } else if (filter.id === 'description') {
+            filteredConfigurations = filteredConfigurations.filter(configuration => regExp.test(configuration.description));
+          }
+        });
+        $scope.filteredConfigurations = filteredConfigurations;
+      }
+  
+      function updateResultCount() {
+        $scope.toolbarConfig.filterConfig.totalCount = $scope.configurations.length;
+        $scope.toolbarConfig.filterConfig.resultsCount = $scope.filteredConfigurations.length;
+      }
+        
+      function openAddPidDialog() {
         $uibModal.open({
           templateUrl: 'addPidDialog.html',
           scope: $scope
@@ -188,6 +243,8 @@ namespace Osgi {
         }
         // update UI
         $scope.configurations = configurations;
+        applyFilters($scope.toolbarConfig.filterConfig.appliedFilters);
+        updateResultCount();
         Core.$apply($scope);
       }
 
