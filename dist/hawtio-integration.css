@@ -113,6 +113,13 @@ caption {
 .camel-main-actions .dropdown-menu {
   min-width: 100%;
 }
+.breadcrumb > .page-title {
+  font-weight: 300;
+  font-size: 24px;
+  margin-top: 12px;
+  line-height: 1.1;
+  display: inline-block;
+}
 
 .activemq-browse-table th:nth-child(1) {
   width: 5%;
@@ -785,7 +792,7 @@ div.camel-properties {
 }
 
 .pid-view {
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 .pid-form .form-control:read-only {
   color: inherit;

@@ -64,19 +64,10 @@ namespace Osgi {
           ]
         }
       };
-        
+
       $scope.listViewConfig = {
         showSelectBox: false
       }
-
-      $scope.listViewActionButtons = [
-        {
-          name: 'More',
-          actionFn: (action, item) => {
-            $location.path(item.pidLink);
-          }
-        }
-      ];
 
       $scope.listViewMenuItems = [
         {

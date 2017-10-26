@@ -1,27 +1,16 @@
 <div class="pid-view" ng-controller="Osgi.PidController">
 
-  <h1>{{zkPid || metaType.name || pid}}</h1>
-
-  <div class="breadcrumb">
-    <a ng-href="{{configurationUrl}}"><span class="fa fa-angle-left"></span> Back to Configuration</a>
-  </div>
-
-  <div class="row toolbar-pf">
-    <div class="col-sm-12">
-      <form class="toolbar-pf-actions">
-        <div class="form-group">
-          <button class="btn btn-default" ng-click="openAddPropertyDialog()" title="Add a new property value to this configuration">
-            Add property
-          </button>
-          <button class="btn btn-default" ng-click="setEditMode(true)" title="Edit this configuration" hawtio-show
-                  object-name="{{hawtioConfigAdminMBean}}" method-name="configAdminUpdate">
-            Edit configuration
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
+  <ol class="breadcrumb">
+    <li>
+        <a ng-href="{{configurationUrl}}">Configuration</a>
+    </li>
+    <li class="page-title">
+      {{zkPid || metaType.name || pid}}
+    </li>
+  </ol>  
+  
+  <pf-toolbar config="toolbarConfig"></pf-toolbar>
+  
   <div ng-hide="editMode">
     <div class="row config-admin-form view">
       <div class="col-sm-12">
@@ -57,7 +46,7 @@
       <div class="col-sm-10">
         <button class="btn btn-primary" ng-show="newPid" ng-disabled="!canSave || !createForm.pidInstanceName" ng-click="pidSave()">Create</button>
         <button class="btn btn-primary" ng-hide="newPid" ng-disabled="!canSave" ng-click="pidSave()">Save</button>
-        <button class="btn btn-default" ng-click="setEditMode(false)">Cancel</button>
+        <button class="btn btn-default" ng-click="cancelSave()">Cancel</button>
       </div>
     </div>
   </div>
@@ -93,13 +82,13 @@
         <div class="form-group">
           <label class="col-sm-2 control-label" for="propKey">Key</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="propKey" placeholder="Key" ng-model="addPropKey" required>
+            <input type="text" class="form-control" id="propKey" ng-model="addPropKey" required>
           </div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label" for="propValue">Value</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="propValue" placeholder="Value" ng-model="addPropValue"/>
+            <input type="text" class="form-control" id="propValue" ng-model="addPropValue"/>
           </div>
         </div>
       </div>

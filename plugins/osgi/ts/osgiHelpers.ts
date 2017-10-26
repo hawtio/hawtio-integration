@@ -380,7 +380,7 @@ namespace Osgi {
       var configPage = isFactory ? "/newConfiguration/" : "/configuration/";
       return "/wiki/branch/" + versionId + configPage + link + "/" + $scope.pageId;
     } else {
-      return "/osgi/pid/" + link;
+      return "osgi/pid/" + link;
     }
   }
 

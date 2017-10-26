@@ -17,7 +17,7 @@ namespace Osgi {
 
     $scope.configurationUrl = Core.url('/osgi/configurations' + workspace.hash());
     $scope.factoryPid = $routeParams['factoryPid'];
-    $scope.pid = $routeParams['pid'] ? $routeParams['pid'].substring(0, $routeParams['pid'].indexOf('?')) : null;
+    $scope.pid = $routeParams['pid'];
     $scope.createForm = {
       pidInstanceName: null
     };
@@ -35,20 +35,40 @@ namespace Osgi {
     }
 
     $scope.selectValues = {};
-
     $scope.modelLoaded = false;
     $scope.canSave = false;
 
-    $scope.setEditMode = (flag) => {
-      $scope.editMode = flag;
-      $scope.formMode = flag ? "edit" : "view";
-      if (!flag || !$scope.entity) {
-        $scope.entity = {};
-        updateTableContents();
+    const addPropertyAction = {
+      name: 'Add property',
+      actionFn: action => {
+        uibModalInstance = $uibModal.open({
+          templateUrl: 'addPropertyDialog.html',
+          scope: $scope
+        });      
       }
-    };
+    }
+
+    const editPropertiesAction = {
+      name: 'Edit properties',
+      actionFn: action => {
+        if (Object.keys($scope.entity).length > 0) {
+          $scope.editMode = true;
+        }
+      },
+      isDisabled: true
+    }
+
+    $scope.toolbarConfig = {
+      actionsConfig: {
+        primaryActions: [
+          addPropertyAction,
+          editPropertiesAction
+        ]
+      }
+    }
+      
     var startInEditMode = $scope.factoryPid && !$routeParams['pid'];
-    $scope.setEditMode(startInEditMode);
+    $scope.editMode = startInEditMode;
 
     $scope.$on("hawtio.form.modelChange", () => {
       if ($scope.modelLoaded) {
@@ -67,7 +87,7 @@ namespace Osgi {
           var newPath = createConfigPidPath($scope, pid);
           $location.path(newPath);
         } else {
-          $scope.setEditMode(false);
+          $scope.editMode = false;
           $scope.canSave = false;
           $scope.saved = true;
         }
@@ -121,7 +141,14 @@ namespace Osgi {
           updatePid(mbean, pid, data);
         }
       }
+
+      $scope.editMode = false;
     };
+
+    $scope.cancelSave = function() {
+      updateSchema();
+      $scope.editMode = false;
+    }
 
     function errorHandler(message) {
        return {
@@ -146,14 +173,14 @@ namespace Osgi {
     }
 
     $scope.addPropertyConfirmed = (key, value) => {
-      $scope.addPropertyDialog.close();
+      uibModalInstance.close();
       $scope.configValues[key] = {
         Key: key,
         Value: value,
         Type: "String"
       };
-      enableCanSave();
       updateSchema();
+      $scope.pidSave();
     };
 
     $scope.deletePidProp = (e) => {
@@ -390,6 +417,8 @@ namespace Osgi {
         }
       });
 
+      editPropertiesAction.isDisabled = Object.keys(entity).length === 0;
+      
       //log.info("default values: " + angular.toJson($scope.defaultValues));
       $scope.entity = entity;
       $scope.schema = schema;

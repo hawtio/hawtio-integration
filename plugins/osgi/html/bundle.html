@@ -1,6 +1,13 @@
 <div class="controller-section" ng-controller="Osgi.BundleController">
 
-  <h1>{{row.Headers['Bundle-Name'].Value}}</h1>
+  <ol class="breadcrumb">
+    <li>
+        <a ng-href="osgi/bundles">Bundles</a>
+    </li>
+    <li class="page-title">
+        {{row.Headers['Bundle-Name'].Value}}
+    </li>
+  </ol>  
 
   <div class="toolbar-pf">
     <form class="toolbar-pf-actions">
