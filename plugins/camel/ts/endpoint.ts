@@ -74,7 +74,7 @@ namespace Camel {
       if (endpointCreated && endpointCreated === true) {
         Core.notification('success', "Creating endpoint " + $scope.message);
       } else {
-        Core.notification('error', "Failed to create endpoint " + $scope.message);
+        Core.notification('danger', "Failed to create endpoint " + $scope.message);
       }
     }
 

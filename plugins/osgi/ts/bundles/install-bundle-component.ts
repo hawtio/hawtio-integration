@@ -14,7 +14,7 @@ namespace Osgi {
           Core.notification('success', response);
           this['onInstall']();
         })
-        .catch(error => Core.notification('error', error));
+        .catch(error => Core.notification('danger', error));
     }
 
   }

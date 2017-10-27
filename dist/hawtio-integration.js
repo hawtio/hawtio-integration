@@ -19019,7 +19019,7 @@ var Camel;
                     Core.notification('success', "Creating endpoint " + $scope.message);
                 }
                 else {
-                    Core.notification('error', "Failed to create endpoint " + $scope.message);
+                    Core.notification('danger', "Failed to create endpoint " + $scope.message);
                 }
             }
             function deleteSuccess() {
@@ -21489,14 +21489,14 @@ var Karaf;
                 Karaf.installFeature(workspace, jolokia, $scope.name, $scope.version, function () {
                     Core.notification('success', 'Installed feature ' + $scope.name);
                 }, function (response) {
-                    Core.notification('error', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
+                    Core.notification('danger', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
                 });
             };
             $scope.uninstall = function () {
                 Karaf.uninstallFeature(workspace, jolokia, $scope.name, $scope.version, function () {
                     Core.notification('success', 'Uninstalled feature ' + $scope.name);
                 }, function (response) {
-                    Core.notification('error', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
+                    Core.notification('danger', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
                 });
             };
             $scope.toProperties = function (elements) {
@@ -22614,7 +22614,7 @@ var Osgi;
                         Core.notification('success', response);
                         _this.loadBundles();
                     })
-                        .catch(function (error) { return Core.notification('error', error); });
+                        .catch(function (error) { return Core.notification('danger', error); });
                 },
                 isDisabled: true
             };
@@ -22627,7 +22627,7 @@ var Osgi;
                         Core.notification('success', response);
                         _this.loadBundles();
                     })
-                        .catch(function (error) { return Core.notification('error', error); });
+                        .catch(function (error) { return Core.notification('danger', error); });
                 },
                 isDisabled: true
             };
@@ -22640,7 +22640,7 @@ var Osgi;
                         Core.notification('success', response);
                         _this.loadBundles();
                     })
-                        .catch(function (error) { return Core.notification('error', error); });
+                        .catch(function (error) { return Core.notification('danger', error); });
                 },
                 isDisabled: true
             };
@@ -22653,7 +22653,7 @@ var Osgi;
                         Core.notification('success', response);
                         _this.loadBundles();
                     })
-                        .catch(function (error) { return Core.notification('error', error); });
+                        .catch(function (error) { return Core.notification('danger', error); });
                 },
                 isDisabled: true
             };
@@ -22666,7 +22666,7 @@ var Osgi;
                         Core.notification('success', response);
                         _this.loadBundles();
                     })
-                        .catch(function (error) { return Core.notification('error', error); });
+                        .catch(function (error) { return Core.notification('danger', error); });
                 },
                 isDisabled: true
             };
@@ -22816,7 +22816,7 @@ var Osgi;
                 Core.notification('success', response);
                 _this['onInstall']();
             })
-                .catch(function (error) { return Core.notification('error', error); });
+                .catch(function (error) { return Core.notification('danger', error); });
         };
         return InstallBundleController;
     }());

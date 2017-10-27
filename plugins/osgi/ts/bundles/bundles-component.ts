@@ -30,7 +30,7 @@ namespace Osgi {
             Core.notification('success', response);
             this.loadBundles();
           })
-          .catch(error => Core.notification('error', error));
+          .catch(error => Core.notification('danger', error));
         },
       isDisabled: true
     }
@@ -44,7 +44,7 @@ namespace Osgi {
             Core.notification('success', response);
             this.loadBundles();
           })
-          .catch(error => Core.notification('error', error));
+          .catch(error => Core.notification('danger', error));
       },
       isDisabled: true
     }
@@ -58,7 +58,7 @@ namespace Osgi {
             Core.notification('success', response);
             this.loadBundles();
           })
-          .catch(error => Core.notification('error', error));
+          .catch(error => Core.notification('danger', error));
       },
       isDisabled: true
     }
@@ -72,7 +72,7 @@ namespace Osgi {
             Core.notification('success', response);
             this.loadBundles();
           })
-          .catch(error => Core.notification('error', error));
+          .catch(error => Core.notification('danger', error));
       },
       isDisabled: true
     }
@@ -86,7 +86,7 @@ namespace Osgi {
             Core.notification('success', response);
             this.loadBundles();
           })
-          .catch(error => Core.notification('error', error));
+          .catch(error => Core.notification('danger', error));
       },
       isDisabled: true
     }
