@@ -21948,7 +21948,7 @@ var Karaf;
             }
             function loadData() {
                 console.log("Loading Karaf data...");
-                jolokia.search("org.apache.karaf:type=admin,*", Core.onSuccess(render));
+                jolokia.search("org.apache.karaf:type=instance,*", Core.onSuccess(render));
             }
             function render(response) {
                 // grab the first mbean as there should ideally only be one karaf in the JVM
