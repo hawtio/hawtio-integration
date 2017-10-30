@@ -203,9 +203,10 @@ namespace Osgi {
     }
 
     private enableDisableActions() {
-      const noBundlesSelected = this.getSelectedBundles().length === 0;
-      this.startAction.isDisabled = noBundlesSelected;
-      this.stopAction.isDisabled = noBundlesSelected;
+      const selectedBundles = this.getSelectedBundles();
+      const noBundlesSelected = selectedBundles.length === 0;
+      this.startAction.isDisabled = noBundlesSelected || selectedBundles.every(bundle => bundle.state === 'active');
+      this.stopAction.isDisabled = noBundlesSelected || selectedBundles.every(bundle => bundle.state !== 'active');
       this.refreshAction.isDisabled = noBundlesSelected;
       this.updateAction.isDisabled = noBundlesSelected;
       this.uninstallAction.isDisabled = noBundlesSelected;

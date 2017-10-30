@@ -22770,9 +22770,10 @@ var Osgi;
                 .filter(function (bundle) { return bundle.selected; });
         };
         BundlesController.prototype.enableDisableActions = function () {
-            var noBundlesSelected = this.getSelectedBundles().length === 0;
-            this.startAction.isDisabled = noBundlesSelected;
-            this.stopAction.isDisabled = noBundlesSelected;
+            var selectedBundles = this.getSelectedBundles();
+            var noBundlesSelected = selectedBundles.length === 0;
+            this.startAction.isDisabled = noBundlesSelected || selectedBundles.every(function (bundle) { return bundle.state === 'active'; });
+            this.stopAction.isDisabled = noBundlesSelected || selectedBundles.every(function (bundle) { return bundle.state !== 'active'; });
             this.refreshAction.isDisabled = noBundlesSelected;
             this.updateAction.isDisabled = noBundlesSelected;
             this.uninstallAction.isDisabled = noBundlesSelected;
