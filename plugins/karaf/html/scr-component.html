@@ -1,11 +1,12 @@
-<div class="controller-section" ng-controller="Karaf.ScrComponentController">
+<div class="controller-section" ng-if="!$ctrl.loading">
 
-  <h1>{{row.Id}}</h1>
+  <h1>Declaritive Service: {{$ctrl.component.id}}</h1>
 
   <div class="breadcrumb">
-    <a ng-href="{{srcComponentsUrl}}"><span class="fa fa-angle-left"></span> Back to Declarative Services</a>
+    <a ng-href="{{$ctrl.srcComponentsUrl}}"><span class="fa fa-angle-left"></span> Back to Declarative Services</a>
   </div>
 
   <div ng-include src="'plugins/karaf/html/scr-component-details.html'"></div>
 
 </div>
+<div class="spinner spinner-lg loading-page" ng-if="$ctrl.loading"></div>  

@@ -1,13 +1,15 @@
-<div class="row toolbar-pf" ng-hide="hasFabric">
+<div class="row toolbar-pf">
   <div class="col-sm-12">
     <form class="toolbar-pf-actions">
       <div class="form-group">
-        <button class="btn btn-default" ng-click="activate()" hawtio-show object-name="{{scrMBean}}"
-                method-name="activateComponent" ng-disabled="row.State === 'Active' || row.State === 'Unsatisfied'">
+        <button class="btn btn-default" 
+                ng-click="$ctrl.activateComponent()" 
+                ng-disabled="$ctrl.disableActivate()">
           Activate
         </button>
-        <button class="btn btn-default" ng-click="deactivate()" hawtio-show object-name="{{scrMBean}}"
-                method-name="deactivateComponent" ng-disabled="row.State === 'Disabled'">
+        <button class="btn btn-default" 
+                ng-click="$ctrl.deactivateComponent()"
+                ng-disabled="$ctrl.disableDeactivate()">
           Deactivate
         </button>
       </div>
@@ -21,11 +23,11 @@
   <div class="col-md-12">
     <dl class="dl-horizontal">
       <dt>Id</dt>
-      <dd>{{row.Id}}</dd>
+      <dd>{{$ctrl.component.id}}</dd>
       <dt>Name</dt>
-      <dd>{{row.Name}}</dd>
+      <dd>{{$ctrl.component.name}}</dd>
       <dt>State</dt>
-      <dd>{{row.State}}</dd>
+      <dd>{{$ctrl.component.state}}</dd>
     </dl>
   </div>
 </div>
@@ -35,7 +37,7 @@
 <div class="row">
   <div class="col-md-12">
     <dl class="dl-horizontal">
-      <dt ng-repeat-start="(key, value) in row.Properties">{{key}}</dt>
+      <dt ng-repeat-start="(key, value) in $ctrl.component.properties">{{key}}</dt>
       <dd ng-repeat-end ng-repeat="v in value">{{v.Value}}</dd>
     </dl>
   </div>
@@ -56,7 +58,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="(key, value) in row.References.values">
+        <tr ng-repeat="(key, value) in $ctrl.component.references">
           <td>{{value.Name}}</td>
           <td>{{value.Availability}}</td>
           <td>{{value.Cardinality}}</td>

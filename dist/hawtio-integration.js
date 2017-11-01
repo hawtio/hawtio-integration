@@ -21456,17 +21456,324 @@ var Karaf;
     }
     Karaf.getSelectionScrMBean = getSelectionScrMBean;
 })(Karaf || (Karaf = {}));
+/// <reference path="scr-component.ts"/>
+/// <reference path="../karafHelpers.ts"/>
+var Karaf;
+(function (Karaf) {
+    var ScrComponentsService = /** @class */ (function () {
+        ScrComponentsService.$inject = ["$q", "jolokia", "workspace"];
+        function ScrComponentsService($q, jolokia, workspace) {
+            'ngInject';
+            this.$q = $q;
+            this.jolokia = jolokia;
+            this.workspace = workspace;
+            this.log = Logger.get("Karaf");
+        }
+        ScrComponentsService.prototype.getComponents = function () {
+            return this.execute(Karaf.getSelectionScrMBean(this.workspace), undefined, undefined, 'read')
+                .then(function (value) {
+                var components = [];
+                angular.forEach(value['Components'].values, function (item, key) {
+                    var component = {
+                        id: item.Id,
+                        name: item.Name,
+                        state: item.State,
+                        properties: item.Properties,
+                        references: item.References
+                    };
+                    components.push(component);
+                });
+                return components;
+            });
+        };
+        ScrComponentsService.prototype.activateComponents = function (components) {
+            var _this = this;
+            var mbean = Karaf.getSelectionScrMBean(this.workspace);
+            var promises = [];
+            angular.forEach(components, function (component) {
+                promises.push(_this.execute(mbean, 'activateComponent(java.lang.String)', component.name));
+            });
+            return this.$q.all(promises).then(this.handleResponse);
+        };
+        ScrComponentsService.prototype.activateComponent = function (component) {
+            return this.activateComponents([component]);
+        };
+        ScrComponentsService.prototype.deactivateComponents = function (components) {
+            var _this = this;
+            var mbean = Karaf.getSelectionScrMBean(this.workspace);
+            var promises = [];
+            angular.forEach(components, function (component) {
+                promises.push(_this.execute(mbean, 'deactivateComponent(java.lang.String)', component.name));
+            });
+            return this.$q.all(promises).then(this.handleResponse);
+        };
+        ScrComponentsService.prototype.deactivateComponent = function (component) {
+            return this.deactivateComponents([component]);
+        };
+        ScrComponentsService.prototype.execute = function (mbean, operation, args, type) {
+            var _this = this;
+            if (args === void 0) { args = undefined; }
+            if (type === void 0) { type = "exec"; }
+            var request = {
+                type: type,
+                mbean: mbean,
+            };
+            if (operation) {
+                request['operation'] = operation;
+            }
+            if (args) {
+                request['arguments'] = [args];
+            }
+            else {
+                request['arguments'] = [];
+            }
+            return this.$q(function (resolve, reject) {
+                _this.jolokia.request(request, {
+                    method: "post",
+                    success: function (response) { return resolve(response.value); },
+                    error: function (response) {
+                        _this.log.error("ScrComponentsService.execute() failed. " + response);
+                        reject(response.error);
+                    }
+                });
+            });
+        };
+        ScrComponentsService.prototype.handleResponse = function (response) {
+            if (response && response['Error']) {
+                throw response['Error'];
+            }
+            else {
+                return "The operation completed successfully";
+            }
+        };
+        return ScrComponentsService;
+    }());
+    Karaf.ScrComponentsService = ScrComponentsService;
+})(Karaf || (Karaf = {}));
+/// <reference path="scr-component.ts"/>
+/// <reference path="scr-components.service.ts"/>
+var Karaf;
+(function (Karaf) {
+    var ScrComponentsController = /** @class */ (function () {
+        ScrComponentsController.$inject = ["scrComponentsService"];
+        function ScrComponentsController(scrComponentsService) {
+            'ngInject';
+            var _this = this;
+            this.scrComponentsService = scrComponentsService;
+            this.activateAction = {
+                name: 'Activate',
+                actionFn: function (action) {
+                    var selectedComponents = _this.getSelectedComponents();
+                    _this.scrComponentsService.activateComponents(selectedComponents)
+                        .then(function (response) {
+                        Core.notification('success', response);
+                        _this.loadComponents();
+                    })
+                        .catch(function (error) { return Core.notification('danger', error); });
+                },
+                isDisabled: true
+            };
+            this.deActivateAction = {
+                name: 'Deactivate',
+                actionFn: function (action) {
+                    var selectedComponents = _this.getSelectedComponents();
+                    _this.scrComponentsService.deactivateComponents(selectedComponents)
+                        .then(function (response) {
+                        Core.notification('success', response);
+                        _this.loadComponents();
+                    })
+                        .catch(function (error) { return Core.notification('danger', error); });
+                },
+                isDisabled: true
+            };
+            this.toolbarConfig = {
+                filterConfig: {
+                    fields: [
+                        {
+                            id: 'name',
+                            title: 'Name',
+                            placeholder: 'Filter by name...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'state',
+                            title: 'State',
+                            placeholder: 'Filter by state...',
+                            filterType: 'select',
+                            filterValues: [
+                                'Enabled',
+                                'Unsatisfied',
+                                'Activating',
+                                'Active',
+                                'Registered',
+                                'Factory',
+                                'Deactivating',
+                                'Destroying',
+                                'Disabling',
+                                'Disposing'
+                            ]
+                        }
+                    ],
+                    onFilterChange: function (filters) {
+                        _this.applyFilters(filters);
+                    },
+                    resultsCount: 0
+                },
+                actionsConfig: {
+                    primaryActions: [
+                        this.activateAction,
+                        this.deActivateAction
+                    ]
+                },
+                isTableView: true
+            };
+            this.tableConfig = {
+                selectionMatchProp: 'name',
+                onCheckBoxChange: function (item) { return _this.enableDisableActions(); }
+            };
+            this.tableColumns = [
+                { header: 'Name', itemField: 'name', templateFn: function (value) { return "<a href=\"osgi/scr-component/" + value + "\">" + value + "</a>"; } },
+                { header: 'State', itemField: 'state' }
+            ];
+            this.tableItems = null;
+            this.loading = true;
+        }
+        ScrComponentsController.prototype.$onInit = function () {
+            this.loadComponents();
+        };
+        ScrComponentsController.prototype.loadComponents = function () {
+            var _this = this;
+            this.scrComponentsService.getComponents()
+                .then(function (components) {
+                _this.components = components;
+                _this.tableItems = components;
+                _this.toolbarConfig.filterConfig.resultsCount = components.length;
+                _this.enableDisableActions();
+                _this.loading = false;
+            });
+        };
+        ScrComponentsController.prototype.applyFilters = function (filters) {
+            var filteredComponents = this.components;
+            filters.forEach(function (filter) {
+                filteredComponents = ScrComponentsController.FILTER_FUNCTIONS[filter.id](filteredComponents, filter.value);
+            });
+            this.tableItems = filteredComponents;
+            this.toolbarConfig.filterConfig.resultsCount = filteredComponents.length;
+        };
+        ScrComponentsController.prototype.enableDisableActions = function () {
+            var selectedComponents = this.getSelectedComponents();
+            var noComponentsSelected = selectedComponents.length === 0;
+            this.activateAction.isDisabled = noComponentsSelected || selectedComponents.every(function (component) { return component.state === 'Active'; });
+            this.deActivateAction.isDisabled = noComponentsSelected || selectedComponents.every(function (component) { return component.state !== 'Active'; });
+        };
+        ScrComponentsController.prototype.getSelectedComponents = function () {
+            var _this = this;
+            return this.tableItems
+                .map(function (tableItem, i) { return angular.extend(_this.components[i], { selected: tableItem['selected'] }); })
+                .filter(function (component) { return component.selected; });
+        };
+        ScrComponentsController.FILTER_FUNCTIONS = {
+            state: function (components, state) { return components.filter(function (component) { return component.state === state; }); },
+            name: function (components, name) {
+                var regExp = new RegExp(name, 'i');
+                return components.filter(function (component) { return regExp.test(component.name); });
+            }
+        };
+        return ScrComponentsController;
+    }());
+    Karaf.ScrComponentsController = ScrComponentsController;
+    Karaf.scrListComponent = {
+        template: "\n      <div class=\"table-view\">\n        <h1>Declarative Services</h1>\n        <div ng-if=\"!$ctrl.loading\">\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <pf-table-view config=\"$ctrl.tableConfig\"\n                         colummns=\"$ctrl.tableColumns\"\n                         items=\"$ctrl.tableItems\"></pf-table-view>\n        </div>\n        <div class=\"spinner spinner-lg loading-page\" ng-if=\"$ctrl.loading\"></div>\n      </div>\n    ",
+        controller: ScrComponentsController
+    };
+})(Karaf || (Karaf = {}));
+/// <reference path="scr-component.ts"/>
+/// <reference path="scr-components.service.ts"/>
+var Karaf;
+(function (Karaf) {
+    var ScrComponentDetailController = /** @class */ (function () {
+        ScrComponentDetailController.$inject = ["scrComponentsService", "$routeParams", "workspace"];
+        function ScrComponentDetailController(scrComponentsService, $routeParams, workspace) {
+            'ngInject';
+            this.scrComponentsService = scrComponentsService;
+            this.$routeParams = $routeParams;
+            this.workspace = workspace;
+            this.srcComponentsUrl = Core.url('/osgi/scr-components' + this.workspace.hash());
+            this.loading = true;
+        }
+        ScrComponentDetailController.prototype.$onInit = function () {
+            this.loadComponent();
+        };
+        ScrComponentDetailController.prototype.loadComponent = function () {
+            var _this = this;
+            this.scrComponentsService.getComponents().then(function (components) {
+                _this.component = components.filter(function (component) {
+                    return component.name === _this.$routeParams['name'];
+                })[0];
+                _this.loading = false;
+            });
+        };
+        ScrComponentDetailController.prototype.disableActivate = function () {
+            return this.component == undefined || this.component.state === 'Active';
+        };
+        ScrComponentDetailController.prototype.activateComponent = function () {
+            var _this = this;
+            this.scrComponentsService.activateComponent(this.component)
+                .then(function (response) {
+                Core.notification('success', response);
+                _this.loadComponent();
+            })
+                .catch(function (error) { return Core.notification('danger', error); });
+        };
+        ScrComponentDetailController.prototype.disableDeactivate = function () {
+            return this.component == undefined || this.component.state !== 'Active';
+        };
+        ScrComponentDetailController.prototype.deactivateComponent = function () {
+            var _this = this;
+            this.scrComponentsService.deactivateComponent(this.component)
+                .then(function (response) {
+                Core.notification('success', response);
+                _this.loadComponent();
+            })
+                .catch(function (error) { return Core.notification('danger', error); });
+        };
+        return ScrComponentDetailController;
+    }());
+    Karaf.ScrComponentDetailController = ScrComponentDetailController;
+    Karaf.scrDetailComponent = {
+        templateUrl: 'plugins/karaf/html/scr-component.html',
+        controller: ScrComponentDetailController
+    };
+})(Karaf || (Karaf = {}));
+/// <reference path="scr-components.component.ts"/>
+/// <reference path="scr-component-detail.component.ts"/>
+/// <reference path="scr-components.service.ts"/>
+var Karaf;
+(function (Karaf) {
+    Karaf.scrComponentsModule = angular
+        .module('hawtio-karaf-scr-components', [])
+        .component('scrListComponents', Karaf.scrListComponent)
+        .component('scrComponentDetail', Karaf.scrDetailComponent)
+        .service('scrComponentsService', Karaf.ScrComponentsService)
+        .name;
+})(Karaf || (Karaf = {}));
 /// <reference path="karafHelpers.ts"/>
+/// <reference path="scr-components/scr-components.module.ts"/>
+/// <reference path="scr-components/scr-component-detail.component.ts"/>
 var Karaf;
 (function (Karaf) {
     var pluginName = 'karaf';
-    Karaf._module = angular.module(pluginName, ['hawtio-core']);
+    Karaf._module = angular.module(pluginName, [
+        'patternfly',
+        'infinite-scroll',
+        Karaf.scrComponentsModule
+    ]);
     Karaf._module.config(["$routeProvider", function ($routeProvider) {
             $routeProvider.
                 when('/osgi/server', { templateUrl: 'plugins/karaf/html/server.html' }).
                 when('/osgi/features', { templateUrl: 'plugins/karaf/html/features.html', reloadOnSearch: false }).
-                when('/osgi/scr-components', { templateUrl: 'plugins/karaf/html/scr-components.html' }).
-                when('/osgi/scr-component/:name', { templateUrl: 'plugins/karaf/html/scr-component.html' }).
+                when('/osgi/scr-components', { template: '<scr-list-components></scr-list-components>' }).
+                when('/osgi/scr-component/:name', { template: '<scr-component-detail></scr-component-detail>' }).
                 when('/osgi/feature/:name/:version', { templateUrl: 'plugins/karaf/html/feature.html' });
         }]);
     Karaf._module.run(["workspace", "viewRegistry", "helpRegistry", function (workspace, viewRegistry, helpRegistry) {
@@ -21814,110 +22121,6 @@ var Karaf;
             $scope.isActive = function (path) { return workspace.isLinkActive(path); };
             $scope.isPrefixActive = function (path) { return workspace.isLinkPrefixActive(path); };
             $scope.goto = function (path) { return $location.path(path); };
-        }]);
-})(Karaf || (Karaf = {}));
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.ScrComponentController", ["$scope", "$location", "workspace", "jolokia", "$routeParams", function ($scope, $location, workspace, jolokia, $routeParams) {
-            $scope.srcComponentsUrl = Core.url('/osgi/scr-components' + workspace.hash());
-            $scope.name = $routeParams['name'];
-            populateTable();
-            function populateTable() {
-                $scope.row = Karaf.getComponentByName(workspace, jolokia, $scope.name);
-                Core.$apply($scope);
-            }
-            $scope.activate = function () {
-                Karaf.activateComponent(workspace, jolokia, $scope.row['Name'], function () {
-                    console.log("Activated!");
-                }, function () {
-                    console.log("Failed to activate!");
-                });
-            };
-            $scope.deactivate = function () {
-                Karaf.deactivateComponent(workspace, jolokia, $scope.row['Name'], function () {
-                    console.log("Deactivated!");
-                }, function () {
-                    console.log("Failed to deactivate!");
-                });
-            };
-        }]);
-})(Karaf || (Karaf = {}));
-/// <reference path="karafHelpers.ts"/>
-/// <reference path="karafPlugin.ts"/>
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.ScrComponentsController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.component = empty();
-            // caches last jolokia result
-            $scope.result = [];
-            // rows in components table
-            $scope.components = [];
-            // selected components
-            $scope.selectedComponents = [];
-            $scope.scrOptions = {
-                data: 'components',
-                sortInfo: { "sortBy": "Name", "ascending": true },
-                selectedItems: $scope.selectedComponents,
-                columnDefs: [
-                    {
-                        field: 'Name',
-                        displayName: 'Name',
-                        cellTemplate: '<div class="ngCellText"><a href="{{row.entity.Url}}">{{row.entity.Name}}</a></div>'
-                    },
-                    {
-                        field: 'State',
-                        displayName: 'State',
-                        cellTemplate: '{{row.entity.State}}'
-                    }
-                ],
-                primaryKeyFn: function (entity) { return entity.Name; }
-            };
-            var scrMBean = Karaf.getSelectionScrMBean(workspace);
-            if (scrMBean) {
-                var components = Karaf.getAllComponents(workspace, jolokia);
-                addUrlField(components);
-                render(components);
-            }
-            function addUrlField(components) {
-                components.forEach(function (component) {
-                    return component.Url = Core.url("/osgi/scr-component/" + component.Name + workspace.hash());
-                });
-            }
-            $scope.activate = function () {
-                $scope.selectedComponents.forEach(function (component) {
-                    Karaf.activateComponent(workspace, jolokia, component.Name, function () {
-                        console.log("Activated!");
-                    }, function () {
-                        console.log("Failed to activate!");
-                    });
-                });
-            };
-            $scope.deactivate = function () {
-                $scope.selectedComponents.forEach(function (component) {
-                    Karaf.deactivateComponent(workspace, jolokia, component.Name, function () {
-                        console.log("Deactivated!");
-                    }, function () {
-                        console.log("Failed to deactivate!");
-                    });
-                });
-            };
-            function empty() {
-                return [
-                    {
-                        Name: "",
-                        Status: false
-                    }
-                ];
-            }
-            function render(components) {
-                if (!angular.equals($scope.result, components)) {
-                    $scope.components = components;
-                    $scope.result = $scope.components;
-                    Core.$apply($scope);
-                }
-            }
         }]);
 })(Karaf || (Karaf = {}));
 /// <reference path="karafHelpers.ts"/>
@@ -25448,9 +25651,8 @@ $templateCache.put('plugins/camel/html/typeConverter.html','<div class="table-vi
 $templateCache.put('plugins/karaf/html/feature-details.html','<div>\n    <table class="overviewSection">\n        <tr ng-hide="hasFabric">\n            <td></td>\n            <td class="less-big">\n                <div class="btn-group">\n                  <button ng-click="uninstall(name,version)" \n                          class="btn btn-default" \n                          title="uninstall" \n                          hawtio-show\n                          object-name="{{featuresMBean}}"\n                          method-name="uninstallFeature">\n                    <i class="fa fa-power-off"></i>\n                  </button>\n                  <button ng-click="install(name,version)" \n                          class="btn btn-default" \n                          title="install" \n                          hawtio-show\n                          object-name="{{featuresMBean}}"\n                          method-name="installFeature">\n                    <i class="fa fa-play-circle"></i>\n                  </button>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>Name:</strong></td>\n            <td class="less-big">{{row.Name}}</td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>Version:</strong></td>\n            <td class="less-big">{{row.Version}}</td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>Repository:</strong></td>\n            <td class="less-big">{{row.RepositoryName}}</td>\n        </tr>\n        <tr>\n          <td class="pull-right"><strong>Repository URI:</strong></td>\n          <td class="less-big">{{row.RepositoryURI}}</td>\n        </tr>\n        <tr>\n            <td class="pull-right"><strong>State:</strong></td>\n            <td class="wrap">\n                <div ng-switch="row.Installed">\n                    <p style="display: inline;" ng-switch-when="true">Installed</p>\n\n                    <p style="display: inline;" ng-switch-default>Not Installed</p>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionFeatures">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionFeatures"\n                               href="collapseFeatures">\n                                Features\n                            </a>\n                        </div>\n                        <div id="collapseFeatures" class="accordion-body collapse in">\n                            <ul class="accordion-inner">\n                                <li ng-repeat="feature in row.Dependencies">\n                                    <a href=\'#/osgi/feature/{{feature.Name}}/{{feature.Version}}?p=container\'>{{feature.Name}}/{{feature.Version}}</a>\n                                </li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionBundles">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionBundles"\n                               href="collapseBundles">\n                                Bundles\n                            </a>\n                        </div>\n                        <div id="collapseBundles" class="accordion-body collapse in">\n                            <ul class="accordion-inner">\n                                <li ng-repeat="bundle in row.BundleDetails">\n                                    <div ng-switch="bundle.Installed">\n                                        <p style="display: inline;" ng-switch-when="true">\n                                            <a href=\'#/osgi/bundle/{{bundle.Identifier}}?p=container\'>{{bundle.Location}}</a></p>\n\n                                        <p style="display: inline;" ng-switch-default>{{bundle.Location}}</p>\n                                    </div>\n                                </li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionConfigurations">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionConfigurations"\n                               href="collapsConfigurations">\n                                Configurations\n                            </a>\n                        </div>\n                        <div id="collapsConfigurations" class="accordion-body collapse in">\n                            <table class="accordion-inner">\n                                <tr ng-repeat="(pid, value) in row.Configurations">\n                                    <td>\n                                      <p>{{value.Pid}}</p>\n                                      <div hawtio-editor="toProperties(value.Elements)" mode="props"></div></td>\n                                </tr>\n                            </table>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n        <tr>\n            <td>\n            </td>\n            <td>\n                <div class="accordion" id="accordionConfigurationFiles">\n                    <div class="accordion-group">\n                        <div class="accordion-heading">\n                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionConfigurationFiles"\n                               href="collapsConfigurationFiles">\n                                Configuration Files\n                            </a>\n                        </div>\n                        <div id="collapsConfigurationFiles" class="accordion-body collapse in">\n                            <table class="accordion-inner">\n                                <tr ng-repeat="file in row.Files">\n                                    <td>{{file.Files}}</td>\n                                </tr>\n                            </table>\n                        </div>\n                    </div>\n                </div>\n            </td>\n        </tr>\n    </table>\n</div>\n');
 $templateCache.put('plugins/karaf/html/feature.html','<div class="controller-section" ng-controller="Karaf.FeatureController">\n  <div class="row">\n    <div class="col-md-4">\n      <h1>{{row.id}}</h1>\n    </div>\n  </div>\n\n  <div ng-include src="\'plugins/karaf/html/feature-details.html\'"></div>\n\n</div>\n\n');
 $templateCache.put('plugins/karaf/html/features.html','<div class="controller-section" ng-controller="Karaf.FeaturesController">\n\n  <div class="row section-filter centered">\n    <input type="text" class="search-query" placeholder="Filter..." ng-model="filter">\n    <i class="fa fa-remove clickable" title="Clear filter" ng-click="filter = \'\'"></i>\n  </div>\n\n  <script type="text/ng-template" id="popoverTemplate">\n    <small>\n      <table class="table">\n        <tbody>\n        <tr ng-repeat="(k, v) in feature track by $index" ng-show="showRow(k, v)">\n          <td class="property-name">{{k}}</td>\n          <td class="property-value" ng-bind="showValue(v)"></td>\n        </tr>\n        </tbody>\n      </table>\n    </small>\n  </script>\n\n  <p></p>\n  <div class="row">\n    <div class="col-md-6">\n      <h3 class="centered">Installed Features</h3>\n      <div ng-show="featuresError" class="alert alert-warning">\n        The feature list returned by the server was null, please check the logs and Karaf console for errors.\n      </div>\n      <div class="bundle-list"\n           hawtio-auto-columns=".bundle-item">\n        <div ng-repeat="feature in installedFeatures"\n             class="bundle-item"\n             ng-show="filterFeature(feature)"\n             ng-class="inSelectedRepository(feature)">\n          <a ng-href="/osgi/feature/{{feature.Id}}?p=container"\n             hawtio-template-popover title="Feature details">\n            <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>\n          </a>\n          <span ng-hide="hasFabric">\n            <a class="toggle-action"\n               href=""\n               ng-show="installed(feature.Installed)"\n               ng-click="uninstall(feature)"\n               hawtio-show\n               object-name="{{featuresMBean}"\n               method-name="uninstallFeature">\n              <i class="fa fa-power-off"></i>\n            </a>\n            <a class="toggle-action"\n               href=""\n               ng-hide="installed(feature.Installed)"\n               ng-click="install(feature)"\n               hawtio-show\n               object-name="{{featuresMBean}"\n               method-name="installFeature">\n              <i class="fa fa-play-circle"></i>\n            </a>\n          </span>\n        </div>\n      </div>\n    </div>\n\n    <div class="col-md-6">\n      <h3 class="centered">Available Features</h3>\n      <div class="row repository-browser-toolbar centered">\n        <select id="repos"\n                class="input-xlarge"\n                title="Feature repositories"\n                ng-model="selectedRepository"\n                ng-options="r.repository for r in repositories"></select>\n        <button class="btn btn-default"\n                title="Remove selected feature repository"\n                ng-click="uninstallRepository()"\n                ng-hide="hasFabric"\n                hawtio-show\n                object-name="{{featuresMBean}}"\n                method-name="removeRepository"><i class="fa fa-minus"></i></button>\n        <input type="text"\n               class="input-xlarge"\n               placeholder="mvn:foo/bar/1.0/xml/features"\n               title="New feature repository URL"\n               ng-model="newRepositoryURI"\n               ng-hide="hasFabric"\n               hawtio-show\n               object-name="{{featuresMBean}}"\n               method-name="addRepository">\n        <button class="btn btn-default"\n                title="Add feature repository URL"\n                ng-hide="hasFabric"\n                ng-click="installRepository()"\n                ng-disabled="isValidRepository()"\n                hawtio-show\n                object-name="{{featuresMBean}}"\n                method-name="addRepository"><i class="fa fa-plus"></i></button>\n      </div>\n      <div class="row">\n        <div class="bundle-list"\n             hawtio-auto-columns=".bundle-item">\n          <div ng-repeat="feature in selectedRepository.features"\n               class="bundle-item"\n               ng-show="filterFeature(feature)"\n               hawtio-template-popover title="Feature details">\n            <a ng-href="/osgi/feature/{{feature.Id}}?p=container">\n              <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>\n            </a >\n            <span ng-hide="hasFabric">\n              <a class="toggle-action"\n                 href=""\n                 ng-show="installed(feature.Installed)"\n                 ng-click="uninstall(feature)"\n                 hawtio-show\n                 object-name="{{featuresMBean}"\n                 method-name="uninstallFeature">\n                <i class="fa fa-power-off"></i>\n              </a>\n              <a class="toggle-action"\n                 href=""\n                 ng-hide="installed(feature.Installed)"\n                 ng-click="install(feature)"\n                 hawtio-show\n                 object-name="{{featuresMBean}"\n                 method-name="installFeature">\n                <i class="fa fa-play-circle"></i>\n              </a>\n            </span>\n          </div>\n        </div>\n      </div>\n    </div>\n\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/karaf/html/scr-component-details.html','<div class="row toolbar-pf" ng-hide="hasFabric">\n  <div class="col-sm-12">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button class="btn btn-default" ng-click="activate()" hawtio-show object-name="{{scrMBean}}"\n                method-name="activateComponent" ng-disabled="row.State === \'Active\' || row.State === \'Unsatisfied\'">\n          Activate\n        </button>\n        <button class="btn btn-default" ng-click="deactivate()" hawtio-show object-name="{{scrMBean}}"\n                method-name="deactivateComponent" ng-disabled="row.State === \'Disabled\'">\n          Deactivate\n        </button>\n      </div>\n    </form>\n  </div>\n</div>\n\n<h2>Details</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt>Id</dt>\n      <dd>{{row.Id}}</dd>\n      <dt>Name</dt>\n      <dd>{{row.Name}}</dd>\n      <dt>State</dt>\n      <dd>{{row.State}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>Properties</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt ng-repeat-start="(key, value) in row.Properties">{{key}}</dt>\n      <dd ng-repeat-end ng-repeat="v in value">{{v.Value}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>References</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <table class="table">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Availability</th>\n          <th>Cardinality</th>\n          <th>Policy</th>\n          <th>Bound Services</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(key, value) in row.References.values">\n          <td>{{value.Name}}</td>\n          <td>{{value.Availability}}</td>\n          <td>{{value.Cardinality}}</td>\n          <td>{{value.Policy}}</td>\n          <td>\n            <ul class="list-unstyled">\n              <li ng-repeat="id in value[\'Bound Services\']">\n                <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>\n              </li>\n            </ul>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n');
-$templateCache.put('plugins/karaf/html/scr-component.html','<div class="controller-section" ng-controller="Karaf.ScrComponentController">\n\n  <h1>{{row.Id}}</h1>\n\n  <div class="breadcrumb">\n    <a ng-href="{{srcComponentsUrl}}"><span class="fa fa-angle-left"></span> Back to Declarative Services</a>\n  </div>\n\n  <div ng-include src="\'plugins/karaf/html/scr-component-details.html\'"></div>\n\n</div>');
-$templateCache.put('plugins/karaf/html/scr-components.html','<h1>Declarative Services</h1>\n\n<div class="controller-section" ng-controller="Karaf.ScrComponentsController">\n\n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="search1" class="sr-only">Filter</label>\n            <input id="search1" type="search" class="form-control" ng-model="scrOptions.filterOptions.filterText" placeholder="Filter...">\n            <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group">\n          <button ng-disabled="selectedComponents.length == 0" \n                  class="btn btn-default" \n                  ng-click="activate()"\n                  hawtio-show\n                  object-name="{{scrMBean}}"\n                  method-name="activateComponent"><i\n                  class="fa fa-play-circle"></i> Activate\n          </button>\n          <button ng-disabled="selectedComponents.length == 0" \n                  class="btn btn-default" \n                  ng-click="deactivate()"\n                  hawtio-show\n                  object-name="{{scrMBean}}"\n                  method-name="deactivateComponent"><i\n                  class="fa fa-stop-circle"></i> Deactivate\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="row">\n    <div class="col-md-12">\n      <table class="table table-striped table-src-components" hawtio-simple-table="scrOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
+$templateCache.put('plugins/karaf/html/scr-component-details.html','<div class="row toolbar-pf">\n  <div class="col-sm-12">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button class="btn btn-default" \n                ng-click="$ctrl.activateComponent()" \n                ng-disabled="$ctrl.disableActivate()">\n          Activate\n        </button>\n        <button class="btn btn-default" \n                ng-click="$ctrl.deactivateComponent()"\n                ng-disabled="$ctrl.disableDeactivate()">\n          Deactivate\n        </button>\n      </div>\n    </form>\n  </div>\n</div>\n\n<h2>Details</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt>Id</dt>\n      <dd>{{$ctrl.component.id}}</dd>\n      <dt>Name</dt>\n      <dd>{{$ctrl.component.name}}</dd>\n      <dt>State</dt>\n      <dd>{{$ctrl.component.state}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>Properties</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt ng-repeat-start="(key, value) in $ctrl.component.properties">{{key}}</dt>\n      <dd ng-repeat-end ng-repeat="v in value">{{v.Value}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>References</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <table class="table">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Availability</th>\n          <th>Cardinality</th>\n          <th>Policy</th>\n          <th>Bound Services</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(key, value) in $ctrl.component.references">\n          <td>{{value.Name}}</td>\n          <td>{{value.Availability}}</td>\n          <td>{{value.Cardinality}}</td>\n          <td>{{value.Policy}}</td>\n          <td>\n            <ul class="list-unstyled">\n              <li ng-repeat="id in value[\'Bound Services\']">\n                <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>\n              </li>\n            </ul>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n');
+$templateCache.put('plugins/karaf/html/scr-component.html','<div class="controller-section" ng-if="!$ctrl.loading">\n\n  <h1>Declaritive Service: {{$ctrl.component.id}}</h1>\n\n  <div class="breadcrumb">\n    <a ng-href="{{$ctrl.srcComponentsUrl}}"><span class="fa fa-angle-left"></span> Back to Declarative Services</a>\n  </div>\n\n  <div ng-include src="\'plugins/karaf/html/scr-component-details.html\'"></div>\n\n</div>\n<div class="spinner spinner-lg loading-page" ng-if="$ctrl.loading"></div>  ');
 $templateCache.put('plugins/karaf/html/server.html','<h1>Server</h1>\n\n<div class="controller-section" ng-controller="Karaf.ServerController">\n\n  <div class="row">\n    <div class="col-md-12">\n      <dl class="dl-horizontal">\n        <dt>Name</dt>\n        <dd>{{data.name}}</dd>\n        <dt>Version</dt>\n        <dd>{{data.version}}</dd>\n        <dt>State</dt>\n        <dd>{{data.state}}</dd>\n        <dt>Is root</dt>\n        <dd>{{data.root}}</dd>\n        <dt>Start Level</dt>\n        <dd>{{data.startLevel}}</dd>\n        <dt>Framework</dt>\n        <dd>{{data.framework}}</dd>\n        <dt>Framework Version</dt>\n        <dd>{{data.frameworkVersion}}</dd>\n        <dt>Location</dt>\n        <dd>{{data.location}}</dd>\n        <dt>SSH Port</dt>\n        <dd>{{data.sshPort}}</dd>\n        <dt>RMI Registry Port</dt>\n        <dd>{{data.rmiRegistryPort}}</dd>\n        <dt>RMI Server Port</dt>\n        <dd>{{data.rmiServerPort}}</dd>\n        <dt>PID</dt>\n        <dd>{{data.pid}}</dd>\n      </dl>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/bundle-list.html','<h1>Bundles</h1>\n\n<div class="bundles-container cards-pf controller-section" ng-controller="Osgi.BundleListController">\n\n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions">\n        <div class="form-group">\n          <label class="sr-only" for="filter">Install Bundle</label>\n          <div class="input-group" hawtio-show object-name="{{frameworkMBean}}" method-name="installBundle">\n            <input type="text" class="form-control" placeholder="Install Bundle..." ng-model="bundleUrl">\n            <div class="input-group-btn">\n              <button type="button" class="btn btn-default" ng-disabled="installDisabled()" ng-click="install()"\n                      title="Install">\n                <i class="fa fa-download"></i>\n              </button>\n            </div>\n          </div>\n        </div>\n        <div class="form-group">\n          <input type="text" class="form-control" ng-model="display.bundleFilter" placeholder="Filter by keyword..." autocomplete="off">\n        </div>\n        <div class="toolbar-pf-action-right">\n          <div class="form-group toolbar-pf-view-selector">\n            <a ng-href="{{listViewUrl}}" class="btn btn-link" title="Grid view">\n              <i class="fa fa-th"></i>\n            </a>\n            <a ng-href="{{tableViewUrl}}" class="btn btn-link" title="Table view">\n              <i class="fa fa-table"></i>\n            </a>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n  \n  <div id="toolbar-row-2" class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions form-inline">\n        <div class="form-group">\n          <label class="sr-only" for="service-filter">Service</label>\n          <select pf-select id="service-filter" title="Filter by service..." ng-model="display.showBundleGroups"\n                  ng-options="service.name for service in availableServices track by service.id" multiple>\n          </select>\n        </div>\n        <div class="form-group">\n          <label for="sortField">Sort by</label>\n          <select id="sortField" class="form-control btn btn-default" ng-model="display.sortField">\n            <option value="Identifier">ID</option>\n            <option value="Name">Name</option>\n            <option value="SymbolicName">Symbolic Name</option>\n          </select>\n        </div>\n        <div class="form-group">\n          <label for="displayField">Display</label>\n          <select id="displayField" class="form-control btn btn-default" ng-model="display.bundleField">\n            <option value="Name">Name</option>\n            <option value="SymbolicName">Symbolic Name</option>\n          </select>\n        </div>\n        <div class="form-group">\n          <label for="startLevelFilter">Start Level</label>\n          <input id="startLevelFilter" type="number" min="0" class="form-control" ng-model="display.startLevelFilter">\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="container-fluid container-cards-pf bundle-cards">\n    <div class="row row-cards-pf">\n      <div ng-repeat="bundle in bundles" ng-show="filterBundle(bundle)">\n        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">\n          <div class="card-pf card-pf-view card-pf-view-select" hawtio-template-popover title="Bundle details" ng-click="showDetails(bundle)">\n            <div class="content">\n              <table>\n                <tr>\n                  <td><span class="bundle-state" ng-class="bundle.State.toLowerCase()"></span></td>\n                  <td>{{getLabel(bundle)}}</td>\n                </tr>\n              </table>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <script type="text/ng-template" id="popoverTemplate">\n    <small>\n      <table class="table">\n        <tbody>\n        <tr ng-repeat="(k, v) in bundle track by $index">\n          <td class="property-name">{{k}}</td>\n          <td class="property-value">{{v}}</td>\n        </tr>\n        </tbody>\n      </table>\n    </small>\n  </script>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/bundle.html','<div class="controller-section" ng-controller="Osgi.BundleController">\n\n  <ol class="breadcrumb">\n    <li>\n        <a ng-href="osgi/bundles">Bundles</a>\n    </li>\n    <li class="page-title">\n        {{row.Headers[\'Bundle-Name\'].Value}}\n    </li>\n  </ol>  \n\n  <div class="toolbar-pf">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button ng-click="startBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="startBundle">Start</button>\n        <button ng-click="stopBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="stopBundle">Stop</button>\n        <button ng-click="refreshBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="refreshBundle">Refresh</button>\n        <button ng-click="updateBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="updateBundle">Update</button>\n        <button ng-click="uninstallBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="uninstallBundle">Uninstall</button>\n      </div>\n    </form>\n  </div>\n\n  <h2>Details</h2>\n\n  <dl class="dl-horizontal osgi-bundle-details-dl">\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Fragment&nbsp;ID</span>\n      <span ng-switch-default>Bundle&nbsp;ID</span>\n    </dt>\n    <dd>\n      {{row.Identifier}}\n    </dd>\n    <dt>\n      Bundle&nbsp;Name\n    </dt>\n    <dd>\n      {{row.Headers[\'Bundle-Name\'].Value}}\n    </dd>\n    <dt>\n      Symbolic&nbsp;Name\n    </dt>\n    <dd>\n      {{row.SymbolicName}}\n    </dd>\n    <dt>\n      Version\n    </dt>\n    <dd>\n      {{row.Version}}\n    </dd>\n    <dt>\n      Start&nbsp;Level\n    </dt>\n    <dd>\n      {{row.StartLevel}}\n    </dd>\n    <dt>\n      Location\n    </dt>\n    <dd>\n      {{row.Location}}\n    </dd>\n    <dt>\n      State\n    </dt>\n    <dd>\n      {{row.State.toLowerCase()}}\n    </dd>\n    <dt>\n      Last&nbsp;Modified\n    </dt>\n    <dd>\n      {{row.LastModified | date:\'medium\'}}\n    </dd>\n    <div>\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Hosts</span>\n      <span ng-switch-default>Fragments</span>\n    </dt>\n    <dd ng-switch="row.Fragment">\n      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"/>\n      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"/>\n    </dd>\n  </dl>\n\n  <h2>Inspect Classloading</h2>\n\n  <div class="alert alert-dismissable" ng-class="\'alert-\' + classLoadingAlert.type" ng-if="classLoadingAlert">\n    <span class="pficon" ng-class="classLoadingAlert.icon"></span>\n    <button type="button" class="close" aria-hidden="true" ng-click="dismissClassLoadingAlert()">\n      <span class="pficon pficon-close"></span>\n    </button>\n    <span ng-bind-html="classLoadingAlert.message"></span>\n  </div>\n\n  <form class="form-horizontal">\n    <div class="form-group">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="classToLoad" class="form-control" ng-model="classToLoad">\n      </div>\n    </div>\n    <div class="form-group">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">\n          Load Class\n        </button>\n      </div>\n    </div>\n    <div class="form-group">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="resourceToLoad" class="form-control" ng-model="resourceToLoad">\n      </div>\n    </div>\n    <div class="form-group">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">\n          Get Resource\n        </button>\n      </div>\n    </div>\n  </form>\n\n  <h2>Imported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Imported Version</th>\n        <th>Version</th>\n        <th>Resolution</th>\n        <th>Dynamic Import</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ImportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td>{{data.headers.Aversion}}</td>\n        <td>{{data.headers.Dresolution}}</td>\n        <td>{{data.headers.reason}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <div ng-if="thereAreUnsatisfiedPackages()">\n    <h3>Imports not satisfied</h3>\n    <table class="table table-striped table-bordered">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Version</th>\n          <th>Resolution</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(package, data) in unsatisfiedPackages">\n          <td>{{package}}</td>\n          <td>{{data.Aversion}}</td>\n          <td>{{data.Dresolution}}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n\n  <h2>Exported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Exported Version</th>\n        <th>Uses</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ExportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td class="osgi-bundle-exported-package-uses">{{data.headers.Duses}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <h2>Services</h2>\n\n  <h3>Registered Services</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.RegisteredServices">\n      <span id="registers.service.{{id}}" class="text-success">{{id}}</span>\n    </li>\n  </ul>\n\n  <h3>Services used by this Bundle</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.ServicesInUse">\n      <span id="uses.service.{{id}}" class="text-info">{{id}}</span>\n    </li>\n  </ul>\n\n  <div ng-if="row.RequiringBundles.length > 0">\n    <h2>Other Bundles using this Bundle</h2>\n\n    <ul class="list-unstyled">\n      <li ng-repeat="bundle in row.RequiringBundles"><a ng-href="{{bundle.url}}">{{bundle.label}}</a></li>\n    </ul>\n  </div>\n\n  <h2>Headers</h2>\n\n  <dl class="dl-horizontal osgi-bundle-headers-dl">\n    <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>\n    <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>\n  </dl>\n\n</div>\n');

@@ -1,5 +1,6 @@
 /// <reference types="jmx" />
 /// <reference types="angular" />
+/// <reference types="angular-route" />
 declare namespace ActiveMQ {
     const log: Logging.Logger;
     const jmxDomain: string;
@@ -1140,11 +1141,74 @@ declare namespace Karaf {
     function getSelectionScrMBean(workspace: Jmx.Workspace): string;
 }
 declare namespace Karaf {
+    interface ScrComponent {
+        id: number;
+        name: string;
+        state: string;
+        properties: any;
+        references: any;
+    }
+}
+declare namespace Karaf {
+    class ScrComponentsService {
+        private $q;
+        private jolokia;
+        private workspace;
+        private log;
+        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
+        getComponents(): ng.IPromise<ScrComponent[]>;
+        activateComponents(components: ScrComponent[]): ng.IPromise<string>;
+        activateComponent(component: ScrComponent): ng.IPromise<string>;
+        deactivateComponents(components: ScrComponent[]): ng.IPromise<string>;
+        deactivateComponent(component: ScrComponent): ng.IPromise<string>;
+        private execute(mbean, operation, args?, type?);
+        private handleResponse(response);
+    }
+}
+declare namespace Karaf {
+    class ScrComponentsController {
+        private scrComponentsService;
+        private static FILTER_FUNCTIONS;
+        private activateAction;
+        private deActivateAction;
+        private toolbarConfig;
+        private tableConfig;
+        private tableColumns;
+        private tableItems;
+        private components;
+        private loading;
+        constructor(scrComponentsService: ScrComponentsService);
+        $onInit(): void;
+        private loadComponents();
+        private applyFilters(filters);
+        private enableDisableActions();
+        private getSelectedComponents();
+    }
+    const scrListComponent: angular.IComponentOptions;
+}
+declare namespace Karaf {
+    class ScrComponentDetailController {
+        private scrComponentsService;
+        private $routeParams;
+        private workspace;
+        private component;
+        private srcComponentsUrl;
+        private loading;
+        constructor(scrComponentsService: ScrComponentsService, $routeParams: angular.route.IRouteParamsService, workspace: Jmx.Workspace);
+        $onInit(): void;
+        private loadComponent();
+        disableActivate(): boolean;
+        activateComponent(): void;
+        disableDeactivate(): boolean;
+        deactivateComponent(): void;
+    }
+    const scrDetailComponent: angular.IComponentOptions;
+}
+declare namespace Karaf {
+    const scrComponentsModule: string;
+}
+declare namespace Karaf {
     var _module: angular.IModule;
-}
-declare namespace Karaf {
-}
-declare namespace Karaf {
 }
 declare namespace Karaf {
 }
