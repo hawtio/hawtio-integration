@@ -109,7 +109,7 @@ gulp.task('connect', ['watch'], function() {
     port: 2772,
     staticProxies: [{
       port: config.proxyPort,
-      path: '/jolokia',
+      path: '/hawtio/jolokia',
       targetPath: config.targetPath
     }],
     staticAssets: [{

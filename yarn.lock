@@ -19,7 +19,7 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@hawtio/core-dts@~3.0.11", "@hawtio/core-dts@~3.0.12", "@hawtio/core-dts@~3.0.14", "@hawtio/core-dts@~3.0.15":
+"@hawtio/core-dts@3.0.17", "@hawtio/core-dts@~3.0.11", "@hawtio/core-dts@~3.0.12", "@hawtio/core-dts@~3.0.14":
   version "3.0.17"
   resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.0.17.tgz#ee4981ef95a3251d00704d3baf1bc66830b6d095"
   dependencies:
@@ -59,7 +59,7 @@
     "@hawtio/core" "~3.0.9"
     "@types/angular" "~1.6.18"
 
-"@hawtio/forms@~3.0.0", "@hawtio/forms@~3.0.7":
+"@hawtio/forms@3.0.11", "@hawtio/forms@~3.0.7":
   version "3.0.11"
   resolved "https://registry.yarnpkg.com/@hawtio/forms/-/forms-3.0.11.tgz#f4f85c26867550ed5429652a3978c2c17d98f320"
   dependencies:
@@ -72,17 +72,16 @@
   dependencies:
     "@hawtio/ui" "~3.0.25"
 
-"@hawtio/jmx@~3.0.66":
-  version "3.0.74"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.0.74.tgz#95ea25a165fec7d9e7e65018b399041784e88b6d"
+"@hawtio/jmx@3.0.75":
+  version "3.0.75"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.0.75.tgz#3a4f92fd8891b2387e46dcf8a1a848b1ea63eca5"
   dependencies:
-    "@hawtio/forms" "~3.0.0"
-    "@hawtio/preferences" "~3.0.8"
-    "@hawtio/ui" "~3.0.28"
-    "@hawtio/utilities" "^3.0.14"
-    angular-patternfly "~4.11.0"
-    angular-resizable "~1.2.0"
-    patternfly-bootstrap-treeview "~2.1.1"
+    "@hawtio/forms" "3.0.11"
+    "@hawtio/preferences" "3.0.10"
+    "@hawtio/utilities" "3.0.14"
+    angular-patternfly "4.12.1"
+    angular-resizable "1.2.0"
+    patternfly-bootstrap-treeview "2.1.5"
 
 "@hawtio/node-backend@~3.0.0":
   version "3.0.0"
@@ -102,7 +101,7 @@
     underscore.string "^3.3.4"
     urijs "^1.18.10"
 
-"@hawtio/preferences@~3.0.8":
+"@hawtio/preferences@3.0.10":
   version "3.0.10"
   resolved "https://registry.yarnpkg.com/@hawtio/preferences/-/preferences-3.0.10.tgz#a1f02edd32c2ddfe5ba9ba4e3c21d7be1be33d0e"
   dependencies:
@@ -119,7 +118,7 @@
     "@types/angular" "~1.6.18"
     angular-route "~1.6.4"
 
-"@hawtio/ui@~3.0.25", "@hawtio/ui@~3.0.28":
+"@hawtio/ui@~3.0.25":
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-3.0.32.tgz#2870bbfd791087907e9ea35e2725c82ec750b3c7"
   dependencies:
@@ -139,7 +138,7 @@
     lodash "~4.17.4"
     marked "~0.3.6"
 
-"@hawtio/utilities@^3.0.14", "@hawtio/utilities@~3.0.8":
+"@hawtio/utilities@3.0.14", "@hawtio/utilities@~3.0.8":
   version "3.0.14"
   resolved "https://registry.yarnpkg.com/@hawtio/utilities/-/utilities-3.0.14.tgz#db6a08f49d86b4697016cf2d23ad5b8d356938c9"
   dependencies:
@@ -176,7 +175,7 @@
   version "2.0.48"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-2.0.48.tgz#3e90d8cde2d29015e5583017f7830cb3975b2eef"
 
-"@types/jqueryui@~1.11.34":
+"@types/jqueryui@1.11.37":
   version "1.11.37"
   resolved "https://registry.yarnpkg.com/@types/jqueryui/-/jqueryui-1.11.37.tgz#baf66986ae3d57be7f0df631806e3faafe90b131"
   dependencies:
@@ -277,9 +276,9 @@ angular-file-upload@~2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/angular-file-upload/-/angular-file-upload-2.5.0.tgz#0f53c93fbc70ed8ba8340a9a289ba64b680e2167"
 
-angular-patternfly@~4.11.0:
-  version "4.11.8"
-  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.11.8.tgz#0084a43d7d3fcb17b072c0c528ecb1686f747c07"
+angular-patternfly@4.12.1:
+  version "4.12.1"
+  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.12.1.tgz#b8079060d0b78a1ef1deff80b7a8db589197d0a3"
   dependencies:
     angular "1.5.*"
     angular-animate "1.5.*"
@@ -301,7 +300,7 @@ angular-patternfly@~4.11.0:
     jquery "~3.2.1"
     moment "~2.14.1"
 
-angular-resizable@~1.2.0:
+angular-resizable@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/angular-resizable/-/angular-resizable-1.2.0.tgz#9dd29af008f8b54abfc051bd269a8f0b4fe43f1a"
 
@@ -2224,7 +2223,7 @@ ng-annotate@^1.2.1:
     stringset "~0.2.1"
     tryor "~0.1.2"
 
-ng-infinite-scroll@~1.3.0:
+ng-infinite-scroll@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/ng-infinite-scroll/-/ng-infinite-scroll-1.3.0.tgz#c2e98d8fd134b0525a4d2cf58c95d9b583755112"
 
@@ -2441,7 +2440,7 @@ patternfly-bootstrap-combobox@~1.1.7:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/patternfly-bootstrap-combobox/-/patternfly-bootstrap-combobox-1.1.7.tgz#6a5e3ccd1170c21b3c4b4aa168a7413e1ddbb6e1"
 
-patternfly-bootstrap-treeview@~2.1.0, patternfly-bootstrap-treeview@~2.1.1:
+patternfly-bootstrap-treeview@2.1.5, patternfly-bootstrap-treeview@~2.1.0:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/patternfly-bootstrap-treeview/-/patternfly-bootstrap-treeview-2.1.5.tgz#4c29f2582fb8a2f28f0a928f2f0d324d21d6990d"
   dependencies:
