@@ -143,6 +143,20 @@
     "is-fullwidth-code-point": "2.0.0",
     "datatables.net-colreorder": "1.4.1",
     "setprototypeof": "1.1.0",
-    "boom": "5.2.0"
+    "boom": "5.2.0",
+    "urijs": "1.19.0",
+    "request": "2.83.0",
+    "aws-sign2": "0.7.0",
+    "form-data": "2.3.1",
+    "har-validator": "5.0.3",
+    "hawk": "6.0.2",
+    "http-signature": "1.2.0",
+    "performance-now": "2.1.0",
+    "ajv": "5.3.0",
+    "har-schema": "2.0.0",
+    "hoek": "4.2.0",
+    "cryptiles": "3.1.2",
+    "sntp": "2.1.0",
+    "debug-fabulous": "0.1.2"
   }
 }
