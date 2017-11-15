@@ -1,10 +1,13 @@
 <div class="controller-section" ng-if="!$ctrl.loading">
 
-  <h1>Declaritive Service: {{$ctrl.component.id}}</h1>
-
-  <div class="breadcrumb">
-    <a ng-href="{{$ctrl.srcComponentsUrl}}"><span class="fa fa-angle-left"></span> Back to Declarative Services</a>
-  </div>
+  <ol class="breadcrumb">
+    <li>
+      <a ng-href="{{$ctrl.srcComponentsUrl}}">Declarative Services</a>
+    </li>
+    <li class="page-title">
+      {{$ctrl.component.name}}
+    </li>
+  </ol>
 
   <div ng-include src="'plugins/karaf/html/scr-component-details.html'"></div>
 
