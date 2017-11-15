@@ -1,152 +1,75 @@
-<div>
-    <table class="overviewSection">
-        <tr ng-hide="hasFabric">
-            <td></td>
-            <td class="less-big">
-                <div class="btn-group">
-                  <button ng-click="uninstall(name,version)" 
-                          class="btn btn-default" 
-                          title="uninstall" 
-                          hawtio-show
-                          object-name="{{featuresMBean}}"
-                          method-name="uninstallFeature">
-                    <i class="fa fa-power-off"></i>
-                  </button>
-                  <button ng-click="install(name,version)" 
-                          class="btn btn-default" 
-                          title="install" 
-                          hawtio-show
-                          object-name="{{featuresMBean}}"
-                          method-name="installFeature">
-                    <i class="fa fa-play-circle"></i>
-                  </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="pull-right"><strong>Name:</strong></td>
-            <td class="less-big">{{row.Name}}</td>
-        </tr>
-        <tr>
-            <td class="pull-right"><strong>Version:</strong></td>
-            <td class="less-big">{{row.Version}}</td>
-        </tr>
-        <tr>
-            <td class="pull-right"><strong>Repository:</strong></td>
-            <td class="less-big">{{row.RepositoryName}}</td>
-        </tr>
-        <tr>
-          <td class="pull-right"><strong>Repository URI:</strong></td>
-          <td class="less-big">{{row.RepositoryURI}}</td>
-        </tr>
-        <tr>
-            <td class="pull-right"><strong>State:</strong></td>
-            <td class="wrap">
-                <div ng-switch="row.Installed">
-                    <p style="display: inline;" ng-switch-when="true">Installed</p>
-
-                    <p style="display: inline;" ng-switch-default>Not Installed</p>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-            </td>
-            <td>
-                <div class="accordion" id="accordionFeatures">
-                    <div class="accordion-group">
-                        <div class="accordion-heading">
-                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionFeatures"
-                               href="collapseFeatures">
-                                Features
-                            </a>
-                        </div>
-                        <div id="collapseFeatures" class="accordion-body collapse in">
-                            <ul class="accordion-inner">
-                                <li ng-repeat="feature in row.Dependencies">
-                                    <a href='#/osgi/feature/{{feature.Name}}/{{feature.Version}}?p=container'>{{feature.Name}}/{{feature.Version}}</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-            </td>
-            <td>
-                <div class="accordion" id="accordionBundles">
-                    <div class="accordion-group">
-                        <div class="accordion-heading">
-                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionBundles"
-                               href="collapseBundles">
-                                Bundles
-                            </a>
-                        </div>
-                        <div id="collapseBundles" class="accordion-body collapse in">
-                            <ul class="accordion-inner">
-                                <li ng-repeat="bundle in row.BundleDetails">
-                                    <div ng-switch="bundle.Installed">
-                                        <p style="display: inline;" ng-switch-when="true">
-                                            <a href='#/osgi/bundle/{{bundle.Identifier}}?p=container'>{{bundle.Location}}</a></p>
-
-                                        <p style="display: inline;" ng-switch-default>{{bundle.Location}}</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-            </td>
-            <td>
-                <div class="accordion" id="accordionConfigurations">
-                    <div class="accordion-group">
-                        <div class="accordion-heading">
-                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionConfigurations"
-                               href="collapsConfigurations">
-                                Configurations
-                            </a>
-                        </div>
-                        <div id="collapsConfigurations" class="accordion-body collapse in">
-                            <table class="accordion-inner">
-                                <tr ng-repeat="(pid, value) in row.Configurations">
-                                    <td>
-                                      <p>{{value.Pid}}</p>
-                                      <div hawtio-editor="toProperties(value.Elements)" mode="props"></div></td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-            </td>
-            <td>
-                <div class="accordion" id="accordionConfigurationFiles">
-                    <div class="accordion-group">
-                        <div class="accordion-heading">
-                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionConfigurationFiles"
-                               href="collapsConfigurationFiles">
-                                Configuration Files
-                            </a>
-                        </div>
-                        <div id="collapsConfigurationFiles" class="accordion-body collapse in">
-                            <table class="accordion-inner">
-                                <tr ng-repeat="file in row.Files">
-                                    <td>{{file.Files}}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
+<div class="toolbar-pf">
+  <form class="toolbar-pf-actions">
+    <div class="form-group">
+      <button ng-click="install(name,version)"
+              class="btn btn-default"
+              title="install"
+              hawtio-show
+              object-name="{{featuresMBean}}"
+              method-name="installFeature">Install</button>
+      <button ng-click="uninstall(name,version)"
+              class="btn btn-default"
+              title="uninstall"
+              hawtio-show
+              object-name="{{featuresMBean}}"
+              method-name="uninstallFeature">Uninstall</button>
+    </div>
+  </form>
 </div>
+
+<h2>Details</h2>
+<dl class="dl-horizontal">
+  <dt>ID</dt>
+  <dd>{{row.Id}}</dd>
+  <dt>Name</dt>
+  <dd>{{row.Name}}</dd>
+  <dt>State</dt>
+  <dd>{{row.Installed === 'true' ? 'Installed' : 'Uninstalled'}}</dd>
+  <dt>Repository Name</dt>
+  <dd>{{row.RepositoryName}}</dd>
+  <dt>Repository URI</dt>
+  <dd>{{row.RepositoryURI}}</dd>
+  <dt>Version</dt>
+  <dd>{{row.Version}}</dd>
+</dl>
+
+<h2>Dependencies</h2>
+<ul class="list-unstyled">
+  <li ng-repeat="feature in row.Dependencies">
+    <a href='osgi/feature/{{feature.Name}}/{{feature.Version}}'>{{feature.Name}}/{{feature.Version}}</a>
+  </li>
+</ul>
+
+<h2>Bundles</h2>
+<ul class="list-unstyled">
+  <li ng-repeat="bundle in row.BundleDetails">
+    <div ng-switch="bundle.Installed">
+      <a ng-switch-when="true" href='osgi/bundle/{{bundle.Identifier}}'>{{bundle.Location}}</a>
+      <span ng-switch-default>{{bundle.Location}}</span>
+    </div>
+  </li>
+</ul>
+
+<h2>Configurations</h2>
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>PID</th>
+      <th>Properties</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="(pid, value) in row.Configurations">
+      <td><a href="osgi/pid/{{value.Pid}}">{{value.Pid}}</a></td>
+      <td>
+        <ul class="list-unstyled">
+          <li ng-repeat="(key, value) in value.Elements">{{key}} = {{value.Value}}</li>
+        </ul>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Configuration Files</h2>
+<ul class="list-unstyled">
+  <li ng-repeat="(key, value) in row['Configuration Files']">{{value.Files}}</li>
+</ul>

@@ -30,6 +30,77 @@ declare namespace ActiveMQ {
     function decorate($scope: any, fn?: any): void;
     function getBrokerMBean(workspace: Jmx.Workspace, jolokia: any, jmxDomain: string): any;
 }
+declare namespace ActiveMQ {
+    class DestinationController {
+        private $scope;
+        private workspace;
+        private $location;
+        private jolokia;
+        private localStorage;
+        private log;
+        private readonly buttonNameLimit;
+        amqJmxDomain: any;
+        message: string;
+        destinationName: string;
+        destinationType: string;
+        createDialog: boolean;
+        deleteDialog: boolean;
+        purgeDialog: boolean;
+        constructor($scope: any, workspace: Jmx.Workspace, $location: ng.ILocationService, jolokia: Jolokia.IJolokia, localStorage: WindowLocalStorage);
+        private operationSuccess();
+        private deleteSuccess();
+        private validateDestinationName(name);
+        private isQueue(destinationType);
+        private checkIfDestinationExists(name, destinationType);
+        validateAndCreateDestination(name: string, destinationType: string): void;
+        private createDestination(name, destinationType);
+        /**
+         * When destination name contains "_" like "aaa_bbb", the actual name might be either
+         * "aaa_bbb" or "aaa:bbb", so the actual name needs to be checked before removal.
+         * @param name destination name
+         */
+        private restoreRealDestinationName(name);
+        deleteDestination(): void;
+        purgeDestination(): void;
+        selectedShortName(): string;
+        selectedName(): string;
+        uncapitalisedDestinationType(): string;
+    }
+}
+declare namespace ActiveMQ {
+    const createDestinationComponent: angular.IComponentOptions;
+    const deleteQueueComponent: angular.IComponentOptions;
+    const deleteTopicComponent: angular.IComponentOptions;
+}
+declare namespace ActiveMQ {
+    const destinationModule: string;
+}
+declare namespace ActiveMQ {
+    const pluginName: string;
+    const _module: angular.IModule;
+    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
+    function isQueue(workspace: Jmx.Workspace): boolean;
+    function isTopic(workspace: Jmx.Workspace): boolean;
+    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
+    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
+    function isJobScheduler(workspace: Jmx.Workspace): boolean;
+    function isBroker(workspace: Jmx.Workspace): boolean;
+}
+declare namespace ActiveMQ {
+    var BrowseQueueController: angular.IModule;
+}
+declare module ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
 declare namespace Camel {
     /**
      * Define the default categories for endpoints and map them to endpoint names
@@ -1042,77 +1113,6 @@ declare namespace Camel {
 }
 declare namespace Camel {
 }
-declare namespace ActiveMQ {
-    class DestinationController {
-        private $scope;
-        private workspace;
-        private $location;
-        private jolokia;
-        private localStorage;
-        private log;
-        private readonly buttonNameLimit;
-        amqJmxDomain: any;
-        message: string;
-        destinationName: string;
-        destinationType: string;
-        createDialog: boolean;
-        deleteDialog: boolean;
-        purgeDialog: boolean;
-        constructor($scope: any, workspace: Jmx.Workspace, $location: ng.ILocationService, jolokia: Jolokia.IJolokia, localStorage: WindowLocalStorage);
-        private operationSuccess();
-        private deleteSuccess();
-        private validateDestinationName(name);
-        private isQueue(destinationType);
-        private checkIfDestinationExists(name, destinationType);
-        validateAndCreateDestination(name: string, destinationType: string): void;
-        private createDestination(name, destinationType);
-        /**
-         * When destination name contains "_" like "aaa_bbb", the actual name might be either
-         * "aaa_bbb" or "aaa:bbb", so the actual name needs to be checked before removal.
-         * @param name destination name
-         */
-        private restoreRealDestinationName(name);
-        deleteDestination(): void;
-        purgeDestination(): void;
-        selectedShortName(): string;
-        selectedName(): string;
-        uncapitalisedDestinationType(): string;
-    }
-}
-declare namespace ActiveMQ {
-    const createDestinationComponent: angular.IComponentOptions;
-    const deleteQueueComponent: angular.IComponentOptions;
-    const deleteTopicComponent: angular.IComponentOptions;
-}
-declare namespace ActiveMQ {
-    const destinationModule: string;
-}
-declare namespace ActiveMQ {
-    const pluginName: string;
-    const _module: angular.IModule;
-    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
-    function isQueue(workspace: Jmx.Workspace): boolean;
-    function isTopic(workspace: Jmx.Workspace): boolean;
-    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
-    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
-    function isJobScheduler(workspace: Jmx.Workspace): boolean;
-    function isBroker(workspace: Jmx.Workspace): boolean;
-}
-declare namespace ActiveMQ {
-    var BrowseQueueController: angular.IModule;
-}
-declare module ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
 declare namespace Karaf {
     var log: Logging.Logger;
     function setSelect(selection: any, group: any): any;
@@ -1139,6 +1139,70 @@ declare namespace Karaf {
     function populateDependencies(attributes: any, dependencies: any, features: any): void;
     function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
     function getSelectionScrMBean(workspace: Jmx.Workspace): string;
+}
+declare namespace Karaf {
+    class Feature {
+        id: string;
+        name: string;
+        version: string;
+        installed: boolean;
+        repositoryName: string;
+        repositoryUri: string;
+        constructor(name: string, version: string, installed: boolean, repositoryName: string, repositoryUri: string);
+        getState(): string;
+    }
+}
+declare namespace Karaf {
+    class FeatureRepository {
+        name: string;
+        uri: string;
+        features: Feature[];
+        constructor(name: string, uri: string);
+    }
+}
+declare namespace Karaf {
+    class FeaturesService {
+        private $q;
+        private jolokia;
+        private workspace;
+        private log;
+        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
+        getFeatureRepositories(): ng.IPromise<FeatureRepository[]>;
+        installFeature(feature: Feature): ng.IPromise<string>;
+        uninstallFeature(feature: Feature): ng.IPromise<string>;
+        addFeatureRepository(repositoryUri: string): ng.IPromise<string>;
+        removeFeatureRepository(repository: FeatureRepository): ng.IPromise<string>;
+        private execute(mbean, operation, args?, type?);
+        private handleResponse(response);
+        sortByName(a: any, b: any): 0 | 1 | -1;
+    }
+}
+declare namespace Karaf {
+    class FeaturesController {
+        private featuresService;
+        private $uibModal;
+        private $scope;
+        private static FILTER_FUNCTIONS;
+        private features;
+        private repositories;
+        private selectedRepository;
+        private repositoryUri;
+        private repositoryFilterValues;
+        private listConfig;
+        private loading;
+        private listItems;
+        private listItemActionButtons;
+        private toolbarConfig;
+        constructor(featuresService: FeaturesService, $uibModal: any, $scope: any);
+        $onInit(): void;
+        private loadFeatureRepositories();
+        private applyFilters(filters);
+        private enableButtonForItem(action, item);
+    }
+    const featuresComponent: angular.IComponentOptions;
+}
+declare namespace Karaf {
+    const featuresModule: string;
 }
 declare namespace Karaf {
     interface ScrComponent {

@@ -1,132 +1,67 @@
-<div class="controller-section" ng-controller="Karaf.FeaturesController">
-
-  <div class="row section-filter centered">
-    <input type="text" class="search-query" placeholder="Filter..." ng-model="filter">
-    <i class="fa fa-remove clickable" title="Clear filter" ng-click="filter = ''"></i>
-  </div>
-
-  <script type="text/ng-template" id="popoverTemplate">
-    <small>
-      <table class="table">
-        <tbody>
-        <tr ng-repeat="(k, v) in feature track by $index" ng-show="showRow(k, v)">
-          <td class="property-name">{{k}}</td>
-          <td class="property-value" ng-bind="showValue(v)"></td>
-        </tr>
-        </tbody>
-      </table>
-    </small>
-  </script>
-
-  <p></p>
-  <div class="row">
-    <div class="col-md-6">
-      <h3 class="centered">Installed Features</h3>
-      <div ng-show="featuresError" class="alert alert-warning">
-        The feature list returned by the server was null, please check the logs and Karaf console for errors.
-      </div>
-      <div class="bundle-list"
-           hawtio-auto-columns=".bundle-item">
-        <div ng-repeat="feature in installedFeatures"
-             class="bundle-item"
-             ng-show="filterFeature(feature)"
-             ng-class="inSelectedRepository(feature)">
-          <a ng-href="/osgi/feature/{{feature.Id}}?p=container"
-             hawtio-template-popover title="Feature details">
-            <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>
-          </a>
-          <span ng-hide="hasFabric">
-            <a class="toggle-action"
-               href=""
-               ng-show="installed(feature.Installed)"
-               ng-click="uninstall(feature)"
-               hawtio-show
-               object-name="{{featuresMBean}"
-               method-name="uninstallFeature">
-              <i class="fa fa-power-off"></i>
-            </a>
-            <a class="toggle-action"
-               href=""
-               ng-hide="installed(feature.Installed)"
-               ng-click="install(feature)"
-               hawtio-show
-               object-name="{{featuresMBean}"
-               method-name="installFeature">
-              <i class="fa fa-play-circle"></i>
-            </a>
+<div class="list-view">
+  <h1>Features</h1>
+  <div ng-if="!$ctrl.loading">
+    <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+    <pf-list-view items="$ctrl.listItems"
+                  config="$ctrl.listConfig"
+                  action-buttons="$ctrl.listItemActionButtons"
+                  enable-button-for-item-fn="$ctrl.enableButtonForItem">
+      <div class="list-view-pf-description">
+        <div class="list-view-pf-left">
+          <span class="list-view-pf-icon-sm"
+                ng-class="item.installed === true ? 'fa fa-check list-view-pf-icon-success' : 'fa fa-times list-view-pf-icon-warning'"
+                title="Feature {{item.id}} {{item.getState()}}">
           </span>
         </div>
+        <div class="list-group-item-heading"><a ng-href=osgi/feature/{{item.id}}>{{item.id}}</a></div>
       </div>
-    </div>
+      </pf-list-view>
+  </div>
 
-    <div class="col-md-6">
-      <h3 class="centered">Available Features</h3>
-      <div class="row repository-browser-toolbar centered">
-        <select id="repos"
-                class="input-xlarge"
-                title="Feature repositories"
-                ng-model="selectedRepository"
-                ng-options="r.repository for r in repositories"></select>
-        <button class="btn btn-default"
-                title="Remove selected feature repository"
-                ng-click="uninstallRepository()"
-                ng-hide="hasFabric"
-                hawtio-show
-                object-name="{{featuresMBean}}"
-                method-name="removeRepository"><i class="fa fa-minus"></i></button>
-        <input type="text"
-               class="input-xlarge"
-               placeholder="mvn:foo/bar/1.0/xml/features"
-               title="New feature repository URL"
-               ng-model="newRepositoryURI"
-               ng-hide="hasFabric"
-               hawtio-show
-               object-name="{{featuresMBean}}"
-               method-name="addRepository">
-        <button class="btn btn-default"
-                title="Add feature repository URL"
-                ng-hide="hasFabric"
-                ng-click="installRepository()"
-                ng-disabled="isValidRepository()"
-                hawtio-show
-                object-name="{{featuresMBean}}"
-                method-name="addRepository"><i class="fa fa-plus"></i></button>
+  <script type="text/ng-template" id="addRepositoryDialog.html">
+    <form name="addProperty" class="form-horizontal">
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">
+          <span class="pficon pficon-close" aria-hidden="true"></span>
+        </button>
+        <h4>Add feature repository</h4>
       </div>
-      <div class="row">
-        <div class="bundle-list"
-             hawtio-auto-columns=".bundle-item">
-          <div ng-repeat="feature in selectedRepository.features"
-               class="bundle-item"
-               ng-show="filterFeature(feature)"
-               hawtio-template-popover title="Feature details">
-            <a ng-href="/osgi/feature/{{feature.Id}}?p=container">
-              <span class="badge" ng-class="getStateStyle(feature)">{{feature.Name}} / {{feature.Version}}</span>
-            </a >
-            <span ng-hide="hasFabric">
-              <a class="toggle-action"
-                 href=""
-                 ng-show="installed(feature.Installed)"
-                 ng-click="uninstall(feature)"
-                 hawtio-show
-                 object-name="{{featuresMBean}"
-                 method-name="uninstallFeature">
-                <i class="fa fa-power-off"></i>
-              </a>
-              <a class="toggle-action"
-                 href=""
-                 ng-hide="installed(feature.Installed)"
-                 ng-click="install(feature)"
-                 hawtio-show
-                 object-name="{{featuresMBean}"
-                 method-name="installFeature">
-                <i class="fa fa-play-circle"></i>
-              </a>
-            </span>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="col-sm-3 control-label" for="repositoryUri">Repository URI</label>
+          <div class="col-sm-9">
+            <input type="text" class="form-control" id="repositoryUri" ng-model="$ctrl.repositoryUri" placeholder="mvn:foo/bar/1.0/xml/features" required>
           </div>
         </div>
       </div>
-    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>
+        <button type="submit" class="btn btn-primary" ng-click="$close()">Add</button>
+      </div>
+    </form>
+  </script>
 
-  </div>
-
+  <script type="text/ng-template" id="removeRepositoryDialog.html">
+    <form name="addProperty" class="form-horizontal">
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">
+          <span class="pficon pficon-close" aria-hidden="true"></span>
+        </button>
+        <h4>Remove feature repository</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="col-sm-3 control-label" for="repository">Repository</label>
+          <div class="col-sm-9">
+            <select ng-model="$ctrl.selectedRepository" ng-options="repository.name for repository in $ctrl.repositories" required></select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>
+        <button type="submit" class="btn btn-primary" ng-click="$close()">Remove</button>
+      </div>
+    </form>
+  </script>
+  <div class="spinner spinner-lg loading-page" ng-if="$ctrl.loading"></div>
 </div>
