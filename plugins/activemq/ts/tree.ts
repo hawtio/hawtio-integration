@@ -5,7 +5,7 @@ namespace ActiveMQ {
 
   _module.controller("ActiveMQ.TreeHeaderController", ["$scope", ($scope) => {
     // TODO: the tree should ideally be initialised synchronously
-    const tree = () => (<any>$('#activemqtree')).treeview(true);
+    const tree = () => ($('#activemqtree') as any).treeview(true);
 
     $scope.expandAll = () => tree().expandNode(tree().getNodes(), { levels: 1, silent: true });
     $scope.contractAll = () => tree().collapseNode(tree().getNodes(), { ignoreChildren: true, silent: true });
@@ -103,6 +103,9 @@ namespace ActiveMQ {
 
     function updateSelectionFromURL() {
       Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $("#activemqtree"), (first: Jmx.Folder) => {
+        if (first.children == null) {
+          return null;
+        }
         // use function to auto select the queue folder on the 1st broker
         var queues = first.children[0];
         if (queues && queues.text === 'Queue') {
