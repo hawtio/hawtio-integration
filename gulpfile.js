@@ -126,7 +126,7 @@ gulp.task('connect', ['watch'], function() {
   hawtio.use('/', function(req, res, next) {
     var path = req.originalUrl;
     if (path === '/') {
-      res.writeHead(301, {Location: '/hawtio'});
+      res.writeHead(302, {Location: '/hawtio'});
       res.end();
     } else if (path.startsWith('/plugins/') && path.endsWith('html')) {
       // avoid returning these files, they should get pulled from js
