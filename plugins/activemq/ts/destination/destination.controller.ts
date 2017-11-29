@@ -23,7 +23,7 @@ namespace ActiveMQ {
       private workspace: Jmx.Workspace,
       private $location: ng.ILocationService,
       private jolokia: Jolokia.IJolokia,
-      private localStorage: WindowLocalStorage) {
+      private localStorage: Storage) {
       'ngInject';
     }
 

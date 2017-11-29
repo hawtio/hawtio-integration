@@ -5,7 +5,7 @@ namespace ActiveMQ {
 
   _module.controller("ActiveMQ.PreferencesController", ["$scope", "localStorage", "userDetails", "$rootScope", (
       $scope,
-      localStorage: WindowLocalStorage,
+      localStorage: Storage,
       userDetails: Core.UserDetails,
       $rootScope: ng.IRootScopeService) => {
 

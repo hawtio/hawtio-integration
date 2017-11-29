@@ -31,7 +31,7 @@ namespace ActiveMQ {
   }]);
 
   _module.controller("ActiveMQ.TreeController", ["$scope", "$location", "workspace", "localStorage", (
-    $scope, $location: ng.ILocationService, workspace: Jmx.Workspace, localStorage: WindowLocalStorage) => {
+    $scope, $location: ng.ILocationService, workspace: Jmx.Workspace, localStorage: Storage) => {
     $scope.treeFetched = () => workspace.treeFetched;
 
     $scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL($location, $('#activemqtree')));

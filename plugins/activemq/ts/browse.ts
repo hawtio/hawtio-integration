@@ -7,7 +7,7 @@ namespace ActiveMQ {
       $scope,
       workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
-      localStorage: WindowLocalStorage,
+      localStorage: Storage,
       $location: ng.ILocationService,
       activeMQMessage,
       $timeout: ng.ITimeoutService,

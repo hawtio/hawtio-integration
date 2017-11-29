@@ -7,7 +7,7 @@ namespace Camel {
     $element,
     workspace: Jmx.Workspace,
     jolokia: Jolokia.IJolokia,
-    localStorage: WindowLocalStorage,
+    localStorage: Storage,
     documentBase: string) => {
 
     const log: Logging.Logger = Logger.get("CamelDebugger");

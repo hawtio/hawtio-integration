@@ -5,7 +5,7 @@ module ActiveMQ {
         $scope,
         workspace: Jmx.Workspace,
         jolokia: Jolokia.IJolokia,
-        localStorage: WindowLocalStorage) => {
+        localStorage: Storage) => {
 
         var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
 

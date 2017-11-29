@@ -196,7 +196,7 @@ namespace Camel {
     return schema;
   }
 
-  export function initEndpointChooserScope($scope, $location, localStorage: WindowLocalStorage, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia) {
+  export function initEndpointChooserScope($scope, $location, localStorage: Storage, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia) {
     $scope.selectedComponentName = null;
     $scope.endpointParameters = {};
     $scope.endpointPath = "";

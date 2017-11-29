@@ -7,7 +7,7 @@ namespace Camel {
       $scope,
       $rootScope: ng.IRootScopeService,
       workspace: Jmx.Workspace,
-      localStorage: WindowLocalStorage,
+      localStorage: Storage,
       jolokia: Jolokia.IJolokia,
       propertiesService: PropertiesService) => {
 

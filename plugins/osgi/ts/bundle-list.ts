@@ -12,7 +12,7 @@ namespace Osgi {
       $scope,
       workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
-      localStorage: WindowLocalStorage,
+      localStorage: Storage,
       $location: ng.ILocationService) => {
 
     const ACTIVEMQ_SERVICE = {id: 'ACTIVEMQ', name: 'ActiveMQ'};

@@ -6,7 +6,7 @@ namespace Camel {
   _module.controller("Camel.EndpointController", ["$scope", "$location", "localStorage", "workspace", "jolokia", (
       $scope,
       $location: ng.ILocationService,
-      localStorage: WindowLocalStorage,
+      localStorage: Storage,
       workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 

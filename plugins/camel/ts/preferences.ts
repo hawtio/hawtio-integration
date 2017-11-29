@@ -4,7 +4,7 @@ namespace Camel {
 
   _module.controller("Camel.PreferencesController", ["$scope", "localStorage", (
       $scope,
-      localStorage: WindowLocalStorage) => {
+      localStorage: Storage) => {
 
     var config = {
       properties: {

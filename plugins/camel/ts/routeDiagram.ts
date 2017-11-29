@@ -11,7 +11,7 @@ namespace Camel {
       workspace: Jmx.Workspace,
       $location: ng.ILocationService,
       jolokia: Jolokia.IJolokia,
-      localStorage: WindowLocalStorage) => {
+      localStorage: Storage) => {
 
     var log: Logging.Logger = Logger.get("Camel");
 

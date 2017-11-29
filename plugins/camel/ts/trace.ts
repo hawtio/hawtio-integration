@@ -4,7 +4,7 @@
 namespace Camel {
 
   _module.controller("Camel.TraceRouteController", ["$scope", "$timeout", "workspace", "jolokia", "localStorage", "tracerStatus",
-    ($scope, $timeout, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, localStorage: WindowLocalStorage, tracerStatus) => {
+    ($scope, $timeout, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, localStorage: Storage, tracerStatus) => {
 
     const log: Logging.Logger = Logger.get("CamelTracer");
     const MESSAGES_LIMIT = 500;

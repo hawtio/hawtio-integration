@@ -6,7 +6,7 @@ namespace Camel {
   _module.controller("Camel.PropertiesDataFormatController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', (
       $scope,
       workspace: Jmx.Workspace,
-      localStorage: WindowLocalStorage,
+      localStorage: Storage,
       jolokia: Jolokia.IJolokia,
       documentBase: string,
       propertiesService: PropertiesService) => {
