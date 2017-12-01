@@ -1157,6 +1157,7 @@ declare namespace Karaf {
         name: string;
         uri: string;
         features: Feature[];
+        dependencies: string[];
         constructor(name: string, uri: string);
     }
 }

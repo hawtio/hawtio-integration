@@ -137,6 +137,23 @@ namespace Karaf {
                 .result
                   .then(() => {
                     if (this.selectedRepository) {
+                      let dependentRepositories = [];
+
+                      angular.forEach(this.repositories, repository => {
+                        if (repository.name !== this.selectedRepository.name) {
+                          angular.forEach(repository.dependencies, dependency => {
+                            if (dependency === this.selectedRepository.uri) {
+                              dependentRepositories.push(repository.name);
+                            }
+                          });
+                        }
+                      });
+
+                      if (dependentRepositories.length > 0) {
+                        Core.notification('danger', `Unable to remove repository ${this.selectedRepository.name}. It is required by ${dependentRepositories}.`)
+                        return;
+                      }
+
                       this.featuresService.removeFeatureRepository(this.selectedRepository)
                       .then(response => {
                         Core.notification('success', response);

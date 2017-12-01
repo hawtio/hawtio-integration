@@ -21484,6 +21484,7 @@ var Karaf;
             this.name = name;
             this.uri = uri;
             this.features = [];
+            this.dependencies = [];
         }
         return FeatureRepository;
     }());
@@ -21510,6 +21511,7 @@ var Karaf;
                 var repositories = [];
                 angular.forEach(value['Repositories'], function (repository) {
                     var featureRepository = new Karaf.FeatureRepository(repository.Name, repository.Uri);
+                    featureRepository.dependencies = repository['Repositories'];
                     angular.forEach(repository['Features'], function (item) {
                         angular.forEach(item, function (featureInfo, version) {
                             var feature = new Karaf.Feature(featureInfo.Name, featureInfo.Version, value['Features'][featureInfo.Name][version].Installed, repository.Name, repository.Uri);
@@ -21711,6 +21713,20 @@ var Karaf;
                                     .result
                                     .then(function () {
                                     if (_this.selectedRepository) {
+                                        var dependentRepositories_1 = [];
+                                        angular.forEach(_this.repositories, function (repository) {
+                                            if (repository.name !== _this.selectedRepository.name) {
+                                                angular.forEach(repository.dependencies, function (dependency) {
+                                                    if (dependency === _this.selectedRepository.uri) {
+                                                        dependentRepositories_1.push(repository.name);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        if (dependentRepositories_1.length > 0) {
+                                            Core.notification('danger', "Unable to remove repository " + _this.selectedRepository.name + ". It is required by " + dependentRepositories_1 + ".");
+                                            return;
+                                        }
                                         _this.featuresService.removeFeatureRepository(_this.selectedRepository)
                                             .then(function (response) {
                                             Core.notification('success', response);
