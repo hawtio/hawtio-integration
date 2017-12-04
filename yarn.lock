@@ -70,7 +70,7 @@
     angular-resizable "1.2.0"
     patternfly-bootstrap-treeview "2.1.5"
 
-"@hawtio/node-backend@~3.0.0":
+"@hawtio/node-backend@~3.0.4":
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/@hawtio/node-backend/-/node-backend-3.0.4.tgz#7902fea86d2eba36ff5b51696d9f1dd9421cdb7d"
   dependencies:
@@ -459,6 +459,10 @@ bootstrap-select@1.12.4, bootstrap-select@^1.12.2, bootstrap-select@~1.12.4:
   resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.12.4.tgz#7f15d3c0ce978868d9c09c70f96624f55fa02ee1"
   dependencies:
     jquery ">=1.8"
+
+bootstrap-slider@^9.9.0:
+  version "9.10.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-slider/-/bootstrap-slider-9.10.0.tgz#1103d6bc00cfbfa8cfc9a2599ab518c55643da3f"
 
 bootstrap-switch@~3.3.4:
   version "3.3.4"
