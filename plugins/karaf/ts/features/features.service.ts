@@ -18,6 +18,7 @@ namespace Karaf {
             const repositories: FeatureRepository[] = [];
             angular.forEach(value['Repositories'], (repository) => {
               let featureRepository: FeatureRepository = new FeatureRepository(repository.Name, repository.Uri)
+              featureRepository.dependencies = repository['Repositories'];
 
               angular.forEach(repository['Features'], (item) => {
                 angular.forEach(item, (featureInfo, version) => {

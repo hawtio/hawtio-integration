@@ -6,7 +6,7 @@ namespace Karaf {
     if (!angular.isDefined(selection)) {
       return group[0];
     }
-    var answer = _.findIndex(group, item => item.id === selection.id);
+    var answer = _.findIndex(group, (item: any) => item.id === selection.id);
     if (answer !== -1) {
       return group[answer];
     } else {

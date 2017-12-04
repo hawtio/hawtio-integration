@@ -1,6 +1,6 @@
 {
   "name": "@hawtio/integration",
-  "version": "3.0.28",
+  "version": "3.0.29",
   "main": "dist/hawtio-integration.js",
   "types": "dist/hawtio-integration.d.ts",
   "files": [
@@ -146,6 +146,7 @@
     "boom": "5.2.0",
     "js-logger": "1.4.1",
     "urijs": "1.19.0",
-    "@hawtio/core": "3.1.0"
+    "@hawtio/core": "3.1.0",
+    "debug-fabulous": "0.1.2"
   }
 }

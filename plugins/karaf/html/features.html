@@ -8,8 +8,8 @@
                   enable-button-for-item-fn="$ctrl.enableButtonForItem">
       <div class="list-view-pf-description">
         <div class="list-view-pf-left">
-          <span class="list-view-pf-icon-sm"
-                ng-class="item.installed === true ? 'fa fa-check list-view-pf-icon-success' : 'fa fa-times list-view-pf-icon-warning'"
+          <span class="list-view-pf-icon-sm fa"
+                ng-class="{'list-view-pf-icon-success fa-check': item.installed}"
                 title="Feature {{item.id}} {{item.getState()}}">
           </span>
         </div>
