@@ -59,14 +59,14 @@
   dependencies:
     "@hawtio/ui" "~3.0.25"
 
-"@hawtio/jmx@~3.0.0":
-  version "3.0.79"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.0.79.tgz#beaec1bfdbc417d0780edcfbba9766aa145d1504"
+"@hawtio/jmx@~3.0.80":
+  version "3.0.80"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.0.80.tgz#15729fe1a376203ced17a0971894f77410c09fbd"
   dependencies:
     "@hawtio/forms" "~3.0.0"
     "@hawtio/preferences" "~3.0.0"
-    "@hawtio/utilities" "~3.0.0"
-    angular-patternfly "4.12.1"
+    "@hawtio/utilities" "^3.0.17"
+    angular-patternfly "^4.0.0"
     angular-resizable "1.2.0"
     patternfly-bootstrap-treeview "2.1.5"
 
@@ -113,9 +113,9 @@
     lodash "~4.17.4"
     marked "~0.3.6"
 
-"@hawtio/utilities@~3.0.0", "@hawtio/utilities@~3.0.8":
-  version "3.0.15"
-  resolved "https://registry.yarnpkg.com/@hawtio/utilities/-/utilities-3.0.15.tgz#5897235705bed897fc1d7aec9001b0b9822ef86b"
+"@hawtio/utilities@^3.0.17", "@hawtio/utilities@~3.0.8":
+  version "3.0.17"
+  resolved "https://registry.yarnpkg.com/@hawtio/utilities/-/utilities-3.0.17.tgz#df1d558435597a8ab05c25b9788e7cf6a27ad356"
   dependencies:
     "@hawtio/core" "~3.0.9"
     "@hawtio/core-dts" "~3.0.11"
@@ -255,9 +255,9 @@ angular-file-upload@~2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/angular-file-upload/-/angular-file-upload-2.5.0.tgz#0f53c93fbc70ed8ba8340a9a289ba64b680e2167"
 
-angular-patternfly@4.12.1:
-  version "4.12.1"
-  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.12.1.tgz#b8079060d0b78a1ef1deff80b7a8db589197d0a3"
+angular-patternfly@^4.0.0:
+  version "4.13.2"
+  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.13.2.tgz#ba40a3cb61337c136cdf2b30a13c636b0ea5c1d0"
   dependencies:
     angular "1.5.*"
     angular-animate "1.5.*"
