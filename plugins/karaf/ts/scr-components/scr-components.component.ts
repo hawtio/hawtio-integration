@@ -89,7 +89,7 @@ namespace Karaf {
     };
 
     private tableColumns = [
-      { header: 'Name', itemField: 'name', templateFn: value => `<a href="osgi/scr-component/${value}">${value}</a>` },
+      { header: 'Name', itemField: 'name', templateFn: value => `<a href="osgi/scr-components/${value}">${value}</a>` },
       { header: 'State', itemField: 'state' }
     ];
 

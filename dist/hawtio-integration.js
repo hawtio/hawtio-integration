@@ -22002,7 +22002,7 @@ var Karaf;
                 onCheckBoxChange: function (item) { return _this.enableDisableActions(); }
             };
             this.tableColumns = [
-                { header: 'Name', itemField: 'name', templateFn: function (value) { return "<a href=\"osgi/scr-component/" + value + "\">" + value + "</a>"; } },
+                { header: 'Name', itemField: 'name', templateFn: function (value) { return "<a href=\"osgi/scr-components/" + value + "\">" + value + "</a>"; } },
                 { header: 'State', itemField: 'state' }
             ];
             this.tableItems = null;
@@ -22145,7 +22145,7 @@ var Karaf;
                 when('/osgi/server', { templateUrl: 'plugins/karaf/html/server.html' }).
                 when('/osgi/features', { template: '<features></features>' }).
                 when('/osgi/scr-components', { template: '<scr-list-components></scr-list-components>' }).
-                when('/osgi/scr-component/:name', { template: '<scr-component-detail></scr-component-detail>' }).
+                when('/osgi/scr-components/:name', { template: '<scr-component-detail></scr-component-detail>' }).
                 when('/osgi/feature/:name/:version', { templateUrl: 'plugins/karaf/html/feature.html' });
         }]);
     Karaf._module.run(["workspace", "viewRegistry", "helpRegistry", function (workspace, viewRegistry, helpRegistry) {
