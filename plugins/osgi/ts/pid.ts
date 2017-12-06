@@ -153,7 +153,7 @@ namespace Osgi {
     function errorHandler(message) {
        return {
          error: (response) => {
-           Core.notification("error", message + "\n" + response['error'] || response);
+           Core.notification("danger", message + "\n" + response['error'] || response);
            Core.defaultJolokiaErrorHandler(response);
          }
        }

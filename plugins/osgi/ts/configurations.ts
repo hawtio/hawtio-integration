@@ -93,7 +93,7 @@ namespace Osgi {
                     $scope.configurations.splice(i, 1);
                     Core.notification("success", "Successfully deleted pid: " + item.pid);
                   },
-                  error: (response) => Core.notification("error", response.error)
+                  error: (response) => Core.notification("danger", response.error)
                 });
               }
         
@@ -128,7 +128,7 @@ namespace Osgi {
         })
         .result.then((newPid) => {
           if ($scope.configurations.some((c) => c['pid'] == newPid)) {
-            Core.notification("error", "pid \"" + newPid + "\" already exists.");
+            Core.notification("danger", "pid \"" + newPid + "\" already exists.");
             return;
           }
           var mbean = getHawtioConfigAdminMBean(workspace);
@@ -439,7 +439,7 @@ namespace Osgi {
       function errorHandler(message) {
         return {
           error: (response) => {
-            Core.notification("error", message + response['error'] || response);
+            Core.notification("danger", message + response['error'] || response);
             Core.defaultJolokiaErrorHandler(response);
           }
         };

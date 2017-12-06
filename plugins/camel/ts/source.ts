@@ -106,7 +106,7 @@ namespace Camel {
         if (mbean) {
           jolokia.execute(mbean, "addOrUpdateRoutesFromXml(java.lang.String)", decoded, Core.onSuccess(saveWorked));
         } else {
-          Core.notification("error", "Could not find CamelContext MBean!");
+          Core.notification("danger", "Could not find CamelContext MBean!");
         }
       }
     };

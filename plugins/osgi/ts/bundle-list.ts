@@ -90,18 +90,18 @@ namespace Osgi {
                     Core.$apply($scope);
                   },
                   error: function (response) {
-                    Core.notification("error", response.error)
+                    Core.notification("danger", response.error)
                   }
                 });
               }
             },
             error: function (response) {
-              Core.notification("error", response.error)
+              Core.notification("danger", response.error)
             }
           });
         },
         error: function (response) {
-          Core.notification("error", response.error);
+          Core.notification("danger", response.error);
         }
       });
     };

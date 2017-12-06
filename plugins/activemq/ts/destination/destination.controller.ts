@@ -76,7 +76,7 @@ namespace ActiveMQ {
         return;
       }
       if (this.checkIfDestinationExists(name, destinationType)) {
-        Core.notification("error", `The ${this.uncapitalisedDestinationType()} "${name}" already exists`);
+        Core.notification("danger", `The ${this.uncapitalisedDestinationType()} "${name}" already exists`);
         return;
       }
       this.createDestination(name, destinationType);
@@ -97,7 +97,7 @@ namespace ActiveMQ {
         if (mbean) {
           this.jolokia.execute(mbean, operation, name, Core.onSuccess(() => this.operationSuccess()));
         } else {
-          Core.notification("error", "Could not find the Broker MBean!");
+          Core.notification("danger", "Could not find the Broker MBean!");
         }
       }
     }

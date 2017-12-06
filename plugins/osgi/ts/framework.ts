@@ -11,7 +11,7 @@ namespace Osgi {
 
     $scope.save = function() {
       if (parseInt($scope.config.startLevel) < parseInt($scope.config.initialBundleStartLevel)) {
-        Core.notification("error", "Can't set Framework Start Level below Initial Bundle Start Level");
+        Core.notification("danger", "Can't set Framework Start Level below Initial Bundle Start Level");
       } else {
         var mbean = getSelectionFrameworkMBean(workspace);
         if (mbean) {
@@ -22,7 +22,7 @@ namespace Osgi {
           ], {
             error: response => {
               if (showNotification) {
-                Core.notification("error", response.error);
+                Core.notification("danger", response.error);
                 showNotification = false;
               }
             },              

@@ -295,7 +295,7 @@ module ActiveMQ {
         };
 
         function onError() {
-            Core.notification("error", "The feature is not available in this broker version!")
+            Core.notification("danger", "The feature is not available in this broker version!")
             $scope.workspace.selectParentNode();
         }
 
