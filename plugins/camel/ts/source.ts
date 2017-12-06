@@ -6,6 +6,7 @@ namespace Camel {
       $scope,
       workspace: Jmx.Workspace) => {
 
+    $scope.camelContextMBean = getSelectionCamelContextMBean(workspace);
     $scope.showUpdateButton = true;
 
     function getSource(routeXmlNode) {

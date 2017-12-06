@@ -7,8 +7,8 @@ namespace Camel {
 
     route: Route = null;
 
-    constructor($scope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
-        private routesService: RoutesService) {
+    constructor(private $scope, private $uibModal, private $timeout: ng.ITimeoutService,
+      private workspace: Jmx.Workspace, private routesService: RoutesService) {
       'ngInject';
       $scope.$on('jmxTreeClicked', (event, selectedNode) => {
         if (workspace.isRoute()) {
@@ -20,11 +20,11 @@ namespace Camel {
       });
     }
 
-    isVisible() {
+    isVisible(): boolean {
       return this.route !== null;
     }
 
-    start() {
+    start(): void {
       this.routesService.startRoute(this.route)
         .then(response => {
           this.routesService.getRoute(this.route.mbean)
@@ -32,7 +32,7 @@ namespace Camel {
         });
     }
 
-    stop() {
+    stop(): void {
       this.routesService.stopRoute(this.route)
         .then(response => {
           this.routesService.getRoute(this.route.mbean)
@@ -40,23 +40,24 @@ namespace Camel {
         });
     }
 
-    delete() {
+    delete(): void {
       this.$uibModal.open({
         templateUrl: 'plugins/camel/html/deleteRouteWarningModal.html'
       })
-      .result.then(() => {
-        this.routesService.removeRoute(this.route)
-          .then(response => {
-            this.route = null;
-            this.workspace.loadTree();
-          });
-      });
+        .result.then(() => {
+          this.routesService.removeRoute(this.route)
+            .then(response => {
+              this.route = null;
+              this.workspace.loadTree();
+            });
+        });
     }
   }
 
   export const routeActionsComponent = <angular.IComponentOptions>{
     template: `
-      <div class="dropdown camel-main-actions" ng-show="$ctrl.isVisible()">
+      <div class="dropdown camel-main-actions" ng-show="$ctrl.isVisible()"
+        hawtio-show object-name-model="$ctrl.route.mbean" method-name="stop" mode="remove">
         <button type="button" id="dropdownMenu1" class="btn btn-default dropdown-toggle"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
           <span class="fa" ng-class="{'fa-play': $ctrl.route.isStarted(), 'fa-stop': $ctrl.route.isStopped()}"></span>

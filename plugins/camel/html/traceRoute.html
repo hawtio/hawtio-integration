@@ -21,9 +21,15 @@
     <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up
       and down in the message table lets you see the flow of the message through the diagram.
     </p>
-    <button type="button" class="btn btn-primary" ng-click="startTracing()">
+    <button type="button" class="btn btn-primary" ng-click="startTracing()"
+      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="remove">
       Start tracing
     </button>
+    <div class="alert alert-info"
+      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="inverse">
+      <span class="pficon pficon-info"></span>
+      Tracing is not allowed for this user.
+    </div>
   </div>
   
   <div class="camel-trace-diagram-wrapper" ng-include src="graphView" ng-if="tracing"></div>

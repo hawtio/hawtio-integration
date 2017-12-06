@@ -59,9 +59,9 @@
   dependencies:
     "@hawtio/ui" "~3.0.25"
 
-"@hawtio/jmx@~3.0.80":
-  version "3.0.80"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.0.80.tgz#15729fe1a376203ced17a0971894f77410c09fbd"
+"@hawtio/jmx@~3.0.81":
+  version "3.0.81"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.0.81.tgz#40ae17563358bffe1152175a5b9129d96c754cf4"
   dependencies:
     "@hawtio/forms" "~3.0.0"
     "@hawtio/preferences" "~3.0.0"
@@ -113,7 +113,7 @@
     lodash "~4.17.4"
     marked "~0.3.6"
 
-"@hawtio/utilities@^3.0.17", "@hawtio/utilities@~3.0.8":
+"@hawtio/utilities@3.0.17", "@hawtio/utilities@^3.0.17", "@hawtio/utilities@~3.0.8":
   version "3.0.17"
   resolved "https://registry.yarnpkg.com/@hawtio/utilities/-/utilities-3.0.17.tgz#df1d558435597a8ab05c25b9788e7cf6a27ad356"
   dependencies:
