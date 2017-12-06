@@ -5,13 +5,14 @@ namespace Karaf {
 
   export class ScrComponentDetailController {
 
-    private component:ScrComponent;
-    private srcComponentsUrl:string = Core.url('/osgi/scr-components' + this.workspace.hash());
-    private loading = true;
-    
+    component: ScrComponent;
+    srcComponentsUrl: string = Core.url('/osgi/scr-components' + this.workspace.hash());
+    loading = true;
+    scrMBean: string = getSelectionScrMBean(this.workspace);
+
     constructor(private scrComponentsService: ScrComponentsService,
-                private $routeParams: angular.route.IRouteParamsService,
-                private workspace: Jmx.Workspace) {
+      private $routeParams: angular.route.IRouteParamsService,
+      private workspace: Jmx.Workspace) {
       'ngInject';
     }
 
@@ -28,11 +29,11 @@ namespace Karaf {
       })
     }
 
-    disableActivate() {
+    disableActivate(): boolean {
       return this.component == undefined || this.component.state === 'Active';
     }
 
-    activateComponent() {
+    activateComponent(): void {
       this.scrComponentsService.activateComponent(this.component)
         .then(response => {
           Core.notification('success', response);
@@ -41,18 +42,18 @@ namespace Karaf {
         .catch(error => Core.notification('danger', error));
     }
 
-    disableDeactivate() {
+    disableDeactivate(): boolean {
       return this.component == undefined || this.component.state !== 'Active';
     }
 
-    deactivateComponent() {
+    deactivateComponent(): void {
       this.scrComponentsService.deactivateComponent(this.component)
-      .then(response => {
-        Core.notification('success', response);
-        this.loadComponent();
-      })
-      .catch(error => Core.notification('danger', error));
-  }
+        .then(response => {
+          Core.notification('success', response);
+          this.loadComponent();
+        })
+        .catch(error => Core.notification('danger', error));
+    }
   }
 
   export const scrDetailComponent: angular.IComponentOptions = {

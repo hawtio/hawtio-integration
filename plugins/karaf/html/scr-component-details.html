@@ -4,12 +4,18 @@
       <div class="form-group">
         <button class="btn btn-default" 
                 ng-click="$ctrl.activateComponent()" 
-                ng-disabled="$ctrl.disableActivate()">
+                ng-disabled="$ctrl.disableActivate()"
+                hawtio-show
+                object-name="{{$ctrl.scrMBean}}"
+                method-name="activateComponent">
           Activate
         </button>
         <button class="btn btn-default" 
                 ng-click="$ctrl.deactivateComponent()"
-                ng-disabled="$ctrl.disableDeactivate()">
+                ng-disabled="$ctrl.disableDeactivate()"
+                hawtio-show
+                object-name="{{$ctrl.scrMBean}}"
+                method-name="deactivateComponent">
           Deactivate
         </button>
       </div>

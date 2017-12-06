@@ -15,9 +15,6 @@ namespace Osgi {
     $scope.metaTypeMBean = Osgi.getMetaTypeMBean(workspace);
     $scope.osgiToolsMBean = Osgi.getHawtioOSGiToolsMBean(workspace);
     $scope.hawtioConfigAdminMBean = Osgi.getHawtioConfigAdminMBean(workspace);
-    $scope.scrMBean = Karaf.getSelectionScrMBean(workspace);
-    $scope.featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
-
 
   }]);
 

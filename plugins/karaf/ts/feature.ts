@@ -8,6 +8,7 @@ namespace Karaf {
       workspace: Jmx.Workspace,
       $routeParams: angular.route.IRouteParamsService) => {
 
+    $scope.featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
     $scope.name = $routeParams['name'];
     $scope.version = $routeParams['version'];
     $scope.bundlesByLocation = {};
