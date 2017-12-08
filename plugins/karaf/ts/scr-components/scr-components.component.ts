@@ -13,7 +13,7 @@ namespace Karaf {
       }
     };
 
-    private activateAction = {
+    private readonly activateAction = {
       name: 'Activate',
       actionFn: action => {
         let selectedComponents = this.getSelectedComponents();
@@ -23,11 +23,11 @@ namespace Karaf {
             this.loadComponents();
           })
           .catch(error => Core.notification('danger', error));
-        },
+      },
       isDisabled: true
     }
 
-    private deActivateAction = {
+    private readonly deactivateAction = {
       name: 'Deactivate',
       actionFn: action => {
         let selectedComponents = this.getSelectedComponents();
@@ -37,8 +37,21 @@ namespace Karaf {
             this.loadComponents();
           })
           .catch(error => Core.notification('danger', error));
-        },
+      },
       isDisabled: true
+    }
+
+    private toolbarActions(): any[] {
+      let actions = [];
+      let scrMBean = getSelectionScrMBean(this.workspace);
+      if (this.workspace.hasInvokeRightsForName(scrMBean, 'activateComponent')) {
+        actions.push(this.activateAction);
+      }
+      if (this.workspace.hasInvokeRightsForName(scrMBean, 'deactivateComponent')) {
+        actions.push(this.deactivateAction);
+      }
+      log.debug("RBAC - Rendered SCR actions:", actions);
+      return actions;
     }
 
     private toolbarConfig = {
@@ -49,10 +62,10 @@ namespace Karaf {
             title: 'Name',
             placeholder: 'Filter by name...',
             filterType: 'text'
-          },    
+          },
           {
             id: 'state',
-            title:  'State',
+            title: 'State',
             placeholder: 'Filter by state...',
             filterType: 'select',
             filterValues: [
@@ -67,7 +80,7 @@ namespace Karaf {
               'Disabling',
               'Disposing'
             ]
-          }   
+          }
         ],
         onFilterChange: (filters: any[]) => {
           this.applyFilters(filters);
@@ -75,10 +88,7 @@ namespace Karaf {
         resultsCount: 0
       },
       actionsConfig: {
-        primaryActions: [
-          this.activateAction,
-          this.deActivateAction
-        ]
+        primaryActions: this.toolbarActions()
       },
       isTableView: true
     };
@@ -96,10 +106,10 @@ namespace Karaf {
     private tableItems = null;
 
     private components: ScrComponent[];
-    
+
     private loading = true;
 
-    constructor(private scrComponentsService: ScrComponentsService) {
+    constructor(private scrComponentsService: ScrComponentsService, private workspace: Jmx.Workspace) {
       'ngInject';
     }
 
@@ -131,7 +141,7 @@ namespace Karaf {
       const selectedComponents = this.getSelectedComponents();
       const noComponentsSelected = selectedComponents.length === 0;
       this.activateAction.isDisabled = noComponentsSelected || selectedComponents.every(component => component.state === 'Active');
-      this.deActivateAction.isDisabled = noComponentsSelected || selectedComponents.every(component => component.state !== 'Active');
+      this.deactivateAction.isDisabled = noComponentsSelected || selectedComponents.every(component => component.state !== 'Active');
     }
 
     private getSelectedComponents(): ScrComponent[] {

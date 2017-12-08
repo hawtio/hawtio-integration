@@ -162,9 +162,9 @@ namespace Camel {
               }
             } else {
               if (!mbean) {
-                Core.notification("error", "Could not find CamelContext MBean!");
+                Core.notification("danger", "Could not find CamelContext MBean!");
               } else {
-                Core.notification("error", "Failed to determine endpoint name!");
+                Core.notification("danger", "Failed to determine endpoint name!");
               }
               log.debug("Parsed context and endpoint: ", target);
             }

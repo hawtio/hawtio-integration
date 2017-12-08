@@ -1,8 +1,8 @@
 /// <reference path="bundle.ts"/>
-/// <reference path="bundles-service.ts"/>
+/// <reference path="bundles.service.ts"/>
 
 namespace Osgi {
-  
+
   export class BundlesController {
 
     private static FILTER_FUNCTIONS = {
@@ -31,7 +31,7 @@ namespace Osgi {
             this.loadBundles();
           })
           .catch(error => Core.notification('danger', error));
-        },
+      },
       isDisabled: true
     }
 
@@ -48,7 +48,7 @@ namespace Osgi {
       },
       isDisabled: true
     }
-    
+
     private refreshAction = {
       name: 'Refresh',
       actionFn: action => {
@@ -62,7 +62,7 @@ namespace Osgi {
       },
       isDisabled: true
     }
-    
+
     private updateAction = {
       name: 'Update',
       actionFn: action => {
@@ -76,7 +76,7 @@ namespace Osgi {
       },
       isDisabled: true
     }
-    
+
     private uninstallAction = {
       name: 'Uninstall',
       actionFn: action => {
@@ -90,13 +90,13 @@ namespace Osgi {
       },
       isDisabled: true
     }
-    
+
     private toolbarConfig = {
       filterConfig: {
         fields: [
           {
             id: 'state',
-            title:  'State',
+            title: 'State',
             placeholder: 'Filter by state...',
             filterType: 'select',
             filterValues: [
@@ -130,7 +130,7 @@ namespace Osgi {
             title: 'Version',
             placeholder: 'Filter by version...',
             filterType: 'text'
-          }         
+          }
         ],
         onFilterChange: (filters: any[]) => {
           this.applyFilters(filters);
@@ -138,13 +138,7 @@ namespace Osgi {
         resultsCount: 0
       },
       actionsConfig: {
-        primaryActions: [
-          this.startAction,
-          this.stopAction,
-          this.refreshAction,
-          this.updateAction,
-          this.uninstallAction
-        ]
+        primaryActions: this.toolbarActions()
       },
       isTableView: true
     };
@@ -168,9 +162,9 @@ namespace Osgi {
 
     private loading = true;
 
-    constructor(private bundlesService: BundlesService) {
+    constructor(private bundlesService: BundlesService, private workspace: Jmx.Workspace) {
       'ngInject';
-    }  
+    }
 
     $onInit() {
       this.loadBundles();
@@ -185,6 +179,28 @@ namespace Osgi {
           this.enableDisableActions();
           this.loading = false;
         });
+    }
+
+    private toolbarActions(): any[] {
+      let actions = [];
+      let frameworkMBean = getSelectionFrameworkMBean(this.workspace);
+      if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'startBundle')) {
+        actions.push(this.startAction);
+      }
+      if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'stopBundle')) {
+        actions.push(this.stopAction);
+      }
+      if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'refreshBundle')) {
+        actions.push(this.refreshAction);
+      }
+      if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'updateBundle')) {
+        actions.push(this.updateAction);
+      }
+      if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'uninstallBundle')) {
+        actions.push(this.uninstallAction);
+      }
+      log.debug("RBAC - Rendered bundles actions:", actions);
+      return actions;
     }
 
     private applyFilters(filters: any[]) {
@@ -211,7 +227,7 @@ namespace Osgi {
       this.updateAction.isDisabled = noBundlesSelected;
       this.uninstallAction.isDisabled = noBundlesSelected;
     }
-    
+
   }
 
   export const bundlesComponent: angular.IComponentOptions = {

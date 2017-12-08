@@ -7,8 +7,8 @@ namespace Camel {
 
     context: Context = null;
 
-    constructor($scope, private $uibModal, private $timeout, private workspace: Jmx.Workspace,
-        private contextsService: ContextsService) {
+    constructor(private $scope, private $uibModal, private $timeout: ng.ITimeoutService,
+      private workspace: Jmx.Workspace, private contextsService: ContextsService) {
       'ngInject';
       $scope.$on('jmxTreeClicked', (event, selectedNode) => {
         if (workspace.isCamelContext()) {
@@ -20,11 +20,11 @@ namespace Camel {
       });
     }
 
-    isVisible() {
+    isVisible(): boolean {
       return this.context !== null;
     }
 
-    start() {
+    start(): void {
       this.contextsService.startContext(this.context)
         .then(response => {
           this.contextsService.getContext(this.context.mbean)
@@ -32,7 +32,7 @@ namespace Camel {
         });
     }
 
-    suspend() {
+    suspend(): void {
       this.contextsService.suspendContext(this.context)
         .then(response => {
           this.contextsService.getContext(this.context.mbean)
@@ -40,12 +40,11 @@ namespace Camel {
         });
     }
 
-    delete() {
+    delete(): void {
       this.$uibModal.open({
         templateUrl: 'plugins/camel/html/deleteContextWarningModal.html'
       })
-      .result
-        .then(() => {
+        .result.then(() => {
           this.contextsService.stopContext(this.context)
             .then(response => {
               this.context = null;
@@ -57,7 +56,8 @@ namespace Camel {
 
   export const contextActionsComponent = <angular.IComponentOptions>{
     template: `
-      <div class="dropdown camel-main-actions" ng-show="$ctrl.isVisible()">
+      <div class="dropdown camel-main-actions" ng-show="$ctrl.isVisible()"
+        hawtio-show object-name-model="$ctrl.context.mbean" method-name="stop" mode="remove">
         <button type="button" id="dropdownMenu1" class="btn btn-default dropdown-toggle"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
           <span class="fa" ng-class="{'fa-play': $ctrl.context.isStarted(), 'fa-pause': $ctrl.context.isSuspended()}"></span>

@@ -11,6 +11,7 @@ namespace Camel {
       $uibModal) => {
     
     $scope.workspace = workspace;
+    $scope.camelContextMBean = getSelectionCamelContextMBean(workspace);
     $scope.mode = 'text';
     $scope.gridOptions = Camel.createBrowseGridOptions();
     $scope.endpointUri = null;
@@ -104,9 +105,9 @@ namespace Camel {
         mbean = workspace.getSelectedMBeanName();
       }
       if (mbean) {
-        log.info("MBean: " + mbean);
-        var options = Core.onSuccess(populateTable);
-        jolokia.execute(mbean, 'browseAllMessagesAsXml(java.lang.Boolean)', true, options);
+        log.info("MBean:", mbean);
+        jolokia.execute(mbean, 'browseAllMessagesAsXml(java.lang.Boolean)', true,
+          Core.onSuccess(populateTable));
       }
     }
 

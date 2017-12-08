@@ -9,7 +9,7 @@
         <form class="toolbar-pf-actions search-pf">
           <div class="form-group">
             <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="openForwardDialog()"
-                    hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendBodyAndHeaders"
+                    hawtio-show object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"
                     title="Forward the selected messages to another endpoint" data-placement="bottom">
               Forward
             </button>
@@ -67,7 +67,7 @@
                   <input type="text" class="form-control camel-forward-message" ng-model="endpointUri" placeholder="URI"
                           uib-typeahead="title for title in endpointUris() | filter:$viewValue" required>
                   <button type="submit" class="btn btn-default" hawtio-show 
-                          object-name="{{workspace.selection.objectName}}" method-name="sendBodyAndHeaders"
+                          object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"
                           data-placement="bottom" title="Forward the selected messages to another endpoint">
                     Forward
                   </button>

@@ -3,8 +3,13 @@
 
 namespace Camel {
 
-  _module.controller("Camel.TraceRouteController", ["$scope", "$timeout", "workspace", "jolokia", "localStorage", "tracerStatus",
-    ($scope, $timeout, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, localStorage: Storage, tracerStatus) => {
+  _module.controller("Camel.TraceRouteController", ["$scope", "$timeout", "workspace", "jolokia", "localStorage", "tracerStatus", (
+    $scope,
+    $timeout: ng.ITimeoutService,
+    workspace: Jmx.Workspace,
+    jolokia: Jolokia.IJolokia,
+    localStorage: Storage,
+    tracerStatus) => {
 
     const log: Logging.Logger = Logger.get("CamelTracer");
     const MESSAGES_LIMIT = 500;
@@ -14,6 +19,7 @@ namespace Camel {
     $scope.message = null;
     $scope.messageIndex = -1;
     $scope.graphView = "plugins/camel/html/routeDiagram.html";
+    $scope.camelTraceMBean = getSelectionCamelTraceMBean(workspace);
 
     $scope.gridOptions = Camel.createBrowseGridOptions();
     $scope.gridOptions.selectWithCheckboxOnly = false;
@@ -129,7 +135,7 @@ namespace Camel {
         allMessages.each((idx, message) => {
           var routeId = $(message).find("routeId").text();
           if (routeId === selectedRouteId) {
-            var messageData:any = Camel.createMessageFromXml(message);
+            var messageData: any = Camel.createMessageFromXml(message);
             var toNode = $(message).find("toNode").text();
             if (toNode) {
               messageData["toNode"] = toNode;
@@ -138,16 +144,16 @@ namespace Camel {
             $scope.messages.push(messageData);
           }
         });
-        
+
         limitMessagesArray();
 
         // keep state of the traced messages on tracerStatus
         tracerStatus.messages = $scope.messages;
-        
+
         if (tableScrolled) {
           scrollTable();
         }
-        
+
         Core.$apply($scope);
       }
     }
@@ -182,22 +188,23 @@ namespace Camel {
       });
     }
 
-    function tracingChanged(response) {
+    function tracingChanged(response: Jolokia.IResponse): void {
       reloadTracingFlag();
       Core.$apply($scope);
     }
 
-    function setTracing(flag:Boolean) {
-      var mbean = getSelectionCamelTraceMBean(workspace);
+    function setTracing(flag: boolean): void {
+      let mbean = getSelectionCamelTraceMBean(workspace);
       if (mbean) {
         // set max only supported on BacklogTracer
         // (the old fabric tracer does not support max length)
         if (_.endsWith(mbean.toString(), "BacklogTracer")) {
-          var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
-          var streams = Camel.traceOrDebugIncludeStreams(localStorage);
-          jolokia.setAttribute(mbean, "BodyMaxChars",  max);
-          jolokia.setAttribute(mbean, "BodyIncludeStreams", streams);
-          jolokia.setAttribute(mbean, "BodyIncludeFiles", streams);
+          let max = Camel.maximumTraceOrDebugBodyLength(localStorage);
+          let streams = Camel.traceOrDebugIncludeStreams(localStorage);
+          let options = Core.onSuccess(null);
+          jolokia.setAttribute(mbean, "BodyMaxChars", max, options);
+          jolokia.setAttribute(mbean, "BodyIncludeStreams", streams, options);
+          jolokia.setAttribute(mbean, "BodyIncludeFiles", streams, options);
         }
         jolokia.setAttribute(mbean, "Enabled", flag, Core.onSuccess(tracingChanged));
       }

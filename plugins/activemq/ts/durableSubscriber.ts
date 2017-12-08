@@ -88,7 +88,7 @@ namespace ActiveMQ {
           loadTable();
         }));
       } else {
-        Core.notification("error", "Could not find the Broker MBean!");
+        Core.notification("danger", "Could not find the Broker MBean!");
       }
     }
 

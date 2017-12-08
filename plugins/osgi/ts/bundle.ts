@@ -3,7 +3,7 @@
 
 namespace Osgi {
 
-  export function formatServiceName(objClass:any):string {
+  export function formatServiceName(objClass: any): string {
     if (angular.isArray(objClass)) {
       return formatServiceNameArray(objClass);
     }
@@ -12,12 +12,12 @@ namespace Osgi {
     return name.substring(idx + 1);
   }
 
-  function formatServiceNameArray(objClass:string[]):string {
+  function formatServiceNameArray(objClass: string[]): string {
     var rv = [];
     for (var i = 0; i < objClass.length; i++) {
       rv.push(formatServiceName(objClass[i]));
     }
-    rv = _.filter(rv, (elem, pos, self:Array<any>) => self.indexOf(elem) === pos);
+    rv = _.filter(rv, (elem, pos, self: Array<any>) => self.indexOf(elem) === pos);
     rv.sort();
     return rv.toString();
   }
@@ -28,8 +28,15 @@ namespace Osgi {
     message: string
   }
 
-  _module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokia", ($scope, $location, workspace: Jmx.Workspace, $routeParams, jolokia) => {
-    
+  _module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokia", (
+    $scope,
+    $location: ng.ILocationService,
+    workspace: Jmx.Workspace,
+    $routeParams,
+    jolokia: Jolokia.IJolokia) => {
+
+    $scope.frameworkMBean = getSelectionFrameworkMBean(workspace);
+    $scope.osgiToolsMBean = getHawtioOSGiToolsMBean(workspace);
     $scope.bundleId = $routeParams.bundleId;
     $scope.classLoadingAlert = null;
 
@@ -58,32 +65,32 @@ namespace Osgi {
       var mbean = getHawtioOSGiToolsMBean(workspace);
       if (mbean) {
         jolokia.request(
-                {type: 'exec', mbean: mbean, operation: 'getLoadClassOrigin', arguments: [$scope.bundleId, clazz]},
-                {
-                  success: function (response) {
-                    var resultBundle = response.value;
-                    if (resultBundle === -1) {
-                      $scope.classLoadingAlert = <Alert>{
-                        type: 'warning',
-                        icon: 'pficon-warning-triangle-o',
-                        message: `Loading class <strong>${clazz}</strong> in Bundle ${$scope.bundleId}.
+          { type: 'exec', mbean: mbean, operation: 'getLoadClassOrigin', arguments: [$scope.bundleId, clazz] },
+          {
+            success: function (response) {
+              var resultBundle = response.value;
+              if (resultBundle === -1) {
+                $scope.classLoadingAlert = <Alert>{
+                  type: 'warning',
+                  icon: 'pficon-warning-triangle-o',
+                  message: `Loading class <strong>${clazz}</strong> in Bundle ${$scope.bundleId}.
                                   Class can not be loaded from this bundle.`
-                      };
-                    } else {
-                      $scope.classLoadingAlert = <Alert>{
-                        type: 'success',
-                        icon: 'pficon-ok',
-                        message: `Loading class <strong>${clazz}</strong> in Bundle ${$scope.bundleId}.
+                };
+              } else {
+                $scope.classLoadingAlert = <Alert>{
+                  type: 'success',
+                  icon: 'pficon-ok',
+                  message: `Loading class <strong>${clazz}</strong> in Bundle ${$scope.bundleId}.
                                   Class is served from Bundle ${bundleLinks(workspace, resultBundle)}`
-                      };
-                    }
-                    Core.$apply($scope);
-                  },
-                  error: function (response) {
-                    inspectReportError(response);
-                    Core.$apply($scope);
-                  }
-                });
+                };
+              }
+              Core.$apply($scope);
+            },
+            error: function (response) {
+              inspectReportError(response);
+              Core.$apply($scope);
+            }
+          });
       } else {
         inspectReportNoMBeanFound();
       }
@@ -93,32 +100,32 @@ namespace Osgi {
       var mbean = getHawtioOSGiToolsMBean(workspace);
       if (mbean) {
         jolokia.request(
-                {type: 'exec', mbean: mbean, operation: 'getResourceURL', arguments: [$scope.bundleId, resource]},
-                {
-                  success: function (response) {
-                    var resultURL = response.value;
-                    if (resultURL === null) {
-                      $scope.classLoadingAlert = <Alert>{
-                        type: 'warning',
-                        icon: 'pficon-warning-triangle-o',
-                        message: `Finding resource <strong>${resource}</strong> in Bundle ${$scope.bundleId}.
+          { type: 'exec', mbean: mbean, operation: 'getResourceURL', arguments: [$scope.bundleId, resource] },
+          {
+            success: function (response) {
+              var resultURL = response.value;
+              if (resultURL === null) {
+                $scope.classLoadingAlert = <Alert>{
+                  type: 'warning',
+                  icon: 'pficon-warning-triangle-o',
+                  message: `Finding resource <strong>${resource}</strong> in Bundle ${$scope.bundleId}.
                                   Resource can not be found from this bundle.`
-                      };
-                    } else {
-                      $scope.classLoadingAlert = <Alert>{
-                        type: 'success',
-                        icon: 'pficon-ok',
-                        message: `Finding resource <strong>${resource}</strong> in Bundle ${$scope.bundleId}.
+                };
+              } else {
+                $scope.classLoadingAlert = <Alert>{
+                  type: 'success',
+                  icon: 'pficon-ok',
+                  message: `Finding resource <strong>${resource}</strong> in Bundle ${$scope.bundleId}.
                                   Resource is available from: ${resultURL}`
-                      };
-                    }
-                    Core.$apply($scope);
-                  },
-                  error: function (response) {
-                    inspectReportError(response);
-                    Core.$apply($scope);
-                  }
-                }
+                };
+              }
+              Core.$apply($scope);
+            },
+            error: function (response) {
+              inspectReportError(response);
+              Core.$apply($scope);
+            }
+          }
         )
       } else {
         inspectReportNoMBeanFound();
@@ -127,42 +134,42 @@ namespace Osgi {
 
     $scope.startBundle = (bundleId) => {
       jolokia.request([
-        {type: 'exec', mbean: getSelectionFrameworkMBean(workspace), operation: 'startBundle', arguments: [bundleId]}
+        { type: 'exec', mbean: getSelectionFrameworkMBean(workspace), operation: 'startBundle', arguments: [bundleId] }
       ],
-              Core.onSuccess(updateTableContents));
+        Core.onSuccess(updateTableContents));
     };
 
     $scope.stopBundle = (bundleId) => {
       jolokia.request([
-        {type: 'exec', mbean: getSelectionFrameworkMBean(workspace), operation: 'stopBundle', arguments: [bundleId]}
+        { type: 'exec', mbean: getSelectionFrameworkMBean(workspace), operation: 'stopBundle', arguments: [bundleId] }
       ],
-              Core.onSuccess(updateTableContents));
+        Core.onSuccess(updateTableContents));
     };
 
     $scope.updatehBundle = (bundleId) => {
       jolokia.request([
-        {type: 'exec', mbean: getSelectionFrameworkMBean(workspace), operation: 'updateBundle', arguments: [bundleId]}
+        { type: 'exec', mbean: getSelectionFrameworkMBean(workspace), operation: 'updateBundle', arguments: [bundleId] }
       ],
-              Core.onSuccess(updateTableContents));
+        Core.onSuccess(updateTableContents));
     };
 
     $scope.refreshBundle = (bundleId) => {
       jolokia.request([
-        {type: 'exec', mbean: getSelectionFrameworkMBean(workspace), operation: 'refreshBundle', arguments: [bundleId]}
+        { type: 'exec', mbean: getSelectionFrameworkMBean(workspace), operation: 'refreshBundle', arguments: [bundleId] }
       ],
-              Core.onSuccess(updateTableContents));
+        Core.onSuccess(updateTableContents));
     };
 
     $scope.uninstallBundle = (bundleId) => {
       jolokia.request([{
-        type: 'exec', 
-        mbean: getSelectionFrameworkMBean(workspace), 
-        operation: 'uninstallBundle', 
+        type: 'exec',
+        mbean: getSelectionFrameworkMBean(workspace),
+        operation: 'uninstallBundle',
         arguments: [bundleId]
-        }], Core.onSuccess(function() {
-          $location.path("/osgi/bundles");
-          Core.$apply($scope); 
-        }));
+      }], Core.onSuccess(function () {
+        $location.path("/osgi/bundles");
+        Core.$apply($scope);
+      }));
     };
 
     function inspectReportNoMBeanFound() {
@@ -184,7 +191,7 @@ namespace Osgi {
     function populateTable(response) {
       var values = response.value;
       $scope.bundles = values;
-      
+
       // now find the row based on the selection ui
       Osgi.defaultBundleValues(workspace, $scope, values);
       $scope.row = Osgi.findBundle($scope.bundleId, values);
@@ -196,9 +203,9 @@ namespace Osgi {
       Core.$apply($scope);
     }
 
-    function createImportPackageSection():void {
+    function createImportPackageSection(): void {
       var importPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Import-Package");
-      
+
       for (var pkg in $scope.row.ImportData) {
         var data = importPackageHeaders[pkg];
         if (data !== undefined) {
@@ -223,7 +230,7 @@ namespace Osgi {
       }
     }
 
-    function createExportPackageSection():void {
+    function createExportPackageSection(): void {
       var exportPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Export-Package");
       for (var pkg in $scope.row.ExportData) {
         // replace commas with comma + whitespace so names wrap nicely in the UI
@@ -234,9 +241,9 @@ namespace Osgi {
       }
     }
 
-    function populateServicesSection():void {
+    function populateServicesSection(): void {
       if (($scope.row.RegisteredServices === undefined || $scope.row.RegisteredServices.length === 0) &&
-              ($scope.row.ServicesInUse === undefined || $scope.row.ServicesInUse === 0)) {
+        ($scope.row.ServicesInUse === undefined || $scope.row.ServicesInUse === 0)) {
         // no services for this bundle
         return;
       }
@@ -244,8 +251,8 @@ namespace Osgi {
       var mbean = getSelectionServiceMBean(workspace);
       if (mbean) {
         jolokia.request(
-                {type: 'exec', mbean: mbean, operation: 'listServices()'},
-                Core.onSuccess(updateServices));
+          { type: 'exec', mbean: mbean, operation: 'listServices()' },
+          Core.onSuccess(updateServices));
       }
     }
 
@@ -260,40 +267,41 @@ namespace Osgi {
         }
 
         jolokia.request({
-                  type: 'exec', mbean: getSelectionServiceMBean(workspace),
-                  operation: 'getProperties', arguments: [id]},
-                Core.onSuccess(function (svcId, regEl, usesEl) {
-                  return function (resp) {
-                    var props = resp.value;
-                    var sortedKeys = Object.keys(props).sort();
-                    var po = "<small><table>";
-                    for (var i = 0; i < sortedKeys.length; i++) {
-                      var value = props[sortedKeys[i]];
-                      if (value !== undefined) {
-                        var fval = value.Value;
-                        if (fval.length > 15) {
-                          fval = fval.replace(/[,]/g, ",<br/>&nbsp;&nbsp;");
-                        }
-
-                        po += "<tr><td valign='top'>" + sortedKeys[i] + "</td><td>" + fval + "</td></tr>"
-                      }
-                    }
-
-                    var regBID = data[svcId].BundleIdentifier;
-                    po += "<tr><td>Registered&nbsp;by</td><td>Bundle " + regBID + " <div class='less-big label'>" + $scope.bundles[regBID].SymbolicName
-                            + "</div></td></tr>";
-                    po += "</table></small>";
-
-                    if (regEl !== undefined && regEl !== null) {
-                      regEl.innerText = " " + formatServiceName(data[svcId].objectClass);
-                      (<any> $)(regEl).popover({title: "service properties", content: po, trigger: "hover", html: true});
-                    }
-                    if (usesEl !== undefined && usesEl !== null) {
-                      usesEl.innerText = " " + formatServiceName(data[svcId].objectClass);
-                      (<any> $)(usesEl).popover({title: "service properties", content: po, trigger: "hover", html: true});
-                    }
+          type: 'exec', mbean: getSelectionServiceMBean(workspace),
+          operation: 'getProperties', arguments: [id]
+        },
+          Core.onSuccess(function (svcId, regEl, usesEl) {
+            return function (resp) {
+              var props = resp.value;
+              var sortedKeys = Object.keys(props).sort();
+              var po = "<small><table>";
+              for (var i = 0; i < sortedKeys.length; i++) {
+                var value = props[sortedKeys[i]];
+                if (value !== undefined) {
+                  var fval = value.Value;
+                  if (fval.length > 15) {
+                    fval = fval.replace(/[,]/g, ",<br/>&nbsp;&nbsp;");
                   }
-                }(id, reg, uses)));
+
+                  po += "<tr><td valign='top'>" + sortedKeys[i] + "</td><td>" + fval + "</td></tr>"
+                }
+              }
+
+              var regBID = data[svcId].BundleIdentifier;
+              po += "<tr><td>Registered&nbsp;by</td><td>Bundle " + regBID + " <div class='less-big label'>" + $scope.bundles[regBID].SymbolicName
+                + "</div></td></tr>";
+              po += "</table></small>";
+
+              if (regEl !== undefined && regEl !== null) {
+                regEl.innerText = " " + formatServiceName(data[svcId].objectClass);
+                (<any>$)(regEl).popover({ title: "service properties", content: po, trigger: "hover", html: true });
+              }
+              if (usesEl !== undefined && usesEl !== null) {
+                usesEl.innerText = " " + formatServiceName(data[svcId].objectClass);
+                (<any>$)(usesEl).popover({ title: "service properties", content: po, trigger: "hover", html: true });
+              }
+            }
+          }(id, reg, uses)));
       }
     }
 
@@ -302,8 +310,8 @@ namespace Osgi {
       var mbean = getSelectionBundleMBean(workspace);
       if (mbean) {
         jolokia.request(
-                {type: 'exec', mbean: mbean, operation: 'listBundles()'},
-                Core.onSuccess(populateTable));
+          { type: 'exec', mbean: mbean, operation: 'listBundles()' },
+          Core.onSuccess(populateTable));
       }
     }
 

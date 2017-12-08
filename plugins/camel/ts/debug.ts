@@ -11,7 +11,7 @@ namespace Camel {
     documentBase: string) => {
 
     const log: Logging.Logger = Logger.get("CamelDebugger");
-    const breakpointImageUrl = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint.png");    
+    const breakpointImageUrl = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint.png");
 
     // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
     $scope.debugging = false;
@@ -22,6 +22,7 @@ namespace Camel {
     $scope.mode = 'text';
     // always show the message details
     $scope.showMessageDetails = true;
+    $scope.camelDebugMBean = getSelectionCamelDebugMBean(workspace);
 
     $scope.startDebugging = () => {
       log.info("Start debugging");
@@ -178,7 +179,7 @@ namespace Camel {
       Core.$apply($scope);
     }
 
-    function onMessages(response, stopNodeId) {
+    function onMessages(response: Jolokia.IResponse): void {
       log.debug("onMessage -> " + response);
       $scope.messages = [];
       if (response) {
@@ -296,7 +297,7 @@ namespace Camel {
         var nodeId = object.cid;
         var thisNode = d3.select(this);
         let icons = thisNode.selectAll("image.breakpoint");
-        
+
         if (isBreakpointSet(nodeId)) {
           if (!icons.length || !icons[0].length) {
             thisNode.append("image")
@@ -321,20 +322,21 @@ namespace Camel {
       });
     }
 
-    function breakpointsChanged(response) {
+    function breakpointsChanged(response: Jolokia.IResponse): void {
       reloadData();
       Core.$apply($scope);
     }
 
-    function setDebugging(flag: Boolean) {
-      var mbean = getSelectionCamelDebugMBean(workspace);
+    function setDebugging(flag: boolean): void {
+      let mbean = getSelectionCamelDebugMBean(workspace);
       if (mbean) {
-        var method = flag ? "enableDebugger" : "disableDebugger";
-        var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
-        var streams = Camel.traceOrDebugIncludeStreams(localStorage);
-        jolokia.setAttribute(mbean, "BodyMaxChars", max);
-        jolokia.setAttribute(mbean, "BodyIncludeStreams", streams);
-        jolokia.setAttribute(mbean, "BodyIncludeFiles", streams);
+        let method = flag ? "enableDebugger" : "disableDebugger";
+        let max = Camel.maximumTraceOrDebugBodyLength(localStorage);
+        let streams = Camel.traceOrDebugIncludeStreams(localStorage);
+        let options = Core.onSuccess(null);
+        jolokia.setAttribute(mbean, "BodyMaxChars", max, options);
+        jolokia.setAttribute(mbean, "BodyIncludeStreams", streams, options);
+        jolokia.setAttribute(mbean, "BodyIncludeFiles", streams, options);
         jolokia.execute(mbean, method, Core.onSuccess(breakpointsChanged));
       }
     }

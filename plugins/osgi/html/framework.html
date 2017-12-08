@@ -18,7 +18,14 @@
     </div>
     <div class="form-group">
       <div class="col-sm-offset-3 col-sm-2">
-        <button type="submit" class="btn btn-primary">Save</button>
+        <!--
+          Use the 'setBundleStartLevel' method here, as the 'setFrameworkStartLevel' and
+          'setInitialBundleStartLevel' methods are not available for hawtio-show directive
+        -->
+        <button type="submit" class="btn btn-primary"
+                hawtio-show object-name="{{frameworkMBean}}" method-name="setBundleStartLevel">
+        Save
+      </button>
       </div>
     </div>
   </form>

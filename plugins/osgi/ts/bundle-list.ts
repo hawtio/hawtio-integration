@@ -20,6 +20,7 @@ namespace Osgi {
     const CXF_SERVICE = {id: 'CXF', name: 'CXF'};
     const PLATFORM_SERVICE = {id: 'PLATFORM', name: 'Platform'};
 
+    $scope.frameworkMBean = getSelectionFrameworkMBean(workspace);
     $scope.availableServices = [
       ACTIVEMQ_SERVICE,
       CAMEL_SERVICE,
@@ -90,18 +91,18 @@ namespace Osgi {
                     Core.$apply($scope);
                   },
                   error: function (response) {
-                    Core.notification("error", response.error)
+                    Core.notification("danger", response.error)
                   }
                 });
               }
             },
             error: function (response) {
-              Core.notification("error", response.error)
+              Core.notification("danger", response.error)
             }
           });
         },
         error: function (response) {
-          Core.notification("error", response.error);
+          Core.notification("danger", response.error);
         }
       });
     };

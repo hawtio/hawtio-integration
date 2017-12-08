@@ -25,7 +25,7 @@ namespace Camel {
           var operation = "createEndpoint(java.lang.String)";
           jolokia.execute(mbean, operation, name, Core.onSuccess(operationSuccess));
         } else {
-          Core.notification("error", "Could not find the CamelContext MBean!");
+          Core.notification("danger", "Could not find the CamelContext MBean!");
         }
       }
     };

@@ -13,7 +13,15 @@
   
   <div ng-if="!debugging">
     <p>Debugging allows you to step through camel routes to diagnose issues.</p>
-    <button type="button" class="btn btn-primary" ng-click="startDebugging()">Start debugging</button>
+    <button type="button" class="btn btn-primary" ng-click="startDebugging()"
+      hawtio-show object-name="{{camelDebugMBean}}" method-name="enableDebugger" mode="remove">
+      Start debugging
+    </button>
+    <div class="alert alert-info"
+      hawtio-show object-name="{{camelDebugMBean}}" method-name="enableDebugger" mode="inverse">
+      <span class="pficon pficon-info"></span>
+      Debugging is not allowed for this user.
+    </div>
   </div>
   
   <div class="toolbar-pf camel-debug-toolbar" ng-if="debugging">

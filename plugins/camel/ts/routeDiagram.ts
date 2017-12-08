@@ -290,7 +290,7 @@ namespace Camel {
           operation: 'dumpRoutesStatsAsXml',
           arguments: [true, true]
           // the dumpRoutesStatsAsXml is not available in all Camel versions so do not barf on errors
-        }, Core.onSuccess(statsCallback, {silent: true, error: false}));
+        }, Core.onSuccess(statsCallback, { silent: true, error: () => { } }));
       }
       $scope.$emit("camel.diagram.layoutComplete");
     }
