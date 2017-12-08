@@ -1,12 +1,15 @@
 /// <reference path="bundle.ts"/>
 
 namespace Osgi {
-  
+
   export class InstallBundleController {
 
-    constructor(private bundlesService: BundlesService) {
+    frameworkMBean: string;
+
+    constructor(private bundlesService: BundlesService, private workspace: Jmx.Workspace) {
       'ngInject';
-    }  
+      this.frameworkMBean = getSelectionFrameworkMBean(this.workspace);
+    }
 
     install(bundleUrl: string) {
       this.bundlesService.installBundle(bundleUrl)
@@ -21,9 +24,8 @@ namespace Osgi {
 
   export const installBundleComponent: angular.IComponentOptions = {
     template: `
-      <div class="row install-bundle">
-        <div class="col-lg-6">
-        </div>
+      <div class="row install-bundle"
+          hawtio-show object-name="{{$ctrl.frameworkMBean}}" method-name="installBundle">
         <div class="col-lg-6">
           <div class="input-group">
             <input type="text" class="form-control" placeholder="Bundle URL..." ng-model="bundleUrl">
@@ -34,12 +36,14 @@ namespace Osgi {
             </span>
           </div>
         </div>
+        <div class="col-lg-6">
+        </div>
       </div>
     `,
     controller: InstallBundleController,
     bindings: {
       onInstall: '&'
-    }    
+    }
   };
 
 }

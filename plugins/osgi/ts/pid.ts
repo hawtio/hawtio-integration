@@ -5,13 +5,13 @@
 namespace Osgi {
 
   _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia", "$uibModal", (
-      $scope,
-      $timeout: ng.ITimeoutService,
-      $routeParams: angular.route.IRouteParamsService,
-      $location: ng.ILocationService,
-      workspace: Jmx.Workspace,
-      jolokia: Jolokia.IJolokia,
-      $uibModal) => {
+    $scope,
+    $timeout: ng.ITimeoutService,
+    $routeParams: angular.route.IRouteParamsService,
+    $location: ng.ILocationService,
+    workspace: Jmx.Workspace,
+    jolokia: Jolokia.IJolokia,
+    $uibModal) => {
 
     let uibModalInstance = null;
 
@@ -44,7 +44,7 @@ namespace Osgi {
         uibModalInstance = $uibModal.open({
           templateUrl: 'addPropertyDialog.html',
           scope: $scope
-        });      
+        });
       }
     }
 
@@ -60,13 +60,25 @@ namespace Osgi {
 
     $scope.toolbarConfig = {
       actionsConfig: {
-        primaryActions: [
-          addPropertyAction,
-          editPropertiesAction
-        ]
+        primaryActions: toolbarActions()
       }
     }
-      
+
+    function toolbarActions(): any[] {
+      let actions = [];
+      let hawtioConfigAdminMBean = getHawtioConfigAdminMBean(workspace);
+      let configAdminMBean = getSelectionConfigAdminMBean(workspace);
+      if (workspace.hasInvokeRightsForName(configAdminMBean, 'createFactoryConfiguration')
+        && workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
+        actions.push(addPropertyAction);
+      }
+      if (workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
+        actions.push(editPropertiesAction);
+      }
+      log.debug("RBAC - Rendered pid actions:", actions);
+      return actions;
+    }
+
     var startInEditMode = $scope.factoryPid && !$routeParams['pid'];
     $scope.editMode = startInEditMode;
 
@@ -145,18 +157,18 @@ namespace Osgi {
       $scope.editMode = false;
     };
 
-    $scope.cancelSave = function() {
+    $scope.cancelSave = function () {
       updateSchema();
       $scope.editMode = false;
     }
 
     function errorHandler(message) {
-       return {
-         error: (response) => {
-           Core.notification("danger", message + "\n" + response['error'] || response);
-           Core.defaultJolokiaErrorHandler(response);
-         }
-       }
+      return {
+        error: (response) => {
+          Core.notification("danger", message + "\n" + response['error'] || response);
+          Core.defaultJolokiaErrorHandler(response);
+        }
+      }
     }
 
     function enableCanSave() {
@@ -169,7 +181,7 @@ namespace Osgi {
       uibModalInstance = $uibModal.open({
         templateUrl: 'addPropertyDialog.html',
         scope: $scope
-      });      
+      });
     }
 
     $scope.addPropertyConfirmed = (key, value) => {
@@ -188,12 +200,12 @@ namespace Osgi {
       uibModalInstance = $uibModal.open({
         templateUrl: 'deletePropDialog.html',
         scope: $scope
-      });      
+      });
     };
 
     $scope.deletePidPropConfirmed = () => {
       uibModalInstance.close();
-      var cell:any = document.getElementById("pid." + $scope.deleteKey);
+      var cell: any = document.getElementById("pid." + $scope.deleteKey);
       cell.parentElement.remove();
       enableCanSave();
     };
@@ -418,7 +430,7 @@ namespace Osgi {
       });
 
       editPropertiesAction.isDisabled = Object.keys(entity).length === 0;
-      
+
       //log.info("default values: " + angular.toJson($scope.defaultValues));
       $scope.entity = entity;
       $scope.schema = schema;
@@ -455,11 +467,11 @@ namespace Osgi {
     }
 
     function encodeKey(key, pid) {
-        return key.replace(/\./g, "__");
+      return key.replace(/\./g, "__");
     }
 
     function decodeKey(key, pid) {
-        return key.replace(/__/g, ".");
+      return key.replace(/__/g, ".");
     }
 
     function asJsonSchemaType(typeName, id) {

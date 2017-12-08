@@ -7,6 +7,7 @@ namespace Osgi {
       $scope,
       workspace: Jmx.Workspace) => {
 
+    $scope.frameworkMBean = getSelectionFrameworkMBean(workspace);
     let showNotification: boolean;
 
     $scope.save = function() {
@@ -25,7 +26,7 @@ namespace Osgi {
                 Core.notification("danger", response.error);
                 showNotification = false;
               }
-            },              
+            },
             success: response => {
               if (showNotification) {
                 Core.notification("success", "Configuration updated");

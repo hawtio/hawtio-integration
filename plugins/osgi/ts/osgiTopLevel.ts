@@ -7,14 +7,10 @@ namespace Osgi {
       $scope,
       workspace: Jmx.Workspace) => {
 
-    $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
     $scope.bundleMBean = Osgi.getSelectionBundleMBean(workspace);
     $scope.serviceMBean = Osgi.getSelectionServiceMBean(workspace);
     $scope.packageMBean = Osgi.getSelectionPackageMBean(workspace);
-    $scope.configAdminMBean = Osgi.getSelectionConfigAdminMBean(workspace);
     $scope.metaTypeMBean = Osgi.getMetaTypeMBean(workspace);
-    $scope.osgiToolsMBean = Osgi.getHawtioOSGiToolsMBean(workspace);
-    $scope.hawtioConfigAdminMBean = Osgi.getHawtioConfigAdminMBean(workspace);
 
   }]);
 

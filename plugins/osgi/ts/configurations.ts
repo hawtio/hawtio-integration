@@ -31,6 +31,11 @@ namespace Osgi {
         }
       };
 
+      const addConfigurationAction = {
+        name: 'Add configuration',
+        actionFn: openAddPidDialog
+      };
+
       $scope.toolbarConfig = {
         filterConfig: {
           fields: [
@@ -56,29 +61,23 @@ namespace Osgi {
           }
         },
         actionsConfig: {
-          primaryActions: [
-            {
-              name: 'Add configuration',
-              actionFn: openAddPidDialog
-            }
-          ]
+          primaryActions: toolbarActions()
         }
       };
 
       $scope.listViewConfig = {
         showSelectBox: false
-      }
+      };
 
-      $scope.listViewMenuItems = [
-        {
-          name: 'Delete',
-          actionFn: (action, item) => {
-            const modalScope = $scope.$new(true);
-            modalScope.item = item;
-            $uibModal.open({
-              templateUrl: 'deletePidDialog.html',
-              scope: modalScope
-            })
+      const deleteItemAction = {
+        name: 'Delete',
+        actionFn: (action, item) => {
+          const modalScope = $scope.$new(true);
+          modalScope.item = item;
+          $uibModal.open({
+            templateUrl: 'deletePidDialog.html',
+            scope: modalScope
+          })
             .result.then(() => {
               var mbean = getSelectionConfigAdminMBean(workspace);
               if (mbean) {
@@ -88,20 +87,40 @@ namespace Osgi {
                   operation: 'delete',
                   arguments: [item.pid]
                 }, {
-                  success: (response) => {
-                    const i = $scope.configurations.indexOf(item);
-                    $scope.configurations.splice(i, 1);
-                    Core.notification("success", "Successfully deleted pid: " + item.pid);
-                  },
-                  error: (response) => Core.notification("danger", response.error)
-                });
+                    success: (response) => {
+                      const i = $scope.configurations.indexOf(item);
+                      $scope.configurations.splice(i, 1);
+                      Core.notification("success", "Successfully deleted pid: " + item.pid);
+                    },
+                    error: (response) => Core.notification("danger", response.error)
+                  });
               }
-        
             })
             .catch(() => undefined);
-          }
         }
-      ]
+      }
+
+      $scope.listViewMenuItems = itemMenuActions();
+
+      function toolbarActions(): any[] {
+        let actions = [];
+        let hawtioConfigAdminMBean = getHawtioConfigAdminMBean(workspace);
+        if (workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
+          actions.push(addConfigurationAction);
+        }
+        log.debug("RBAC - Rendered configuration actions:", actions);
+        return actions;
+      }
+
+      function itemMenuActions(): any[] {
+        let actions = [];
+        let configAdminMBean = Osgi.getSelectionConfigAdminMBean(workspace);
+        if (workspace.hasInvokeRightsForName(configAdminMBean, 'delete')) {
+          actions.push(deleteItemAction);
+        }
+        log.debug("RBAC - Rendered configuration item actions:", actions);
+        return actions;
+      }
 
       function applyFilters(filters) {
         let filteredConfigurations = $scope.configurations;

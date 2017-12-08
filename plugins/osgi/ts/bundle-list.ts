@@ -20,6 +20,7 @@ namespace Osgi {
     const CXF_SERVICE = {id: 'CXF', name: 'CXF'};
     const PLATFORM_SERVICE = {id: 'PLATFORM', name: 'Platform'};
 
+    $scope.frameworkMBean = getSelectionFrameworkMBean(workspace);
     $scope.availableServices = [
       ACTIVEMQ_SERVICE,
       CAMEL_SERVICE,

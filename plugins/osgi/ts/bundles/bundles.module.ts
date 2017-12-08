@@ -1,6 +1,6 @@
-/// <reference path="bundles-component.ts"/>
-/// <reference path="install-bundle-component.ts"/>
-/// <reference path="bundles-service.ts"/>
+/// <reference path="bundles.component.ts"/>
+/// <reference path="install-bundle.component.ts"/>
+/// <reference path="bundles.service.ts"/>
 
 namespace Osgi {
 
