@@ -151,7 +151,7 @@
     "debug-fabulous": "0.1.2",
     "@hawtio/utilities": "3.0.17",
     "angular-route": "1.6.7",
-    "@hawtio/core": "3.1.2",
+    "@hawtio/core": "3.1.3",
     "request": "2.83.0",
     "aws-sign2": "0.7.0",
     "form-data": "2.3.1",
