@@ -171,10 +171,6 @@ caption {
   content: url("img/icons/activemq/topic_folder.png");
 }
 
-.table-src-components th:nth-child(3) {
-  width: 30%;
-}
-
 .form-inline.camel-forward-message {
   margin-bottom: 20px;
 }
@@ -678,6 +674,10 @@ div.camel-properties {
 }
 .camel-type-converters-enable-statistics-button {
   width: 111px;
+}
+
+.table-src-components th:nth-child(3) {
+  width: 30%;
 }
 
 .install-bundle {
