@@ -46,7 +46,7 @@ declare namespace ActiveMQ {
         createDialog: boolean;
         deleteDialog: boolean;
         purgeDialog: boolean;
-        constructor($scope: any, workspace: Jmx.Workspace, $location: ng.ILocationService, jolokia: Jolokia.IJolokia, localStorage: WindowLocalStorage);
+        constructor($scope: any, workspace: Jmx.Workspace, $location: ng.ILocationService, jolokia: Jolokia.IJolokia, localStorage: Storage);
         private operationSuccess();
         private deleteSuccess();
         private validateDestinationName(name);
@@ -223,7 +223,7 @@ declare namespace Camel {
     function getEndpointConfig(endpointName: any, category: any): any;
     function getEndpointCategory(endpointName: string): any;
     function getConfiguredCamelModel(): any;
-    function initEndpointChooserScope($scope: any, $location: any, localStorage: WindowLocalStorage, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia): void;
+    function initEndpointChooserScope($scope: any, $location: any, localStorage: Storage, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia): void;
 }
 declare var _apacheCamelModel: any;
 declare namespace Camel {
@@ -576,12 +576,13 @@ declare namespace Camel {
 }
 declare namespace Camel {
     class ContextActionsController {
+        private $scope;
         private $uibModal;
         private $timeout;
         private workspace;
         private contextsService;
         context: Context;
-        constructor($scope: any, $uibModal: any, $timeout: any, workspace: Jmx.Workspace, contextsService: ContextsService);
+        constructor($scope: any, $uibModal: any, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, contextsService: ContextsService);
         isVisible(): boolean;
         start(): void;
         suspend(): void;
@@ -667,12 +668,13 @@ declare namespace Camel {
 }
 declare namespace Camel {
     class RouteActionsController {
+        private $scope;
         private $uibModal;
         private $timeout;
         private workspace;
         private routesService;
         route: Route;
-        constructor($scope: any, $uibModal: any, $timeout: any, workspace: Jmx.Workspace, routesService: RoutesService);
+        constructor($scope: any, $uibModal: any, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, routesService: RoutesService);
         isVisible(): boolean;
         start(): void;
         stop(): void;
@@ -1183,22 +1185,54 @@ declare namespace Karaf {
         private featuresService;
         private $uibModal;
         private $scope;
+        private workspace;
         private static FILTER_FUNCTIONS;
         private features;
         private repositories;
         private selectedRepository;
         private repositoryUri;
         private repositoryFilterValues;
-        private listConfig;
-        private loading;
-        private listItems;
-        private listItemActionButtons;
-        private toolbarConfig;
-        constructor(featuresService: FeaturesService, $uibModal: any, $scope: any);
+        listConfig: {
+            showSelectBox: boolean;
+            useExpandingRows: boolean;
+        };
+        loading: boolean;
+        listItems: any;
+        private readonly installButton;
+        private readonly uninstallButton;
+        listItemActionButtons: any[];
+        private readonly addRepositoryAction;
+        private readonly removeRepositoryAction;
+        toolbarConfig: {
+            filterConfig: {
+                fields: ({
+                    id: string;
+                    title: string;
+                    placeholder: string;
+                    filterType: string;
+                } | {
+                    id: string;
+                    title: string;
+                    placeholder: string;
+                    filterType: string;
+                    filterValues: string[];
+                })[];
+                onFilterChange: (filters: any[]) => void;
+                appliedFilters: any[];
+                resultsCount: number;
+            };
+            actionsConfig: {
+                primaryActions: any[];
+            };
+            isTableView: boolean;
+        };
+        constructor(featuresService: FeaturesService, $uibModal: any, $scope: any, workspace: Jmx.Workspace);
         $onInit(): void;
+        private itemActionButtons();
+        private toolbarActions();
         private loadFeatureRepositories();
         private applyFilters(filters);
-        private enableButtonForItem(action, item);
+        enableButtonForItem(action: any, item: any): boolean;
     }
     const featuresComponent: angular.IComponentOptions;
 }
@@ -1233,16 +1267,18 @@ declare namespace Karaf {
 declare namespace Karaf {
     class ScrComponentsController {
         private scrComponentsService;
+        private workspace;
         private static FILTER_FUNCTIONS;
-        private activateAction;
-        private deActivateAction;
+        private readonly activateAction;
+        private readonly deactivateAction;
+        private toolbarActions();
         private toolbarConfig;
         private tableConfig;
         private tableColumns;
         private tableItems;
         private components;
         private loading;
-        constructor(scrComponentsService: ScrComponentsService);
+        constructor(scrComponentsService: ScrComponentsService, workspace: Jmx.Workspace);
         $onInit(): void;
         private loadComponents();
         private applyFilters(filters);
@@ -1256,9 +1292,10 @@ declare namespace Karaf {
         private scrComponentsService;
         private $routeParams;
         private workspace;
-        private component;
-        private srcComponentsUrl;
-        private loading;
+        component: ScrComponent;
+        srcComponentsUrl: string;
+        loading: boolean;
+        scrMBean: string;
         constructor(scrComponentsService: ScrComponentsService, $routeParams: angular.route.IRouteParamsService, workspace: Jmx.Workspace);
         $onInit(): void;
         private loadComponent();
@@ -1380,6 +1417,7 @@ declare namespace Osgi {
 declare namespace Osgi {
     class BundlesController {
         private bundlesService;
+        private workspace;
         private static FILTER_FUNCTIONS;
         private startAction;
         private stopAction;
@@ -1392,9 +1430,10 @@ declare namespace Osgi {
         private tableItems;
         private bundles;
         private loading;
-        constructor(bundlesService: BundlesService);
+        constructor(bundlesService: BundlesService, workspace: Jmx.Workspace);
         $onInit(): void;
         private loadBundles();
+        private toolbarActions();
         private applyFilters(filters);
         private getSelectedBundles();
         private enableDisableActions();
@@ -1404,7 +1443,9 @@ declare namespace Osgi {
 declare namespace Osgi {
     class InstallBundleController {
         private bundlesService;
-        constructor(bundlesService: BundlesService);
+        private workspace;
+        frameworkMBean: string;
+        constructor(bundlesService: BundlesService, workspace: Jmx.Workspace);
         install(bundleUrl: string): void;
     }
     const installBundleComponent: angular.IComponentOptions;

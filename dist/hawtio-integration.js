@@ -13985,7 +13985,7 @@ var ActiveMQ;
                 return;
             }
             if (this.checkIfDestinationExists(name, destinationType)) {
-                Core.notification("error", "The " + this.uncapitalisedDestinationType() + " \"" + name + "\" already exists");
+                Core.notification("danger", "The " + this.uncapitalisedDestinationType() + " \"" + name + "\" already exists");
                 return;
             }
             this.createDestination(name, destinationType);
@@ -14008,7 +14008,7 @@ var ActiveMQ;
                     this.jolokia.execute(mbean, operation, name, Core.onSuccess(function () { return _this.operationSuccess(); }));
                 }
                 else {
-                    Core.notification("error", "Could not find the Broker MBean!");
+                    Core.notification("danger", "Could not find the Broker MBean!");
                 }
             }
         };
@@ -15020,7 +15020,7 @@ var ActiveMQ;
                 }
             };
             function onError() {
-                Core.notification("error", "The feature is not available in this broker version!");
+                Core.notification("danger", "The feature is not available in this broker version!");
                 $scope.workspace.selectParentNode();
             }
             function populateTable(response) {
@@ -15127,7 +15127,7 @@ var ActiveMQ;
                     }));
                 }
                 else {
-                    Core.notification("error", "Could not find the Broker MBean!");
+                    Core.notification("danger", "Could not find the Broker MBean!");
                 }
             };
             $scope.deleteSubscribers = function () {
@@ -15827,7 +15827,7 @@ var Camel;
             if (!profileWorkspace) {
                 var remoteJolokia = $scope.jolokia;
                 if (remoteJolokia) {
-                    profileWorkspace = Jmx.createRemoteWorkspace(remoteJolokia, $location, localStorage);
+                    profileWorkspace = Jmx.createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location, localStorage);
                     $scope.profileWorkspace = profileWorkspace;
                 }
             }
@@ -17509,6 +17509,7 @@ var Camel;
         function ContextActionsController($scope, $uibModal, $timeout, workspace, contextsService) {
             'ngInject';
             var _this = this;
+            this.$scope = $scope;
             this.$uibModal = $uibModal;
             this.$timeout = $timeout;
             this.workspace = workspace;
@@ -17548,8 +17549,7 @@ var Camel;
             this.$uibModal.open({
                 templateUrl: 'plugins/camel/html/deleteContextWarningModal.html'
             })
-                .result
-                .then(function () {
+                .result.then(function () {
                 _this.contextsService.stopContext(_this.context)
                     .then(function (response) {
                     _this.context = null;
@@ -17561,7 +17561,7 @@ var Camel;
     }());
     Camel.ContextActionsController = ContextActionsController;
     Camel.contextActionsComponent = {
-        template: "\n      <div class=\"dropdown camel-main-actions\" ng-show=\"$ctrl.isVisible()\">\n        <button type=\"button\" id=\"dropdownMenu1\" class=\"btn btn-default dropdown-toggle\"\n          data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">\n          <span class=\"fa\" ng-class=\"{'fa-play': $ctrl.context.isStarted(), 'fa-pause': $ctrl.context.isSuspended()}\"></span>\n          &nbsp;\n          {{$ctrl.context.state}}\n          &nbsp;\n          <span class=\"caret\"></span>\n        </button>\n        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu1\">\n          <li ng-class=\"{disabled: $ctrl.context.state === 'Started'}\">\n            <a href=\"#\" ng-click=\"$ctrl.start()\">Start</a>\n          </li>\n          <li ng-class=\"{disabled: $ctrl.context.state === 'Suspended'}\">\n            <a href=\"#\" ng-click=\"$ctrl.suspend()\">Suspend</a>\n          </li>\n          <li>\n            <a href=\"#\" ng-click=\"$ctrl.delete()\">Delete</a>\n          </li>\n        </ul>\n      </div>\n    ",
+        template: "\n      <div class=\"dropdown camel-main-actions\" ng-show=\"$ctrl.isVisible()\"\n        hawtio-show object-name-model=\"$ctrl.context.mbean\" method-name=\"stop\" mode=\"remove\">\n        <button type=\"button\" id=\"dropdownMenu1\" class=\"btn btn-default dropdown-toggle\"\n          data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">\n          <span class=\"fa\" ng-class=\"{'fa-play': $ctrl.context.isStarted(), 'fa-pause': $ctrl.context.isSuspended()}\"></span>\n          &nbsp;\n          {{$ctrl.context.state}}\n          &nbsp;\n          <span class=\"caret\"></span>\n        </button>\n        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu1\">\n          <li ng-class=\"{disabled: $ctrl.context.state === 'Started'}\">\n            <a href=\"#\" ng-click=\"$ctrl.start()\">Start</a>\n          </li>\n          <li ng-class=\"{disabled: $ctrl.context.state === 'Suspended'}\">\n            <a href=\"#\" ng-click=\"$ctrl.suspend()\">Suspend</a>\n          </li>\n          <li>\n            <a href=\"#\" ng-click=\"$ctrl.delete()\">Delete</a>\n          </li>\n        </ul>\n      </div>\n    ",
         controller: ContextActionsController
     };
 })(Camel || (Camel = {}));
@@ -17844,6 +17844,7 @@ var Camel;
         function RouteActionsController($scope, $uibModal, $timeout, workspace, routesService) {
             'ngInject';
             var _this = this;
+            this.$scope = $scope;
             this.$uibModal = $uibModal;
             this.$timeout = $timeout;
             this.workspace = workspace;
@@ -17895,7 +17896,7 @@ var Camel;
     }());
     Camel.RouteActionsController = RouteActionsController;
     Camel.routeActionsComponent = {
-        template: "\n      <div class=\"dropdown camel-main-actions\" ng-show=\"$ctrl.isVisible()\">\n        <button type=\"button\" id=\"dropdownMenu1\" class=\"btn btn-default dropdown-toggle\"\n          data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">\n          <span class=\"fa\" ng-class=\"{'fa-play': $ctrl.route.isStarted(), 'fa-stop': $ctrl.route.isStopped()}\"></span>\n          &nbsp;\n          {{$ctrl.route.state}}\n          &nbsp;\n          <span class=\"caret\"></span>\n        </button>\n        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu1\">\n          <li ng-class=\"{disabled: $ctrl.route.isStarted()}\">\n            <a href=\"#\" ng-click=\"$ctrl.start()\">Start</a>\n          </li>\n          <li ng-class=\"{disabled: $ctrl.route.isStopped()}\">\n            <a href=\"#\" ng-click=\"$ctrl.stop()\">Stop</a>\n          </li>\n          <li ng-class=\"{disabled: $ctrl.route.isStarted()}\">\n            <a href=\"#\" ng-click=\"$ctrl.delete()\">Delete</a>\n          </li>\n        </ul>\n      </div>\n    ",
+        template: "\n      <div class=\"dropdown camel-main-actions\" ng-show=\"$ctrl.isVisible()\"\n        hawtio-show object-name-model=\"$ctrl.route.mbean\" method-name=\"stop\" mode=\"remove\">\n        <button type=\"button\" id=\"dropdownMenu1\" class=\"btn btn-default dropdown-toggle\"\n          data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">\n          <span class=\"fa\" ng-class=\"{'fa-play': $ctrl.route.isStarted(), 'fa-stop': $ctrl.route.isStopped()}\"></span>\n          &nbsp;\n          {{$ctrl.route.state}}\n          &nbsp;\n          <span class=\"caret\"></span>\n        </button>\n        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu1\">\n          <li ng-class=\"{disabled: $ctrl.route.isStarted()}\">\n            <a href=\"#\" ng-click=\"$ctrl.start()\">Start</a>\n          </li>\n          <li ng-class=\"{disabled: $ctrl.route.isStopped()}\">\n            <a href=\"#\" ng-click=\"$ctrl.stop()\">Stop</a>\n          </li>\n          <li ng-class=\"{disabled: $ctrl.route.isStarted()}\">\n            <a href=\"#\" ng-click=\"$ctrl.delete()\">Delete</a>\n          </li>\n        </ul>\n      </div>\n    ",
         controller: RouteActionsController
     };
 })(Camel || (Camel = {}));
@@ -18226,6 +18227,7 @@ var Camel;
 (function (Camel) {
     Camel.BrowseEndpointController = Camel._module.controller("Camel.BrowseEndpointController", ["$scope", "$routeParams", "workspace", "jolokia", "$uibModal", function ($scope, $routeParams, workspace, jolokia, $uibModal) {
             $scope.workspace = workspace;
+            $scope.camelContextMBean = Camel.getSelectionCamelContextMBean(workspace);
             $scope.mode = 'text';
             $scope.gridOptions = Camel.createBrowseGridOptions();
             $scope.endpointUri = null;
@@ -18307,9 +18309,8 @@ var Camel;
                     mbean = workspace.getSelectedMBeanName();
                 }
                 if (mbean) {
-                    Camel.log.info("MBean: " + mbean);
-                    var options = Core.onSuccess(populateTable);
-                    jolokia.execute(mbean, 'browseAllMessagesAsXml(java.lang.Boolean)', true, options);
+                    Camel.log.info("MBean:", mbean);
+                    jolokia.execute(mbean, 'browseAllMessagesAsXml(java.lang.Boolean)', true, Core.onSuccess(populateTable));
                 }
             }
             function populateTable(response) {
@@ -18684,6 +18685,7 @@ var Camel;
             $scope.mode = 'text';
             // always show the message details
             $scope.showMessageDetails = true;
+            $scope.camelDebugMBean = Camel.getSelectionCamelDebugMBean(workspace);
             $scope.startDebugging = function () {
                 log.info("Start debugging");
                 setDebugging(true);
@@ -18819,7 +18821,7 @@ var Camel;
                 updateBreakpointNodes();
                 Core.$apply($scope);
             }
-            function onMessages(response, stopNodeId) {
+            function onMessages(response) {
                 log.debug("onMessage -> " + response);
                 $scope.messages = [];
                 if (response) {
@@ -18960,9 +18962,10 @@ var Camel;
                     var method = flag ? "enableDebugger" : "disableDebugger";
                     var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
                     var streams = Camel.traceOrDebugIncludeStreams(localStorage);
-                    jolokia.setAttribute(mbean, "BodyMaxChars", max);
-                    jolokia.setAttribute(mbean, "BodyIncludeStreams", streams);
-                    jolokia.setAttribute(mbean, "BodyIncludeFiles", streams);
+                    var options = Core.onSuccess(null);
+                    jolokia.setAttribute(mbean, "BodyMaxChars", max, options);
+                    jolokia.setAttribute(mbean, "BodyIncludeStreams", streams, options);
+                    jolokia.setAttribute(mbean, "BodyIncludeFiles", streams, options);
                     jolokia.execute(mbean, method, Core.onSuccess(breakpointsChanged));
                 }
             }
@@ -18987,7 +18990,7 @@ var Camel;
                         jolokia.execute(mbean, operation, name, Core.onSuccess(operationSuccess));
                     }
                     else {
-                        Core.notification("error", "Could not find the CamelContext MBean!");
+                        Core.notification("danger", "Could not find the CamelContext MBean!");
                     }
                 }
             };
@@ -20080,7 +20083,7 @@ var Camel;
                         operation: 'dumpRoutesStatsAsXml',
                         arguments: [true, true]
                         // the dumpRoutesStatsAsXml is not available in all Camel versions so do not barf on errors
-                    }, Core.onSuccess(statsCallback, { silent: true, error: false }));
+                    }, Core.onSuccess(statsCallback, { silent: true, error: function () { } }));
                 }
                 $scope.$emit("camel.diagram.layoutComplete");
             }
@@ -20366,10 +20369,10 @@ var Camel;
                             }
                             else {
                                 if (!mbean) {
-                                    Core.notification("error", "Could not find CamelContext MBean!");
+                                    Core.notification("danger", "Could not find CamelContext MBean!");
                                 }
                                 else {
-                                    Core.notification("error", "Failed to determine endpoint name!");
+                                    Core.notification("danger", "Failed to determine endpoint name!");
                                 }
                                 log.debug("Parsed context and endpoint: ", target);
                             }
@@ -20403,6 +20406,7 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.SourceController", ["$scope", "workspace", function ($scope, workspace) {
+            $scope.camelContextMBean = Camel.getSelectionCamelContextMBean(workspace);
             $scope.showUpdateButton = true;
             function getSource(routeXmlNode) {
                 function removeCrappyHeaders(idx, e) {
@@ -20496,7 +20500,7 @@ var Camel;
                         jolokia.execute(mbean, "addOrUpdateRoutesFromXml(java.lang.String)", decoded, Core.onSuccess(saveWorked));
                     }
                     else {
-                        Core.notification("error", "Could not find CamelContext MBean!");
+                        Core.notification("danger", "Could not find CamelContext MBean!");
                     }
                 }
             };
@@ -20712,8 +20716,7 @@ var Camel;
 /// <reference path="camelPlugin.ts"/>
 var Camel;
 (function (Camel) {
-    Camel._module.controller("Camel.TraceRouteController", ["$scope", "$timeout", "workspace", "jolokia", "localStorage", "tracerStatus",
-        function ($scope, $timeout, workspace, jolokia, localStorage, tracerStatus) {
+    Camel._module.controller("Camel.TraceRouteController", ["$scope", "$timeout", "workspace", "jolokia", "localStorage", "tracerStatus", function ($scope, $timeout, workspace, jolokia, localStorage, tracerStatus) {
             var log = Logger.get("CamelTracer");
             var MESSAGES_LIMIT = 500;
             $scope.tracing = false;
@@ -20721,6 +20724,7 @@ var Camel;
             $scope.message = null;
             $scope.messageIndex = -1;
             $scope.graphView = "plugins/camel/html/routeDiagram.html";
+            $scope.camelTraceMBean = Camel.getSelectionCamelTraceMBean(workspace);
             $scope.gridOptions = Camel.createBrowseGridOptions();
             $scope.gridOptions.selectWithCheckboxOnly = false;
             $scope.gridOptions.showSelectionCheckbox = false;
@@ -20876,9 +20880,10 @@ var Camel;
                     if (_.endsWith(mbean.toString(), "BacklogTracer")) {
                         var max = Camel.maximumTraceOrDebugBodyLength(localStorage);
                         var streams = Camel.traceOrDebugIncludeStreams(localStorage);
-                        jolokia.setAttribute(mbean, "BodyMaxChars", max);
-                        jolokia.setAttribute(mbean, "BodyIncludeStreams", streams);
-                        jolokia.setAttribute(mbean, "BodyIncludeFiles", streams);
+                        var options = Core.onSuccess(null);
+                        jolokia.setAttribute(mbean, "BodyMaxChars", max, options);
+                        jolokia.setAttribute(mbean, "BodyIncludeStreams", streams, options);
+                        jolokia.setAttribute(mbean, "BodyIncludeFiles", streams, options);
                     }
                     jolokia.setAttribute(mbean, "Enabled", flag, Core.onSuccess(tracingChanged));
                 }
@@ -21607,13 +21612,14 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     var FeaturesController = /** @class */ (function () {
-        FeaturesController.$inject = ["featuresService", "$uibModal", "$scope"];
-        function FeaturesController(featuresService, $uibModal, $scope) {
+        FeaturesController.$inject = ["featuresService", "$uibModal", "$scope", "workspace"];
+        function FeaturesController(featuresService, $uibModal, $scope, workspace) {
             'ngInject';
             var _this = this;
             this.featuresService = featuresService;
             this.$uibModal = $uibModal;
             this.$scope = $scope;
+            this.workspace = workspace;
             this.features = [];
             this.repositoryFilterValues = [];
             this.listConfig = {
@@ -21622,42 +21628,95 @@ var Karaf;
             };
             this.loading = true;
             this.listItems = null;
-            this.listItemActionButtons = [
-                {
-                    name: 'Install',
-                    actionFn: function (action, item) {
-                        action.selectedId = item.id;
-                        _this.featuresService.installFeature(item)
-                            .then(function (response) {
-                            Core.notification('success', response);
-                            _this.loadFeatureRepositories();
-                            action.selectedId = null;
-                        })
-                            .catch(function (error) {
-                            Core.notification('danger', error);
-                            action.selectedId = null;
-                        });
-                    },
-                    selectedId: null
+            this.installButton = {
+                name: 'Install',
+                actionFn: function (action, item) {
+                    action.selectedId = item.id;
+                    _this.featuresService.installFeature(item)
+                        .then(function (response) {
+                        Core.notification('success', response);
+                        _this.loadFeatureRepositories();
+                        action.selectedId = null;
+                    })
+                        .catch(function (error) {
+                        Core.notification('danger', error);
+                        action.selectedId = null;
+                    });
                 },
-                {
-                    name: 'Uninstall',
-                    actionFn: function (action, item) {
-                        action.selectedId = item.id;
-                        _this.featuresService.uninstallFeature(item)
-                            .then(function (response) {
-                            Core.notification('success', response);
-                            _this.loadFeatureRepositories();
-                            action.selectedId = null;
-                        })
-                            .catch(function (error) {
-                            Core.notification('danger', error);
-                            action.selectedId = null;
-                        });
-                    },
-                    selectedId: null
+                selectedId: null
+            };
+            this.uninstallButton = {
+                name: 'Uninstall',
+                actionFn: function (action, item) {
+                    action.selectedId = item.id;
+                    _this.featuresService.uninstallFeature(item)
+                        .then(function (response) {
+                        Core.notification('success', response);
+                        _this.loadFeatureRepositories();
+                        action.selectedId = null;
+                    })
+                        .catch(function (error) {
+                        Core.notification('danger', error);
+                        action.selectedId = null;
+                    });
+                },
+                selectedId: null
+            };
+            this.listItemActionButtons = this.itemActionButtons();
+            this.addRepositoryAction = {
+                name: 'Add repository',
+                actionFn: function (action) {
+                    _this.$uibModal.open({
+                        templateUrl: 'addRepositoryDialog.html',
+                        scope: _this.$scope
+                    })
+                        .result.then(function () {
+                        if (_this.repositoryUri) {
+                            _this.featuresService.addFeatureRepository(_this.repositoryUri)
+                                .then(function (response) {
+                                Core.notification('success', response);
+                                _this.loadFeatureRepositories();
+                            })
+                                .catch(function (error) { return Core.notification('danger', error); });
+                        }
+                        _this.repositoryUri = null;
+                    });
                 }
-            ];
+            };
+            this.removeRepositoryAction = {
+                name: 'Remove repository',
+                actionFn: function (action) {
+                    _this.$uibModal.open({
+                        templateUrl: 'removeRepositoryDialog.html',
+                        scope: _this.$scope
+                    })
+                        .result.then(function () {
+                        if (_this.selectedRepository) {
+                            var dependentRepositories_1 = [];
+                            angular.forEach(_this.repositories, function (repository) {
+                                if (repository.name !== _this.selectedRepository.name) {
+                                    angular.forEach(repository.dependencies, function (dependency) {
+                                        if (dependency === _this.selectedRepository.uri) {
+                                            dependentRepositories_1.push(repository.name);
+                                        }
+                                    });
+                                }
+                            });
+                            if (dependentRepositories_1.length > 0) {
+                                Core.notification('danger', "Unable to remove repository " + _this.selectedRepository.name + ". It is required by " + dependentRepositories_1 + ".");
+                                return;
+                            }
+                            _this.featuresService.removeFeatureRepository(_this.selectedRepository)
+                                .then(function (response) {
+                                Core.notification('success', response);
+                                _this.loadFeatureRepositories();
+                            })
+                                .catch(function (error) { return Core.notification('danger', error); });
+                        }
+                        _this.selectedRepository = null;
+                    });
+                }
+            };
             this.toolbarConfig = {
                 filterConfig: {
                     fields: [
@@ -21691,70 +21750,37 @@ var Karaf;
                     resultsCount: 0
                 },
                 actionsConfig: {
-                    primaryActions: [
-                        {
-                            name: 'Add repository',
-                            actionFn: function (action) {
-                                _this.$uibModal.open({
-                                    templateUrl: 'addRepositoryDialog.html',
-                                    scope: _this.$scope
-                                })
-                                    .result
-                                    .then(function () {
-                                    if (_this.repositoryUri) {
-                                        _this.featuresService.addFeatureRepository(_this.repositoryUri)
-                                            .then(function (response) {
-                                            Core.notification('success', response);
-                                            _this.loadFeatureRepositories();
-                                        })
-                                            .catch(function (error) { return Core.notification('danger', error); });
-                                    }
-                                    _this.repositoryUri = null;
-                                });
-                            }
-                        },
-                        {
-                            name: 'Remove repository',
-                            actionFn: function (action) {
-                                _this.$uibModal.open({
-                                    templateUrl: 'removeRepositoryDialog.html',
-                                    scope: _this.$scope
-                                })
-                                    .result
-                                    .then(function () {
-                                    if (_this.selectedRepository) {
-                                        var dependentRepositories_1 = [];
-                                        angular.forEach(_this.repositories, function (repository) {
-                                            if (repository.name !== _this.selectedRepository.name) {
-                                                angular.forEach(repository.dependencies, function (dependency) {
-                                                    if (dependency === _this.selectedRepository.uri) {
-                                                        dependentRepositories_1.push(repository.name);
-                                                    }
-                                                });
-                                            }
-                                        });
-                                        if (dependentRepositories_1.length > 0) {
-                                            Core.notification('danger', "Unable to remove repository " + _this.selectedRepository.name + ". It is required by " + dependentRepositories_1 + ".");
-                                            return;
-                                        }
-                                        _this.featuresService.removeFeatureRepository(_this.selectedRepository)
-                                            .then(function (response) {
-                                            Core.notification('success', response);
-                                            _this.loadFeatureRepositories();
-                                        })
-                                            .catch(function (error) { return Core.notification('danger', error); });
-                                    }
-                                    _this.selectedRepository = null;
-                                });
-                            }
-                        }
-                    ]
+                    primaryActions: this.toolbarActions()
                 },
                 isTableView: false
             };
         }
         FeaturesController.prototype.$onInit = function () {
             this.loadFeatureRepositories();
+        };
+        FeaturesController.prototype.itemActionButtons = function () {
+            var buttons = [];
+            var featuresMBean = Karaf.getSelectionFeaturesMBean(this.workspace);
+            if (this.workspace.hasInvokeRightsForName(featuresMBean, 'installFeature')) {
+                buttons.push(this.installButton);
+            }
+            if (this.workspace.hasInvokeRightsForName(featuresMBean, 'uninstallFeature')) {
+                buttons.push(this.uninstallButton);
+            }
+            Karaf.log.debug("RBAC - Rendered features buttons:", buttons);
+            return buttons;
+        };
+        FeaturesController.prototype.toolbarActions = function () {
+            var actions = [];
+            var featuresMBean = Karaf.getSelectionFeaturesMBean(this.workspace);
+            if (this.workspace.hasInvokeRightsForName(featuresMBean, 'addRepository')) {
+                actions.push(this.addRepositoryAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(featuresMBean, 'removeRepository')) {
+                actions.push(this.removeRepositoryAction);
+            }
+            Karaf.log.debug("RBAC - Rendered features actions:", actions);
+            return actions;
         };
         FeaturesController.prototype.loadFeatureRepositories = function () {
             var _this = this;
@@ -21925,11 +21951,12 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     var ScrComponentsController = /** @class */ (function () {
-        ScrComponentsController.$inject = ["scrComponentsService"];
-        function ScrComponentsController(scrComponentsService) {
+        ScrComponentsController.$inject = ["scrComponentsService", "workspace"];
+        function ScrComponentsController(scrComponentsService, workspace) {
             'ngInject';
             var _this = this;
             this.scrComponentsService = scrComponentsService;
+            this.workspace = workspace;
             this.activateAction = {
                 name: 'Activate',
                 actionFn: function (action) {
@@ -21943,7 +21970,7 @@ var Karaf;
                 },
                 isDisabled: true
             };
-            this.deActivateAction = {
+            this.deactivateAction = {
                 name: 'Deactivate',
                 actionFn: function (action) {
                     var selectedComponents = _this.getSelectedComponents();
@@ -21990,10 +22017,7 @@ var Karaf;
                     resultsCount: 0
                 },
                 actionsConfig: {
-                    primaryActions: [
-                        this.activateAction,
-                        this.deActivateAction
-                    ]
+                    primaryActions: this.toolbarActions()
                 },
                 isTableView: true
             };
@@ -22008,6 +22032,18 @@ var Karaf;
             this.tableItems = null;
             this.loading = true;
         }
+        ScrComponentsController.prototype.toolbarActions = function () {
+            var actions = [];
+            var scrMBean = Karaf.getSelectionScrMBean(this.workspace);
+            if (this.workspace.hasInvokeRightsForName(scrMBean, 'activateComponent')) {
+                actions.push(this.activateAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(scrMBean, 'deactivateComponent')) {
+                actions.push(this.deactivateAction);
+            }
+            Karaf.log.debug("RBAC - Rendered SCR actions:", actions);
+            return actions;
+        };
         ScrComponentsController.prototype.$onInit = function () {
             this.loadComponents();
         };
@@ -22034,7 +22070,7 @@ var Karaf;
             var selectedComponents = this.getSelectedComponents();
             var noComponentsSelected = selectedComponents.length === 0;
             this.activateAction.isDisabled = noComponentsSelected || selectedComponents.every(function (component) { return component.state === 'Active'; });
-            this.deActivateAction.isDisabled = noComponentsSelected || selectedComponents.every(function (component) { return component.state !== 'Active'; });
+            this.deactivateAction.isDisabled = noComponentsSelected || selectedComponents.every(function (component) { return component.state !== 'Active'; });
         };
         ScrComponentsController.prototype.getSelectedComponents = function () {
             var _this = this;
@@ -22070,6 +22106,7 @@ var Karaf;
             this.workspace = workspace;
             this.srcComponentsUrl = Core.url('/osgi/scr-components' + this.workspace.hash());
             this.loading = true;
+            this.scrMBean = Karaf.getSelectionScrMBean(this.workspace);
         }
         ScrComponentDetailController.prototype.$onInit = function () {
             this.loadComponent();
@@ -22159,6 +22196,7 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     Karaf._module.controller("Karaf.FeatureController", ["$scope", "jolokia", "workspace", "$routeParams", function ($scope, jolokia, workspace, $routeParams) {
+            $scope.featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
             $scope.name = $routeParams['name'];
             $scope.version = $routeParams['version'];
             $scope.bundlesByLocation = {};
@@ -23171,15 +23209,16 @@ var Osgi;
     Osgi.BundlesService = BundlesService;
 })(Osgi || (Osgi = {}));
 /// <reference path="bundle.ts"/>
-/// <reference path="bundles-service.ts"/>
+/// <reference path="bundles.service.ts"/>
 var Osgi;
 (function (Osgi) {
     var BundlesController = /** @class */ (function () {
-        BundlesController.$inject = ["bundlesService"];
-        function BundlesController(bundlesService) {
+        BundlesController.$inject = ["bundlesService", "workspace"];
+        function BundlesController(bundlesService, workspace) {
             'ngInject';
             var _this = this;
             this.bundlesService = bundlesService;
+            this.workspace = workspace;
             this.startAction = {
                 name: 'Start',
                 actionFn: function (action) {
@@ -23292,13 +23331,7 @@ var Osgi;
                     resultsCount: 0
                 },
                 actionsConfig: {
-                    primaryActions: [
-                        this.startAction,
-                        this.stopAction,
-                        this.refreshAction,
-                        this.updateAction,
-                        this.uninstallAction
-                    ]
+                    primaryActions: this.toolbarActions()
                 },
                 isTableView: true
             };
@@ -23329,6 +23362,27 @@ var Osgi;
                 _this.enableDisableActions();
                 _this.loading = false;
             });
+        };
+        BundlesController.prototype.toolbarActions = function () {
+            var actions = [];
+            var frameworkMBean = Osgi.getSelectionFrameworkMBean(this.workspace);
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'startBundle')) {
+                actions.push(this.startAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'stopBundle')) {
+                actions.push(this.stopAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'refreshBundle')) {
+                actions.push(this.refreshAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'updateBundle')) {
+                actions.push(this.updateAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'uninstallBundle')) {
+                actions.push(this.uninstallAction);
+            }
+            Osgi.log.debug("RBAC - Rendered bundles actions:", actions);
+            return actions;
         };
         BundlesController.prototype.applyFilters = function (filters) {
             var filteredBundles = this.bundles;
@@ -23380,10 +23434,12 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     var InstallBundleController = /** @class */ (function () {
-        InstallBundleController.$inject = ["bundlesService"];
-        function InstallBundleController(bundlesService) {
+        InstallBundleController.$inject = ["bundlesService", "workspace"];
+        function InstallBundleController(bundlesService, workspace) {
             'ngInject';
             this.bundlesService = bundlesService;
+            this.workspace = workspace;
+            this.frameworkMBean = Osgi.getSelectionFrameworkMBean(this.workspace);
         }
         InstallBundleController.prototype.install = function (bundleUrl) {
             var _this = this;
@@ -23398,16 +23454,16 @@ var Osgi;
     }());
     Osgi.InstallBundleController = InstallBundleController;
     Osgi.installBundleComponent = {
-        template: "\n      <div class=\"row install-bundle\">\n        <div class=\"col-lg-6\">\n        </div>\n        <div class=\"col-lg-6\">\n          <div class=\"input-group\">\n            <input type=\"text\" class=\"form-control\" placeholder=\"Bundle URL...\" ng-model=\"bundleUrl\">\n            <span class=\"input-group-btn\">\n              <button type=\"button\" class=\"btn btn-default\" ng-click=\"$ctrl.install(bundleUrl)\">\n                Install\n              </button>\n            </span>\n          </div>\n        </div>\n      </div>\n    ",
+        template: "\n      <div class=\"row install-bundle\"\n          hawtio-show object-name=\"{{$ctrl.frameworkMBean}}\" method-name=\"installBundle\">\n        <div class=\"col-lg-6\">\n          <div class=\"input-group\">\n            <input type=\"text\" class=\"form-control\" placeholder=\"Bundle URL...\" ng-model=\"bundleUrl\">\n            <span class=\"input-group-btn\">\n              <button type=\"button\" class=\"btn btn-default\" ng-click=\"$ctrl.install(bundleUrl)\">\n                Install\n              </button>\n            </span>\n          </div>\n        </div>\n        <div class=\"col-lg-6\">\n        </div>\n      </div>\n    ",
         controller: InstallBundleController,
         bindings: {
             onInstall: '&'
         }
     };
 })(Osgi || (Osgi = {}));
-/// <reference path="bundles-component.ts"/>
-/// <reference path="install-bundle-component.ts"/>
-/// <reference path="bundles-service.ts"/>
+/// <reference path="bundles.component.ts"/>
+/// <reference path="install-bundle.component.ts"/>
+/// <reference path="bundles.service.ts"/>
 var Osgi;
 (function (Osgi) {
     Osgi.bundlesModule = angular
@@ -23469,6 +23525,7 @@ var Osgi;
             var CAMEL_SERVICE = { id: 'CAMEL', name: 'Camel' };
             var CXF_SERVICE = { id: 'CXF', name: 'CXF' };
             var PLATFORM_SERVICE = { id: 'PLATFORM', name: 'Platform' };
+            $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
             $scope.availableServices = [
                 ACTIVEMQ_SERVICE,
                 CAMEL_SERVICE,
@@ -23536,18 +23593,18 @@ var Osgi;
                                             Core.$apply($scope);
                                         },
                                         error: function (response) {
-                                            Core.notification("error", response.error);
+                                            Core.notification("danger", response.error);
                                         }
                                     });
                                 }
                             },
                             error: function (response) {
-                                Core.notification("error", response.error);
+                                Core.notification("danger", response.error);
                             }
                         });
                     },
                     error: function (response) {
-                        Core.notification("error", response.error);
+                        Core.notification("danger", response.error);
                     }
                 });
             };
@@ -23696,6 +23753,8 @@ var Osgi;
         return rv.toString();
     }
     Osgi._module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokia", function ($scope, $location, workspace, $routeParams, jolokia) {
+            $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
+            $scope.osgiToolsMBean = Osgi.getHawtioOSGiToolsMBean(workspace);
             $scope.bundleId = $routeParams.bundleId;
             $scope.classLoadingAlert = null;
             updateTableContents();
@@ -23954,6 +24013,10 @@ var Osgi;
                     title: "Configuration which does not yet have any bound values"
                 }
             };
+            var addConfigurationAction = {
+                name: 'Add configuration',
+                actionFn: openAddPidDialog
+            };
             $scope.toolbarConfig = {
                 filterConfig: {
                     fields: [
@@ -23979,49 +24042,61 @@ var Osgi;
                     }
                 },
                 actionsConfig: {
-                    primaryActions: [
-                        {
-                            name: 'Add configuration',
-                            actionFn: openAddPidDialog
-                        }
-                    ]
+                    primaryActions: toolbarActions()
                 }
             };
             $scope.listViewConfig = {
                 showSelectBox: false
             };
-            $scope.listViewMenuItems = [
-                {
-                    name: 'Delete',
-                    actionFn: function (action, item) {
-                        var modalScope = $scope.$new(true);
-                        modalScope.item = item;
-                        $uibModal.open({
-                            templateUrl: 'deletePidDialog.html',
-                            scope: modalScope
-                        })
-                            .result.then(function () {
-                            var mbean = Osgi.getSelectionConfigAdminMBean(workspace);
-                            if (mbean) {
-                                jolokia.request({
-                                    type: "exec",
-                                    mbean: mbean,
-                                    operation: 'delete',
-                                    arguments: [item.pid]
-                                }, {
-                                    success: function (response) {
-                                        var i = $scope.configurations.indexOf(item);
-                                        $scope.configurations.splice(i, 1);
-                                        Core.notification("success", "Successfully deleted pid: " + item.pid);
-                                    },
-                                    error: function (response) { return Core.notification("error", response.error); }
-                                });
-                            }
-                        })
-                            .catch(function () { return undefined; });
-                    }
+            var deleteItemAction = {
+                name: 'Delete',
+                actionFn: function (action, item) {
+                    var modalScope = $scope.$new(true);
+                    modalScope.item = item;
+                    $uibModal.open({
+                        templateUrl: 'deletePidDialog.html',
+                        scope: modalScope
+                    })
+                        .result.then(function () {
+                        var mbean = Osgi.getSelectionConfigAdminMBean(workspace);
+                        if (mbean) {
+                            jolokia.request({
+                                type: "exec",
+                                mbean: mbean,
+                                operation: 'delete',
+                                arguments: [item.pid]
+                            }, {
+                                success: function (response) {
+                                    var i = $scope.configurations.indexOf(item);
+                                    $scope.configurations.splice(i, 1);
+                                    Core.notification("success", "Successfully deleted pid: " + item.pid);
+                                },
+                                error: function (response) { return Core.notification("danger", response.error); }
+                            });
+                        }
+                    })
+                        .catch(function () { return undefined; });
                 }
-            ];
+            };
+            $scope.listViewMenuItems = itemMenuActions();
+            function toolbarActions() {
+                var actions = [];
+                var hawtioConfigAdminMBean = Osgi.getHawtioConfigAdminMBean(workspace);
+                if (workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
+                    actions.push(addConfigurationAction);
+                }
+                Osgi.log.debug("RBAC - Rendered configuration actions:", actions);
+                return actions;
+            }
+            function itemMenuActions() {
+                var actions = [];
+                var configAdminMBean = Osgi.getSelectionConfigAdminMBean(workspace);
+                if (workspace.hasInvokeRightsForName(configAdminMBean, 'delete')) {
+                    actions.push(deleteItemAction);
+                }
+                Osgi.log.debug("RBAC - Rendered configuration item actions:", actions);
+                return actions;
+            }
             function applyFilters(filters) {
                 var filteredConfigurations = $scope.configurations;
                 filters.forEach(function (filter) {
@@ -24046,7 +24121,7 @@ var Osgi;
                 })
                     .result.then(function (newPid) {
                     if ($scope.configurations.some(function (c) { return c['pid'] == newPid; })) {
-                        Core.notification("error", "pid \"" + newPid + "\" already exists.");
+                        Core.notification("danger", "pid \"" + newPid + "\" already exists.");
                         return;
                     }
                     var mbean = Osgi.getHawtioConfigAdminMBean(workspace);
@@ -24346,7 +24421,7 @@ var Osgi;
             function errorHandler(message) {
                 return {
                     error: function (response) {
-                        Core.notification("error", message + response['error'] || response);
+                        Core.notification("danger", message + response['error'] || response);
                         Core.defaultJolokiaErrorHandler(response);
                     }
                 };
@@ -24363,10 +24438,11 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi._module.controller("Osgi.FrameworkController", ["$scope", "workspace", function ($scope, workspace) {
+            $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
             var showNotification;
             $scope.save = function () {
                 if (parseInt($scope.config.startLevel) < parseInt($scope.config.initialBundleStartLevel)) {
-                    Core.notification("error", "Can't set Framework Start Level below Initial Bundle Start Level");
+                    Core.notification("danger", "Can't set Framework Start Level below Initial Bundle Start Level");
                 }
                 else {
                     var mbean = Osgi.getSelectionFrameworkMBean(workspace);
@@ -24378,7 +24454,7 @@ var Osgi;
                         ], {
                             error: function (response) {
                                 if (showNotification) {
-                                    Core.notification("error", response.error);
+                                    Core.notification("danger", response.error);
                                     showNotification = false;
                                 }
                             },
@@ -24520,16 +24596,10 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi.TopLevelController = Osgi._module.controller("Osgi.TopLevelController", ["$scope", "workspace", function ($scope, workspace) {
-            $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
             $scope.bundleMBean = Osgi.getSelectionBundleMBean(workspace);
             $scope.serviceMBean = Osgi.getSelectionServiceMBean(workspace);
             $scope.packageMBean = Osgi.getSelectionPackageMBean(workspace);
-            $scope.configAdminMBean = Osgi.getSelectionConfigAdminMBean(workspace);
             $scope.metaTypeMBean = Osgi.getMetaTypeMBean(workspace);
-            $scope.osgiToolsMBean = Osgi.getHawtioOSGiToolsMBean(workspace);
-            $scope.hawtioConfigAdminMBean = Osgi.getHawtioConfigAdminMBean(workspace);
-            $scope.scrMBean = Karaf.getSelectionScrMBean(workspace);
-            $scope.featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
         }]);
 })(Osgi || (Osgi = {}));
 /// <reference path="osgiHelpers.ts"/>
@@ -24745,12 +24815,23 @@ var Osgi;
             };
             $scope.toolbarConfig = {
                 actionsConfig: {
-                    primaryActions: [
-                        addPropertyAction,
-                        editPropertiesAction
-                    ]
+                    primaryActions: toolbarActions()
                 }
             };
+            function toolbarActions() {
+                var actions = [];
+                var hawtioConfigAdminMBean = Osgi.getHawtioConfigAdminMBean(workspace);
+                var configAdminMBean = Osgi.getSelectionConfigAdminMBean(workspace);
+                if (workspace.hasInvokeRightsForName(configAdminMBean, 'createFactoryConfiguration')
+                    && workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
+                    actions.push(addPropertyAction);
+                }
+                if (workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
+                    actions.push(editPropertiesAction);
+                }
+                Osgi.log.debug("RBAC - Rendered pid actions:", actions);
+                return actions;
+            }
             var startInEditMode = $scope.factoryPid && !$routeParams['pid'];
             $scope.editMode = startInEditMode;
             $scope.$on("hawtio.form.modelChange", function () {
@@ -24831,7 +24912,7 @@ var Osgi;
             function errorHandler(message) {
                 return {
                     error: function (response) {
-                        Core.notification("error", message + "\n" + response['error'] || response);
+                        Core.notification("danger", message + "\n" + response['error'] || response);
                         Core.defaultJolokiaErrorHandler(response);
                     }
                 };
@@ -25784,7 +25865,7 @@ var Camel;
     });
 })(Camel || (Camel = {}));
 
-angular.module('hawtio-integration-templates', []).run(['$templateCache', function($templateCache) {$templateCache.put('plugins/activemq/html/browseQueue.html','<div ng-controller="ActiveMQ.BrowseQueueController">\n\n  <h1>Browse Queue</h1>\n\n  <div ng-hide="showMessageDetails">\n    <div class="row toolbar-pf table-view-pf-toolbar">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group toolbar-pf-filter has-clear">\n            <div class="search-pf-input-group">\n              <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n              <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n              <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                <span class="pficon pficon-close"></span>\n              </button>\n            </div>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="dlq" ng-click="retryMessages()"\n                title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">\n                Retry\n              </button>\n              <button class="btn btn-default" ng-disabled="gridOptions.selectedItems.length !== 1" ng-show="showButtons" ng-click="resendMessage()"\n                title="Edit the message to resend it" data-placement="bottom">\n                Resend\n              </button>\n\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                title="Delete the selected messages">\n                Delete\n              </button>\n              <button class="btn btn-default" ng-click="refresh()"\n                title="Refreshes the list of messages">\n                <i class="fa fa-refresh"></i>\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n    <table class="table table-striped table-bordered table-hover activemq-browse-table" hawtio-simple-table="gridOptions"></table>\n  </div>\n\n  <div ng-show="showMessageDetails">\n    <div class="row toolbar-pf">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions">\n          <div class="form-group">\n            <button class="btn btn-primary" ng-click="showMessageDetails = false">\n              Back\n            </button>\n          </div>\n\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                title="Delete the selected messages">\n                Delete\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>\n\n    <div class="expandable closed">\n      <div title="Headers" class="title">\n        <h3><i class="expandable-indicator"></i> Headers & Properties</h3>\n      </div>\n      <div class="expandable-body well">\n        <table class="table table-condensed table-striped table-bordered table-hover">\n          <thead>\n            <tr>\n              <th>Header</th>\n              <th>Value</th>\n            </tr>\n          </thead>\n          <tbody compile="row.headerHtml"></tbody>\n        </table>\n      </div>\n    </div>\n\n    <h3>Displaying body as <span ng-bind="row.textMode"></span></h3>\n    <div hawtio-editor="row.bodyText" read-only="true" mode=\'mode\'></div>\n\n  </div>\n\n  <div hawtio-confirm-dialog="deleteDialog" title="Delete messages?"\n       ok-button-text="Delete"\n       cancel-button-text="Cancel"\n       on-ok="deleteMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        This operation cannot be undone so please be careful.\n      </p>\n      <p>You are about to delete\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'a message!\', \'other\': \'{} messages!\'}">\n        </ng-pluralize>\n      </p>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="moveDialog" title="Move messages?"\n       ok-button-text="Move"\n       cancel-button-text="Cancel"\n       on-ok="moveMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        You cannot undo this operation.<br/>\n        Though after the move you can always move the\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'messages\'}"></ng-pluralize>\n        back again.\n      </p>\n      <p>Move\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'{} messages\'}"></ng-pluralize>\n        to: <select ng-model="queueName" ng-options="qn for qn in queueNames" ng-init="queueName=queueNames[0]"></select>\n      </p>\n    </div>\n  </div>\n\n</div>\n\n');
+angular.module('hawtio-integration-templates', []).run(['$templateCache', function($templateCache) {$templateCache.put('plugins/activemq/html/browseQueue.html','<div ng-controller="ActiveMQ.BrowseQueueController">\n\n  <h1>Browse Queue</h1>\n\n  <div ng-hide="showMessageDetails">\n    <div class="row toolbar-pf table-view-pf-toolbar">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group toolbar-pf-filter has-clear">\n            <div class="search-pf-input-group">\n              <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n              <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n              <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                <span class="pficon pficon-close"></span>\n              </button>\n            </div>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="dlq" ng-click="retryMessages()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="retryMessage" mode="remove"\n                title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">\n                Retry\n              </button>\n              <button class="btn btn-default" ng-disabled="gridOptions.selectedItems.length !== 1" ng-show="showButtons" ng-click="resendMessage()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendTextMessage" mode="remove"\n                title="Edit the message to resend it" data-placement="bottom">\n                Resend\n              </button>\n\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n              <button class="btn btn-default" ng-click="refresh()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="browse" mode="remove"\n                title="Refreshes the list of messages">\n                <i class="fa fa-refresh"></i>\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n    <table class="table table-striped table-bordered table-hover activemq-browse-table" hawtio-simple-table="gridOptions"></table>\n  </div>\n\n  <div ng-show="showMessageDetails">\n    <div class="row toolbar-pf">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions">\n          <div class="form-group">\n            <button class="btn btn-primary" ng-click="showMessageDetails = false">\n              Back\n            </button>\n          </div>\n\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>\n\n    <div class="expandable closed">\n      <div title="Headers" class="title">\n        <h3><i class="expandable-indicator"></i> Headers & Properties</h3>\n      </div>\n      <div class="expandable-body well">\n        <table class="table table-condensed table-striped table-bordered table-hover">\n          <thead>\n            <tr>\n              <th>Header</th>\n              <th>Value</th>\n            </tr>\n          </thead>\n          <tbody compile="row.headerHtml"></tbody>\n        </table>\n      </div>\n    </div>\n\n    <h3>Displaying body as <span ng-bind="row.textMode"></span></h3>\n    <div hawtio-editor="row.bodyText" read-only="true" mode=\'mode\'></div>\n\n  </div>\n\n  <div hawtio-confirm-dialog="deleteDialog" title="Delete messages?"\n       ok-button-text="Delete"\n       cancel-button-text="Cancel"\n       on-ok="deleteMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        This operation cannot be undone so please be careful.\n      </p>\n      <p>You are about to delete\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'a message!\', \'other\': \'{} messages!\'}">\n        </ng-pluralize>\n      </p>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="moveDialog" title="Move messages?"\n       ok-button-text="Move"\n       cancel-button-text="Cancel"\n       on-ok="moveMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        You cannot undo this operation.<br/>\n        Though after the move you can always move the\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'messages\'}"></ng-pluralize>\n        back again.\n      </p>\n      <p>Move\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'{} messages\'}"></ng-pluralize>\n        to: <select ng-model="queueName" ng-options="qn for qn in queueNames" ng-init="queueName=queueNames[0]"></select>\n      </p>\n    </div>\n  </div>\n\n</div>\n\n');
 $templateCache.put('plugins/activemq/html/createDestination.html','<p>\n  <div class="alert alert-info">\n    <span class="pficon pficon-info"></span>The JMS API does not define a standard\n    address syntax. Although a standard address syntax was considered, it was decided\n    that the differences in address semantics between existing message-oriented\n    middleware (MOM) products were too wide to bridge with a single syntax.\n  </div>\n</p>\n\n<form class="form-horizontal">\n\n  <div class="form-group">\n    <label class="col-sm-2 control-label" for="name-markup">{{$ctrl.destinationType}} name</label>\n\n    <div class="col-sm-10">\n      <input id="name-markup" class="form-control" type="text" maxlength="300"\n             name="destinationName" ng-model="$ctrl.destinationName" placeholder="{{$ctrl.destinationType}} name"/>\n    </div>\n  </div>\n  <div class="form-group">\n    <label class="col-sm-2 control-label">Destination type</label>\n\n    <div class="col-sm-10">\n      <label class="checkbox">\n        <input type="radio" ng-model="$ctrl.destinationType" value="Queue"> Queue\n      </label>\n      <label class="checkbox">\n        <input type="radio" ng-model="$ctrl.destinationType" value="Topic"> Topic\n      </label>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <div class="col-sm-offset-2 col-sm-10">\n      <button type="submit" class="btn btn-primary"\n              ng-click="$ctrl.validateAndCreateDestination($ctrl.destinationName, $ctrl.destinationType)"\n              ng-disabled="!$ctrl.destinationName">Create {{$ctrl.destinationType}}\n      </button>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="$ctrl.createDialog"\n        ok-button-text="Create"\n        cancel-button-text="Cancel"\n        on-ok="$ctrl.createDestination($ctrl.destinationName, $ctrl.destinationType)">\n    <div class="dialog-body">\n      <p>{{$ctrl.destinationType}} name <b>{{$ctrl.destinationName}}</b> contains unrecommended characters: <code>:</code></p>\n      <p>This may cause unexpected problems. Are you really sure to create this {{$ctrl.uncapitalisedDestinationType()}}?</p>\n    </div>\n  </div>\n\n</form>\n');
 $templateCache.put('plugins/activemq/html/deleteQueue.html','<p>\n  <div class="alert alert-warning">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    These operations cannot be undone. Please be careful!\n  </div>\n</p>\n\n<div class="row">\n  <div class="col-md-6">\n    <div class="control-group">\n      <button type="submit" class="btn btn-warning" ng-click="$ctrl.deleteDialog = true">\n        Delete queue \'{{$ctrl.selectedShortName()}}\'\n      </button>\n      <label>Removes the queue completely.</label>\n    </div>\n  </div>\n  <div class="col-md-6">\n    <div class="control-group">\n      <button type="submit" class="btn btn-warning" ng-click="$ctrl.purgeDialog = true">\n        Purge queue \'{{$ctrl.selectedShortName()}}\'\n      </button>\n      <label>Purges all the current messages on the queue.</label>\n    </div>\n  </div>\n</div>\n\n<div hawtio-confirm-dialog="$ctrl.deleteDialog"\n     title="Confirm delete queue"\n     ok-button-text="Delete"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.deleteDestination()">\n  <div class="dialog-body">\n    <p>You are about to delete the <b>{{$ctrl.selectedName()}}</b> queue.</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n\n<div hawtio-confirm-dialog="$ctrl.purgeDialog"\n     title="Confirm purge queue"\n     ok-button-text="Purge"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.purgeDestination()">\n  <div class="dialog-body">\n    <p>You are about to purge the <b>{{$ctrl.selectedName()}}</b> queue</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/deleteTopic.html','<p>\n  <div class="alert alert-warning">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    This operation cannot be undone. Please be careful!\n  </div>\n</p>\n\n<div class="row">\n  <div class="col-md-12">\n    <div class="control-group">\n      <button type="submit" class="btn btn-warning" ng-click="$ctrl.deleteDialog = true">\n        Delete topic \'{{$ctrl.selectedName()}}\'\n      </button>\n      <label>Removes the topic completely.</label>\n    </div>\n  </div>\n</div>\n\n<div hawtio-confirm-dialog="$ctrl.deleteDialog"\n     title="Confirm delete topic"\n     ok-button-text="Delete"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.deleteDestination()">\n  <div class="dialog-body">\n    <p>You are about to delete the <b>{{$ctrl.selectedName()}}</b> topic.</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n');
@@ -25794,12 +25875,12 @@ $templateCache.put('plugins/activemq/html/jobs.html','<div ng-controller="Active
 $templateCache.put('plugins/activemq/html/layoutActiveMQTree.html','<div class="tree-nav-layout">\n\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n\n    <div class="tree-nav-sidebar-header" ng-controller="ActiveMQ.TreeHeaderController">\n      <form role="form" class="search-pf has-button">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="input-search" class="sr-only">Search Tree:</label>\n            <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n              ng-model="filter">\n            <button type="button" class="clear" aria-hidden="true"\n              ng-hide="filter.length === 0"\n              ng-click="filter = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group tree-nav-buttons">\n          <span class="badge" ng-class="{positive: result.length > 0}"\n            ng-show="filter.length > 0">\n            {{result.length}}\n          </span>\n          <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>\n          <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>\n        </div>\n      </form>\n    </div>\n\n    <div class="tree-nav-sidebar-content" ng-controller="ActiveMQ.TreeController">\n      <div class="spinner spinner-lg" ng-hide="treeFetched()"></div>\n      <div id="activemqtree" class="treeview-pf-hover treeview-pf-select"></div>\n    </div>\n\n  </div>\n\n  <div class="tree-nav-main">\n    <jmx-header></jmx-header>\n    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="ActiveMQ.TabsController">\n      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">\n        <a ng-href="#" ng-click="goto(tab.path)">{{tab.title}}</a>\n      </li>\n      <li class="dropdown overflow">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          More <span class="caret"></span>\n        </a>\n        <ul class="dropdown-menu" role="menu"></ul>\n      </li>\n    </ul>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/preferences.html','<div ng-controller="ActiveMQ.PreferencesController">\n  <div hawtio-form-2="config" entity="entity"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/blocked.html','<div class="table-view" ng-controller="Camel.BlockedExchangesController">\n\n  <h3>Blocked</h3>\n  \n  <p ng-if="!initDone">\n    <span class="spinner spinner-xs spinner-inline"></span> Loading...\n  </p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No blocked exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n            <div class="form-group">\n              <button type="button" class="btn btn-default" ng-disabled="gridOptions.selectedItems.length === 0"\n                ng-click="unblockDialog = true" data-placement="bottom">Unblock</button>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="unblockDialog" ok-button-text="Unblock" cancel-button-text="Cancel" on-ok="doUnblock()"\n       title="Unblock Exchange">\n    <div class="dialog-body">\n      <p>You are about to unblock the selected thread.</p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/camel/html/browseEndpoint.html','<div ng-controller="Camel.BrowseEndpointController">\n\n  <div ng-class="{\'wiki-fixed\' : !isJmxTab}">\n\n    <h2>Browse</h2>\n\n    <div class="row toolbar-pf">\n      <div class="col-md-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group">\n            <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="openForwardDialog()"\n                    hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendBodyAndHeaders"\n                    title="Forward the selected messages to another endpoint" data-placement="bottom">\n              Forward\n            </button>\n            <button class="btn btn-default" ng-click="refresh()" title="Refreshes the list of messages">\n              Refresh\n            </button>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="search1" class="sr-only">Filter</label>\n                <input id="search1" type="search" class="form-control" ng-model="gridOptions.filterOptions.filterText"\n                      placeholder="Search">\n                <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="col-md-12">\n        <table class="table" hawtio-simple-table="gridOptions"></table>\n      </div>\n    </div>\n\n    <script type="text/ng-template" id="camelBrowseEndpointMessageDetails.html">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <div class="row">\n          <div class="col-md-4">\n            <h4 class="modal-title" id="myModalLabel">Message</h4>\n          </div>\n          <div class="col-md-7">\n            <div class=""\n                hawtio-pager="messages"\n                on-index-change="selectRowIndex"\n                row-index="rowIndex">\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class="modal-body camel-forward-message">\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Forward to endpoint</dt>\n              <dd>\n                <form class="form-inline camel-forward-message" ng-submit="forwardMessage(row, endpointUri)">\n                  <input type="text" class="form-control camel-forward-message" ng-model="endpointUri" placeholder="URI"\n                          uib-typeahead="title for title in endpointUris() | filter:$viewValue" required>\n                  <button type="submit" class="btn btn-default" hawtio-show \n                          object-name="{{workspace.selection.objectName}}" method-name="sendBodyAndHeaders"\n                          data-placement="bottom" title="Forward the selected messages to another endpoint">\n                    Forward\n                  </button>\n                </form>\n              </dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>ID</dt>\n              <dd>{{row.id}}</dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Body</dt>\n              <dd><div hawtio-editor="row.body" read-only="true" mode="mode"></div></dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Headers</dt>\n              <dd>\n                <table class="table">\n                  <thead>\n                    <tr>\n                      <th>Name</th>\n                      <th>Type</th>\n                      <th>Value</th>\n                    </tr>\n                  </thead>\n                  <tbody compile="row.headerHtml"></tbody>\n                </table>\n              </dd>\n            </dl>\n          </div>\n        </div>\n      </div>\n    </script>\n\n    <script type="text/ng-template" id="camelBrowseEndpointForwardMessage.html">\n      <form class="form-horizontal" ng-submit="forwardMessages(endpointUri); $close();">\n        <div class="modal-header">\n          <button type="button" class="close" aria-label="Close" ng-click="$close()">\n            <span class="pficon pficon-close" aria-hidden="true"></span>\n          </button>\n          <h4>\n            Forward to endpoint\n          </h4>\n        </div>\n        <div class="modal-body">\n            <div class="form-group">\n              <label class="col-sm-1 control-label" for="endpointUri">URI</label>\n              <div class="col-sm-11">\n                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri" required\n                        uib-typeahead="title for title in endpointUris() | filter:$viewValue">\n              </div>\n            </div>\n        </div>\n        <div class="modal-footer">\n          <button type="button" class="btn btn-default" ng-click="$close()">Close</button>\n          <button type="submit" class="btn btn-primary">Forward</button>\n        </div>\n      </form>\n    </script>\n\n  </div>\n\n</div>\n');
+$templateCache.put('plugins/camel/html/browseEndpoint.html','<div ng-controller="Camel.BrowseEndpointController">\n\n  <div ng-class="{\'wiki-fixed\' : !isJmxTab}">\n\n    <h2>Browse</h2>\n\n    <div class="row toolbar-pf">\n      <div class="col-md-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group">\n            <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="openForwardDialog()"\n                    hawtio-show object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"\n                    title="Forward the selected messages to another endpoint" data-placement="bottom">\n              Forward\n            </button>\n            <button class="btn btn-default" ng-click="refresh()" title="Refreshes the list of messages">\n              Refresh\n            </button>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="search1" class="sr-only">Filter</label>\n                <input id="search1" type="search" class="form-control" ng-model="gridOptions.filterOptions.filterText"\n                      placeholder="Search">\n                <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="col-md-12">\n        <table class="table" hawtio-simple-table="gridOptions"></table>\n      </div>\n    </div>\n\n    <script type="text/ng-template" id="camelBrowseEndpointMessageDetails.html">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <div class="row">\n          <div class="col-md-4">\n            <h4 class="modal-title" id="myModalLabel">Message</h4>\n          </div>\n          <div class="col-md-7">\n            <div class=""\n                hawtio-pager="messages"\n                on-index-change="selectRowIndex"\n                row-index="rowIndex">\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class="modal-body camel-forward-message">\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Forward to endpoint</dt>\n              <dd>\n                <form class="form-inline camel-forward-message" ng-submit="forwardMessage(row, endpointUri)">\n                  <input type="text" class="form-control camel-forward-message" ng-model="endpointUri" placeholder="URI"\n                          uib-typeahead="title for title in endpointUris() | filter:$viewValue" required>\n                  <button type="submit" class="btn btn-default" hawtio-show \n                          object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"\n                          data-placement="bottom" title="Forward the selected messages to another endpoint">\n                    Forward\n                  </button>\n                </form>\n              </dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>ID</dt>\n              <dd>{{row.id}}</dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Body</dt>\n              <dd><div hawtio-editor="row.body" read-only="true" mode="mode"></div></dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Headers</dt>\n              <dd>\n                <table class="table">\n                  <thead>\n                    <tr>\n                      <th>Name</th>\n                      <th>Type</th>\n                      <th>Value</th>\n                    </tr>\n                  </thead>\n                  <tbody compile="row.headerHtml"></tbody>\n                </table>\n              </dd>\n            </dl>\n          </div>\n        </div>\n      </div>\n    </script>\n\n    <script type="text/ng-template" id="camelBrowseEndpointForwardMessage.html">\n      <form class="form-horizontal" ng-submit="forwardMessages(endpointUri); $close();">\n        <div class="modal-header">\n          <button type="button" class="close" aria-label="Close" ng-click="$close()">\n            <span class="pficon pficon-close" aria-hidden="true"></span>\n          </button>\n          <h4>\n            Forward to endpoint\n          </h4>\n        </div>\n        <div class="modal-body">\n            <div class="form-group">\n              <label class="col-sm-1 control-label" for="endpointUri">URI</label>\n              <div class="col-sm-11">\n                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri" required\n                        uib-typeahead="title for title in endpointUris() | filter:$viewValue">\n              </div>\n            </div>\n        </div>\n        <div class="modal-footer">\n          <button type="button" class="btn btn-default" ng-click="$close()">Close</button>\n          <button type="submit" class="btn btn-primary">Forward</button>\n        </div>\n      </form>\n    </script>\n\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/browseRoute.html','<ng-include src="\'plugins/camel/html/browseMessageTemplate.html\'"></ng-include>\n\n<div class="row">\n  <table class="table table-striped" hawtio-simple-table="gridOptions"></table>\n  <!--\n      <div class="gridStyle" hawtio-datatable="gridOptions"></div>\n  -->\n</div>\n');
 $templateCache.put('plugins/camel/html/createEndpoint.html','<div ng-controller="Camel.EndpointController" ng-switch="hasComponentNames">\n  <div ng-switch-when="true">\n    <tabs>\n      <pane heading="URL">\n        <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n      </pane>\n      <pane heading="Components">\n        <ng-include src="\'plugins/camel/html/createEndpointWizard.html\'"></ng-include>\n      </pane>\n    </tabs>\n  </div>\n  <div ng-switch-default="false">\n    <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n  </div>\n</div>\n');
 $templateCache.put('plugins/camel/html/createEndpointURL.html','<form class="form-horizontal">\n  <div class="control-group">\n    <input class="col-md-12" type="text" size="255" ng-model="endpointName" placeholder="Endpoint URI"/>\n  </div>\n  <div class="control-group">\n    <button type="submit" class="btn btn-info" ng-click="createEndpoint(endpointName)"\n            ng-disabled="!endpointName">\n      Create endpoint from URI\n    </button>\n  </div>\n</form>\n');
 $templateCache.put('plugins/camel/html/createEndpointWizard.html','<div ng-controller="Camel.EndpointController">\n  <form class="form-horizontal">\n    <div class="control-group">\n      <label class="control-label" for="componentName">Component</label>\n\n      <div class="controls">\n        <select id="componentName" ng-model="selectedComponentName"\n                ng-options="componentName for componentName in componentNames"></select>\n      </div>\n    </div>\n    <div ng-show="selectedComponentName">\n      <div class="control-group">\n        <label class="control-label" for="endpointPath">Endpoint</label>\n\n        <div class="controls">\n          <input id="endpointPath" class="col-md-10" type="text" ng-model="endpointPath" placeholder="name"\n                 uib-typeahead="title for title in endpointCompletions($viewValue) | filter:$viewValue"\n                 min-length="1">\n        </div>\n      </div>\n\n      <div simple-form name="formEditor" entity=\'endpointParameters\' data=\'endpointSchema\' schema="schema"></div>\n\n      <div class="control-group">\n        <div class="controls">\n          <button type="submit" class="btn btn-info" ng-click="createEndpointFromData()"\n                  ng-disabled="!endpointPath || !selectedComponentName">\n            Create endpoint from data\n          </button>\n        </div>\n      </div>\n    </div>\n  </form>\n</div>\n');
-$templateCache.put('plugins/camel/html/debug.html','<div class="camel-debug-main" ng-controller="Camel.DebugRouteController">\n  \n  <div class="row camel-debug-header">\n    <div class="col-sm-6">\n      <h2>Debug</h2>\n    </div>\n    <div class="col-sm-6">\n      <button type="button" class="btn btn-primary pull-right" ng-if="debugging" ng-click="stopDebugging()">\n        Stop debugging\n      </button>\n    </div>\n  </div>\n  \n  <div ng-if="!debugging">\n    <p>Debugging allows you to step through camel routes to diagnose issues.</p>\n    <button type="button" class="btn btn-primary" ng-click="startDebugging()">Start debugging</button>\n  </div>\n  \n  <div class="toolbar-pf camel-debug-toolbar" ng-if="debugging">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <div ng-switch="hasBreakpoint">\n          <button type="button" ng-switch-when="true" class="btn btn-default" ng-disabled="!selectedDiagramNodeId"\n                  ng-click="removeBreakpoint()" title="Remove the breakpoint on the selected node">\n            Remove breakpoint\n          </button>\n          <button type="button" ng-switch-default="false" class="btn btn-default" ng-disabled="shouldDisableAddBreakpoint()"\n                  ng-click="addBreakpoint()" title="Add a breakpoint on the selected node">\n            Add breakpoint\n          </button>\n        </div>\n      </div>\n      <div class="form-group camel-debug-icon-buttons">\n        <button type="button" class="btn btn-default" ng-click="step()" ng-disabled="!stopped"\n                title="Step into the next node">\n          <i class="fa fa-arrow-down" aria-hidden="true"></i>\n        </button>\n        <button type="button" class="btn btn-default" ng-click="resume()" ng-disabled="!stopped"\n                title="Resume running">\n          <i class="fa fa-play" aria-hidden="true"></i>\n        </button>\n        <button type="button" class="btn btn-default" ng-click="suspend()" ng-disabled="stopped"\n                title="Suspend all threads in this route">\n          <i class="fa fa-pause" aria-hidden="true"></i>\n        </button>\n      </div>\n    </form>\n  </div>\n\n  <div class="camel-debug-diagram-wrapper" ng-include src="graphView" ng-if="debugging"></div>\n\n  <div class="camel-debug-bottom-panel" resizable r-directions="[\'top\']" r-flex="true" ng-if="debugging"\n    ng-show="showDebugPanel">\n    <div class="camel-debug-bottom-panel-left">\n      <ul class="nav nav-tabs" ng-init="activeTab = \'headers\'">\n        <li ng-class="{\'active\': activeTab === \'headers\' && stopped}">\n          <a href="" ng-click="activeTab = \'headers\'" ng-class="{\'disabled\': !stopped}">Headers</a>\n        </li>\n        <li ng-class="{\'active\': activeTab === \'body\' && stopped}">\n          <a href="" ng-click="activeTab = \'body\'" ng-class="{\'disabled\': !stopped}">Body</a>\n        </li>\n      </ul>\n      <div class="camel-debug-headers-contents" ng-show="activeTab === \'headers\'">\n        <div ng-repeat="(key, value) in row.headers"><label>{{key}}:</label> {{value}}</div>\n      </div>\n      <div class="camel-debug-body-contents" ng-show="activeTab === \'body\'">\n        <em class="camel-debug-no-body-text" ng-show="row.body === \'[Body is null]\'">No Body</em>\n        <pre ng-show="row.body !== \'[Body is null]\'">{{row.body}}</pre>\n      </div>\n    </div>\n    <div class="camel-debug-bottom-panel-right">\n      <ul class="nav nav-tabs">\n        <li>\n          <a>Breakpoints</a>\n        </li>\n      </ul>\n      <ul class="camel-debug-breakpoints-list list-unstyled">\n        <li ng-class="{\'suspended\': isSuspendedAt(b)}"\n          ng-repeat="b in breakpoints">\n          <span>{{b}}</span>\n          <button type="button" class="close" aria-label="Close" title="Remove breakpoint"\n            ng-click="removeBreakpointById(b)">\n            <span aria-hidden="true">&times;</span>\n          </button>\n        </li>\n      </ul>\n    </div>\n  </div>\n\n</div>\n');
+$templateCache.put('plugins/camel/html/debug.html','<div class="camel-debug-main" ng-controller="Camel.DebugRouteController">\n  \n  <div class="row camel-debug-header">\n    <div class="col-sm-6">\n      <h2>Debug</h2>\n    </div>\n    <div class="col-sm-6">\n      <button type="button" class="btn btn-primary pull-right" ng-if="debugging" ng-click="stopDebugging()">\n        Stop debugging\n      </button>\n    </div>\n  </div>\n  \n  <div ng-if="!debugging">\n    <p>Debugging allows you to step through camel routes to diagnose issues.</p>\n    <button type="button" class="btn btn-primary" ng-click="startDebugging()"\n      hawtio-show object-name="{{camelDebugMBean}}" method-name="enableDebugger" mode="remove">\n      Start debugging\n    </button>\n    <div class="alert alert-info"\n      hawtio-show object-name="{{camelDebugMBean}}" method-name="enableDebugger" mode="inverse">\n      <span class="pficon pficon-info"></span>\n      Debugging is not allowed for this user.\n    </div>\n  </div>\n  \n  <div class="toolbar-pf camel-debug-toolbar" ng-if="debugging">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <div ng-switch="hasBreakpoint">\n          <button type="button" ng-switch-when="true" class="btn btn-default" ng-disabled="!selectedDiagramNodeId"\n                  ng-click="removeBreakpoint()" title="Remove the breakpoint on the selected node">\n            Remove breakpoint\n          </button>\n          <button type="button" ng-switch-default="false" class="btn btn-default" ng-disabled="shouldDisableAddBreakpoint()"\n                  ng-click="addBreakpoint()" title="Add a breakpoint on the selected node">\n            Add breakpoint\n          </button>\n        </div>\n      </div>\n      <div class="form-group camel-debug-icon-buttons">\n        <button type="button" class="btn btn-default" ng-click="step()" ng-disabled="!stopped"\n                title="Step into the next node">\n          <i class="fa fa-arrow-down" aria-hidden="true"></i>\n        </button>\n        <button type="button" class="btn btn-default" ng-click="resume()" ng-disabled="!stopped"\n                title="Resume running">\n          <i class="fa fa-play" aria-hidden="true"></i>\n        </button>\n        <button type="button" class="btn btn-default" ng-click="suspend()" ng-disabled="stopped"\n                title="Suspend all threads in this route">\n          <i class="fa fa-pause" aria-hidden="true"></i>\n        </button>\n      </div>\n    </form>\n  </div>\n\n  <div class="camel-debug-diagram-wrapper" ng-include src="graphView" ng-if="debugging"></div>\n\n  <div class="camel-debug-bottom-panel" resizable r-directions="[\'top\']" r-flex="true" ng-if="debugging"\n    ng-show="showDebugPanel">\n    <div class="camel-debug-bottom-panel-left">\n      <ul class="nav nav-tabs" ng-init="activeTab = \'headers\'">\n        <li ng-class="{\'active\': activeTab === \'headers\' && stopped}">\n          <a href="" ng-click="activeTab = \'headers\'" ng-class="{\'disabled\': !stopped}">Headers</a>\n        </li>\n        <li ng-class="{\'active\': activeTab === \'body\' && stopped}">\n          <a href="" ng-click="activeTab = \'body\'" ng-class="{\'disabled\': !stopped}">Body</a>\n        </li>\n      </ul>\n      <div class="camel-debug-headers-contents" ng-show="activeTab === \'headers\'">\n        <div ng-repeat="(key, value) in row.headers"><label>{{key}}:</label> {{value}}</div>\n      </div>\n      <div class="camel-debug-body-contents" ng-show="activeTab === \'body\'">\n        <em class="camel-debug-no-body-text" ng-show="row.body === \'[Body is null]\'">No Body</em>\n        <pre ng-show="row.body !== \'[Body is null]\'">{{row.body}}</pre>\n      </div>\n    </div>\n    <div class="camel-debug-bottom-panel-right">\n      <ul class="nav nav-tabs">\n        <li>\n          <a>Breakpoints</a>\n        </li>\n      </ul>\n      <ul class="camel-debug-breakpoints-list list-unstyled">\n        <li ng-class="{\'suspended\': isSuspendedAt(b)}"\n          ng-repeat="b in breakpoints">\n          <span>{{b}}</span>\n          <button type="button" class="close" aria-label="Close" title="Remove breakpoint"\n            ng-click="removeBreakpointById(b)">\n            <span aria-hidden="true">&times;</span>\n          </button>\n        </li>\n      </ul>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/deleteContextWarningModal.html','<div class="modal-header">\n  <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n    <span class="pficon pficon-close" aria-hidden="true"></span>\n  </button>\n  <h4>Are you sure?</h4>\n</div>\n<div class="modal-body">\n  <p>You are about to delete this Camel Context.</p>\n  <p>This operation cannot be undone so please be careful.</p>\n</div>\n<div class="modal-footer">\n  <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n  <button type="button" class="btn btn-danger" ng-click="$close()">Delete</button>\n</div>\n');
 $templateCache.put('plugins/camel/html/deleteRouteWarningModal.html','<div class="modal-header">\n  <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n    <span class="pficon pficon-close" aria-hidden="true"></span>\n  </button>\n  <h4>Are you sure?</h4>\n</div>\n<div class="modal-body">\n  <p>You are about to delete this Camel route.</p>\n  <p>This operation cannot be undone so please be careful.</p>\n</div>\n<div class="modal-footer">\n  <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n  <button type="button" class="btn btn-danger" ng-click="$close()">Delete</button>\n</div>\n');
 $templateCache.put('plugins/camel/html/endpointRuntimeRegistry.html','<div class="table-view" ng-controller="Camel.EndpointRuntimeRegistryController">\n\n  <h2>Endpoints (in/out)</h2>\n  \n  <div ng-if="!selectedMBean" class="spinner spinner-lg loading-page"></div>\n  \n  <div ng-if="selectedMBean">\n    <div class="loading-message" ng-if="data.length === 0">\n      There are no endpoints currently in use in this CamelContext.\n    </div>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-endpoints-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
@@ -25819,23 +25900,23 @@ $templateCache.put('plugins/camel/html/routeDiagram.html','<div class="camel-rou
 $templateCache.put('plugins/camel/html/routeMetrics.html','<div ng-controller="Camel.RouteMetricsController">\n\n  <h2>Route Metrics</h2>\n \n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="toolbar-pf-action-right">\n          <div class="form-group has-clear">\n            <div class="search-pf-input-group">\n              <label for="search1" class="sr-only">Filter</label>\n              <input id="search1" type="search" class="form-control" ng-model="filterText"\n                    placeholder="Search">\n              <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n                <span class="pficon pficon-close"></span>\n              </button>\n            </div>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="spinner spinner-lg loading-page" ng-if="!initDone"></div>\n\n  <div ng-show="initDone">\n    <div class="row" ng-if="metricDivs.length === 0">\n      <div class="col-md-12">\n        <div class="loading-message">\n          This Camel context has no route metrics data.\n        </div>\n      </div>\n    </div>\n    <div class="row" ng-if="metricDivs.length > 0">\n      <div class="col-md-12">\n        <div id="{{metric.id}}" ng-repeat="metric in metricDivs track by metric.id" ng-show="metricVisible(metric)"></div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/sendMessage.html','<div ng-controller="Camel.SendMessageController">\n\n  <h2>Send Message</h2>\n\n  <div class="alert alert-warning" ng-show="noCredentials">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    <strong>No credentials set for endpoint!</strong>\n    Please set your username and password in the\n    <a href="#" class="alert-link" ng-click="openPrefs()">Preferences</a> page.\n  </div>\n\n  <h3>Headers</h3>\n\n  <div class="row camel-message-headers" ng-if="headers.length > 0">\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Name</label>\n          <input type="text" class="form-control" ng-model="header.name" ng-repeat="header in headers"\n                 uib-typeahead="completion for completion in defaultHeaderNames() | filter:$viewValue"\n                 pf-focused="$last">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Value</label>\n          <input type="text" class="form-control" ng-model="header.value" ng-repeat="header in headers">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-2">\n      <form>\n        <div class="form-group">\n          <label>&nbsp;</label>\n          <button type="button" class="btn btn-default" title="Delete" ng-click="removeHeader(header)"\n                  ng-repeat="header in headers">\n            <span class="pficon pficon-delete"></span>\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div>\n    <a href="" ng-click="addHeader()">Add header</a>\n  </div>\n\n  <h3>Body</h3>\n\n  <form>\n    <div class="form-group">\n      <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>\n    </div>\n    <div class="form-group">\n      <select class="form-control camel-send-message-format" ng-model="codeMirrorOptions.mode.name">\n        <option value="javascript">JSON</option>\n        <option value="xml">XML</option>\n      </select>\n      <button class="btn btn-default" ng-click="formatMessage()"\n              title="Automatically pretty prints the message so its easier to read">Format\n      </button>\n    </div>\n  </form>\n\n  <p>\n    <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>\n  </p>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/source.html','<div class="table-view" ng-controller="Camel.SourceController">\n  \n  <h2>Source</h2>\n  \n  <form>\n    <div class="form-group">\n      <div hawtio-editor="source" mode="\'xml\'" read-only="!showUpdateButton"></div>\n    </div>\n  </form>\n  \n  <button class="btn btn-primary" hawtio-show object-name="{{camelContextMBean}}"\n          method-name="addOrUpdateRoutesFromXml" ng-click="saveRouteXml()" ng-if="showUpdateButton">\n    Update\n  </button>\n\n</div>\n');
-$templateCache.put('plugins/camel/html/traceRoute.html','<div class="camel-trace-main" ng-controller="Camel.TraceRouteController">\n  \n  <div class="row camel-trace-header">\n    <div class="col-sm-6">\n      <h2>Trace</h2>\n    </div>\n    <div class="col-sm-6">\n      <button type="button" class="btn btn-primary pull-right" ng-if="tracing" ng-click="stopTracing()">\n        Stop tracing\n      </button>\n    </div>\n  </div>\n  \n  <div ng-if="!tracing">\n    <p>Tracing allows you to send messages to a route and then step through and see the messages flow through a route\n      to aid debugging and to help diagnose issues.\n    </p>\n    <p>Once you start tracing, you can send messages to the input endpoints, then come back to this page and see the\n      flow of messages through your route.\n    </p>\n    <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up\n      and down in the message table lets you see the flow of the message through the diagram.\n    </p>\n    <button type="button" class="btn btn-primary" ng-click="startTracing()">\n      Start tracing\n    </button>\n  </div>\n  \n  <div class="camel-trace-diagram-wrapper" ng-include src="graphView" ng-if="tracing"></div>\n\n  <div class="camel-trace-bottom-panel" resizable r-directions="[\'top\']" r-flex="true" ng-if="tracing">\n    <table class="table table-striped table-bordered camel-trace-messages-table-header" ng-show="!message">\n      <thead>\n        <tr>\n          <th>ID</th>\n          <th>To Node</th>\n        </tr>\n      </thead>\n    </table>\n    <div class="camel-trace-messages-table-body-container" ng-show="!message">\n      <table class="table table-striped table-bordered">\n        <tbody>\n          <tr ng-repeat="message in messages">\n            <td>\n              <a href="" title="View message" ng-click="openMessageDialog(message, $index)">\n                {{message.headers.breadcrumbId}}\n              </a>\n            </td>\n            <td>{{message.toNode}}</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n    <div class="camel-trace-message-details" ng-if="message">\n      <button type="button" class="close" aria-hidden="true" ng-click="closeMessageDetails()">\n        <span class="pficon pficon-close"></span>\n      </button>\n      <ul class="pagination">\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="First" ng-disabled="messageIndex === 0" ng-click="changeMessage(0)">\n            <span class="i fa fa-angle-double-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="Previous" ng-disabled="messageIndex === 0" ng-click="changeMessage(messageIndex - 1)">\n            <span class="i fa fa-angle-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Next" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messageIndex + 1)">\n            <span class="i fa fa-angle-right"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Last" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messages.length - 1)">\n            <span class="i fa fa-angle-double-right"></span>\n          </a>\n        </li>\n      </ul>\n      <ul class="nav nav-tabs" ng-init="activeTab = \'headers\'">\n        <li ng-class="{\'active\': activeTab === \'headers\'}">\n          <a href="" ng-click="activeTab = \'headers\'">Headers</a>\n        </li>\n        <li ng-class="{\'active\': activeTab === \'body\'}">\n          <a href="" ng-click="activeTab = \'body\'">Body</a>\n        </li>\n      </ul>\n      <div class="camel-trace-headers-contents" ng-show="activeTab === \'headers\'">\n        <div ng-repeat="(key, value) in message.headers"><label>{{key}}:</label> {{value}}</div>\n      </div>\n      <div class="camel-trace-body-contents" ng-show="activeTab === \'body\'">\n        <em class="camel-trace-no-body-text" ng-show="message.body === \'[Body is null]\'">No Body</em>\n        <pre ng-show="message.body !== \'[Body is null]\'">{{message.body}}</pre>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
+$templateCache.put('plugins/camel/html/traceRoute.html','<div class="camel-trace-main" ng-controller="Camel.TraceRouteController">\n  \n  <div class="row camel-trace-header">\n    <div class="col-sm-6">\n      <h2>Trace</h2>\n    </div>\n    <div class="col-sm-6">\n      <button type="button" class="btn btn-primary pull-right" ng-if="tracing" ng-click="stopTracing()">\n        Stop tracing\n      </button>\n    </div>\n  </div>\n  \n  <div ng-if="!tracing">\n    <p>Tracing allows you to send messages to a route and then step through and see the messages flow through a route\n      to aid debugging and to help diagnose issues.\n    </p>\n    <p>Once you start tracing, you can send messages to the input endpoints, then come back to this page and see the\n      flow of messages through your route.\n    </p>\n    <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up\n      and down in the message table lets you see the flow of the message through the diagram.\n    </p>\n    <button type="button" class="btn btn-primary" ng-click="startTracing()"\n      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="remove">\n      Start tracing\n    </button>\n    <div class="alert alert-info"\n      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="inverse">\n      <span class="pficon pficon-info"></span>\n      Tracing is not allowed for this user.\n    </div>\n  </div>\n  \n  <div class="camel-trace-diagram-wrapper" ng-include src="graphView" ng-if="tracing"></div>\n\n  <div class="camel-trace-bottom-panel" resizable r-directions="[\'top\']" r-flex="true" ng-if="tracing">\n    <table class="table table-striped table-bordered camel-trace-messages-table-header" ng-show="!message">\n      <thead>\n        <tr>\n          <th>ID</th>\n          <th>To Node</th>\n        </tr>\n      </thead>\n    </table>\n    <div class="camel-trace-messages-table-body-container" ng-show="!message">\n      <table class="table table-striped table-bordered">\n        <tbody>\n          <tr ng-repeat="message in messages">\n            <td>\n              <a href="" title="View message" ng-click="openMessageDialog(message, $index)">\n                {{message.headers.breadcrumbId}}\n              </a>\n            </td>\n            <td>{{message.toNode}}</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n    <div class="camel-trace-message-details" ng-if="message">\n      <button type="button" class="close" aria-hidden="true" ng-click="closeMessageDetails()">\n        <span class="pficon pficon-close"></span>\n      </button>\n      <ul class="pagination">\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="First" ng-disabled="messageIndex === 0" ng-click="changeMessage(0)">\n            <span class="i fa fa-angle-double-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="Previous" ng-disabled="messageIndex === 0" ng-click="changeMessage(messageIndex - 1)">\n            <span class="i fa fa-angle-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Next" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messageIndex + 1)">\n            <span class="i fa fa-angle-right"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Last" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messages.length - 1)">\n            <span class="i fa fa-angle-double-right"></span>\n          </a>\n        </li>\n      </ul>\n      <ul class="nav nav-tabs" ng-init="activeTab = \'headers\'">\n        <li ng-class="{\'active\': activeTab === \'headers\'}">\n          <a href="" ng-click="activeTab = \'headers\'">Headers</a>\n        </li>\n        <li ng-class="{\'active\': activeTab === \'body\'}">\n          <a href="" ng-click="activeTab = \'body\'">Body</a>\n        </li>\n      </ul>\n      <div class="camel-trace-headers-contents" ng-show="activeTab === \'headers\'">\n        <div ng-repeat="(key, value) in message.headers"><label>{{key}}:</label> {{value}}</div>\n      </div>\n      <div class="camel-trace-body-contents" ng-show="activeTab === \'body\'">\n        <em class="camel-trace-no-body-text" ng-show="message.body === \'[Body is null]\'">No Body</em>\n        <pre ng-show="message.body !== \'[Body is null]\'">{{message.body}}</pre>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/typeConverter.html','<div class="table-view" ng-controller="Camel.TypeConverterController">\n  \n  <h2>Type Converters</h2>\n  \n  <div class="toolbar-pf">\n      <form class="toolbar-pf-actions">\n        <div class="form-group">\n          <button type="button" class="btn btn-default camel-type-converters-enable-statistics-button"\n            ng-click="enableStatistics()" ng-if="!mbeanAttributes.StatisticsEnabled">\n            <span ng-show="enableTypeConvertersStats" class="spinner spinner-xs spinner-inline"></span>\n            <span ng-show="!enableTypeConvertersStats">Enable statistics</span>\n          </button>\n          <button type="button" class="btn btn-default camel-type-converters-enable-statistics-button"\n            ng-click="disableStatistics()" ng-if="mbeanAttributes.StatisticsEnabled">\n            <span ng-show="disableTypeConvertersStats" class="spinner spinner-xs spinner-inline"></span>\n            <span ng-show="!disableTypeConvertersStats">Disable statistics</span>\n          </button>\n          <button type="button" class="btn btn-default" ng-click="resetStatistics()"\n            ng-disabled="!mbeanAttributes.StatisticsEnabled">Reset statistics</button>\n        </div>\n      </form>\n  </div>\n  \n  <div>\n    <dl class="dl-horizontal camel-type-converters-dl">\n      <dt>Number of Type Converters</dt>\n      <dd>{{mbeanAttributes.NumberOfTypeConverters}}</dd>\n      <dt># Attempts</dt>\n      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.AttemptCounter : \'-\'}}</dd>\n      <dt># Hit</dt>\n      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.HitCounter : \'-\'}}</dd>\n      <dt># Miss</dt>\n      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.MissCounter : \'-\'}}</dd>\n      <dt># Failed</dt>\n      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.FailedCounter : \'-\'}}</dd>\n    </dl>\n  </div>\n\n  <div class="row toolbar-pf table-view-pf-toolbar">\n    <div class="col-sm-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n            <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n            <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>\n\n</div>\n');
 $templateCache.put('plugins/karaf/html/feature-details.html','<div class="toolbar-pf">\n  <form class="toolbar-pf-actions">\n    <div class="form-group">\n      <button ng-click="install(name,version)"\n              class="btn btn-default"\n              title="install"\n              hawtio-show\n              object-name="{{featuresMBean}}"\n              method-name="installFeature">Install</button>\n      <button ng-click="uninstall(name,version)"\n              class="btn btn-default"\n              title="uninstall"\n              hawtio-show\n              object-name="{{featuresMBean}}"\n              method-name="uninstallFeature">Uninstall</button>\n    </div>\n  </form>\n</div>\n\n<h2>Details</h2>\n<dl class="dl-horizontal">\n  <dt>ID</dt>\n  <dd>{{row.Id}}</dd>\n  <dt>Name</dt>\n  <dd>{{row.Name}}</dd>\n  <dt>State</dt>\n  <dd>{{row.Installed === \'true\' ? \'Installed\' : \'Uninstalled\'}}</dd>\n  <dt>Repository Name</dt>\n  <dd>{{row.RepositoryName}}</dd>\n  <dt>Repository URI</dt>\n  <dd>{{row.RepositoryURI}}</dd>\n  <dt>Version</dt>\n  <dd>{{row.Version}}</dd>\n</dl>\n\n<h2>Dependencies</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="feature in row.Dependencies">\n    <a href=\'osgi/feature/{{feature.Name}}/{{feature.Version}}\'>{{feature.Name}}/{{feature.Version}}</a>\n  </li>\n</ul>\n\n<h2>Bundles</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="bundle in row.BundleDetails">\n    <div ng-switch="bundle.Installed">\n      <a ng-switch-when="true" href=\'osgi/bundle/{{bundle.Identifier}}\'>{{bundle.Location}}</a>\n      <span ng-switch-default>{{bundle.Location}}</span>\n    </div>\n  </li>\n</ul>\n\n<h2>Configurations</h2>\n<table class="table table-striped table-bordered">\n  <thead>\n    <tr>\n      <th>PID</th>\n      <th>Properties</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr ng-repeat="(pid, value) in row.Configurations">\n      <td><a href="osgi/pid/{{value.Pid}}">{{value.Pid}}</a></td>\n      <td>\n        <ul class="list-unstyled">\n          <li ng-repeat="(key, value) in value.Elements">{{key}} = {{value.Value}}</li>\n        </ul>\n    </tr>\n  </tbody>\n</table>\n\n<h2>Configuration Files</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="(key, value) in row[\'Configuration Files\']">{{value.Files}}</li>\n</ul>\n');
 $templateCache.put('plugins/karaf/html/feature.html','<div class="controller-section" ng-controller="Karaf.FeatureController">\n\n  <ol class="breadcrumb">\n    <li>\n      <a ng-href="osgi/features">Features</a>\n    </li>\n    <li class="page-title">\n      {{row.Id}}\n    </li>\n  </ol>\n\n  <div ng-include src="\'plugins/karaf/html/feature-details.html\'"></div>\n\n</div>\n\n');
 $templateCache.put('plugins/karaf/html/features.html','<div class="list-view">\n  <h1>Features</h1>\n  <div ng-if="!$ctrl.loading">\n    <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>\n    <pf-list-view items="$ctrl.listItems"\n                  config="$ctrl.listConfig"\n                  action-buttons="$ctrl.listItemActionButtons"\n                  enable-button-for-item-fn="$ctrl.enableButtonForItem">\n      <div class="list-view-pf-description">\n        <div class="list-view-pf-left">\n          <span class="list-view-pf-icon-sm fa"\n                ng-class="{\'list-view-pf-icon-success fa-check\': item.installed}"\n                title="Feature {{item.id}} {{item.getState()}}">\n          </span>\n        </div>\n        <div class="list-group-item-heading"><a ng-href=osgi/feature/{{item.id}}>{{item.id}}</a></div>\n      </div>\n      </pf-list-view>\n  </div>\n\n  <script type="text/ng-template" id="addRepositoryDialog.html">\n    <form name="addProperty" class="form-horizontal">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Add feature repository</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-3 control-label" for="repositoryUri">Repository URI</label>\n          <div class="col-sm-9">\n            <input type="text" class="form-control" id="repositoryUri" ng-model="$ctrl.repositoryUri" placeholder="mvn:foo/bar/1.0/xml/features" required>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-primary" ng-click="$close()">Add</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="removeRepositoryDialog.html">\n    <form name="addProperty" class="form-horizontal">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Remove feature repository</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-3 control-label" for="repository">Repository</label>\n          <div class="col-sm-9">\n            <select ng-model="$ctrl.selectedRepository" ng-options="repository.name for repository in $ctrl.repositories" required></select>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-primary" ng-click="$close()">Remove</button>\n      </div>\n    </form>\n  </script>\n  <div class="spinner spinner-lg loading-page" ng-if="$ctrl.loading"></div>\n</div>\n');
-$templateCache.put('plugins/karaf/html/scr-component-details.html','<div class="row toolbar-pf">\n  <div class="col-sm-12">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button class="btn btn-default" \n                ng-click="$ctrl.activateComponent()" \n                ng-disabled="$ctrl.disableActivate()">\n          Activate\n        </button>\n        <button class="btn btn-default" \n                ng-click="$ctrl.deactivateComponent()"\n                ng-disabled="$ctrl.disableDeactivate()">\n          Deactivate\n        </button>\n      </div>\n    </form>\n  </div>\n</div>\n\n<h2>Details</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt>Id</dt>\n      <dd>{{$ctrl.component.id}}</dd>\n      <dt>Name</dt>\n      <dd>{{$ctrl.component.name}}</dd>\n      <dt>State</dt>\n      <dd>{{$ctrl.component.state}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>Properties</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt ng-repeat-start="(key, value) in $ctrl.component.properties">{{key}}</dt>\n      <dd ng-repeat-end ng-repeat="v in value">{{v.Value}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>References</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <table class="table">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Availability</th>\n          <th>Cardinality</th>\n          <th>Policy</th>\n          <th>Bound Services</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(key, value) in $ctrl.component.references">\n          <td>{{value.Name}}</td>\n          <td>{{value.Availability}}</td>\n          <td>{{value.Cardinality}}</td>\n          <td>{{value.Policy}}</td>\n          <td>\n            <ul class="list-unstyled">\n              <li ng-repeat="id in value[\'Bound Services\']">\n                <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>\n              </li>\n            </ul>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n');
+$templateCache.put('plugins/karaf/html/scr-component-details.html','<div class="row toolbar-pf">\n  <div class="col-sm-12">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button class="btn btn-default" \n                ng-click="$ctrl.activateComponent()" \n                ng-disabled="$ctrl.disableActivate()"\n                hawtio-show\n                object-name="{{$ctrl.scrMBean}}"\n                method-name="activateComponent">\n          Activate\n        </button>\n        <button class="btn btn-default" \n                ng-click="$ctrl.deactivateComponent()"\n                ng-disabled="$ctrl.disableDeactivate()"\n                hawtio-show\n                object-name="{{$ctrl.scrMBean}}"\n                method-name="deactivateComponent">\n          Deactivate\n        </button>\n      </div>\n    </form>\n  </div>\n</div>\n\n<h2>Details</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt>Id</dt>\n      <dd>{{$ctrl.component.id}}</dd>\n      <dt>Name</dt>\n      <dd>{{$ctrl.component.name}}</dd>\n      <dt>State</dt>\n      <dd>{{$ctrl.component.state}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>Properties</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt ng-repeat-start="(key, value) in $ctrl.component.properties">{{key}}</dt>\n      <dd ng-repeat-end ng-repeat="v in value">{{v.Value}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>References</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <table class="table">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Availability</th>\n          <th>Cardinality</th>\n          <th>Policy</th>\n          <th>Bound Services</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(key, value) in $ctrl.component.references">\n          <td>{{value.Name}}</td>\n          <td>{{value.Availability}}</td>\n          <td>{{value.Cardinality}}</td>\n          <td>{{value.Policy}}</td>\n          <td>\n            <ul class="list-unstyled">\n              <li ng-repeat="id in value[\'Bound Services\']">\n                <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>\n              </li>\n            </ul>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n');
 $templateCache.put('plugins/karaf/html/scr-component.html','<div class="controller-section" ng-if="!$ctrl.loading">\n\n  <ol class="breadcrumb">\n    <li>\n      <a ng-href="{{$ctrl.srcComponentsUrl}}">Declarative Services</a>\n    </li>\n    <li class="page-title">\n      {{$ctrl.component.name}}\n    </li>\n  </ol>\n\n  <div ng-include src="\'plugins/karaf/html/scr-component-details.html\'"></div>\n\n</div>\n<div class="spinner spinner-lg loading-page" ng-if="$ctrl.loading"></div>  ');
 $templateCache.put('plugins/karaf/html/server.html','<h1>Server</h1>\n\n<div class="controller-section" ng-controller="Karaf.ServerController">\n\n  <div class="row">\n    <div class="col-md-12">\n      <dl class="dl-horizontal">\n        <dt>Name</dt>\n        <dd>{{data.name}}</dd>\n        <dt>Version</dt>\n        <dd>{{data.version}}</dd>\n        <dt>State</dt>\n        <dd>{{data.state}}</dd>\n        <dt>Is root</dt>\n        <dd>{{data.root}}</dd>\n        <dt>Start Level</dt>\n        <dd>{{data.startLevel}}</dd>\n        <dt>Framework</dt>\n        <dd>{{data.framework}}</dd>\n        <dt>Framework Version</dt>\n        <dd>{{data.frameworkVersion}}</dd>\n        <dt>Location</dt>\n        <dd>{{data.location}}</dd>\n        <dt>SSH Port</dt>\n        <dd>{{data.sshPort}}</dd>\n        <dt>RMI Registry Port</dt>\n        <dd>{{data.rmiRegistryPort}}</dd>\n        <dt>RMI Server Port</dt>\n        <dd>{{data.rmiServerPort}}</dd>\n        <dt>PID</dt>\n        <dd>{{data.pid}}</dd>\n      </dl>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/bundle-list.html','<h1>Bundles</h1>\n\n<div class="bundles-container cards-pf controller-section" ng-controller="Osgi.BundleListController">\n\n  <div class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions">\n        <div class="form-group">\n          <label class="sr-only" for="filter">Install Bundle</label>\n          <div class="input-group" hawtio-show object-name="{{frameworkMBean}}" method-name="installBundle">\n            <input type="text" class="form-control" placeholder="Install Bundle..." ng-model="bundleUrl">\n            <div class="input-group-btn">\n              <button type="button" class="btn btn-default" ng-disabled="installDisabled()" ng-click="install()"\n                      title="Install">\n                <i class="fa fa-download"></i>\n              </button>\n            </div>\n          </div>\n        </div>\n        <div class="form-group">\n          <input type="text" class="form-control" ng-model="display.bundleFilter" placeholder="Filter by keyword..." autocomplete="off">\n        </div>\n        <div class="toolbar-pf-action-right">\n          <div class="form-group toolbar-pf-view-selector">\n            <a ng-href="{{listViewUrl}}" class="btn btn-link" title="Grid view">\n              <i class="fa fa-th"></i>\n            </a>\n            <a ng-href="{{tableViewUrl}}" class="btn btn-link" title="Table view">\n              <i class="fa fa-table"></i>\n            </a>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n  \n  <div id="toolbar-row-2" class="row toolbar-pf">\n    <div class="col-md-12">\n      <form class="toolbar-pf-actions form-inline">\n        <div class="form-group">\n          <label class="sr-only" for="service-filter">Service</label>\n          <select pf-select id="service-filter" title="Filter by service..." ng-model="display.showBundleGroups"\n                  ng-options="service.name for service in availableServices track by service.id" multiple>\n          </select>\n        </div>\n        <div class="form-group">\n          <label for="sortField">Sort by</label>\n          <select id="sortField" class="form-control btn btn-default" ng-model="display.sortField">\n            <option value="Identifier">ID</option>\n            <option value="Name">Name</option>\n            <option value="SymbolicName">Symbolic Name</option>\n          </select>\n        </div>\n        <div class="form-group">\n          <label for="displayField">Display</label>\n          <select id="displayField" class="form-control btn btn-default" ng-model="display.bundleField">\n            <option value="Name">Name</option>\n            <option value="SymbolicName">Symbolic Name</option>\n          </select>\n        </div>\n        <div class="form-group">\n          <label for="startLevelFilter">Start Level</label>\n          <input id="startLevelFilter" type="number" min="0" class="form-control" ng-model="display.startLevelFilter">\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div class="container-fluid container-cards-pf bundle-cards">\n    <div class="row row-cards-pf">\n      <div ng-repeat="bundle in bundles" ng-show="filterBundle(bundle)">\n        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">\n          <div class="card-pf card-pf-view card-pf-view-select" hawtio-template-popover title="Bundle details" ng-click="showDetails(bundle)">\n            <div class="content">\n              <table>\n                <tr>\n                  <td><span class="bundle-state" ng-class="bundle.State.toLowerCase()"></span></td>\n                  <td>{{getLabel(bundle)}}</td>\n                </tr>\n              </table>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <script type="text/ng-template" id="popoverTemplate">\n    <small>\n      <table class="table">\n        <tbody>\n        <tr ng-repeat="(k, v) in bundle track by $index">\n          <td class="property-name">{{k}}</td>\n          <td class="property-value">{{v}}</td>\n        </tr>\n        </tbody>\n      </table>\n    </small>\n  </script>\n\n</div>\n');
-$templateCache.put('plugins/osgi/html/bundle.html','<div class="controller-section" ng-controller="Osgi.BundleController">\n\n  <ol class="breadcrumb">\n    <li>\n        <a ng-href="osgi/bundles">Bundles</a>\n    </li>\n    <li class="page-title">\n        {{row.Headers[\'Bundle-Name\'].Value}}\n    </li>\n  </ol>  \n\n  <div class="toolbar-pf">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button ng-click="startBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="startBundle">Start</button>\n        <button ng-click="stopBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="stopBundle">Stop</button>\n        <button ng-click="refreshBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="refreshBundle">Refresh</button>\n        <button ng-click="updateBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="updateBundle">Update</button>\n        <button ng-click="uninstallBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="uninstallBundle">Uninstall</button>\n      </div>\n    </form>\n  </div>\n\n  <h2>Details</h2>\n\n  <dl class="dl-horizontal osgi-bundle-details-dl">\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Fragment&nbsp;ID</span>\n      <span ng-switch-default>Bundle&nbsp;ID</span>\n    </dt>\n    <dd>\n      {{row.Identifier}}\n    </dd>\n    <dt>\n      Bundle&nbsp;Name\n    </dt>\n    <dd>\n      {{row.Headers[\'Bundle-Name\'].Value}}\n    </dd>\n    <dt>\n      Symbolic&nbsp;Name\n    </dt>\n    <dd>\n      {{row.SymbolicName}}\n    </dd>\n    <dt>\n      Version\n    </dt>\n    <dd>\n      {{row.Version}}\n    </dd>\n    <dt>\n      Start&nbsp;Level\n    </dt>\n    <dd>\n      {{row.StartLevel}}\n    </dd>\n    <dt>\n      Location\n    </dt>\n    <dd>\n      {{row.Location}}\n    </dd>\n    <dt>\n      State\n    </dt>\n    <dd>\n      {{row.State.toLowerCase()}}\n    </dd>\n    <dt>\n      Last&nbsp;Modified\n    </dt>\n    <dd>\n      {{row.LastModified | date:\'medium\'}}\n    </dd>\n    <div>\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Hosts</span>\n      <span ng-switch-default>Fragments</span>\n    </dt>\n    <dd ng-switch="row.Fragment">\n      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"/>\n      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"/>\n    </dd>\n  </dl>\n\n  <h2>Inspect Classloading</h2>\n\n  <div class="alert alert-dismissable" ng-class="\'alert-\' + classLoadingAlert.type" ng-if="classLoadingAlert">\n    <span class="pficon" ng-class="classLoadingAlert.icon"></span>\n    <button type="button" class="close" aria-hidden="true" ng-click="dismissClassLoadingAlert()">\n      <span class="pficon pficon-close"></span>\n    </button>\n    <span ng-bind-html="classLoadingAlert.message"></span>\n  </div>\n\n  <form class="form-horizontal">\n    <div class="form-group">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="classToLoad" class="form-control" ng-model="classToLoad">\n      </div>\n    </div>\n    <div class="form-group">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">\n          Load Class\n        </button>\n      </div>\n    </div>\n    <div class="form-group">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="resourceToLoad" class="form-control" ng-model="resourceToLoad">\n      </div>\n    </div>\n    <div class="form-group">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">\n          Get Resource\n        </button>\n      </div>\n    </div>\n  </form>\n\n  <h2>Imported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Imported Version</th>\n        <th>Version</th>\n        <th>Resolution</th>\n        <th>Dynamic Import</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ImportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td>{{data.headers.Aversion}}</td>\n        <td>{{data.headers.Dresolution}}</td>\n        <td>{{data.headers.reason}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <div ng-if="thereAreUnsatisfiedPackages()">\n    <h3>Imports not satisfied</h3>\n    <table class="table table-striped table-bordered">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Version</th>\n          <th>Resolution</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(package, data) in unsatisfiedPackages">\n          <td>{{package}}</td>\n          <td>{{data.Aversion}}</td>\n          <td>{{data.Dresolution}}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n\n  <h2>Exported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Exported Version</th>\n        <th>Uses</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ExportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td class="osgi-bundle-exported-package-uses">{{data.headers.Duses}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <h2>Services</h2>\n\n  <h3>Registered Services</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.RegisteredServices">\n      <span id="registers.service.{{id}}" class="text-success">{{id}}</span>\n    </li>\n  </ul>\n\n  <h3>Services used by this Bundle</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.ServicesInUse">\n      <span id="uses.service.{{id}}" class="text-info">{{id}}</span>\n    </li>\n  </ul>\n\n  <div ng-if="row.RequiringBundles.length > 0">\n    <h2>Other Bundles using this Bundle</h2>\n\n    <ul class="list-unstyled">\n      <li ng-repeat="bundle in row.RequiringBundles"><a ng-href="{{bundle.url}}">{{bundle.label}}</a></li>\n    </ul>\n  </div>\n\n  <h2>Headers</h2>\n\n  <dl class="dl-horizontal osgi-bundle-headers-dl">\n    <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>\n    <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>\n  </dl>\n\n</div>\n');
+$templateCache.put('plugins/osgi/html/bundle.html','<div class="controller-section" ng-controller="Osgi.BundleController">\n\n  <ol class="breadcrumb">\n    <li>\n        <a ng-href="osgi/bundles">Bundles</a>\n    </li>\n    <li class="page-title">\n        {{row.Headers[\'Bundle-Name\'].Value}}\n    </li>\n  </ol>  \n\n  <div class="toolbar-pf">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button ng-click="startBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="startBundle">Start</button>\n        <button ng-click="stopBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="stopBundle">Stop</button>\n        <button ng-click="refreshBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="refreshBundle">Refresh</button>\n        <button ng-click="updateBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="updateBundle">Update</button>\n        <button ng-click="uninstallBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="uninstallBundle">Uninstall</button>\n      </div>\n    </form>\n  </div>\n\n  <h2>Details</h2>\n\n  <dl class="dl-horizontal osgi-bundle-details-dl">\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Fragment&nbsp;ID</span>\n      <span ng-switch-default>Bundle&nbsp;ID</span>\n    </dt>\n    <dd>\n      {{row.Identifier}}\n    </dd>\n    <dt>\n      Bundle&nbsp;Name\n    </dt>\n    <dd>\n      {{row.Headers[\'Bundle-Name\'].Value}}\n    </dd>\n    <dt>\n      Symbolic&nbsp;Name\n    </dt>\n    <dd>\n      {{row.SymbolicName}}\n    </dd>\n    <dt>\n      Version\n    </dt>\n    <dd>\n      {{row.Version}}\n    </dd>\n    <dt>\n      Start&nbsp;Level\n    </dt>\n    <dd>\n      {{row.StartLevel}}\n    </dd>\n    <dt>\n      Location\n    </dt>\n    <dd>\n      {{row.Location}}\n    </dd>\n    <dt>\n      State\n    </dt>\n    <dd>\n      {{row.State.toLowerCase()}}\n    </dd>\n    <dt>\n      Last&nbsp;Modified\n    </dt>\n    <dd>\n      {{row.LastModified | date:\'medium\'}}\n    </dd>\n    <div>\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Hosts</span>\n      <span ng-switch-default>Fragments</span>\n    </dt>\n    <dd ng-switch="row.Fragment">\n      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"/>\n      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"/>\n    </dd>\n  </dl>\n\n  <h2>Inspect Classloading</h2>\n\n  <div class="alert alert-dismissable" ng-class="\'alert-\' + classLoadingAlert.type" ng-if="classLoadingAlert">\n    <span class="pficon" ng-class="classLoadingAlert.icon"></span>\n    <button type="button" class="close" aria-hidden="true" ng-click="dismissClassLoadingAlert()">\n      <span class="pficon pficon-close"></span>\n    </button>\n    <span ng-bind-html="classLoadingAlert.message"></span>\n  </div>\n\n  <form class="form-horizontal">\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin" mode="remove">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="classToLoad" class="form-control" ng-model="classToLoad">\n      </div>\n    </div>\n    <div hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin" mode="inverse">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10 alert alert-info">\n        <span class="pficon pficon-info"></span>\n        Loading class is not allowed for this user.\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">\n          Load Class\n        </button>\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL" mode="remove">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="resourceToLoad" class="form-control" ng-model="resourceToLoad">\n      </div>\n    </div>\n    <div hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL" mode="inverse">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10 alert alert-info">\n        <span class="pficon pficon-info"></span>\n        Getting resource is not allowed for this user.\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">\n          Get Resource\n        </button>\n      </div>\n    </div>\n  </form>\n\n  <h2>Imported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Imported Version</th>\n        <th>Version</th>\n        <th>Resolution</th>\n        <th>Dynamic Import</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ImportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td>{{data.headers.Aversion}}</td>\n        <td>{{data.headers.Dresolution}}</td>\n        <td>{{data.headers.reason}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <div ng-if="thereAreUnsatisfiedPackages()">\n    <h3>Imports not satisfied</h3>\n    <table class="table table-striped table-bordered">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Version</th>\n          <th>Resolution</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(package, data) in unsatisfiedPackages">\n          <td>{{package}}</td>\n          <td>{{data.Aversion}}</td>\n          <td>{{data.Dresolution}}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n\n  <h2>Exported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Exported Version</th>\n        <th>Uses</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ExportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td class="osgi-bundle-exported-package-uses">{{data.headers.Duses}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <h2>Services</h2>\n\n  <h3>Registered Services</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.RegisteredServices">\n      <span id="registers.service.{{id}}" class="text-success">{{id}}</span>\n    </li>\n  </ul>\n\n  <h3>Services used by this Bundle</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.ServicesInUse">\n      <span id="uses.service.{{id}}" class="text-info">{{id}}</span>\n    </li>\n  </ul>\n\n  <div ng-if="row.RequiringBundles.length > 0">\n    <h2>Other Bundles using this Bundle</h2>\n\n    <ul class="list-unstyled">\n      <li ng-repeat="bundle in row.RequiringBundles"><a ng-href="{{bundle.url}}">{{bundle.label}}</a></li>\n    </ul>\n  </div>\n\n  <h2>Headers</h2>\n\n  <dl class="dl-horizontal osgi-bundle-headers-dl">\n    <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>\n    <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>\n  </dl>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/configurations.html','<h1>Configuration</h1>\n\n<div class="controller-section" ng-controller="Osgi.ConfigurationsController">\n\n  <div class="spinner spinner-lg loading-page" ng-if="!configurations"></div>\n  \n  <div ng-if="configurations">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <pf-list-view items="filteredConfigurations" config="listViewConfig" menu-actions="listViewMenuItems">\n      <div class="list-view-pf-left" ng-class="{\'osgi-configuration-factory-instance\': item.isFactoryInstance}">\n        <span class="list-view-pf-icon-sm" ng-class="item.kind.class" title="{{item.kind.title}}"></span>\n      </div>\n      <div class="list-view-pf-body">\n        <div class="list-view-pf-description">\n          <div class="list-group-item-heading" title="{{item.name}}">\n            <a ng-href="{{item.pidLink}}">{{item.name}}</a>\n          </div>\n          <div class="list-group-item-text">\n            {{item.description}}\n          </div>\n        </div>\n      </div>\n    </pf-list-view>\n  </div>\n  \n  <script type="text/ng-template" id="addPidDialog.html">\n    <form class="form-horizontal" ng-submit="$close(newPid)">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Add configuration</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-3 control-label" for="newPid">Configuration ID</label>\n          <div class="col-sm-9">\n            <input type="text" id="newPid" class="form-control" ng-model="newPid" required/>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-primary" ng-disabled="!(newPid !== \'\' && newPid !== undefined)">Add</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="deletePidDialog.html">\n    <form class="form-horizontal" ng-submit="$close()">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Delete configuration</h4>\n      </div>\n      <div class="modal-body">\n        <p>Delete \'{{item.name}}\' configuration?</p>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-danger">Delete</button>\n      </div>\n    </form>\n  </script>\n  \n</div>\n');
-$templateCache.put('plugins/osgi/html/framework.html','<div class="framework-main" ng-controller="Osgi.FrameworkController">\n\n  <h1>Framework Configuration</h1>\n\n  <form class="form-horizontal framework-form" ng-submit="save()">\n    <div class="form-group">\n      <label class="col-sm-3 control-label" for="startLevel">Current Framework Start Level</label>\n      <div class="col-sm-2">\n        <input id="startLevel" class="form-control" type="number" min="0" max="100" ng-model="config.startLevel">\n      </div>\n    </div>\n    <div class="form-group">\n      <label class="col-sm-3 control-label" for="initialBundleStartLevel">Initial Bundle Start Level</label>\n      <div class="col-sm-2">\n        <input id="initialBundleStartLevel" class="form-control" type="number" min="0" max="100"\n          ng-model="config.initialBundleStartLevel">\n      </div>\n    </div>\n    <div class="form-group">\n      <div class="col-sm-offset-3 col-sm-2">\n        <button type="submit" class="btn btn-primary">Save</button>\n      </div>\n    </div>\n  </form>\n\n</div>\n');
+$templateCache.put('plugins/osgi/html/framework.html','<div class="framework-main" ng-controller="Osgi.FrameworkController">\n\n  <h1>Framework Configuration</h1>\n\n  <form class="form-horizontal framework-form" ng-submit="save()">\n    <div class="form-group">\n      <label class="col-sm-3 control-label" for="startLevel">Current Framework Start Level</label>\n      <div class="col-sm-2">\n        <input id="startLevel" class="form-control" type="number" min="0" max="100" ng-model="config.startLevel">\n      </div>\n    </div>\n    <div class="form-group">\n      <label class="col-sm-3 control-label" for="initialBundleStartLevel">Initial Bundle Start Level</label>\n      <div class="col-sm-2">\n        <input id="initialBundleStartLevel" class="form-control" type="number" min="0" max="100"\n          ng-model="config.initialBundleStartLevel">\n      </div>\n    </div>\n    <div class="form-group">\n      <div class="col-sm-offset-3 col-sm-2">\n        <!--\n          Use the \'setBundleStartLevel\' method here, as the \'setFrameworkStartLevel\' and\n          \'setInitialBundleStartLevel\' methods are not available for hawtio-show directive\n        -->\n        <button type="submit" class="btn btn-primary"\n                hawtio-show object-name="{{frameworkMBean}}" method-name="setBundleStartLevel">\n        Save\n      </button>\n      </div>\n    </div>\n  </form>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/layoutOsgi.html','<div class="osgi-nav-main">\n  <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Karaf.NavBarController">\n    <li ng-class=\'{active : isActive("/osgi/bundle")}\'>\n        <a href="" ng-click="goto(\'/osgi/bundles\')">Bundles</a>\n    </li>\n    <li ng-class=\'{active : isActive("/osgi/features") || isActive("/osgi/feature")}\' ng-show="isFeaturesEnabled">\n      <a href="" ng-click="goto(\'/osgi/features\')">Features</a>\n    </li>\n    <li ng-class=\'{active : isActive("/osgi/package")}\'>\n      <a href="" ng-click="goto(\'/osgi/packages\')">Packages</a>\n    </li>\n    <li ng-class=\'{active : isActive("/osgi/service")}\'>\n      <a href="" ng-click="goto(\'/osgi/services\')">Services</a>\n    </li>\n    <li ng-class=\'{active : isActive("/osgi/scr-components")}\' ng-show="isScrEnabled">\n      <a href="" ng-click="goto(\'/osgi/scr-components\')">Declarative Services</a>\n    </li>\n    <li ng-class=\'{active : isActive("/osgi/server")}\'>\n      <a href="" ng-click="goto(\'/osgi/server\')">Server</a>\n    </li>\n    <li ng-class=\'{active : isActive("/osgi/fwk")}\'>\n      <a href="" ng-click="goto(\'/osgi/fwk\')">Framework</a>\n    </li>\n    <li ng-class=\'{active : isActive("/osgi/configuration") || isPrefixActive("/osgi/pid")}\'>\n      <a href="" ng-click="goto(\'/osgi/configurations\')">Configuration</a>\n    </li>\n    <li class="dropdown overflow">\n      <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n        More <span class="caret"></span>\n      </a>\n      <ul class="dropdown-menu" role="menu"></ul>\n    </li>\n  </ul>\n  <div class="contents" ng-view></div>\n</div>\n');
 $templateCache.put('plugins/osgi/html/packages.html','<h1>Packages</h1>\n\n<div class="osgi-packages-main" ng-controller="Osgi.PackagesController">\n\n  <div class="spinner spinner-lg loading-page" ng-if="!packages"></div>\n\n  <div ng-if="packages">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <div class="list-group list-view-pf list-view-pf-view osgi-packages-list" infinite-scroll="appendItems()"\n      infinite-scroll-distance="2" infinite-scroll-container=\'".osgi-nav-main .contents"\'>\n      <div class="list-group-item" ng-repeat="package in scrollablePackages"\n        ng-class="{\'list-view-pf-expand-active\': package.exportsExpanded || package.importsExpanded}">\n        <div class="list-view-pf-main-info">\n          <div class="list-view-pf-body">\n            <div class="list-view-pf-description">\n              <div class="list-group-item-heading" title="{{package.Name}}">\n                {{package.Name}}\n              </div>\n              <div class="list-group-item-text">\n                {{package.Version}}\n              </div>\n            </div>\n            <div class="list-view-pf-additional-info">\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand" ng-class="{\'active\': package.exportsExpanded}"\n                  ng-click="package.exportsExpanded = !package.exportsExpanded; package.importsExpanded = false;">\n                  <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': package.exportsExpanded}"></span>\n                  <span class="pficon pficon-export"></span>\n                  <strong>{{package.ExportingBundles.length}}</strong>\n                  Exporting Bundle{{package.ExportingBundles.length !== 1 ? \'s\' : \'\'}}\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand" ng-class="{\'active\': package.importsExpanded}"\n                  ng-click="package.importsExpanded = !package.importsExpanded; package.exportsExpanded = false;">\n                  <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': package.importsExpanded}"></span>\n                  <span class="pficon pficon-import"></span>\n                  <strong>{{package.ImportingBundles.length}}</strong>\n                  Importing Bundle{{package.ImportingBundles.length !== 1 ? \'s\' : \'\'}}\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand">\n                  <span ng-show="package.RemovalPending">\n                    <span class="pficon pficon-warning-triangle-o"></span>\n                    Removal Pending\n                  </span>\n                </div>\n              </div>\n            </div>              \n          </div>\n        </div>\n        <div class="list-group-item-container" ng-if="package.exportsExpanded">\n          <div class="close" ng-click="package.exportsExpanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <dl>\n            <dt>Exporting Bundles</dt>\n            <dd>\n              <ul class="package-bundles-list">\n                <li ng-repeat="bundle in package.ExportingBundles">\n                  <a title="Exported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n        <div class="list-group-item-container" ng-if="package.importsExpanded">\n          <div class="close" ng-click="package.importsExpanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <dl>\n            <dt>Importing Bundles</dt>\n            <dd>\n              <ul class="package-bundles-list">\n                <li ng-repeat="bundle in package.ImportingBundles">\n                  <a title="Imported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/pid.html','<div class="pid-view" ng-controller="Osgi.PidController">\n\n  <ol class="breadcrumb">\n    <li>\n        <a ng-href="{{configurationUrl}}">Configuration</a>\n    </li>\n    <li class="page-title">\n      {{zkPid || metaType.name || pid}}\n    </li>\n  </ol>  \n  \n  <pf-toolbar config="toolbarConfig"></pf-toolbar>\n  \n  <div ng-hide="editMode">\n    <div class="row config-admin-form view">\n      <div class="col-sm-12">\n        <div simple-form class="pid-form" name="pidEditor" mode=\'view\' entity=\'entity\' data=\'schema\' schema="fullSchema"></div>\n      </div>\n    </div>\n  </div>\n  \n  <div ng-show="editMode">\n    <div class="row config-admin-form edit">\n      <div ng-show="newPid" class="col-sm-12 new-config-name-form">\n        <form class="form-horizontal" action="">\n          <fieldset>\n            <div class="spacer"></div>\n            <div class="form-group">\n              <label class="col-sm-2 control-label" title="The name of the configuration file">\n                Configuration name\n              </label>\n              <div class="col-sm-10">\n                <input type="text" title="The name of the configuration file" ng-required="true"\n                        ng-model="createForm.pidInstanceName" name="path" autofocus>\n              </div>\n            </div>\n          </fieldset>\n        </form>\n      </div>\n      <div class="col-sm-12">\n        <div simple-form name="pidEditor" mode=\'edit\' entity=\'entity\' data=\'schema\' schema="fullSchema" onSubmit="pidSave()"></div>\n      </div>\n    </div>\n    <div class="row">\n      <div class="col-sm-2"></div>\n      <div class="col-sm-10">\n        <button class="btn btn-primary" ng-show="newPid" ng-disabled="!canSave || !createForm.pidInstanceName" ng-click="pidSave()">Create</button>\n        <button class="btn btn-primary" ng-hide="newPid" ng-disabled="!canSave" ng-click="pidSave()">Save</button>\n        <button class="btn btn-default" ng-click="cancelSave()">Cancel</button>\n      </div>\n    </div>\n  </div>\n\n  <script type="text/ng-template" id="deletePropDialog.html">\n    <form name="deleteProperty" class="form-horizontal no-bottom-margin" ng-submit="deletePidPropConfirmed()">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Delete property \'{{deleteKey}}\'</h4>\n      </div>\n      <div class="modal-body">\n        <p class="lead">Are you sure?</p>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n        <button type="submit" class="btn btn-danger">Delete</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="addPropertyDialog.html">\n    <form name="addProperty" class="form-horizontal"\n          ng-submit="addPropertyConfirmed(addPropKey, addPropValue)">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Add property</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-2 control-label" for="propKey">Key</label>\n          <div class="col-sm-10">\n            <input type="text" class="form-control" id="propKey" ng-model="addPropKey" required>\n          </div>\n        </div>\n        <div class="form-group">\n          <label class="col-sm-2 control-label" for="propValue">Value</label>\n          <div class="col-sm-10">\n            <input type="text" class="form-control" id="propValue" ng-model="addPropValue"/>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n        <button type="submit" class="btn btn-primary">Add</button>\n      </div>\n    </form>\n  </script>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/services.html','<h1>Services</h1>\n\n<div class="controller-section" ng-controller="Osgi.ServiceController">\n\n  <div class="spinner spinner-lg loading-page" ng-if="!services"></div>\n\n  <div ng-if="services">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <div class="list-group list-view-pf list-view-pf-view">\n      <div class="list-group-item" ng-class="{\'list-view-pf-expand-active\': service.expanded}"\n          ng-repeat="service in filteredServices">\n        <div class="list-group-item-header" ng-click="service.expanded = !service.expanded">\n          <div class="list-view-pf-expand">\n            <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': service.expanded}"></span>\n          </div>\n          <div class="list-view-pf-main-info">\n            <div class="list-view-pf-body">\n              <div class="list-view-pf-description">\n                <div class="list-group-item-heading">\n                  ID {{service.Identifier}}\n                </div>\n                <div class="list-group-item-text" ng-bind-html="service.BundleLinks">\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info">\n                <div class="list-view-pf-additional-info-item" title="Object Classes">\n                  {{service.objectClass[0]}}{{service.objectClass.length > 1 ? \'...\' : \'\'}}\n                </div>\n              </div>              \n            </div>\n          </div>\n        </div>\n        <div class="list-group-item-container" ng-if="service.expanded">\n          <div class="close" ng-click="service.expanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <div class="col-md-5">\n            <dl>\n              <dt>Using Bundles</dt>\n              <dd>\n                <ul class="service-bundles-list">\n                  <li ng-repeat="bundle in service.UsingBundles">\n                    <a ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                  </li>\n                </ul>\n              </dd>\n            </dl>\n          </div>\n          <div class="col-md-5">\n            <dl>\n              <dt>Object Classes</dt>\n              <dd>\n                <ul class="service-object-classes-list">\n                  <li ng-repeat="clazz in service.objectClass">\n                    {{clazz}}\n                  </li>\n                </ul>\n              </dd>\n            </dl>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/activemq/doc/help.md','### ActiveMQ\n\nClick [ActiveMQ](#/jmx/attributes?tab=activmemq) in the top navigation bar to see the ActiveMQ specific plugin. (The ActiveMQ tab won\'t appear if there is no broker in this JVM).  The ActiveMQ plugin works very much the same as the JMX plugin however with a focus on interacting with an ActiveMQ broker.\n\nThe tree view on the left-hand side shows the top level JMX tree of each broker instance running in the JVM.  Expanding the tree will show the various MBeans registered by ActiveMQ that you can inspect via the **Attributes** tab.\n\nYou can then click on the **Queue** node to see the queues and **Topic** node to see the topics. From either of these nodes you should see **Create Queue** or **Create Topic** tabs to be able to create new destinations.\n\nOnce you have selected a destination you should be able to **Send** to it, **Browse** a queue or view the  **Attributes** or **Charts**\n\nYou can also see a graphical view of all producers, destinations and consumers for all queues (or if you select a Topic folder then topics) using the **Diagram** tab. Selecting a single queue or topic shows just all the producers and consumers on that destination. This diagram makes it easy to spot if producers are sending messages when there are no consumers, or that consumers are on the wrong destination etc.\n');
 $templateCache.put('plugins/camel/doc/help.md','### Camel\n\nClick [Camel](#/jmx/attributes?tab=camel) in the top navigation bar to view all the running Camel Contexts in the current JVM. (The selection will not appear on the navigation bar if there is no Camel running).\n\nThe Camel plugin allows you to view all the running Camel applications in the current JVM.\nYou can among others see the following details:\n\n* Lists of all running Camel applications\n* Detailed information of each Camel Context such as Camel version number, runtime statics\n* Lists of all routes in each Camel applications and their runtime statistics\n* Manage the lifecycle of all Camel applications and their routes, so you can restart / stop / pause / resume, etc.\n* Graphical representation of the running routes along with real time metrics\n* Live tracing and debugging of running routes\n* Profile the running routes with real time runtime statics; detailed specified per processor\n* Browsing and sending messages to Camel endpoint\n');
+$templateCache.put('plugins/activemq/doc/help.md','### ActiveMQ\n\nClick [ActiveMQ](#/jmx/attributes?tab=activmemq) in the top navigation bar to see the ActiveMQ specific plugin. (The ActiveMQ tab won\'t appear if there is no broker in this JVM).  The ActiveMQ plugin works very much the same as the JMX plugin however with a focus on interacting with an ActiveMQ broker.\n\nThe tree view on the left-hand side shows the top level JMX tree of each broker instance running in the JVM.  Expanding the tree will show the various MBeans registered by ActiveMQ that you can inspect via the **Attributes** tab.\n\nYou can then click on the **Queue** node to see the queues and **Topic** node to see the topics. From either of these nodes you should see **Create Queue** or **Create Topic** tabs to be able to create new destinations.\n\nOnce you have selected a destination you should be able to **Send** to it, **Browse** a queue or view the  **Attributes** or **Charts**\n\nYou can also see a graphical view of all producers, destinations and consumers for all queues (or if you select a Topic folder then topics) using the **Diagram** tab. Selecting a single queue or topic shows just all the producers and consumers on that destination. This diagram makes it easy to spot if producers are sending messages when there are no consumers, or that consumers are on the wrong destination etc.\n');
 $templateCache.put('plugins/karaf/doc/help.md','### Karaf\n\nThis plugin supports the [Apache Karaf](http://karaf.apache.org/) container');
 $templateCache.put('plugins/osgi/doc/help.md','### OSGi\n\nThis plugin supports the various OSGi standards for working with bundles, Config Admin, services, packages etc.');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");
