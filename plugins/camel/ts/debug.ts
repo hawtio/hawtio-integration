@@ -105,6 +105,19 @@ namespace Camel {
       }
     };
 
+    $scope.shouldDisableAddBreakpoint = () => {
+      if (!$scope.selectedDiagramNodeId) {
+        return true;
+      }
+
+      let nodes = getDiagramNodes();
+      if (!nodes || nodes.length == 0) {
+        return true
+      }
+
+      return nodes[0][0].getAttribute("data-cid") === $scope.selectedDiagramNodeId;
+    }
+
     function onSelectionChanged() {
       Camel.highlightSelectedNode(getDiagramNodes(), getStoppedBreakpointId());
     }

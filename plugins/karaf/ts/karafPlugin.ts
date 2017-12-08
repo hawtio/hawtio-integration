@@ -19,7 +19,7 @@ namespace Karaf {
             when('/osgi/server', {templateUrl: 'plugins/karaf/html/server.html'}).
             when('/osgi/features', {template: '<features></features>'}).
             when('/osgi/scr-components', {template: '<scr-list-components></scr-list-components>'}).
-            when('/osgi/scr-component/:name', {template: '<scr-component-detail></scr-component-detail>'}).
+            when('/osgi/scr-components/:name', {template: '<scr-component-detail></scr-component-detail>'}).
             when('/osgi/feature/:name/:version', {templateUrl: 'plugins/karaf/html/feature.html'})
   }]);
 
