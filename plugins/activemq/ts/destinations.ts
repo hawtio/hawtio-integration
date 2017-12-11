@@ -1,5 +1,5 @@
 /// <reference path="activemqPlugin.ts"/>
-module ActiveMQ {
+namespace ActiveMQ {
 
     _module.controller("ActiveMQ.QueuesController", ["$scope", "workspace", "jolokia", "localStorage", (
         $scope,

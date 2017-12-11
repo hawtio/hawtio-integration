@@ -89,7 +89,7 @@ declare namespace ActiveMQ {
 declare namespace ActiveMQ {
     var BrowseQueueController: angular.IModule;
 }
-declare module ActiveMQ {
+declare namespace ActiveMQ {
 }
 declare namespace ActiveMQ {
 }
