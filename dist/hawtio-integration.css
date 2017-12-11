@@ -676,10 +676,6 @@ div.camel-properties {
   width: 111px;
 }
 
-.table-src-components th:nth-child(3) {
-  width: 30%;
-}
-
 .install-bundle {
   margin-bottom: 10px;
 }
@@ -798,6 +794,10 @@ div.camel-properties {
   color: inherit;
   background-color: inherit;
   border: none;
+}
+
+.table-src-components th:nth-child(3) {
+  width: 30%;
 }
 
 .metricsWatcher .panel-group:first-child {

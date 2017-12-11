@@ -1,9 +1,6 @@
 {
   "branding": {
-    "logoUrl": "node_modules/patternfly/dist/img/logo.svg",
-    "logoAltUrl": "node_modules/patternfly/dist/img/logo-alt.svg",
-    "brandUrl": "node_modules/patternfly/dist/img/brand.svg",
-    "brandAltUrl": "node_modules/patternfly/dist/img/brand-alt.svg",
-    "brandName": "PatternFly Enterprise Application"
+    "appName": "Hawtio Management Console",
+    "logoUrl": "node_modules/@hawtio/core/dist/img/hawtio-logo.svg"
   }
 }
