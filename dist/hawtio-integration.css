@@ -676,8 +676,8 @@ div.camel-properties {
   width: 111px;
 }
 
-.table-src-components th:nth-child(3) {
-  width: 30%;
+.scr-component-references-table td:nth-child(3) {
+  text-transform: capitalize;
 }
 
 .install-bundle {

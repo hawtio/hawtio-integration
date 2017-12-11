@@ -3,20 +3,20 @@
     <form class="toolbar-pf-actions">
       <div class="form-group">
         <button class="btn btn-default" 
-                ng-click="$ctrl.activateComponent()" 
-                ng-disabled="$ctrl.disableActivate()"
+                ng-click="$ctrl.enableComponent()"
+                ng-disabled="$ctrl.disableComponentEnable()"
                 hawtio-show
                 object-name="{{$ctrl.scrMBean}}"
-                method-name="activateComponent">
-          Activate
+                method-name="enableComponent">
+          Enable
         </button>
         <button class="btn btn-default" 
-                ng-click="$ctrl.deactivateComponent()"
-                ng-disabled="$ctrl.disableDeactivate()"
+                ng-click="$ctrl.disableComponent()"
+                ng-disabled="$ctrl.disableComponentDisable()"
                 hawtio-show
                 object-name="{{$ctrl.scrMBean}}"
-                method-name="deactivateComponent">
-          Deactivate
+                method-name="disableComponent">
+          Disable
         </button>
       </div>
     </form>
@@ -28,8 +28,10 @@
 <div class="row">
   <div class="col-md-12">
     <dl class="dl-horizontal">
-      <dt>Id</dt>
-      <dd>{{$ctrl.component.id}}</dd>
+      <dt ng-if="$ctrl.component.id >= 0">ID</dt>
+      <dd ng-if="$ctrl.component.id >= 0">{{$ctrl.component.id}}</dd>
+      <dt>Bundle ID</dt>
+      <dd><a ng-href="osgi/bundle/{{$ctrl.component.bundleId}}">{{$ctrl.component.bundleId}}</a></dd>
       <dt>Name</dt>
       <dd>{{$ctrl.component.name}}</dd>
       <dt>State</dt>
@@ -39,12 +41,11 @@
 </div>
 
 <h2>Properties</h2>
-
 <div class="row">
   <div class="col-md-12">
     <dl class="dl-horizontal">
       <dt ng-repeat-start="(key, value) in $ctrl.component.properties">{{key}}</dt>
-      <dd ng-repeat-end ng-repeat="v in value">{{v.Value}}</dd>
+      <dd ng-repeat-end>{{value.Value}}</dd>
     </dl>
   </div>
 </div>
@@ -53,11 +54,10 @@
 
 <div class="row">
   <div class="col-md-12">
-    <table class="table">
+    <table class="scr-component-references-table table">
       <thead>
         <tr>
           <th>Name</th>
-          <th>Availability</th>
           <th>Cardinality</th>
           <th>Policy</th>
           <th>Bound Services</th>
@@ -66,12 +66,11 @@
       <tbody>
         <tr ng-repeat="(key, value) in $ctrl.component.references">
           <td>{{value.Name}}</td>
-          <td>{{value.Availability}}</td>
           <td>{{value.Cardinality}}</td>
           <td>{{value.Policy}}</td>
           <td>
             <ul class="list-unstyled">
-              <li ng-repeat="id in value['Bound Services']">
+              <li ng-repeat="id in value['BoundServices']">
                 <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>
               </li>
             </ul>

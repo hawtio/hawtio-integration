@@ -12,15 +12,38 @@ namespace Karaf {
     }
 
     getComponents(): ng.IPromise<ScrComponent[]> {
-      return this.execute(getSelectionScrMBean(this.workspace), undefined, undefined, 'read')
+      return this.execute(getSelectionScrMBean(this.workspace), undefined, 'read')
         .then(value => {
           const components: ScrComponent[] = [];
           angular.forEach(value['Components'].values, (item, key) => {
-            var component: ScrComponent = {
-              id: item.Id,
+            let id = -1;
+            let state = 'Disabled';
+            let properties = item.Properties;
+
+            // Fetch additional info from the ComponentConfigs attribute to avoid making additional Jolokia calls
+            let componentConfig = value['ComponentConfigs'].values.filter((component) => {
+              return component.Name === item.Name;
+            });
+
+            if (componentConfig && componentConfig.length > 0) {
+              id = componentConfig[0].Id;
+              state = 'Enabled';
+              properties = componentConfig[0].Properties;
+
+              angular.forEach(componentConfig[0].SatisfiedReferences, (reference) => {
+                if (item.References[reference.Name]) {
+                  // Augment references with BoundServices info
+                  item.References[reference.Name]['BoundServices'] = reference.BoundServices;
+                }
+              });
+            }
+
+            let component: ScrComponent = {
+              id: id,
+              bundleId: item.BundleId,
               name: item.Name,
-              state: item.State,
-              properties: item.Properties,
+              state: state,
+              properties: properties,
               references: item.References
             };
             components.push(component);
@@ -29,35 +52,35 @@ namespace Karaf {
       });
     }
 
-    activateComponents(components: ScrComponent[]): ng.IPromise<string> {
-      const mbean = getSelectionScrMBean(this.workspace);
-      let promises:ng.IPromise<String>[] = []
-      angular.forEach(components, (component) => {
-        promises.push(this.execute(mbean, 'activateComponent(java.lang.String)', component.name))
-      });
-
-      return this.$q.all(promises).then(this.handleResponse);
-    }
-
-    activateComponent(component: ScrComponent): ng.IPromise<string> {
-      return this.activateComponents([component]);
-    }
-
-    deactivateComponents(components: ScrComponent[]): ng.IPromise<string> {
+    enableComponents(components: ScrComponent[]): ng.IPromise<string> {
       const mbean = getSelectionScrMBean(this.workspace);
       let promises:ng.IPromise<string>[] = []
       angular.forEach(components, (component) => {
-        promises.push(this.execute(mbean, 'deactivateComponent(java.lang.String)', component.name))
+        promises.push(this.execute(mbean, 'enableComponent(long, java.lang.String)', 'exec', component.bundleId, component.name))
       });
 
       return this.$q.all(promises).then(this.handleResponse);
     }
 
-    deactivateComponent(component: ScrComponent): ng.IPromise<string> {
-      return this.deactivateComponents([component]);
+    enableComponent(component: ScrComponent): ng.IPromise<string> {
+      return this.enableComponents([component]);
     }
 
-    private execute(mbean: string, operation: string, args = undefined, type: string = "exec"): ng.IPromise<string> {
+    disableComponents(components: ScrComponent[]): ng.IPromise<string> {
+      const mbean = getSelectionScrMBean(this.workspace);
+      let promises:ng.IPromise<string>[] = []
+      angular.forEach(components, (component) => {
+        promises.push(this.execute(mbean, 'disableComponent(long, java.lang.String)', 'exec', component.bundleId, component.name))
+      });
+
+      return this.$q.all(promises).then(this.handleResponse);
+    }
+
+    disableComponent(component: ScrComponent): ng.IPromise<string> {
+      return this.disableComponents([component]);
+    }
+
+    private execute(mbean: string, operation: string, type: string, ...args: any[]): ng.IPromise<string> {
       const request = {
         type: type,
         mbean: mbean,
@@ -68,7 +91,7 @@ namespace Karaf {
       }
 
       if (args) {
-        request['arguments'] = [args];
+        request['arguments'] = args;
       } else {
         request['arguments'] = [];
       }

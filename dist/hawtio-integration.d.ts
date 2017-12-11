@@ -1305,6 +1305,7 @@ declare namespace Karaf {
 declare namespace Karaf {
     interface ScrComponent {
         id: number;
+        bundleId: number;
         name: string;
         state: string;
         properties: any;
@@ -1319,11 +1320,11 @@ declare namespace Karaf {
         private log;
         constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
         getComponents(): ng.IPromise<ScrComponent[]>;
-        activateComponents(components: ScrComponent[]): ng.IPromise<string>;
-        activateComponent(component: ScrComponent): ng.IPromise<string>;
-        deactivateComponents(components: ScrComponent[]): ng.IPromise<string>;
-        deactivateComponent(component: ScrComponent): ng.IPromise<string>;
-        private execute(mbean, operation, args?, type?);
+        enableComponents(components: ScrComponent[]): ng.IPromise<string>;
+        enableComponent(component: ScrComponent): ng.IPromise<string>;
+        disableComponents(components: ScrComponent[]): ng.IPromise<string>;
+        disableComponent(component: ScrComponent): ng.IPromise<string>;
+        private execute(mbean, operation, type, ...args);
         private handleResponse(response);
     }
 }
@@ -1332,8 +1333,8 @@ declare namespace Karaf {
         private scrComponentsService;
         private workspace;
         private static FILTER_FUNCTIONS;
-        private readonly activateAction;
-        private readonly deactivateAction;
+        private readonly enableAction;
+        private readonly disableAction;
         private toolbarActions();
         private toolbarConfig;
         private tableConfig;
@@ -1362,10 +1363,10 @@ declare namespace Karaf {
         constructor(scrComponentsService: ScrComponentsService, $routeParams: angular.route.IRouteParamsService, workspace: Jmx.Workspace);
         $onInit(): void;
         private loadComponent();
-        disableActivate(): boolean;
-        activateComponent(): void;
-        disableDeactivate(): boolean;
-        deactivateComponent(): void;
+        disableComponentEnable(): boolean;
+        enableComponent(): void;
+        disableComponentDisable(): boolean;
+        disableComponent(): void;
     }
     const scrDetailComponent: angular.IComponentOptions;
 }

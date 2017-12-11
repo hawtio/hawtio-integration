@@ -13,11 +13,11 @@ namespace Karaf {
       }
     };
 
-    private readonly activateAction = {
-      name: 'Activate',
+    private readonly enableAction = {
+      name: 'Enable',
       actionFn: action => {
         let selectedComponents = this.getSelectedComponents();
-        this.scrComponentsService.activateComponents(selectedComponents)
+        this.scrComponentsService.enableComponents(selectedComponents)
           .then(response => {
             Core.notification('success', response);
             this.loadComponents();
@@ -27,11 +27,11 @@ namespace Karaf {
       isDisabled: true
     }
 
-    private readonly deactivateAction = {
-      name: 'Deactivate',
+    private readonly disableAction = {
+      name: 'Disable',
       actionFn: action => {
         let selectedComponents = this.getSelectedComponents();
-        this.scrComponentsService.deactivateComponents(selectedComponents)
+        this.scrComponentsService.disableComponents(selectedComponents)
           .then(response => {
             Core.notification('success', response);
             this.loadComponents();
@@ -44,11 +44,11 @@ namespace Karaf {
     private toolbarActions(): any[] {
       let actions = [];
       let scrMBean = getSelectionScrMBean(this.workspace);
-      if (this.workspace.hasInvokeRightsForName(scrMBean, 'activateComponent')) {
-        actions.push(this.activateAction);
+      if (this.workspace.hasInvokeRightsForName(scrMBean, 'enableComponent')) {
+        actions.push(this.enableAction);
       }
-      if (this.workspace.hasInvokeRightsForName(scrMBean, 'deactivateComponent')) {
-        actions.push(this.deactivateAction);
+      if (this.workspace.hasInvokeRightsForName(scrMBean, 'disableComponent')) {
+        actions.push(this.disableAction);
       }
       log.debug("RBAC - Rendered SCR actions:", actions);
       return actions;
@@ -70,15 +70,7 @@ namespace Karaf {
             filterType: 'select',
             filterValues: [
               'Enabled',
-              'Unsatisfied',
-              'Activating',
-              'Active',
-              'Registered',
-              'Factory',
-              'Deactivating',
-              'Destroying',
-              'Disabling',
-              'Disposing'
+              'Disabled'
             ]
           }
         ],
@@ -140,8 +132,8 @@ namespace Karaf {
     private enableDisableActions() {
       const selectedComponents = this.getSelectedComponents();
       const noComponentsSelected = selectedComponents.length === 0;
-      this.activateAction.isDisabled = noComponentsSelected || selectedComponents.every(component => component.state === 'Active');
-      this.deactivateAction.isDisabled = noComponentsSelected || selectedComponents.every(component => component.state !== 'Active');
+      this.enableAction.isDisabled = noComponentsSelected || selectedComponents.every(component => component.state === 'Enabled');
+      this.disableAction.isDisabled = noComponentsSelected || selectedComponents.every(component => component.state !== 'Enabled');
     }
 
     private getSelectedComponents(): ScrComponent[] {

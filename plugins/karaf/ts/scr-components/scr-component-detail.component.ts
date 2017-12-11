@@ -29,12 +29,12 @@ namespace Karaf {
       })
     }
 
-    disableActivate(): boolean {
-      return this.component == undefined || this.component.state === 'Active';
+    disableComponentEnable(): boolean {
+      return this.component == undefined || this.component.state === 'Enabled';
     }
 
-    activateComponent(): void {
-      this.scrComponentsService.activateComponent(this.component)
+    enableComponent(): void {
+      this.scrComponentsService.enableComponent(this.component)
         .then(response => {
           Core.notification('success', response);
           this.loadComponent();
@@ -42,12 +42,13 @@ namespace Karaf {
         .catch(error => Core.notification('danger', error));
     }
 
-    disableDeactivate(): boolean {
-      return this.component == undefined || this.component.state !== 'Active';
+    disableComponentDisable(): boolean {
+      console.log(this.component.state)
+      return this.component == undefined || this.component.state !== 'Enabled';
     }
 
-    deactivateComponent(): void {
-      this.scrComponentsService.deactivateComponent(this.component)
+    disableComponent(): void {
+      this.scrComponentsService.disableComponent(this.component)
         .then(response => {
           Core.notification('success', response);
           this.loadComponent();
