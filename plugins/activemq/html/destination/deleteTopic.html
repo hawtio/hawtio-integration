@@ -5,16 +5,11 @@
   </div>
 </p>
 
-<div class="row">
-  <div class="col-md-12">
-    <div class="control-group">
-      <button type="submit" class="btn btn-warning" ng-click="$ctrl.deleteDialog = true">
-        Delete topic '{{$ctrl.selectedName()}}'
-      </button>
-      <label>Removes the topic completely.</label>
-    </div>
-  </div>
-</div>
+<h2>Delete topic</h2>
+<p>Remove the topic completely.</p>
+<button type="submit" class="btn btn-danger" ng-click="$ctrl.deleteDialog = true">
+  Delete topic
+</button>
 
 <div hawtio-confirm-dialog="$ctrl.deleteDialog"
      title="Confirm delete topic"
