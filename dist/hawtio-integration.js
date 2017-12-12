@@ -17903,9 +17903,191 @@ var Camel;
         .service('routesService', Camel.RoutesService)
         .name;
 })(Camel || (Camel = {}));
+/// <reference path="../camelPlugin.ts"/>
+var Camel;
+(function (Camel) {
+    var TreeHeaderController = /** @class */ (function () {
+        TreeHeaderController.$inject = ["$scope", "$element"];
+        function TreeHeaderController($scope, $element) {
+            'ngInject';
+            this.$scope = $scope;
+            this.$element = $element;
+            this.filter = '';
+            this.result = [];
+            // it's not possible to declare classes to the component host tag in AngularJS
+            $element.addClass('tree-nav-sidebar-header');
+        }
+        TreeHeaderController.prototype.$onInit = function () {
+            var _this = this;
+            this.$scope.$watch(angular.bind(this, function () { return _this.filter; }), function (filter, previous) {
+                if (filter !== previous) {
+                    _this.search(filter);
+                }
+            });
+        };
+        TreeHeaderController.prototype.search = function (filter) {
+            var _this = this;
+            var doSearch = function (filter) {
+                var result = _this.tree().search(filter, {
+                    ignoreCase: true,
+                    exactMatch: false,
+                    revealResults: true,
+                });
+                _this.result.length = 0;
+                (_a = _this.result).push.apply(_a, result);
+                Core.$apply(_this.$scope);
+                var _a;
+            };
+            _.debounce(doSearch, 300, { leading: false, trailing: true })(filter);
+        };
+        TreeHeaderController.prototype.tree = function () {
+            return $('#cameltree').treeview(true);
+        };
+        TreeHeaderController.prototype.expandAll = function () {
+            return this.tree()
+                .expandNode(this.tree().getNodes(), { levels: 1, silent: true });
+        };
+        TreeHeaderController.prototype.contractAll = function () {
+            return this.tree()
+                .collapseNode(this.tree().getNodes(), { ignoreChildren: true, silent: true });
+        };
+        return TreeHeaderController;
+    }());
+    Camel.TreeHeaderController = TreeHeaderController;
+    var TreeController = /** @class */ (function () {
+        TreeController.$inject = ["$scope", "$location", "workspace", "$route", "jolokia", "$element"];
+        function TreeController($scope, $location, workspace, $route, jolokia, $element) {
+            'ngInject';
+            this.$scope = $scope;
+            this.$location = $location;
+            this.workspace = workspace;
+            this.$route = $route;
+            this.jolokia = jolokia;
+            this.$element = $element;
+            // it's not possible to declare classes to the component host tag in AngularJS
+            $element.addClass('tree-nav-sidebar-content');
+        }
+        TreeController.prototype.$onInit = function () {
+            var _this = this;
+            this.$scope.$on('$destroy', function () {
+                var tree = $('#cameltree').treeview(true);
+                tree.clearSearch();
+                // Bootstrap tree view leaks the node elements into the data structure
+                // so let's clean this up when the user leaves the view
+                var cleanTreeFolder = function (node) {
+                    delete node['$el'];
+                    if (node.nodes)
+                        node.nodes.forEach(cleanTreeFolder);
+                };
+                cleanTreeFolder(_this.workspace.tree);
+                // Then call the tree clean-up method
+                tree.remove();
+            });
+            this.$scope.$on('$routeChangeStart', function () { return Jmx.updateTreeSelectionFromURL(_this.$location, $('#cameltree')); });
+            this.$scope.$watch(angular.bind(this, function () { return _this.workspace.tree; }), function () { return _this.populateTree(); });
+            this.$scope.$on('jmxTreeUpdated', function () { return _this.populateTree(); });
+            this.$scope.$on('jmxTreeClicked', function (event, selection) { return _this.navigateToDefaultTab(selection); });
+            if (this.workspace.selection) {
+                this.navigateToDefaultTab(this.workspace.selection);
+            }
+        };
+        TreeController.prototype.treeFetched = function () {
+            return this.workspace.treeFetched;
+        };
+        TreeController.prototype.updateSelectionFromURL = function () {
+            Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $('#cameltree'), function (first) {
+                // use function to auto select first Camel context routes if there is only one Camel context
+                var contexts = first.children;
+                if (contexts && contexts.length === 1) {
+                    var first_1 = contexts[0];
+                    var children = first_1.children;
+                    if (children && children.length) {
+                        var routes = children[0];
+                        if (routes.typeName === 'routes') {
+                            return routes;
+                        }
+                    }
+                }
+                return null;
+            }, true);
+        };
+        TreeController.prototype.populateTree = function () {
+            var tree = this.workspace.tree;
+            if (tree) {
+                var rootFolder = tree.findDescendant(function (node) { return node.key === 'camelContexts'; });
+                if (rootFolder) {
+                    var treeElement = $('#cameltree');
+                    Jmx.enableTree(this.$scope, this.$location, this.workspace, treeElement, [rootFolder]);
+                    this.updateSelectionFromURL();
+                }
+            }
+        };
+        // TODO: the logic should ideally be factorized with that of the visible tabs
+        TreeController.prototype.navigateToDefaultTab = function (selection) {
+            var path = '/jmx/attributes';
+            if (this.workspace.isRoutesFolder()) {
+                path = '/camel/routes';
+            }
+            else if (this.workspace.isRoute()) {
+                if (this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(this.workspace), 'dumpRoutesAsXml')) {
+                    path = '/camel/routeDiagram';
+                }
+                else {
+                    path = '/jmx/attributes';
+                }
+            }
+            else if (this.workspace.selection && this.workspace.selection.key === 'camelContexts') {
+                path = '/camel/contexts';
+            }
+            else if (Camel.isRouteNode(this.workspace)) {
+                path = 'camel/propertiesRoute';
+            }
+            else if (this.workspace.isComponent()
+                && Camel.isCamelVersionEQGT(2, 15, this.workspace, this.jolokia)
+                && this.workspace.hasInvokeRights(this.workspace.selection, 'explainComponentJson')) {
+                path = '/camel/propertiesComponent';
+            }
+            else if (this.workspace.isEndpoint()
+                && Camel.isCamelVersionEQGT(2, 15, this.workspace, this.jolokia)
+                && this.workspace.hasInvokeRights(this.workspace.selection, 'explainEndpointJson')) {
+                path = '/camel/propertiesEndpoint';
+            }
+            else if (this.workspace.isDataformat()
+                && Camel.isCamelVersionEQGT(2, 16, this.workspace, this.jolokia)
+                && this.workspace.hasInvokeRights(this.workspace.selection, "explainDataFormatJson")) {
+                path = '/camel/propertiesDataFormat';
+            }
+            this.$location.path(path);
+        };
+        return TreeController;
+    }());
+    Camel.TreeController = TreeController;
+})(Camel || (Camel = {}));
+/// <reference path="tree.controller.ts"/>
+var Camel;
+(function (Camel) {
+    Camel.treeHeaderComponent = {
+        templateUrl: 'plugins/camel/html/tree/header.html',
+        controller: Camel.TreeHeaderController,
+    };
+    Camel.treeComponent = {
+        templateUrl: 'plugins/camel/html/tree/content.html',
+        controller: Camel.TreeController,
+    };
+})(Camel || (Camel = {}));
+/// <reference path="tree.component.ts"/>
+var Camel;
+(function (Camel) {
+    Camel.treeModule = angular
+        .module('hawtio-camel-tree', [])
+        .component('camelTreeHeader', Camel.treeHeaderComponent)
+        .component('camelTree', Camel.treeComponent)
+        .name;
+})(Camel || (Camel = {}));
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="contexts/contexts.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
+/// <reference path="tree/tree.module.ts"/>
 var Camel;
 (function (Camel) {
     Camel.pluginName = 'camel';
@@ -17914,7 +18096,8 @@ var Camel;
         'patternfly.table',
         'angularResizable',
         Camel.contextsModule,
-        Camel.routesModule
+        Camel.routesModule,
+        Camel.treeModule,
     ]);
     Camel._module.config(["$routeProvider", function ($routeProvider) {
             $routeProvider
@@ -20882,128 +21065,6 @@ var Camel;
             log.info("Re-activating tracer with " + tracerStatus.messages.length + " existing messages");
             $scope.messages = tracerStatus.messages;
             $scope.tracing = tracerStatus.jhandle != null;
-        }]);
-})(Camel || (Camel = {}));
-/// <reference path="camelPlugin.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.TreeHeaderController", ["$scope", "$location", function ($scope, $location) {
-            // TODO: the tree should ideally be initialised synchronously
-            var tree = function () { return $('#cameltree').treeview(true); };
-            $scope.expandAll = function () { return tree().expandNode(tree().getNodes(), { levels: 1, silent: true }); };
-            $scope.contractAll = function () { return tree().collapseNode(tree().getNodes(), { ignoreChildren: true, silent: true }); };
-            var search = _.debounce(function (filter) {
-                var result = tree().search(filter, {
-                    ignoreCase: true,
-                    exactMatch: false,
-                    revealResults: true
-                });
-                $scope.result.length = 0;
-                (_a = $scope.result).push.apply(_a, result);
-                Core.$apply($scope);
-                var _a;
-            }, 300, { leading: false, trailing: true });
-            $scope.filter = '';
-            $scope.result = [];
-            $scope.$watch('filter', function (filter, previous) {
-                if (filter !== previous) {
-                    search(filter);
-                }
-            });
-        }]);
-    Camel._module.controller("Camel.TreeController", ["$scope", "$location", "$timeout", "workspace", 'jolokia',
-        function ($scope, $location, $timeout, workspace, jolokia) {
-            $scope.treeFetched = function () { return workspace.treeFetched; };
-            $scope.$on('$routeChangeStart', function () { return Jmx.updateTreeSelectionFromURL($location, $('#cameltree')); });
-            $scope.$watch('workspace.tree', function () {
-                reloadFunction();
-            });
-            $scope.$on('jmxTreeUpdated', function () {
-                reloadFunction();
-            });
-            $scope.$on('jmxTreeClicked', function (event, selection) { return navigateToDefaultTab(selection); });
-            // TODO: the logic should ideally be factorized with that of the visible tabs
-            function navigateToDefaultTab(selection) {
-                var path = '/jmx/attributes';
-                if (workspace.isRoutesFolder()) {
-                    path = '/camel/routes';
-                }
-                else if (workspace.isRoute()) {
-                    if (workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(workspace), 'dumpRoutesAsXml')) {
-                        path = '/camel/routeDiagram';
-                    }
-                    else {
-                        path = '/jmx/attributes';
-                    }
-                }
-                else if (workspace.selection && workspace.selection.key === 'camelContexts') {
-                    path = '/camel/contexts';
-                }
-                else if (Camel.isRouteNode(workspace)) {
-                    path = 'camel/propertiesRoute';
-                }
-                else if (workspace.isComponent()
-                    && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-                    && workspace.hasInvokeRights(workspace.selection, 'explainComponentJson')) {
-                    path = '/camel/propertiesComponent';
-                }
-                else if (workspace.isEndpoint()
-                    && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-                    && workspace.hasInvokeRights(workspace.selection, 'explainEndpointJson')) {
-                    path = '/camel/propertiesEndpoint';
-                }
-                else if (workspace.isDataformat()
-                    && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
-                    && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson")) {
-                    path = '/camel/propertiesDataFormat';
-                }
-                $location.path(path);
-            }
-            function reloadFunction() {
-                var tree = workspace.tree;
-                if (tree) {
-                    var rootFolder = tree.findDescendant(function (node) { return node.key === 'camelContexts'; });
-                    if (rootFolder) {
-                        var treeElement = $('#cameltree');
-                        Jmx.enableTree($scope, $location, workspace, treeElement, [rootFolder]);
-                        updateSelectionFromURL();
-                    }
-                }
-            }
-            function updateSelectionFromURL() {
-                Jmx.updateTreeSelectionFromURLAndAutoSelect($location, $('#cameltree'), function (first) {
-                    // use function to auto select first Camel context routes if there is only one Camel context
-                    var contexts = first.children;
-                    if (contexts && contexts.length === 1) {
-                        var first_1 = contexts[0];
-                        var children = first_1.children;
-                        if (children && children.length) {
-                            var routes = children[0];
-                            if (routes.typeName === 'routes') {
-                                return routes;
-                            }
-                        }
-                    }
-                    return null;
-                }, true);
-            }
-            $scope.$on('$destroy', function () {
-                var tree = $('#cameltree').treeview(true);
-                tree.clearSearch();
-                // Bootstrap tree view leaks the node elements into the data structure
-                // so let's clean this up when the user leaves the view
-                var cleanTreeFolder = function (node) {
-                    delete node['$el'];
-                    if (node.nodes)
-                        node.nodes.forEach(cleanTreeFolder);
-                };
-                cleanTreeFolder(workspace.tree);
-                // Then call the tree clean-up method
-                tree.remove();
-            });
-            if (workspace.selection) {
-                navigateToDefaultTab(workspace.selection);
-            }
         }]);
 })(Camel || (Camel = {}));
 /// <reference path="camelPlugin.ts"/>
@@ -25874,7 +25935,7 @@ $templateCache.put('plugins/camel/html/deleteRouteWarningModal.html','<div class
 $templateCache.put('plugins/camel/html/endpointRuntimeRegistry.html','<div class="table-view" ng-controller="Camel.EndpointRuntimeRegistryController">\n\n  <h2>Endpoints (in/out)</h2>\n  \n  <div ng-if="!selectedMBean" class="spinner spinner-lg loading-page"></div>\n  \n  <div ng-if="selectedMBean">\n    <div class="loading-message" ng-if="data.length === 0">\n      There are no endpoints currently in use in this CamelContext.\n    </div>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-endpoints-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/exchanges.html','<h2>Exchanges</h2>\n<div ng-include src="\'plugins/camel/html/inflight.html\'"></div>\n<div ng-include src="\'plugins/camel/html/blocked.html\'"></div>');
 $templateCache.put('plugins/camel/html/inflight.html','<div class="table-view" ng-controller="Camel.InflightExchangesController">\n\n  <h3>Inflight</h3>\n  \n  <p ng-if="!initDone">\n    <span class="spinner spinner-xs spinner-inline"></span> Loading...\n  </p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No inflight exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-inflight-exchanges-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/camel/html/layoutCamelTree.html','<div class="tree-nav-layout">\n\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n\n    <div class="tree-nav-sidebar-header" ng-controller="Camel.TreeHeaderController">\n      <form role="form" class="search-pf has-button">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="input-search" class="sr-only">Search Tree:</label>\n            <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n              ng-model="filter">\n            <button type="button" class="clear" aria-hidden="true"\n              ng-hide="filter.length === 0"\n              ng-click="filter = \'\'">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n        <div class="form-group tree-nav-buttons">\n          <span class="badge" ng-class="{positive: result.length > 0}"\n            ng-show="filter.length > 0">\n            {{result.length}}\n          </span>\n          <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>\n          <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>\n        </div>\n      </form>\n    </div>\n\n    <div class="tree-nav-sidebar-content" ng-controller="Camel.TreeController">\n      <div class="spinner spinner-lg" ng-hide="treeFetched()"></div>\n      <div id="cameltree" class="treeview-pf-hover treeview-pf-select"></div>\n    </div>\n\n  </div>\n\n  <div class="tree-nav-main">\n    <div>\n      <context-actions></context-actions>\n      <route-actions></route-actions>\n      <jmx-header></jmx-header>\n    </div>\n    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">\n      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">\n        <a href="#" ng-click="goto(tab.path)">{{tab.title}}</a>\n      </li>\n      <li class="dropdown overflow">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          More <span class="caret"></span>\n        </a>\n        <ul class="dropdown-menu" role="menu"></ul>\n      </li>\n    </ul>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
+$templateCache.put('plugins/camel/html/layoutCamelTree.html','<div class="tree-nav-layout">\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n    <camel-tree-header></camel-tree-header>\n    <camel-tree></camel-tree>\n  </div>\n  <div class="tree-nav-main">\n    <div>\n      <context-actions></context-actions>\n      <route-actions></route-actions>\n      <jmx-header></jmx-header>\n    </div>\n    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">\n      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">\n        <a href="#" ng-click="goto(tab.path)">{{tab.title}}</a>\n      </li>\n      <li class="dropdown overflow">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          More <span class="caret"></span>\n        </a>\n        <ul class="dropdown-menu" role="menu"></ul>\n      </li>\n    </ul>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/camel/html/nodePropertiesEdit.html','<div class="row-fluid">\n\n  <!-- the label and input fields needs to be wider -->\n  <style>\n    input, textarea, .uneditable-input {\n      width: 600px;\n    }\n    input, textarea, .editable-input {\n      width: 600px;\n    }\n\n    .form-horizontal .control-label {\n      width: 180px;\n    }\n\n    .form-horizontal .controls {\n      margin-left: 200px;\n    }\n  </style>\n\n  <h3>\n    <img src="{{icon}}" width="48" height="48" ng-show="icon"/> {{model.title}}\n    <span style="margin-left: 10px" ng-repeat="label in labels track by $index" class="pod-label badge" title="{{label}}">{{label}}</span>\n  </h3>\n\n  <div simple-form name="formViewer" mode=\'edit\' entity=\'nodeData\' data=\'model\' schema="schema"\n       showhelp="!hideHelp"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/nodePropertiesView.html','<header class="camel-properties-header">\n  <h2>Properties</h2>\n  <h3>\n    <img ng-src="{{icon}}" width="24" height="24" ng-show="icon"/>\n    <span>{{title}}</span>\n  </h3>\n  <em><span ng-repeat="label in labels track by $index">{{$first ? \'\' : \' / \'}}{{label}}<span></em>\n</header>\n<p>{{description}}</p>\n<property-list title="Defined Properties" properties="definedProperties"></property-list>\n<property-list title="Default Properties" properties="defaultProperties"></property-list>\n<property-list title="Undefined Properties" properties="undefinedProperties"></property-list>\n<div class="camel-properties-empty-space-for-tooltip"></div>');
 $templateCache.put('plugins/camel/html/preferences.html','<div ng-controller="Camel.PreferencesController">\n  <div hawtio-form-2="config" entity="entity"></div>\n</div>\n');
@@ -25907,7 +25968,9 @@ $templateCache.put('plugins/osgi/html/services.html','<h1>Services</h1>\n\n<div 
 $templateCache.put('plugins/activemq/html/destination/create.html','<p>\n  <div class="alert alert-info">\n    <span class="pficon pficon-info"></span>The JMS API does not define a standard\n    address syntax. Although a standard address syntax was considered, it was decided\n    that the differences in address semantics between existing message-oriented\n    middleware (MOM) products were too wide to bridge with a single syntax.\n  </div>\n</p>\n\n<form class="form-horizontal">\n\n  <div class="form-group">\n    <label class="col-sm-2 control-label" for="name-markup">{{$ctrl.destinationType}} name</label>\n\n    <div class="col-sm-10">\n      <input id="name-markup" class="form-control" type="text" maxlength="300"\n             name="destinationName" ng-model="$ctrl.destinationName" placeholder="{{$ctrl.destinationType}} name"/>\n    </div>\n  </div>\n  <div class="form-group">\n    <label class="col-sm-2 control-label">Destination type</label>\n\n    <div class="col-sm-10">\n      <label class="checkbox">\n        <input type="radio" ng-model="$ctrl.destinationType" value="Queue"> Queue\n      </label>\n      <label class="checkbox">\n        <input type="radio" ng-model="$ctrl.destinationType" value="Topic"> Topic\n      </label>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <div class="col-sm-offset-2 col-sm-10">\n      <button type="submit" class="btn btn-primary"\n              ng-click="$ctrl.validateAndCreateDestination($ctrl.destinationName, $ctrl.destinationType)"\n              ng-disabled="!$ctrl.destinationName">Create {{$ctrl.destinationType}}\n      </button>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="$ctrl.createDialog"\n        ok-button-text="Create"\n        cancel-button-text="Cancel"\n        on-ok="$ctrl.createDestination($ctrl.destinationName, $ctrl.destinationType)">\n    <div class="dialog-body">\n      <p>{{$ctrl.destinationType}} name <b>{{$ctrl.destinationName}}</b> contains unrecommended characters: <code>:</code></p>\n      <p>This may cause unexpected problems. Are you really sure to create this {{$ctrl.uncapitalisedDestinationType()}}?</p>\n    </div>\n  </div>\n\n</form>\n');
 $templateCache.put('plugins/activemq/html/destination/deleteQueue.html','<p>\n  <div class="alert alert-warning">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    These operations cannot be undone. Please be careful!\n  </div>\n</p>\n\n<h2>Purge queue</h2>\n<p>Purge all the current messages on the queue.</p>\n<button type="submit" class="btn btn-danger" ng-click="$ctrl.purgeDialog = true">\n  Purge queue\n</button>\n\n<hr />\n\n<h2>Delete queue</h2>\n<p>Remove the queue completely.</p>\n<button type="submit" class="btn btn-danger" ng-click="$ctrl.deleteDialog = true">\n  Delete queue\n</button>\n\n<div hawtio-confirm-dialog="$ctrl.deleteDialog"\n     title="Confirm delete queue"\n     ok-button-text="Delete"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.deleteDestination()">\n  <div class="dialog-body">\n    <p>You are about to delete the <b>{{$ctrl.selectedName()}}</b> queue.</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n\n<div hawtio-confirm-dialog="$ctrl.purgeDialog"\n     title="Confirm purge queue"\n     ok-button-text="Purge"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.purgeDestination()">\n  <div class="dialog-body">\n    <p>You are about to purge the <b>{{$ctrl.selectedName()}}</b> queue</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/destination/deleteTopic.html','<p>\n  <div class="alert alert-warning">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    This operation cannot be undone. Please be careful!\n  </div>\n</p>\n\n<h2>Delete topic</h2>\n<p>Remove the topic completely.</p>\n<button type="submit" class="btn btn-danger" ng-click="$ctrl.deleteDialog = true">\n  Delete topic\n</button>\n\n<div hawtio-confirm-dialog="$ctrl.deleteDialog"\n     title="Confirm delete topic"\n     ok-button-text="Delete"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.deleteDestination()">\n  <div class="dialog-body">\n    <p>You are about to delete the <b>{{$ctrl.selectedName()}}</b> topic.</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n');
+$templateCache.put('plugins/camel/html/tree/content.html','<div class="tree-nav-sidebar-content">\n  <div class="spinner spinner-lg" ng-hide="$ctrl.treeFetched()"></div>\n  <div id="cameltree" class="treeview-pf-hover treeview-pf-select"></div>\n</div>\n');
+$templateCache.put('plugins/camel/html/tree/header.html','<div class="tree-nav-sidebar-header">\n  <form role="form" class="search-pf has-button">\n    <div class="form-group has-clear">\n      <div class="search-pf-input-group">\n        <label for="input-search" class="sr-only">Search Tree:</label>\n        <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n          ng-model="$ctrl.filter">\n        <button type="button" class="clear" aria-hidden="true"\n          ng-hide="$ctrl.filter.length === 0"\n          ng-click="$ctrl.filter = \'\'">\n          <span class="pficon pficon-close"></span>\n        </button>\n      </div>\n    </div>\n    <div class="form-group tree-nav-buttons">\n      <span class="badge" ng-class="{positive: $ctrl.result.length > 0}"\n        ng-show="$ctrl.filter.length > 0">\n        {{$ctrl.result.length}}\n      </span>\n      <i class="fa fa-plus-square-o" title="Expand All" ng-click="$ctrl.expandAll()"></i>\n      <i class="fa fa-minus-square-o" title="Collapse All" ng-click="$ctrl.contractAll()"></i>\n    </div>\n  </form>\n</div>\n');
 $templateCache.put('plugins/activemq/doc/help.md','### ActiveMQ\n\nClick [ActiveMQ](#/jmx/attributes?tab=activmemq) in the top navigation bar to see the ActiveMQ specific plugin. (The ActiveMQ tab won\'t appear if there is no broker in this JVM).  The ActiveMQ plugin works very much the same as the JMX plugin however with a focus on interacting with an ActiveMQ broker.\n\nThe tree view on the left-hand side shows the top level JMX tree of each broker instance running in the JVM.  Expanding the tree will show the various MBeans registered by ActiveMQ that you can inspect via the **Attributes** tab.\n\nYou can then click on the **Queue** node to see the queues and **Topic** node to see the topics. From either of these nodes you should see **Create Queue** or **Create Topic** tabs to be able to create new destinations.\n\nOnce you have selected a destination you should be able to **Send** to it, **Browse** a queue or view the  **Attributes** or **Charts**\n\nYou can also see a graphical view of all producers, destinations and consumers for all queues (or if you select a Topic folder then topics) using the **Diagram** tab. Selecting a single queue or topic shows just all the producers and consumers on that destination. This diagram makes it easy to spot if producers are sending messages when there are no consumers, or that consumers are on the wrong destination etc.\n');
 $templateCache.put('plugins/camel/doc/help.md','### Camel\n\nClick [Camel](#/jmx/attributes?tab=camel) in the top navigation bar to view all the running Camel Contexts in the current JVM. (The selection will not appear on the navigation bar if there is no Camel running).\n\nThe Camel plugin allows you to view all the running Camel applications in the current JVM.\nYou can among others see the following details:\n\n* Lists of all running Camel applications\n* Detailed information of each Camel Context such as Camel version number, runtime statics\n* Lists of all routes in each Camel applications and their runtime statistics\n* Manage the lifecycle of all Camel applications and their routes, so you can restart / stop / pause / resume, etc.\n* Graphical representation of the running routes along with real time metrics\n* Live tracing and debugging of running routes\n* Profile the running routes with real time runtime statics; detailed specified per processor\n* Browsing and sending messages to Camel endpoint\n');
-$templateCache.put('plugins/karaf/doc/help.md','### Karaf\n\nThis plugin supports the [Apache Karaf](http://karaf.apache.org/) container');
-$templateCache.put('plugins/osgi/doc/help.md','### OSGi\n\nThis plugin supports the various OSGi standards for working with bundles, Config Admin, services, packages etc.');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");
+$templateCache.put('plugins/osgi/doc/help.md','### OSGi\n\nThis plugin supports the various OSGi standards for working with bundles, Config Admin, services, packages etc.');
+$templateCache.put('plugins/karaf/doc/help.md','### Karaf\n\nThis plugin supports the [Apache Karaf](http://karaf.apache.org/) container');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");

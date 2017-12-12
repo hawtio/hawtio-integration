@@ -684,6 +684,41 @@ declare namespace Camel {
     const routesModule: string;
 }
 declare namespace Camel {
+    class TreeHeaderController {
+        private $scope;
+        private $element;
+        filter: string;
+        result: any[];
+        constructor($scope: any, $element: JQuery);
+        $onInit(): void;
+        private search(filter);
+        private tree();
+        expandAll(): any;
+        contractAll(): any;
+    }
+    class TreeController {
+        private $scope;
+        private $location;
+        private workspace;
+        private $route;
+        private jolokia;
+        private $element;
+        constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, $route: angular.route.IRouteService, jolokia: Jolokia.IJolokia, $element: JQuery);
+        $onInit(): void;
+        treeFetched(): boolean;
+        private updateSelectionFromURL();
+        private populateTree();
+        private navigateToDefaultTab(selection);
+    }
+}
+declare namespace Camel {
+    const treeHeaderComponent: angular.IComponentOptions;
+    const treeComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const treeModule: string;
+}
+declare namespace Camel {
     const pluginName: string;
     const _module: angular.IModule;
 }
@@ -1096,8 +1131,6 @@ declare namespace Camel {
         graph: graphlib.Graph;
     };
     function dagreUpdateGraphData(): void;
-}
-declare namespace Camel {
 }
 declare namespace Camel {
 }

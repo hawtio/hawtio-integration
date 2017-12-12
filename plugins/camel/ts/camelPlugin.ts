@@ -1,6 +1,7 @@
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="contexts/contexts.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
+/// <reference path="tree/tree.module.ts"/>
 
 namespace Camel {
 
@@ -11,7 +12,8 @@ namespace Camel {
     'patternfly.table',
     'angularResizable',
     contextsModule,
-    routesModule
+    routesModule,
+    treeModule,
   ]);
 
   _module.config(["$routeProvider", ($routeProvider) => {
