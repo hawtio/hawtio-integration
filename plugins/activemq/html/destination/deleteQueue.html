@@ -5,24 +5,19 @@
   </div>
 </p>
 
-<div class="row">
-  <div class="col-md-6">
-    <div class="control-group">
-      <button type="submit" class="btn btn-warning" ng-click="$ctrl.deleteDialog = true">
-        Delete queue '{{$ctrl.selectedShortName()}}'
-      </button>
-      <label>Removes the queue completely.</label>
-    </div>
-  </div>
-  <div class="col-md-6">
-    <div class="control-group">
-      <button type="submit" class="btn btn-warning" ng-click="$ctrl.purgeDialog = true">
-        Purge queue '{{$ctrl.selectedShortName()}}'
-      </button>
-      <label>Purges all the current messages on the queue.</label>
-    </div>
-  </div>
-</div>
+<h2>Purge queue</h2>
+<p>Purge all the current messages on the queue.</p>
+<button type="submit" class="btn btn-danger" ng-click="$ctrl.purgeDialog = true">
+  Purge queue
+</button>
+
+<hr />
+
+<h2>Delete queue</h2>
+<p>Remove the queue completely.</p>
+<button type="submit" class="btn btn-danger" ng-click="$ctrl.deleteDialog = true">
+  Delete queue
+</button>
 
 <div hawtio-confirm-dialog="$ctrl.deleteDialog"
      title="Confirm delete queue"

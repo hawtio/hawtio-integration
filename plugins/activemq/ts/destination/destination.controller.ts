@@ -6,8 +6,6 @@ namespace ActiveMQ {
 
     private log: Logging.Logger = Logger.get("ActiveMQ");
 
-    private readonly buttonNameLimit = 30;
-
     amqJmxDomain = this.localStorage['activemqJmxDomain'] || "org.apache.activemq";
 
     message: string = "";
@@ -147,15 +145,6 @@ namespace ActiveMQ {
         name = _.unescape(name);
         this.jolokia.execute(mbean, operation, Core.onSuccess(() => this.operationSuccess()));
       }
-    }
-
-    selectedShortName(): string {
-      let name = this.selectedName();
-      if (name === null) {
-        return null;
-      }
-      let ellipsis = name.length > this.buttonNameLimit ? "..." : ""
-      return name ? name.substring(0, this.buttonNameLimit) + ellipsis : null;
     }
 
     selectedName(): string {
