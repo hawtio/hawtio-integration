@@ -59,9 +59,9 @@
   dependencies:
     "@hawtio/ui" "~3.0.25"
 
-"@hawtio/jmx@~3.0.83":
-  version "3.0.83"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.0.83.tgz#adae7077597ee16eb5d2b4f5d73c506efccf8f6b"
+"@hawtio/jmx@~3.0.85":
+  version "3.0.85"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.0.85.tgz#dac27fde090a0cb80ccfe8a6e7ed9e82b3d08d9b"
   dependencies:
     "@hawtio/forms" "~3.0.0"
     "@hawtio/preferences" "~3.0.0"

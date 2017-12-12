@@ -38,7 +38,6 @@ declare namespace ActiveMQ {
         private jolokia;
         private localStorage;
         private log;
-        private readonly buttonNameLimit;
         amqJmxDomain: any;
         message: string;
         destinationName: string;
@@ -62,7 +61,6 @@ declare namespace ActiveMQ {
         private restoreRealDestinationName(name);
         deleteDestination(): void;
         purgeDestination(): void;
-        selectedShortName(): string;
         selectedName(): string;
         uncapitalisedDestinationType(): string;
     }
