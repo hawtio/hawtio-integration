@@ -5,17 +5,17 @@ namespace ActiveMQ {
 
   export const createDestinationComponent: angular.IComponentOptions = {
     controller: DestinationController,
-    templateUrl: 'plugins/activemq/html/createDestination.html'
+    templateUrl: 'plugins/activemq/html/destination/create.html'
   };
 
   export const deleteQueueComponent: angular.IComponentOptions = {
     controller: DestinationController,
-    templateUrl: 'plugins/activemq/html/deleteQueue.html'
+    templateUrl: 'plugins/activemq/html/destination/deleteQueue.html'
   };
 
   export const deleteTopicComponent: angular.IComponentOptions = {
     controller: DestinationController,
-    templateUrl: 'plugins/activemq/html/deleteTopic.html'
+    templateUrl: 'plugins/activemq/html/destination/deleteTopic.html'
   };
 
 }
