@@ -74,6 +74,40 @@ declare namespace ActiveMQ {
     const destinationModule: string;
 }
 declare namespace ActiveMQ {
+    class TreeHeaderController {
+        private $scope;
+        private $element;
+        filter: string;
+        result: any[];
+        constructor($scope: any, $element: JQuery);
+        $onInit(): void;
+        private search(filter);
+        private tree();
+        expandAll(): any;
+        contractAll(): any;
+    }
+    class TreeController {
+        private $scope;
+        private $location;
+        private workspace;
+        private $route;
+        private jolokia;
+        private $element;
+        constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, $route: angular.route.IRouteService, jolokia: Jolokia.IJolokia, $element: JQuery);
+        $onInit(): void;
+        treeFetched(): boolean;
+        private updateSelectionFromURL();
+        private populateTree();
+    }
+}
+declare namespace ActiveMQ {
+    const treeHeaderComponent: angular.IComponentOptions;
+    const treeComponent: angular.IComponentOptions;
+}
+declare namespace ActiveMQ {
+    const treeModule: string;
+}
+declare namespace ActiveMQ {
     const pluginName: string;
     const _module: angular.IModule;
     function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
@@ -86,8 +120,6 @@ declare namespace ActiveMQ {
 }
 declare namespace ActiveMQ {
     var BrowseQueueController: angular.IModule;
-}
-declare namespace ActiveMQ {
 }
 declare namespace ActiveMQ {
 }

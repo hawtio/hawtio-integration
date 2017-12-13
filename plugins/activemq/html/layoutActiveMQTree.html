@@ -1,44 +1,15 @@
 <div class="tree-nav-layout">
-
   <div class="sidebar-pf sidebar-pf-left" resizable r-directions="['right']">
-
-    <div class="tree-nav-sidebar-header" ng-controller="ActiveMQ.TreeHeaderController">
-      <form role="form" class="search-pf has-button">
-        <div class="form-group has-clear">
-          <div class="search-pf-input-group">
-            <label for="input-search" class="sr-only">Search Tree:</label>
-            <input id="input-search" type="search" class="form-control" placeholder="Search tree:"
-              ng-model="filter">
-            <button type="button" class="clear" aria-hidden="true"
-              ng-hide="filter.length === 0"
-              ng-click="filter = ''">
-              <span class="pficon pficon-close"></span>
-            </button>
-          </div>
-        </div>
-        <div class="form-group tree-nav-buttons">
-          <span class="badge" ng-class="{positive: result.length > 0}"
-            ng-show="filter.length > 0">
-            {{result.length}}
-          </span>
-          <i class="fa fa-plus-square-o" title="Expand All" ng-click="expandAll()"></i>
-          <i class="fa fa-minus-square-o" title="Collapse All" ng-click="contractAll()"></i>
-        </div>
-      </form>
-    </div>
-
-    <div class="tree-nav-sidebar-content" ng-controller="ActiveMQ.TreeController">
-      <div class="spinner spinner-lg" ng-hide="treeFetched()"></div>
-      <div id="activemqtree" class="treeview-pf-hover treeview-pf-select"></div>
-    </div>
-
+    <activemq-tree-header></activemq-tree-header>
+    <activemq-tree></activemq-tree>
   </div>
-
   <div class="tree-nav-main">
-    <jmx-header></jmx-header>
+    <div>
+      <jmx-header></jmx-header>
+    </div>
     <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="ActiveMQ.TabsController">
       <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
-        <a ng-href="#" ng-click="goto(tab.path)">{{tab.title}}</a>
+        <a href="#" ng-click="goto(tab.path)">{{tab.title}}</a>
       </li>
       <li class="dropdown overflow">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">

@@ -1,5 +1,6 @@
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="destination/destination.module.ts"/>
+/// <reference path="tree/tree.module.ts"/>
 
 namespace ActiveMQ {
 
@@ -7,7 +8,8 @@ namespace ActiveMQ {
   
   export const _module = angular.module(pluginName, [
     'angularResizable',
-    destinationModule
+    destinationModule,
+    treeModule,
   ]);
 
   _module.config(["$routeProvider", ($routeProvider) => {
