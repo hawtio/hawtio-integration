@@ -13,11 +13,13 @@
     <form class="toolbar-pf-actions">
       <div class="form-group">
         <button ng-click="startBundle(bundleId)" 
+                ng-disabled="row.State === 'ACTIVE'"
                 class="btn btn-default" 
                 hawtio-show
                 object-name="{{frameworkMBean}}"
                 method-name="startBundle">Start</button>
         <button ng-click="stopBundle(bundleId)" 
+                ng-disabled="row.State !== 'ACTIVE'"
                 class="btn btn-default" 
                 hawtio-show
                 object-name="{{frameworkMBean}}"

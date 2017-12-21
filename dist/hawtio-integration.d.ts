@@ -1522,8 +1522,6 @@ declare namespace Osgi {
     var _module: angular.IModule;
 }
 declare namespace Osgi {
-}
-declare namespace Osgi {
     function formatServiceName(objClass: any): string;
 }
 declare namespace Osgi {
