@@ -116,9 +116,7 @@ gulp.task('connect', ['watch'], function() {
     staticAssets: [{
       path: '/hawtio/',
       dir: '.'
-
     }],
-    fallback: 'index.html',
     liveReload: {
       enabled: true
     }
@@ -126,8 +124,7 @@ gulp.task('connect', ['watch'], function() {
   hawtio.use('/', function(req, res, next) {
     var path = req.originalUrl;
     if (path === '/') {
-      res.writeHead(302, {Location: '/hawtio'});
-      res.end();
+      res.redirect('/hawtio');
     } else if (path.startsWith('/plugins/') && path.endsWith('html')) {
       // avoid returning these files, they should get pulled from js
       if (argv.debug) {

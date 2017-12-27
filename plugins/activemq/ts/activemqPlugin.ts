@@ -35,7 +35,7 @@ namespace ActiveMQ {
       workspace: Jmx.Workspace,
       viewRegistry,
       helpRegistry,
-      preferencesRegistry: HawtioPreferences.PreferencesRegistry,
+      preferencesRegistry: Core.PreferencesRegistry,
       $templateCache: ng.ITemplateCacheService,
       documentBase: string) => {
 

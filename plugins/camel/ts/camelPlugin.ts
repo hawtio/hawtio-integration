@@ -73,7 +73,7 @@ namespace Camel {
       viewRegistry,
       layoutFull,
       helpRegistry,
-      preferencesRegistry: HawtioPreferences.PreferencesRegistry,
+      preferencesRegistry: Core.PreferencesRegistry,
       $templateCache: ng.ITemplateCacheService,
       $location: ng.ILocationService,
       $rootScope: ng.IRootScopeService) => {

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html class="layout-pf layout-pf-fixed">
-
   <head>
     <title>hawtio-integration</title>
     <base href='/hawtio/'></base>
@@ -24,8 +23,6 @@
     <link rel="stylesheet" href="node_modules/@hawtio/ui/dist/hawtio-ui.css" />
     <!-- @hawtio/forms -->
     <link rel="stylesheet" href="node_modules/@hawtio/forms/dist/hawtio-forms.css" />
-    <!-- @hawtio/preferences -->
-    <link rel="stylesheet" href="node_modules/@hawtio/preferences/dist/hawtio-preferences.css" />
     <!-- @hawtio/jmx -->
     <link rel="stylesheet" href="node_modules/@hawtio/jmx/dist/hawtio-jmx.css" />
     <!-- @hawtio/integration -->
@@ -97,9 +94,9 @@
     <script src="node_modules/codemirror/mode/properties/properties.js"></script>
     <script src="node_modules/codemirror/mode/clike/clike.js"></script>
     <script src="node_modules/codemirror/mode/yaml/yaml.js"></script>
-    <!-- graphlib, dagre -->
+    <!-- graphlib, dagre-layout -->
     <script src="node_modules/graphlib/dist/graphlib.core.min.js"></script>
-    <script src="node_modules/dagre/dist/dagre.core.min.js"></script>
+    <script src="node_modules/dagre-layout/dist/dagre-layout.js"></script>
     <!-- ng-infinite-scroll -->
     <script src="node_modules/ng-infinite-scroll/build/ng-infinite-scroll.min.js"></script>
     <!-- @hawtio/core -->
@@ -110,41 +107,42 @@
     <script src="node_modules/@hawtio/ui/dist/hawtio-ui.js"></script>
     <!-- @hawtio/forms -->
     <script src="node_modules/@hawtio/forms/dist/hawtio-forms.js"></script>
-    <!-- @hawtio/preferences -->
-    <script src="node_modules/@hawtio/preferences/dist/hawtio-preferences.js"></script>
     <!-- @hawtio/jmx -->
     <script src="node_modules/@hawtio/jmx/dist/hawtio-jmx.js"></script>
     <!-- @hawtio/integration -->
     <script src="dist/hawtio-integration.js"></script>
   </head>
-
   <body>
     <nav class="navbar navbar-pf-vertical">
       <div class="navbar-header">
-        <a href="/" class="navbar-brand">
+        <a href="." class="navbar-brand">
           <hawtio-branding-image class="navbar-brand-name" src="logoUrl" alt="appName"></hawtio-branding-image>
         </a>
       </div>
       <nav class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-right navbar-iconic">
+          <li>
+            <a class="nav-item-iconic" href="help">
+              <span title="Help" class="fa pficon-help"></span>
+            </a>
+          </li>
           <li class="dropdown">
-            <a class="dropdown-toggle nav-item-iconic" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <a class="dropdown-toggle nav-item-iconic" id="userDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
               <span title="Username" class="fa pficon-user"></span>
               <span class="caret"></span>
             </a>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1" hawtio-extension name="hawtio-user">
+            <ul class="dropdown-menu" aria-labelledby="userDropdownMenu" hawtio-extension name="hawtio-user">
             </ul>
           </li>
         </ul>
       </nav>
     </nav>
-
+  
     <hawtio-vertical-nav></hawtio-vertical-nav>
 
     <div id="main" class="container-fluid container-pf-nav-pf-vertical ng-cloak"
-        ng-controller="HawtioNav.ViewController"
-        ng-include src="viewPartial">
+         ng-controller="HawtioNav.ViewController"
+         ng-include src="viewPartial">
     </div>
   </body>
-
 </html>
