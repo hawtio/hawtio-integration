@@ -4,8 +4,6 @@ namespace Camel {
 
   export class RoutesService {
 
-    private log: Logging.Logger = Logger.get("Camel");
-
     constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia) {
       'ngInject';
     }
@@ -19,14 +17,14 @@ namespace Camel {
 
       return this.$q((resolve, reject) => {
         this.jolokia.request(request, {
-          success: function(response) {
+          success: response => {
             let object = response.value;
             let route = new Route(object.RouteId, object.State, response.request.mbean);
             resolve(route);
           }
         }, {
-          error: (response) => {
-            this.log.debug('RoutesService.getRoute() failed: ' + response.error);
+          error: response => {
+            log.error('RoutesService.getRoute() failed: ' + response.error);
             reject(response.error);
           }
         });
@@ -47,17 +45,17 @@ namespace Camel {
       return this.$q((resolve, reject) => {
         let routes = [];
         this.jolokia.request(requests, {
-          success: function(response) {
+          success: response => {
             let object = response.value;
-            let route = new Route(object.RouteId, object.State, object.CamelManagementName);
+            let route = new Route(object.RouteId, object.State, mbeans[routes.length]);
             routes.push(route);
             if (routes.length === requests.length) {
               resolve(routes);
             }
           }
         }, {
-          error: (response) => {
-            this.log.debug('RoutesService.getRoutes() failed: ' + response.error);
+          error: response => {
+            log.error('RoutesService.getRoutes() failed: ' + response.error);
             reject(response.error);
           }
         });
@@ -102,15 +100,15 @@ namespace Camel {
       return this.$q((resolve, reject) => {
         let responseCount = 0;
         this.jolokia.request(requests, {
-          success: function(response) {
+          success: response => {
             responseCount++;
             if (responseCount === requests.length) {
               resolve('success');
             }
           }
         }, {
-          error: (response) => {
-            this.log.debug('RoutesService.executeOperationOnRoutes() failed: ' + response.error);
+          error: response => {
+            log.error('RoutesService.executeOperationOnRoutes() failed: ' + response.error);
             reject(response.error);
           }
         });

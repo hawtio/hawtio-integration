@@ -148,13 +148,13 @@ namespace Karaf {
     template: `
       <div class="table-view">
         <h1>Declarative Services</h1>
+        <p ng-if="$ctrl.loading">Loading...</p>
         <div ng-if="!$ctrl.loading">
           <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
           <pf-table-view config="$ctrl.tableConfig"
                          colummns="$ctrl.tableColumns"
                          items="$ctrl.tableItems"></pf-table-view>
         </div>
-        <div class="spinner spinner-lg loading-page" ng-if="$ctrl.loading"></div>
       </div>
     `,
     controller: ScrComponentsController

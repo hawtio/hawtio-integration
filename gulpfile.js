@@ -19,7 +19,7 @@ let config = {
   targetPath: argv.path || '/hawtio/jolokia',
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
   ts: ['plugins/**/*.ts'],
-  templates: ['plugins/**/*.html', 'plugins/**/doc/*.md'],
+  templates: ['plugins/**/*.html', 'plugins/**/*.md'],
   less: ['plugins/**/*.less', 'vendor/**/*.less', 'vendor/**/*.css'],
   templateModule: 'hawtio-integration-templates',
   dist: argv.out || './dist/',
@@ -117,6 +117,7 @@ gulp.task('connect', ['watch'], function() {
       path: '/hawtio/',
       dir: '.'
     }],
+    fallback: 'index.html',
     liveReload: {
       enabled: true
     }

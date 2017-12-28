@@ -638,7 +638,6 @@ declare namespace Camel {
     class RoutesService {
         private $q;
         private jolokia;
-        private log;
         constructor($q: ng.IQService, jolokia: Jolokia.IJolokia);
         getRoute(mbean: string): ng.IPromise<Route>;
         getRoutes(mbeans: string[]): ng.IPromise<Route[]>;
@@ -672,6 +671,7 @@ declare namespace Camel {
                     isDisabled: boolean;
                 }[];
             };
+            isTableView: boolean;
         };
         tableConfig: {
             selectionMatchProp: string;

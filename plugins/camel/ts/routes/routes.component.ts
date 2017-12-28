@@ -11,7 +11,7 @@ namespace Camel {
         let selectedRoutes = this.getSelectedRoutes();
         this.routesService.startRoutes(selectedRoutes)
           .then(response => this.updateRoutes())
-          .catch(error => console.error(error));
+          .catch(error => log.error(error));
       },
       isDisabled: true
     };
@@ -21,7 +21,7 @@ namespace Camel {
         let selectedRoutes = this.getSelectedRoutes();
         this.routesService.stopRoutes(selectedRoutes)
           .then(response => this.updateRoutes())
-          .catch(error => console.error(error));
+          .catch(error => log.error(error));
       },
       isDisabled: true
     };
@@ -35,7 +35,7 @@ namespace Camel {
         .result.then(() => {
           this.routesService.removeRoutes(selectedRoutes)
             .then(response => this.removeSelectedRoutes())
-            .catch(error => console.error(error));
+            .catch(error => log.error(error));
         });
       },
       isDisabled: true
@@ -50,7 +50,8 @@ namespace Camel {
         moreActions: [
           this.deleteAction
         ]
-      }
+      },
+      isTableView: true
     };
 
     tableConfig = {
@@ -91,7 +92,7 @@ namespace Camel {
       if (this.workspace.selection) {
         var typeNames = Jmx.getUniqueTypeNames(this.workspace.selection.children);
         if (typeNames.length > 1) {
-          console.error("Child nodes aren't of the same type. Found types: " + typeNames);
+          log.error("Child nodes aren't of the same type. Found types: " + typeNames);
         }
         let mbeans = _.map(this.workspace.selection.children, node => node.objectName);
         this.routesService.getRoutes(mbeans)
@@ -102,7 +103,7 @@ namespace Camel {
             }));
             this.routes = routes;
           })
-          .catch(error => console.error(error));
+          .catch(error => log.error(error));
       }
     }
 
@@ -111,10 +112,14 @@ namespace Camel {
       this.routesService.getRoutes(mbeans)
         .then(routes => {
           this.routes = routes;
-          routes.forEach((route, i) => this.tableItems[i].state = route.state);
+          routes.forEach((route, i) => {
+            if (route.state !== this.tableItems[i].state) {
+              this.tableItems[i] = angular.extend({}, this.tableItems[i], {state: route.state});
+            }
+          });
           this.enableDisableActions();
         })
-        .catch(error => console.error(error));
+        .catch(error => log.error(error));
     }
 
     private removeSelectedRoutes() {
@@ -129,6 +134,7 @@ namespace Camel {
 
   export const routesComponent = <angular.IComponentOptions>{
     template: `
+      <h2>Routes</h2>
       <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
       <pf-table-view config="$ctrl.tableConfig" colummns="$ctrl.tableColummns" items="$ctrl.tableItems"></pf-table-view>
     `,

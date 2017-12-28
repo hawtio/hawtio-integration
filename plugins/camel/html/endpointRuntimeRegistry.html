@@ -2,7 +2,7 @@
 
   <h2>Endpoints (in/out)</h2>
   
-  <div ng-if="!selectedMBean" class="spinner spinner-lg loading-page"></div>
+  <p ng-if="!selectedMBean">Loading...</p>
   
   <div ng-if="selectedMBean">
     <div class="loading-message" ng-if="data.length === 0">

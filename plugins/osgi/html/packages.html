@@ -2,7 +2,7 @@
 
 <div class="osgi-packages-main" ng-controller="Osgi.PackagesController">
 
-  <div class="spinner spinner-lg loading-page" ng-if="!packages"></div>
+  <p ng-if="!packages">Loading...</p>
 
   <div ng-if="packages">
     <pf-toolbar config="toolbarConfig"></pf-toolbar>

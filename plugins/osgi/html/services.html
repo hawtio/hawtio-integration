@@ -2,7 +2,7 @@
 
 <div class="controller-section" ng-controller="Osgi.ServiceController">
 
-  <div class="spinner spinner-lg loading-page" ng-if="!services"></div>
+  <p ng-if="!services">Loading...</p>
 
   <div ng-if="services">
     <pf-toolbar config="toolbarConfig"></pf-toolbar>

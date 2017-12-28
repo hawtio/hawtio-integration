@@ -234,6 +234,7 @@ namespace Osgi {
     template: `
       <div class="table-view">
         <h1>Bundles</h1>
+        <p ng-if="$ctrl.loading">Loading...</p>
         <div ng-if="!$ctrl.loading">
           <install-bundle on-install="$ctrl.loadBundles()"></install-bundle>
           <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
@@ -241,7 +242,6 @@ namespace Osgi {
                          colummns="$ctrl.tableColumns"
                          items="$ctrl.tableItems"></pf-table-view>
         </div>
-        <div class="spinner spinner-lg loading-page" ng-if="$ctrl.loading"></div>
       </div>
     `,
     controller: BundlesController

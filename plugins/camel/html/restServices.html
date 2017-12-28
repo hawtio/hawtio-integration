@@ -2,7 +2,7 @@
   
   <h2>REST Services</h2>
   
-  <div ng-if="!selectedMBean" class="spinner spinner-lg loading-page"></div>
+  <p ng-if="!selectedMBean">Loading...</p>
   
   <div ng-if="selectedMBean">
     <div ng-if="data.length === 0" class="loading-message">

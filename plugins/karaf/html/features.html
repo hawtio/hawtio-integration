@@ -1,5 +1,9 @@
 <div class="list-view">
+
   <h1>Features</h1>
+
+  <p ng-if="$ctrl.loading">Loading...</p>
+
   <div ng-if="!$ctrl.loading">
     <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
     <pf-list-view items="$ctrl.listItems"
@@ -63,5 +67,4 @@
       </div>
     </form>
   </script>
-  <div class="spinner spinner-lg loading-page" ng-if="$ctrl.loading"></div>
 </div>
