@@ -30,7 +30,7 @@ namespace Camel {
       actionFn: action => {
         let selectedRoutes = this.getSelectedRoutes();
         this.$uibModal.open({
-          templateUrl: 'plugins/camel/html/deleteRouteModal.html'
+          templateUrl: 'plugins/camel/html/deleteRouteWarningModal.html'
         })
         .result.then(() => {
           this.routesService.removeRoutes(selectedRoutes)

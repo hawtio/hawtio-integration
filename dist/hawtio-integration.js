@@ -17794,7 +17794,7 @@ var Camel;
                 actionFn: function (action) {
                     var selectedRoutes = _this.getSelectedRoutes();
                     _this.$uibModal.open({
-                        templateUrl: 'plugins/camel/html/deleteRouteModal.html'
+                        templateUrl: 'plugins/camel/html/deleteRouteWarningModal.html'
                     })
                         .result.then(function () {
                         _this.routesService.removeRoutes(selectedRoutes)

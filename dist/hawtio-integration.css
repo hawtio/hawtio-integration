@@ -676,6 +676,10 @@ div.camel-properties {
   width: 111px;
 }
 
+.scr-component-references-table td:nth-child(3) {
+  text-transform: capitalize;
+}
+
 .install-bundle {
   margin-bottom: 10px;
 }
@@ -794,10 +798,6 @@ div.camel-properties {
   color: inherit;
   background-color: inherit;
   border: none;
-}
-
-.scr-component-references-table td:nth-child(3) {
-  text-transform: capitalize;
 }
 
 .metricsWatcher .panel-group:first-child {
