@@ -423,7 +423,7 @@ declare namespace Camel {
      * @method
      */
     function getSelectionRouteMBean(workspace: Jmx.Workspace, routeId: String): string;
-    function getCamelVersion(workspace: Jmx.Workspace, jolokia: any): any;
+    function getCamelVersion(workspace: Jmx.Workspace, jolokia: any): string;
     function createMessageFromXml(exchange: any): {
         headers: {};
         headerTypes: {};

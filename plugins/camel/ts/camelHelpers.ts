@@ -875,11 +875,14 @@ namespace Camel {
   export function getCamelVersion(workspace: Jmx.Workspace, jolokia) {
     const context = getSelectionCamelContext(workspace);
     if (context) {
-      // must use onSuccess(null) that means sync as we need the version asap
-      const version = jolokia.getAttribute(context.objectName, 'CamelVersion', Core.onSuccess(null));
-      // cache version so we do not need to read it again using jolokia
-      context.version = version;
-      return version;
+      if (context.version) {
+        // return cached version
+        return context.version;
+      } else {
+        // fetch version using onSuccess(null) to force synchronous call
+        context.version = jolokia.getAttribute(context.objectName, 'CamelVersion', Core.onSuccess(null));
+        return context.version;
+      }
     }
     return null;
   }
@@ -1357,7 +1360,6 @@ namespace Camel {
   export function isCamelVersionEQGT(major, minor, workspace, jolokia) {
     var camelVersion = getCamelVersion(workspace, jolokia);
     if (camelVersion) {
-      // console.log("Camel version " + camelVersion)
       camelVersion += "camel-";
       var numbers = Core.parseVersionNumbers(camelVersion);
       if (Core.compareVersionNumberArrays(numbers, [major, minor]) >= 0) {
