@@ -13,6 +13,7 @@ let path = require('path');
 let rename = require("gulp-rename");
 let sourcemaps = require('gulp-sourcemaps');
 let typescript = require('gulp-typescript');
+let Server = require('karma').Server;
 
 let config = {
   proxyPort: argv.port || 8181,
@@ -39,7 +40,7 @@ gulp.task('clean-defs', function() {
 });
 
 gulp.task('tsc', ['clean-defs'], function() {
-  var tsResult = gulp.src(config.ts)
+  var tsResult = config.tsProject.src()
     .pipe(gulpif(config.sourceMap, sourcemaps.init()))
     .pipe(config.tsProject());
 
@@ -150,6 +151,12 @@ gulp.task('connect', ['watch'], function() {
 gulp.task('reload', function() {
   gulp.src('.')
     .pipe(hawtio.reload());
+});
+
+gulp.task('test', function (done) {
+  new Server({
+    configFile: __dirname + '/karma.conf.js'
+  }, done).start();
 });
 
 gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean', 'copy-images']);

@@ -1,0 +1,6 @@
+<div class="spring-boot-layout">
+  <div ng-controller="SpringBootLayoutController as $ctrl">
+    <hawtio-tabs names="$ctrl.names" on-change="$ctrl.changePath(name)"></hawtio-tabs>
+  </div>
+  <div class="contents" ng-view></div>
+</div>

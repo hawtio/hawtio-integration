@@ -680,6 +680,44 @@ div.camel-properties {
   text-transform: capitalize;
 }
 
+.spring-boot-health-main {
+  margin-bottom: 20px;
+}
+.spring-boot-health-main .toast-pf {
+  position: relative;
+  top: 0;
+  right: 0;
+  display: block;
+  border: none;
+  box-shadow: 0 1px 1px rgba(3, 3, 3, 0.175);
+  margin-left: -10px;
+  margin-right: -10px;
+}
+.spring-boot-health-main .container-cards-pf {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.spring-boot-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
+.spring-boot-layout .nav-tabs {
+  flex: 0 0 auto;
+  padding-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+.spring-boot-layout .contents {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  position: relative;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 .install-bundle {
   margin-bottom: 10px;
 }

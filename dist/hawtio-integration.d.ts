@@ -1,6 +1,7 @@
 /// <reference types="jmx" />
 /// <reference types="angular" />
 /// <reference types="angular-route" />
+/// <reference types="core" />
 declare namespace ActiveMQ {
     const log: Logging.Logger;
     const jmxDomain: string;
@@ -1178,6 +1179,36 @@ declare namespace Camel {
 }
 declare namespace Camel {
 }
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+    class Property {
+        name: string;
+        value: string;
+        description: string;
+        constructor(name: string, value: string, description: string);
+        static sortByName(a: any, b: any): 0 | 1 | -1;
+    }
+}
+declare namespace Camel {
+    class PropertiesService {
+        getDefinedProperties(schemaProperties: {}): Property[];
+        getDefaultProperties(schemaProperties: {}): Property[];
+        getUndefinedProperties(schemaProperties: {}): Property[];
+    }
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
+declare namespace Camel {
+}
 declare namespace Karaf {
     var log: Logging.Logger;
     function setSelect(selection: any, group: any): any;
@@ -1629,33 +1660,40 @@ declare namespace Osgi {
 declare namespace Osgi {
     var ServiceController: angular.IModule;
 }
-declare namespace Camel {
+declare namespace SpringBoot {
+    function configureRoutes($routeProvider: angular.route.IRouteProvider): void;
+    function configureNavigation(viewRegistry: any, HawtioNav: HawtioMainNav.Registry, workspace: Jmx.Workspace): void;
 }
-declare namespace Camel {
-}
-declare namespace Camel {
-    class Property {
-        name: string;
-        value: string;
-        description: string;
-        constructor(name: string, value: string, description: string);
-        static sortByName(a: any, b: any): 0 | 1 | -1;
+declare namespace SpringBoot {
+    interface HealthItem {
+        title: string;
+        info: string[];
     }
-}
-declare namespace Camel {
-    class PropertiesService {
-        getDefinedProperties(schemaProperties: {}): Property[];
-        getDefaultProperties(schemaProperties: {}): Property[];
-        getUndefinedProperties(schemaProperties: {}): Property[];
+    class HealthController {
+        private $interval;
+        private jolokiaService;
+        private humanizeService;
+        dataLoaded: boolean;
+        status: string;
+        items: HealthItem[];
+        constructor($interval: ng.IIntervalService, jolokiaService: JVM.JolokiaService, humanizeService: Core.HumanizeService);
+        $onInit(): void;
+        loadData(): void;
+        buildItems(data: any): HealthItem[];
+        getStatusIcon(): "pficon-error-circle-o" | "pficon-ok" | "pficon-info";
+        getStatusClass(): "alert-success" | "alert-danger" | "alert-info";
     }
+    const healthComponent: angular.IComponentOptions;
 }
-declare namespace Camel {
+declare namespace SpringBoot {
+    const healthModule: string;
 }
-declare namespace Camel {
+declare namespace SpringBoot {
+    function SpringBootLayoutController($location: ng.ILocationService): void;
 }
-declare namespace Camel {
+declare namespace SpringBoot {
+    const layoutModule: string;
 }
-declare namespace Camel {
-}
-declare namespace Camel {
+declare namespace SpringBoot {
+    const log: Logging.Logger;
 }
