@@ -1669,8 +1669,10 @@ declare namespace SpringBoot {
         dataLoaded: boolean;
         status: string;
         items: HealthItem[];
+        promise: ng.IPromise<any>;
         constructor($interval: ng.IIntervalService, jolokiaService: JVM.JolokiaService, humanizeService: Core.HumanizeService);
         $onInit(): void;
+        $onDestroy(): void;
         loadData(): void;
         buildItems(data: any): HealthItem[];
         getStatusIcon(): "pficon-error-circle-o" | "pficon-ok" | "pficon-info";

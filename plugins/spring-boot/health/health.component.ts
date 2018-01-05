@@ -10,6 +10,7 @@ namespace SpringBoot {
     dataLoaded = false;
     status: string;
     items: HealthItem[];
+    promise: ng.IPromise<any>;
 
     constructor(private $interval: ng.IIntervalService, private jolokiaService: JVM.JolokiaService,
       private humanizeService: Core.HumanizeService) {
@@ -18,7 +19,11 @@ namespace SpringBoot {
 
     $onInit() {
       this.loadData();
-      this.$interval(() => this.loadData(), 10000);
+      this.promise = this.$interval(() => this.loadData(), 10000);
+    }
+
+    $onDestroy() {
+      this.$interval.cancel(this.promise);
     }
 
     loadData(): void {

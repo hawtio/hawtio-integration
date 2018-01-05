@@ -25800,7 +25800,10 @@ var SpringBoot;
         HealthController.prototype.$onInit = function () {
             var _this = this;
             this.loadData();
-            this.$interval(function () { return _this.loadData(); }, 10000);
+            this.promise = this.$interval(function () { return _this.loadData(); }, 10000);
+        };
+        HealthController.prototype.$onDestroy = function () {
+            this.$interval.cancel(this.promise);
         };
         HealthController.prototype.loadData = function () {
             var _this = this;
