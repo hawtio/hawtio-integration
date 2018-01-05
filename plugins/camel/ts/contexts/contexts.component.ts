@@ -47,7 +47,8 @@ namespace Camel {
         moreActions: [
           this.deleteAction
         ]
-      }
+      },
+      isTableView: true
     };
 
     tableConfig = {
@@ -60,8 +61,6 @@ namespace Camel {
       { header: "State", itemField: "state" }
     ];
 
-    tableItems = [{ name: null, state: null }];
-    
     contexts: Context[];
 
     constructor(private $uibModal, private workspace: Jmx.Workspace, private contextsService: ContextsService) {
@@ -73,8 +72,7 @@ namespace Camel {
     }
 
     private getSelectedContexts(): Context[] {
-      return _.map(this.tableItems, (tableItem, i) => angular.extend(this.contexts[i], { selected: tableItem['selected'] }))
-        .filter(context => context.selected);
+      return this.contexts.filter(context => context.selected);
     }
 
     private enableDisableActions() {
@@ -92,13 +90,7 @@ namespace Camel {
         }
         let mbeans = _.map(this.workspace.selection.children, node => node.objectName);
         this.contextsService.getContexts(mbeans)
-          .then(contexts => {
-            this.tableItems = _.map(contexts, context => ({
-              name: context.name,
-              state: context.state
-            }));
-            this.contexts = contexts;
-          });
+          .then(contexts => this.contexts = contexts);
       }
     }
 
@@ -106,16 +98,17 @@ namespace Camel {
       let mbeans = _.map(this.contexts, context => context.mbean);
       this.contextsService.getContexts(mbeans)
         .then(contexts => {
-          this.contexts = contexts;
-          contexts.forEach((context, i) => this.tableItems[i].state = context.state);
+          for (let i = 0; i < contexts.length; i++) {
+            if (this.contexts[i].state !== contexts[i].state) {
+              this.contexts[i] = angular.extend({}, this.contexts[i], {state: contexts[i].state});
+            }
+          }
           this.enableDisableActions();
         });
     }
 
     private removeSelectedContexts() {
-      this.tableItems.forEach((tableItem, i) => angular.extend(this.contexts[i], { selected: tableItem['selected'] }));
       _.remove(this.contexts, context => context.selected);
-      _.remove(this.tableItems, tableItem => tableItem['selected']);
       this.workspace.loadTree();
       this.enableDisableActions();
     }
@@ -124,8 +117,12 @@ namespace Camel {
 
   export const contextsComponent = <angular.IComponentOptions>{
     template: `
-      <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
-      <pf-table-view config="$ctrl.tableConfig" colummns="$ctrl.tableColummns" items="$ctrl.tableItems"></pf-table-view>
+      <h2>Contexts</h2>
+      <p ng-if="!$ctrl.contexts">Loading...</p>
+      <div ng-if="$ctrl.contexts">
+        <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+        <pf-table-view config="$ctrl.tableConfig" colummns="$ctrl.tableColummns" items="$ctrl.contexts"></pf-table-view>
+      </div>
     `,
     controller: ContextsController
   };

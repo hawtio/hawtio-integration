@@ -698,26 +698,6 @@ div.camel-properties {
   padding-bottom: 20px;
 }
 
-.spring-boot-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: auto;
-}
-.spring-boot-layout .nav-tabs {
-  flex: 0 0 auto;
-  padding-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-.spring-boot-layout .contents {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  position: relative;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
 .install-bundle {
   margin-bottom: 10px;
 }
@@ -836,6 +816,26 @@ div.camel-properties {
   color: inherit;
   background-color: inherit;
   border: none;
+}
+
+.spring-boot-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
+.spring-boot-layout .nav-tabs {
+  flex: 0 0 auto;
+  padding-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+.spring-boot-layout .contents {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  position: relative;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .metricsWatcher .panel-group:first-child {

@@ -581,6 +581,7 @@ declare namespace Camel {
                     isDisabled: boolean;
                 }[];
             };
+            isTableView: boolean;
         };
         tableConfig: {
             selectionMatchProp: string;
@@ -589,10 +590,6 @@ declare namespace Camel {
         tableColummns: {
             header: string;
             itemField: string;
-        }[];
-        tableItems: {
-            name: any;
-            state: any;
         }[];
         contexts: Context[];
         constructor($uibModal: any, workspace: Jmx.Workspace, contextsService: ContextsService);
@@ -681,10 +678,6 @@ declare namespace Camel {
         tableColummns: {
             header: string;
             itemField: string;
-        }[];
-        tableItems: {
-            name: any;
-            state: any;
         }[];
         routes: Route[];
         constructor($uibModal: any, workspace: Jmx.Workspace, routesService: RoutesService);

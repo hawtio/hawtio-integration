@@ -64,8 +64,6 @@ namespace Camel {
       { header: "State", itemField: "state" }
     ];
 
-    tableItems = [{ name: null, state: null }];
-    
     routes: Route[];
 
     constructor(private $uibModal, private workspace: Jmx.Workspace, private routesService: RoutesService) {
@@ -77,8 +75,7 @@ namespace Camel {
     }
 
     private getSelectedRoutes() {
-      return _.map(this.tableItems, (tableItem, i) => angular.extend(this.routes[i], { selected: tableItem['selected'] }))
-        .filter(route => route.selected);
+      return this.routes.filter(route => route.selected);
     }
 
     private enableDisableActions() {
@@ -96,14 +93,7 @@ namespace Camel {
         }
         let mbeans = _.map(this.workspace.selection.children, node => node.objectName);
         this.routesService.getRoutes(mbeans)
-          .then(routes => {
-            this.tableItems = _.map(routes, route => ({
-              name: route.name,
-              state: route.state
-            }));
-            this.routes = routes;
-          })
-          .catch(error => log.error(error));
+          .then(routes => this.routes = routes);
       }
     }
 
@@ -111,21 +101,17 @@ namespace Camel {
       let mbeans = _.map(this.routes, route => route.mbean);
       this.routesService.getRoutes(mbeans)
         .then(routes => {
-          this.routes = routes;
-          routes.forEach((route, i) => {
-            if (route.state !== this.tableItems[i].state) {
-              this.tableItems[i] = angular.extend({}, this.tableItems[i], {state: route.state});
+          for (let i = 0; i < routes.length; i++) {
+            if (this.routes[i].state !== routes[i].state) {
+              this.routes[i] = angular.extend({}, this.routes[i], {state: routes[i].state});
             }
-          });
+          }
           this.enableDisableActions();
-        })
-        .catch(error => log.error(error));
+        });
     }
 
     private removeSelectedRoutes() {
-      this.tableItems.forEach((tableItem, i) => angular.extend(this.routes[i], { selected: tableItem['selected'] }));
       _.remove(this.routes, route => route.selected);
-      _.remove(this.tableItems, tableItem => tableItem['selected']);
       this.workspace.loadTree();
       this.enableDisableActions();
     }
@@ -135,8 +121,11 @@ namespace Camel {
   export const routesComponent = <angular.IComponentOptions>{
     template: `
       <h2>Routes</h2>
-      <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
-      <pf-table-view config="$ctrl.tableConfig" colummns="$ctrl.tableColummns" items="$ctrl.tableItems"></pf-table-view>
+      <p ng-if="!$ctrl.routes">Loading...</p>
+      <div ng-if="$ctrl.routes">
+        <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+        <pf-table-view config="$ctrl.tableConfig" colummns="$ctrl.tableColummns" items="$ctrl.routes"></pf-table-view>
+      </div>
     `,
     controller: RoutesController
   };
