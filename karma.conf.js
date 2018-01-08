@@ -16,17 +16,57 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'node_modules/jquery/dist/jquery.min.js',
+      'node_modules/datatables.net/js/jquery.dataTables.js',
+      'node_modules/datatables.net-select/js/dataTables.select.js',
+      'node_modules/bootstrap/dist/js/bootstrap.min.js',
+      'node_modules/patternfly/dist/js/patternfly.min.js',
+      'node_modules/patternfly-bootstrap-treeview/dist/bootstrap-treeview.js',
       'node_modules/angular/angular.js',
+      'node_modules/angular-sanitize/angular-sanitize.js',
+      'node_modules/angular-route/angular-route.min.js',
+      'node_modules/angular-file-upload/dist/angular-file-upload.min.js',
+      'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
+      'node_modules/angular-resizable/angular-resizable.min.js',
+      'node_modules/angular-animate/angular-animate.min.js',
+      'node_modules/angular-drag-and-drop-lists/angular-drag-and-drop-lists.min.js',
+      'node_modules/angularjs-datatables/dist/angular-datatables.min.js',
+      'node_modules/angularjs-datatables/dist/plugins/select/angular-datatables.select.min.js',    
+      'node_modules/angular-patternfly/dist/angular-patternfly.js',
+      'node_modules/c3/c3.min.js',
+      'node_modules/d3/d3.min.js',
       'node_modules/lodash/lodash.min.js',
       'node_modules/urijs/src/URI.min.js',
       'node_modules/js-logger/src/logger.min.js',
-      'node_modules/d3/d3.min.js',
+      'node_modules/clipboard/dist/clipboard.js',
+      'node_modules/marked/lib/marked.js',
+      'node_modules/js-beautify/js/lib/beautify.js',
+      'node_modules/js-beautify/js/lib/beautify-html.js',
+      'node_modules/codemirror/lib/codemirror.js',
+      'node_modules/codemirror/addon/edit/closetag.js',
+      'node_modules/codemirror/addon/edit/continuelist.js',
+      'node_modules/codemirror/addon/edit/matchbrackets.js',
+      'node_modules/codemirror/addon/fold/foldcode.js',
+      'node_modules/codemirror/addon/fold/brace-fold.js',
+      'node_modules/codemirror/addon/fold/xml-fold.js',
+      'node_modules/codemirror/mode/javascript/javascript.js',
+      'node_modules/codemirror/mode/xml/xml.js',
+      'node_modules/codemirror/mode/css/css.js',
+      'node_modules/codemirror/mode/htmlmixed/htmlmixed.js',
+      'node_modules/codemirror/mode/markdown/markdown.js',
+      'node_modules/codemirror/mode/diff/diff.js',
+      'node_modules/codemirror/mode/properties/properties.js',
+      'node_modules/codemirror/mode/clike/clike.js',
+      'node_modules/codemirror/mode/yaml/yaml.js',
+      'node_modules/graphlib/dist/graphlib.core.min.js',
+      'node_modules/dagre-layout/dist/dagre-layout.js',
+      'node_modules/ng-infinite-scroll/build/ng-infinite-scroll.min.js',
       'node_modules/@hawtio/core/dist/hawtio-core.js',
       'node_modules/@hawtio/utilities/dist/hawtio-utilities.js',
       'node_modules/@hawtio/ui/dist/hawtio-ui.js',
       'node_modules/@hawtio/forms/dist/hawtio-forms.js',
       'node_modules/@hawtio/jmx/dist/hawtio-jmx.js',
       'dist/hawtio-integration.js',
+      'node_modules/angular-mocks/angular-mocks.js',
       'plugins/**/*.spec.ts'
     ],
 
@@ -79,7 +119,8 @@ module.exports = function(config) {
     concurrency: Infinity,
 
 
-    // Add base tag to test page
-    customContextFile: '.karma/context.html'
+    // Add base tag to test pages
+    customContextFile: '.karma/context.html',
+    customDebugFile: '.karma/debug.html'
   })
 }

@@ -1,53 +1,59 @@
 /// <reference path="health.component.ts"/>
+/// <reference path="health.service.ts"/>
 
 describe("HealthController", function() {
 
   let $interval;
-  let jolokiaService;
-  let humanizeService;
-  let healthController;
+  let healthService: jasmine.SpyObj<SpringBoot.HealthService>;
+  let healthController: SpringBoot.HealthController;
+  let $q: ng.IQService;
+  let $rootScope: ng.IRootScopeService;
 
-  beforeEach(function() {
+  beforeEach(inject(function(_$q_, _$rootScope_) {
     $interval = jasmine.createSpy('$interval');
-    jolokiaService = jasmine.createSpyObj('jolokiaService', Object.getOwnPropertyNames(JVM.JolokiaService.prototype));
-    humanizeService = new Core.HumanizeService();
-    healthController = new SpringBoot.HealthController($interval, jolokiaService, humanizeService);
-  });
+    healthService = jasmine.createSpyObj('jolokiaService', ['getHealth']);
+    healthController = new SpringBoot.HealthController($interval, healthService);
+    $q = _$q_;
+    $rootScope = _$rootScope_;
+  }));
 
-  describe("buildItems()", function() {
-
-    it("should return empty array when data object has no additional properties", function() {
-      // given
-      const data = {status: "UP"};
-      // when
-      const items = healthController.buildItems(data);
-      // then
-      expect(items).toEqual([]);
-    });
+  describe("$onInit()", function() {
   
-    it("should return two items when data object has two additional properties", function() {
+    it("should load health data and start $interval", function() {
       // given
-      const data = {
-        camel: {contextStatus: "Started", name: "SampleCamel", version: "2.19.2", status: "UP"},
-        diskSpace: {total: 220138139648, threshold: 10485760, free: 117575626752, status: "UP"},
-        status: "UP"
-      };
+      const health = new SpringBoot.Health('UP', []);
+      healthService.getHealth.and.returnValue($q.resolve(health));
       // when
-      const items = healthController.buildItems(data);
+      healthController.$onInit();
+      $rootScope.$apply();
       // then
-      expect(items).toEqual([
-        {title: "Camel", info: ["Context status: Started", "Name: SampleCamel", "Version: 2.19.2", "Status: UP"]},
-        {title: "Disk space", info: ["Total: 220138139648", "Threshold: 10485760", "Free: 117575626752", "Status: UP"]}
-      ]);
+      expect(healthController.health).toBe(health);
+      expect($interval).toHaveBeenCalledWith(jasmine.any(Function), 10000);
     });
 
   });
 
+  describe("$onDestroy()", function() {
+  
+    it("should cancel $interval", function() {
+      // given
+      $interval.cancel = function(promise) {};
+      spyOn($interval, 'cancel');
+      const promise = <ng.IPromise<any>> {};
+      healthController.promise = promise;
+      // when
+      healthController.$onDestroy();
+      // then
+      expect($interval.cancel).toHaveBeenCalledWith(promise);
+    });
+
+  });
+  
   describe("getStatusIcon()", function() {
   
     it("should return 'pficon-ok' when status is 'UP'", function() {
       // given
-      healthController.status = 'UP';
+      healthController.health = new SpringBoot.Health('UP', []);
       // when
       const statusIcon = healthController.getStatusIcon();
       // then
@@ -56,7 +62,7 @@ describe("HealthController", function() {
 
     it("should return 'pficon-error-circle-o' when status is 'FATAL'", function() {
       // given
-      healthController.status = 'FATAL';
+      healthController.health = new SpringBoot.Health('FATAL', []);
       // when
       const statusIcon = healthController.getStatusIcon();
       // then
@@ -65,7 +71,7 @@ describe("HealthController", function() {
 
     it("should return 'pficon-info' when status is not 'UP' or 'FATAL'", function() {
       // given
-      healthController.status = 'UNKNOWN';
+      healthController.health = new SpringBoot.Health('UNKNOWN', []);
       // when
       const statusIcon = healthController.getStatusIcon();
       // then
@@ -73,12 +79,12 @@ describe("HealthController", function() {
     });
 
   });
-
+  
   describe("getStatusClass()", function() {
   
     it("should return 'alert-success' when status is 'UP'", function() {
       // given
-      healthController.status = 'UP';
+      healthController.health = new SpringBoot.Health('UP', []);
       // when
       const statusIcon = healthController.getStatusClass();
       // then
@@ -87,7 +93,7 @@ describe("HealthController", function() {
 
     it("should return 'alert-danger' when status is 'FATAL'", function() {
       // given
-      healthController.status = 'FATAL';
+      healthController.health = new SpringBoot.Health('FATAL', []);
       // when
       const statusIcon = healthController.getStatusClass();
       // then
@@ -96,7 +102,7 @@ describe("HealthController", function() {
 
     it("should return 'alert-info' when status is not 'UP' or 'FATAL'", function() {
       // given
-      healthController.status = 'UNKNOWN';
+      healthController.health = new SpringBoot.Health('UNKNOWN', []);
       // when
       const statusIcon = healthController.getStatusClass();
       // then

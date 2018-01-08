@@ -9,7 +9,7 @@
   "scripts": {
     "start": "gulp",
     "build": "gulp build && gulp test",
-    "test": "gulp build && gulp test"
+    "test": "gulp test"
   },
   "dependencies": {
     "@hawtio/jmx": "3.2.2",
@@ -19,6 +19,8 @@
   },
   "devDependencies": {
     "@hawtio/node-backend": "3.0.4",
+    "@types/angular-mocks": "~1.5.11",
+    "angular-mocks": "~1.6.8",
     "del": "~3.0.0",
     "event-stream": "~3.3.0",
     "gulp": "~3.9.0",

@@ -1,6 +1,7 @@
 /// <reference types="jmx" />
 /// <reference types="angular" />
 /// <reference types="angular-route" />
+/// <reference types="angular-mocks" />
 /// <reference types="core" />
 declare namespace ActiveMQ {
     const log: Logging.Logger;
@@ -1658,23 +1659,37 @@ declare namespace SpringBoot {
     function configureNavigation(viewRegistry: any, HawtioNav: HawtioMainNav.Registry, workspace: Jmx.Workspace): void;
 }
 declare namespace SpringBoot {
+    class Health {
+        status: HealthStatus;
+        items: HealthItem[];
+        constructor(status: HealthStatus, items: HealthItem[]);
+    }
+    type HealthStatus = 'FATAL' | 'DOWN' | 'OUT OF SERVICE' | 'UNKNOWN' | 'UP';
     interface HealthItem {
         title: string;
         info: string[];
     }
-    class HealthController {
-        private $interval;
+}
+declare namespace SpringBoot {
+    class HealthService {
         private jolokiaService;
         private humanizeService;
-        dataLoaded: boolean;
-        status: string;
-        items: HealthItem[];
+        constructor(jolokiaService: JVM.JolokiaService, humanizeService: Core.HumanizeService);
+        getHealth(): ng.IPromise<Health>;
+        private toHealthStatus(str);
+        private toItems(data);
+    }
+}
+declare namespace SpringBoot {
+    class HealthController {
+        private $interval;
+        private healthService;
+        health: Health;
         promise: ng.IPromise<any>;
-        constructor($interval: ng.IIntervalService, jolokiaService: JVM.JolokiaService, humanizeService: Core.HumanizeService);
+        constructor($interval: ng.IIntervalService, healthService: HealthService);
         $onInit(): void;
         $onDestroy(): void;
         loadData(): void;
-        buildItems(data: any): HealthItem[];
         getStatusIcon(): "pficon-error-circle-o" | "pficon-ok" | "pficon-info";
         getStatusClass(): "alert-success" | "alert-danger" | "alert-info";
     }

@@ -25788,14 +25788,61 @@ var SpringBoot;
 })(SpringBoot || (SpringBoot = {}));
 var SpringBoot;
 (function (SpringBoot) {
-    var HealthController = /** @class */ (function () {
-        HealthController.$inject = ["$interval", "jolokiaService", "humanizeService"];
-        function HealthController($interval, jolokiaService, humanizeService) {
+    var Health = /** @class */ (function () {
+        function Health(status, items) {
+            this.status = status;
+            this.items = items;
+        }
+        return Health;
+    }());
+    SpringBoot.Health = Health;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="health.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var HealthService = /** @class */ (function () {
+        HealthService.$inject = ["jolokiaService", "humanizeService"];
+        function HealthService(jolokiaService, humanizeService) {
             'ngInject';
-            this.$interval = $interval;
             this.jolokiaService = jolokiaService;
             this.humanizeService = humanizeService;
-            this.dataLoaded = false;
+        }
+        HealthService.prototype.getHealth = function () {
+            var _this = this;
+            SpringBoot.log.debug('Fetch health data');
+            return this.jolokiaService.getAttribute('org.springframework.boot:type=Endpoint,name=healthEndpoint', 'Data')
+                .then(function (data) {
+                var status = _this.toHealthStatus(data.status);
+                var items = _this.toItems(data);
+                return new SpringBoot.Health(status, items);
+            });
+        };
+        HealthService.prototype.toHealthStatus = function (str) {
+            return this.humanizeService.toUpperCase(str);
+        };
+        HealthService.prototype.toItems = function (data) {
+            var _this = this;
+            return _.toPairs(data)
+                .filter(function (pair) { return _.isObject(pair[1]); })
+                .map(function (pair) { return ({
+                title: _this.humanizeService.toSentenceCase(pair[0]),
+                info: _.toPairs(pair[1]).map(function (pair) { return _this.humanizeService.toSentenceCase(pair[0]) + ': ' + pair[1]; })
+            }); });
+        };
+        return HealthService;
+    }());
+    SpringBoot.HealthService = HealthService;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="health.service.ts"/>
+/// <reference path="health.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var HealthController = /** @class */ (function () {
+        HealthController.$inject = ["$interval", "healthService"];
+        function HealthController($interval, healthService) {
+            'ngInject';
+            this.$interval = $interval;
+            this.healthService = healthService;
         }
         HealthController.prototype.$onInit = function () {
             var _this = this;
@@ -25808,24 +25855,11 @@ var SpringBoot;
         HealthController.prototype.loadData = function () {
             var _this = this;
             SpringBoot.log.debug('Load health data');
-            this.jolokiaService.getAttribute('org.springframework.boot:type=Endpoint,name=healthEndpoint', 'Data')
-                .then(function (data) {
-                _this.status = _this.humanizeService.toUpperCase(data.status);
-                _this.items = _this.buildItems(data);
-                _this.dataLoaded = true;
-            });
-        };
-        HealthController.prototype.buildItems = function (data) {
-            var _this = this;
-            return _.toPairs(data)
-                .filter(function (pair) { return _.isObject(pair[1]); })
-                .map(function (pair) { return ({
-                title: _this.humanizeService.toSentenceCase(pair[0]),
-                info: _.toPairs(pair[1]).map(function (pair) { return _this.humanizeService.toSentenceCase(pair[0]) + ': ' + pair[1]; })
-            }); });
+            this.healthService.getHealth()
+                .then(function (health) { return _this.health = health; });
         };
         HealthController.prototype.getStatusIcon = function () {
-            switch (this.status) {
+            switch (this.health.status) {
                 case 'UP':
                     return 'pficon-ok';
                 case 'FATAL':
@@ -25835,7 +25869,7 @@ var SpringBoot;
             }
         };
         HealthController.prototype.getStatusClass = function () {
-            switch (this.status) {
+            switch (this.health.status) {
                 case 'UP':
                     return 'alert-success';
                 case 'FATAL':
@@ -25848,16 +25882,18 @@ var SpringBoot;
     }());
     SpringBoot.HealthController = HealthController;
     SpringBoot.healthComponent = {
-        template: "\n      <div class=\"spring-boot-health-main\" ng-if=\"$ctrl.dataLoaded\">\n        <h1>Health</h1>\n        <div class=\"cards-pf\">\n          <div class=\"container-fluid container-cards-pf\">\n            <div class=\"row row-cards-pf\">\n              <div class=\"col-lg-12\">\n                <div class=\"toast-pf alert\" ng-class=\"$ctrl.getStatusClass()\">\n                  <span class=\"pficon\" ng-class=\"$ctrl.getStatusIcon()\"></span>\n                  <strong>{{$ctrl.status}}</strong>\n                </div>\n              </div>\n              <div class=\"col-xs-12 col-sm-6 col-md-4 col-lg-3\" ng-repeat=\"item in $ctrl.items\">\n                <pf-info-status-card status=\"item\"></pf-info-status-card>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    ",
+        template: "\n      <div class=\"spring-boot-health-main\">\n        <h1>Health</h1>\n        <div class=\"cards-pf\" ng-if=\"$ctrl.health\">\n          <div class=\"container-fluid container-cards-pf\">\n            <div class=\"row row-cards-pf\">\n              <div class=\"col-lg-12\">\n                <div class=\"toast-pf alert\" ng-class=\"$ctrl.getStatusClass()\">\n                  <span class=\"pficon\" ng-class=\"$ctrl.getStatusIcon()\"></span>\n                  <strong>{{$ctrl.health.status}}</strong>\n                </div>\n              </div>\n              <div class=\"col-xs-12 col-sm-6 col-md-4 col-lg-3\" ng-repeat=\"item in $ctrl.health.items\">\n                <pf-info-status-card status=\"item\"></pf-info-status-card>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    ",
         controller: HealthController
     };
 })(SpringBoot || (SpringBoot = {}));
 /// <reference path="health.component.ts"/>
+/// <reference path="health.service.ts"/>
 var SpringBoot;
 (function (SpringBoot) {
     SpringBoot.healthModule = angular
         .module('spring-boot-health', [])
         .component('springBootHealth', SpringBoot.healthComponent)
+        .service('healthService', SpringBoot.HealthService)
         .name;
 })(SpringBoot || (SpringBoot = {}));
 var SpringBoot;

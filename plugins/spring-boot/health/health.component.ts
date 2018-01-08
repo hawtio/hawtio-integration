@@ -1,19 +1,14 @@
-namespace SpringBoot {
+/// <reference path="health.service.ts"/>
+/// <reference path="health.ts"/>
 
-  export interface HealthItem {
-    title: string,
-    info: string[]
-  }
+namespace SpringBoot {
 
   export class HealthController {
 
-    dataLoaded = false;
-    status: string;
-    items: HealthItem[];
+    health: Health;
     promise: ng.IPromise<any>;
 
-    constructor(private $interval: ng.IIntervalService, private jolokiaService: JVM.JolokiaService,
-      private humanizeService: Core.HumanizeService) {
+    constructor(private $interval: ng.IIntervalService, private healthService: HealthService) {
       'ngInject';
     }
 
@@ -28,25 +23,12 @@ namespace SpringBoot {
 
     loadData(): void {
       log.debug('Load health data');
-      this.jolokiaService.getAttribute('org.springframework.boot:type=Endpoint,name=healthEndpoint', 'Data')
-        .then(data => {
-          this.status = this.humanizeService.toUpperCase(data.status);
-          this.items = this.buildItems(data);
-          this.dataLoaded = true;
-        });
-    }
-
-    buildItems(data): HealthItem[] {
-      return _.toPairs(data)
-        .filter(pair => _.isObject(pair[1]))
-        .map(pair => ({
-          title: this.humanizeService.toSentenceCase(pair[0]),
-          info: _.toPairs(pair[1]).map(pair => this.humanizeService.toSentenceCase(pair[0]) + ': ' + pair[1])
-        }));
+      this.healthService.getHealth()
+        .then(health => this.health = health);
     }
 
     getStatusIcon() {
-      switch (this.status) {
+      switch (this.health.status) {
         case 'UP':
           return 'pficon-ok'
         case 'FATAL':
@@ -57,7 +39,7 @@ namespace SpringBoot {
     }
 
     getStatusClass() {
-      switch (this.status) {
+      switch (this.health.status) {
         case 'UP':
           return 'alert-success'
         case 'FATAL':
@@ -71,18 +53,18 @@ namespace SpringBoot {
 
   export const healthComponent: angular.IComponentOptions = {
     template: `
-      <div class="spring-boot-health-main" ng-if="$ctrl.dataLoaded">
+      <div class="spring-boot-health-main">
         <h1>Health</h1>
-        <div class="cards-pf">
+        <div class="cards-pf" ng-if="$ctrl.health">
           <div class="container-fluid container-cards-pf">
             <div class="row row-cards-pf">
               <div class="col-lg-12">
                 <div class="toast-pf alert" ng-class="$ctrl.getStatusClass()">
                   <span class="pficon" ng-class="$ctrl.getStatusIcon()"></span>
-                  <strong>{{$ctrl.status}}</strong>
+                  <strong>{{$ctrl.health.status}}</strong>
                 </div>
               </div>
-              <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="item in $ctrl.items">
+              <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="item in $ctrl.health.items">
                 <pf-info-status-card status="item"></pf-info-status-card>
               </div>
             </div>
