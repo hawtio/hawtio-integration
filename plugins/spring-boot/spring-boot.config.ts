@@ -4,8 +4,9 @@ namespace SpringBoot {
     'ngInject';
     $routeProvider
       .when('/spring-boot', {redirectTo: '/spring-boot/health'})
-      .when('/spring-boot/health', {template: '<spring-boot-health></spring-boot-health>'});
-  }
+      .when('/spring-boot/health', {template: '<spring-boot-health></spring-boot-health>'})
+      .when('/spring-boot/mappings', {template: '<spring-boot-mappings></spring-boot-mappings>'});
+    }
 
   export function configureNavigation(viewRegistry, HawtioNav: HawtioMainNav.Registry, workspace: Jmx.Workspace) {
     'ngInject';
