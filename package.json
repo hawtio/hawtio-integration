@@ -196,6 +196,7 @@
     "socks": "1.1.9",
     "@hawtio/ui": "3.2.0",
     "codemirror": "5.33.0",
-    "js-beautify": "1.7.5"
+    "js-beautify": "1.7.5",
+    "bootstrap-datepicker": "1.6.4"
   }
 }
