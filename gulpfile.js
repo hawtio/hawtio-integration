@@ -108,14 +108,14 @@ gulp.task('connect', ['watch'], function() {
   hawtio.setConfig({
     logLevel: config.logLevel,
     port: 2772,
-    proxy: '/hawtio/proxy',
+    proxy: '/integration/proxy',
     staticProxies: [{
       port: config.proxyPort,
-      path: '/hawtio/jolokia',
+      path: '/integration/jolokia',
       targetPath: config.targetPath
     }],
     staticAssets: [{
-      path: '/hawtio/',
+      path: '/integration/',
       dir: '.'
     }],
     fallback: 'index.html',
@@ -126,7 +126,7 @@ gulp.task('connect', ['watch'], function() {
   hawtio.use('/', function(req, res, next) {
     var path = req.originalUrl;
     if (path === '/') {
-      res.redirect('/hawtio');
+      res.redirect('/integration');
     } else if (path.startsWith('/plugins/') && path.endsWith('html')) {
       // avoid returning these files, they should get pulled from js
       if (argv.debug) {
