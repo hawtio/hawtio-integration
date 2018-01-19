@@ -8,6 +8,9 @@ node_modules/
 # Bower dependency directory (https://bower.io/)
 libs/
 
+# Site
+site/
+
 # Logs
 logs
 *.log
