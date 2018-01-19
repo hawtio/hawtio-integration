@@ -3,17 +3,22 @@ let argv = require('yargs').argv;
 let concat = require('gulp-concat');
 let del = require('del');
 let eventStream = require('event-stream');
+let fs = require('fs');
 let gulp = require('gulp');
 let gulpif = require('gulp-if');
+let gulpLoadPlugins = require('gulp-load-plugins');
 let hawtio = require('@hawtio/node-backend');
 let less = require('gulp-less');
 let logger = require('js-logger');
 let ngAnnotate = require('gulp-ng-annotate');
 let path = require('path');
 let rename = require("gulp-rename");
+let sequence = require('run-sequence');
 let sourcemaps = require('gulp-sourcemaps');
 let typescript = require('gulp-typescript');
 let Server = require('karma').Server;
+
+const plugins  = gulpLoadPlugins({});
 
 let config = {
   proxyPort: argv.port || 8181,
@@ -72,9 +77,7 @@ gulp.task('concat', ['template'], function() {
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('clean', ['concat'], function() {
-  return del(['templates.js', 'compiled.js']);
-});
+gulp.task('clean', () => del(['templates.js', 'compiled.js', './site/']));
 
 gulp.task('less', function () {
   let pluginsCss = gulp.src(config.less)
@@ -159,6 +162,89 @@ gulp.task('test', function (done) {
   }, done).start();
 });
 
+gulp.task('site-fonts', () =>
+  gulp
+    .src(
+      [
+        'node_modules/**/*.woff',
+        'node_modules/**/*.woff2',
+        'node_modules/**/*.ttf',
+        'node_modules/**/fonts/*.eot',
+        'node_modules/**/fonts/*.svg'
+      ],
+      { base: '.' }
+    )
+    .pipe(plugins.flatten())
+    .pipe(plugins.chmod(0o644))
+    .pipe(plugins.dedupe({ same: false }))
+    .pipe(plugins.debug({ title: 'site font files' }))
+    .pipe(gulp.dest('site/fonts/', { overwrite: false }))
+);
+
+gulp.task('site-files', () => gulp.src(['images/**', 'img/**'], { base: '.' })
+  .pipe(plugins.chmod(0o644))
+  .pipe(plugins.dedupe({ same: false }))
+  .pipe(plugins.debug({ title: 'site files' }))
+  .pipe(gulp.dest('site')));
+
+gulp.task('usemin', () => gulp.src('index.html')
+  .pipe(plugins.usemin({
+    css: [plugins.minifyCss({ keepBreaks: true }), 'concat'],
+    js : [plugins.uglify(), plugins.rev()],
+  }))
+  .pipe(plugins.debug({ title: 'usemin' }))
+  .pipe(gulp.dest('site')));
+
+gulp.task('tweak-urls', ['usemin'], () => gulp.src('site/style.css')
+  .pipe(plugins.replace(/url\(\.\.\//g, 'url('))
+  // tweak fonts URL coming from PatternFly that does not repackage then in dist
+  .pipe(plugins.replace(/url\(\.\.\/components\/font-awesome\//g, 'url('))
+  .pipe(plugins.replace(/url\(\.\.\/components\/bootstrap\/dist\//g, 'url('))
+  .pipe(plugins.replace(/url\(node_modules\/bootstrap\/dist\//g, 'url('))
+  .pipe(plugins.replace(/url\(node_modules\/patternfly\/components\/bootstrap\/dist\//g, 'url('))
+  .pipe(plugins.debug({title: 'tweak-urls'}))
+  .pipe(gulp.dest('site')));
+
+gulp.task('copy-site-images', function () {
+  const dirs = fs.readdirSync('./node_modules/@hawtio');
+  const patterns = [];
+  dirs.forEach(function (dir) {
+    const path = './node_modules/@hawtio/' + dir + '/dist/img';
+    try {
+      if (fs.statSync(path).isDirectory()) {
+        console.log('found image dir: ', path);
+        const pattern = 'node_modules/@hawtio/' + dir + '/dist/img/**';
+        patterns.push(pattern);
+      }
+    } catch (e) {
+      // ignore, file does not exist
+    }
+  });
+  // Add PatternFly images package in dist
+  patterns.push('node_modules/patternfly/dist/img/**');
+  return gulp.src(patterns)
+    .pipe(plugins.debug({title: 'img-copy'}))
+    .pipe(plugins.chmod(0o644))
+    .pipe(gulp.dest('site/img'));
+});
+
+gulp.task('serve-site', function () {
+  hawtio.setConfig({
+    port: 2772,
+    staticAssets: [{
+      path : '/integration',
+      dir  : 'site',
+    }],
+    liveReload : {
+      enabled : false,
+    },
+  });
+
+  return hawtio.listen(server => console.log(`Hawtio console started at http://localhost:${server.address().port}`));
+});
+
 gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean', 'copy-images']);
+
+gulp.task('site', callback => sequence('clean', ['site-fonts', 'site-files', 'usemin', 'tweak-urls', 'copy-site-images'], callback));
 
 gulp.task('default', ['connect']);
