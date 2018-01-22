@@ -1744,6 +1744,55 @@ declare namespace SpringBoot {
     const mappingsModule: string;
 }
 declare namespace SpringBoot {
+    class Trace {
+        timestamp: string;
+        method: string;
+        path: string;
+        httpStatusCode: number;
+        timeTaken: number;
+        info: any;
+        constructor(trace: any);
+    }
+}
+declare namespace SpringBoot {
+    class TraceService {
+        private jolokiaService;
+        constructor(jolokiaService: JVM.JolokiaService);
+        getTraces(): ng.IPromise<Trace[]>;
+    }
+}
+declare namespace SpringBoot {
+    class TraceController {
+        private traceService;
+        private $scope;
+        private $filter;
+        private $timeout;
+        private $interval;
+        private $uibModal;
+        private static CACHE_SIZE;
+        private toolbarConfig;
+        loading: boolean;
+        traces: Trace[];
+        tableItems: Trace[];
+        selectedTrace: Trace;
+        promise: ng.IPromise<any>;
+        dateFormat: string;
+        constructor(traceService: TraceService, $scope: any, $filter: ng.IFilterService, $timeout: ng.ITimeoutService, $interval: ng.IIntervalService, $uibModal: any);
+        $onInit(): void;
+        $onDestroy(): void;
+        loadTraces(): void;
+        applyFilters(filters: any[]): void;
+        getStatusClass(trace: Trace): string;
+        openTraceModal(trace: Trace): void;
+        private aggregateTraces(traces);
+        private scrollIfRequired();
+    }
+    const traceComponent: angular.IComponentOptions;
+}
+declare namespace SpringBoot {
+    const traceModule: string;
+}
+declare namespace SpringBoot {
     function SpringBootLayoutController($location: ng.ILocationService): void;
 }
 declare namespace SpringBoot {

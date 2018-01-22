@@ -1,0 +1,65 @@
+<div class="spring-boot-trace-main">
+  <div class="spring-boot-trace-flex-container">
+    <div class="spring-boot-trace-fixed-toolbar">
+      <h1>Trace</h1>
+      <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+      <div class="blank-slate-pf no-border" ng-if="$ctrl.loading === false && $ctrl.traces.length === 0">
+        <div class="blank-slate-pf-icon">
+          <span class="pficon pficon pficon-add-circle-o"></span>
+        </div>
+        <h1>No Spring Boot Traces</h1>
+        <p>There are no trace details to display for this applicaton.</p>
+        <p>Wait for some trace events to be generated or revise your search filter criteria.</p>
+      </div>
+      <div ng-show="$ctrl.traces.length > 0">
+        <table class="table table-striped spring-boot-trace-header-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>HTTP Status</th>
+              <th>HTTP Method</th>
+              <th>Path</th>
+              <th>Time Taken</th>
+              <th></th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+    <div class="spring-boot-trace-scrollable-table" ng-show="$ctrl.traces.length > 0">
+      <table class="table table-striped">
+        <tbody>
+          <tr ng-repeat="trace in $ctrl.tableItems">
+            <td>{{trace.timestamp | date: $ctrl.dateFormat}}</td>
+            <td ng-switch="trace.httpStatusCode === undefined">
+              <span ng-switch-when="true">Unknown</span>
+              <span ng-switch-default ng-class="$ctrl.getStatusClass(trace)">{{trace.httpStatusCode}}</span>
+            </td>
+            <td>{{trace.method}}</td>
+            <td>{{trace.path}}</td>
+            <td ng-switch="trace.timeTaken === undefined">
+              <span ng-switch-when="true">Unknown</span>
+              <span ng-switch-default>{{trace.timeTaken}} ms</span>
+            </td>
+            <td>
+              <div class="table-view-pf-btn">
+                <button class="btn btn-default" type="button" ng-click="$ctrl.openTraceModal(trace)">Show Trace Detail</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script type="text/ng-template" id="traceDetailsModal.html">
+    <div class="modal-header">
+      <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">
+        <span class="pficon pficon-close" aria-hidden="true"></span>
+      </button>
+      <h4 class="modal-title">Trace</h4>
+    </div>
+    <div class="modal-body">
+      <pre>{{trace.info | json}}</pre>
+    </div>
+  </script>
+</div>
