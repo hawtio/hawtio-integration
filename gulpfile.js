@@ -235,9 +235,18 @@ gulp.task('serve-site', function () {
       path : '/integration',
       dir  : 'site',
     }],
+    fallback: 'site/index.html',
     liveReload : {
       enabled : false,
     },
+  });
+
+  hawtio.use('/', function(req, res, next) {
+    if (!req.originalUrl.startsWith('/integration')) {
+      res.redirect('/integration');
+    } else {
+      next();
+    }
   });
 
   return hawtio.listen(server => console.log(`Hawtio console started at http://localhost:${server.address().port}`));
