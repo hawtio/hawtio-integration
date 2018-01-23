@@ -187,15 +187,15 @@ gulp.task('site-files', () => gulp.src(['images/**', 'img/**'], { base: '.' })
   .pipe(plugins.debug({ title: 'site files' }))
   .pipe(gulp.dest('site')));
 
-gulp.task('usemin', () => gulp.src('index.html')
+gulp.task('site-usemin', () => gulp.src('index.html')
   .pipe(plugins.usemin({
     css: [plugins.minifyCss({ keepBreaks: true }), 'concat'],
     js : [plugins.uglify(), plugins.rev()],
   }))
-  .pipe(plugins.debug({ title: 'usemin' }))
+  .pipe(plugins.debug({ title: 'site usemin' }))
   .pipe(gulp.dest('site')));
 
-gulp.task('tweak-urls', ['usemin', 'site-config'], () => eventStream.merge(
+gulp.task('site-tweak-urls', ['site-usemin', 'site-config'], () => eventStream.merge(
   gulp.src('site/style.css')
     .pipe(plugins.replace(/url\(\.\.\//g, 'url('))
     // tweak fonts URL coming from PatternFly that does not repackage then in dist
@@ -203,13 +203,13 @@ gulp.task('tweak-urls', ['usemin', 'site-config'], () => eventStream.merge(
     .pipe(plugins.replace(/url\(\.\.\/components\/bootstrap\/dist\//g, 'url('))
     .pipe(plugins.replace(/url\(node_modules\/bootstrap\/dist\//g, 'url('))
     .pipe(plugins.replace(/url\(node_modules\/patternfly\/components\/bootstrap\/dist\//g, 'url('))
-    .pipe(plugins.debug({title: 'tweak-urls'}))
     .pipe(gulp.dest('site')),
   gulp.src('site/hawtconfig.json')
-  .pipe(plugins.replace(/node_modules\/@hawtio\/core\/dist\//g, ''))
-  .pipe(gulp.dest('site'))));
+    .pipe(plugins.replace(/node_modules\/@hawtio\/core\/dist\//g, ''))
+    .pipe(gulp.dest('site')))
+  .pipe(plugins.debug({ title: 'site tweak urls' })));
 
-gulp.task('copy-site-images', function () {
+gulp.task('site-images', function () {
   const dirs = fs.readdirSync('./node_modules/@hawtio');
   const patterns = [];
   dirs.forEach(function (dir) {
@@ -261,6 +261,6 @@ gulp.task('serve-site', function () {
 
 gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean', 'copy-images']);
 
-gulp.task('site', callback => sequence('clean', ['site-fonts', 'site-files', 'usemin', 'tweak-urls', 'copy-site-images', 'site-config'], callback));
+gulp.task('site', callback => sequence('clean', ['site-fonts', 'site-files', 'site-usemin', 'site-tweak-urls', 'site-images', 'site-config'], callback));
 
 gulp.task('default', ['connect']);
