@@ -14100,14 +14100,12 @@ var ActiveMQ;
 var ActiveMQ;
 (function (ActiveMQ) {
     var TreeController = /** @class */ (function () {
-        TreeController.$inject = ["$scope", "$location", "workspace", "$route", "jolokia", "$element"];
-        function TreeController($scope, $location, workspace, $route, jolokia, $element) {
+        TreeController.$inject = ["$scope", "$location", "workspace", "$element"];
+        function TreeController($scope, $location, workspace, $element) {
             'ngInject';
             this.$scope = $scope;
             this.$location = $location;
             this.workspace = workspace;
-            this.$route = $route;
-            this.jolokia = jolokia;
             this.$element = $element;
             // it's not possible to declare classes to the component host tag in AngularJS
             $element.addClass('tree-nav-sidebar-content');
@@ -17960,13 +17958,12 @@ var Camel;
 var Camel;
 (function (Camel) {
     var TreeController = /** @class */ (function () {
-        TreeController.$inject = ["$scope", "$location", "workspace", "$route", "jolokia", "$element"];
-        function TreeController($scope, $location, workspace, $route, jolokia, $element) {
+        TreeController.$inject = ["$scope", "$location", "workspace", "jolokia", "$element"];
+        function TreeController($scope, $location, workspace, jolokia, $element) {
             'ngInject';
             this.$scope = $scope;
             this.$location = $location;
             this.workspace = workspace;
-            this.$route = $route;
             this.jolokia = jolokia;
             this.$element = $element;
             // it's not possible to declare classes to the component host tag in AngularJS

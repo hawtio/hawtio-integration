@@ -1,7 +1,7 @@
 /// <reference types="jmx" />
 /// <reference types="angular" />
-/// <reference types="angular-route" />
 /// <reference types="angular-mocks" />
+/// <reference types="angular-route" />
 /// <reference types="core" />
 declare namespace ActiveMQ {
     const log: Logging.Logger;
@@ -80,10 +80,8 @@ declare namespace ActiveMQ {
         private $scope;
         private $location;
         private workspace;
-        private $route;
-        private jolokia;
         private $element;
-        constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, $route: angular.route.IRouteService, jolokia: Jolokia.IJolokia, $element: JQuery);
+        constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, $element: JQuery);
         $onInit(): void;
         treeFetched(): boolean;
         private updateSelectionFromURL();
@@ -718,10 +716,9 @@ declare namespace Camel {
         private $scope;
         private $location;
         private workspace;
-        private $route;
         private jolokia;
         private $element;
-        constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, $route: angular.route.IRouteService, jolokia: Jolokia.IJolokia, $element: JQuery);
+        constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, $element: JQuery);
         $onInit(): void;
         treeFetched(): boolean;
         private updateSelectionFromURL();

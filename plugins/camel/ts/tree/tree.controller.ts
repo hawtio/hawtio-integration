@@ -8,7 +8,6 @@ namespace Camel {
       private $scope,
       private $location: ng.ILocationService,
       private workspace: Jmx.Workspace,
-      private $route: angular.route.IRouteService,
       private jolokia: Jolokia.IJolokia,
       private $element: JQuery) {
         'ngInject';
