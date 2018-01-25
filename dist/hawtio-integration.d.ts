@@ -735,6 +735,7 @@ declare namespace Camel {
         treeFetched(): boolean;
         private updateSelectionFromURL();
         private populateTree();
+        private removeTree();
         private navigateToDefaultTab(selection);
     }
 }

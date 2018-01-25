@@ -18013,20 +18013,7 @@ var Camel;
         }
         TreeController.prototype.$onInit = function () {
             var _this = this;
-            this.$scope.$on('$destroy', function () {
-                var tree = $('#cameltree').treeview(true);
-                tree.clearSearch();
-                // Bootstrap tree view leaks the node elements into the data structure
-                // so let's clean this up when the user leaves the view
-                var cleanTreeFolder = function (node) {
-                    delete node['$el'];
-                    if (node.nodes)
-                        node.nodes.forEach(cleanTreeFolder);
-                };
-                cleanTreeFolder(_this.workspace.tree);
-                // Then call the tree clean-up method
-                tree.remove();
-            });
+            this.$scope.$on('$destroy', function () { return _this.removeTree(); });
             this.$scope.$on('$routeChangeStart', function () { return Jmx.updateTreeSelectionFromURL(_this.$location, $('#cameltree')); });
             this.$scope.$watch(angular.bind(this, function () { return _this.workspace.tree; }), function () { return _this.populateTree(); });
             this.$scope.$on('jmxTreeUpdated', function () { return _this.populateTree(); });
@@ -18060,10 +18047,28 @@ var Camel;
             if (tree) {
                 var rootFolder = tree.findDescendant(function (node) { return node.key === 'camelContexts'; });
                 if (rootFolder) {
-                    var treeElement = $('#cameltree');
-                    Jmx.enableTree(this.$scope, this.$location, this.workspace, treeElement, [rootFolder]);
+                    this.removeTree();
+                    Jmx.enableTree(this.$scope, this.$location, this.workspace, $('#cameltree'), [rootFolder]);
                     this.updateSelectionFromURL();
                 }
+            }
+        };
+        TreeController.prototype.removeTree = function () {
+            var tree = $('#cameltree').treeview(true);
+            // There is no exposed API to check whether the tree has already been initialized,
+            // so let's just check if the methods are presents
+            if (tree.clearSearch) {
+                tree.clearSearch();
+                // Bootstrap tree view leaks the node elements into the data structure
+                // so let's clean this up when the user leaves the view
+                var cleanTreeFolder_1 = function (node) {
+                    delete node['$el'];
+                    if (node.nodes)
+                        node.nodes.forEach(cleanTreeFolder_1);
+                };
+                cleanTreeFolder_1(this.workspace.tree);
+                // Then call the tree clean-up method
+                tree.remove();
             }
         };
         // TODO: the logic should ideally be factorized with that of the visible tabs
