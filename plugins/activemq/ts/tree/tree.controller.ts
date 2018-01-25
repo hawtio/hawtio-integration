@@ -69,24 +69,9 @@ namespace ActiveMQ {
     }
 
     $onInit(): void {
-      this.$scope.$on('$destroy', () => {
-        const tree = ($('#activemqtree') as any).treeview(true);
-        tree.clearSearch();
-        // Bootstrap tree view leaks the node elements into the data structure
-        // so let's clean this up when the user leaves the view
-        const cleanTreeFolder = (node: Jmx.Folder) => {
-          delete node['$el'];
-          if (node.nodes) node.nodes.forEach(cleanTreeFolder);
-        };
-        cleanTreeFolder(this.workspace.tree);
-        // Then call the tree clean-up method
-        tree.remove();
-      });
-
+      this.$scope.$on('$destroy', () => this.removeTree());
       this.$scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL(this.$location, $('#activemqtree')));
-
       this.$scope.$watch(angular.bind(this, () => this.workspace.tree), () => this.populateTree());
-
       this.$scope.$on('jmxTreeUpdated', () => this.populateTree());
     }
 
@@ -156,9 +141,27 @@ namespace ActiveMQ {
           }
         });
 
-        const treeElement = $('#activemqtree');
-        Jmx.enableTree(this.$scope, this.$location, this.workspace, treeElement, children);
+        this.removeTree();
+        Jmx.enableTree(this.$scope, this.$location, this.workspace, $('#activemqtree'), children);
         this.updateSelectionFromURL();
+      }
+    }
+
+    private removeTree(): void {
+      const tree = ($('#activemqtree') as any).treeview(true);
+      // There is no exposed API to check whether the tree has already been initialized,
+      // so let's just check if the methods are presents
+      if (tree.clearSearch) {
+        tree.clearSearch();
+        // Bootstrap tree view leaks the node elements into the data structure
+        // so let's clean this up when the user leaves the view
+        const cleanTreeFolder = (node: Jmx.Folder) => {
+          delete node['$el'];
+          if (node.nodes) node.nodes.forEach(cleanTreeFolder);
+        };
+        cleanTreeFolder(this.workspace.tree);
+        // Then call the tree clean-up method
+        tree.remove();
       }
     }
   }

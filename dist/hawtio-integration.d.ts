@@ -100,6 +100,7 @@ declare namespace ActiveMQ {
         treeFetched(): boolean;
         private updateSelectionFromURL();
         private populateTree();
+        private removeTree();
     }
 }
 declare namespace ActiveMQ {
