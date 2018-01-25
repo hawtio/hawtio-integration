@@ -14,7 +14,7 @@ namespace SpringBoot {
           let traces: Trace[] = [];
 
           // Avoid including our own jolokia requests in the results
-          let filteredTraces = data.filter(trace => {return /^\/jolokia\/?$/.test(trace.info.path) === false;});
+          let filteredTraces = data.filter(trace => {return /^\/jolokia\/?(?:\/.*(?=$))?$/.test(trace.info.path) === false;});
 
           angular.forEach(filteredTraces, (traceEvent) => {
             traces.push(new Trace(traceEvent));

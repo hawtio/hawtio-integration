@@ -71,45 +71,23 @@ describe("TraceService", function() {
     });
 
     it("should filter jolokia paths", function(done) {
-
       // given
       let data = [
-        {
-          timestamp: 1516808934460,
-          info: {
-            method: "GET",
-            path: "/info",
-            headers: {
-              request: {
-              },
-              response: {
-                status: "200"
-              }
-            },
-            timeTaken: "6"
-          }
-        },
-        {
-          timestamp: 1516808934394,
-          info: {
-            method: "POST",
-            path: "/jolokia",
-            headers: {
-              request: {
-              },
-              response: {
-                status: "200"
-              }
-            },
-            timeTaken: "1"
-          }
-        },
+        { timestamp: 1, info: { path: "/info", headers: {}}},
+        { timestamp: 2, info: { path: "/jolo", headers: {}}},
+        { timestamp: 3, info: { path: "/jolo/", headers: {}}},
+        { timestamp: 4, info: { path: "/jolokia", headers: {}}},
+        { timestamp: 5, info: { path: "/jolokia/", headers: {}}},
+        { timestamp: 6, info: { path: "/jolokia/read", headers: {}}},
+        { timestamp: 7, info: { path: "/jolokia/read/foo", headers: {}}},
       ];
 
       jolokiaService.getAttribute.and.returnValue($q.resolve(data));
 
       let expectedTraces = [
-        new SpringBoot.Trace(data[0]), 
+        new SpringBoot.Trace(data[0]),
+        new SpringBoot.Trace(data[1]),
+        new SpringBoot.Trace(data[2]),
       ];
 
       // when

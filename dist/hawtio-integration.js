@@ -26184,7 +26184,7 @@ var SpringBoot;
                 .then(function (data) {
                 var traces = [];
                 // Avoid including our own jolokia requests in the results
-                var filteredTraces = data.filter(function (trace) { return /^\/jolokia\/?$/.test(trace.info.path) === false; });
+                var filteredTraces = data.filter(function (trace) { return /^\/jolokia\/?(?:\/.*(?=$))?$/.test(trace.info.path) === false; });
                 angular.forEach(filteredTraces, function (traceEvent) {
                     traces.push(new SpringBoot.Trace(traceEvent));
                 });
