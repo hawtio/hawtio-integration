@@ -76,18 +76,6 @@ declare namespace ActiveMQ {
     const destinationModule: string;
 }
 declare namespace ActiveMQ {
-    class TreeHeaderController {
-        private $scope;
-        private $element;
-        filter: string;
-        result: any[];
-        constructor($scope: any, $element: JQuery);
-        $onInit(): void;
-        private search(filter);
-        private tree();
-        expandAll(): any;
-        contractAll(): any;
-    }
     class TreeController {
         private $scope;
         private $location;
@@ -101,6 +89,20 @@ declare namespace ActiveMQ {
         private updateSelectionFromURL();
         private populateTree();
         private removeTree();
+    }
+}
+declare namespace ActiveMQ {
+    class TreeHeaderController {
+        private $scope;
+        private $element;
+        filter: string;
+        result: any[];
+        constructor($scope: any, $element: JQuery);
+        $onInit(): void;
+        private search(filter);
+        private tree();
+        expandAll(): any;
+        contractAll(): any;
     }
 }
 declare namespace ActiveMQ {

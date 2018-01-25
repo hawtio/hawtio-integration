@@ -14099,54 +14099,6 @@ var ActiveMQ;
 /// <reference path="../activemqPlugin.ts"/>
 var ActiveMQ;
 (function (ActiveMQ) {
-    var TreeHeaderController = /** @class */ (function () {
-        TreeHeaderController.$inject = ["$scope", "$element"];
-        function TreeHeaderController($scope, $element) {
-            'ngInject';
-            this.$scope = $scope;
-            this.$element = $element;
-            this.filter = '';
-            this.result = [];
-            // it's not possible to declare classes to the component host tag in AngularJS
-            $element.addClass('tree-nav-sidebar-header');
-        }
-        TreeHeaderController.prototype.$onInit = function () {
-            var _this = this;
-            this.$scope.$watch(angular.bind(this, function () { return _this.filter; }), function (filter, previous) {
-                if (filter !== previous) {
-                    _this.search(filter);
-                }
-            });
-        };
-        TreeHeaderController.prototype.search = function (filter) {
-            var _this = this;
-            var doSearch = function (filter) {
-                var result = _this.tree().search(filter, {
-                    ignoreCase: true,
-                    exactMatch: false,
-                    revealResults: true,
-                });
-                _this.result.length = 0;
-                (_a = _this.result).push.apply(_a, result);
-                Core.$apply(_this.$scope);
-                var _a;
-            };
-            _.debounce(doSearch, 300, { leading: false, trailing: true })(filter);
-        };
-        TreeHeaderController.prototype.tree = function () {
-            return $('#activemqtree').treeview(true);
-        };
-        TreeHeaderController.prototype.expandAll = function () {
-            return this.tree()
-                .expandNode(this.tree().getNodes(), { levels: 1, silent: true });
-        };
-        TreeHeaderController.prototype.contractAll = function () {
-            return this.tree()
-                .collapseNode(this.tree().getNodes(), { ignoreChildren: true, silent: true });
-        };
-        return TreeHeaderController;
-    }());
-    ActiveMQ.TreeHeaderController = TreeHeaderController;
     var TreeController = /** @class */ (function () {
         TreeController.$inject = ["$scope", "$location", "workspace", "$route", "jolokia", "$element"];
         function TreeController($scope, $location, workspace, $route, jolokia, $element) {
@@ -14257,7 +14209,59 @@ var ActiveMQ;
     }());
     ActiveMQ.TreeController = TreeController;
 })(ActiveMQ || (ActiveMQ = {}));
+var ActiveMQ;
+(function (ActiveMQ) {
+    var TreeHeaderController = /** @class */ (function () {
+        TreeHeaderController.$inject = ["$scope", "$element"];
+        function TreeHeaderController($scope, $element) {
+            'ngInject';
+            this.$scope = $scope;
+            this.$element = $element;
+            this.filter = '';
+            this.result = [];
+            // it's not possible to declare classes to the component host tag in AngularJS
+            $element.addClass('tree-nav-sidebar-header');
+        }
+        TreeHeaderController.prototype.$onInit = function () {
+            var _this = this;
+            this.$scope.$watch(angular.bind(this, function () { return _this.filter; }), function (filter, previous) {
+                if (filter !== previous) {
+                    _this.search(filter);
+                }
+            });
+        };
+        TreeHeaderController.prototype.search = function (filter) {
+            var _this = this;
+            var doSearch = function (filter) {
+                var result = _this.tree().search(filter, {
+                    ignoreCase: true,
+                    exactMatch: false,
+                    revealResults: true,
+                });
+                _this.result.length = 0;
+                (_a = _this.result).push.apply(_a, result);
+                Core.$apply(_this.$scope);
+                var _a;
+            };
+            _.debounce(doSearch, 300, { leading: false, trailing: true })(filter);
+        };
+        TreeHeaderController.prototype.tree = function () {
+            return $('#activemqtree').treeview(true);
+        };
+        TreeHeaderController.prototype.expandAll = function () {
+            return this.tree()
+                .expandNode(this.tree().getNodes(), { levels: 1, silent: true });
+        };
+        TreeHeaderController.prototype.contractAll = function () {
+            return this.tree()
+                .collapseNode(this.tree().getNodes(), { ignoreChildren: true, silent: true });
+        };
+        return TreeHeaderController;
+    }());
+    ActiveMQ.TreeHeaderController = TreeHeaderController;
+})(ActiveMQ || (ActiveMQ = {}));
 /// <reference path="tree.controller.ts"/>
+/// <reference path="tree-header.controller.ts"/>
 var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ.treeHeaderComponent = {
