@@ -1,4 +1,5 @@
 /// <reference path="tree.controller.ts"/>
+/// <reference path="tree-header.controller.ts"/>
 
 namespace Camel {
 

@@ -711,18 +711,6 @@ declare namespace Camel {
     const routesModule: string;
 }
 declare namespace Camel {
-    class TreeHeaderController {
-        private $scope;
-        private $element;
-        filter: string;
-        result: any[];
-        constructor($scope: any, $element: JQuery);
-        $onInit(): void;
-        private search(filter);
-        private tree();
-        expandAll(): any;
-        contractAll(): any;
-    }
     class TreeController {
         private $scope;
         private $location;
@@ -737,6 +725,20 @@ declare namespace Camel {
         private populateTree();
         private removeTree();
         private navigateToDefaultTab(selection);
+    }
+}
+declare namespace Camel {
+    class TreeHeaderController {
+        private $scope;
+        private $element;
+        filter: string;
+        result: any[];
+        constructor($scope: any, $element: JQuery);
+        $onInit(): void;
+        private search(filter);
+        private tree();
+        expandAll(): any;
+        contractAll(): any;
     }
 }
 declare namespace Camel {
