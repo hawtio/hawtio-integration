@@ -38,7 +38,7 @@ namespace ActiveMQ {
     }
 
     private tree(): any {
-      return ($('#activemqtree') as any).treeview(true);
+      return ($(treeElementId) as any).treeview(true);
     }
 
     expandAll(): any {

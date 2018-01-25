@@ -16,7 +16,7 @@ namespace ActiveMQ {
 
     $onInit(): void {
       this.$scope.$on('$destroy', () => this.removeTree());
-      this.$scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL(this.$location, $('#activemqtree')));
+      this.$scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL(this.$location, $(treeElementId)));
       this.$scope.$watch(angular.bind(this, () => this.workspace.tree), () => this.populateTree());
       this.$scope.$on('jmxTreeUpdated', () => this.populateTree());
     }
@@ -26,7 +26,7 @@ namespace ActiveMQ {
     }
 
     private updateSelectionFromURL() {
-      Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $('#activemqtree'), (first: Jmx.Folder) => {
+      Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $(treeElementId), (first: Jmx.Folder) => {
         if (first.children == null) {
           return null;
         }
@@ -88,13 +88,13 @@ namespace ActiveMQ {
         });
 
         this.removeTree();
-        Jmx.enableTree(this.$scope, this.$location, this.workspace, $('#activemqtree'), children);
+        Jmx.enableTree(this.$scope, this.$location, this.workspace, $(treeElementId), children);
         this.updateSelectionFromURL();
       }
     }
 
     private removeTree(): void {
-      const tree = ($('#activemqtree') as any).treeview(true);
+      const tree = ($(treeElementId) as any).treeview(true);
       // There is no exposed API to check whether the tree has already been initialized,
       // so let's just check if the methods are presents
       if (tree.clearSearch) {

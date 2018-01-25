@@ -14113,7 +14113,7 @@ var ActiveMQ;
         TreeController.prototype.$onInit = function () {
             var _this = this;
             this.$scope.$on('$destroy', function () { return _this.removeTree(); });
-            this.$scope.$on('$routeChangeStart', function () { return Jmx.updateTreeSelectionFromURL(_this.$location, $('#activemqtree')); });
+            this.$scope.$on('$routeChangeStart', function () { return Jmx.updateTreeSelectionFromURL(_this.$location, $(ActiveMQ.treeElementId)); });
             this.$scope.$watch(angular.bind(this, function () { return _this.workspace.tree; }), function () { return _this.populateTree(); });
             this.$scope.$on('jmxTreeUpdated', function () { return _this.populateTree(); });
         };
@@ -14121,7 +14121,7 @@ var ActiveMQ;
             return this.workspace.treeFetched;
         };
         TreeController.prototype.updateSelectionFromURL = function () {
-            Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $('#activemqtree'), function (first) {
+            Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $(ActiveMQ.treeElementId), function (first) {
                 if (first.children == null) {
                     return null;
                 }
@@ -14181,12 +14181,12 @@ var ActiveMQ;
                     }
                 });
                 this.removeTree();
-                Jmx.enableTree(this.$scope, this.$location, this.workspace, $('#activemqtree'), children);
+                Jmx.enableTree(this.$scope, this.$location, this.workspace, $(ActiveMQ.treeElementId), children);
                 this.updateSelectionFromURL();
             }
         };
         TreeController.prototype.removeTree = function () {
-            var tree = $('#activemqtree').treeview(true);
+            var tree = $(ActiveMQ.treeElementId).treeview(true);
             // There is no exposed API to check whether the tree has already been initialized,
             // so let's just check if the methods are presents
             if (tree.clearSearch) {
@@ -14244,7 +14244,7 @@ var ActiveMQ;
             _.debounce(doSearch, 300, { leading: false, trailing: true })(filter);
         };
         TreeHeaderController.prototype.tree = function () {
-            return $('#activemqtree').treeview(true);
+            return $(ActiveMQ.treeElementId).treeview(true);
         };
         TreeHeaderController.prototype.expandAll = function () {
             return this.tree()
@@ -14279,6 +14279,7 @@ var ActiveMQ;
         .component('activemqTreeHeader', ActiveMQ.treeHeaderComponent)
         .component('activemqTree', ActiveMQ.treeComponent)
         .name;
+    ActiveMQ.treeElementId = '#activemqtree';
 })(ActiveMQ || (ActiveMQ = {}));
 /// <reference path="activemqHelpers.ts"/>
 /// <reference path="destination/destination.module.ts"/>

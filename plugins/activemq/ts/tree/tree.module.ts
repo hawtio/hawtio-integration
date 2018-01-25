@@ -7,4 +7,6 @@ namespace ActiveMQ {
     .component('activemqTreeHeader', treeHeaderComponent)
     .component('activemqTree', treeComponent)
     .name;
+
+    export const treeElementId = '#activemqtree';
 }

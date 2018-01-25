@@ -109,6 +109,7 @@ declare namespace ActiveMQ {
 }
 declare namespace ActiveMQ {
     const treeModule: string;
+    const treeElementId = "#activemqtree";
 }
 declare namespace ActiveMQ {
     const pluginName: string;
