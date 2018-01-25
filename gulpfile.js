@@ -238,6 +238,12 @@ gulp.task('site-config', () => gulp.src('hawtconfig.json')
 gulp.task('serve-site', function () {
   hawtio.setConfig({
     port: 2772,
+    proxy: '/integration/proxy',
+    staticProxies: [{
+      port: config.proxyPort,
+      path: '/integration/jolokia',
+      targetPath: config.targetPath,
+    }],
     staticAssets: [{
       path : '/integration',
       dir  : 'site',
