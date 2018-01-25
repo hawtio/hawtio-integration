@@ -37,7 +37,7 @@ namespace Camel {
     }
 
     private tree(): any {
-      return ($('#cameltree') as any).treeview(true);
+      return ($(treeElementId) as any).treeview(true);
     }
 
     expandAll(): any {

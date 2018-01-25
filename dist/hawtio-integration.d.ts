@@ -747,6 +747,7 @@ declare namespace Camel {
 }
 declare namespace Camel {
     const treeModule: string;
+    const treeElementId = "#cameltree";
 }
 declare namespace Camel {
     const pluginName: string;

@@ -17972,7 +17972,7 @@ var Camel;
         TreeController.prototype.$onInit = function () {
             var _this = this;
             this.$scope.$on('$destroy', function () { return _this.removeTree(); });
-            this.$scope.$on('$routeChangeStart', function () { return Jmx.updateTreeSelectionFromURL(_this.$location, $('#cameltree')); });
+            this.$scope.$on('$routeChangeStart', function () { return Jmx.updateTreeSelectionFromURL(_this.$location, $(Camel.treeElementId)); });
             this.$scope.$watch(angular.bind(this, function () { return _this.workspace.tree; }), function () { return _this.populateTree(); });
             this.$scope.$on('jmxTreeUpdated', function () { return _this.populateTree(); });
             this.$scope.$on('jmxTreeClicked', function (event, selection) { return _this.navigateToDefaultTab(selection); });
@@ -17984,7 +17984,7 @@ var Camel;
             return this.workspace.treeFetched;
         };
         TreeController.prototype.updateSelectionFromURL = function () {
-            Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $('#cameltree'), function (first) {
+            Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $(Camel.treeElementId), function (first) {
                 // use function to auto select first Camel context routes if there is only one Camel context
                 var contexts = first.children;
                 if (contexts && contexts.length === 1) {
@@ -18006,13 +18006,13 @@ var Camel;
                 var rootFolder = tree.findDescendant(function (node) { return node.key === 'camelContexts'; });
                 if (rootFolder) {
                     this.removeTree();
-                    Jmx.enableTree(this.$scope, this.$location, this.workspace, $('#cameltree'), [rootFolder]);
+                    Jmx.enableTree(this.$scope, this.$location, this.workspace, $(Camel.treeElementId), [rootFolder]);
                     this.updateSelectionFromURL();
                 }
             }
         };
         TreeController.prototype.removeTree = function () {
-            var tree = $('#cameltree').treeview(true);
+            var tree = $(Camel.treeElementId).treeview(true);
             // There is no exposed API to check whether the tree has already been initialized,
             // so let's just check if the methods are presents
             if (tree.clearSearch) {
@@ -18107,7 +18107,7 @@ var Camel;
             _.debounce(doSearch, 300, { leading: false, trailing: true })(filter);
         };
         TreeHeaderController.prototype.tree = function () {
-            return $('#cameltree').treeview(true);
+            return $(Camel.treeElementId).treeview(true);
         };
         TreeHeaderController.prototype.expandAll = function () {
             return this.tree()
@@ -18142,6 +18142,7 @@ var Camel;
         .component('camelTreeHeader', Camel.treeHeaderComponent)
         .component('camelTree', Camel.treeComponent)
         .name;
+    Camel.treeElementId = '#cameltree';
 })(Camel || (Camel = {}));
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="contexts/contexts.module.ts"/>

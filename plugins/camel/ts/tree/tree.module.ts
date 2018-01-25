@@ -7,4 +7,6 @@ namespace Camel {
     .component('camelTreeHeader', treeHeaderComponent)
     .component('camelTree', treeComponent)
     .name;
+
+    export const treeElementId = '#cameltree';
 }

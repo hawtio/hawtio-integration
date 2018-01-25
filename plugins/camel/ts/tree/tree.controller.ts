@@ -17,7 +17,7 @@ namespace Camel {
 
     $onInit(): void {
       this.$scope.$on('$destroy', () => this.removeTree());
-      this.$scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL(this.$location, $('#cameltree')));
+      this.$scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL(this.$location, $(treeElementId)));
       this.$scope.$watch(angular.bind(this, () => this.workspace.tree), () => this.populateTree());
       this.$scope.$on('jmxTreeUpdated', () => this.populateTree());
       this.$scope.$on('jmxTreeClicked',
@@ -33,7 +33,7 @@ namespace Camel {
     }
 
     private updateSelectionFromURL(): void {
-      Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $('#cameltree'), (first: Jmx.Folder) => {
+      Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $(treeElementId), (first: Jmx.Folder) => {
         // use function to auto select first Camel context routes if there is only one Camel context
         const contexts = first.children;
         if (contexts && contexts.length === 1) {
@@ -56,14 +56,14 @@ namespace Camel {
         const rootFolder = tree.findDescendant(node => node.key === 'camelContexts');
         if (rootFolder) {
           this.removeTree();
-          Jmx.enableTree(this.$scope, this.$location, this.workspace, $('#cameltree'), [rootFolder]);
+          Jmx.enableTree(this.$scope, this.$location, this.workspace, $(treeElementId), [rootFolder]);
           this.updateSelectionFromURL();
         }
       }
     }
 
     private removeTree(): void {
-      const tree = ($('#cameltree') as any).treeview(true);
+      const tree = ($(treeElementId) as any).treeview(true);
       // There is no exposed API to check whether the tree has already been initialized,
       // so let's just check if the methods are presents
       if (tree.clearSearch) {

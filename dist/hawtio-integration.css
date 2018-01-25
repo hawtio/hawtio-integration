@@ -171,10 +171,6 @@ caption {
   content: url("img/icons/activemq/topic_folder.png");
 }
 
-.scr-component-references-table td:nth-child(3) {
-  text-transform: capitalize;
-}
-
 .form-inline.camel-forward-message {
   margin-bottom: 20px;
 }
@@ -680,6 +676,10 @@ div.camel-properties {
   width: 111px;
 }
 
+.scr-component-references-table td:nth-child(3) {
+  text-transform: capitalize;
+}
+
 .install-bundle {
   margin-bottom: 10px;
 }
@@ -792,23 +792,6 @@ div.camel-properties {
   border: none;
 }
 
-.spring-boot-health-main {
-  margin-bottom: 20px;
-}
-.spring-boot-health-main .toast-pf {
-  position: relative;
-  top: 0;
-  right: 0;
-  display: block;
-  border: none;
-  box-shadow: 0 1px 1px rgba(3, 3, 3, 0.175);
-  margin: 0 -10px 20px -10px;
-}
-.spring-boot-health-main .container-cards-pf {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
 .spring-boot-layout {
   display: flex;
   flex-direction: column;
@@ -827,6 +810,23 @@ div.camel-properties {
   position: relative;
   padding-left: 20px;
   padding-right: 20px;
+}
+
+.spring-boot-health-main {
+  margin-bottom: 20px;
+}
+.spring-boot-health-main .toast-pf {
+  position: relative;
+  top: 0;
+  right: 0;
+  display: block;
+  border: none;
+  box-shadow: 0 1px 1px rgba(3, 3, 3, 0.175);
+  margin: 0 -10px 20px -10px;
+}
+.spring-boot-health-main .container-cards-pf {
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .spring-boot-trace-response-status {
