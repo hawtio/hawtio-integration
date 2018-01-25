@@ -882,6 +882,9 @@ spring-boot-trace,
   table-layout: fixed;
   margin-bottom: 0;
 }
+.spring-boot-trace-main .table td:nth-child(4) {
+  word-break: break-all;
+}
 
 .metricsWatcher .panel-group:first-child {
   margin-top: 20px;
