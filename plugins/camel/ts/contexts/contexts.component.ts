@@ -56,7 +56,7 @@ namespace Camel {
       onCheckBoxChange: item => this.enableDisableActions()
     };
 
-    tableColummns = [
+    tableColumns = [
       { header: "Name", itemField: "name" },
       { header: "State", itemField: "state" }
     ];
@@ -121,7 +121,7 @@ namespace Camel {
       <p ng-if="!$ctrl.contexts">Loading...</p>
       <div ng-if="$ctrl.contexts">
         <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
-        <pf-table-view config="$ctrl.tableConfig" colummns="$ctrl.tableColummns" items="$ctrl.contexts"></pf-table-view>
+        <pf-table-view config="$ctrl.tableConfig" columns="$ctrl.tableColumns" items="$ctrl.contexts"></pf-table-view>
       </div>
     `,
     controller: ContextsController

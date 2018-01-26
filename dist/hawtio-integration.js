@@ -17499,7 +17499,7 @@ var Camel;
                 selectionMatchProp: "name",
                 onCheckBoxChange: function (item) { return _this.enableDisableActions(); }
             };
-            this.tableColummns = [
+            this.tableColumns = [
                 { header: "Name", itemField: "name" },
                 { header: "State", itemField: "state" }
             ];
@@ -17550,7 +17550,7 @@ var Camel;
     }());
     Camel.ContextsController = ContextsController;
     Camel.contextsComponent = {
-        template: "\n      <h2>Contexts</h2>\n      <p ng-if=\"!$ctrl.contexts\">Loading...</p>\n      <div ng-if=\"$ctrl.contexts\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <pf-table-view config=\"$ctrl.tableConfig\" colummns=\"$ctrl.tableColummns\" items=\"$ctrl.contexts\"></pf-table-view>\n      </div>\n    ",
+        template: "\n      <h2>Contexts</h2>\n      <p ng-if=\"!$ctrl.contexts\">Loading...</p>\n      <div ng-if=\"$ctrl.contexts\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <pf-table-view config=\"$ctrl.tableConfig\" columns=\"$ctrl.tableColumns\" items=\"$ctrl.contexts\"></pf-table-view>\n      </div>\n    ",
         controller: ContextsController
     };
 })(Camel || (Camel = {}));
@@ -17823,7 +17823,7 @@ var Camel;
                 selectionMatchProp: "name",
                 onCheckBoxChange: function (item) { return _this.enableDisableActions(); }
             };
-            this.tableColummns = [
+            this.tableColumns = [
                 { header: "Name", itemField: "name" },
                 { header: "State", itemField: "state" }
             ];
@@ -17874,7 +17874,7 @@ var Camel;
     }());
     Camel.RoutesController = RoutesController;
     Camel.routesComponent = {
-        template: "\n      <h2>Routes</h2>\n      <p ng-if=\"!$ctrl.routes\">Loading...</p>\n      <div ng-if=\"$ctrl.routes\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <pf-table-view config=\"$ctrl.tableConfig\" colummns=\"$ctrl.tableColummns\" items=\"$ctrl.routes\"></pf-table-view>\n      </div>\n    ",
+        template: "\n      <h2>Routes</h2>\n      <p ng-if=\"!$ctrl.routes\">Loading...</p>\n      <div ng-if=\"$ctrl.routes\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <pf-table-view config=\"$ctrl.tableConfig\" columns=\"$ctrl.tableColumns\" items=\"$ctrl.routes\"></pf-table-view>\n      </div>\n    ",
         controller: RoutesController
     };
 })(Camel || (Camel = {}));
@@ -22714,7 +22714,7 @@ var Karaf;
     }());
     Karaf.ScrComponentsController = ScrComponentsController;
     Karaf.scrListComponent = {
-        template: "\n      <div class=\"table-view\">\n        <h1>Declarative Services</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <pf-table-view config=\"$ctrl.tableConfig\"\n                         colummns=\"$ctrl.tableColumns\"\n                         items=\"$ctrl.tableItems\"></pf-table-view>\n        </div>\n      </div>\n    ",
+        template: "\n      <div class=\"table-view\">\n        <h1>Declarative Services</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <pf-table-view config=\"$ctrl.tableConfig\"\n                         columns=\"$ctrl.tableColumns\"\n                         items=\"$ctrl.tableItems\"></pf-table-view>\n        </div>\n      </div>\n    ",
         controller: ScrComponentsController
     };
 })(Karaf || (Karaf = {}));
@@ -24052,7 +24052,7 @@ var Osgi;
     }());
     Osgi.BundlesController = BundlesController;
     Osgi.bundlesComponent = {
-        template: "\n      <div class=\"table-view\">\n        <h1>Bundles</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <install-bundle on-install=\"$ctrl.loadBundles()\"></install-bundle>\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <pf-table-view config=\"$ctrl.tableConfig\"\n                         colummns=\"$ctrl.tableColumns\"\n                         items=\"$ctrl.tableItems\"></pf-table-view>\n        </div>\n      </div>\n    ",
+        template: "\n      <div class=\"table-view\">\n        <h1>Bundles</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <install-bundle on-install=\"$ctrl.loadBundles()\"></install-bundle>\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <pf-table-view config=\"$ctrl.tableConfig\"\n                         columns=\"$ctrl.tableColumns\"\n                         items=\"$ctrl.tableItems\"></pf-table-view>\n        </div>\n      </div>\n    ",
         controller: BundlesController
     };
 })(Osgi || (Osgi = {}));

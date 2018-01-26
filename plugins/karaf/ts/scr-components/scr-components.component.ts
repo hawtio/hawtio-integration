@@ -152,7 +152,7 @@ namespace Karaf {
         <div ng-if="!$ctrl.loading">
           <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
           <pf-table-view config="$ctrl.tableConfig"
-                         colummns="$ctrl.tableColumns"
+                         columns="$ctrl.tableColumns"
                          items="$ctrl.tableItems"></pf-table-view>
         </div>
       </div>

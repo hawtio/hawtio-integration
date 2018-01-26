@@ -590,7 +590,7 @@ declare namespace Camel {
             selectionMatchProp: string;
             onCheckBoxChange: (item: any) => void;
         };
-        tableColummns: {
+        tableColumns: {
             header: string;
             itemField: string;
         }[];
@@ -678,7 +678,7 @@ declare namespace Camel {
             selectionMatchProp: string;
             onCheckBoxChange: (item: any) => void;
         };
-        tableColummns: {
+        tableColumns: {
             header: string;
             itemField: string;
         }[];
