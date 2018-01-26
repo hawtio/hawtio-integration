@@ -1,6 +1,6 @@
 <div class="spring-boot-layout">
   <div ng-controller="SpringBootLayoutController as $ctrl">
-    <hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>
+    <hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)" active-tab="$ctrl.activeTab()"></hawtio-tabs>
   </div>
   <div class="contents" ng-view></div>
 </div>
