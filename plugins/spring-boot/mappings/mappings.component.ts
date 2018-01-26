@@ -128,7 +128,7 @@ namespace SpringBoot {
 
   export const mappingsComponent: angular.IComponentOptions = {
     template:`
-      <div class="table-view">
+      <div class="spring-boot-mappings-main table-view">
         <h1>Mappings</h1>
         <p ng-if="$ctrl.loading">Loading...</p>
         <div ng-if="!$ctrl.loading">
