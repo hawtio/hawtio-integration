@@ -837,18 +837,6 @@ div.camel-properties {
   width: 200px;
 }
 
-.spring-boot-trace-response-status {
-  font-weight: bold;
-}
-.spring-boot-trace-http-status-code-1xx,
-.spring-boot-trace-http-status-code-2xx,
-.spring-boot-trace-http-status-code-3xx {
-  color: green;
-}
-.spring-boot-trace-http-status-code-4xx,
-.spring-boot-trace-http-status-code-5xx {
-  color: red;
-}
 div[ng-view],
 spring-boot-trace,
 .spring-boot-trace-main {
@@ -892,6 +880,9 @@ spring-boot-trace,
 }
 .spring-boot-trace-main .table td:nth-child(4) {
   word-break: break-all;
+}
+.spring-boot-trace-main .http-status-code-icon {
+  margin-right: 5px;
 }
 
 .metricsWatcher .panel-group:first-child {

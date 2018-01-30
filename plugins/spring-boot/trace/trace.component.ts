@@ -131,7 +131,11 @@ namespace SpringBoot {
 
     getStatusClass(trace: Trace): string {
       if (trace.httpStatusCode) {
-        return 'spring-boot-trace-http-status-code-' + Math.floor(trace.httpStatusCode / 100) + 'xx';
+        if (trace.httpStatusCode < 400) {
+          return 'http-status-code-icon pficon pficon-ok';
+        } else {
+          return 'http-status-code-icon pficon pficon-error-circle-o';
+        }
       }
       return '';
     }

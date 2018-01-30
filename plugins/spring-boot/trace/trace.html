@@ -33,7 +33,10 @@
             <td>{{trace.timestamp | date: $ctrl.dateFormat}}</td>
             <td ng-switch="trace.httpStatusCode === undefined">
               <span ng-switch-when="true">Unknown</span>
-              <span ng-switch-default ng-class="$ctrl.getStatusClass(trace)">{{trace.httpStatusCode}}</span>
+              <div ng-switch-default>
+                <span ng-class="$ctrl.getStatusClass(trace)"></span>
+                <span>{{trace.httpStatusCode}}</span>
+              </div>
             </td>
             <td>{{trace.method}}</td>
             <td>{{trace.path}}</td>

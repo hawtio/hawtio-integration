@@ -173,13 +173,28 @@ describe("TraceController", function() {
   });
 
   describe("getStatusClass()", function() {
-    it("should return a class for the status code", function() {
+    it("should return a pficon-ok class for a HTTP success status code", function() {
       //given
-      let trace: SpringBoot.Trace = new SpringBoot.Trace({info: { headers: {response: {status: 200}}}});
+      let trace200Status: SpringBoot.Trace = new SpringBoot.Trace({info: { headers: {response: {status: 200}}}});
+      let trace301Status: SpringBoot.Trace = new SpringBoot.Trace({info: { headers: {response: {status: 301}}}});
       //when
-      let statusClass = traceController.getStatusClass(trace);
+      let statusClassA = traceController.getStatusClass(trace200Status);
+      let statusClassB = traceController.getStatusClass(trace301Status);
       //then
-      expect(statusClass).toBe('spring-boot-trace-http-status-code-2xx');
+      expect(statusClassA).toBe('http-status-code-icon pficon pficon-ok');
+      expect(statusClassB).toBe('http-status-code-icon pficon pficon-ok');
+    });
+
+    it("should return a pficon-err class for a HTTP error status code", function() {
+      //given
+      let trace400Status: SpringBoot.Trace = new SpringBoot.Trace({info: { headers: {response: {status: 400}}}});
+      let trace500Status: SpringBoot.Trace = new SpringBoot.Trace({info: { headers: {response: {status: 500}}}});
+      //when
+      let statusClassA = traceController.getStatusClass(trace400Status);
+      let statusClassB = traceController.getStatusClass(trace500Status);
+      //then
+      expect(statusClassA).toBe('http-status-code-icon pficon pficon-error-circle-o');
+      expect(statusClassB).toBe('http-status-code-icon pficon pficon-error-circle-o');
     });
 
     it("should return an empty string for a null status code", function() {
