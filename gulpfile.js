@@ -77,7 +77,7 @@ gulp.task('concat', ['template'], function() {
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('clean', () => del(['templates.js', 'compiled.js', './site/']));
+gulp.task('clean', () => del(['templates.js', 'compiled.js', './docker/site/']));
 
 gulp.task('less', function () {
   let pluginsCss = gulp.src(config.less)
@@ -178,14 +178,14 @@ gulp.task('site-fonts', () =>
     .pipe(plugins.chmod(0o644))
     .pipe(plugins.dedupe({ same: false }))
     .pipe(plugins.debug({ title: 'site font files' }))
-    .pipe(gulp.dest('site/fonts/', { overwrite: false }))
+    .pipe(gulp.dest('docker/site/fonts/', { overwrite: false }))
 );
 
 gulp.task('site-files', () => gulp.src(['images/**', 'img/**'], { base: '.' })
   .pipe(plugins.chmod(0o644))
   .pipe(plugins.dedupe({ same: false }))
   .pipe(plugins.debug({ title: 'site files' }))
-  .pipe(gulp.dest('site')));
+  .pipe(gulp.dest('docker/site')));
 
 gulp.task('site-usemin', () => gulp.src('index.html')
   .pipe(plugins.usemin({
@@ -193,20 +193,20 @@ gulp.task('site-usemin', () => gulp.src('index.html')
     js : [plugins.uglify(), plugins.rev()],
   }))
   .pipe(plugins.debug({ title: 'site usemin' }))
-  .pipe(gulp.dest('site')));
+  .pipe(gulp.dest('docker/site')));
 
 gulp.task('site-tweak-urls', ['site-usemin', 'site-config'], () => eventStream.merge(
-  gulp.src('site/style.css')
+  gulp.src('docker/site/style.css')
     .pipe(plugins.replace(/url\(\.\.\//g, 'url('))
     // tweak fonts URL coming from PatternFly that does not repackage then in dist
     .pipe(plugins.replace(/url\(\.\.\/components\/font-awesome\//g, 'url('))
     .pipe(plugins.replace(/url\(\.\.\/components\/bootstrap\/dist\//g, 'url('))
     .pipe(plugins.replace(/url\(node_modules\/bootstrap\/dist\//g, 'url('))
     .pipe(plugins.replace(/url\(node_modules\/patternfly\/components\/bootstrap\/dist\//g, 'url('))
-    .pipe(gulp.dest('site')),
-  gulp.src('site/hawtconfig.json')
+    .pipe(gulp.dest('docker/site')),
+  gulp.src('docker/site/hawtconfig.json')
     .pipe(plugins.replace(/node_modules\/@hawtio\/core\/dist\//g, ''))
-    .pipe(gulp.dest('site')))
+    .pipe(gulp.dest('docker/site')))
   .pipe(plugins.debug({ title: 'site tweak urls' })));
 
 gulp.task('site-images', function () {
@@ -229,11 +229,11 @@ gulp.task('site-images', function () {
   return gulp.src(patterns)
     .pipe(plugins.debug({title: 'img-copy'}))
     .pipe(plugins.chmod(0o644))
-    .pipe(gulp.dest('site/img'));
+    .pipe(gulp.dest('docker/site/img'));
 });
 
 gulp.task('site-config', () => gulp.src('hawtconfig.json')
-  .pipe(gulp.dest('site')));
+  .pipe(gulp.dest('docker/site')));
 
 gulp.task('serve-site', function () {
   hawtio.setConfig({
@@ -246,9 +246,9 @@ gulp.task('serve-site', function () {
     }],
     staticAssets: [{
       path : '/integration',
-      dir  : 'site',
+      dir  : 'docker/site',
     }],
-    fallback: 'site/index.html',
+    fallback: 'docker/site/index.html',
     liveReload : {
       enabled : false,
     },
