@@ -55,9 +55,9 @@
     "@hawtio/core-dts" "~3.0.12"
     "@hawtio/ui" "~3.0.25"
 
-"@hawtio/jmx@3.2.5":
-  version "3.2.5"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.5.tgz#c1fce57042414da2cc5ae6be2062df0c6631dd7b"
+"@hawtio/jmx@3.2.6":
+  version "3.2.6"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.6.tgz#268f204aa906ef260d16645ad0a30cf12f93ccfa"
   dependencies:
     "@hawtio/core" "3.2.5"
     "@hawtio/forms" "3.0.12"
