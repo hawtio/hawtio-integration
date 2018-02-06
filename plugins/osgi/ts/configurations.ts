@@ -230,7 +230,7 @@ module Osgi {
             pids[pid] = config;
           }
         });
-        angular.forEach(pids, (config, pid) => {
+        angular.forEach(pids, (config: any, pid) => {
           var idx = pid.indexOf('-');
           if (idx > 0) {
             var factoryPid = pid.substring(0, idx);

@@ -10,8 +10,8 @@ module Osgi {
     export class OsgiGraphBuilder {
 
         private osgiDataService : OsgiDataService;
-        private bundleFilter : String;
-        private packageFilter : String;
+        private bundleFilter : string;
+        private packageFilter : string;
         private showServices : boolean;
         private showPackages : boolean;
         private hideUnused   : boolean;
@@ -28,8 +28,8 @@ module Osgi {
 
         constructor(
             osgiDataService: OsgiDataService,
-            bundleFilter: String,
-            packageFilter: String,
+            bundleFilter: string,
+            packageFilter: string,
             showServices: boolean,
             showPackages: boolean,
             hideUnused: boolean

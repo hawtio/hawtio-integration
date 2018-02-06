@@ -24,7 +24,7 @@
     "hawtio-core-navigation": "2.0.58",
     "hawtio-extension-service": "2.0.3",
     "hawtio-forms": "2.0.40",
-    "hawtio-jmx": "2.0.78",
+    "hawtio-jmx": "2.0.82",
     "hawtio-preferences": "2.0.9",
     "hawtio-template-cache": "2.0.6",
     "hawtio-ui": "2.0.108",
@@ -43,6 +43,8 @@
   },
   "resolutions": {
     "angular": "1.5.8",
-    "angular-route": "1.5.8"
+    "angular-route": "1.5.8",
+    "patternfly": "3.19.0",
+    "jquery": "~2.1.4"
   }
 }
