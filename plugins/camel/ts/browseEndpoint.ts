@@ -77,7 +77,7 @@ module Camel {
     function loadData() {
       var mbean: string = null;
       if ($scope.contextId && $scope.endpointPath) {
-        var node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
+        var node: any = workspace.findMBeanWithProperties(Camel.jmxDomain, {
           context: $scope.contextId,
           type: "endpoints",
           name: $scope.endpointPath

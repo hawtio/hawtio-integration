@@ -32,7 +32,20 @@ gulp.task('bower', function() {
     .pipe(gulp.dest('.'));
 });
 
-gulp.task('tsc', function() {
+/** Adjust the reference path of any typescript-built plugin this project depends on */
+gulp.task('path-adjust', function() {
+  return eventStream.merge(
+    gulp.src('libs/**/defs.d.ts')
+      .pipe(plugins.replace(/"libs/gm, '"../../libs'))
+      .pipe(gulp.dest('libs')),
+    gulp.src('libs/**/includes.d.ts')
+      .pipe(plugins.replace(/"\.\.\/libs/gm, '"../../../libs'))
+      .pipe(gulp.dest('libs'))
+  );
+
+});
+
+gulp.task('tsc', ['path-adjust'], function() {
   return gulp.src(config.ts)
     .pipe(config.tsProject())
     .pipe(gulp.dest('.'));
