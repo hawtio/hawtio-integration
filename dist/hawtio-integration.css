@@ -680,107 +680,6 @@ div.camel-properties {
   text-transform: capitalize;
 }
 
-.spring-boot-health-main {
-  margin-bottom: 20px;
-}
-.spring-boot-health-main .toast-pf {
-  position: relative;
-  top: 0;
-  right: 0;
-  display: block;
-  border: none;
-  box-shadow: 0 1px 1px rgba(3, 3, 3, 0.175);
-  margin: 0 -10px 20px -10px;
-}
-.spring-boot-health-main .container-cards-pf {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-.spring-boot-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: auto;
-}
-.spring-boot-layout .nav-tabs {
-  flex: 0 0 auto;
-  padding-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-.spring-boot-layout .contents {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  position: relative;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.spring-boot-loggers-list-group li {
-  display: flex;
-  word-break: break-all;
-}
-.spring-boot-loggers-list-group li select {
-  margin-right: 30px;
-}
-
-.spring-boot-mappings-main table td:nth-child(2) {
-  word-break: break-all;
-}
-.spring-boot-mappings-main table td:nth-child(5) {
-  word-break: break-all;
-  width: 200px;
-}
-
-div[ng-view],
-spring-boot-trace,
-.spring-boot-trace-main {
-  height: inherit;
-}
-.spring-boot-trace-main {
-  height: inherit;
-  padding-bottom: 20px;
-  padding-left: 0px;
-  padding-right: 0px;
-}
-.spring-boot-trace-main .spring-boot-trace-flex-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.spring-boot-trace-main .spring-boot-trace-flex-container .spring-boot-trace-fixed-toolbar {
-  flex: 0 0 auto;
-}
-.spring-boot-trace-main .spring-boot-trace-flex-container .spring-boot-trace-scrollable-table {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  position: relative;
-  border-left: 1px solid #d1d1d1;
-  border-right: 1px solid #d1d1d1;
-  border-bottom: 1px solid #d1d1d1;
-}
-.spring-boot-trace-main .spring-boot-trace-flex-container .spring-boot-trace-scrollable-table tr:first-child td {
-  border-top-width: 0;
-}
-.spring-boot-trace-main .spring-boot-trace-header-table {
-  border: 1px solid #d1d1d1;
-}
-.spring-boot-trace-main .spring-boot-trace-header-table th {
-  border-bottom-width: 0;
-}
-.spring-boot-trace-main .table {
-  table-layout: fixed;
-  margin-bottom: 0;
-}
-.spring-boot-trace-main .table td:nth-child(4) {
-  word-break: break-all;
-}
-.spring-boot-trace-main .http-status-code-icon {
-  margin-right: 5px;
-}
-
 .install-bundle {
   margin-bottom: 10px;
 }
@@ -891,6 +790,107 @@ spring-boot-trace,
   color: inherit;
   background-color: inherit;
   border: none;
+}
+
+.spring-boot-health-main {
+  margin-bottom: 20px;
+}
+.spring-boot-health-main .toast-pf {
+  position: relative;
+  top: 0;
+  right: 0;
+  display: block;
+  border: none;
+  box-shadow: 0 1px 1px rgba(3, 3, 3, 0.175);
+  margin: 0 -10px 20px -10px;
+}
+.spring-boot-health-main .container-cards-pf {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.spring-boot-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
+.spring-boot-layout .nav-tabs {
+  flex: 0 0 auto;
+  padding-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+.spring-boot-layout .contents {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  position: relative;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.spring-boot-loggers-list-group li {
+  display: flex;
+  word-break: break-all;
+}
+.spring-boot-loggers-list-group li select {
+  margin-right: 30px;
+}
+
+.spring-boot-mappings-main table td:nth-child(2) {
+  word-break: break-all;
+}
+.spring-boot-mappings-main table td:nth-child(5) {
+  word-break: break-all;
+  width: 200px;
+}
+
+div[ng-view],
+spring-boot-trace,
+.spring-boot-trace-main {
+  height: inherit;
+}
+.spring-boot-trace-main {
+  height: inherit;
+  padding-bottom: 20px;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.spring-boot-trace-main .spring-boot-trace-flex-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.spring-boot-trace-main .spring-boot-trace-flex-container .spring-boot-trace-fixed-toolbar {
+  flex: 0 0 auto;
+}
+.spring-boot-trace-main .spring-boot-trace-flex-container .spring-boot-trace-scrollable-table {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  position: relative;
+  border-left: 1px solid #d1d1d1;
+  border-right: 1px solid #d1d1d1;
+  border-bottom: 1px solid #d1d1d1;
+}
+.spring-boot-trace-main .spring-boot-trace-flex-container .spring-boot-trace-scrollable-table tr:first-child td {
+  border-top-width: 0;
+}
+.spring-boot-trace-main .spring-boot-trace-header-table {
+  border: 1px solid #d1d1d1;
+}
+.spring-boot-trace-main .spring-boot-trace-header-table th {
+  border-bottom-width: 0;
+}
+.spring-boot-trace-main .table {
+  table-layout: fixed;
+  margin-bottom: 0;
+}
+.spring-boot-trace-main .table td:nth-child(4) {
+  word-break: break-all;
+}
+.spring-boot-trace-main .http-status-code-icon {
+  margin-right: 5px;
 }
 
 .metricsWatcher .panel-group:first-child {
