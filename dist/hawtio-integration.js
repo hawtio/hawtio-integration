@@ -25787,7 +25787,8 @@ var SpringBoot;
             .when('/spring-boot', { redirectTo: '/spring-boot/health' })
             .when('/spring-boot/health', { template: '<spring-boot-health></spring-boot-health>' })
             .when('/spring-boot/mappings', { template: '<spring-boot-mappings></spring-boot-mappings>' })
-            .when('/spring-boot/trace', { template: '<spring-boot-trace></spring-boot-trace>' });
+            .when('/spring-boot/trace', { template: '<spring-boot-trace></spring-boot-trace>' })
+            .when('/spring-boot/loggers', { template: '<spring-boot-loggers></spring-boot-loggers>' });
     }
     SpringBoot.configureRoutes = configureRoutes;
     function configureNavigation(viewRegistry, HawtioNav, workspace) {
@@ -26375,6 +26376,147 @@ var SpringBoot;
 })(SpringBoot || (SpringBoot = {}));
 var SpringBoot;
 (function (SpringBoot) {
+    SpringBoot.jmxDomain = "org.springframework.boot:type=Endpoint,name=loggersEndpoint";
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="logger.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var LoggersService = /** @class */ (function () {
+        LoggersService.$inject = ["jolokiaService"];
+        function LoggersService(jolokiaService) {
+            'ngInject';
+            this.jolokiaService = jolokiaService;
+        }
+        LoggersService.prototype.getLoggerConfiguration = function () {
+            return this.jolokiaService.getAttribute(SpringBoot.jmxDomain, 'Loggers')
+                .then(function (data) {
+                var loggers = [];
+                angular.forEach(data.loggers, function (loggerInfo, loggerName) {
+                    var logger = {
+                        name: loggerName,
+                        configuredLevel: loggerInfo.configuredLevel == null ? loggerInfo.effectiveLevel : loggerInfo.configuredLevel,
+                        effectiveLevel: loggerInfo.effectiveLevel
+                    };
+                    loggers.push(logger);
+                });
+                var loggerConfiguration = {
+                    levels: data.levels,
+                    loggers: loggers
+                };
+                return loggerConfiguration;
+            });
+        };
+        LoggersService.prototype.setLoggerLevel = function (logger) {
+            return this.jolokiaService.execute(SpringBoot.jmxDomain, 'setLogLevel', logger.name, logger.configuredLevel);
+        };
+        return LoggersService;
+    }());
+    SpringBoot.LoggersService = LoggersService;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="loggers.service.ts"/>
+/// <reference path="logger.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var LoggersController = /** @class */ (function () {
+        LoggersController.$inject = ["loggersService"];
+        function LoggersController(loggersService) {
+            'ngInject';
+            var _this = this;
+            this.loggersService = loggersService;
+            this.filterFields = [
+                {
+                    id: 'name',
+                    title: 'Logger Name',
+                    placeholder: 'Filter by logger name...',
+                    filterType: 'text'
+                },
+                {
+                    id: 'level',
+                    title: 'Log Level',
+                    placeholder: 'Filter by log level...',
+                    filterType: 'select',
+                    filterValues: []
+                }
+            ];
+            this.filterConfig = {
+                fields: this.filterFields,
+                onFilterChange: function (filters) {
+                    _this.applyFilters(filters);
+                },
+                appliedFilters: [],
+                resultsCount: 0
+            };
+            this.toolbarConfig = {
+                filterConfig: this.filterConfig,
+                isTableView: false
+            };
+            this.pageSize = 10;
+            this.pageNumber = 1;
+            this.loading = true;
+            this.loggers = [];
+            this.tableItems = [];
+        }
+        LoggersController.prototype.$onInit = function () {
+            this.loadData();
+        };
+        LoggersController.prototype.loadData = function () {
+            var _this = this;
+            this.loggersService.getLoggerConfiguration().then(function (logConfiguration) {
+                _this.loggers = logConfiguration.loggers;
+                _this.loggerLevels = logConfiguration.levels;
+                _this.tableItems = logConfiguration.loggers;
+                _this.filterConfig.resultsCount = logConfiguration.loggers.length;
+                _this.filterFields[1]['filterValues'] = logConfiguration.levels;
+                _this.numTotalItems = _this.tableItems.length;
+                if (_this.filterConfig.appliedFilters.length > 0) {
+                    _this.applyFilters(_this.filterConfig.appliedFilters);
+                }
+                _this.loading = false;
+            }).catch(function (error) { return Core.notification('danger', error); });
+        };
+        LoggersController.prototype.setLoggerLevel = function (logger) {
+            var _this = this;
+            this.loggersService.setLoggerLevel(logger).then(function () {
+                _this.loadData();
+            }).catch(function (error) { return Core.notification('danger', error); });
+        };
+        LoggersController.prototype.applyFilters = function (filters) {
+            var filteredLoggers = this.loggers;
+            filters.forEach(function (filter) {
+                var regExp = new RegExp(filter.value, 'i');
+                switch (filter.id) {
+                    case 'name':
+                        filteredLoggers = filteredLoggers.filter(function (logger) { return logger.name.match(regExp) !== null; });
+                        break;
+                    case 'level':
+                        filteredLoggers = filteredLoggers.filter(function (logger) { return logger.effectiveLevel.match(regExp) !== null; });
+                        break;
+                }
+            });
+            this.tableItems = filteredLoggers;
+            this.numTotalItems = filteredLoggers.length;
+            this.toolbarConfig.filterConfig.resultsCount = filteredLoggers.length;
+        };
+        return LoggersController;
+    }());
+    SpringBoot.LoggersController = LoggersController;
+    SpringBoot.loggersComponent = {
+        template: "\n      <div class=\"spring-boot-loggers-main\">\n        <h1>Loggers</h1>\n        <div class=\"blank-slate-pf no-border\" ng-if=\"$ctrl.loading === false && $ctrl.loggers.length === 0\">\n          <div class=\"blank-slate-pf-icon\">\n            <span class=\"pficon pficon pficon-add-circle-o\"></span>\n          </div>\n          <h1>No Spring Boot Loggers</h1>\n          <p>There are no loggers to display for this application.</p>\n          <p>Check your Spring Boot logging configuration.</p>\n        </div>\n        <div ng-show=\"$ctrl.loggers.length > 0\">\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <ul class=\"list-group spring-boot-loggers-list-group\">\n            <li class=\"list-group-item\"\n                ng-repeat=\"item in $ctrl.tableItems | orderBy : 'name' | startFrom:($ctrl.pageNumber - 1) * $ctrl.pageSize | limitTo: $ctrl.pageSize\">\n                <div title=\"Logger Level\">\n                  <select ng-model=\"item.configuredLevel\"\n                          ng-options=\"level for level in $ctrl.loggerLevels\"\n                          ng-change=\"$ctrl.setLoggerLevel(item)\"\n                          ng-selected=\"item.effectiveLevel === level\">\n                  </select>\n                </div>\n                <div class=\"list-group-item-heading\">{{item.name}}</div>\n            </li>\n          </ul>\n          <pf-pagination\n            page-size=\"$ctrl.pageSize\"\n            page-number=\"$ctrl.pageNumber\"\n            num-total-items=\"$ctrl.numTotalItems\">\n          </pf-pagination>\n        </div>\n      </div>\n    ",
+        controller: LoggersController
+    };
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="loggers.component.ts"/>
+/// <reference path="loggers.service.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    SpringBoot.loggersModule = angular
+        .module('spring-boot-loggers', [])
+        .component('springBootLoggers', SpringBoot.loggersComponent)
+        .service('loggersService', SpringBoot.LoggersService)
+        .name;
+})(SpringBoot || (SpringBoot = {}));
+var SpringBoot;
+(function (SpringBoot) {
     SpringBootLayoutController.$inject = ["$location"];
     function SpringBootLayoutController($location) {
         'ngInject';
@@ -26382,7 +26524,8 @@ var SpringBoot;
         this.tabs = [
             new Core.HawtioTab('Health', '/spring-boot/health'),
             new Core.HawtioTab('Mappings', '/spring-boot/mappings'),
-            new Core.HawtioTab('Trace', '/spring-boot/trace')
+            new Core.HawtioTab('Trace', '/spring-boot/trace'),
+            new Core.HawtioTab('Loggers', '/spring-boot/loggers')
         ];
         this.goto = function (tab) {
             $location.path(tab.path);
@@ -26404,6 +26547,7 @@ var SpringBoot;
 /// <reference path="health/health.module.ts"/>
 /// <reference path="mappings/mappings.module.ts"/>
 /// <reference path="trace/trace.module.ts"/>
+/// <reference path="loggers/loggers.module.ts"/>
 /// <reference path="layout/layout.module.ts"/>
 /// <reference path="spring-boot.config.ts"/>
 var SpringBoot;
@@ -26412,6 +26556,7 @@ var SpringBoot;
         .module('hawtio-spring-boot', [
         SpringBoot.healthModule,
         SpringBoot.mappingsModule,
+        SpringBoot.loggersModule,
         SpringBoot.layoutModule,
         SpringBoot.traceModule
     ])

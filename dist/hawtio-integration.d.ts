@@ -1798,6 +1798,50 @@ declare namespace SpringBoot {
     const traceModule: string;
 }
 declare namespace SpringBoot {
+    const jmxDomain: string;
+    interface LoggerConfiguration {
+        levels: string[];
+        loggers: Logger[];
+    }
+    interface Logger {
+        name: string;
+        configuredLevel: string;
+        effectiveLevel: string;
+    }
+}
+declare namespace SpringBoot {
+    class LoggersService {
+        private jolokiaService;
+        constructor(jolokiaService: JVM.JolokiaService);
+        getLoggerConfiguration(): ng.IPromise<LoggerConfiguration>;
+        setLoggerLevel(logger: Logger): ng.IPromise<void>;
+    }
+}
+declare namespace SpringBoot {
+    class LoggersController {
+        private loggersService;
+        private filterFields;
+        private filterConfig;
+        private toolbarConfig;
+        private pageSize;
+        private pageNumber;
+        private numTotalItems;
+        loading: boolean;
+        loggers: Logger[];
+        tableItems: Logger[];
+        loggerLevels: string[];
+        constructor(loggersService: LoggersService);
+        $onInit(): void;
+        loadData(): void;
+        setLoggerLevel(logger: Logger): void;
+        applyFilters(filters: any[]): void;
+    }
+    const loggersComponent: angular.IComponentOptions;
+}
+declare namespace SpringBoot {
+    const loggersModule: string;
+}
+declare namespace SpringBoot {
     function SpringBootLayoutController($location: ng.ILocationService): void;
 }
 declare namespace SpringBoot {
