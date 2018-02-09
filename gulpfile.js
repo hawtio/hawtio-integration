@@ -77,7 +77,9 @@ gulp.task('concat', ['template'], function() {
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('clean', () => del(['templates.js', 'compiled.js', './docker/site/']));
+gulp.task('clean', ['concat'], function() {
+  del(['templates.js', 'compiled.js', './site/']);
+});
 
 gulp.task('less', function () {
   let pluginsCss = gulp.src(config.less)

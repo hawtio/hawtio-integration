@@ -1,8 +1,8 @@
 /// <reference types="jmx" />
 /// <reference types="angular" />
 /// <reference types="angular-mocks" />
-/// <reference types="angular-route" />
 /// <reference types="core" />
+/// <reference types="angular-route" />
 declare namespace ActiveMQ {
     const log: Logging.Logger;
     const jmxDomain: string;
@@ -756,6 +756,18 @@ declare namespace Camel {
 }
 declare namespace Camel {
     var BrowseEndpointController: angular.IModule;
+}
+declare namespace Camel {
+    function CamelTabsController($scope: ng.IScope, $location: ng.ILocationService, camelTabsService: CamelTabsService): void;
+}
+declare namespace Camel {
+    class CamelTabsService {
+        private workspace;
+        private jolokia;
+        private hasRestServices;
+        constructor(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia);
+        getTabs(): Core.HawtioTab[];
+    }
 }
 declare namespace Camel {
     var camelHeaderSchema: {

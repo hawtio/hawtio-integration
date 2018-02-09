@@ -18566,6 +18566,150 @@ var Camel;
             }
         }]);
 })(Camel || (Camel = {}));
+/// <reference path="camelPlugin.ts"/>
+var Camel;
+(function (Camel) {
+    CamelTabsController.$inject = ["$scope", "$location", "camelTabsService"];
+    function CamelTabsController($scope, $location, camelTabsService) {
+        'ngInject';
+        var _this = this;
+        this.tabs = camelTabsService.getTabs();
+        $scope.$on('jmxTreeClicked', function () {
+            _this.tabs = camelTabsService.getTabs();
+        });
+        this.goto = function (tab) {
+            $location.path(tab.path);
+        };
+    }
+    Camel.CamelTabsController = CamelTabsController;
+    Camel._module.controller('CamelTabsController', CamelTabsController);
+})(Camel || (Camel = {}));
+/// <reference path="camelPlugin.ts"/>
+var Camel;
+(function (Camel) {
+    var CamelTabsService = /** @class */ (function () {
+        CamelTabsService.$inject = ["workspace", "jolokia"];
+        function CamelTabsService(workspace, jolokia) {
+            'ngInject';
+            this.workspace = workspace;
+            this.jolokia = jolokia;
+            this.hasRestServices = Camel.hasRestServices(workspace, jolokia);
+        }
+        CamelTabsService.prototype.getTabs = function () {
+            var tabs = [];
+            var isCamelContext = this.workspace.isCamelContext();
+            var isCamelVersionEQGT_2_13 = Camel.isCamelVersionEQGT(2, 13, this.workspace, this.jolokia);
+            var isCamelVersionEQGT_2_14 = Camel.isCamelVersionEQGT(2, 14, this.workspace, this.jolokia);
+            var isCamelVersionEQGT_2_15 = Camel.isCamelVersionEQGT(2, 15, this.workspace, this.jolokia);
+            var isCamelVersionEQGT_2_16 = Camel.isCamelVersionEQGT(2, 16, this.workspace, this.jolokia);
+            var isComponent = this.workspace.isComponent();
+            var isComponentsFolder = this.workspace.isComponentsFolder();
+            var isContextsFolder = this.workspace.selection && this.workspace.selection.key === 'camelContexts';
+            var isEndpoint = this.workspace.isEndpoint();
+            var isEndpointsFolder = this.workspace.isEndpointsFolder();
+            var inEndpointRuntimeRegistry = Camel.getSelectionCamelEndpointRuntimeRegistry(this.workspace) !== null;
+            var isDataformat = this.workspace.isDataformat();
+            var isDebugMbean = Camel.getSelectionCamelDebugMBean(this.workspace) !== null;
+            var isRestRegistry = Camel.getSelectionCamelRestRegistry(this.workspace) !== null;
+            var isRoute = this.workspace.isRoute();
+            var isRoutesFolder = this.workspace.isRoutesFolder();
+            var isRouteMetrics = Camel.getSelectionCamelRouteMetrics(this.workspace) !== null;
+            var isTraceMBean = Camel.getSelectionCamelTraceMBean(this.workspace) !== null;
+            var canBrowse = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelInflightRepository(this.workspace), "browse");
+            var canBrowseAllMessagesAsXml = this.workspace.hasInvokeRights(this.workspace.selection, "browseAllMessagesAsXml");
+            var canCreateEndpoint = this.workspace.hasInvokeRights(this.workspace.selection, "createEndpoint");
+            var canDumpRoutesAsXml = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(this.workspace), "dumpRoutesAsXml");
+            var canExplainEndpointJson = this.workspace.hasInvokeRights(this.workspace.selection, "explainEndpointJson");
+            var canExplainComponentJson = this.workspace.hasInvokeRights(this.workspace.selection, "explainComponentJson");
+            var canExplainDataFormatJson = this.workspace.hasInvokeRights(this.workspace.selection, "explainDataFormatJson");
+            var canDumpAllTracedMessagesAsXml = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(this.workspace), "dumpAllTracedMessagesAsXml");
+            var canDumpStatisticsAsJson = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelRouteMetrics(this.workspace), "dumpStatisticsAsJson");
+            var canGetBreakpoints = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelDebugMBean(this.workspace), "getBreakpoints");
+            var canListRestServices = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelRestRegistry(this.workspace), "listRestServices");
+            var canListTypeConverters = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelTypeConverter(this.workspace), "listTypeConverters");
+            var canSeeEndpointStatistics = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelEndpointRuntimeRegistry(this.workspace), "endpointStatistics");
+            var canSendMesssage = this.workspace.hasInvokeRights(this.workspace.selection, this.workspace.selection && this.workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage");
+            if (isContextsFolder) {
+                tabs.push(new Core.HawtioTab('Contexts', '/camel/contexts'));
+            }
+            if (isRoutesFolder) {
+                tabs.push(new Core.HawtioTab('Routes', '/camel/routes'));
+            }
+            if ((isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
+                tabs.push(new Core.HawtioTab('Route Diagram', '/camel/routeDiagram'));
+            }
+            if (!isEndpointsFolder && !isEndpoint && (isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
+                tabs.push(new Core.HawtioTab('Source', '/camel/source'));
+            }
+            if (Camel.isRouteNode(this.workspace)) {
+                tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesRoute'));
+            }
+            if (isEndpoint && isCamelVersionEQGT_2_15 && canExplainEndpointJson) {
+                tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesEndpoint'));
+            }
+            if (isComponent && isCamelVersionEQGT_2_15 && canExplainComponentJson) {
+                tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesComponent'));
+            }
+            if (isDataformat && isCamelVersionEQGT_2_16 && canExplainDataFormatJson) {
+                tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesDataFormat'));
+            }
+            if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder &&
+                !isComponent && (isCamelContext || isRoutesFolder || isRoute) &&
+                isCamelVersionEQGT_2_15 && canBrowse) {
+                tabs.push(new Core.HawtioTab('Exchanges', '/camel/exchanges'));
+            }
+            if (!isEndpointsFolder && !isEndpoint && (isCamelContext || isRoutesFolder) &&
+                isCamelVersionEQGT_2_14 && isRouteMetrics && canDumpStatisticsAsJson) {
+                tabs.push(new Core.HawtioTab('Route Metrics', '/camel/routeMetrics'));
+            }
+            if (!Camel.isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
+                (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_14 && isRestRegistry &&
+                this.hasRestServices && canListRestServices) {
+                tabs.push(new Core.HawtioTab('REST Services', '/camel/restServices'));
+            }
+            if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
+                (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_16 && inEndpointRuntimeRegistry &&
+                canSeeEndpointStatistics) {
+                tabs.push(new Core.HawtioTab('Endpoints (in/out)', '/camel/endpointRuntimeRegistry'));
+            }
+            if (!Camel.isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
+                (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_13 && canListTypeConverters) {
+                tabs.push(new Core.HawtioTab('Type Converters', '/camel/typeConverter'));
+            }
+            if (isRoute && isTraceMBean && canDumpAllTracedMessagesAsXml) {
+                tabs.push(new Core.HawtioTab('Profile', '/camel/profileRoute'));
+            }
+            if (isRoute && isDebugMbean && canGetBreakpoints) {
+                tabs.push(new Core.HawtioTab('Debug', '/camel/debugRoute'));
+            }
+            if (isRoute && isTraceMBean && canDumpAllTracedMessagesAsXml) {
+                tabs.push(new Core.HawtioTab('Trace', '/camel/traceRoute'));
+            }
+            if (isEndpoint && canBrowseAllMessagesAsXml) {
+                tabs.push(new Core.HawtioTab('Browse', '/camel/browseEndpoint'));
+            }
+            if (isEndpoint && canSendMesssage) {
+                tabs.push(new Core.HawtioTab('Send', '/camel/sendMessage'));
+            }
+            if (isEndpointsFolder && canCreateEndpoint) {
+                tabs.push(new Core.HawtioTab('Endpoint', '/camel/createEndpoint'));
+            }
+            if (!isContextsFolder && !isRoutesFolder) {
+                tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
+            }
+            if (!isContextsFolder && !isRoutesFolder) {
+                tabs.push(new Core.HawtioTab('Operations', '/jmx/operations'));
+            }
+            if (!isContextsFolder && !isRoutesFolder) {
+                tabs.push(new Core.HawtioTab('Chart', '/jmx/charts'));
+            }
+            return tabs;
+        };
+        return CamelTabsService;
+    }());
+    Camel.CamelTabsService = CamelTabsService;
+    Camel._module.service('camelTabsService', CamelTabsService);
+})(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
     // NOTE this file is code generated by the ide-codegen module in Fuse IDE
@@ -26283,7 +26427,6 @@ var SpringBoot;
     SpringBootLayoutController.$inject = ["$location"];
     function SpringBootLayoutController($location) {
         'ngInject';
-        var _this = this;
         this.tabs = [
             new Core.HawtioTab('Health', '/spring-boot/health'),
             new Core.HawtioTab('Trace', '/spring-boot/trace'),
@@ -26291,9 +26434,6 @@ var SpringBoot;
         ];
         this.goto = function (tab) {
             $location.path(tab.path);
-        };
-        this.activeTab = function () {
-            return _this.tabs.find(function (tab) { return tab.path === $location.path(); });
         };
     }
     SpringBoot.SpringBootLayoutController = SpringBootLayoutController;
@@ -26345,7 +26485,7 @@ $templateCache.put('plugins/camel/html/deleteRouteWarningModal.html','<div class
 $templateCache.put('plugins/camel/html/endpointRuntimeRegistry.html','<div class="table-view" ng-controller="Camel.EndpointRuntimeRegistryController">\n\n  <h2>Endpoints (in/out)</h2>\n  \n  <p ng-if="!selectedMBean">Loading...</p>\n  \n  <div ng-if="selectedMBean">\n    <div class="loading-message" ng-if="data.length === 0">\n      There are no endpoints currently in use in this CamelContext.\n    </div>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-endpoints-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/exchanges.html','<h2>Exchanges</h2>\n<div ng-include src="\'plugins/camel/html/inflight.html\'"></div>\n<div ng-include src="\'plugins/camel/html/blocked.html\'"></div>');
 $templateCache.put('plugins/camel/html/inflight.html','<div class="table-view" ng-controller="Camel.InflightExchangesController">\n\n  <h3>Inflight</h3>\n  \n  <p ng-if="!initDone">Loading...</p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No inflight exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-inflight-exchanges-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/camel/html/layoutCamelTree.html','<div class="tree-nav-layout">\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n    <camel-tree-header></camel-tree-header>\n    <camel-tree></camel-tree>\n  </div>\n  <div class="tree-nav-main">\n    <div>\n      <context-actions></context-actions>\n      <route-actions></route-actions>\n      <jmx-header></jmx-header>\n    </div>\n    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">\n      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">\n        <a href="#" ng-click="goto(tab.path)">{{tab.title}}</a>\n      </li>\n      <li class="dropdown overflow">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          More <span class="caret"></span>\n        </a>\n        <ul class="dropdown-menu" role="menu"></ul>\n      </li>\n    </ul>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
+$templateCache.put('plugins/camel/html/layoutCamelTree.html','<div class="tree-nav-layout">\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n    <camel-tree-header></camel-tree-header>\n    <camel-tree></camel-tree>\n  </div>\n  <div class="tree-nav-main">\n    <div>\n      <context-actions></context-actions>\n      <route-actions></route-actions>\n      <jmx-header></jmx-header>\n    </div>\n    <div ng-controller="CamelTabsController as $ctrl">\n      <hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>\n    </div>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/camel/html/nodePropertiesEdit.html','<div class="row-fluid">\n\n  <!-- the label and input fields needs to be wider -->\n  <style>\n    input, textarea, .uneditable-input {\n      width: 600px;\n    }\n    input, textarea, .editable-input {\n      width: 600px;\n    }\n\n    .form-horizontal .control-label {\n      width: 180px;\n    }\n\n    .form-horizontal .controls {\n      margin-left: 200px;\n    }\n  </style>\n\n  <h3>\n    <img src="{{icon}}" width="48" height="48" ng-show="icon"/> {{model.title}}\n    <span style="margin-left: 10px" ng-repeat="label in labels track by $index" class="pod-label badge" title="{{label}}">{{label}}</span>\n  </h3>\n\n  <div simple-form name="formViewer" mode=\'edit\' entity=\'nodeData\' data=\'model\' schema="schema"\n       showhelp="!hideHelp"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/nodePropertiesView.html','<header class="camel-properties-header">\n  <h2>Properties</h2>\n  <h3>\n    <img ng-src="{{icon}}" width="24" height="24" ng-show="icon"/>\n    <span>{{title}}</span>\n  </h3>\n  <em><span ng-repeat="label in labels track by $index">{{$first ? \'\' : \' / \'}}{{label}}<span></em>\n</header>\n<p>{{description}}</p>\n<property-list title="Defined Properties" properties="definedProperties"></property-list>\n<property-list title="Default Properties" properties="defaultProperties"></property-list>\n<property-list title="Undefined Properties" properties="undefinedProperties"></property-list>\n<div class="camel-properties-empty-space-for-tooltip"></div>');
 $templateCache.put('plugins/camel/html/preferences.html','<div ng-controller="Camel.PreferencesController">\n  <div hawtio-form-2="config" entity="entity"></div>\n</div>\n');
@@ -26374,7 +26514,7 @@ $templateCache.put('plugins/osgi/html/layoutOsgi.html','<div class="osgi-nav-mai
 $templateCache.put('plugins/osgi/html/packages.html','<h1>Packages</h1>\n\n<div class="osgi-packages-main" ng-controller="Osgi.PackagesController">\n\n  <p ng-if="!packages">Loading...</p>\n\n  <div ng-if="packages">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <div class="list-group list-view-pf list-view-pf-view osgi-packages-list" infinite-scroll="appendItems()"\n      infinite-scroll-distance="2" infinite-scroll-container=\'".osgi-nav-main .contents"\'>\n      <div class="list-group-item" ng-repeat="package in scrollablePackages"\n        ng-class="{\'list-view-pf-expand-active\': package.exportsExpanded || package.importsExpanded}">\n        <div class="list-view-pf-main-info">\n          <div class="list-view-pf-body">\n            <div class="list-view-pf-description">\n              <div class="list-group-item-heading" title="{{package.Name}}">\n                {{package.Name}}\n              </div>\n              <div class="list-group-item-text">\n                {{package.Version}}\n              </div>\n            </div>\n            <div class="list-view-pf-additional-info">\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand" ng-class="{\'active\': package.exportsExpanded}"\n                  ng-click="package.exportsExpanded = !package.exportsExpanded; package.importsExpanded = false;">\n                  <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': package.exportsExpanded}"></span>\n                  <span class="pficon pficon-export"></span>\n                  <strong>{{package.ExportingBundles.length}}</strong>\n                  Exporting Bundle{{package.ExportingBundles.length !== 1 ? \'s\' : \'\'}}\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand" ng-class="{\'active\': package.importsExpanded}"\n                  ng-click="package.importsExpanded = !package.importsExpanded; package.exportsExpanded = false;">\n                  <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': package.importsExpanded}"></span>\n                  <span class="pficon pficon-import"></span>\n                  <strong>{{package.ImportingBundles.length}}</strong>\n                  Importing Bundle{{package.ImportingBundles.length !== 1 ? \'s\' : \'\'}}\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand">\n                  <span ng-show="package.RemovalPending">\n                    <span class="pficon pficon-warning-triangle-o"></span>\n                    Removal Pending\n                  </span>\n                </div>\n              </div>\n            </div>              \n          </div>\n        </div>\n        <div class="list-group-item-container" ng-if="package.exportsExpanded">\n          <div class="close" ng-click="package.exportsExpanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <dl>\n            <dt>Exporting Bundles</dt>\n            <dd>\n              <ul class="package-bundles-list">\n                <li ng-repeat="bundle in package.ExportingBundles">\n                  <a title="Exported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n        <div class="list-group-item-container" ng-if="package.importsExpanded">\n          <div class="close" ng-click="package.importsExpanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <dl>\n            <dt>Importing Bundles</dt>\n            <dd>\n              <ul class="package-bundles-list">\n                <li ng-repeat="bundle in package.ImportingBundles">\n                  <a title="Imported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/pid.html','<div class="pid-view" ng-controller="Osgi.PidController">\n\n  <ol class="breadcrumb">\n    <li>\n        <a ng-href="{{configurationUrl}}">Configuration</a>\n    </li>\n    <li class="page-title">\n      {{zkPid || metaType.name || pid}}\n    </li>\n  </ol>  \n  \n  <pf-toolbar config="toolbarConfig"></pf-toolbar>\n  \n  <div ng-hide="editMode">\n    <div class="row config-admin-form view">\n      <div class="col-sm-12">\n        <div simple-form class="pid-form" name="pidEditor" mode=\'view\' entity=\'entity\' data=\'schema\' schema="fullSchema"></div>\n      </div>\n    </div>\n  </div>\n  \n  <div ng-show="editMode">\n    <div class="row config-admin-form edit">\n      <div ng-show="newPid" class="col-sm-12 new-config-name-form">\n        <form class="form-horizontal" action="">\n          <fieldset>\n            <div class="spacer"></div>\n            <div class="form-group">\n              <label class="col-sm-2 control-label" title="The name of the configuration file">\n                Configuration name\n              </label>\n              <div class="col-sm-10">\n                <input type="text" title="The name of the configuration file" ng-required="true"\n                        ng-model="createForm.pidInstanceName" name="path" autofocus>\n              </div>\n            </div>\n          </fieldset>\n        </form>\n      </div>\n      <div class="col-sm-12">\n        <div simple-form name="pidEditor" mode=\'edit\' entity=\'entity\' data=\'schema\' schema="fullSchema" onSubmit="pidSave()"></div>\n      </div>\n    </div>\n    <div class="row">\n      <div class="col-sm-2"></div>\n      <div class="col-sm-10">\n        <button class="btn btn-primary" ng-show="newPid" ng-disabled="!canSave || !createForm.pidInstanceName" ng-click="pidSave()">Create</button>\n        <button class="btn btn-primary" ng-hide="newPid" ng-disabled="!canSave" ng-click="pidSave()">Save</button>\n        <button class="btn btn-default" ng-click="cancelSave()">Cancel</button>\n      </div>\n    </div>\n  </div>\n\n  <script type="text/ng-template" id="deletePropDialog.html">\n    <form name="deleteProperty" class="form-horizontal no-bottom-margin" ng-submit="deletePidPropConfirmed()">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Delete property \'{{deleteKey}}\'</h4>\n      </div>\n      <div class="modal-body">\n        <p class="lead">Are you sure?</p>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n        <button type="submit" class="btn btn-danger">Delete</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="addPropertyDialog.html">\n    <form name="addProperty" class="form-horizontal"\n          ng-submit="addPropertyConfirmed(addPropKey, addPropValue)">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Add property</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-2 control-label" for="propKey">Key</label>\n          <div class="col-sm-10">\n            <input type="text" class="form-control" id="propKey" ng-model="addPropKey" required>\n          </div>\n        </div>\n        <div class="form-group">\n          <label class="col-sm-2 control-label" for="propValue">Value</label>\n          <div class="col-sm-10">\n            <input type="text" class="form-control" id="propValue" ng-model="addPropValue"/>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n        <button type="submit" class="btn btn-primary">Add</button>\n      </div>\n    </form>\n  </script>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/services.html','<h1>Services</h1>\n\n<div class="controller-section" ng-controller="Osgi.ServiceController">\n\n  <p ng-if="!services">Loading...</p>\n\n  <div ng-if="services">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <div class="list-group list-view-pf list-view-pf-view">\n      <div class="list-group-item" ng-class="{\'list-view-pf-expand-active\': service.expanded}"\n          ng-repeat="service in filteredServices">\n        <div class="list-group-item-header" ng-click="service.expanded = !service.expanded">\n          <div class="list-view-pf-expand">\n            <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': service.expanded}"></span>\n          </div>\n          <div class="list-view-pf-main-info">\n            <div class="list-view-pf-body">\n              <div class="list-view-pf-description">\n                <div class="list-group-item-heading">\n                  ID {{service.Identifier}}\n                </div>\n                <div class="list-group-item-text" ng-bind-html="service.BundleLinks">\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info">\n                <div class="list-view-pf-additional-info-item" title="Object Classes">\n                  {{service.objectClass[0]}}{{service.objectClass.length > 1 ? \'...\' : \'\'}}\n                </div>\n              </div>              \n            </div>\n          </div>\n        </div>\n        <div class="list-group-item-container" ng-if="service.expanded">\n          <div class="close" ng-click="service.expanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <div class="col-md-5">\n            <dl>\n              <dt>Using Bundles</dt>\n              <dd>\n                <ul class="service-bundles-list">\n                  <li ng-repeat="bundle in service.UsingBundles">\n                    <a ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                  </li>\n                </ul>\n              </dd>\n            </dl>\n          </div>\n          <div class="col-md-5">\n            <dl>\n              <dt>Object Classes</dt>\n              <dd>\n                <ul class="service-object-classes-list">\n                  <li ng-repeat="clazz in service.objectClass">\n                    {{clazz}}\n                  </li>\n                </ul>\n              </dd>\n            </dl>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/spring-boot/layout/layout.html','<div class="spring-boot-layout">\n  <div ng-controller="SpringBootLayoutController as $ctrl">\n    <hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)" active-tab="$ctrl.activeTab()"></hawtio-tabs>\n  </div>\n  <div class="contents" ng-view></div>\n</div>');
+$templateCache.put('plugins/spring-boot/layout/layout.html','<div class="spring-boot-layout">\n  <div ng-controller="SpringBootLayoutController as $ctrl">\n    <hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>\n  </div>\n  <div class="contents" ng-view></div>\n</div>');
 $templateCache.put('plugins/spring-boot/trace/trace.html','<div class="spring-boot-trace-main">\n  <div class="spring-boot-trace-flex-container">\n    <div class="spring-boot-trace-fixed-toolbar">\n      <h1>Trace</h1>\n      <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>\n      <div class="blank-slate-pf no-border" ng-if="$ctrl.loading === false && $ctrl.traces.length === 0">\n        <div class="blank-slate-pf-icon">\n          <span class="pficon pficon pficon-add-circle-o"></span>\n        </div>\n        <h1>No Spring Boot Traces</h1>\n        <p>There are no trace details to display for this application.</p>\n        <p>Wait for some trace events to be generated or revise your search filter criteria.</p>\n      </div>\n      <div ng-show="$ctrl.traces.length > 0">\n        <table class="table table-striped spring-boot-trace-header-table">\n          <thead>\n            <tr>\n              <th>Timestamp</th>\n              <th>HTTP Status</th>\n              <th>HTTP Method</th>\n              <th>Path</th>\n              <th>Time Taken</th>\n              <th></th>\n            </tr>\n          </thead>\n        </table>\n      </div>\n    </div>\n    <div class="spring-boot-trace-scrollable-table" ng-show="$ctrl.traces.length > 0">\n      <table class="table table-striped">\n        <tbody>\n          <tr ng-repeat="trace in $ctrl.tableItems">\n            <td>{{trace.timestamp | date: $ctrl.dateFormat}}</td>\n            <td ng-switch="trace.httpStatusCode === undefined">\n              <span ng-switch-when="true">Unknown</span>\n              <div ng-switch-default>\n                <span ng-class="$ctrl.getStatusClass(trace)"></span>\n                <span>{{trace.httpStatusCode}}</span>\n              </div>\n            </td>\n            <td>{{trace.method}}</td>\n            <td>{{trace.path}}</td>\n            <td ng-switch="trace.timeTaken === undefined">\n              <span ng-switch-when="true">Unknown</span>\n              <span ng-switch-default>{{trace.timeTaken}} ms</span>\n            </td>\n            <td>\n              <div class="table-view-pf-btn">\n                <button class="btn btn-default" type="button" ng-click="$ctrl.openTraceModal(trace)">Show Trace Detail</button>\n              </div>\n            </td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <script type="text/ng-template" id="traceDetailsModal.html">\n    <div class="modal-header">\n      <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n        <span class="pficon pficon-close" aria-hidden="true"></span>\n      </button>\n      <h4 class="modal-title">Trace</h4>\n    </div>\n    <div class="modal-body">\n      <pre>{{trace.info | json}}</pre>\n    </div>\n  </script>\n</div>');
 $templateCache.put('plugins/activemq/html/destination/create.html','<p>\n  <div class="alert alert-info">\n    <span class="pficon pficon-info"></span>The JMS API does not define a standard\n    address syntax. Although a standard address syntax was considered, it was decided\n    that the differences in address semantics between existing message-oriented\n    middleware (MOM) products were too wide to bridge with a single syntax.\n  </div>\n</p>\n\n<form class="form-horizontal">\n\n  <div class="form-group">\n    <label class="col-sm-2 control-label" for="name-markup">{{$ctrl.destinationType}} name</label>\n\n    <div class="col-sm-10">\n      <input id="name-markup" class="form-control" type="text" maxlength="300"\n             name="destinationName" ng-model="$ctrl.destinationName" placeholder="{{$ctrl.destinationType}} name"/>\n    </div>\n  </div>\n  <div class="form-group">\n    <label class="col-sm-2 control-label">Destination type</label>\n\n    <div class="col-sm-10">\n      <label class="checkbox">\n        <input type="radio" ng-model="$ctrl.destinationType" value="Queue"> Queue\n      </label>\n      <label class="checkbox">\n        <input type="radio" ng-model="$ctrl.destinationType" value="Topic"> Topic\n      </label>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <div class="col-sm-offset-2 col-sm-10">\n      <button type="submit" class="btn btn-primary"\n              ng-click="$ctrl.validateAndCreateDestination($ctrl.destinationName, $ctrl.destinationType)"\n              ng-disabled="!$ctrl.destinationName">Create {{$ctrl.destinationType}}\n      </button>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="$ctrl.createDialog"\n        ok-button-text="Create"\n        cancel-button-text="Cancel"\n        on-ok="$ctrl.createDestination($ctrl.destinationName, $ctrl.destinationType)">\n    <div class="dialog-body">\n      <p>{{$ctrl.destinationType}} name <b>{{$ctrl.destinationName}}</b> contains unrecommended characters: <code>:</code></p>\n      <p>This may cause unexpected problems. Are you really sure to create this {{$ctrl.uncapitalisedDestinationType()}}?</p>\n    </div>\n  </div>\n\n</form>\n');
 $templateCache.put('plugins/activemq/html/destination/deleteQueue.html','<p>\n  <div class="alert alert-warning">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    These operations cannot be undone. Please be careful!\n  </div>\n</p>\n\n<h2>Purge queue</h2>\n<p>Purge all the current messages on the queue.</p>\n<button type="submit" class="btn btn-danger" ng-click="$ctrl.purgeDialog = true">\n  Purge queue\n</button>\n\n<hr />\n\n<h2>Delete queue</h2>\n<p>Remove the queue completely.</p>\n<button type="submit" class="btn btn-danger" ng-click="$ctrl.deleteDialog = true">\n  Delete queue\n</button>\n\n<div hawtio-confirm-dialog="$ctrl.deleteDialog"\n     title="Confirm delete queue"\n     ok-button-text="Delete"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.deleteDestination()">\n  <div class="dialog-body">\n    <p>You are about to delete the <b>{{$ctrl.selectedName()}}</b> queue.</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n\n<div hawtio-confirm-dialog="$ctrl.purgeDialog"\n     title="Confirm purge queue"\n     ok-button-text="Purge"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.purgeDestination()">\n  <div class="dialog-body">\n    <p>You are about to purge the <b>{{$ctrl.selectedName()}}</b> queue</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n');

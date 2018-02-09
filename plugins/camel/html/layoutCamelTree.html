@@ -9,17 +9,9 @@
       <route-actions></route-actions>
       <jmx-header></jmx-header>
     </div>
-    <ul class="nav nav-tabs" hawtio-auto-dropdown ng-controller="Camel.TabsController">
-      <li ng-repeat="tab in tabs track by tab.id" ng-class="{active: isActive(tab)}" ng-show="tab.show()">
-        <a href="#" ng-click="goto(tab.path)">{{tab.title}}</a>
-      </li>
-      <li class="dropdown overflow">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-          More <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu" role="menu"></ul>
-      </li>
-    </ul>
+    <div ng-controller="CamelTabsController as $ctrl">
+      <hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>
+    </div>
     <div class="contents" ng-view></div>
   </div>
 </div>

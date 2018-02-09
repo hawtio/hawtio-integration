@@ -12,9 +12,5 @@ namespace SpringBoot {
     this.goto = tab => {
       $location.path(tab.path);
     };
-
-    this.activeTab = () => {
-      return this.tabs.find(tab => tab.path === $location.path())
-    }
   }
 }
