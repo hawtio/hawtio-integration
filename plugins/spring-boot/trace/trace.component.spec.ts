@@ -18,7 +18,7 @@ describe("TraceController", function() {
     $scope = jasmine.createSpy('$scope');
     $timeout = jasmine.createSpy('$timeout');
     $uibModal = jasmine.createSpy("$uibModal");
-    traceService = jasmine.createSpyObj('mappingsService', ['getTraces']);
+    traceService = jasmine.createSpyObj('traceService', ['getTraces']);
     $filter =  _$filter_;
     $q = _$q_;
     $rootScope = _$rootScope_;
@@ -37,7 +37,7 @@ describe("TraceController", function() {
       expect(traceController.traces).toEqual(traces);
       expect(traceController.tableItems).toEqual(traces);
       expect(traceController.loading).toBe(false);
-      expect($interval).toHaveBeenCalledWith(jasmine.any(Function), 10000);      
+      expect($interval).toHaveBeenCalledWith(jasmine.any(Function), 10000);
     });
   });
 
@@ -169,7 +169,7 @@ describe("TraceController", function() {
       $rootScope.$apply();
       //then
       expect(traceController.tableItems).toEqual([traceB]);
-    });    
+    });
   });
 
   describe("getStatusClass()", function() {

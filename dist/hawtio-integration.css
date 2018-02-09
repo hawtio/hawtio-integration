@@ -837,14 +837,6 @@ div.camel-properties {
   margin-right: 30px;
 }
 
-.spring-boot-mappings-main table td:nth-child(2) {
-  word-break: break-all;
-}
-.spring-boot-mappings-main table td:nth-child(5) {
-  word-break: break-all;
-  width: 200px;
-}
-
 div[ng-view],
 spring-boot-trace,
 .spring-boot-trace-main {

@@ -5,7 +5,6 @@ namespace SpringBoot {
     $routeProvider
       .when('/spring-boot', {redirectTo: '/spring-boot/health'})
       .when('/spring-boot/health', {template: '<spring-boot-health></spring-boot-health>'})
-      .when('/spring-boot/mappings', {template: '<spring-boot-mappings></spring-boot-mappings>'})
       .when('/spring-boot/trace', {template: '<spring-boot-trace></spring-boot-trace>'})
       .when('/spring-boot/loggers', {template: '<spring-boot-loggers></spring-boot-loggers>'});
     }

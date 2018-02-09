@@ -1704,51 +1704,6 @@ declare namespace SpringBoot {
     const healthModule: string;
 }
 declare namespace SpringBoot {
-    class Mapping {
-        bean: string;
-        beanMethod: string;
-        consumes: string;
-        headers: string;
-        methods: string;
-        params: string;
-        produces: string;
-        paths: string;
-        getClassMethod(): string;
-    }
-}
-declare namespace SpringBoot {
-    class MappingsService {
-        private jolokiaService;
-        constructor(jolokiaService: JVM.JolokiaService);
-        getMappings(): ng.IPromise<Mapping[]>;
-        private toMapping(beanInfo, mappingAttributes);
-        private santizeAttributes(attribute);
-        private isPath(pathCandidate);
-        private isProperty(propertyCandidate);
-    }
-}
-declare namespace SpringBoot {
-    class MappingsController {
-        private mappingsService;
-        private static FILTER_FUNCTIONS;
-        private toolbarConfig;
-        private tableConfig;
-        private tableColumns;
-        loading: boolean;
-        mappings: any[];
-        tableItems: any[];
-        constructor(mappingsService: MappingsService);
-        $onInit(): void;
-        loadMappings(): void;
-        applyFilters(filters: any[]): void;
-        private renderByLine(values);
-    }
-    const mappingsComponent: angular.IComponentOptions;
-}
-declare namespace SpringBoot {
-    const mappingsModule: string;
-}
-declare namespace SpringBoot {
     class Trace {
         timestamp: string;
         method: string;
