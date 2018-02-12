@@ -25,7 +25,7 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@3.2.1", "@hawtio/core@3.2.3", "@hawtio/core@3.2.8", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
+"@hawtio/core@3.2.1", "@hawtio/core@3.2.3", "@hawtio/core@3.2.8", "@hawtio/core@3.2.9", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
   version "3.2.8"
   resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.8.tgz#8228a99ff294eaf93ff16829f2ae47ff0a833917"
   dependencies:
@@ -55,11 +55,11 @@
     "@hawtio/core-dts" "~3.0.12"
     "@hawtio/ui" "~3.0.25"
 
-"@hawtio/jmx@3.2.8":
-  version "3.2.8"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.8.tgz#bdfaeef8244734575bae798354c848cebd9e524a"
+"@hawtio/jmx@3.2.9":
+  version "3.2.9"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.9.tgz#8fe9c2aef9a3684b1bccc08f2b910049e1db84b2"
   dependencies:
-    "@hawtio/core" "3.2.8"
+    "@hawtio/core" "3.2.9"
     "@hawtio/forms" "3.0.12"
     "@hawtio/ui" "3.2.0"
     "@hawtio/utilities" "3.2.0"
@@ -344,7 +344,7 @@ ansi-regex@2.1.1, ansi-regex@^2.0.0, ansi-regex@^3.0.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-2.1.1.tgz#c3b33ab5ee360d86e0e628f0468ae7ef27d654df"
 
-ansi-styles@2.2.1, ansi-styles@^2.2.1, ansi-styles@^3.1.0:
+ansi-styles@2.2.1, ansi-styles@^2.2.1, ansi-styles@^3.2.0:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-2.2.1.tgz#b432dd3358b634cf75e1e4664368240533c1ddbe"
 
@@ -2409,9 +2409,9 @@ has-cors@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/has-cors/-/has-cors-1.1.0.tgz#5e474793f7ea9843d1bb99c23eef49ff126fff39"
 
-has-flag@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-2.0.0.tgz#e8207af1cc7b30d446cc70b734b5e8be18f88d51"
+has-flag@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-3.0.0.tgz#b5d454dc2199ae225699f3467e5a07f3b955bafd"
 
 has-gulplog@^0.1.0:
   version "0.1.0"
@@ -4790,7 +4790,7 @@ subarg@^1.0.0:
   dependencies:
     minimist "^1.1.0"
 
-supports-color@2.0.0, supports-color@^2.0.0, supports-color@^4.0.0:
+supports-color@2.0.0, supports-color@^2.0.0, supports-color@^5.2.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
 
