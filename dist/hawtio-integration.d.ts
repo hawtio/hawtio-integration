@@ -1661,6 +1661,17 @@ declare namespace Osgi {
     };
 }
 declare namespace Osgi {
+    class OsgiNavigationController {
+        private $location;
+        private workspace;
+        tabs: Core.HawtioTab[];
+        constructor($location: ng.ILocationService, workspace: Jmx.Workspace);
+        $onInit(): void;
+        goto(tab: Core.HawtioTab): void;
+    }
+    const osgiNavigationComponent: angular.IComponentOptions;
+}
+declare namespace Osgi {
     var TopLevelController: angular.IModule;
 }
 declare namespace Osgi {
