@@ -1,7 +1,7 @@
 /// <reference types="jmx" />
 /// <reference types="angular" />
-/// <reference types="angular-mocks" />
 /// <reference types="core" />
+/// <reference types="angular-mocks" />
 /// <reference types="angular-route" />
 declare namespace ActiveMQ {
     const log: Logging.Logger;
@@ -114,18 +114,43 @@ declare namespace ActiveMQ {
 declare namespace ActiveMQ {
     const pluginName: string;
     const _module: angular.IModule;
-    function getBroker(workspace: Jmx.Workspace): Jmx.Folder;
-    function isQueue(workspace: Jmx.Workspace): boolean;
-    function isTopic(workspace: Jmx.Workspace): boolean;
-    function isQueuesFolder(workspace: Jmx.Workspace): boolean;
-    function isTopicsFolder(workspace: Jmx.Workspace): boolean;
-    function isJobScheduler(workspace: Jmx.Workspace): boolean;
-    function isBroker(workspace: Jmx.Workspace): boolean;
+}
+declare namespace ActiveMQ {
+    class ActiveMQNavigationService {
+        private workspace;
+        constructor(workspace: Jmx.Workspace);
+        getTabs(): Core.HawtioTab[];
+        private shouldShowBrowseTab();
+        private shouldShowSendTab();
+        private shouldShowDurableSubscribersTab();
+        private shouldShowJobsTab();
+        private shouldShowCreateTab();
+        private shouldShowDeleteTopicTab();
+        private shouldShowDeleteQueueTab();
+        private shouldShowQueuesTab();
+        private shouldShowTopicsTab();
+        private isQueue();
+        private isTopic();
+        private isQueuesFolder();
+        private isTopicsFolder();
+        private isJobScheduler();
+        private isBroker();
+        private getBroker();
+    }
+}
+declare namespace ActiveMQ {
+    class ActiveMQNavigationController {
+        private $location;
+        private activeMQNavigationService;
+        tabs: Core.HawtioTab[];
+        constructor($scope: ng.IScope, $location: ng.ILocationService, activeMQNavigationService: ActiveMQNavigationService);
+        $onInit(): void;
+        goto(tab: Core.HawtioTab): void;
+    }
+    const activeMQNavigationComponent: angular.IComponentOptions;
 }
 declare namespace ActiveMQ {
     var BrowseQueueController: angular.IModule;
-}
-declare namespace ActiveMQ {
 }
 declare namespace ActiveMQ {
 }

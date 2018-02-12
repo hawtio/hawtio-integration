@@ -136,4 +136,13 @@ namespace ActiveMQ {
     return mbean;
   };
 
+  function isBroker(workspace: Jmx.Workspace) {
+    if (workspace.selectionHasDomainAndType(jmxDomain, 'Broker')) {
+      var self = Core.pathGet(workspace, ["selection"]);
+      var parent = Core.pathGet(workspace, ["selection", "parent"]);
+      return !(parent && (parent.ancestorHasType('Broker') || self.ancestorHasType('Broker')));
+    }
+    return false;
+  }
+
 }
