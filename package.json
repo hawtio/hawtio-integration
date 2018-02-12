@@ -1,6 +1,6 @@
 {
   "name": "@hawtio/integration",
-  "version": "3.2.12",
+  "version": "3.2.13",
   "main": "dist/hawtio-integration.js",
   "types": "dist/hawtio-integration.d.ts",
   "files": [
