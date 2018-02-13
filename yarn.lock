@@ -25,7 +25,7 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@3.2.1", "@hawtio/core@3.2.10", "@hawtio/core@3.2.3", "@hawtio/core@3.2.9", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
+"@hawtio/core@3.2.1", "@hawtio/core@3.2.10", "@hawtio/core@3.2.3", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
   version "3.2.10"
   resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.10.tgz#65fb8359ecb70e61cf10dbececcb2d0943236658"
   dependencies:
@@ -55,14 +55,14 @@
     "@hawtio/core-dts" "~3.0.12"
     "@hawtio/ui" "~3.0.25"
 
-"@hawtio/jmx@3.2.9":
-  version "3.2.9"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.9.tgz#8fe9c2aef9a3684b1bccc08f2b910049e1db84b2"
+"@hawtio/jmx@3.2.11":
+  version "3.2.11"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.11.tgz#f6ec5654ed2aa8821b9c544de30ab15bfec340ea"
   dependencies:
-    "@hawtio/core" "3.2.9"
+    "@hawtio/core" "3.2.10"
     "@hawtio/forms" "3.0.12"
     "@hawtio/ui" "3.2.0"
-    "@hawtio/utilities" "3.2.0"
+    "@hawtio/utilities" "3.2.1"
     "@types/jqueryui" "1.12.0"
     angular-patternfly "4.14.0"
     angular-resizable "1.2.0"
@@ -103,7 +103,7 @@
     codemirror "5.33.0"
     js-beautify "1.7.5"
 
-"@hawtio/utilities@3.2.0", "@hawtio/utilities@~3.0.8":
+"@hawtio/utilities@3.2.0", "@hawtio/utilities@3.2.1", "@hawtio/utilities@~3.0.8":
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/@hawtio/utilities/-/utilities-3.2.0.tgz#31506054856fdd3013ab3e4c8dadbcb55f599ef9"
   dependencies:
