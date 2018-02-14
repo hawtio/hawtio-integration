@@ -178,7 +178,7 @@
     "jquery": "2.2.4",
     "lodash": "4.17.4",
     "urijs": "1.19.0",
-    "@hawtio/core": "3.2.10",
+    "@hawtio/core": "3.2.11",
     "@hawtio/utilities": "3.2.0",
     "@hawtio/core-dts": "3.0.18",
     "@types/lodash": "4.14.91",
