@@ -1,12 +1,24 @@
+<h1>Add Endpoint</h1>
 <div ng-controller="Camel.EndpointController" ng-switch="hasComponentNames">
   <div ng-switch-when="true">
-    <tabs>
-      <pane heading="URL">
-        <ng-include src="'plugins/camel/html/createEndpointURL.html'"></ng-include>
-      </pane>
-      <pane heading="Components">
-        <ng-include src="'plugins/camel/html/createEndpointWizard.html'"></ng-include>
-      </pane>
+    <div class="radio">
+      <label>
+        <input type="radio" ng-model="inputSource" value="uri">
+        From URI
+      </label>
+    </div>
+    <div ng-show="inputSource === 'uri'">
+      <ng-include src="'plugins/camel/html/createEndpointURL.html'"></ng-include>
+    </div>
+    <div class="radio">
+      <label>
+        <input type="radio" ng-model="inputSource" value="wizard">
+        From data
+      </label>
+    </div>
+    <div ng-show="inputSource === 'wizard'">
+      <ng-include src="'plugins/camel/html/createEndpointWizard.html'"></ng-include>
+    </div>
     </tabs>
   </div>
   <div ng-switch-default="false">

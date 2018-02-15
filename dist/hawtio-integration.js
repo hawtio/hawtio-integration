@@ -17647,6 +17647,111 @@ var Camel;
 })(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
+    var Endpoint = /** @class */ (function () {
+        Endpoint.$inject = ["uri", "state", "mbean"];
+        function Endpoint(uri, state, mbean) {
+            'ngInject';
+            this.uri = uri;
+            this.state = state;
+            this.mbean = mbean;
+        }
+        return Endpoint;
+    }());
+    Camel.Endpoint = Endpoint;
+})(Camel || (Camel = {}));
+/// <reference path="endpoint.ts"/>
+var Camel;
+(function (Camel) {
+    var EndpointsService = /** @class */ (function () {
+        EndpointsService.$inject = ["$q", "jolokiaService", "workspace"];
+        function EndpointsService($q, jolokiaService, workspace) {
+            'ngInject';
+            this.$q = $q;
+            this.jolokiaService = jolokiaService;
+            this.workspace = workspace;
+        }
+        EndpointsService.prototype.getEndpoints = function () {
+            if (this.workspace.selection && this.workspace.selection.children.length > 0) {
+                var mbeans_1 = this.workspace.selection.children.map(function (node) { return node.objectName; });
+                return this.jolokiaService.readMany(mbeans_1)
+                    .then(function (objects) { return objects.map(function (object, i) { return new Camel.Endpoint(object.EndpointUri, object.State, mbeans_1[i]); }); });
+            }
+            else {
+                return this.$q.resolve([]);
+            }
+        };
+        EndpointsService.prototype.canCreateEndpoints = function () {
+            return this.workspace.selection &&
+                this.workspace.hasInvokeRights(this.workspace.selection, "createEndpoint");
+        };
+        return EndpointsService;
+    }());
+    Camel.EndpointsService = EndpointsService;
+})(Camel || (Camel = {}));
+/// <reference path="endpoint.ts"/>
+/// <reference path="endpoints.service.ts"/>
+var Camel;
+(function (Camel) {
+    var EndpointsController = /** @class */ (function () {
+        EndpointsController.$inject = ["$location", "endpointsService"];
+        function EndpointsController($location, endpointsService) {
+            'ngInject';
+            var _this = this;
+            this.$location = $location;
+            this.endpointsService = endpointsService;
+            this.addAction = {
+                name: 'Add',
+                actionFn: function (action) {
+                    _this.$location.path('/camel/createEndpoint');
+                },
+                isDisabled: true
+            };
+            this.toolbarConfig = {
+                actionsConfig: {
+                    primaryActions: [
+                        this.addAction
+                    ]
+                },
+                isTableView: true
+            };
+            this.tableConfig = {
+                selectionMatchProp: 'uri',
+                showCheckboxes: false
+            };
+            this.tableDtOptions = {
+                order: [[0, "asc"]],
+            };
+            this.tableColumns = [
+                { header: 'URI', itemField: 'uri' },
+                { header: 'State', itemField: 'state' }
+            ];
+        }
+        EndpointsController.prototype.$onInit = function () {
+            var _this = this;
+            this.endpointsService.getEndpoints()
+                .then(function (endpoints) { return _this.endpoints = endpoints; });
+            this.addAction.isDisabled = !this.endpointsService.canCreateEndpoints();
+        };
+        return EndpointsController;
+    }());
+    Camel.EndpointsController = EndpointsController;
+    Camel.endpointsComponent = {
+        template: "\n      <h2>Endpoints</h2>\n      <p ng-if=\"!$ctrl.endpoints\">Loading...</p>\n      <div ng-if=\"$ctrl.endpoints\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <pf-table-view config=\"$ctrl.tableConfig\"\n                       dt-options=\"$ctrl.tableDtOptions\"\n                       columns=\"$ctrl.tableColumns\"\n                       items=\"$ctrl.endpoints\"></pf-table-view>\n      </div>\n    ",
+        controller: EndpointsController
+    };
+})(Camel || (Camel = {}));
+/// <reference path="endpoints.component.ts"/>
+/// <reference path="endpoints.service.ts"/>
+var Camel;
+(function (Camel) {
+    Camel.endpointsModule = angular
+        .module('hawtio-camel-endpoints', [])
+        .component('endpoints', Camel.endpointsComponent)
+        .service('endpointsService', Camel.EndpointsService)
+        .name;
+})(Camel || (Camel = {}));
+var Camel;
+(function (Camel) {
     var Route = /** @class */ (function () {
         function Route(name, state, mbean) {
             this.name = name;
@@ -17990,10 +18095,6 @@ var Camel;
             this.$scope.$on('$routeChangeStart', function () { return Jmx.updateTreeSelectionFromURL(_this.$location, $(Camel.treeElementId)); });
             this.$scope.$watch(angular.bind(this, function () { return _this.workspace.tree; }), function () { return _this.populateTree(); });
             this.$scope.$on('jmxTreeUpdated', function () { return _this.populateTree(); });
-            this.$scope.$on('jmxTreeClicked', function (event, selection) { return _this.navigateToDefaultTab(selection); });
-            if (this.workspace.selection) {
-                this.navigateToDefaultTab(this.workspace.selection);
-            }
         };
         TreeController.prototype.treeFetched = function () {
             return this.workspace.treeFetched;
@@ -18043,43 +18144,6 @@ var Camel;
                 // Then call the tree clean-up method
                 tree.remove();
             }
-        };
-        // TODO: the logic should ideally be factorized with that of the visible tabs
-        TreeController.prototype.navigateToDefaultTab = function (selection) {
-            var path = '/jmx/attributes';
-            if (this.workspace.isRoutesFolder()) {
-                path = '/camel/routes';
-            }
-            else if (this.workspace.isRoute()) {
-                if (this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(this.workspace), 'dumpRoutesAsXml')) {
-                    path = '/camel/routeDiagram';
-                }
-                else {
-                    path = '/jmx/attributes';
-                }
-            }
-            else if (this.workspace.selection && this.workspace.selection.key === 'camelContexts') {
-                path = '/camel/contexts';
-            }
-            else if (Camel.isRouteNode(this.workspace)) {
-                path = 'camel/propertiesRoute';
-            }
-            else if (this.workspace.isComponent()
-                && Camel.isCamelVersionEQGT(2, 15, this.workspace, this.jolokia)
-                && this.workspace.hasInvokeRights(this.workspace.selection, 'explainComponentJson')) {
-                path = '/camel/propertiesComponent';
-            }
-            else if (this.workspace.isEndpoint()
-                && Camel.isCamelVersionEQGT(2, 15, this.workspace, this.jolokia)
-                && this.workspace.hasInvokeRights(this.workspace.selection, 'explainEndpointJson')) {
-                path = '/camel/propertiesEndpoint';
-            }
-            else if (this.workspace.isDataformat()
-                && Camel.isCamelVersionEQGT(2, 16, this.workspace, this.jolokia)
-                && this.workspace.hasInvokeRights(this.workspace.selection, "explainDataFormatJson")) {
-                path = '/camel/propertiesDataFormat';
-            }
-            this.$location.path(path);
         };
         return TreeController;
     }());
@@ -18161,6 +18225,7 @@ var Camel;
 })(Camel || (Camel = {}));
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="contexts/contexts.module.ts"/>
+/// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
 var Camel;
@@ -18171,6 +18236,7 @@ var Camel;
         'patternfly.table',
         'angularResizable',
         Camel.contextsModule,
+        Camel.endpointsModule,
         Camel.routesModule,
         Camel.treeModule,
     ]);
@@ -18178,6 +18244,7 @@ var Camel;
             $routeProvider
                 .when('/camel/contexts', { template: '<contexts></contexts>' })
                 .when('/camel/routes', { template: '<routes></routes>' })
+                .when('/camel/endpoints', { template: '<endpoints></endpoints>' })
                 .when('/camel/browseEndpoint', { templateUrl: 'plugins/camel/html/browseEndpoint.html' })
                 .when('/camel/endpoint/browse/:contextId/*endpointPath', { templateUrl: 'plugins/camel/html/browseEndpoint.html' })
                 .when('/camel/createEndpoint', { templateUrl: 'plugins/camel/html/createEndpoint.html' })
@@ -18631,7 +18698,6 @@ var Camel;
             var isTraceMBean = Camel.getSelectionCamelTraceMBean(this.workspace) !== null;
             var canBrowse = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelInflightRepository(this.workspace), "browse");
             var canBrowseAllMessagesAsXml = this.workspace.hasInvokeRights(this.workspace.selection, "browseAllMessagesAsXml");
-            var canCreateEndpoint = this.workspace.hasInvokeRights(this.workspace.selection, "createEndpoint");
             var canDumpRoutesAsXml = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(this.workspace), "dumpRoutesAsXml");
             var canExplainEndpointJson = this.workspace.hasInvokeRights(this.workspace.selection, "explainEndpointJson");
             var canExplainComponentJson = this.workspace.hasInvokeRights(this.workspace.selection, "explainComponentJson");
@@ -18643,6 +18709,9 @@ var Camel;
             var canListTypeConverters = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelTypeConverter(this.workspace), "listTypeConverters");
             var canSeeEndpointStatistics = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelEndpointRuntimeRegistry(this.workspace), "endpointStatistics");
             var canSendMesssage = this.workspace.hasInvokeRights(this.workspace.selection, this.workspace.selection && this.workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage");
+            if (!isContextsFolder && !isRoutesFolder) {
+                tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
+            }
             if (isContextsFolder) {
                 tabs.push(new Core.HawtioTab('Contexts', '/camel/contexts'));
             }
@@ -18705,11 +18774,8 @@ var Camel;
             if (isEndpoint && canSendMesssage) {
                 tabs.push(new Core.HawtioTab('Send', '/camel/sendMessage'));
             }
-            if (isEndpointsFolder && canCreateEndpoint) {
-                tabs.push(new Core.HawtioTab('Endpoint', '/camel/createEndpoint'));
-            }
-            if (!isContextsFolder && !isRoutesFolder) {
-                tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
+            if (isEndpointsFolder) {
+                tabs.push(new Core.HawtioTab('Endpoints', '/camel/endpoints'));
             }
             if (!isContextsFolder && !isRoutesFolder) {
                 tabs.push(new Core.HawtioTab('Operations', '/jmx/operations'));
@@ -19373,6 +19439,7 @@ var Camel;
             $scope.loadEndpointNames();
             $scope.workspace = workspace;
             $scope.message = "";
+            $scope.cancel = function () { return $location.path('/camel/endpoints'); };
             $scope.createEndpoint = function (name) {
                 var jolokia = workspace.jolokia;
                 if (jolokia) {
@@ -20899,211 +20966,6 @@ var Camel;
             };
             updateRoutes();
         }]);
-})(Camel || (Camel = {}));
-/// <reference path="camelPlugin.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.TabsController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.tabs = [
-                {
-                    id: 'jmx-attributes',
-                    title: 'Attributes',
-                    path: "/jmx/attributes",
-                    show: function () { return !isContextsFolder(workspace) && !workspace.isRoutesFolder(); }
-                },
-                {
-                    id: 'camel-contexts',
-                    title: 'Contexts',
-                    path: "/camel/contexts",
-                    show: function () { return isContextsFolder(workspace); }
-                },
-                {
-                    id: 'camel-routes',
-                    title: 'Routes',
-                    path: "/camel/routes",
-                    show: function () { return workspace.isRoutesFolder(); }
-                },
-                {
-                    id: 'camel-route-diagram',
-                    title: 'Route Diagram',
-                    path: "/camel/routeDiagram",
-                    show: function () { return (workspace.isRoute() || workspace.isRoutesFolder())
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"); }
-                },
-                {
-                    id: 'camel-route-source',
-                    title: 'Source',
-                    path: "/camel/source",
-                    show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && (workspace.isRoute() || workspace.isRoutesFolder())
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelContextMBean(workspace), "dumpRoutesAsXml"); },
-                    isSelected: function () { return workspace.isLinkActive('camel/source'); }
-                },
-                {
-                    id: 'camel-route-properties',
-                    title: 'Properties',
-                    path: "/camel/propertiesRoute",
-                    show: function () { return Camel.isRouteNode(workspace); }
-                },
-                {
-                    id: 'camel-endpoint-properties',
-                    title: 'Properties',
-                    path: "/camel/propertiesEndpoint",
-                    show: function () { return workspace.isEndpoint()
-                        && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-                        && workspace.hasInvokeRights(workspace.selection, "explainEndpointJson"); }
-                },
-                {
-                    id: 'camel-component-properties',
-                    title: 'Properties',
-                    path: "/camel/propertiesComponent",
-                    show: function () { return workspace.isComponent()
-                        && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-                        && workspace.hasInvokeRights(workspace.selection, "explainComponentJson"); }
-                },
-                {
-                    id: 'camel-dataformat-properties',
-                    title: 'Properties',
-                    path: "/camel/propertiesDataFormat",
-                    show: function () { return workspace.isDataformat()
-                        && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
-                        && workspace.hasInvokeRights(workspace.selection, "explainDataFormatJson"); }
-                },
-                {
-                    id: 'camel-exchanges',
-                    title: 'Exchanges',
-                    path: "/camel/exchanges",
-                    show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && !workspace.isComponentsFolder() && !workspace.isComponent()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder() || workspace.isRoute())
-                        && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelInflightRepository(workspace), "browse"); }
-                },
-                // {
-                //   id: 'camel-blocked-exchanges',
-                //   title: 'Blocked',
-                //   path: "/camel/blocked",
-                //   show: () => !workspace.isEndpointsFolder()
-                //     && (workspace.isRoute() || workspace.isRoutesFolder())
-                //     && Camel.isCamelVersionEQGT(2, 15, workspace, jolokia)
-                //     && workspace.hasInvokeRightsForName(getSelectionCamelBlockedExchanges(workspace), "browse")
-                // },
-                {
-                    id: 'camel-route-metrics',
-                    title: 'Route Metrics',
-                    path: "/camel/routeMetrics",
-                    show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder())
-                        && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
-                        && Camel.getSelectionCamelRouteMetrics(workspace)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelRouteMetrics(workspace), "dumpStatisticsAsJson"); }
-                },
-                {
-                    id: 'camel-rest-services',
-                    title: 'REST Services',
-                    path: "/camel/restServices",
-                    show: function () { return !Camel.getSelectedRouteNode(workspace)
-                        && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && !workspace.isComponentsFolder() && !workspace.isComponent()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder())
-                        && Camel.isCamelVersionEQGT(2, 14, workspace, jolokia)
-                        && Camel.getSelectionCamelRestRegistry(workspace)
-                        && hasRestServices(workspace, jolokia)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelRestRegistry(workspace), "listRestServices"); }
-                },
-                {
-                    id: 'camel-endpoint-runtime-registry',
-                    title: 'Endpoints (in/out)',
-                    path: "/camel/endpointRuntimeRegistry",
-                    show: function () { return !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && !workspace.isComponentsFolder() && !workspace.isComponent()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder())
-                        && Camel.isCamelVersionEQGT(2, 16, workspace, jolokia)
-                        && Camel.getSelectionCamelEndpointRuntimeRegistry(workspace)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelEndpointRuntimeRegistry(workspace), "endpointStatistics"); }
-                },
-                {
-                    id: 'camel-type-converters',
-                    title: 'Type Converters',
-                    path: "/camel/typeConverter",
-                    show: function () { return !Camel.getSelectedRouteNode(workspace)
-                        && !workspace.isEndpointsFolder() && !workspace.isEndpoint()
-                        && !workspace.isComponentsFolder() && !workspace.isComponent()
-                        && (workspace.isCamelContext() || workspace.isRoutesFolder())
-                        && Camel.isCamelVersionEQGT(2, 13, workspace, jolokia)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTypeConverter(workspace), "listTypeConverters"); }
-                },
-                {
-                    id: 'camel-route-profile',
-                    title: 'Profile',
-                    path: "/camel/profileRoute",
-                    show: function () { return workspace.isRoute()
-                        && Camel.getSelectionCamelTraceMBean(workspace)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"); }
-                },
-                {
-                    id: 'camel-route-debug',
-                    title: 'Debug',
-                    path: "/camel/debugRoute",
-                    show: function () { return workspace.isRoute()
-                        && Camel.getSelectionCamelDebugMBean(workspace)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelDebugMBean(workspace), "getBreakpoints"); }
-                },
-                {
-                    id: 'camel-route-trace',
-                    title: 'Trace',
-                    path: "/camel/traceRoute",
-                    show: function () { return workspace.isRoute()
-                        && Camel.getSelectionCamelTraceMBean(workspace)
-                        && workspace.hasInvokeRightsForName(Camel.getSelectionCamelTraceMBean(workspace), "dumpAllTracedMessagesAsXml"); }
-                },
-                {
-                    id: 'camel-endpoint-browser',
-                    title: 'Browse',
-                    path: "/camel/browseEndpoint",
-                    show: function () { return workspace.isEndpoint()
-                        && workspace.hasInvokeRights(workspace.selection, "browseAllMessagesAsXml"); }
-                },
-                {
-                    id: 'camel-endpoint-send',
-                    title: 'Send',
-                    path: "/camel/sendMessage",
-                    show: function () { return workspace.isEndpoint()
-                        && workspace.hasInvokeRights(workspace.selection, workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage"); }
-                },
-                {
-                    id: 'camel-endpoint-create',
-                    title: 'Endpoint',
-                    path: "/camel/createEndpoint",
-                    show: function () { return workspace.isEndpointsFolder()
-                        && workspace.hasInvokeRights(workspace.selection, "createEndpoint"); }
-                },
-                {
-                    id: 'jmx-operations',
-                    title: 'Operations',
-                    path: "/jmx/operations",
-                    show: function () { return !isContextsFolder(workspace) && !workspace.isRoutesFolder(); }
-                },
-                {
-                    id: 'jmx-charts',
-                    title: 'Chart',
-                    path: "/jmx/charts",
-                    show: function () { return !isContextsFolder(workspace) && !workspace.isRoutesFolder(); }
-                }
-            ];
-            $scope.isActive = function (tab) { return workspace.isLinkActive(tab.path); };
-            $scope.goto = function (path) { return $location.path(path); };
-        }]);
-    function isContextsFolder(workspace) {
-        return workspace.selection && workspace.selection.key === 'camelContexts';
-    }
-    var _hasRestServices = null;
-    function hasRestServices(workspace, jolokia) {
-        if (_hasRestServices === null) {
-            _hasRestServices = Camel.hasRestServices(workspace, jolokia);
-        }
-        return _hasRestServices;
-    }
 })(Camel || (Camel = {}));
 /// <reference path="../../activemq/ts/activemqHelpers.ts"/>
 /// <reference path="camelPlugin.ts"/>
@@ -26528,9 +26390,9 @@ $templateCache.put('plugins/activemq/html/preferences.html','<div ng-controller=
 $templateCache.put('plugins/camel/html/blocked.html','<div class="table-view" ng-controller="Camel.BlockedExchangesController">\n\n  <h3>Blocked</h3>\n  \n  <p ng-if="!initDone">Loading...</p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No blocked exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n            <div class="form-group">\n              <button type="button" class="btn btn-default" ng-disabled="gridOptions.selectedItems.length === 0"\n                ng-click="unblockDialog = true" data-placement="bottom">Unblock</button>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="unblockDialog" ok-button-text="Unblock" cancel-button-text="Cancel" on-ok="doUnblock()"\n       title="Unblock Exchange">\n    <div class="dialog-body">\n      <p>You are about to unblock the selected thread.</p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/browseEndpoint.html','<div ng-controller="Camel.BrowseEndpointController">\n\n  <div ng-class="{\'wiki-fixed\' : !isJmxTab}">\n\n    <h2>Browse</h2>\n\n    <div class="row toolbar-pf">\n      <div class="col-md-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group">\n            <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="openForwardDialog()"\n                    hawtio-show object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"\n                    title="Forward the selected messages to another endpoint" data-placement="bottom">\n              Forward\n            </button>\n            <button class="btn btn-default" ng-click="refresh()" title="Refreshes the list of messages">\n              Refresh\n            </button>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="search1" class="sr-only">Filter</label>\n                <input id="search1" type="search" class="form-control" ng-model="gridOptions.filterOptions.filterText"\n                      placeholder="Search">\n                <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="col-md-12">\n        <table class="table" hawtio-simple-table="gridOptions"></table>\n      </div>\n    </div>\n\n    <script type="text/ng-template" id="camelBrowseEndpointMessageDetails.html">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <div class="row">\n          <div class="col-md-4">\n            <h4 class="modal-title" id="myModalLabel">Message</h4>\n          </div>\n          <div class="col-md-7">\n            <div class=""\n                hawtio-pager="messages"\n                on-index-change="selectRowIndex"\n                row-index="rowIndex">\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class="modal-body camel-forward-message">\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Forward to endpoint</dt>\n              <dd>\n                <form class="form-inline camel-forward-message" ng-submit="forwardMessage(row, endpointUri)">\n                  <input type="text" class="form-control camel-forward-message" ng-model="endpointUri" placeholder="URI"\n                          uib-typeahead="title for title in endpointUris() | filter:$viewValue" required>\n                  <button type="submit" class="btn btn-default" hawtio-show \n                          object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"\n                          data-placement="bottom" title="Forward the selected messages to another endpoint">\n                    Forward\n                  </button>\n                </form>\n              </dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>ID</dt>\n              <dd>{{row.id}}</dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Body</dt>\n              <dd><div hawtio-editor="row.body" read-only="true" mode="mode"></div></dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Headers</dt>\n              <dd>\n                <table class="table">\n                  <thead>\n                    <tr>\n                      <th>Name</th>\n                      <th>Type</th>\n                      <th>Value</th>\n                    </tr>\n                  </thead>\n                  <tbody compile="row.headerHtml"></tbody>\n                </table>\n              </dd>\n            </dl>\n          </div>\n        </div>\n      </div>\n    </script>\n\n    <script type="text/ng-template" id="camelBrowseEndpointForwardMessage.html">\n      <form class="form-horizontal" ng-submit="forwardMessages(endpointUri); $close();">\n        <div class="modal-header">\n          <button type="button" class="close" aria-label="Close" ng-click="$close()">\n            <span class="pficon pficon-close" aria-hidden="true"></span>\n          </button>\n          <h4>\n            Forward to endpoint\n          </h4>\n        </div>\n        <div class="modal-body">\n            <div class="form-group">\n              <label class="col-sm-1 control-label" for="endpointUri">URI</label>\n              <div class="col-sm-11">\n                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri" required\n                        uib-typeahead="title for title in endpointUris() | filter:$viewValue">\n              </div>\n            </div>\n        </div>\n        <div class="modal-footer">\n          <button type="button" class="btn btn-default" ng-click="$close()">Close</button>\n          <button type="submit" class="btn btn-primary">Forward</button>\n        </div>\n      </form>\n    </script>\n\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/browseRoute.html','<ng-include src="\'plugins/camel/html/browseMessageTemplate.html\'"></ng-include>\n\n<div class="row">\n  <table class="table table-striped" hawtio-simple-table="gridOptions"></table>\n  <!--\n      <div class="gridStyle" hawtio-datatable="gridOptions"></div>\n  -->\n</div>\n');
-$templateCache.put('plugins/camel/html/createEndpoint.html','<div ng-controller="Camel.EndpointController" ng-switch="hasComponentNames">\n  <div ng-switch-when="true">\n    <tabs>\n      <pane heading="URL">\n        <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n      </pane>\n      <pane heading="Components">\n        <ng-include src="\'plugins/camel/html/createEndpointWizard.html\'"></ng-include>\n      </pane>\n    </tabs>\n  </div>\n  <div ng-switch-default="false">\n    <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n  </div>\n</div>\n');
-$templateCache.put('plugins/camel/html/createEndpointURL.html','<form class="form-horizontal">\n  <div class="control-group">\n    <input class="col-md-12" type="text" size="255" ng-model="endpointName" placeholder="Endpoint URI"/>\n  </div>\n  <div class="control-group">\n    <button type="submit" class="btn btn-info" ng-click="createEndpoint(endpointName)"\n            ng-disabled="!endpointName">\n      Create endpoint from URI\n    </button>\n  </div>\n</form>\n');
-$templateCache.put('plugins/camel/html/createEndpointWizard.html','<div ng-controller="Camel.EndpointController">\n  <form class="form-horizontal">\n    <div class="control-group">\n      <label class="control-label" for="componentName">Component</label>\n\n      <div class="controls">\n        <select id="componentName" ng-model="selectedComponentName"\n                ng-options="componentName for componentName in componentNames"></select>\n      </div>\n    </div>\n    <div ng-show="selectedComponentName">\n      <div class="control-group">\n        <label class="control-label" for="endpointPath">Endpoint</label>\n\n        <div class="controls">\n          <input id="endpointPath" class="col-md-10" type="text" ng-model="endpointPath" placeholder="name"\n                 uib-typeahead="title for title in endpointCompletions($viewValue) | filter:$viewValue"\n                 min-length="1">\n        </div>\n      </div>\n\n      <div simple-form name="formEditor" entity=\'endpointParameters\' data=\'endpointSchema\' schema="schema"></div>\n\n      <div class="control-group">\n        <div class="controls">\n          <button type="submit" class="btn btn-info" ng-click="createEndpointFromData()"\n                  ng-disabled="!endpointPath || !selectedComponentName">\n            Create endpoint from data\n          </button>\n        </div>\n      </div>\n    </div>\n  </form>\n</div>\n');
+$templateCache.put('plugins/camel/html/createEndpoint.html','<h1>Add Endpoint</h1>\n<div ng-controller="Camel.EndpointController" ng-switch="hasComponentNames">\n  <div ng-switch-when="true">\n    <div class="radio">\n      <label>\n        <input type="radio" ng-model="inputSource" value="uri">\n        From URI\n      </label>\n    </div>\n    <div ng-show="inputSource === \'uri\'">\n      <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n    </div>\n    <div class="radio">\n      <label>\n        <input type="radio" ng-model="inputSource" value="wizard">\n        From data\n      </label>\n    </div>\n    <div ng-show="inputSource === \'wizard\'">\n      <ng-include src="\'plugins/camel/html/createEndpointWizard.html\'"></ng-include>\n    </div>\n    </tabs>\n  </div>\n  <div ng-switch-default="false">\n    <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n  </div>\n</div>\n');
+$templateCache.put('plugins/camel/html/createEndpointURL.html','<form class="form-horizontal">\n  <div class="form-group">\n    <label class="col-sm-2 control-label" for="endpointName">URI</label>\n    <div class="col-sm-10">\n      <input type="text" class="form-control" size="255" ng-model="endpointName">\n    </div>\n  </div>\n  <div class="form-group">\n    <div class="col-sm-offset-2 col-sm-10">\n      <button type="button" class="btn btn-default" ng-click="cancel()">\n        Cancel\n      </button>\n      <button type="submit" class="btn btn-primary" ng-click="createEndpoint(endpointName)"\n              ng-disabled="!endpointName">\n        Add\n      </button>\n    </div>\n  </div>\n</form>\n');
+$templateCache.put('plugins/camel/html/createEndpointWizard.html','<div ng-controller="Camel.EndpointController">\n  <form class="form-horizontal">\n    <div class="form-group">\n      <label class="col-sm-2 control-label" for="componentName">Component</label>\n      <div class="col-sm-5">\n        <select id="componentName" class="form-control" ng-model="selectedComponentName"\n                ng-options="componentName for componentName in componentNames"></select>\n      </div>\n    </div>\n    <div ng-show="selectedComponentName">\n      <div class="form-group">\n        <label class="col-sm-2 control-label" for="endpointPath">Endpoint</label>\n        <div class="col-sm-10">\n          <input id="endpointPath" class="form-control" type="text" ng-model="endpointPath" placeholder="name"\n                  uib-typeahead="title for title in endpointCompletions($viewValue) | filter:$viewValue"\n                  min-length="1">\n        </div>\n      </div>\n      <div simple-form name="formEditor" entity=\'endpointParameters\' data=\'endpointSchema\' schema="schema"></div>\n      <div class="form-group">\n        <div class="col-sm-offset-2 col-sm-10">\n          <button type="button" class="btn btn-default" ng-click="cancel()">\n            Cancel\n          </button>\n          <button type="submit" class="btn btn-primary" ng-click="createEndpointFromData()"\n                  ng-disabled="!endpointPath || !selectedComponentName">\n            Add\n          </button>\n        </div>\n      </div>\n    </div>\n  </form>\n</div>\n');
 $templateCache.put('plugins/camel/html/debug.html','<div class="camel-debug-main" ng-controller="Camel.DebugRouteController">\n  \n  <div class="row camel-debug-header">\n    <div class="col-sm-6">\n      <h2>Debug</h2>\n    </div>\n    <div class="col-sm-6">\n      <button type="button" class="btn btn-primary pull-right" ng-if="debugging" ng-click="stopDebugging()">\n        Stop debugging\n      </button>\n    </div>\n  </div>\n  \n  <div ng-if="!debugging">\n    <p>Debugging allows you to step through camel routes to diagnose issues.</p>\n    <button type="button" class="btn btn-primary" ng-click="startDebugging()"\n      hawtio-show object-name="{{camelDebugMBean}}" method-name="enableDebugger" mode="remove">\n      Start debugging\n    </button>\n    <div class="alert alert-info"\n      hawtio-show object-name="{{camelDebugMBean}}" method-name="enableDebugger" mode="inverse">\n      <span class="pficon pficon-info"></span>\n      Debugging is not allowed for this user.\n    </div>\n  </div>\n  \n  <div class="toolbar-pf camel-debug-toolbar" ng-if="debugging">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <div ng-switch="hasBreakpoint">\n          <button type="button" ng-switch-when="true" class="btn btn-default" ng-disabled="!selectedDiagramNodeId"\n                  ng-click="removeBreakpoint()" title="Remove the breakpoint on the selected node">\n            Remove breakpoint\n          </button>\n          <button type="button" ng-switch-default="false" class="btn btn-default" ng-disabled="shouldDisableAddBreakpoint()"\n                  ng-click="addBreakpoint()" title="Add a breakpoint on the selected node">\n            Add breakpoint\n          </button>\n        </div>\n      </div>\n      <div class="form-group camel-debug-icon-buttons">\n        <button type="button" class="btn btn-default" ng-click="step()" ng-disabled="!stopped"\n                title="Step into the next node">\n          <i class="fa fa-arrow-down" aria-hidden="true"></i>\n        </button>\n        <button type="button" class="btn btn-default" ng-click="resume()" ng-disabled="!stopped"\n                title="Resume running">\n          <i class="fa fa-play" aria-hidden="true"></i>\n        </button>\n        <button type="button" class="btn btn-default" ng-click="suspend()" ng-disabled="stopped"\n                title="Suspend all threads in this route">\n          <i class="fa fa-pause" aria-hidden="true"></i>\n        </button>\n      </div>\n    </form>\n  </div>\n\n  <div class="camel-debug-diagram-wrapper" ng-include src="graphView" ng-if="debugging"></div>\n\n  <div class="camel-debug-bottom-panel" resizable r-directions="[\'top\']" r-flex="true" ng-if="debugging"\n    ng-show="showDebugPanel">\n    <div class="camel-debug-bottom-panel-left">\n      <ul class="nav nav-tabs" ng-init="activeTab = \'headers\'">\n        <li ng-class="{\'active\': activeTab === \'headers\' && stopped}">\n          <a href="" ng-click="activeTab = \'headers\'" ng-class="{\'disabled\': !stopped}">Headers</a>\n        </li>\n        <li ng-class="{\'active\': activeTab === \'body\' && stopped}">\n          <a href="" ng-click="activeTab = \'body\'" ng-class="{\'disabled\': !stopped}">Body</a>\n        </li>\n      </ul>\n      <div class="camel-debug-headers-contents" ng-show="activeTab === \'headers\'">\n        <div ng-repeat="(key, value) in row.headers"><label>{{key}}:</label> {{value}}</div>\n      </div>\n      <div class="camel-debug-body-contents" ng-show="activeTab === \'body\'">\n        <em class="camel-debug-no-body-text" ng-show="row.body === \'[Body is null]\'">No Body</em>\n        <pre ng-show="row.body !== \'[Body is null]\'">{{row.body}}</pre>\n      </div>\n    </div>\n    <div class="camel-debug-bottom-panel-right">\n      <ul class="nav nav-tabs">\n        <li>\n          <a>Breakpoints</a>\n        </li>\n      </ul>\n      <ul class="camel-debug-breakpoints-list list-unstyled">\n        <li ng-class="{\'suspended\': isSuspendedAt(b)}"\n          ng-repeat="b in breakpoints">\n          <span>{{b}}</span>\n          <button type="button" class="close" aria-label="Close" title="Remove breakpoint"\n            ng-click="removeBreakpointById(b)">\n            <span aria-hidden="true">&times;</span>\n          </button>\n        </li>\n      </ul>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/deleteContextWarningModal.html','<div class="modal-header">\n  <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n    <span class="pficon pficon-close" aria-hidden="true"></span>\n  </button>\n  <h4>Are you sure?</h4>\n</div>\n<div class="modal-body">\n  <p>You are about to delete this Camel Context.</p>\n  <p>This operation cannot be undone so please be careful.</p>\n</div>\n<div class="modal-footer">\n  <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n  <button type="button" class="btn btn-danger" ng-click="$close()">Delete</button>\n</div>\n');
 $templateCache.put('plugins/camel/html/deleteRouteWarningModal.html','<div class="modal-header">\n  <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n    <span class="pficon pficon-close" aria-hidden="true"></span>\n  </button>\n  <h4>Are you sure?</h4>\n</div>\n<div class="modal-body">\n  <p>You are about to delete this Camel route.</p>\n  <p>This operation cannot be undone so please be careful.</p>\n</div>\n<div class="modal-footer">\n  <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n  <button type="button" class="btn btn-danger" ng-click="$close()">Delete</button>\n</div>\n');

@@ -33,7 +33,6 @@ namespace Camel {
       const isTraceMBean = Camel.getSelectionCamelTraceMBean(this.workspace) !== null;
       const canBrowse = this.workspace.hasInvokeRightsForName(getSelectionCamelInflightRepository(this.workspace), "browse");
       const canBrowseAllMessagesAsXml = this.workspace.hasInvokeRights(this.workspace.selection, "browseAllMessagesAsXml");
-      const canCreateEndpoint = this.workspace.hasInvokeRights(this.workspace.selection, "createEndpoint");
       const canDumpRoutesAsXml = this.workspace.hasInvokeRightsForName(getSelectionCamelContextMBean(this.workspace), "dumpRoutesAsXml");
       const canExplainEndpointJson = this.workspace.hasInvokeRights(this.workspace.selection, "explainEndpointJson");
       const canExplainComponentJson = this.workspace.hasInvokeRights(this.workspace.selection, "explainComponentJson");
@@ -45,6 +44,10 @@ namespace Camel {
       const canListTypeConverters = this.workspace.hasInvokeRightsForName(getSelectionCamelTypeConverter(this.workspace), "listTypeConverters");
       const canSeeEndpointStatistics = this.workspace.hasInvokeRightsForName(getSelectionCamelEndpointRuntimeRegistry(this.workspace), "endpointStatistics");
       const canSendMesssage = this.workspace.hasInvokeRights(this.workspace.selection, this.workspace.selection && this.workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage");
+      
+      if (!isContextsFolder && !isRoutesFolder) {
+        tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
+      }
       
       if (isContextsFolder) {
         tabs.push(new Core.HawtioTab('Contexts', '/camel/contexts'));
@@ -126,12 +129,8 @@ namespace Camel {
         tabs.push(new Core.HawtioTab('Send', '/camel/sendMessage'));
       }
 
-      if (isEndpointsFolder && canCreateEndpoint) {
-        tabs.push(new Core.HawtioTab('Endpoint', '/camel/createEndpoint'));
-      }
-
-      if (!isContextsFolder && !isRoutesFolder) {
-        tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
+      if (isEndpointsFolder) {
+        tabs.push(new Core.HawtioTab('Endpoints', '/camel/endpoints'));
       }
       
       if (!isContextsFolder && !isRoutesFolder) {

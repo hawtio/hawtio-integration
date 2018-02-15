@@ -16,6 +16,8 @@ namespace Camel {
     $scope.workspace = workspace;
     $scope.message = "";
 
+    $scope.cancel = () => $location.path('/camel/endpoints');
+
     $scope.createEndpoint = (name) => {
       var jolokia = workspace.jolokia;
       if (jolokia) {

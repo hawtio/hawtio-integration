@@ -1,11 +1,19 @@
 <form class="form-horizontal">
-  <div class="control-group">
-    <input class="col-md-12" type="text" size="255" ng-model="endpointName" placeholder="Endpoint URI"/>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="endpointName">URI</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" size="255" ng-model="endpointName">
+    </div>
   </div>
-  <div class="control-group">
-    <button type="submit" class="btn btn-info" ng-click="createEndpoint(endpointName)"
-            ng-disabled="!endpointName">
-      Create endpoint from URI
-    </button>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="button" class="btn btn-default" ng-click="cancel()">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-primary" ng-click="createEndpoint(endpointName)"
+              ng-disabled="!endpointName">
+        Add
+      </button>
+    </div>
   </div>
 </form>

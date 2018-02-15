@@ -20,12 +20,6 @@ namespace Camel {
       this.$scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL(this.$location, $(treeElementId)));
       this.$scope.$watch(angular.bind(this, () => this.workspace.tree), () => this.populateTree());
       this.$scope.$on('jmxTreeUpdated', () => this.populateTree());
-      this.$scope.$on('jmxTreeClicked',
-        (event, selection: Jmx.NodeSelection) => this.navigateToDefaultTab(selection));
-
-      if (this.workspace.selection) {
-        this.navigateToDefaultTab(this.workspace.selection);
-      }
     }
 
     treeFetched(): boolean {
@@ -80,35 +74,5 @@ namespace Camel {
       }
     }
 
-    // TODO: the logic should ideally be factorized with that of the visible tabs
-    private navigateToDefaultTab(selection: Jmx.NodeSelection) {
-      let path = '/jmx/attributes';
-      if (this.workspace.isRoutesFolder()) {
-        path = '/camel/routes';
-      } else if (this.workspace.isRoute()) {
-          if (this.workspace.hasInvokeRightsForName(getSelectionCamelContextMBean(this.workspace), 'dumpRoutesAsXml')) {
-            path = '/camel/routeDiagram';
-          } else {
-            path = '/jmx/attributes';
-          }
-      } else if (this.workspace.selection && this.workspace.selection.key === 'camelContexts') {
-        path = '/camel/contexts';
-      } else if (isRouteNode(this.workspace)) {
-        path = 'camel/propertiesRoute';
-      } else if (this.workspace.isComponent()
-          && Camel.isCamelVersionEQGT(2, 15, this.workspace, this.jolokia)
-          && this.workspace.hasInvokeRights(this.workspace.selection, 'explainComponentJson')) {
-        path = '/camel/propertiesComponent';
-      } else if (this.workspace.isEndpoint()
-          && Camel.isCamelVersionEQGT(2, 15, this.workspace, this.jolokia)
-          && this.workspace.hasInvokeRights(this.workspace.selection, 'explainEndpointJson')) {
-        path = '/camel/propertiesEndpoint';
-      } else if (this.workspace.isDataformat()
-          && Camel.isCamelVersionEQGT(2, 16, this.workspace, this.jolokia)
-          && this.workspace.hasInvokeRights(this.workspace.selection, "explainDataFormatJson")) {
-        path = '/camel/propertiesDataFormat';
-      }
-      this.$location.path(path);
-    }
   }
 }

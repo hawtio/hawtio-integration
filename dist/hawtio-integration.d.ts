@@ -650,6 +650,59 @@ declare namespace Camel {
     const contextsModule: string;
 }
 declare namespace Camel {
+    class Endpoint {
+        uri: string;
+        state: string;
+        mbean: string;
+        constructor(uri: string, state: string, mbean: string);
+    }
+}
+declare namespace Camel {
+    class EndpointsService {
+        private $q;
+        private jolokiaService;
+        private workspace;
+        constructor($q: ng.IQService, jolokiaService: JVM.JolokiaService, workspace: Jmx.Workspace);
+        getEndpoints(): ng.IPromise<Endpoint[]>;
+        canCreateEndpoints(): boolean;
+    }
+}
+declare namespace Camel {
+    class EndpointsController {
+        private $location;
+        private endpointsService;
+        private addAction;
+        toolbarConfig: {
+            actionsConfig: {
+                primaryActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+            };
+            isTableView: boolean;
+        };
+        tableConfig: {
+            selectionMatchProp: string;
+            showCheckboxes: boolean;
+        };
+        tableDtOptions: {
+            order: (string | number)[][];
+        };
+        tableColumns: {
+            header: string;
+            itemField: string;
+        }[];
+        endpoints: Endpoint[];
+        constructor($location: ng.ILocationService, endpointsService: EndpointsService);
+        $onInit(): void;
+    }
+    const endpointsComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const endpointsModule: string;
+}
+declare namespace Camel {
     class Route {
         name: string;
         state: string;
@@ -750,7 +803,6 @@ declare namespace Camel {
         private updateSelectionFromURL();
         private populateTree();
         private removeTree();
-        private navigateToDefaultTab(selection);
     }
 }
 declare namespace Camel {
@@ -1200,8 +1252,6 @@ declare namespace Camel {
         graph: graphlib.Graph;
     };
     function dagreUpdateGraphData(): void;
-}
-declare namespace Camel {
 }
 declare namespace Camel {
 }

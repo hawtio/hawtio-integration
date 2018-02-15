@@ -1,31 +1,30 @@
 <div ng-controller="Camel.EndpointController">
   <form class="form-horizontal">
-    <div class="control-group">
-      <label class="control-label" for="componentName">Component</label>
-
-      <div class="controls">
-        <select id="componentName" ng-model="selectedComponentName"
+    <div class="form-group">
+      <label class="col-sm-2 control-label" for="componentName">Component</label>
+      <div class="col-sm-5">
+        <select id="componentName" class="form-control" ng-model="selectedComponentName"
                 ng-options="componentName for componentName in componentNames"></select>
       </div>
     </div>
     <div ng-show="selectedComponentName">
-      <div class="control-group">
-        <label class="control-label" for="endpointPath">Endpoint</label>
-
-        <div class="controls">
-          <input id="endpointPath" class="col-md-10" type="text" ng-model="endpointPath" placeholder="name"
-                 uib-typeahead="title for title in endpointCompletions($viewValue) | filter:$viewValue"
-                 min-length="1">
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="endpointPath">Endpoint</label>
+        <div class="col-sm-10">
+          <input id="endpointPath" class="form-control" type="text" ng-model="endpointPath" placeholder="name"
+                  uib-typeahead="title for title in endpointCompletions($viewValue) | filter:$viewValue"
+                  min-length="1">
         </div>
       </div>
-
       <div simple-form name="formEditor" entity='endpointParameters' data='endpointSchema' schema="schema"></div>
-
-      <div class="control-group">
-        <div class="controls">
-          <button type="submit" class="btn btn-info" ng-click="createEndpointFromData()"
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="button" class="btn btn-default" ng-click="cancel()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" ng-click="createEndpointFromData()"
                   ng-disabled="!endpointPath || !selectedComponentName">
-            Create endpoint from data
+            Add
           </button>
         </div>
       </div>

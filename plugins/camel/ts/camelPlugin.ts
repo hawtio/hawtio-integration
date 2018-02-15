@@ -1,5 +1,6 @@
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="contexts/contexts.module.ts"/>
+/// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
 
@@ -12,6 +13,7 @@ namespace Camel {
     'patternfly.table',
     'angularResizable',
     contextsModule,
+    endpointsModule,
     routesModule,
     treeModule,
   ]);
@@ -20,6 +22,7 @@ namespace Camel {
     $routeProvider
             .when('/camel/contexts', {template: '<contexts></contexts>'})
             .when('/camel/routes', {template: '<routes></routes>'})
+            .when('/camel/endpoints', {template: '<endpoints></endpoints>'})
             .when('/camel/browseEndpoint', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
             .when('/camel/endpoint/browse/:contextId/*endpointPath', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
             .when('/camel/createEndpoint', {templateUrl: 'plugins/camel/html/createEndpoint.html'})
