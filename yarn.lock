@@ -25,7 +25,7 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@3.2.1", "@hawtio/core@3.2.10", "@hawtio/core@3.2.11", "@hawtio/core@3.2.3", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
+"@hawtio/core@3.2.1", "@hawtio/core@3.2.11", "@hawtio/core@3.2.3", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
   version "3.2.11"
   resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.11.tgz#bb1d34659fc8a1531aa15212fbce7cf06ef45546"
   dependencies:
@@ -55,11 +55,11 @@
     "@hawtio/core-dts" "~3.0.12"
     "@hawtio/ui" "~3.0.25"
 
-"@hawtio/jmx@3.2.11":
-  version "3.2.11"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.11.tgz#f6ec5654ed2aa8821b9c544de30ab15bfec340ea"
+"@hawtio/jmx@3.2.12":
+  version "3.2.12"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.12.tgz#aef944c2b46146eb578311dccb3bff21593504af"
   dependencies:
-    "@hawtio/core" "3.2.10"
+    "@hawtio/core" "3.2.11"
     "@hawtio/forms" "3.0.12"
     "@hawtio/ui" "3.2.0"
     "@hawtio/utilities" "3.2.1"
