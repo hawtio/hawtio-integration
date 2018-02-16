@@ -101,7 +101,7 @@ namespace Camel {
       if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
           (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_16 && inEndpointRuntimeRegistry &&
           canSeeEndpointStatistics) {
-        tabs.push(new Core.HawtioTab('Endpoints (in/out)', '/camel/endpointRuntimeRegistry'));
+        tabs.push(new Core.HawtioTab('Endpoints (in/out)', '/camel/endpoints-statistics'));
       }
 
       if (!isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&

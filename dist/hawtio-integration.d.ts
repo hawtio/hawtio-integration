@@ -3,6 +3,9 @@
 /// <reference types="core" />
 /// <reference types="angular-mocks" />
 /// <reference types="angular-route" />
+declare namespace Pf {
+    function filter(items: object[], filters: any[], filterConfig: any): object[];
+}
 declare namespace ActiveMQ {
     const log: Logging.Logger;
     const jmxDomain: string;
@@ -650,6 +653,53 @@ declare namespace Camel {
     const contextsModule: string;
 }
 declare namespace Camel {
+    class EndpointsStatisticsService {
+        private $q;
+        private jolokiaService;
+        private workspace;
+        constructor($q: ng.IQService, jolokiaService: JVM.JolokiaService, workspace: Jmx.Workspace);
+        getStatistics(): ng.IPromise<any[]>;
+    }
+}
+declare namespace Camel {
+    class EndpointsStatisticsController {
+        private endpointsStatisticsService;
+        allItems: any[];
+        filteredItems: any[];
+        toolbarConfig: {
+            filterConfig: {
+                fields: {
+                    id: string;
+                    title: string;
+                    placeholder: string;
+                    filterType: string;
+                }[];
+                onFilterChange: (filters: any[]) => void;
+                appliedFilters: any[];
+                resultsCount: number;
+            };
+            isTableView: boolean;
+        };
+        tableConfig: {
+            selectionMatchProp: string;
+            showCheckboxes: boolean;
+        };
+        tableDtOptions: {
+            order: (string | number)[][];
+        };
+        tableColumns: {
+            itemField: string;
+            header: string;
+        }[];
+        constructor(endpointsStatisticsService: EndpointsStatisticsService);
+        $onInit(): void;
+    }
+    const endpointsStatisticsComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const endpointsStatisticsModule: string;
+}
+declare namespace Camel {
     class Endpoint {
         uri: string;
         state: string;
@@ -1182,8 +1232,6 @@ declare namespace Camel {
             };
         };
     };
-}
-declare namespace Camel {
 }
 declare namespace Camel {
 }

@@ -13778,6 +13778,30 @@ var _apacheCamelModel ={
 
 }(window.metricsWatcher = window.metricsWatcher || {}, jQuery));
 
+var Pf;
+(function (Pf) {
+    function filter(items, filters, filterConfig) {
+        var filteredItems = items;
+        filters.forEach(function (filter) {
+            var filterType = _.find(filterConfig.fields, { 'id': filter.id }).filterType;
+            switch (filterType) {
+                case 'text':
+                    var regExp_1 = new RegExp(filter.value, 'i');
+                    filteredItems = filteredItems.filter(function (item) { return regExp_1.test(item[filter.id]); });
+                    break;
+                case 'number':
+                    filteredItems = filteredItems.filter(function (item) { return item[filter.id] === parseInt(filter.value); });
+                    break;
+                case 'select':
+                    filteredItems = filteredItems.filter(function (item) { return item[filter.id] === filter.value; });
+                    break;
+            }
+        });
+        filterConfig.resultsCount = filteredItems.length;
+        return filteredItems;
+    }
+    Pf.filter = filter;
+})(Pf || (Pf = {}));
 var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ.log = Logger.get("ActiveMQ");
@@ -17647,6 +17671,108 @@ var Camel;
 })(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
+    var EndpointsStatisticsService = /** @class */ (function () {
+        EndpointsStatisticsService.$inject = ["$q", "jolokiaService", "workspace"];
+        function EndpointsStatisticsService($q, jolokiaService, workspace) {
+            'ngInject';
+            this.$q = $q;
+            this.jolokiaService = jolokiaService;
+            this.workspace = workspace;
+        }
+        EndpointsStatisticsService.prototype.getStatistics = function () {
+            var mbean = Camel.getSelectionCamelEndpointRuntimeRegistry(this.workspace);
+            return this.jolokiaService.execute(mbean, 'endpointStatistics')
+                .then(function (response) { return _.values(response); });
+        };
+        return EndpointsStatisticsService;
+    }());
+    Camel.EndpointsStatisticsService = EndpointsStatisticsService;
+})(Camel || (Camel = {}));
+/// <reference path="../../../pf-utils.ts"/>
+/// <reference path="endpoints-statistics.service.ts"/>
+var Camel;
+(function (Camel) {
+    var EndpointsStatisticsController = /** @class */ (function () {
+        EndpointsStatisticsController.$inject = ["endpointsStatisticsService"];
+        function EndpointsStatisticsController(endpointsStatisticsService) {
+            'ngInject';
+            var _this = this;
+            this.endpointsStatisticsService = endpointsStatisticsService;
+            this.toolbarConfig = {
+                filterConfig: {
+                    fields: [
+                        {
+                            id: 'url',
+                            title: 'URL',
+                            placeholder: 'Filter by URL...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'routeId',
+                            title: 'Route ID',
+                            placeholder: 'Filter by route ID...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'direction',
+                            title: 'Direction',
+                            placeholder: 'Filter by direction...',
+                            filterType: 'text'
+                        }
+                    ],
+                    onFilterChange: function (filters) {
+                        _this.filteredItems = Pf.filter(_this.allItems, filters, _this.toolbarConfig.filterConfig);
+                    },
+                    appliedFilters: [],
+                    resultsCount: 0
+                },
+                isTableView: true
+            };
+            this.tableConfig = {
+                selectionMatchProp: 'url',
+                showCheckboxes: false
+            };
+            this.tableDtOptions = {
+                order: [[0, "asc"]],
+            };
+            this.tableColumns = [
+                { itemField: 'url', header: 'URL' },
+                { itemField: 'routeId', header: 'Route ID' },
+                { itemField: 'direction', header: 'Direction' },
+                { itemField: 'static', header: 'Static' },
+                { itemField: 'dynamic', header: 'Dynamic' },
+                { itemField: 'hits', header: 'Hits' }
+            ];
+        }
+        EndpointsStatisticsController.prototype.$onInit = function () {
+            var _this = this;
+            this.endpointsStatisticsService.getStatistics()
+                .then(function (items) {
+                _this.allItems = items;
+                _this.filteredItems = items;
+                _this.toolbarConfig.filterConfig.resultsCount = items.length;
+            });
+        };
+        return EndpointsStatisticsController;
+    }());
+    Camel.EndpointsStatisticsController = EndpointsStatisticsController;
+    Camel.endpointsStatisticsComponent = {
+        template: "\n      <h2>Endpoints (in/out)</h2>\n      <p ng-if=\"!$ctrl.filteredItems\">Loading...</p>\n      <div ng-if=\"$ctrl.filteredItems\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <pf-table-view config=\"$ctrl.tableConfig\"\n                       dt-options=\"$ctrl.tableDtOptions\"\n                       columns=\"$ctrl.tableColumns\"\n                       items=\"$ctrl.filteredItems\"></pf-table-view>\n      </div>\n    ",
+        controller: EndpointsStatisticsController
+    };
+})(Camel || (Camel = {}));
+/// <reference path="endpoints-statistics.component.ts"/>
+/// <reference path="endpoints-statistics.service.ts"/>
+var Camel;
+(function (Camel) {
+    Camel.endpointsStatisticsModule = angular
+        .module('hawtio-camel-endpoints-statistics', [])
+        .component('endpointsStatistics', Camel.endpointsStatisticsComponent)
+        .service('endpointsStatisticsService', Camel.EndpointsStatisticsService)
+        .name;
+})(Camel || (Camel = {}));
+var Camel;
+(function (Camel) {
     var Endpoint = /** @class */ (function () {
         Endpoint.$inject = ["uri", "state", "mbean"];
         function Endpoint(uri, state, mbean) {
@@ -18225,6 +18351,7 @@ var Camel;
 })(Camel || (Camel = {}));
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="contexts/contexts.module.ts"/>
+/// <reference path="endpoints-statistics/endpoints-statistics.module.ts"/>
 /// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
@@ -18236,6 +18363,7 @@ var Camel;
         'patternfly.table',
         'angularResizable',
         Camel.contextsModule,
+        Camel.endpointsStatisticsModule,
         Camel.endpointsModule,
         Camel.routesModule,
         Camel.treeModule,
@@ -18252,7 +18380,7 @@ var Camel;
                 .when('/camel/routeDiagram', { templateUrl: 'plugins/camel/html/routeDiagram.html' })
                 .when('/camel/typeConverter', { templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false })
                 .when('/camel/restServices', { templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false })
-                .when('/camel/endpointRuntimeRegistry', { templateUrl: 'plugins/camel/html/endpointRuntimeRegistry.html', reloadOnSearch: false })
+                .when('/camel/endpoints-statistics', { template: '<endpoints-statistics></endpoints-statistics>' })
                 .when('/camel/routeMetrics', { templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false })
                 .when('/camel/exchanges', { templateUrl: 'plugins/camel/html/exchanges.html', reloadOnSearch: false })
                 .when('/camel/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false })
@@ -18753,7 +18881,7 @@ var Camel;
             if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
                 (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_16 && inEndpointRuntimeRegistry &&
                 canSeeEndpointStatistics) {
-                tabs.push(new Core.HawtioTab('Endpoints (in/out)', '/camel/endpointRuntimeRegistry'));
+                tabs.push(new Core.HawtioTab('Endpoints (in/out)', '/camel/endpoints-statistics'));
             }
             if (!Camel.isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
                 (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_13 && canListTypeConverters) {
@@ -19510,94 +19638,6 @@ var Camel;
                 Core.$apply($scope);
                 Core.notification("success", $scope.message);
             }
-        }]);
-})(Camel || (Camel = {}));
-/// <reference path="camelPlugin.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.EndpointRuntimeRegistryController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.data = [];
-            $scope.selectedMBean = null;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'url',
-                    displayName: 'URL'
-                },
-                {
-                    field: 'routeId',
-                    displayName: 'Route ID'
-                },
-                {
-                    field: 'direction',
-                    displayName: 'Direction'
-                },
-                {
-                    field: 'static',
-                    displayName: 'Static'
-                },
-                {
-                    field: 'dynamic',
-                    displayName: 'Dynamic'
-                },
-                {
-                    field: 'hits',
-                    displayName: 'Hits'
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: false,
-                canSelectRows: false,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                },
-                primaryKeyFn: function (entity) { return entity.routeId; }
-            };
-            function onRestRegistry(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var entry = obj[key];
-                        arr.push({
-                            url: entry.url,
-                            routeId: entry.routeId,
-                            direction: entry.direction,
-                            static: entry.static,
-                            dynamic: entry.dynamic,
-                            hits: entry.hits
-                        });
-                    }
-                    arr = _.sortBy(arr, "url");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
-                }
-                else {
-                    // set the mbean to a value so the ui can get updated
-                    $scope.selectedMBean = "true";
-                }
-                // ensure web page is updated
-                Core.$apply($scope);
-            }
-            $scope.renderIcon = function (state) {
-                return Camel.iconClass(state);
-            };
-            function loadEndpointRegistry() {
-                console.log("Loading EndpointRuntimeRegistry data...");
-                var mbean = Camel.getSelectionCamelEndpointRuntimeRegistry(workspace);
-                if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'endpointStatistics' }, Core.onSuccess(onRestRegistry));
-                }
-            }
-            // load data
-            loadEndpointRegistry();
         }]);
 })(Camel || (Camel = {}));
 var Camel;
@@ -26396,7 +26436,6 @@ $templateCache.put('plugins/camel/html/createEndpointWizard.html','<div ng-contr
 $templateCache.put('plugins/camel/html/debug.html','<div class="camel-debug-main" ng-controller="Camel.DebugRouteController">\n  \n  <div class="row camel-debug-header">\n    <div class="col-sm-6">\n      <h2>Debug</h2>\n    </div>\n    <div class="col-sm-6">\n      <button type="button" class="btn btn-primary pull-right" ng-if="debugging" ng-click="stopDebugging()">\n        Stop debugging\n      </button>\n    </div>\n  </div>\n  \n  <div ng-if="!debugging">\n    <p>Debugging allows you to step through camel routes to diagnose issues.</p>\n    <button type="button" class="btn btn-primary" ng-click="startDebugging()"\n      hawtio-show object-name="{{camelDebugMBean}}" method-name="enableDebugger" mode="remove">\n      Start debugging\n    </button>\n    <div class="alert alert-info"\n      hawtio-show object-name="{{camelDebugMBean}}" method-name="enableDebugger" mode="inverse">\n      <span class="pficon pficon-info"></span>\n      Debugging is not allowed for this user.\n    </div>\n  </div>\n  \n  <div class="toolbar-pf camel-debug-toolbar" ng-if="debugging">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <div ng-switch="hasBreakpoint">\n          <button type="button" ng-switch-when="true" class="btn btn-default" ng-disabled="!selectedDiagramNodeId"\n                  ng-click="removeBreakpoint()" title="Remove the breakpoint on the selected node">\n            Remove breakpoint\n          </button>\n          <button type="button" ng-switch-default="false" class="btn btn-default" ng-disabled="shouldDisableAddBreakpoint()"\n                  ng-click="addBreakpoint()" title="Add a breakpoint on the selected node">\n            Add breakpoint\n          </button>\n        </div>\n      </div>\n      <div class="form-group camel-debug-icon-buttons">\n        <button type="button" class="btn btn-default" ng-click="step()" ng-disabled="!stopped"\n                title="Step into the next node">\n          <i class="fa fa-arrow-down" aria-hidden="true"></i>\n        </button>\n        <button type="button" class="btn btn-default" ng-click="resume()" ng-disabled="!stopped"\n                title="Resume running">\n          <i class="fa fa-play" aria-hidden="true"></i>\n        </button>\n        <button type="button" class="btn btn-default" ng-click="suspend()" ng-disabled="stopped"\n                title="Suspend all threads in this route">\n          <i class="fa fa-pause" aria-hidden="true"></i>\n        </button>\n      </div>\n    </form>\n  </div>\n\n  <div class="camel-debug-diagram-wrapper" ng-include src="graphView" ng-if="debugging"></div>\n\n  <div class="camel-debug-bottom-panel" resizable r-directions="[\'top\']" r-flex="true" ng-if="debugging"\n    ng-show="showDebugPanel">\n    <div class="camel-debug-bottom-panel-left">\n      <ul class="nav nav-tabs" ng-init="activeTab = \'headers\'">\n        <li ng-class="{\'active\': activeTab === \'headers\' && stopped}">\n          <a href="" ng-click="activeTab = \'headers\'" ng-class="{\'disabled\': !stopped}">Headers</a>\n        </li>\n        <li ng-class="{\'active\': activeTab === \'body\' && stopped}">\n          <a href="" ng-click="activeTab = \'body\'" ng-class="{\'disabled\': !stopped}">Body</a>\n        </li>\n      </ul>\n      <div class="camel-debug-headers-contents" ng-show="activeTab === \'headers\'">\n        <div ng-repeat="(key, value) in row.headers"><label>{{key}}:</label> {{value}}</div>\n      </div>\n      <div class="camel-debug-body-contents" ng-show="activeTab === \'body\'">\n        <em class="camel-debug-no-body-text" ng-show="row.body === \'[Body is null]\'">No Body</em>\n        <pre ng-show="row.body !== \'[Body is null]\'">{{row.body}}</pre>\n      </div>\n    </div>\n    <div class="camel-debug-bottom-panel-right">\n      <ul class="nav nav-tabs">\n        <li>\n          <a>Breakpoints</a>\n        </li>\n      </ul>\n      <ul class="camel-debug-breakpoints-list list-unstyled">\n        <li ng-class="{\'suspended\': isSuspendedAt(b)}"\n          ng-repeat="b in breakpoints">\n          <span>{{b}}</span>\n          <button type="button" class="close" aria-label="Close" title="Remove breakpoint"\n            ng-click="removeBreakpointById(b)">\n            <span aria-hidden="true">&times;</span>\n          </button>\n        </li>\n      </ul>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/deleteContextWarningModal.html','<div class="modal-header">\n  <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n    <span class="pficon pficon-close" aria-hidden="true"></span>\n  </button>\n  <h4>Are you sure?</h4>\n</div>\n<div class="modal-body">\n  <p>You are about to delete this Camel Context.</p>\n  <p>This operation cannot be undone so please be careful.</p>\n</div>\n<div class="modal-footer">\n  <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n  <button type="button" class="btn btn-danger" ng-click="$close()">Delete</button>\n</div>\n');
 $templateCache.put('plugins/camel/html/deleteRouteWarningModal.html','<div class="modal-header">\n  <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n    <span class="pficon pficon-close" aria-hidden="true"></span>\n  </button>\n  <h4>Are you sure?</h4>\n</div>\n<div class="modal-body">\n  <p>You are about to delete this Camel route.</p>\n  <p>This operation cannot be undone so please be careful.</p>\n</div>\n<div class="modal-footer">\n  <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n  <button type="button" class="btn btn-danger" ng-click="$close()">Delete</button>\n</div>\n');
-$templateCache.put('plugins/camel/html/endpointRuntimeRegistry.html','<div class="table-view" ng-controller="Camel.EndpointRuntimeRegistryController">\n\n  <h2>Endpoints (in/out)</h2>\n  \n  <p ng-if="!selectedMBean">Loading...</p>\n  \n  <div ng-if="selectedMBean">\n    <div class="loading-message" ng-if="data.length === 0">\n      There are no endpoints currently in use in this CamelContext.\n    </div>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-endpoints-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/exchanges.html','<h2>Exchanges</h2>\n<div ng-include src="\'plugins/camel/html/inflight.html\'"></div>\n<div ng-include src="\'plugins/camel/html/blocked.html\'"></div>');
 $templateCache.put('plugins/camel/html/inflight.html','<div class="table-view" ng-controller="Camel.InflightExchangesController">\n\n  <h3>Inflight</h3>\n  \n  <p ng-if="!initDone">Loading...</p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No inflight exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-inflight-exchanges-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/layoutCamelTree.html','<div class="tree-nav-layout">\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n    <camel-tree-header></camel-tree-header>\n    <camel-tree></camel-tree>\n  </div>\n  <div class="tree-nav-main">\n    <div>\n      <context-actions></context-actions>\n      <route-actions></route-actions>\n      <jmx-header></jmx-header>\n    </div>\n    <div ng-controller="CamelTabsController as $ctrl">\n      <hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>\n    </div>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
@@ -26437,7 +26476,7 @@ $templateCache.put('plugins/activemq/html/tree/content.html','<div class="tree-n
 $templateCache.put('plugins/activemq/html/tree/header.html','<div class="tree-nav-sidebar-header">\n  <form role="form" class="search-pf has-button">\n    <div class="form-group has-clear">\n      <div class="search-pf-input-group">\n        <label for="input-search" class="sr-only">Search Tree:</label>\n        <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n          ng-model="$ctrl.filter">\n        <button type="button" class="clear" aria-hidden="true"\n          ng-hide="$ctrl.filter.length === 0"\n          ng-click="$ctrl.filter = \'\'">\n          <span class="pficon pficon-close"></span>\n        </button>\n      </div>\n    </div>\n    <div class="form-group tree-nav-buttons">\n      <span class="badge" ng-class="{positive: $ctrl.result.length > 0}"\n        ng-show="$ctrl.filter.length > 0">\n        {{$ctrl.result.length}}\n      </span>\n      <i class="fa fa-plus-square-o" title="Expand All" ng-click="$ctrl.expandAll()"></i>\n      <i class="fa fa-minus-square-o" title="Collapse All" ng-click="$ctrl.contractAll()"></i>\n    </div>\n  </form>\n</div>\n');
 $templateCache.put('plugins/camel/html/tree/content.html','<div class="tree-nav-sidebar-content">\n  <div class="spinner spinner-lg" ng-hide="$ctrl.treeFetched()"></div>\n  <div id="cameltree" class="treeview-pf-hover treeview-pf-select"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/tree/header.html','<div class="tree-nav-sidebar-header">\n  <form role="form" class="search-pf has-button">\n    <div class="form-group has-clear">\n      <div class="search-pf-input-group">\n        <label for="input-search" class="sr-only">Search Tree:</label>\n        <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n          ng-model="$ctrl.filter">\n        <button type="button" class="clear" aria-hidden="true"\n          ng-hide="$ctrl.filter.length === 0"\n          ng-click="$ctrl.filter = \'\'">\n          <span class="pficon pficon-close"></span>\n        </button>\n      </div>\n    </div>\n    <div class="form-group tree-nav-buttons">\n      <span class="badge" ng-class="{positive: $ctrl.result.length > 0}"\n        ng-show="$ctrl.filter.length > 0">\n        {{$ctrl.result.length}}\n      </span>\n      <i class="fa fa-plus-square-o" title="Expand All" ng-click="$ctrl.expandAll()"></i>\n      <i class="fa fa-minus-square-o" title="Collapse All" ng-click="$ctrl.contractAll()"></i>\n    </div>\n  </form>\n</div>\n');
-$templateCache.put('plugins/activemq/doc/help.md','### ActiveMQ\n\nClick [ActiveMQ](#/jmx/attributes?tab=activmemq) in the top navigation bar to see the ActiveMQ specific plugin. (The ActiveMQ tab won\'t appear if there is no broker in this JVM).  The ActiveMQ plugin works very much the same as the JMX plugin however with a focus on interacting with an ActiveMQ broker.\n\nThe tree view on the left-hand side shows the top level JMX tree of each broker instance running in the JVM.  Expanding the tree will show the various MBeans registered by ActiveMQ that you can inspect via the **Attributes** tab.\n\nYou can then click on the **Queue** node to see the queues and **Topic** node to see the topics. From either of these nodes you should see **Create Queue** or **Create Topic** tabs to be able to create new destinations.\n\nOnce you have selected a destination you should be able to **Send** to it, **Browse** a queue or view the  **Attributes** or **Charts**\n\nYou can also see a graphical view of all producers, destinations and consumers for all queues (or if you select a Topic folder then topics) using the **Diagram** tab. Selecting a single queue or topic shows just all the producers and consumers on that destination. This diagram makes it easy to spot if producers are sending messages when there are no consumers, or that consumers are on the wrong destination etc.\n');
 $templateCache.put('plugins/camel/doc/help.md','### Camel\n\nClick [Camel](#/jmx/attributes?tab=camel) in the top navigation bar to view all the running Camel Contexts in the current JVM. (The selection will not appear on the navigation bar if there is no Camel running).\n\nThe Camel plugin allows you to view all the running Camel applications in the current JVM.\nYou can among others see the following details:\n\n* Lists of all running Camel applications\n* Detailed information of each Camel Context such as Camel version number, runtime statics\n* Lists of all routes in each Camel applications and their runtime statistics\n* Manage the lifecycle of all Camel applications and their routes, so you can restart / stop / pause / resume, etc.\n* Graphical representation of the running routes along with real time metrics\n* Live tracing and debugging of running routes\n* Profile the running routes with real time runtime statics; detailed specified per processor\n* Browsing and sending messages to Camel endpoint\n');
+$templateCache.put('plugins/activemq/doc/help.md','### ActiveMQ\n\nClick [ActiveMQ](#/jmx/attributes?tab=activmemq) in the top navigation bar to see the ActiveMQ specific plugin. (The ActiveMQ tab won\'t appear if there is no broker in this JVM).  The ActiveMQ plugin works very much the same as the JMX plugin however with a focus on interacting with an ActiveMQ broker.\n\nThe tree view on the left-hand side shows the top level JMX tree of each broker instance running in the JVM.  Expanding the tree will show the various MBeans registered by ActiveMQ that you can inspect via the **Attributes** tab.\n\nYou can then click on the **Queue** node to see the queues and **Topic** node to see the topics. From either of these nodes you should see **Create Queue** or **Create Topic** tabs to be able to create new destinations.\n\nOnce you have selected a destination you should be able to **Send** to it, **Browse** a queue or view the  **Attributes** or **Charts**\n\nYou can also see a graphical view of all producers, destinations and consumers for all queues (or if you select a Topic folder then topics) using the **Diagram** tab. Selecting a single queue or topic shows just all the producers and consumers on that destination. This diagram makes it easy to spot if producers are sending messages when there are no consumers, or that consumers are on the wrong destination etc.\n');
 $templateCache.put('plugins/karaf/doc/help.md','### Karaf\n\nThis plugin supports the [Apache Karaf](http://karaf.apache.org/) container');
 $templateCache.put('plugins/osgi/doc/help.md','### OSGi\n\nThis plugin supports the various OSGi standards for working with bundles, Config Admin, services, packages etc.');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");

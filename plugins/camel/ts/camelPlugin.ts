@@ -1,5 +1,6 @@
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="contexts/contexts.module.ts"/>
+/// <reference path="endpoints-statistics/endpoints-statistics.module.ts"/>
 /// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
@@ -13,6 +14,7 @@ namespace Camel {
     'patternfly.table',
     'angularResizable',
     contextsModule,
+    endpointsStatisticsModule,
     endpointsModule,
     routesModule,
     treeModule,
@@ -30,7 +32,7 @@ namespace Camel {
             .when('/camel/routeDiagram', {templateUrl: 'plugins/camel/html/routeDiagram.html'})
             .when('/camel/typeConverter', {templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false})
             .when('/camel/restServices', {templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false})
-            .when('/camel/endpointRuntimeRegistry', {templateUrl: 'plugins/camel/html/endpointRuntimeRegistry.html', reloadOnSearch: false})
+            .when('/camel/endpoints-statistics', {template: '<endpoints-statistics></endpoints-statistics>'})
             .when('/camel/routeMetrics', {templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false})
             .when('/camel/exchanges', {templateUrl: 'plugins/camel/html/exchanges.html', reloadOnSearch: false})
             .when('/camel/sendMessage', {templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false})
