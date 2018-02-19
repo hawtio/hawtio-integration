@@ -101,6 +101,13 @@ namespace SpringBoot {
       this.numTotalItems = filteredLoggers.length;
       this.toolbarConfig.filterConfig.resultsCount = filteredLoggers.length;
     }
+
+    private orderLoggers(item: Logger): any {
+      if (item.name === 'ROOT') {
+        return -1;
+      }
+      else return item.name;
+    }
   }
 
   export const loggersComponent: angular.IComponentOptions = {
@@ -119,7 +126,7 @@ namespace SpringBoot {
           <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
           <ul class="list-group spring-boot-loggers-list-group">
             <li class="list-group-item"
-                ng-repeat="item in $ctrl.tableItems | orderBy : 'name' | startFrom:($ctrl.pageNumber - 1) * $ctrl.pageSize | limitTo: $ctrl.pageSize">
+                ng-repeat="item in $ctrl.tableItems | orderBy : $ctrl.orderLoggers | startFrom:($ctrl.pageNumber - 1) * $ctrl.pageSize | limitTo: $ctrl.pageSize">
                 <div title="Logger Level">
                   <select ng-model="item.configuredLevel"
                           ng-options="level for level in $ctrl.loggerLevels"

@@ -1936,6 +1936,7 @@ declare namespace SpringBoot {
         loadData(): void;
         setLoggerLevel(logger: Logger): void;
         applyFilters(filters: any[]): void;
+        private orderLoggers(item);
     }
     const loggersComponent: angular.IComponentOptions;
 }

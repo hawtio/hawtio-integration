@@ -26358,11 +26358,18 @@ var SpringBoot;
             this.numTotalItems = filteredLoggers.length;
             this.toolbarConfig.filterConfig.resultsCount = filteredLoggers.length;
         };
+        LoggersController.prototype.orderLoggers = function (item) {
+            if (item.name === 'ROOT') {
+                return -1;
+            }
+            else
+                return item.name;
+        };
         return LoggersController;
     }());
     SpringBoot.LoggersController = LoggersController;
     SpringBoot.loggersComponent = {
-        template: "\n      <div class=\"spring-boot-loggers-main\">\n        <h1>Loggers</h1>\n        <div class=\"blank-slate-pf no-border\" ng-if=\"$ctrl.loading === false && $ctrl.loggers.length === 0\">\n          <div class=\"blank-slate-pf-icon\">\n            <span class=\"pficon pficon pficon-warning-triangle-o\"></span>\n          </div>\n          <h1>No Spring Boot Loggers</h1>\n          <p>There are no loggers to display for this application.</p>\n          <p>Check your Spring Boot logging configuration.</p>\n        </div>\n        <div ng-show=\"$ctrl.loggers.length > 0\">\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <ul class=\"list-group spring-boot-loggers-list-group\">\n            <li class=\"list-group-item\"\n                ng-repeat=\"item in $ctrl.tableItems | orderBy : 'name' | startFrom:($ctrl.pageNumber - 1) * $ctrl.pageSize | limitTo: $ctrl.pageSize\">\n                <div title=\"Logger Level\">\n                  <select ng-model=\"item.configuredLevel\"\n                          ng-options=\"level for level in $ctrl.loggerLevels\"\n                          ng-change=\"$ctrl.setLoggerLevel(item)\"\n                          ng-selected=\"item.effectiveLevel === level\">\n                  </select>\n                </div>\n                <div class=\"list-group-item-heading\">{{item.name}}</div>\n            </li>\n          </ul>\n          <pf-pagination\n            page-size=\"$ctrl.pageSize\"\n            page-number=\"$ctrl.pageNumber\"\n            num-total-items=\"$ctrl.numTotalItems\">\n          </pf-pagination>\n        </div>\n      </div>\n    ",
+        template: "\n      <div class=\"spring-boot-loggers-main\">\n        <h1>Loggers</h1>\n        <div class=\"blank-slate-pf no-border\" ng-if=\"$ctrl.loading === false && $ctrl.loggers.length === 0\">\n          <div class=\"blank-slate-pf-icon\">\n            <span class=\"pficon pficon pficon-warning-triangle-o\"></span>\n          </div>\n          <h1>No Spring Boot Loggers</h1>\n          <p>There are no loggers to display for this application.</p>\n          <p>Check your Spring Boot logging configuration.</p>\n        </div>\n        <div ng-show=\"$ctrl.loggers.length > 0\">\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <ul class=\"list-group spring-boot-loggers-list-group\">\n            <li class=\"list-group-item\"\n                ng-repeat=\"item in $ctrl.tableItems | orderBy : $ctrl.orderLoggers | startFrom:($ctrl.pageNumber - 1) * $ctrl.pageSize | limitTo: $ctrl.pageSize\">\n                <div title=\"Logger Level\">\n                  <select ng-model=\"item.configuredLevel\"\n                          ng-options=\"level for level in $ctrl.loggerLevels\"\n                          ng-change=\"$ctrl.setLoggerLevel(item)\"\n                          ng-selected=\"item.effectiveLevel === level\">\n                  </select>\n                </div>\n                <div class=\"list-group-item-heading\">{{item.name}}</div>\n            </li>\n          </ul>\n          <pf-pagination\n            page-size=\"$ctrl.pageSize\"\n            page-number=\"$ctrl.pageNumber\"\n            num-total-items=\"$ctrl.numTotalItems\">\n          </pf-pagination>\n        </div>\n      </div>\n    ",
         controller: LoggersController
     };
 })(SpringBoot || (SpringBoot = {}));
