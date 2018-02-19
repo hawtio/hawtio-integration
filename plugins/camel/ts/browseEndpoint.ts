@@ -1,56 +1,110 @@
-/// <reference path="../../activemq/ts/activemqHelpers.ts"/>
 /// <reference path="camelPlugin.ts"/>
 
 namespace Camel {
 
-  export var BrowseEndpointController = _module.controller("Camel.BrowseEndpointController", ["$scope", "$routeParams", "workspace", "jolokia", "$uibModal", (
-      $scope,
-      $routeParams: angular.route.IRouteParamsService,
-      workspace: Jmx.Workspace,
-      jolokia: Jolokia.IJolokia,
-      $uibModal) => {
+  export var BrowseEndpointController = _module.controller("Camel.BrowseEndpointController", ["$scope",
+    "$routeParams", "workspace", "jolokia", "$uibModal", ($scope, $routeParams: angular.route.IRouteParamsService,
+    workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, $uibModal) => {
+
+    const forwardAction = {
+      name: 'Forward',
+      actionFn: action => {
+        $uibModal.open({
+          templateUrl: 'camelBrowseEndpointForwardMessage.html',
+          scope: $scope
+        });
+      },
+      isDisabled: true
+    };
+
+    const refreshAction = {
+      name: 'Refresh',
+      actionFn: action => loadData()
+    };
     
-    $scope.workspace = workspace;
+    let allMessages = null;
+    $scope.messages = null;
     $scope.camelContextMBean = getSelectionCamelContextMBean(workspace);
     $scope.mode = 'text';
-    $scope.gridOptions = Camel.createBrowseGridOptions();
     $scope.endpointUri = null;
     $scope.contextId = $routeParams["contextId"];
     $scope.endpointPath = $routeParams["endpointPath"];
     $scope.isJmxTab = !$routeParams["contextId"] || !$routeParams["endpointPath"];
+    $scope.model = {
+      allSelected: false
+    }
 
-    // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
-    $scope.openMessageDialog = (message) => {
-      ActiveMQ.selectCurrentMessage(message, "id", $scope);
-      if ($scope.row) {
-        $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
-        $uibModal.open({
-          templateUrl: 'camelBrowseEndpointMessageDetails.html',
-          scope: $scope,
-          size: 'lg'
-        });
-      }
+    $scope.toolbarConfig = {
+      filterConfig: {
+        fields: [
+          {
+            id: 'id',
+            title: 'Message ID',
+            placeholder: 'Filter by message ID...',
+            filterType: 'text'
+          }
+        ],
+        onFilterChange: (filters: any[]) => {
+          $scope.messages = Pf.filter(allMessages, $scope.toolbarConfig.filterConfig);
+        }
+      },
+      actionsConfig: {
+        primaryActions: [forwardAction, refreshAction]
+      },
+      isTableView: true
     };
 
-    $scope.openForwardDialog = (message) => {
+    $scope.refreshForwardActionDisabledProperty = () => {
+      forwardAction.isDisabled = !$scope.messages.some(message => message.selected);
+    }
+
+    $scope.tableConfig = {
+      selectionMatchProp: 'id',
+      showCheckboxes: true
+    };
+    
+    $scope.tableDtOptions = {
+      order: [[1, "desc"]],
+    };
+
+    $scope.tableColumns = [
+      {
+        itemField: 'id',
+        header: 'Message ID'
+      }
+    ];
+
+    $scope.selectAll = () => {
+      $scope.messages.forEach(message => message.selected = $scope.model.allSelected);
+      forwardAction.isDisabled = !$scope.model.allSelected;
+    };
+    
+    $scope.selectRowIndex = (rowIndex) => {
+      $scope.rowIndex = rowIndex;
+      $scope.row = $scope.messages[rowIndex];
+    };
+    
+    $scope.openMessageDialog = (message, index) => {
+      $scope.row = message;
+      $scope.rowIndex = index;
+      $scope.mode = CodeEditor.detectTextFormat(message.body);
       $uibModal.open({
-        templateUrl: 'camelBrowseEndpointForwardMessage.html',
-        scope: $scope
+        templateUrl: 'camelBrowseEndpointMessageDetails.html',
+        scope: $scope,
+        size: 'lg'
       });
     };
 
-    ActiveMQ.decorate($scope);
-
     $scope.forwardMessages = (uri) => {
       var mbean = getSelectionCamelContextMBean(workspace);
-      var selectedItems = $scope.gridOptions.selectedItems;
-      if (mbean && uri && selectedItems && selectedItems.length) {
+      var selectedMessages = $scope.messages.filter(message => message.selected);
+      if (mbean && uri && selectedMessages && selectedMessages.length) {
         //console.log("Creating a new endpoint called: " + uri + " just in case!");
         jolokia.execute(mbean, "createEndpoint(java.lang.String)", uri, Core.onSuccess(intermediateResult));
 
-        $scope.message = "Forwarded " + Core.maybePlural(selectedItems.length, "message" + " to " + uri);
-        angular.forEach(selectedItems, (item, idx) => {
-          var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
+        $scope.message = "Forwarded " + Core.maybePlural(selectedMessages.length, "message" + " to " + uri);
+        angular.forEach(selectedMessages, (item, idx) => {
+          var callback = (idx + 1 < selectedMessages.length) ? intermediateResult : operationSuccess;
           var body = item.body;
           var headers = item.headers;
           //console.log("sending to uri " + uri + " headers: " + JSON.stringify(headers) + " body: " + body);
@@ -78,13 +132,10 @@ namespace Camel {
       return (endpointFolder) ? endpointFolder.children.map(n => n.text) : [];
     };
 
-    $scope.refresh = loadData;
-
     function intermediateResult() {
     }
 
     function operationSuccess() {
-      $scope.gridOptions.selectedItems.splice(0);
       Core.notification("success", $scope.message);
       setTimeout(loadData, 50);
     }
@@ -113,20 +164,27 @@ namespace Camel {
 
     function populateTable(response) {
       var data = [];
+      
       if (angular.isString(response)) {
         // lets parse the XML DOM here...
         var doc = $.parseXML(response);
-        var allMessages = $(doc).find("message");
+        var docMessages = $(doc).find("message");
+        
+        const totalRows = docMessages.length;
+        data.length = totalRows;
 
-        allMessages.each((idx, message) => {
-          var messageData:any = Camel.createMessageFromXml(message);
-          // attach the open dialog to make it work
-          messageData.openMessageDialog = $scope.openMessageDialog;
-          data.push(messageData);
-        });
+        for (let i = 0; i < totalRows; i++) {
+          data[totalRows - 1 - i] = Camel.createMessageFromXml(docMessages[i]);
+        }
       }
-      $scope.messages = data;
+
+      allMessages = data;
+      $scope.messages = Pf.filter(allMessages, $scope.toolbarConfig.filterConfig);
+      $scope.model.allSelected = false;
+      
       Core.$apply($scope);
     }
+
+    loadData();
   }]);
 }

@@ -31,7 +31,7 @@ namespace Camel {
           }
         ],
         onFilterChange: (filters: any[]) => {
-          this.filteredItems = Pf.filter(this.allItems, filters, this.toolbarConfig.filterConfig);
+          this.filteredItems = Pf.filter(this.allItems, this.toolbarConfig.filterConfig);
         },
         appliedFilters: [],
         resultsCount: 0
@@ -72,7 +72,7 @@ namespace Camel {
 
   }
 
-  export const endpointsStatisticsComponent = <angular.IComponentOptions>{
+  export const endpointsStatisticsComponent: angular.IComponentOptions = {
     template: `
       <h2>Endpoints (in/out)</h2>
       <p ng-if="!$ctrl.filteredItems">Loading...</p>

@@ -50,7 +50,7 @@ namespace Camel {
 
   }
 
-  export const endpointsComponent = <angular.IComponentOptions>{
+  export const endpointsComponent: angular.IComponentOptions = {
     template: `
       <h2>Endpoints</h2>
       <p ng-if="!$ctrl.endpoints">Loading...</p>

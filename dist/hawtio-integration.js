@@ -13780,23 +13780,25 @@ var _apacheCamelModel ={
 
 var Pf;
 (function (Pf) {
-    function filter(items, filters, filterConfig) {
+    function filter(items, filterConfig) {
         var filteredItems = items;
-        filters.forEach(function (filter) {
-            var filterType = _.find(filterConfig.fields, { 'id': filter.id }).filterType;
-            switch (filterType) {
-                case 'text':
-                    var regExp_1 = new RegExp(filter.value, 'i');
-                    filteredItems = filteredItems.filter(function (item) { return regExp_1.test(item[filter.id]); });
-                    break;
-                case 'number':
-                    filteredItems = filteredItems.filter(function (item) { return item[filter.id] === parseInt(filter.value); });
-                    break;
-                case 'select':
-                    filteredItems = filteredItems.filter(function (item) { return item[filter.id] === filter.value; });
-                    break;
-            }
-        });
+        if (filterConfig.appliedFilters) {
+            filterConfig.appliedFilters.forEach(function (filter) {
+                var filterType = _.find(filterConfig.fields, { 'id': filter.id }).filterType;
+                switch (filterType) {
+                    case 'text':
+                        var regExp_1 = new RegExp(filter.value, 'i');
+                        filteredItems = filteredItems.filter(function (item) { return regExp_1.test(item[filter.id]); });
+                        break;
+                    case 'number':
+                        filteredItems = filteredItems.filter(function (item) { return item[filter.id] === parseInt(filter.value); });
+                        break;
+                    case 'select':
+                        filteredItems = filteredItems.filter(function (item) { return item[filter.id] === filter.value; });
+                        break;
+                }
+            });
+        }
         filterConfig.resultsCount = filteredItems.length;
         return filteredItems;
     }
@@ -17721,7 +17723,7 @@ var Camel;
                         }
                     ],
                     onFilterChange: function (filters) {
-                        _this.filteredItems = Pf.filter(_this.allItems, filters, _this.toolbarConfig.filterConfig);
+                        _this.filteredItems = Pf.filter(_this.allItems, _this.toolbarConfig.filterConfig);
                     },
                     appliedFilters: [],
                     resultsCount: 0
@@ -17797,7 +17799,7 @@ var Camel;
             this.workspace = workspace;
         }
         EndpointsService.prototype.getEndpoints = function () {
-            if (this.workspace.selection && this.workspace.selection.children.length > 0) {
+            if (this.workspace.selection && this.workspace.selection.children && this.workspace.selection.children.length > 0) {
                 var mbeans_1 = this.workspace.selection.children.map(function (node) { return node.objectName; });
                 return this.jolokiaService.readMany(mbeans_1)
                     .then(function (objects) { return objects.map(function (object, i) { return new Camel.Endpoint(object.EndpointUri, object.State, mbeans_1[i]); }); });
@@ -18665,47 +18667,98 @@ var Camel;
         task();
     });
 })(Camel || (Camel = {}));
-/// <reference path="../../activemq/ts/activemqHelpers.ts"/>
 /// <reference path="camelPlugin.ts"/>
 var Camel;
 (function (Camel) {
-    Camel.BrowseEndpointController = Camel._module.controller("Camel.BrowseEndpointController", ["$scope", "$routeParams", "workspace", "jolokia", "$uibModal", function ($scope, $routeParams, workspace, jolokia, $uibModal) {
-            $scope.workspace = workspace;
+    Camel.BrowseEndpointController = Camel._module.controller("Camel.BrowseEndpointController", ["$scope",
+        "$routeParams", "workspace", "jolokia", "$uibModal", function ($scope, $routeParams, workspace, jolokia, $uibModal) {
+            var forwardAction = {
+                name: 'Forward',
+                actionFn: function (action) {
+                    $uibModal.open({
+                        templateUrl: 'camelBrowseEndpointForwardMessage.html',
+                        scope: $scope
+                    });
+                },
+                isDisabled: true
+            };
+            var refreshAction = {
+                name: 'Refresh',
+                actionFn: function (action) { return loadData(); }
+            };
+            var allMessages = null;
+            $scope.messages = null;
             $scope.camelContextMBean = Camel.getSelectionCamelContextMBean(workspace);
             $scope.mode = 'text';
-            $scope.gridOptions = Camel.createBrowseGridOptions();
             $scope.endpointUri = null;
             $scope.contextId = $routeParams["contextId"];
             $scope.endpointPath = $routeParams["endpointPath"];
             $scope.isJmxTab = !$routeParams["contextId"] || !$routeParams["endpointPath"];
-            // TODO can we share these 2 methods from activemq browse / camel browse / came trace?
-            $scope.openMessageDialog = function (message) {
-                ActiveMQ.selectCurrentMessage(message, "id", $scope);
-                if ($scope.row) {
-                    $scope.mode = CodeEditor.detectTextFormat($scope.row.body);
-                    $uibModal.open({
-                        templateUrl: 'camelBrowseEndpointMessageDetails.html',
-                        scope: $scope,
-                        size: 'lg'
-                    });
-                }
+            $scope.model = {
+                allSelected: false
             };
-            $scope.openForwardDialog = function (message) {
+            $scope.toolbarConfig = {
+                filterConfig: {
+                    fields: [
+                        {
+                            id: 'id',
+                            title: 'Message ID',
+                            placeholder: 'Filter by message ID...',
+                            filterType: 'text'
+                        }
+                    ],
+                    onFilterChange: function (filters) {
+                        $scope.messages = Pf.filter(allMessages, $scope.toolbarConfig.filterConfig);
+                    }
+                },
+                actionsConfig: {
+                    primaryActions: [forwardAction, refreshAction]
+                },
+                isTableView: true
+            };
+            $scope.refreshForwardActionDisabledProperty = function () {
+                forwardAction.isDisabled = !$scope.messages.some(function (message) { return message.selected; });
+            };
+            $scope.tableConfig = {
+                selectionMatchProp: 'id',
+                showCheckboxes: true
+            };
+            $scope.tableDtOptions = {
+                order: [[1, "desc"]],
+            };
+            $scope.tableColumns = [
+                {
+                    itemField: 'id',
+                    header: 'Message ID'
+                }
+            ];
+            $scope.selectAll = function () {
+                $scope.messages.forEach(function (message) { return message.selected = $scope.model.allSelected; });
+                forwardAction.isDisabled = !$scope.model.allSelected;
+            };
+            $scope.selectRowIndex = function (rowIndex) {
+                $scope.rowIndex = rowIndex;
+                $scope.row = $scope.messages[rowIndex];
+            };
+            $scope.openMessageDialog = function (message, index) {
+                $scope.row = message;
+                $scope.rowIndex = index;
+                $scope.mode = CodeEditor.detectTextFormat(message.body);
                 $uibModal.open({
-                    templateUrl: 'camelBrowseEndpointForwardMessage.html',
-                    scope: $scope
+                    templateUrl: 'camelBrowseEndpointMessageDetails.html',
+                    scope: $scope,
+                    size: 'lg'
                 });
             };
-            ActiveMQ.decorate($scope);
             $scope.forwardMessages = function (uri) {
                 var mbean = Camel.getSelectionCamelContextMBean(workspace);
-                var selectedItems = $scope.gridOptions.selectedItems;
-                if (mbean && uri && selectedItems && selectedItems.length) {
+                var selectedMessages = $scope.messages.filter(function (message) { return message.selected; });
+                if (mbean && uri && selectedMessages && selectedMessages.length) {
                     //console.log("Creating a new endpoint called: " + uri + " just in case!");
                     jolokia.execute(mbean, "createEndpoint(java.lang.String)", uri, Core.onSuccess(intermediateResult));
-                    $scope.message = "Forwarded " + Core.maybePlural(selectedItems.length, "message" + " to " + uri);
-                    angular.forEach(selectedItems, function (item, idx) {
-                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
+                    $scope.message = "Forwarded " + Core.maybePlural(selectedMessages.length, "message" + " to " + uri);
+                    angular.forEach(selectedMessages, function (item, idx) {
+                        var callback = (idx + 1 < selectedMessages.length) ? intermediateResult : operationSuccess;
                         var body = item.body;
                         var headers = item.headers;
                         //console.log("sending to uri " + uri + " headers: " + JSON.stringify(headers) + " body: " + body);
@@ -18729,11 +18782,9 @@ var Camel;
                 var endpointFolder = Camel.getSelectionCamelContextEndpoints(workspace);
                 return (endpointFolder) ? endpointFolder.children.map(function (n) { return n.text; }) : [];
             };
-            $scope.refresh = loadData;
             function intermediateResult() {
             }
             function operationSuccess() {
-                $scope.gridOptions.selectedItems.splice(0);
                 Core.notification("success", $scope.message);
                 setTimeout(loadData, 50);
             }
@@ -18762,17 +18813,19 @@ var Camel;
                 if (angular.isString(response)) {
                     // lets parse the XML DOM here...
                     var doc = $.parseXML(response);
-                    var allMessages = $(doc).find("message");
-                    allMessages.each(function (idx, message) {
-                        var messageData = Camel.createMessageFromXml(message);
-                        // attach the open dialog to make it work
-                        messageData.openMessageDialog = $scope.openMessageDialog;
-                        data.push(messageData);
-                    });
+                    var docMessages = $(doc).find("message");
+                    var totalRows = docMessages.length;
+                    data.length = totalRows;
+                    for (var i = 0; i < totalRows; i++) {
+                        data[totalRows - 1 - i] = Camel.createMessageFromXml(docMessages[i]);
+                    }
                 }
-                $scope.messages = data;
+                allMessages = data;
+                $scope.messages = Pf.filter(allMessages, $scope.toolbarConfig.filterConfig);
+                $scope.model.allSelected = false;
                 Core.$apply($scope);
             }
+            loadData();
         }]);
 })(Camel || (Camel = {}));
 /// <reference path="camelPlugin.ts"/>
@@ -26435,7 +26488,7 @@ $templateCache.put('plugins/activemq/html/jobs.html','<div ng-controller="Active
 $templateCache.put('plugins/activemq/html/layoutActiveMQTree.html','<div class="tree-nav-layout">\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n    <activemq-tree-header></activemq-tree-header>\n    <activemq-tree></activemq-tree>\n  </div>\n  <div class="tree-nav-main">\n    <div>\n      <jmx-header></jmx-header>\n    </div>\n    <activemq-navigation></activemq-navigation>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/preferences.html','<div ng-controller="ActiveMQ.PreferencesController">\n  <div hawtio-form-2="config" entity="entity"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/blocked.html','<div class="table-view" ng-controller="Camel.BlockedExchangesController">\n\n  <h3>Blocked</h3>\n  \n  <p ng-if="!initDone">Loading...</p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No blocked exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n            <div class="form-group">\n              <button type="button" class="btn btn-default" ng-disabled="gridOptions.selectedItems.length === 0"\n                ng-click="unblockDialog = true" data-placement="bottom">Unblock</button>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="unblockDialog" ok-button-text="Unblock" cancel-button-text="Cancel" on-ok="doUnblock()"\n       title="Unblock Exchange">\n    <div class="dialog-body">\n      <p>You are about to unblock the selected thread.</p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/camel/html/browseEndpoint.html','<div ng-controller="Camel.BrowseEndpointController">\n\n  <div ng-class="{\'wiki-fixed\' : !isJmxTab}">\n\n    <h2>Browse</h2>\n\n    <div class="row toolbar-pf">\n      <div class="col-md-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group">\n            <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="openForwardDialog()"\n                    hawtio-show object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"\n                    title="Forward the selected messages to another endpoint" data-placement="bottom">\n              Forward\n            </button>\n            <button class="btn btn-default" ng-click="refresh()" title="Refreshes the list of messages">\n              Refresh\n            </button>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="search1" class="sr-only">Filter</label>\n                <input id="search1" type="search" class="form-control" ng-model="gridOptions.filterOptions.filterText"\n                      placeholder="Search">\n                <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="col-md-12">\n        <table class="table" hawtio-simple-table="gridOptions"></table>\n      </div>\n    </div>\n\n    <script type="text/ng-template" id="camelBrowseEndpointMessageDetails.html">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <div class="row">\n          <div class="col-md-4">\n            <h4 class="modal-title" id="myModalLabel">Message</h4>\n          </div>\n          <div class="col-md-7">\n            <div class=""\n                hawtio-pager="messages"\n                on-index-change="selectRowIndex"\n                row-index="rowIndex">\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class="modal-body camel-forward-message">\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Forward to endpoint</dt>\n              <dd>\n                <form class="form-inline camel-forward-message" ng-submit="forwardMessage(row, endpointUri)">\n                  <input type="text" class="form-control camel-forward-message" ng-model="endpointUri" placeholder="URI"\n                          uib-typeahead="title for title in endpointUris() | filter:$viewValue" required>\n                  <button type="submit" class="btn btn-default" hawtio-show \n                          object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"\n                          data-placement="bottom" title="Forward the selected messages to another endpoint">\n                    Forward\n                  </button>\n                </form>\n              </dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>ID</dt>\n              <dd>{{row.id}}</dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Body</dt>\n              <dd><div hawtio-editor="row.body" read-only="true" mode="mode"></div></dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Headers</dt>\n              <dd>\n                <table class="table">\n                  <thead>\n                    <tr>\n                      <th>Name</th>\n                      <th>Type</th>\n                      <th>Value</th>\n                    </tr>\n                  </thead>\n                  <tbody compile="row.headerHtml"></tbody>\n                </table>\n              </dd>\n            </dl>\n          </div>\n        </div>\n      </div>\n    </script>\n\n    <script type="text/ng-template" id="camelBrowseEndpointForwardMessage.html">\n      <form class="form-horizontal" ng-submit="forwardMessages(endpointUri); $close();">\n        <div class="modal-header">\n          <button type="button" class="close" aria-label="Close" ng-click="$close()">\n            <span class="pficon pficon-close" aria-hidden="true"></span>\n          </button>\n          <h4>\n            Forward to endpoint\n          </h4>\n        </div>\n        <div class="modal-body">\n            <div class="form-group">\n              <label class="col-sm-1 control-label" for="endpointUri">URI</label>\n              <div class="col-sm-11">\n                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri" required\n                        uib-typeahead="title for title in endpointUris() | filter:$viewValue">\n              </div>\n            </div>\n        </div>\n        <div class="modal-footer">\n          <button type="button" class="btn btn-default" ng-click="$close()">Close</button>\n          <button type="submit" class="btn btn-primary">Forward</button>\n        </div>\n      </form>\n    </script>\n\n  </div>\n\n</div>\n');
+$templateCache.put('plugins/camel/html/browseEndpoint.html','<div class="table-view" ng-controller="Camel.BrowseEndpointController">\n\n  <div ng-class="{\'wiki-fixed\' : !isJmxTab}">\n\n    <h2>Browse</h2>\n\n    <p ng-if="!messages">Loading...</p>\n    <div ng-if="messages">\n      <pf-toolbar config="toolbarConfig"></pf-toolbar>\n      <table class="table table-striped table-bordered camel-browse-endpoints-table">\n        <thead>\n          <tr>\n            <th>\n              <input type="checkbox" ng-model="model.allSelected" ng-change="selectAll(model.allSelected)">\n            </th>\n            <th>\n              Message ID\n            </th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr ng-repeat="message in messages track by $index">\n            <td>\n              <input type="checkbox" ng-model="message.selected" ng-click="refreshForwardActionDisabledProperty()">\n            </td>\n            <td>\n              <div class="ngCellText">\n                <a href="" ng-click="openMessageDialog(message, $index)">{{message.id}}</a>\n              </div>\n            </td>\n          </tr>\n        </tbody>\n      </table>                    \n    </div>\n\n    <script type="text/ng-template" id="camelBrowseEndpointMessageDetails.html">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <div class="row">\n          <div class="col-md-4">\n            <h4 class="modal-title" id="myModalLabel">Message</h4>\n          </div>\n          <div class="col-md-7">\n            <div class=""\n                hawtio-pager="messages"\n                on-index-change="selectRowIndex"\n                row-index="rowIndex">\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class="modal-body camel-forward-message">\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Forward to endpoint</dt>\n              <dd>\n                <form class="form-horizontal" ng-submit="forwardMessage(row, endpointUri)">\n                  <label class="sr-only" for="endpointUri">URI</label>\n                  <div class="input-group">\n                    <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri" placeholder="URI"\n                            uib-typeahead="title for title in endpointUris() | filter:$viewValue">\n                    <div class="input-group-btn">\n                      <button type="submit" class="btn btn-default" hawtio-show ng-disabled="!endpointUri"\n                              object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"\n                              data-placement="bottom" title="Forward the selected messages to another endpoint">\n                        Forward\n                      </button>\n                    </div>\n                  </div>\n                </form>\n              </dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>ID</dt>\n              <dd>{{row.id}}</dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Body</dt>\n              <dd><div hawtio-editor="row.body" read-only="true" mode="mode"></div></dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Headers</dt>\n              <dd>\n                <table class="table table-bordered">\n                  <thead>\n                    <tr>\n                      <th>Name</th>\n                      <th>Type</th>\n                      <th>Value</th>\n                    </tr>\n                  </thead>\n                  <tbody compile="row.headerHtml"></tbody>\n                </table>\n              </dd>\n            </dl>\n          </div>\n        </div>\n      </div>\n    </script>\n\n    <script type="text/ng-template" id="camelBrowseEndpointForwardMessage.html">\n      <form class="form-horizontal" ng-submit="forwardMessages(endpointUri); $close();">\n        <div class="modal-header">\n          <button type="button" class="close" aria-label="Close" ng-click="$close()">\n            <span class="pficon pficon-close" aria-hidden="true"></span>\n          </button>\n          <h4>\n            Forward to endpoint\n          </h4>\n        </div>\n        <div class="modal-body">\n            <div class="form-group">\n              <label class="col-sm-1 control-label" for="endpointUri">URI</label>\n              <div class="col-sm-11">\n                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri"\n                        uib-typeahead="title for title in endpointUris() | filter:$viewValue">\n              </div>\n            </div>\n        </div>\n        <div class="modal-footer">\n          <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n          <button type="submit" class="btn btn-primary" ng-disabled="!endpointUri">Forward</button>\n        </div>\n      </form>\n    </script>\n\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/browseRoute.html','<ng-include src="\'plugins/camel/html/browseMessageTemplate.html\'"></ng-include>\n\n<div class="row">\n  <table class="table table-striped" hawtio-simple-table="gridOptions"></table>\n  <!--\n      <div class="gridStyle" hawtio-datatable="gridOptions"></div>\n  -->\n</div>\n');
 $templateCache.put('plugins/camel/html/createEndpoint.html','<h1>Add Endpoint</h1>\n<div ng-controller="Camel.EndpointController" ng-switch="hasComponentNames">\n  <div ng-switch-when="true">\n    <div class="radio">\n      <label>\n        <input type="radio" ng-model="inputSource" value="uri">\n        From URI\n      </label>\n    </div>\n    <div ng-show="inputSource === \'uri\'">\n      <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n    </div>\n    <div class="radio">\n      <label>\n        <input type="radio" ng-model="inputSource" value="wizard">\n        From data\n      </label>\n    </div>\n    <div ng-show="inputSource === \'wizard\'">\n      <ng-include src="\'plugins/camel/html/createEndpointWizard.html\'"></ng-include>\n    </div>\n    </tabs>\n  </div>\n  <div ng-switch-default="false">\n    <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n  </div>\n</div>\n');
 $templateCache.put('plugins/camel/html/createEndpointURL.html','<form class="form-horizontal">\n  <div class="form-group">\n    <label class="col-sm-2 control-label" for="endpointName">URI</label>\n    <div class="col-sm-10">\n      <input type="text" class="form-control" size="255" ng-model="endpointName">\n    </div>\n  </div>\n  <div class="form-group">\n    <div class="col-sm-offset-2 col-sm-10">\n      <button type="button" class="btn btn-default" ng-click="cancel()">\n        Cancel\n      </button>\n      <button type="submit" class="btn btn-primary" ng-click="createEndpoint(endpointName)"\n              ng-disabled="!endpointName">\n        Add\n      </button>\n    </div>\n  </div>\n</form>\n');

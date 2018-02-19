@@ -4,7 +4,7 @@
 /// <reference types="angular-mocks" />
 /// <reference types="angular-route" />
 declare namespace Pf {
-    function filter(items: object[], filters: any[], filterConfig: any): object[];
+    function filter(items: object[], filterConfig: any): object[];
 }
 declare namespace ActiveMQ {
     const log: Logging.Logger;

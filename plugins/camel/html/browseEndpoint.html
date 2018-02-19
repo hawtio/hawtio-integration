@@ -1,42 +1,36 @@
-<div ng-controller="Camel.BrowseEndpointController">
+<div class="table-view" ng-controller="Camel.BrowseEndpointController">
 
   <div ng-class="{'wiki-fixed' : !isJmxTab}">
 
     <h2>Browse</h2>
 
-    <div class="row toolbar-pf">
-      <div class="col-md-12">
-        <form class="toolbar-pf-actions search-pf">
-          <div class="form-group">
-            <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-click="openForwardDialog()"
-                    hawtio-show object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"
-                    title="Forward the selected messages to another endpoint" data-placement="bottom">
-              Forward
-            </button>
-            <button class="btn btn-default" ng-click="refresh()" title="Refreshes the list of messages">
-              Refresh
-            </button>
-          </div>
-          <div class="toolbar-pf-action-right">
-            <div class="form-group has-clear">
-              <div class="search-pf-input-group">
-                <label for="search1" class="sr-only">Filter</label>
-                <input id="search1" type="search" class="form-control" ng-model="gridOptions.filterOptions.filterText"
-                      placeholder="Search">
-                <button type="button" class="clear" aria-hidden="true" ng-click="filterText = ''">
-                  <span class="pficon pficon-close"></span>
-                </button>
+    <p ng-if="!messages">Loading...</p>
+    <div ng-if="messages">
+      <pf-toolbar config="toolbarConfig"></pf-toolbar>
+      <table class="table table-striped table-bordered camel-browse-endpoints-table">
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" ng-model="model.allSelected" ng-change="selectAll(model.allSelected)">
+            </th>
+            <th>
+              Message ID
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="message in messages track by $index">
+            <td>
+              <input type="checkbox" ng-model="message.selected" ng-click="refreshForwardActionDisabledProperty()">
+            </td>
+            <td>
+              <div class="ngCellText">
+                <a href="" ng-click="openMessageDialog(message, $index)">{{message.id}}</a>
               </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12">
-        <table class="table" hawtio-simple-table="gridOptions"></table>
-      </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>                    
     </div>
 
     <script type="text/ng-template" id="camelBrowseEndpointMessageDetails.html">
@@ -63,14 +57,19 @@
             <dl>
               <dt>Forward to endpoint</dt>
               <dd>
-                <form class="form-inline camel-forward-message" ng-submit="forwardMessage(row, endpointUri)">
-                  <input type="text" class="form-control camel-forward-message" ng-model="endpointUri" placeholder="URI"
-                          uib-typeahead="title for title in endpointUris() | filter:$viewValue" required>
-                  <button type="submit" class="btn btn-default" hawtio-show 
-                          object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"
-                          data-placement="bottom" title="Forward the selected messages to another endpoint">
-                    Forward
-                  </button>
+                <form class="form-horizontal" ng-submit="forwardMessage(row, endpointUri)">
+                  <label class="sr-only" for="endpointUri">URI</label>
+                  <div class="input-group">
+                    <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri" placeholder="URI"
+                            uib-typeahead="title for title in endpointUris() | filter:$viewValue">
+                    <div class="input-group-btn">
+                      <button type="submit" class="btn btn-default" hawtio-show ng-disabled="!endpointUri"
+                              object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"
+                              data-placement="bottom" title="Forward the selected messages to another endpoint">
+                        Forward
+                      </button>
+                    </div>
+                  </div>
                 </form>
               </dd>
             </dl>
@@ -97,7 +96,7 @@
             <dl>
               <dt>Headers</dt>
               <dd>
-                <table class="table">
+                <table class="table table-bordered">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -128,14 +127,14 @@
             <div class="form-group">
               <label class="col-sm-1 control-label" for="endpointUri">URI</label>
               <div class="col-sm-11">
-                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri" required
+                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri"
                         uib-typeahead="title for title in endpointUris() | filter:$viewValue">
               </div>
             </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" ng-click="$close()">Close</button>
-          <button type="submit" class="btn btn-primary">Forward</button>
+          <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>
+          <button type="submit" class="btn btn-primary" ng-disabled="!endpointUri">Forward</button>
         </div>
       </form>
     </script>
