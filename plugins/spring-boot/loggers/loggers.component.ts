@@ -109,7 +109,7 @@ namespace SpringBoot {
         <h1>Loggers</h1>
         <div class="blank-slate-pf no-border" ng-if="$ctrl.loading === false && $ctrl.loggers.length === 0">
           <div class="blank-slate-pf-icon">
-            <span class="pficon pficon pficon-add-circle-o"></span>
+            <span class="pficon pficon pficon-warning-triangle-o"></span>
           </div>
           <h1>No Spring Boot Loggers</h1>
           <p>There are no loggers to display for this application.</p>

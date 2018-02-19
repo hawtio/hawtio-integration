@@ -3,9 +3,9 @@
     <div class="spring-boot-trace-fixed-toolbar">
       <h1>Trace</h1>
       <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
-      <div class="blank-slate-pf no-border" ng-if="$ctrl.loading === false && $ctrl.traces.length === 0">
+      <div class="blank-slate-pf no-border" ng-if="$ctrl.traces.length === 0">
         <div class="blank-slate-pf-icon">
-          <span class="pficon pficon pficon-add-circle-o"></span>
+          <span class="pficon pficon pficon-warning-triangle-o"></span>
         </div>
         <h1>No Spring Boot Traces</h1>
         <p>There are no trace details to display for this application.</p>
