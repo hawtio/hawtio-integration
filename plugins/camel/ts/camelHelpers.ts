@@ -1371,4 +1371,17 @@ namespace Camel {
     return false;
   }
 
+  /**
+   * Determines whether the endpoint supports browse operations
+   * @param endpoint The selected endpoint JMX tree node
+   */
+  export function isBrowsableEndpoint(endpoint: Jmx.NodeSelection): boolean {
+    if (endpoint && endpoint['mbean']) {
+      let mbean = endpoint['mbean'];
+      if (mbean['op']) {
+        return mbean['op']['browseAllMessagesAsXml'] != null;
+      }
+    }
+    return false;
+  }
 }

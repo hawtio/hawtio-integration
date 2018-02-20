@@ -562,6 +562,11 @@ declare namespace Camel {
      * @param minor   minor version as number
      */
     function isCamelVersionEQGT(major: any, minor: any, workspace: any, jolokia: any): boolean;
+    /**
+     * Determines whether the endpoint supports browse operations
+     * @param endpoint The selected endpoint JMX tree node
+     */
+    function isBrowsableEndpoint(endpoint: Jmx.NodeSelection): boolean;
 }
 declare namespace Camel {
     class Context {

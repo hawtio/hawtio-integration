@@ -21,7 +21,7 @@ namespace Camel {
       name: 'Refresh',
       actionFn: action => loadData()
     };
-    
+
     let allMessages = null;
     $scope.messages = null;
     $scope.camelContextMBean = getSelectionCamelContextMBean(workspace);
@@ -62,7 +62,7 @@ namespace Camel {
       selectionMatchProp: 'id',
       showCheckboxes: true
     };
-    
+
     $scope.tableDtOptions = {
       order: [[1, "desc"]],
     };
@@ -78,12 +78,12 @@ namespace Camel {
       $scope.messages.forEach(message => message.selected = $scope.model.allSelected);
       forwardAction.isDisabled = !$scope.model.allSelected;
     };
-    
+
     $scope.selectRowIndex = (rowIndex) => {
       $scope.rowIndex = rowIndex;
       $scope.row = $scope.messages[rowIndex];
     };
-    
+
     $scope.openMessageDialog = (message, index) => {
       $scope.row = message;
       $scope.rowIndex = index;
@@ -156,7 +156,7 @@ namespace Camel {
         mbean = workspace.getSelectedMBeanName();
       }
       if (mbean) {
-        log.info("MBean:", mbean);
+        log.debug("MBean:", mbean);
         jolokia.execute(mbean, 'browseAllMessagesAsXml(java.lang.Boolean)', true,
           Core.onSuccess(populateTable));
       }
@@ -164,12 +164,12 @@ namespace Camel {
 
     function populateTable(response) {
       var data = [];
-      
+
       if (angular.isString(response)) {
         // lets parse the XML DOM here...
         var doc = $.parseXML(response);
         var docMessages = $(doc).find("message");
-        
+
         const totalRows = docMessages.length;
         data.length = totalRows;
 
@@ -181,7 +181,7 @@ namespace Camel {
       allMessages = data;
       $scope.messages = Pf.filter(allMessages, $scope.toolbarConfig.filterConfig);
       $scope.model.allSelected = false;
-      
+
       Core.$apply($scope);
     }
 

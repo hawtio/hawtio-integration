@@ -44,11 +44,11 @@ namespace Camel {
       const canListTypeConverters = this.workspace.hasInvokeRightsForName(getSelectionCamelTypeConverter(this.workspace), "listTypeConverters");
       const canSeeEndpointStatistics = this.workspace.hasInvokeRightsForName(getSelectionCamelEndpointRuntimeRegistry(this.workspace), "endpointStatistics");
       const canSendMesssage = this.workspace.hasInvokeRights(this.workspace.selection, this.workspace.selection && this.workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage");
-      
+
       if (!isContextsFolder && !isRoutesFolder) {
         tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
       }
-      
+
       if (isContextsFolder) {
         tabs.push(new Core.HawtioTab('Contexts', '/camel/contexts'));
       }
@@ -60,7 +60,7 @@ namespace Camel {
       if ((isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
         tabs.push(new Core.HawtioTab('Route Diagram', '/camel/routeDiagram'));
       }
-      
+
       if (!isEndpointsFolder && !isEndpoint && (isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
         tabs.push(new Core.HawtioTab('Source', '/camel/source'));
       }
@@ -72,7 +72,7 @@ namespace Camel {
       if (isEndpoint && isCamelVersionEQGT_2_15 && canExplainEndpointJson) {
         tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesEndpoint'));
       }
-      
+
       if (isComponent && isCamelVersionEQGT_2_15 && canExplainComponentJson) {
         tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesComponent'));
       }
@@ -80,7 +80,7 @@ namespace Camel {
       if (isDataformat && isCamelVersionEQGT_2_16 && canExplainDataFormatJson) {
         tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesDataFormat'));
       }
-      
+
       if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder &&
           !isComponent && (isCamelContext || isRoutesFolder || isRoute) &&
           isCamelVersionEQGT_2_15 && canBrowse) {
@@ -116,12 +116,12 @@ namespace Camel {
       if (isRoute && isDebugMbean && canGetBreakpoints) {
         tabs.push(new Core.HawtioTab('Debug', '/camel/debugRoute'));
       }
-      
+
       if (isRoute && isTraceMBean && canDumpAllTracedMessagesAsXml) {
         tabs.push(new Core.HawtioTab('Trace', '/camel/traceRoute'));
       }
 
-      if (isEndpoint && canBrowseAllMessagesAsXml) {
+      if (isEndpoint && isBrowsableEndpoint(this.workspace.selection) && canBrowseAllMessagesAsXml) {
         tabs.push(new Core.HawtioTab('Browse', '/camel/browseEndpoint'));
       }
 
@@ -132,7 +132,7 @@ namespace Camel {
       if (isEndpointsFolder) {
         tabs.push(new Core.HawtioTab('Endpoints', '/camel/endpoints'));
       }
-      
+
       if (!isContextsFolder && !isRoutesFolder) {
         tabs.push(new Core.HawtioTab('Operations', '/jmx/operations'));
       }
@@ -147,5 +147,5 @@ namespace Camel {
   }
 
   _module.service('camelTabsService', CamelTabsService);
-  
+
 }

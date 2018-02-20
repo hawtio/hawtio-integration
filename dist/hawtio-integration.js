@@ -17346,6 +17346,20 @@ var Camel;
         return false;
     }
     Camel.isCamelVersionEQGT = isCamelVersionEQGT;
+    /**
+     * Determines whether the endpoint supports browse operations
+     * @param endpoint The selected endpoint JMX tree node
+     */
+    function isBrowsableEndpoint(endpoint) {
+        if (endpoint && endpoint['mbean']) {
+            var mbean = endpoint['mbean'];
+            if (mbean['op']) {
+                return mbean['op']['browseAllMessagesAsXml'] != null;
+            }
+        }
+        return false;
+    }
+    Camel.isBrowsableEndpoint = isBrowsableEndpoint;
 })(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
@@ -18798,7 +18812,7 @@ var Camel;
                     mbean = workspace.getSelectedMBeanName();
                 }
                 if (mbean) {
-                    Camel.log.info("MBean:", mbean);
+                    Camel.log.debug("MBean:", mbean);
                     jolokia.execute(mbean, 'browseAllMessagesAsXml(java.lang.Boolean)', true, Core.onSuccess(populateTable));
                 }
             }
@@ -18943,7 +18957,7 @@ var Camel;
             if (isRoute && isTraceMBean && canDumpAllTracedMessagesAsXml) {
                 tabs.push(new Core.HawtioTab('Trace', '/camel/traceRoute'));
             }
-            if (isEndpoint && canBrowseAllMessagesAsXml) {
+            if (isEndpoint && Camel.isBrowsableEndpoint(this.workspace.selection) && canBrowseAllMessagesAsXml) {
                 tabs.push(new Core.HawtioTab('Browse', '/camel/browseEndpoint'));
             }
             if (isEndpoint && canSendMesssage) {
