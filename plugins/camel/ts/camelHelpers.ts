@@ -874,7 +874,7 @@ namespace Camel {
 
   export function getCamelVersion(workspace: Jmx.Workspace, jolokia) {
     const context = getSelectionCamelContext(workspace);
-    if (context) {
+    if (context && context.parent != null) {
       if (context.version) {
         // return cached version
         return context.version;

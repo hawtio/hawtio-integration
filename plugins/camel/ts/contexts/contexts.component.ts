@@ -84,11 +84,8 @@ namespace Camel {
 
     private loadContexts() {
       if (this.workspace.selection) {
-        var typeNames = Jmx.getUniqueTypeNames(this.workspace.selection.children);
-        if (typeNames.length > 1) {
-          console.error("Child nodes aren't of the same type. Found types: " + typeNames);
-        }
-        let mbeans = _.map(this.workspace.selection.children, node => node.objectName);
+        let children = this.workspace.selection.children.filter(node => {return node.objectName != null})
+        let mbeans = _.map(children, node => node.objectName);
         this.contextsService.getContexts(mbeans)
           .then(contexts => this.contexts = contexts);
       }

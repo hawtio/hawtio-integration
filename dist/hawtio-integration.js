@@ -16842,7 +16842,7 @@ var Camel;
     Camel.getSelectionRouteMBean = getSelectionRouteMBean;
     function getCamelVersion(workspace, jolokia) {
         var context = getSelectionCamelContext(workspace);
-        if (context) {
+        if (context && context.parent != null) {
             if (context.version) {
                 // return cached version
                 return context.version;
@@ -17559,11 +17559,8 @@ var Camel;
         ContextsController.prototype.loadContexts = function () {
             var _this = this;
             if (this.workspace.selection) {
-                var typeNames = Jmx.getUniqueTypeNames(this.workspace.selection.children);
-                if (typeNames.length > 1) {
-                    console.error("Child nodes aren't of the same type. Found types: " + typeNames);
-                }
-                var mbeans = _.map(this.workspace.selection.children, function (node) { return node.objectName; });
+                var children = this.workspace.selection.children.filter(function (node) { return node.objectName != null; });
+                var mbeans = _.map(children, function (node) { return node.objectName; });
                 this.contextsService.getContexts(mbeans)
                     .then(function (contexts) { return _this.contexts = contexts; });
             }
@@ -18090,11 +18087,8 @@ var Camel;
         RoutesController.prototype.loadRoutes = function () {
             var _this = this;
             if (this.workspace.selection) {
-                var typeNames = Jmx.getUniqueTypeNames(this.workspace.selection.children);
-                if (typeNames.length > 1) {
-                    Camel.log.error("Child nodes aren't of the same type. Found types: " + typeNames);
-                }
-                var mbeans = _.map(this.workspace.selection.children, function (node) { return node.objectName; });
+                var children = this.workspace.selection.children.filter(function (node) { return node.objectName != null; });
+                var mbeans = _.map(children, function (node) { return node.objectName; });
                 this.routesService.getRoutes(mbeans)
                     .then(function (routes) { return _this.routes = routes; });
             }
