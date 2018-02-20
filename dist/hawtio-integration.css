@@ -683,23 +683,6 @@ div.camel-properties {
   text-transform: capitalize;
 }
 
-.spring-boot-health-main {
-  margin-bottom: 20px;
-}
-.spring-boot-health-main .toast-pf {
-  position: relative;
-  top: 0;
-  right: 0;
-  display: block;
-  border: none;
-  box-shadow: 0 1px 1px rgba(3, 3, 3, 0.175);
-  margin: 0 -10px 20px -10px;
-}
-.spring-boot-health-main .container-cards-pf {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
 .install-bundle {
   margin-bottom: 10px;
 }
@@ -810,6 +793,23 @@ div.camel-properties {
   color: inherit;
   background-color: inherit;
   border: none;
+}
+
+.spring-boot-health-main {
+  margin-bottom: 20px;
+}
+.spring-boot-health-main .toast-pf {
+  position: relative;
+  top: 0;
+  right: 0;
+  display: block;
+  border: none;
+  box-shadow: 0 1px 1px rgba(3, 3, 3, 0.175);
+  margin: 0 -10px 20px -10px;
+}
+.spring-boot-health-main .container-cards-pf {
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .spring-boot-layout {
