@@ -4,7 +4,7 @@
     <img ng-src="{{icon}}" width="24" height="24" ng-show="icon"/>
     <span>{{title}}</span>
   </h3>
-  <em><span ng-repeat="label in labels track by $index">{{$first ? '' : ' / '}}{{label}}<span></em>
+  <span class="label label-default" ng-repeat="label in labels track by $index">{{label}}<span>
 </header>
 <p>{{description}}</p>
 <property-list title="Defined Properties" properties="definedProperties"></property-list>

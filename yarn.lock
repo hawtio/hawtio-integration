@@ -25,9 +25,9 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@3.2.1", "@hawtio/core@3.2.11", "@hawtio/core@3.2.3", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
-  version "3.2.11"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.11.tgz#bb1d34659fc8a1531aa15212fbce7cf06ef45546"
+"@hawtio/core@3.2.1", "@hawtio/core@3.2.12", "@hawtio/core@3.2.13", "@hawtio/core@3.2.3", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
+  version "3.2.13"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.13.tgz#76b8793b8673ccc6d71201ed5d58474962224c9e"
   dependencies:
     "@hawtio/core-dts" "3.0.18"
     "@types/angular" "1.6.39"
@@ -38,13 +38,13 @@
     "@types/marked" "0.3.0"
     "@types/urijs" "1.15.34"
     angular "1.6.8"
+    angular-patternfly "^4.0.0"
     angular-route "1.6.8"
     angular-sanitize "1.6.8"
     jquery "2.2.4"
     js-logger "1.4.1"
     lodash "4.17.4"
     marked "0.3.9"
-    patternfly "3.32.1"
     urijs "1.19.0"
 
 "@hawtio/forms@3.0.12":
@@ -55,16 +55,15 @@
     "@hawtio/core-dts" "~3.0.12"
     "@hawtio/ui" "~3.0.25"
 
-"@hawtio/jmx@3.2.12":
-  version "3.2.12"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.12.tgz#aef944c2b46146eb578311dccb3bff21593504af"
+"@hawtio/jmx@3.2.13":
+  version "3.2.13"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.13.tgz#2b91d91ce0b68bff6b572de3296c246718af1f36"
   dependencies:
-    "@hawtio/core" "3.2.11"
+    "@hawtio/core" "3.2.13"
     "@hawtio/forms" "3.0.12"
     "@hawtio/ui" "3.2.0"
-    "@hawtio/utilities" "3.2.1"
+    "@hawtio/utilities" "3.2.2"
     "@types/jqueryui" "1.12.0"
-    angular-patternfly "4.14.0"
     angular-resizable "1.2.0"
     patternfly-bootstrap-treeview "2.1.5"
 
@@ -103,11 +102,11 @@
     codemirror "5.33.0"
     js-beautify "1.7.5"
 
-"@hawtio/utilities@3.2.0", "@hawtio/utilities@3.2.1", "@hawtio/utilities@~3.0.8":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/utilities/-/utilities-3.2.0.tgz#31506054856fdd3013ab3e4c8dadbcb55f599ef9"
+"@hawtio/utilities@3.2.0", "@hawtio/utilities@3.2.2", "@hawtio/utilities@~3.0.8":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@hawtio/utilities/-/utilities-3.2.2.tgz#b9b30194d135d7af85af3f87f554f12d47e01965"
   dependencies:
-    "@hawtio/core" "3.2.1"
+    "@hawtio/core" "3.2.12"
     angular-file-upload "~2.5.0"
     human-date "~1.4.0"
     humanize-duration "~3.10.0"
@@ -277,9 +276,9 @@ angular-mocks@~1.6.8:
   version "1.6.8"
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.6.8.tgz#ba2120057b4edaa56492d8789ddfbc8f18afa3c5"
 
-angular-patternfly@4.14.0:
-  version "4.14.0"
-  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.14.0.tgz#87db81ac346764208060caebde49c369953729d4"
+angular-patternfly@^4.0.0:
+  version "4.14.11"
+  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.14.11.tgz#a4c54c29bae1ee245393d972c335d5d7adc7b269"
   dependencies:
     angular "1.5.*"
     angular-animate "1.5.*"
@@ -287,18 +286,18 @@ angular-patternfly@4.14.0:
     angular-svg-base-fix "2.0.0"
     angular-ui-bootstrap "2.3.x"
     lodash "4.x"
-    patternfly "^3.31.0"
+    patternfly "^3.37.1"
   optionalDependencies:
     angular-drag-and-drop-lists "2.0.0"
     angularjs-datatables "^0.5.9"
     bootstrap "~3.3.7"
     bootstrap-select "~1.12.4"
     c3 "~0.4.11"
-    components-jqueryui components/jqueryui#1.12.1
     d3 "~3.5.17"
     datatables.net "^1.10.12"
     datatables.net-select "~1.2.0"
     jquery "~3.2.1"
+    jquery-ui-dist "~1.12.1"
     moment "~2.19.3"
 
 angular-resizable@1.2.0:
@@ -1001,10 +1000,6 @@ component-emitter@1.2.1:
 component-inherit@0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/component-inherit/-/component-inherit-0.0.3.tgz#645fc4adf58b72b649d5cae65135619db26ff143"
-
-components-jqueryui@components/jqueryui#1.12.1:
-  version "1.12.1"
-  resolved "https://codeload.github.com/components/jqueryui/tar.gz/44ecf3794cc56b65954cc19737234a3119d036cc"
 
 concat-map@0.0.1:
   version "0.0.1"
@@ -2836,6 +2831,10 @@ jquery-match-height@^0.7.2:
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/jquery-match-height/-/jquery-match-height-0.7.2.tgz#f8d9f3ba5314daab109cf07408674be204be5f0e"
 
+jquery-ui-dist@~1.12.1:
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/jquery-ui-dist/-/jquery-ui-dist-1.12.1.tgz#5c0815d3cc6f90ff5faaf5b268a6e23b4ca904fa"
+
 jquery@2.2.4, "jquery@>= 2.1.x", jquery@>=1.11.0, jquery@>=1.7, jquery@>=1.7.0, jquery@>=1.7.1, "jquery@>=1.7.1 <4.0.0", jquery@>=1.8, "jquery@^1.8.3 || ^2.0 || ^3.0", jquery@~2.2.4, jquery@~3.2.1:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-2.2.4.tgz#2c89d6889b5eac522a7eea32c14521559c6cbf02"
@@ -3955,7 +3954,7 @@ patternfly-bootstrap-treeview@2.1.5, patternfly-bootstrap-treeview@~2.1.0:
     bootstrap "3.3.x"
     jquery ">= 2.1.x"
 
-patternfly@3.26.1, patternfly@3.32.1, patternfly@^3.31.0, patternfly@~3.30.0:
+patternfly@3.26.1, patternfly@3.32.1, patternfly@^3.37.1, patternfly@~3.30.0:
   version "3.26.1"
   resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.26.1.tgz#ef77c98d4a9cb92651082a11c3ef6ac7d37883e7"
   dependencies:

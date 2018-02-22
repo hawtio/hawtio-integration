@@ -393,7 +393,7 @@ div.camel-properties {
 }
 .camel-properties-header h3 {
   display: inline-block;
-  margin-right: 50px;
+  margin-right: 40px;
 }
 .camel-properties-header h3 img {
   margin-right: 5px;
@@ -401,11 +401,10 @@ div.camel-properties {
 .camel-properties-header h3 span {
   vertical-align: sub;
 }
-.camel-properties-header em {
-  vertical-align: sub;
+.camel-properties-header .label:not(:last-child) {
+  margin-right: 3px;
 }
 .camel-properties-info-circle {
-  color: #8b8d8f;
   position: relative;
   left: -17px;
   float: left;

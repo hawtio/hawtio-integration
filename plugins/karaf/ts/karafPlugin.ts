@@ -8,7 +8,6 @@ namespace Karaf {
   var pluginName = 'karaf';
 
   export var _module = angular.module(pluginName, [
-    'patternfly',
     'infinite-scroll',
     featuresModule,
     scrComponentsModule
