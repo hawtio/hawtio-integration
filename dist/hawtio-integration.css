@@ -186,6 +186,10 @@ caption {
   width: 1px;
 }
 
+.camel-preferences-form {
+  margin-top: 20px;
+}
+
 @media screen and (max-width: 767px) {
 }
 @media (min-width: 768px) {

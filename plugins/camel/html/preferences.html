@@ -1,3 +1,93 @@
-<div ng-controller="Camel.PreferencesController">
-  <div hawtio-form-2="config" entity="entity"></div>
-</div>
+<form class="form-horizontal camel-preferences-form" ng-controller="Camel.PreferencesController">
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="camelHideOptionDocumentation">
+      Hide option documentation
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to hide documentation in the properties view and Camel route editor"></span>
+    </label>
+    <div class="col-md-6">
+      <input type="checkbox" id="camelHideOptionDocumentation" ng-model="camelHideOptionDocumentation">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="camelHideOptionDefaultValue">
+      Hide default option values
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to hide options that are using a default value in the properties view"></span>
+    </label>
+    <div class="col-md-6">
+      <input type="checkbox" id="camelHideOptionDefaultValue" ng-model="camelHideOptionDefaultValue">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="camelHideOptionUnusedValue">
+      Hide unused option values
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to hide unused/empty options in the properties view"></span>
+    </label>
+    <div class="col-md-6">
+      <input type="checkbox" id="camelHideOptionUnusedValue" ng-model="camelHideOptionUnusedValue">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="camelTraceOrDebugIncludeStreams">
+      Include trace / debug streams
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to include stream based message body when using the tracer and debugger"></span>
+    </label>
+    <div class="col-md-6">
+      <input type="checkbox" id="camelTraceOrDebugIncludeStreams" ng-model="camelTraceOrDebugIncludeStreams">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="camelMaximumTraceOrDebugBodyLength">
+      Maximum trace / debug body length
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum length of the body before its clipped when using the tracer and debugger"></span>
+    </label>
+    <div class="col-md-6">
+      <input id="camelMaximumTraceOrDebugBodyLength" type="number" class="form-control" ng-model="camelMaximumTraceOrDebugBodyLength" min="0"/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="camelMaximumLabelWidth">
+      Maximum label width
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum length of a label in Camel diagrams before it is clipped"></span>
+    </label>
+    <div class="col-md-6">
+      <input id="camelMaximumLabelWidth" type="number" class="form-control" ng-model="camelMaximumLabelWidth" min="0"/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="camelIgnoreIdForLabel">
+      Ignore ID for label
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="If enabled then we will ignore the ID value when viewing a pattern in a Camel diagram; otherwise we will use the ID value as the label (the tooltip will show the actual detail"></span>
+    </label>
+    <div class="col-md-6">
+      <input type="checkbox" id="camelIgnoreIdForLabel" ng-model="camelIgnoreIdForLabel">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="camelShowInflightCounter">
+      Show inflight counter
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to show inflight counter in route diagram"></span>
+    </label>
+    <div class="col-md-6">
+      <input type="checkbox" id="camelShowInflightCounter" ng-model="camelShowInflightCounter">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="camelRouteMetricMaxSeconds">
+      Route metric maximum seconds
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum value in seconds used by the route metrics duration and histogram charts"></span>
+    </label>
+    <div class="col-md-6">
+      <input id="camelRouteMetricMaxSeconds" type="number" class="form-control" ng-model="camelRouteMetricMaxSeconds" min="0" max="100"/>
+    </div>
+  </div>
+
+</form>
