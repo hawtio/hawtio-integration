@@ -146,6 +146,10 @@ caption {
   width: 15%;
 }
 
+.activemq-preferences-form {
+  margin-top: 20px;
+}
+
 .org-apache-activemq span.node-icon:before,
 .org-apache-activemq-Broker span.node-icon:before,
 .org-apache-activemq-Broker-folder span.node-icon:before {

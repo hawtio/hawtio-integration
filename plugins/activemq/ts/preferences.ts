@@ -9,37 +9,13 @@ namespace ActiveMQ {
       userDetails: Core.UserDetails,
       $rootScope: ng.IRootScopeService) => {
 
-    var config = {
-      properties: {
-        activemqUserName: {
-          type: 'string',
-          description: 'The user name to be used when connecting to the broker'
-        },
-        activemqPassword: {
-          type: 'password',
-          description: 'Password to be used when connecting to the broker'
-        },
-        activemqFilterAdvisoryTopics: {
-          type: 'boolean',
-          default: 'false',
-          description: 'Whether to exclude advisory topics in tree/table'
-        },
-        activemqBrowseBytesMessages: {
-          type: 'number',
-          enum: {
-            'Hex and text': 1,
-            'Decimal and text': 2,
-            'Hex': 4,
-            'Decimal': 8,
-            'Off': 99
-          },
-          description: 'Browsing byte messages should display the message body as'
-        }
-      }
+    $scope.messageBodyDisplayOptions = {
+      'Hex and text': 1,
+      'Decimal and text': 2,
+      'Hex': 4,
+      'Decimal': 8,
+      'Off': 99
     };
-
-    $scope.entity = $scope;
-    $scope.config = config;
 
     Core.initPreferenceScope($scope, localStorage, {
       'activemqUserName': {
@@ -60,6 +36,5 @@ namespace ActiveMQ {
         }
       }
     });
-
   }]);
 }

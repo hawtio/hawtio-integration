@@ -1,3 +1,47 @@
-<div ng-controller="ActiveMQ.PreferencesController">
-  <div hawtio-form-2="config" entity="entity"></div>
-</div>
+<form class="form-horizontal camel-preferences-form" ng-controller="ActiveMQ.PreferencesController">
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="activemqUserName">
+      ActiveMQ user name
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The user name to be used when connecting to the broker"></span>
+    </label>
+    <div class="col-md-6">
+      <input id="activemqUserName" type="text" class="form-control" ng-model="activemqUserName"/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="activemqPassword">
+      ActiveMQ password
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The user name to be used when connecting to the broker"></span>
+    </label>
+    <div class="col-md-6">
+      <input id="activemqPassword" type="password" class="form-control" ng-model="activemqPassword"/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="activemqFilterAdvisoryTopics">
+      Filter advisory topics
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to exclude advisory topics in tree/table"></span>
+    </label>
+    <div class="col-md-6">
+      <input type="checkbox" id="activemqFilterAdvisoryTopics" ng-model="activemqFilterAdvisoryTopics">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="activemqBrowseBytesMessages">
+      Display message body as
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Browsing byte messages should display the message body as"></span>
+    </label>
+    <div class="col-md-6">
+      <select id="activemqBrowseBytesMessages"
+              ng-model="activemqBrowseBytesMessages"
+              ng-options="key for (key, value) in messageBodyDisplayOptions"
+              ng-selected="activemqBrowseBytesMessages === value">
+      </select>
+    </div>
+  </div>
+
+</form>
