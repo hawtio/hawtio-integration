@@ -23874,6 +23874,7 @@ var Osgi;
                     var bundle = {
                         id: item.Identifier,
                         name: item.Headers['Bundle-Name'] ? item.Headers['Bundle-Name']['Value'] : '',
+                        location: item.Location,
                         symbolicName: item.SymbolicName,
                         state: item.State.toLowerCase(),
                         version: item.Version
@@ -23943,7 +23944,6 @@ var Osgi;
             });
         };
         BundlesService.prototype.handleResponse = function (response) {
-            console.log(response);
             if (response && response['Error']) {
                 throw response['Error'];
             }
@@ -24173,7 +24173,7 @@ var Osgi;
     }());
     Osgi.BundlesController = BundlesController;
     Osgi.bundlesComponent = {
-        template: "\n      <div class=\"table-view\">\n        <h1>Bundles</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <install-bundle on-install=\"$ctrl.loadBundles()\"></install-bundle>\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <pf-table-view config=\"$ctrl.tableConfig\"\n                         columns=\"$ctrl.tableColumns\"\n                         items=\"$ctrl.tableItems\"></pf-table-view>\n        </div>\n      </div>\n    ",
+        template: "\n      <div class=\"table-view\">\n        <h1>Bundles</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <install-bundle bundles=\"$ctrl.bundles\" on-install=\"$ctrl.loadBundles()\"></install-bundle>\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <pf-table-view config=\"$ctrl.tableConfig\"\n                         columns=\"$ctrl.tableColumns\"\n                         items=\"$ctrl.tableItems\"></pf-table-view>\n        </div>\n      </div>\n    ",
         controller: BundlesController
     };
 })(Osgi || (Osgi = {}));
@@ -24186,25 +24186,44 @@ var Osgi;
             'ngInject';
             this.bundlesService = bundlesService;
             this.workspace = workspace;
+            this.loading = false;
+            this.bundles = [];
             this.frameworkMBean = Osgi.getSelectionFrameworkMBean(this.workspace);
         }
         InstallBundleController.prototype.install = function (bundleUrl) {
             var _this = this;
+            var bundle = this.findBundleByUrl(bundleUrl);
+            if (bundle) {
+                Core.notification('warning', "Bundle " + bundle.name + " " + bundle.version + " is already installed");
+                return;
+            }
+            this.loading = true;
             this.bundlesService.installBundle(bundleUrl)
                 .then(function (response) {
+                _this.loading = false;
                 Core.notification('success', response);
                 _this['onInstall']();
             })
-                .catch(function (error) { return Core.notification('danger', error); });
+                .catch(function (error) {
+                _this.loading = false;
+                Core.notification('danger', error);
+            });
+        };
+        InstallBundleController.prototype.findBundleByUrl = function (bundleUrl) {
+            return this.bundles.filter(function (bundle) { return bundle.location === bundleUrl.trim(); })[0];
+        };
+        InstallBundleController.prototype.installDisabled = function (bundleUrl) {
+            return this.loading || (!bundleUrl || bundleUrl.trim().length === 0);
         };
         return InstallBundleController;
     }());
     Osgi.InstallBundleController = InstallBundleController;
     Osgi.installBundleComponent = {
-        template: "\n      <div class=\"row install-bundle\"\n          hawtio-show object-name=\"{{$ctrl.frameworkMBean}}\" method-name=\"installBundle\">\n        <div class=\"col-lg-6\">\n          <div class=\"input-group\">\n            <input type=\"text\" class=\"form-control\" placeholder=\"Bundle URL...\" ng-model=\"bundleUrl\">\n            <span class=\"input-group-btn\">\n              <button type=\"button\" class=\"btn btn-default\" ng-click=\"$ctrl.install(bundleUrl)\">\n                Install\n              </button>\n            </span>\n          </div>\n        </div>\n        <div class=\"col-lg-6\">\n        </div>\n      </div>\n    ",
+        template: "\n      <div class=\"row install-bundle\"\n          hawtio-show object-name=\"{{$ctrl.frameworkMBean}}\" method-name=\"installBundle\">\n        <div class=\"col-lg-6\">\n          <div class=\"input-group\">\n            <input type=\"text\" class=\"form-control\" placeholder=\"Bundle URL...\" ng-model=\"bundleUrl\">\n            <span class=\"input-group-btn\">\n              <button type=\"button\" class=\"btn btn-default\" ng-click=\"$ctrl.install(bundleUrl)\" ng-disabled=\"$ctrl.installDisabled(bundleUrl)\">\n                Install\n              </button>\n            </span>\n          </div>\n        </div>\n        <div class=\"col-lg-6\">\n        </div>\n      </div>\n    ",
         controller: InstallBundleController,
         bindings: {
-            onInstall: '&'
+            onInstall: '&',
+            bundles: '<'
         }
     };
 })(Osgi || (Osgi = {}));

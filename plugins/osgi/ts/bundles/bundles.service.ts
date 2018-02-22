@@ -6,7 +6,7 @@ namespace Osgi {
   export class BundlesService {
 
     private log: Logging.Logger = Logger.get("Osgi");
-    
+
     constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia, private workspace: Jmx.Workspace) {
       'ngInject';
     }
@@ -19,6 +19,7 @@ namespace Osgi {
             var bundle: Bundle = {
               id: item.Identifier,
               name: item.Headers['Bundle-Name'] ? item.Headers['Bundle-Name']['Value'] : '',
+              location: item.Location,
               symbolicName: item.SymbolicName,
               state: item.State.toLowerCase(),
               version: item.Version
@@ -35,7 +36,7 @@ namespace Osgi {
       return this.execute(mbean, 'startBundles([J)', ids)
         .then(this.handleResponse);
     }
-    
+
     stopBundles(bundles: Bundle[]): ng.IPromise<string> {
       const mbean = getSelectionFrameworkMBean(this.workspace);
       const ids = bundles.map(bundle => bundle.id);
@@ -63,7 +64,7 @@ namespace Osgi {
       return this.execute(mbean, 'uninstallBundles([J)', ids)
         .then(this.handleResponse);
     }
-    
+
     installBundle(bundleUrl: string): ng.IPromise<string> {
       const mbean = getSelectionFrameworkMBean(this.workspace);
       return this.execute(mbean, 'installBundle(java.lang.String)', bundleUrl)
@@ -91,9 +92,8 @@ namespace Osgi {
         });
       });
     }
-    
+
     private handleResponse(response) {
-      console.log(response);
       if (response && response['Error']) {
         throw response['Error'];
       } else {

@@ -1625,6 +1625,7 @@ declare namespace Osgi {
     interface Bundle {
         id: number;
         name: string;
+        location: string;
         symbolicName: string;
         state: string;
         version: string;
@@ -1678,9 +1679,13 @@ declare namespace Osgi {
     class InstallBundleController {
         private bundlesService;
         private workspace;
+        loading: boolean;
         frameworkMBean: string;
+        bundles: Bundle[];
         constructor(bundlesService: BundlesService, workspace: Jmx.Workspace);
         install(bundleUrl: string): void;
+        findBundleByUrl(bundleUrl: string): Bundle;
+        installDisabled(bundleUrl: string): boolean;
     }
     const installBundleComponent: angular.IComponentOptions;
 }

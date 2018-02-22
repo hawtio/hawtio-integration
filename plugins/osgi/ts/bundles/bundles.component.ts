@@ -227,7 +227,6 @@ namespace Osgi {
       this.updateAction.isDisabled = noBundlesSelected;
       this.uninstallAction.isDisabled = noBundlesSelected;
     }
-
   }
 
   export const bundlesComponent: angular.IComponentOptions = {
@@ -236,7 +235,7 @@ namespace Osgi {
         <h1>Bundles</h1>
         <p ng-if="$ctrl.loading">Loading...</p>
         <div ng-if="!$ctrl.loading">
-          <install-bundle on-install="$ctrl.loadBundles()"></install-bundle>
+          <install-bundle bundles="$ctrl.bundles" on-install="$ctrl.loadBundles()"></install-bundle>
           <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
           <pf-table-view config="$ctrl.tableConfig"
                          columns="$ctrl.tableColumns"

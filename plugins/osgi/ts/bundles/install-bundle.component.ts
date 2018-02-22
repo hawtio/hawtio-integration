@@ -4,7 +4,9 @@ namespace Osgi {
 
   export class InstallBundleController {
 
+    loading: boolean = false;
     frameworkMBean: string;
+    bundles: Bundle[] = [];
 
     constructor(private bundlesService: BundlesService, private workspace: Jmx.Workspace) {
       'ngInject';
@@ -12,14 +14,32 @@ namespace Osgi {
     }
 
     install(bundleUrl: string) {
+      let bundle: Bundle = this.findBundleByUrl(bundleUrl);
+      if (bundle) {
+        Core.notification('warning',`Bundle ${bundle.name} ${bundle.version} is already installed`);
+        return;
+      }
+
+      this.loading = true;
       this.bundlesService.installBundle(bundleUrl)
-        .then(response => {
-          Core.notification('success', response);
-          this['onInstall']();
-        })
-        .catch(error => Core.notification('danger', error));
+      .then(response => {
+        this.loading = false;
+        Core.notification('success', response);
+        this['onInstall']();
+      })
+      .catch(error => {
+        this.loading = false;
+        Core.notification('danger', error);
+      });
     }
 
+    findBundleByUrl(bundleUrl: string): Bundle {
+      return this.bundles.filter((bundle) => {return bundle.location === bundleUrl.trim()})[0];
+    }
+
+    installDisabled(bundleUrl: string): boolean {
+      return this.loading || (!bundleUrl || bundleUrl.trim().length === 0);
+    }
   }
 
   export const installBundleComponent: angular.IComponentOptions = {
@@ -30,7 +50,7 @@ namespace Osgi {
           <div class="input-group">
             <input type="text" class="form-control" placeholder="Bundle URL..." ng-model="bundleUrl">
             <span class="input-group-btn">
-              <button type="button" class="btn btn-default" ng-click="$ctrl.install(bundleUrl)">
+              <button type="button" class="btn btn-default" ng-click="$ctrl.install(bundleUrl)" ng-disabled="$ctrl.installDisabled(bundleUrl)">
                 Install
               </button>
             </span>
@@ -42,8 +62,8 @@ namespace Osgi {
     `,
     controller: InstallBundleController,
     bindings: {
-      onInstall: '&'
+      onInstall: '&',
+      bundles: '<'
     }
   };
-
 }
