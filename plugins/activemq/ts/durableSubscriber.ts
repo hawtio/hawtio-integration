@@ -3,70 +3,102 @@
 
 namespace ActiveMQ {
 
-  _module.controller("ActiveMQ.DurableSubscriberController", ["$scope", "workspace", "jolokia", (
+  _module.controller("ActiveMQ.DurableSubscriberController", ["$scope", "$uibModal", "workspace", "jolokia", (
       $scope,
+      $uibModal,
       workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
     var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
 
-    $scope.refresh = loadTable;
+    let allSubscribers = null;
+    $scope.durableSubscribers = null;
+    $scope.selectedSubscriber;
 
-    $scope.durableSubscribers = [];
-
-    $scope.tempData = [];
-
-    $scope.createSubscriberDialog = new UI.Dialog();
+    $scope.createSubscriberDialog;
     $scope.deleteSubscriberDialog = new UI.Dialog();
-    $scope.showSubscriberDialog = new UI.Dialog();
+    $scope.showSubscriberDialog;
 
     $scope.topicName = '';
     $scope.clientId = '';
     $scope.subscriberName = '';
     $scope.subSelector = '';
 
-    $scope.gridOptions = {
-      selectedItems: [],
-      data: 'durableSubscribers',
-      displayFooter: false,
-      showFilter: false,
-      showColumnMenu: true,
-      enableCellSelection: false,
-      enableColumnResize: true,
-      enableColumnReordering: true,
-      selectWithCheckboxOnly: false,
-      showSelectionCheckbox: false,
-      multiSelect: false,
-      displaySelectionCheckbox : false, // old pre 2.0 config!
-      filterOptions: {
-        filterText: ''
-      },
-      maintainColumnRatios: false,
-      columnDefs: [
-        {
-          field: 'destinationName',
-          displayName: 'Topic',
-          width: '30%'
-        },
-        {
-          field: 'clientId',
-          displayName: 'Client ID',
-          width: '30%'
-        },
-        {
-          field: 'consumerId',
-          displayName: 'Consumer ID',
-          cellTemplate: '<div class="ngCellText"><span ng-hide="row.entity.status != \'Offline\'">{{row.entity.consumerId}}</span><a ng-show="row.entity.status != \'Offline\'" ng-click="openSubscriberDialog(row)">{{row.entity.consumerId}}</a></div>',
-          width: '30%'
-        },
-        {
-          field: 'status',
-          displayName: 'Status',
-          width: '10%'
-        }
-      ],
-      primaryKeyFn: entity => entity.destinationName + '/' + entity.clientId + '/' + entity.consumerId
+    $scope.model = {
+      allSelected: false
+    }
+
+    $scope.uiModalInstance;
+
+    const refreshAction = {
+      name: 'Refresh',
+      actionFn: action => loadTable()
     };
+
+    const createAction = {
+      name: 'Create',
+      actionFn: action => {
+        $scope.createSubscriberDialog = $uibModal.open({
+          templateUrl: 'createSubscriberDialog.html',
+          scope: $scope
+        });
+      }
+    };
+
+    const deleteAction = {
+      name: 'Delete',
+      actionFn: action => $scope.deleteSubscriberDialog.open(),
+      isDisabled: true
+    };
+
+    $scope.toolbarConfig = {
+      filterConfig: {
+        fields: [
+          {
+            id: 'destinationName',
+            title: 'Topic',
+            placeholder: 'Filter by topic...',
+            filterType: 'text'
+          },
+          {
+            id: 'clientId',
+            title: 'Client ID',
+            placeholder: 'Filter by client id...',
+            filterType: 'text'
+          },
+          {
+            id: 'consumerId',
+            title: 'Consumer ID',
+            placeholder: 'Filter by consumer id...',
+            filterType: 'text'
+          },
+          {
+            id: 'status',
+            title: 'Status',
+            placeholder: 'Filter by status...',
+            filterType: 'select',
+            filterValues: ['Active', 'Offline']
+          },
+
+        ],
+        onFilterChange: (filters: any[]) => {
+          $scope.durableSubscribers = Pf.filter(allSubscribers, $scope.toolbarConfig.filterConfig);
+        }
+      },
+      actionsConfig: {
+        primaryActions: [refreshAction, createAction, deleteAction]
+      },
+      isTableView: true
+    };
+
+    $scope.selectAll = () => {
+      $scope.durableSubscribers.forEach(subscriber => subscriber.selected = $scope.model.allSelected);
+      deleteAction.isDisabled = !$scope.model.allSelected;
+    };
+
+    $scope.toggleDeleteActionDisabled = () => {
+      deleteAction.isDisabled = !$scope.durableSubscribers.some(subscriber => subscriber.selected);
+    }
 
     $scope.doCreateSubscriber = (clientId, subscriberName, topicName, subSelector) => {
       $scope.createSubscriberDialog.close();
@@ -93,27 +125,27 @@ namespace ActiveMQ {
     }
 
     $scope.deleteSubscribers = () => {
-      var mbean = $scope.gridOptions.selectedItems[0]._id;
-      jolokia.execute(mbean, "destroy()",  Core.onSuccess(function() {
-          $scope.showSubscriberDialog.close();
-          Core.notification('success', "Deleted durable subscriber");
-          loadTable();
-          $scope.gridOptions.selectedItems.splice(0, $scope.gridOptions.selectedItems.length);
+      let selectedItems = $scope.durableSubscribers.filter(subscriber => subscriber.selected);
+      let requests = selectedItems.map(subscriber => ({
+        type: 'exec',
+        operation: 'destroy()',
+        mbean: subscriber._id
+      }));
+
+      jolokia.request(requests,  Core.onSuccess(function() {
+        Core.notification('success', "Operation successful");
+        loadTable();
       }));
     };
 
     $scope.openSubscriberDialog = (subscriber) => {
-      jolokia.request({type: "read", mbean: subscriber.entity._id}, Core.onSuccess((response) => {
-        $scope.showSubscriberDialog.subscriber = response.value;
-        $scope.showSubscriberDialog.subscriber.Status =  subscriber.entity.status;
-        console.log("Subscriber is now " + $scope.showSubscriberDialog.subscriber);
-        Core.$apply($scope);
-
-        // now lets start opening the dialog
-        setTimeout(() => {
-          $scope.showSubscriberDialog.open();
-          Core.$apply($scope);
-        }, 100);
+      jolokia.request({type: "read", mbean: subscriber._id}, Core.onSuccess((response) => {
+        $scope.selectedSubscriber = response.value;
+        $scope.selectedSubscriber.Status = subscriber.status;
+        $scope.showSubscriberDialog = $uibModal.open({
+          templateUrl: 'showSubscriberDialog.html',
+          scope: $scope
+        });
       }));
     };
 
@@ -122,7 +154,7 @@ namespace ActiveMQ {
     function loadTable() {
       var mbean = getBrokerMBean(workspace, jolokia, amqJmxDomain);
       if (mbean) {
-        $scope.durableSubscribers = []
+        allSubscribers = [];
         jolokia.request({type: "read", mbean: mbean, attribute: ["DurableTopicSubscribers"]}, Core.onSuccess( (response) => populateTable(response, "DurableTopicSubscribers", "Active")));
         jolokia.request({type: "read", mbean: mbean, attribute: ["InactiveDurableTopicSubscribers"]}, Core.onSuccess( (response) => populateTable(response, "InactiveDurableTopicSubscribers", "Offline")));
       }
@@ -131,7 +163,7 @@ namespace ActiveMQ {
     function populateTable(response, attr, status) {
       var data = response.value;
       log.debug("Got data: ", data);
-      $scope.durableSubscribers.push.apply($scope.durableSubscribers, data[attr].map(o => {
+      allSubscribers.push.apply(allSubscribers, data[attr].map(o => {
         var objectName = o["objectName"];
         var entries = Core.objectNameProperties(objectName);
         if (!('objectName' in o)) {
@@ -146,7 +178,12 @@ namespace ActiveMQ {
         return entries;
       }));
 
+      $scope.durableSubscribers = Pf.filter(allSubscribers, $scope.toolbarConfig.filterConfig);
+      $scope.model.allSelected = false;
+
       Core.$apply($scope);
     }
+
+    loadTable();
   }]);
 }

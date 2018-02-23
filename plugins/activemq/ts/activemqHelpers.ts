@@ -64,7 +64,7 @@ namespace ActiveMQ {
       $scope.gridOptions.selectAll(false);
     } else {
       $scope.gridOptions.selectedItems.length = 0;
-    } 
+    }
     var idx = Core.pathGet(message, ["rowIndex"]) || Core.pathGet(message, ['index']);
     var jmsMessageID = Core.pathGet(message, ["entity", key]);
     $scope.rowIndex = idx;
@@ -120,17 +120,19 @@ namespace ActiveMQ {
     if (selection && isBroker(workspace) && selection.objectName) {
       return selection.objectName;
     }
-    var folderNames = selection.folderNames;
-    var parent = selection ? selection.parent : null;
-    if (selection && parent && jolokia && folderNames && folderNames.length > 1) {
-      mbean = parent.objectName;
+    if (selection) {
+      var folderNames = selection.folderNames;
+      var parent = selection ? selection.parent : null;
+      if (parent && jolokia && folderNames && folderNames.length > 1) {
+        mbean = parent.objectName;
 
-      // we might be a destination, so lets try one more parent
-      if (!mbean && parent) {
-        mbean = parent.parent.objectName;
-      }
-      if (!mbean) {
-        mbean = "" + folderNames[0] + ":BrokerName=" + folderNames[1] + ",Type=Broker";
+        // we might be a destination, so lets try one more parent
+        if (!mbean && parent) {
+          mbean = parent.parent.objectName;
+        }
+        if (!mbean) {
+          mbean = "" + folderNames[0] + ":BrokerName=" + folderNames[1] + ",Type=Broker";
+        }
       }
     }
     return mbean;

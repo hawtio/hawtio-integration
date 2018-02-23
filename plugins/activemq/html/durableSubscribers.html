@@ -1,131 +1,115 @@
-<div ng-controller="ActiveMQ.DurableSubscriberController">
+<div class="table-view" ng-controller="ActiveMQ.DurableSubscriberController">
+    <h2>Durable Subscribers</h2>
+    <pf-toolbar config="toolbarConfig"></pf-toolbar>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>
+            <input type="checkbox" ng-model="model.allSelected" ng-change="selectAll()">
+          </th>
+          <th>Topic</th>
+          <th>Client ID</th>
+          <th>Consumer ID</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="subscriber in durableSubscribers">
+          <td>
+            <input type="checkbox" ng-model="subscriber.selected" ng-click="toggleDeleteActionDisabled()">
+          </td>
+          <td>{{subscriber.destinationName}}</td>
+          <td>{{subscriber.clientId}}</td>
+          <td>
+              <div class="ngCellText">
+                <span ng-hide="subscriber.status != 'Offline'">{{subscriber.consumerId}}</span>
+                <a href="" ng-show="subscriber.status != 'Offline'" ng-click="openSubscriberDialog(subscriber)">{{subscriber.consumerId}}</a>
+              </div>
+          </td>
+          <td>{{subscriber.status}}</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="row">
-      <div class="col-md-12">
-        <div class="pull-right">
-            <form class="form-inline">
-                <button class="btn btn-default" ng-click="createSubscriberDialog.open()"
-                        hawtio-show object-name="{{workspace.selection.objectName}}" method-name="createDurableSubscriber"
-                        title="Create durable subscriber">
-                    <i class="fa fa-plus"></i> Create
-                </button>
-                <button class="btn btn-default" ng-click="deleteSubscriberDialog.open()"
-                        hawtio-show object-name="{{$scope.gridOptions.selectedItems[0]._id}}" method-name="destroy"
-                        title="Destroy durable subscriber" ng-disabled="gridOptions.selectedItems.length != 1">
-                    <i class="fa fa-exclamation"></i> Destroy
-                </button>
-                <button class="btn btn-default" ng-click="refresh()"
-                        title="Refreshes the list of subscribers">
-                    <i class="fa fa-refresh"></i>
-                </button>
-            </form>
+    <script type="text/ng-template" id="createSubscriberDialog.html">
+      <form name="createSubscriber" class="form-horizontal" ng-submit="doCreateSubscriber(clientId, subscriberName, topicName, subSelector)">
+        <div class="modal-header">
+          <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">
+            <span class="pficon pficon-close" aria-hidden="true"></span>
+          </button>
+          <h4>Create durable subscriber</h4>
         </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="gridStyle" ng-grid="gridOptions"></div>
-    </div>
-
-    <div modal="createSubscriberDialog.show">
-      <form name="createSubscriber" class="form-horizontal no-bottom-margin" ng-submit="doCreateSubscriber(clientId, subscriberName, topicName, subSelector)">
-        <div class="modal-header"><h4>Create Durable Subscriber</h4></div>
         <div class="modal-body">
-          <label>Client Id: </label>
-          <input name="clientId" class="input-xlarge" type="text" ng-model="clientId" required>
-          <label>Subscriber name: </label>
-          <input name="subscriberName" class="input-xlarge" type="text" ng-model="subscriberName" required>
-          <label>Topic name: </label>
-          <input name="topicName" class="input-xlarge" type="text" ng-model="topicName" required uib-typeahead="title for title in topicNames($viewValue) | filter:$viewValue">
-          <label>Selector: </label>
-          <input name="subSelector" class="input-xlarge" type="text" ng-model="subSelector">
-        </div>
-        <div class="modal-footer">
-          <input class="btn btn-success" type="submit" value="Create">
-          <input class="btn btn-primary" type="button" ng-click="createSubscriberDialog.close()" value="Cancel">
-        </div>
-      </form>
-    </div>
-
-    <div hawtio-slideout="showSubscriberDialog.show" title="Details">
-      <div class="dialog-body">
-
-        <div class="row">
-          <div class="pull-right">
-            <form class="form-inline">
-
-              <button class="btn btn-danger" ng-disabled="showSubscriberDialog.subscriber.Status == 'Active'"
-                      ng-click="deleteSubscriberDialog.open()"
-                      title="Delete subscriber">
-                <i class="fa fa-remove"></i> Delete
-              </button>
-
-              <button class="btn btn-default" ng-click="showSubscriberDialog.close()" title="Close this dialog">
-                <i class="fa fa-remove"></i> Close
-              </button>
-
-            </form>
+          <div class="form-group">
+            <label class="col-sm-3 control-label" for="clientId">Client ID</label>
+            <div class="col-sm-9">
+              <input id="clientId" class="form-control" type="text" ng-model="clientId" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label" for="subscriberName">Subscriber name</label>
+            <div class="col-sm-9">
+              <input id="subscriberName" class="form-control" type="text" ng-model="subscriberName" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label" for="topicName">Topic name</label>
+            <div class="col-sm-9">
+              <input id="topicName" class="form-control" type="text" ng-model="topicName" required required uib-typeahead="title for title in topicNames($viewValue) | filter:$viewValue">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label" for="subSelector">Selector</label>
+            <div class="col-sm-9">
+              <input id="subSelector" class="form-control" type="text" ng-model="subSelector" required>
+            </div>
           </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>
+          <button type="submit" class="btn btn-primary" ng-click="$close()">Create</button>
+        </div>
+      </form>
+    </script>
 
-          <div class="row">
-              <div class="expandable-body well">
-                <table class="table table-condensed table-striped">
-                  <thead>
-                  <tr>
-                    <th>Property</th>
-                    <th>Value</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                    <td class="property-name">Client Id</td>
-                    <td class="property-value">{{showSubscriberDialog.subscriber["ClientId"]}}</td>
-                  </tr>
-                  <tr>
-                    <td class="property-name">Subscription Name</td>
-                    <td class="property-value">{{showSubscriberDialog.subscriber["SubscriptionName"]}}</td>
-                  </tr>
-                  <tr>
-                    <td class="property-name">Topic Name</td>
-                    <td class="property-value">{{showSubscriberDialog.subscriber["DestinationName"]}}</td>
-                  </tr>
-                  <tr>
-                    <td class="property-name">Selector</td>
-                    <td class="property-value">{{showSubscriberDialog.subscriber["Selector"]}}</td>
-                  </tr>
-                  <tr>
-                    <td class="property-name">Status</td>
-                    <td class="property-value">{{showSubscriberDialog.subscriber.Status}}</td>
-                  </tr>
-                  <tr>
-                    <td class="property-name">Enqueue Counter</td>
-                    <td class="property-value">{{showSubscriberDialog.subscriber["EnqueueCounter"]}}</td>
-                  </tr>
-                  <tr>
-                    <td class="property-name">Dequeue Counter</td>
-                    <td class="property-value">{{showSubscriberDialog.subscriber["DequeueCounter"]}}</td>
-                  </tr>
-                  <tr>
-                    <td class="property-name">Dispatched Counter</td>
-                    <td class="property-value">{{showSubscriberDialog.subscriber["DispatchedCounter"]}}</td>
-                  </tr>
-                  <tr>
-                    <td class="property-name">Pending Size</td>
-                    <td class="property-value">{{showSubscriberDialog.subscriber["PendingQueueSize"]}}</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
+    <script type="text/ng-template" id="showSubscriberDialog.html">
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" ng-click="$close()">
+          <span class="pficon pficon-close" aria-hidden="true"></span>
+        </button>
+        <h4>Durable subscriber</h4>
       </div>
+      <div class="modal-body">
+        <dl class="dl-horizontal">
+          <dt>Client Id</dt>
+          <dd>{{selectedSubscriber.ClientId}}</dd>
+          <dt>Subscription Name</dt>
+          <dd>{{selectedSubscriber.SubscriptionName}}</dd>
+          <dt>Topic Name</dt>
+          <dd>{{selectedSubscriber.DestinationName}}</dd>
+          <dt ng-if="selectedSubscriber.Selector">Selector</dt>
+          <dd ng-if="selectedSubscriber.Selector">{{selectedSubscriber.Selector}}</dd>
+          <dt>Status</dt>
+          <dd>{{selectedSubscriber.Status}}</dd>
+          <dt>Enqueue Counter</dt>
+          <dd>{{selectedSubscriber.EnqueueCounter}}</dd>
+          <dt>Dequeue Counter</dt>
+          <dd>{{selectedSubscriber.DequeueCounter}}</dd>
+          <dt>Dispatched Counter</dt>
+          <dd>{{selectedSubscriber.DispatchedCounter}}</dd>
+          <dt>Pending Size</dt>
+          <dd>{{selectedSubscriber.PendingQueueSize}}</dd>
+        </dl>
+      </div>
+    </script>
 
-    </div>
-
-    <div hawtio-confirm-dialog="deleteSubscriberDialog.show" ok-button-text="Yes" cancel-button-text="No" on-ok="deleteSubscribers()">
+    <div hawtio-confirm-dialog="deleteSubscriberDialog.show"
+         title="Delete durable subscriber"
+         ok-button-text="Yes"
+         cancel-button-text="No"
+         on-ok="deleteSubscribers()">
       <div class="dialog-body">
-        <p>Are you sure you want to delete the subscriber</p>
+        <p>Are you sure you want to delete the subscriber(s)?</p>
       </div>
     </div>
 

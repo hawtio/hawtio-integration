@@ -13927,16 +13927,18 @@ var ActiveMQ;
         if (selection && isBroker(workspace) && selection.objectName) {
             return selection.objectName;
         }
-        var folderNames = selection.folderNames;
-        var parent = selection ? selection.parent : null;
-        if (selection && parent && jolokia && folderNames && folderNames.length > 1) {
-            mbean = parent.objectName;
-            // we might be a destination, so lets try one more parent
-            if (!mbean && parent) {
-                mbean = parent.parent.objectName;
-            }
-            if (!mbean) {
-                mbean = "" + folderNames[0] + ":BrokerName=" + folderNames[1] + ",Type=Broker";
+        if (selection) {
+            var folderNames = selection.folderNames;
+            var parent = selection ? selection.parent : null;
+            if (parent && jolokia && folderNames && folderNames.length > 1) {
+                mbean = parent.objectName;
+                // we might be a destination, so lets try one more parent
+                if (!mbean && parent) {
+                    mbean = parent.parent.objectName;
+                }
+                if (!mbean) {
+                    mbean = "" + folderNames[0] + ":BrokerName=" + folderNames[1] + ",Type=Broker";
+                }
             }
         }
         return mbean;
@@ -14320,142 +14322,155 @@ var ActiveMQ;
 /// <reference path="tree/tree.module.ts"/>
 var ActiveMQ;
 (function (ActiveMQ) {
+    defineRoutes.$inject = ["$routeProvider"];
+    configurePlugin.$inject = ["HawtioNav", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "localStorage", "preLogoutTasks", "documentBase"];
     ActiveMQ.pluginName = 'activemq';
-    ActiveMQ._module = angular.module(ActiveMQ.pluginName, [
+    ActiveMQ._module = angular
+        .module(ActiveMQ.pluginName, [
         'angularResizable',
         ActiveMQ.destinationModule,
         ActiveMQ.treeModule,
-    ]);
-    ActiveMQ._module.config(["$routeProvider", function ($routeProvider) {
-            $routeProvider.
-                when('/activemq/browseQueue', { templateUrl: 'plugins/activemq/html/browseQueue.html' }).
-                when('/activemq/createDestination', { template: '<create-destination></create-destination>' }).
-                when('/activemq/deleteQueue', { template: '<delete-queue></delete-queue>' }).
-                when('/activemq/deleteTopic', { template: '<delete-topic></delete-topic>' }).
-                when('/activemq/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html' }).
-                when('/activemq/durableSubscribers', { templateUrl: 'plugins/activemq/html/durableSubscribers.html' }).
-                when('/activemq/jobs', { templateUrl: 'plugins/activemq/html/jobs.html' }).
-                when('/activemq/queues', { templateUrl: 'app/activemq/html/destinations.html' }).
-                when('/activemq/topics', { templateUrl: 'app/activemq/html/destinations.html', controller: 'topicsController' });
-        }]);
-    ActiveMQ._module.controller('topicsController', ["$scope", function ($scope) {
-        $scope.destinationType = 'topic';
-    }]);
-    ActiveMQ._module.run(["HawtioNav", "$location", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "$templateCache", "documentBase", function (nav, $location, workspace, viewRegistry, helpRegistry, preferencesRegistry, $templateCache, documentBase) {
-            viewRegistry['{ "main-tab": "activemq" }'] = 'plugins/activemq/html/layoutActiveMQTree.html';
-            helpRegistry.addUserDoc('activemq', 'plugins/activemq/doc/help.md', function () {
-                return workspace.treeContainsDomainAndProperties("org.apache.activemq");
-            });
-            preferencesRegistry.addTab("ActiveMQ", "plugins/activemq/html/preferences.html", function () {
-                return workspace.treeContainsDomainAndProperties("org.apache.activemq");
-            });
-            workspace.addTreePostProcessor(postProcessTree);
-            // register default attribute views
-            var attributes = workspace.attributeColumnDefs;
-            attributes[ActiveMQ.jmxDomain + "/Broker/folder"] = [
-                { field: 'BrokerName', displayName: 'Name', width: "**" },
-                { field: 'TotalProducerCount', displayName: 'Producer' },
-                { field: 'TotalConsumerCount', displayName: 'Consumer' },
-                { field: 'StorePercentUsage', displayName: 'Store %' },
-                { field: 'TempPercentUsage', displayName: 'Temp %' },
-                { field: 'MemoryPercentUsage', displayName: 'Memory %' },
-                { field: 'TotalEnqueueCount', displayName: 'Enqueue' },
-                { field: 'TotalDequeueCount', displayName: 'Dequeue' }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/Queue/folder"] = [
-                { field: 'Name', displayName: 'Name', width: "***" },
-                { field: 'QueueSize', displayName: 'Queue Size' },
-                { field: 'ProducerCount', displayName: 'Producer' },
-                { field: 'ConsumerCount', displayName: 'Consumer' },
-                { field: 'EnqueueCount', displayName: 'Enqueue' },
-                { field: 'DequeueCount', displayName: 'Dequeue' },
-                { field: 'MemoryPercentUsage', displayName: 'Memory %' },
-                { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/Topic/folder"] = [
-                { field: 'Name', displayName: 'Name', width: "****" },
-                { field: 'ProducerCount', displayName: 'Producer' },
-                { field: 'ConsumerCount', displayName: 'Consumer' },
-                { field: 'EnqueueCount', displayName: 'Enqueue' },
-                { field: 'DequeueCount', displayName: 'Dequeue' },
-                { field: 'MemoryPercentUsage', displayName: 'Memory %' },
-                { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/Consumer/folder"] = [
-                { field: 'ConnectionId', displayName: 'Name', width: "**" },
-                { field: 'PrefetchSize', displayName: 'Prefetch Size' },
-                { field: 'Priority', displayName: 'Priority' },
-                { field: 'DispatchedQueueSize', displayName: 'Dispatched Queue #' },
-                { field: 'SlowConsumer', displayName: 'Slow ?' },
-                { field: 'Retroactive', displayName: 'Retroactive' },
-                { field: 'Selector', displayName: 'Selector' }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/networkConnectors/folder"] = [
-                { field: 'Name', displayName: 'Name', width: "**" },
-                { field: 'UserName', displayName: 'User Name' },
-                { field: 'PrefetchSize', displayName: 'Prefetch Size' },
-                { field: 'ConduitSubscriptions', displayName: 'Conduit Subscriptions?' },
-                { field: 'Duplex', displayName: 'Duplex' },
-                { field: 'DynamicOnly', displayName: 'Dynamic Only' }
-            ];
-            attributes[ActiveMQ.jmxDomain + "/PersistenceAdapter/folder"] = [
-                { field: 'IndexDirectory', displayName: 'Index Directory', width: "**" },
-                { field: 'LogDirectory', displayName: 'Log Directory', width: "**" }
-            ];
-            var tab = nav.builder().id('activemq')
-                .title(function () { return 'ActiveMQ'; })
-                .defaultPage({
-                rank: 15,
-                isValid: function (yes, no) { return workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain) ? yes() : no(); }
-            })
-                .href(function () { return '/jmx/attributes'; })
-                .isValid(function () { return workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain); })
-                .isSelected(function () { return workspace.isMainTabActive('activemq'); })
-                .build();
-            nav.add(tab);
-            function postProcessTree(tree) {
-                var activemq = tree.get("org.apache.activemq");
-                setConsumerType(activemq);
-                // lets move queue and topic as first children within brokers
-                if (activemq) {
-                    angular.forEach(activemq.children, function (broker) {
-                        angular.forEach(broker.children, function (child) {
-                            // lets move Topic/Queue to the front.
-                            var grandChildren = child.children;
-                            if (grandChildren) {
-                                var names = ["Topic", "Queue"];
-                                angular.forEach(names, function (name) {
-                                    var idx = _.findIndex(grandChildren, function (n) { return n.text === name; });
-                                    if (idx > 0) {
-                                        var old = grandChildren[idx];
-                                        grandChildren.splice(idx, 1);
-                                        grandChildren.splice(0, 0, old);
-                                    }
-                                });
-                            }
-                        });
+    ])
+        .config(defineRoutes)
+        .controller('topicsController', ['$scope', function ($scope) {
+            $scope.destinationType = 'topic';
+        }])
+        .run(configurePlugin);
+    function defineRoutes($routeProvider) {
+        'ngInject';
+        $routeProvider.
+            when('/activemq/browseQueue', { templateUrl: 'plugins/activemq/html/browseQueue.html' }).
+            when('/activemq/createDestination', { template: '<create-destination></create-destination>' }).
+            when('/activemq/deleteQueue', { template: '<delete-queue></delete-queue>' }).
+            when('/activemq/deleteTopic', { template: '<delete-topic></delete-topic>' }).
+            when('/activemq/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html' }).
+            when('/activemq/durableSubscribers', { templateUrl: 'plugins/activemq/html/durableSubscribers.html' }).
+            when('/activemq/jobs', { templateUrl: 'plugins/activemq/html/jobs.html' }).
+            when('/activemq/queues', { templateUrl: 'app/activemq/html/destinations.html' }).
+            when('/activemq/topics', { templateUrl: 'app/activemq/html/destinations.html', controller: 'topicsController' });
+    }
+    function configurePlugin(HawtioNav, workspace, viewRegistry, helpRegistry, preferencesRegistry, localStorage, preLogoutTasks, documentBase) {
+        'ngInject';
+        viewRegistry['{ "main-tab": "activemq" }'] = 'plugins/activemq/html/layoutActiveMQTree.html';
+        helpRegistry.addUserDoc('activemq', 'plugins/activemq/doc/help.md', function () {
+            return workspace.treeContainsDomainAndProperties("org.apache.activemq");
+        });
+        preferencesRegistry.addTab("ActiveMQ", "plugins/activemq/html/preferences.html", function () {
+            return workspace.treeContainsDomainAndProperties("org.apache.activemq");
+        });
+        workspace.addTreePostProcessor(postProcessTree);
+        // clean up local storage upon logout
+        preLogoutTasks.addTask('CleanupActiveMQCredentials', function () {
+            ActiveMQ.log.debug("Clean up ActiveMQ credentials in local storage");
+            localStorage.removeItem('activemqUserName');
+            localStorage.removeItem('activemqPassword');
+        });
+        // register default attribute views
+        var attributes = workspace.attributeColumnDefs;
+        attributes[ActiveMQ.jmxDomain + "/Broker/folder"] = [
+            { field: 'BrokerName', displayName: 'Name', width: "**" },
+            { field: 'TotalProducerCount', displayName: 'Producer' },
+            { field: 'TotalConsumerCount', displayName: 'Consumer' },
+            { field: 'StorePercentUsage', displayName: 'Store %' },
+            { field: 'TempPercentUsage', displayName: 'Temp %' },
+            { field: 'MemoryPercentUsage', displayName: 'Memory %' },
+            { field: 'TotalEnqueueCount', displayName: 'Enqueue' },
+            { field: 'TotalDequeueCount', displayName: 'Dequeue' }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/Queue/folder"] = [
+            { field: 'Name', displayName: 'Name', width: "***" },
+            { field: 'QueueSize', displayName: 'Queue Size' },
+            { field: 'ProducerCount', displayName: 'Producer' },
+            { field: 'ConsumerCount', displayName: 'Consumer' },
+            { field: 'EnqueueCount', displayName: 'Enqueue' },
+            { field: 'DequeueCount', displayName: 'Dequeue' },
+            { field: 'MemoryPercentUsage', displayName: 'Memory %' },
+            { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/Topic/folder"] = [
+            { field: 'Name', displayName: 'Name', width: "****" },
+            { field: 'ProducerCount', displayName: 'Producer' },
+            { field: 'ConsumerCount', displayName: 'Consumer' },
+            { field: 'EnqueueCount', displayName: 'Enqueue' },
+            { field: 'DequeueCount', displayName: 'Dequeue' },
+            { field: 'MemoryPercentUsage', displayName: 'Memory %' },
+            { field: 'DispatchCount', displayName: 'Dispatch', visible: false }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/Consumer/folder"] = [
+            { field: 'ConnectionId', displayName: 'Name', width: "**" },
+            { field: 'PrefetchSize', displayName: 'Prefetch Size' },
+            { field: 'Priority', displayName: 'Priority' },
+            { field: 'DispatchedQueueSize', displayName: 'Dispatched Queue #' },
+            { field: 'SlowConsumer', displayName: 'Slow ?' },
+            { field: 'Retroactive', displayName: 'Retroactive' },
+            { field: 'Selector', displayName: 'Selector' }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/networkConnectors/folder"] = [
+            { field: 'Name', displayName: 'Name', width: "**" },
+            { field: 'UserName', displayName: 'User Name' },
+            { field: 'PrefetchSize', displayName: 'Prefetch Size' },
+            { field: 'ConduitSubscriptions', displayName: 'Conduit Subscriptions?' },
+            { field: 'Duplex', displayName: 'Duplex' },
+            { field: 'DynamicOnly', displayName: 'Dynamic Only' }
+        ];
+        attributes[ActiveMQ.jmxDomain + "/PersistenceAdapter/folder"] = [
+            { field: 'IndexDirectory', displayName: 'Index Directory', width: "**" },
+            { field: 'LogDirectory', displayName: 'Log Directory', width: "**" }
+        ];
+        var tab = HawtioNav.builder().id('activemq')
+            .title(function () { return 'ActiveMQ'; })
+            .defaultPage({
+            rank: 15,
+            isValid: function (yes, no) { return workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain) ? yes() : no(); }
+        })
+            .href(function () { return '/jmx/attributes'; })
+            .isValid(function () { return workspace.treeContainsDomainAndProperties(ActiveMQ.jmxDomain); })
+            .isSelected(function () { return workspace.isMainTabActive('activemq'); })
+            .build();
+        HawtioNav.add(tab);
+        function postProcessTree(tree) {
+            var activemq = tree.get("org.apache.activemq");
+            setConsumerType(activemq);
+            // lets move queue and topic as first children within brokers
+            if (activemq) {
+                angular.forEach(activemq.children, function (broker) {
+                    angular.forEach(broker.children, function (child) {
+                        // lets move Topic/Queue to the front.
+                        var grandChildren = child.children;
+                        if (grandChildren) {
+                            var names = ["Topic", "Queue"];
+                            angular.forEach(names, function (name) {
+                                var idx = _.findIndex(grandChildren, function (n) { return n.text === name; });
+                                if (idx > 0) {
+                                    var old = grandChildren[idx];
+                                    grandChildren.splice(idx, 1);
+                                    grandChildren.splice(0, 0, old);
+                                }
+                            });
+                        }
                     });
-                }
+                });
             }
-            function setConsumerType(node) {
-                if (node) {
-                    var parent = node.parent;
-                    var entries = node.entries;
-                    if (parent && !parent.typeName && entries) {
-                        var endpoint = entries["endpoint"];
-                        if (endpoint === "Consumer" || endpoint === "Producer") {
-                            parent.typeName = endpoint;
-                        }
-                        var connectorName = entries["connectorName"];
-                        if (connectorName && !node.icon) {
-                            // lets default a connector icon
-                            node.icon = UrlHelpers.join(documentBase, "/img/icons/activemq/connector.png");
-                        }
+        }
+        function setConsumerType(node) {
+            if (node) {
+                var parent = node.parent;
+                var entries = node.entries;
+                if (parent && !parent.typeName && entries) {
+                    var endpoint = entries["endpoint"];
+                    if (endpoint === "Consumer" || endpoint === "Producer") {
+                        parent.typeName = endpoint;
                     }
-                    angular.forEach(node.children, function (child) { return setConsumerType(child); });
+                    var connectorName = entries["connectorName"];
+                    if (connectorName && !node.icon) {
+                        // lets default a connector icon
+                        node.icon = UrlHelpers.join(documentBase, "/img/icons/activemq/connector.png");
+                    }
                 }
+                angular.forEach(node.children, function (child) { return setConsumerType(child); });
             }
-        }]);
+        }
+    }
     hawtioPluginLoader.addModule(ActiveMQ.pluginName);
 })(ActiveMQ || (ActiveMQ = {}));
 /// <reference path="activemqHelpers.ts"/>
@@ -15361,59 +15376,84 @@ var ActiveMQ;
 /// <reference path="activemqPlugin.ts"/>
 var ActiveMQ;
 (function (ActiveMQ) {
-    ActiveMQ._module.controller("ActiveMQ.DurableSubscriberController", ["$scope", "workspace", "jolokia", function ($scope, workspace, jolokia) {
+    ActiveMQ._module.controller("ActiveMQ.DurableSubscriberController", ["$scope", "$uibModal", "workspace", "jolokia", function ($scope, $uibModal, workspace, jolokia) {
             var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
-            $scope.refresh = loadTable;
-            $scope.durableSubscribers = [];
-            $scope.tempData = [];
-            $scope.createSubscriberDialog = new UI.Dialog();
+            var allSubscribers = null;
+            $scope.durableSubscribers = null;
+            $scope.selectedSubscriber;
+            $scope.createSubscriberDialog;
             $scope.deleteSubscriberDialog = new UI.Dialog();
-            $scope.showSubscriberDialog = new UI.Dialog();
+            $scope.showSubscriberDialog;
             $scope.topicName = '';
             $scope.clientId = '';
             $scope.subscriberName = '';
             $scope.subSelector = '';
-            $scope.gridOptions = {
-                selectedItems: [],
-                data: 'durableSubscribers',
-                displayFooter: false,
-                showFilter: false,
-                showColumnMenu: true,
-                enableCellSelection: false,
-                enableColumnResize: true,
-                enableColumnReordering: true,
-                selectWithCheckboxOnly: false,
-                showSelectionCheckbox: false,
-                multiSelect: false,
-                displaySelectionCheckbox: false,
-                filterOptions: {
-                    filterText: ''
-                },
-                maintainColumnRatios: false,
-                columnDefs: [
-                    {
-                        field: 'destinationName',
-                        displayName: 'Topic',
-                        width: '30%'
-                    },
-                    {
-                        field: 'clientId',
-                        displayName: 'Client ID',
-                        width: '30%'
-                    },
-                    {
-                        field: 'consumerId',
-                        displayName: 'Consumer ID',
-                        cellTemplate: '<div class="ngCellText"><span ng-hide="row.entity.status != \'Offline\'">{{row.entity.consumerId}}</span><a ng-show="row.entity.status != \'Offline\'" ng-click="openSubscriberDialog(row)">{{row.entity.consumerId}}</a></div>',
-                        width: '30%'
-                    },
-                    {
-                        field: 'status',
-                        displayName: 'Status',
-                        width: '10%'
+            $scope.model = {
+                allSelected: false
+            };
+            $scope.uiModalInstance;
+            var refreshAction = {
+                name: 'Refresh',
+                actionFn: function (action) { return loadTable(); }
+            };
+            var createAction = {
+                name: 'Create',
+                actionFn: function (action) {
+                    $scope.createSubscriberDialog = $uibModal.open({
+                        templateUrl: 'createSubscriberDialog.html',
+                        scope: $scope
+                    });
+                }
+            };
+            var deleteAction = {
+                name: 'Delete',
+                actionFn: function (action) { return $scope.deleteSubscriberDialog.open(); },
+                isDisabled: true
+            };
+            $scope.toolbarConfig = {
+                filterConfig: {
+                    fields: [
+                        {
+                            id: 'destinationName',
+                            title: 'Topic',
+                            placeholder: 'Filter by topic...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'clientId',
+                            title: 'Client ID',
+                            placeholder: 'Filter by client id...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'consumerId',
+                            title: 'Consumer ID',
+                            placeholder: 'Filter by consumer id...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'status',
+                            title: 'Status',
+                            placeholder: 'Filter by status...',
+                            filterType: 'select',
+                            filterValues: ['Active', 'Offline']
+                        },
+                    ],
+                    onFilterChange: function (filters) {
+                        $scope.durableSubscribers = Pf.filter(allSubscribers, $scope.toolbarConfig.filterConfig);
                     }
-                ],
-                primaryKeyFn: function (entity) { return entity.destinationName + '/' + entity.clientId + '/' + entity.consumerId; }
+                },
+                actionsConfig: {
+                    primaryActions: [refreshAction, createAction, deleteAction]
+                },
+                isTableView: true
+            };
+            $scope.selectAll = function () {
+                $scope.durableSubscribers.forEach(function (subscriber) { return subscriber.selected = $scope.model.allSelected; });
+                deleteAction.isDisabled = !$scope.model.allSelected;
+            };
+            $scope.toggleDeleteActionDisabled = function () {
+                deleteAction.isDisabled = !$scope.durableSubscribers.some(function (subscriber) { return subscriber.selected; });
             };
             $scope.doCreateSubscriber = function (clientId, subscriberName, topicName, subSelector) {
                 $scope.createSubscriberDialog.close();
@@ -15440,32 +15480,32 @@ var ActiveMQ;
                 }
             };
             $scope.deleteSubscribers = function () {
-                var mbean = $scope.gridOptions.selectedItems[0]._id;
-                jolokia.execute(mbean, "destroy()", Core.onSuccess(function () {
-                    $scope.showSubscriberDialog.close();
-                    Core.notification('success', "Deleted durable subscriber");
+                var selectedItems = $scope.durableSubscribers.filter(function (subscriber) { return subscriber.selected; });
+                var requests = selectedItems.map(function (subscriber) { return ({
+                    type: 'exec',
+                    operation: 'destroy()',
+                    mbean: subscriber._id
+                }); });
+                jolokia.request(requests, Core.onSuccess(function () {
+                    Core.notification('success', "Operation successful");
                     loadTable();
-                    $scope.gridOptions.selectedItems.splice(0, $scope.gridOptions.selectedItems.length);
                 }));
             };
             $scope.openSubscriberDialog = function (subscriber) {
-                jolokia.request({ type: "read", mbean: subscriber.entity._id }, Core.onSuccess(function (response) {
-                    $scope.showSubscriberDialog.subscriber = response.value;
-                    $scope.showSubscriberDialog.subscriber.Status = subscriber.entity.status;
-                    console.log("Subscriber is now " + $scope.showSubscriberDialog.subscriber);
-                    Core.$apply($scope);
-                    // now lets start opening the dialog
-                    setTimeout(function () {
-                        $scope.showSubscriberDialog.open();
-                        Core.$apply($scope);
-                    }, 100);
+                jolokia.request({ type: "read", mbean: subscriber._id }, Core.onSuccess(function (response) {
+                    $scope.selectedSubscriber = response.value;
+                    $scope.selectedSubscriber.Status = subscriber.status;
+                    $scope.showSubscriberDialog = $uibModal.open({
+                        templateUrl: 'showSubscriberDialog.html',
+                        scope: $scope
+                    });
                 }));
             };
             $scope.topicNames = function (completionText) { return ActiveMQ.retrieveTopicNames(workspace, false); };
             function loadTable() {
                 var mbean = ActiveMQ.getBrokerMBean(workspace, jolokia, amqJmxDomain);
                 if (mbean) {
-                    $scope.durableSubscribers = [];
+                    allSubscribers = [];
                     jolokia.request({ type: "read", mbean: mbean, attribute: ["DurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "DurableTopicSubscribers", "Active"); }));
                     jolokia.request({ type: "read", mbean: mbean, attribute: ["InactiveDurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "InactiveDurableTopicSubscribers", "Offline"); }));
                 }
@@ -15473,7 +15513,7 @@ var ActiveMQ;
             function populateTable(response, attr, status) {
                 var data = response.value;
                 ActiveMQ.log.debug("Got data: ", data);
-                $scope.durableSubscribers.push.apply($scope.durableSubscribers, data[attr].map(function (o) {
+                allSubscribers.push.apply(allSubscribers, data[attr].map(function (o) {
                     var objectName = o["objectName"];
                     var entries = Core.objectNameProperties(objectName);
                     if (!('objectName' in o)) {
@@ -15486,8 +15526,11 @@ var ActiveMQ;
                     entries["status"] = status;
                     return entries;
                 }));
+                $scope.durableSubscribers = Pf.filter(allSubscribers, $scope.toolbarConfig.filterConfig);
+                $scope.model.allSelected = false;
                 Core.$apply($scope);
             }
+            loadTable();
         }]);
 })(ActiveMQ || (ActiveMQ = {}));
 /// <reference path="activemqHelpers.ts"/>
@@ -26435,7 +26478,7 @@ var SpringBoot;
 
 angular.module('hawtio-integration-templates', []).run(['$templateCache', function($templateCache) {$templateCache.put('plugins/activemq/html/browseQueue.html','<div ng-controller="ActiveMQ.BrowseQueueController">\n\n  <h1>Browse Queue</h1>\n\n  <div ng-hide="showMessageDetails">\n    <div class="row toolbar-pf table-view-pf-toolbar">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group toolbar-pf-filter has-clear">\n            <div class="search-pf-input-group">\n              <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n              <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n              <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                <span class="pficon pficon-close"></span>\n              </button>\n            </div>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="dlq" ng-click="retryMessages()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="retryMessage" mode="remove"\n                title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">\n                Retry\n              </button>\n              <button class="btn btn-default" ng-disabled="gridOptions.selectedItems.length !== 1" ng-show="showButtons" ng-click="resendMessage()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendTextMessage" mode="remove"\n                title="Edit the message to resend it" data-placement="bottom">\n                Resend\n              </button>\n\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n              <button class="btn btn-default" ng-click="refresh()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="browse" mode="remove"\n                title="Refreshes the list of messages">\n                <i class="fa fa-refresh"></i>\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n    <table class="table table-striped table-bordered table-hover activemq-browse-table" hawtio-simple-table="gridOptions"></table>\n  </div>\n\n  <div ng-show="showMessageDetails">\n    <div class="row toolbar-pf">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions">\n          <div class="form-group">\n            <button class="btn btn-primary" ng-click="showMessageDetails = false">\n              Back\n            </button>\n          </div>\n\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>\n\n    <div class="expandable closed">\n      <div title="Headers" class="title">\n        <h3><i class="expandable-indicator"></i> Headers & Properties</h3>\n      </div>\n      <div class="expandable-body well">\n        <table class="table table-condensed table-striped table-bordered table-hover">\n          <thead>\n            <tr>\n              <th>Header</th>\n              <th>Value</th>\n            </tr>\n          </thead>\n          <tbody compile="row.headerHtml"></tbody>\n        </table>\n      </div>\n    </div>\n\n    <h3>Displaying body as <span ng-bind="row.textMode"></span></h3>\n    <div hawtio-editor="row.bodyText" read-only="true" mode=\'mode\'></div>\n\n  </div>\n\n  <div hawtio-confirm-dialog="deleteDialog" title="Delete messages?"\n       ok-button-text="Delete"\n       cancel-button-text="Cancel"\n       on-ok="deleteMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        This operation cannot be undone so please be careful.\n      </p>\n      <p>You are about to delete\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'a message!\', \'other\': \'{} messages!\'}">\n        </ng-pluralize>\n      </p>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="moveDialog" title="Move messages?"\n       ok-button-text="Move"\n       cancel-button-text="Cancel"\n       on-ok="moveMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        You cannot undo this operation.<br/>\n        Though after the move you can always move the\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'messages\'}"></ng-pluralize>\n        back again.\n      </p>\n      <p>Move\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'{} messages\'}"></ng-pluralize>\n        to: <select ng-model="queueName" ng-options="qn for qn in queueNames" ng-init="queueName=queueNames[0]"></select>\n      </p>\n    </div>\n  </div>\n\n</div>\n\n');
 $templateCache.put('plugins/activemq/html/destinations.html','<div ng-controller="ActiveMQ.QueuesController">\n\n    <div class="row-fluid">\n        <div class="span24">\n            <div class="section-filter">\n                <input class="search-query span12" type="text" ng-model="gridOptions.filterOptions.filterText"\n                       placeholder="{{destinationFilterPlaceholder}}">\n                <i class="icon-remove clickable"\n                   title="Clear filter"\n                   ng-click="gridOptions.filterOptions.filterText = \'\'"></i>\n            </div>\n            <div class="control-group inline-block">\n                <form class="form-inline no-bottom-margin">\n                    <label>&nbsp;&nbsp;&nbsp;Filter: </label>\n                    <select ng-model="destinationFilter.filter" id="destinationFilter">\n                        <option value="" selected="selected">None...</option>\n                        <option ng-repeat="option in destinationFilterOptions" value="{{option.id}}">{{option.name}}\n                        </option>\n                    </select>\n                    <button class="btn" ng-click="refresh()"\n                            title="Filter">\n                        <i class="icon-refresh"></i>\n                    </button>\n                </form>\n            </div>\n        </div>\n    </div>\n\n\n    <div class="row-fluid">\n        <div class="gridStyle" ng-grid="gridOptions" ui-grid-resize-columns></div>\n    </div>\n\n</div>');
-$templateCache.put('plugins/activemq/html/durableSubscribers.html','<div ng-controller="ActiveMQ.DurableSubscriberController">\n\n    <div class="row">\n      <div class="col-md-12">\n        <div class="pull-right">\n            <form class="form-inline">\n                <button class="btn btn-default" ng-click="createSubscriberDialog.open()"\n                        hawtio-show object-name="{{workspace.selection.objectName}}" method-name="createDurableSubscriber"\n                        title="Create durable subscriber">\n                    <i class="fa fa-plus"></i> Create\n                </button>\n                <button class="btn btn-default" ng-click="deleteSubscriberDialog.open()"\n                        hawtio-show object-name="{{$scope.gridOptions.selectedItems[0]._id}}" method-name="destroy"\n                        title="Destroy durable subscriber" ng-disabled="gridOptions.selectedItems.length != 1">\n                    <i class="fa fa-exclamation"></i> Destroy\n                </button>\n                <button class="btn btn-default" ng-click="refresh()"\n                        title="Refreshes the list of subscribers">\n                    <i class="fa fa-refresh"></i>\n                </button>\n            </form>\n        </div>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="gridStyle" ng-grid="gridOptions"></div>\n    </div>\n\n    <div modal="createSubscriberDialog.show">\n      <form name="createSubscriber" class="form-horizontal no-bottom-margin" ng-submit="doCreateSubscriber(clientId, subscriberName, topicName, subSelector)">\n        <div class="modal-header"><h4>Create Durable Subscriber</h4></div>\n        <div class="modal-body">\n          <label>Client Id: </label>\n          <input name="clientId" class="input-xlarge" type="text" ng-model="clientId" required>\n          <label>Subscriber name: </label>\n          <input name="subscriberName" class="input-xlarge" type="text" ng-model="subscriberName" required>\n          <label>Topic name: </label>\n          <input name="topicName" class="input-xlarge" type="text" ng-model="topicName" required uib-typeahead="title for title in topicNames($viewValue) | filter:$viewValue">\n          <label>Selector: </label>\n          <input name="subSelector" class="input-xlarge" type="text" ng-model="subSelector">\n        </div>\n        <div class="modal-footer">\n          <input class="btn btn-success" type="submit" value="Create">\n          <input class="btn btn-primary" type="button" ng-click="createSubscriberDialog.close()" value="Cancel">\n        </div>\n      </form>\n    </div>\n\n    <div hawtio-slideout="showSubscriberDialog.show" title="Details">\n      <div class="dialog-body">\n\n        <div class="row">\n          <div class="pull-right">\n            <form class="form-inline">\n\n              <button class="btn btn-danger" ng-disabled="showSubscriberDialog.subscriber.Status == \'Active\'"\n                      ng-click="deleteSubscriberDialog.open()"\n                      title="Delete subscriber">\n                <i class="fa fa-remove"></i> Delete\n              </button>\n\n              <button class="btn btn-default" ng-click="showSubscriberDialog.close()" title="Close this dialog">\n                <i class="fa fa-remove"></i> Close\n              </button>\n\n            </form>\n          </div>\n        </div>\n\n          <div class="row">\n              <div class="expandable-body well">\n                <table class="table table-condensed table-striped">\n                  <thead>\n                  <tr>\n                    <th>Property</th>\n                    <th>Value</th>\n                  </tr>\n                  </thead>\n                  <tbody>\n                  <tr>\n                    <td class="property-name">Client Id</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["ClientId"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Subscription Name</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["SubscriptionName"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Topic Name</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["DestinationName"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Selector</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["Selector"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Status</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber.Status}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Enqueue Counter</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["EnqueueCounter"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Dequeue Counter</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["DequeueCounter"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Dispatched Counter</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["DispatchedCounter"]}}</td>\n                  </tr>\n                  <tr>\n                    <td class="property-name">Pending Size</td>\n                    <td class="property-value">{{showSubscriberDialog.subscriber["PendingQueueSize"]}}</td>\n                  </tr>\n                  </tbody>\n                </table>\n              </div>\n            </div>\n\n      </div>\n\n    </div>\n\n    <div hawtio-confirm-dialog="deleteSubscriberDialog.show" ok-button-text="Yes" cancel-button-text="No" on-ok="deleteSubscribers()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the subscriber</p>\n      </div>\n    </div>\n\n</div>');
+$templateCache.put('plugins/activemq/html/durableSubscribers.html','<div class="table-view" ng-controller="ActiveMQ.DurableSubscriberController">\n    <h2>Durable Subscribers</h2>\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n    <table class="table table-striped table-bordered">\n      <thead>\n        <tr>\n          <th>\n            <input type="checkbox" ng-model="model.allSelected" ng-change="selectAll()">\n          </th>\n          <th>Topic</th>\n          <th>Client ID</th>\n          <th>Consumer ID</th>\n          <th>Status</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="subscriber in durableSubscribers">\n          <td>\n            <input type="checkbox" ng-model="subscriber.selected" ng-click="toggleDeleteActionDisabled()">\n          </td>\n          <td>{{subscriber.destinationName}}</td>\n          <td>{{subscriber.clientId}}</td>\n          <td>\n              <div class="ngCellText">\n                <span ng-hide="subscriber.status != \'Offline\'">{{subscriber.consumerId}}</span>\n                <a href="" ng-show="subscriber.status != \'Offline\'" ng-click="openSubscriberDialog(subscriber)">{{subscriber.consumerId}}</a>\n              </div>\n          </td>\n          <td>{{subscriber.status}}</td>\n        </tr>\n      </tbody>\n    </table>\n\n    <script type="text/ng-template" id="createSubscriberDialog.html">\n      <form name="createSubscriber" class="form-horizontal" ng-submit="doCreateSubscriber(clientId, subscriberName, topicName, subSelector)">\n        <div class="modal-header">\n          <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n            <span class="pficon pficon-close" aria-hidden="true"></span>\n          </button>\n          <h4>Create durable subscriber</h4>\n        </div>\n        <div class="modal-body">\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="clientId">Client ID</label>\n            <div class="col-sm-9">\n              <input id="clientId" class="form-control" type="text" ng-model="clientId" required>\n            </div>\n          </div>\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="subscriberName">Subscriber name</label>\n            <div class="col-sm-9">\n              <input id="subscriberName" class="form-control" type="text" ng-model="subscriberName" required>\n            </div>\n          </div>\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="topicName">Topic name</label>\n            <div class="col-sm-9">\n              <input id="topicName" class="form-control" type="text" ng-model="topicName" required required uib-typeahead="title for title in topicNames($viewValue) | filter:$viewValue">\n            </div>\n          </div>\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="subSelector">Selector</label>\n            <div class="col-sm-9">\n              <input id="subSelector" class="form-control" type="text" ng-model="subSelector" required>\n            </div>\n          </div>\n        </div>\n        <div class="modal-footer">\n          <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n          <button type="submit" class="btn btn-primary" ng-click="$close()">Create</button>\n        </div>\n      </form>\n    </script>\n\n    <script type="text/ng-template" id="showSubscriberDialog.html">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Durable subscriber</h4>\n      </div>\n      <div class="modal-body">\n        <dl class="dl-horizontal">\n          <dt>Client Id</dt>\n          <dd>{{selectedSubscriber.ClientId}}</dd>\n          <dt>Subscription Name</dt>\n          <dd>{{selectedSubscriber.SubscriptionName}}</dd>\n          <dt>Topic Name</dt>\n          <dd>{{selectedSubscriber.DestinationName}}</dd>\n          <dt ng-if="selectedSubscriber.Selector">Selector</dt>\n          <dd ng-if="selectedSubscriber.Selector">{{selectedSubscriber.Selector}}</dd>\n          <dt>Status</dt>\n          <dd>{{selectedSubscriber.Status}}</dd>\n          <dt>Enqueue Counter</dt>\n          <dd>{{selectedSubscriber.EnqueueCounter}}</dd>\n          <dt>Dequeue Counter</dt>\n          <dd>{{selectedSubscriber.DequeueCounter}}</dd>\n          <dt>Dispatched Counter</dt>\n          <dd>{{selectedSubscriber.DispatchedCounter}}</dd>\n          <dt>Pending Size</dt>\n          <dd>{{selectedSubscriber.PendingQueueSize}}</dd>\n        </dl>\n      </div>\n    </script>\n\n    <div hawtio-confirm-dialog="deleteSubscriberDialog.show"\n         title="Delete durable subscriber"\n         ok-button-text="Yes"\n         cancel-button-text="No"\n         on-ok="deleteSubscribers()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the subscriber(s)?</p>\n      </div>\n    </div>\n\n</div>');
 $templateCache.put('plugins/activemq/html/jobs.html','<div ng-controller="ActiveMQ.JobSchedulerController">\n\n    <div class="row">\n      <div class="col-md-12">\n        <div class="pull-right">\n            <form class="form-inline">\n                <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length"\n                        hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeJob"\n                        ng-click="deleteJobsDialog.open()"\n                        title="Delete the selected jobs">\n                  <i class="fa fa-remove"></i> Delete\n                </button>\n                <button class="btn btn-default" ng-click="refresh()"\n                        title="Refreshes the list of subscribers">\n                    <i class="fa fa-refresh"></i>\n                </button>\n            </form>\n        </div>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="gridStyle" ng-grid="gridOptions"></div>\n    </div>\n\n    <div hawtio-confirm-dialog="deleteJobsDialog.show" ok-button-text="Yes" cancel-button-text="No" on-ok="deleteJobs()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the jobs</p>\n      </div>\n    </div>\n\n</div>');
 $templateCache.put('plugins/activemq/html/layoutActiveMQTree.html','<div class="tree-nav-layout">\n  <div class="sidebar-pf sidebar-pf-left" resizable r-directions="[\'right\']">\n    <activemq-tree-header></activemq-tree-header>\n    <activemq-tree></activemq-tree>\n  </div>\n  <div class="tree-nav-main">\n    <div>\n      <jmx-header></jmx-header>\n    </div>\n    <activemq-navigation></activemq-navigation>\n    <div class="contents" ng-view></div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/preferences.html','<form class="form-horizontal activemq-preferences-form" ng-controller="ActiveMQ.PreferencesController">\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqUserName">\n      ActiveMQ user name\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The user name to be used when connecting to the broker"></span>\n    </label>\n    <div class="col-md-6">\n      <input id="activemqUserName" type="text" class="form-control" ng-model="activemqUserName"/>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqPassword">\n      ActiveMQ password\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The user name to be used when connecting to the broker"></span>\n    </label>\n    <div class="col-md-6">\n      <input id="activemqPassword" type="password" class="form-control" ng-model="activemqPassword"/>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqFilterAdvisoryTopics">\n      Filter advisory topics\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to exclude advisory topics in tree/table"></span>\n    </label>\n    <div class="col-md-6">\n      <input type="checkbox" id="activemqFilterAdvisoryTopics" ng-model="activemqFilterAdvisoryTopics">\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqBrowseBytesMessages">\n      Display message body as\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Browsing byte messages should display the message body as"></span>\n    </label>\n    <div class="col-md-6">\n      <select id="activemqBrowseBytesMessages"\n              ng-model="activemqBrowseBytesMessages"\n              ng-options="key for (key, value) in messageBodyDisplayOptions"\n              ng-selected="activemqBrowseBytesMessages === value">\n      </select>\n    </div>\n  </div>\n\n</form>\n');
