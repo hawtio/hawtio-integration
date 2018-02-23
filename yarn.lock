@@ -25,9 +25,9 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@3.2.1", "@hawtio/core@3.2.12", "@hawtio/core@3.2.13", "@hawtio/core@3.2.3", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
-  version "3.2.13"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.13.tgz#76b8793b8673ccc6d71201ed5d58474962224c9e"
+"@hawtio/core@3.2.1", "@hawtio/core@3.2.12", "@hawtio/core@3.2.13", "@hawtio/core@3.2.14", "@hawtio/core@3.2.3", "@hawtio/core@~3.0.9", "@hawtio/core@~3.1.0":
+  version "3.2.14"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.14.tgz#c8c4d1c8d64e6c3e01864031b72cd98b32030b1c"
   dependencies:
     "@hawtio/core-dts" "3.0.18"
     "@types/angular" "1.6.39"
@@ -85,9 +85,9 @@
     underscore.string "^3.3.4"
     urijs "^1.18.10"
 
-"@hawtio/ui@3.2.0", "@hawtio/ui@~3.0.25":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-3.2.0.tgz#29ed6aa1d01cd7d7e5e704dc5dd16a2e6e76e0a4"
+"@hawtio/ui@3.2.0", "@hawtio/ui@3.2.1", "@hawtio/ui@~3.0.25":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-3.2.1.tgz#89a9b54dd55f7e46e649491ac9e1ef723c6a3a8b"
   dependencies:
     "@hawtio/core" "3.2.3"
     "@hawtio/core-dts" "3.0.18"

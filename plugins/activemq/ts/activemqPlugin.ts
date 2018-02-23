@@ -5,14 +5,21 @@
 namespace ActiveMQ {
 
   export const pluginName: string = 'activemq';
-  
-  export const _module = angular.module(pluginName, [
-    'angularResizable',
-    destinationModule,
-    treeModule,
-  ]);
 
-  _module.config(["$routeProvider", ($routeProvider) => {
+  export const _module = angular
+    .module(pluginName, [
+      'angularResizable',
+      destinationModule,
+      treeModule,
+    ])
+    .config(defineRoutes)
+    .controller('topicsController', ['$scope', ($scope): void => {
+      $scope.destinationType = 'topic';
+    }])
+    .run(configurePlugin);
+
+  function defineRoutes($routeProvider: ng.route.IRouteProvider): void {
+    'ngInject';
     $routeProvider.
         when('/activemq/browseQueue',        {templateUrl: 'plugins/activemq/html/browseQueue.html'}).
         when('/activemq/createDestination',  {template:    '<create-destination></create-destination>'}).
@@ -23,21 +30,18 @@ namespace ActiveMQ {
         when('/activemq/jobs',               {templateUrl: 'plugins/activemq/html/jobs.html'}).
         when('/activemq/queues',             {templateUrl: 'app/activemq/html/destinations.html'}).
         when('/activemq/topics',             {templateUrl: 'app/activemq/html/destinations.html', controller: 'topicsController'})
-  }]);
+  }
 
-  _module.controller('topicsController', function($scope) {
-      $scope.destinationType = 'topic';
-  });
-
-  _module.run(["HawtioNav", "$location", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "$templateCache", "documentBase", (
-      nav: HawtioMainNav.Registry,
-      $location: ng.ILocationService,
+  function configurePlugin(
+      HawtioNav: HawtioMainNav.Registry,
       workspace: Jmx.Workspace,
       viewRegistry,
-      helpRegistry,
+      helpRegistry: Help.HelpRegistry,
       preferencesRegistry: Core.PreferencesRegistry,
-      $templateCache: ng.ITemplateCacheService,
-      documentBase: string) => {
+      localStorage: Storage,
+      preLogoutTasks: Core.Tasks,
+      documentBase: string): void {
+    'ngInject';
 
     viewRegistry['{ "main-tab": "activemq" }'] = 'plugins/activemq/html/layoutActiveMQTree.html';
     helpRegistry.addUserDoc('activemq', 'plugins/activemq/doc/help.md', () => {
@@ -49,6 +53,13 @@ namespace ActiveMQ {
     });
 
     workspace.addTreePostProcessor(postProcessTree);
+
+    // clean up local storage upon logout
+    preLogoutTasks.addTask('CleanupActiveMQCredentials', () => {
+      log.debug("Clean up ActiveMQ credentials in local storage");
+      localStorage.removeItem('activemqUserName');
+      localStorage.removeItem('activemqPassword');
+    });
 
     // register default attribute views
     var attributes = workspace.attributeColumnDefs;
@@ -103,7 +114,7 @@ namespace ActiveMQ {
       {field: 'LogDirectory', displayName: 'Log Directory', width: "**"}
     ];
 
-    const tab = nav.builder().id('activemq')
+    const tab = HawtioNav.builder().id('activemq')
       .title(() => 'ActiveMQ')
       .defaultPage({
         rank: 15,
@@ -114,7 +125,7 @@ namespace ActiveMQ {
       .isSelected(() => workspace.isMainTabActive('activemq'))
       .build();
 
-    nav.add(tab);
+    HawtioNav.add(tab);
 
     function postProcessTree(tree: Jmx.Folder) {
       var activemq = tree.get("org.apache.activemq");
@@ -160,7 +171,7 @@ namespace ActiveMQ {
         angular.forEach(node.children, (child: Jmx.NodeSelection) => setConsumerType(child));
       }
     }
-  }]);
+  }
 
   hawtioPluginLoader.addModule(pluginName);
 
