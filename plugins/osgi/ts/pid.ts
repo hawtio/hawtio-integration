@@ -41,6 +41,7 @@ namespace Osgi {
     const addPropertyAction = {
       name: 'Add property',
       actionFn: action => {
+        $scope.propertyKeyErrorMsg = null;
         uibModalInstance = $uibModal.open({
           templateUrl: 'addPropertyDialog.html',
           scope: $scope
@@ -177,22 +178,22 @@ namespace Osgi {
       }
     }
 
-    $scope.openAddPropertyDialog = () => {
-      uibModalInstance = $uibModal.open({
-        templateUrl: 'addPropertyDialog.html',
-        scope: $scope
-      });
-    }
-
-    $scope.addPropertyConfirmed = (key, value) => {
-      uibModalInstance.close();
-      $scope.configValues[key] = {
-        Key: key,
-        Value: value,
-        Type: "String"
-      };
-      updateSchema();
-      $scope.pidSave();
+    $scope.addPropertyConfirmed = (key: string, value: string) => {
+      key = key.trim();
+      const propertyKeyRegex = RegExp('^[A-Za-z]{1}[A-Za-z0-9]*$');
+      const valid = propertyKeyRegex.test(key);
+      if (valid) {
+        uibModalInstance.close();
+        $scope.configValues[key] = {
+          Key: key,
+          Value: value,
+          Type: "String"
+        };
+        updateSchema();
+        $scope.pidSave();
+      } else {
+        $scope.propertyKeyErrorMsg = `Use only letters and numbers and don't start with a number`;
+      }
     };
 
     $scope.deletePidProp = (e) => {
