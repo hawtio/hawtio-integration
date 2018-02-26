@@ -75,7 +75,7 @@ describe("LoggersService", function() {
       loggersService.setLoggerLevel(logger);
 
       // then
-      expect(jolokiaService.execute).toHaveBeenCalledWith(SpringBoot.jmxDomain, 'setLogLevel', 'org.foo', 'TRACE');
+      expect(jolokiaService.execute).toHaveBeenCalledWith(SpringBoot.loggersJmxDomain, 'setLogLevel', 'org.foo', 'TRACE');
       done();
     });
   });

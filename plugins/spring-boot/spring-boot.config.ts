@@ -1,3 +1,5 @@
+/// <reference path="layout/layout.service.ts"/>
+
 namespace SpringBoot {
 
   export function configureRoutes($routeProvider: angular.route.IRouteProvider) {
@@ -9,20 +11,26 @@ namespace SpringBoot {
       .when('/spring-boot/loggers', {template: '<spring-boot-loggers></spring-boot-loggers>'});
     }
 
-  export function configureNavigation(viewRegistry, HawtioNav: HawtioMainNav.Registry, workspace: Jmx.Workspace) {
+  export function configureNavigation($rootScope: ng.IScope,
+                                      viewRegistry,
+                                      HawtioNav: HawtioMainNav.Registry,
+                                      workspace: Jmx.Workspace,
+                                      springBootLayoutService: SpringBootLayoutService) {
     'ngInject';
 
     viewRegistry['spring-boot'] = 'plugins/spring-boot/layout/layout.html';
 
-    let valid = false;
-    const tab = HawtioNav.builder()
+    const unsubscribe = $rootScope.$on('jmxTreeUpdated', () => {
+      unsubscribe();
+      let valid = springBootLayoutService.getTabs().length > 0;
+      const tab = HawtioNav.builder()
       .id('spring-boot')
       .title(() => 'Spring Boot')
       .href(() => '/spring-boot')
-      .isValid(() => workspace.treeContainsDomainAndProperties('org.springframework.boot'))
+      .isValid(() => valid)
       .isSelected(() => workspace.isMainTabActive('spring-boot'))
       .build();
-    HawtioNav.add(tab);
+      HawtioNav.add(tab);
+    });
   }
-
 }

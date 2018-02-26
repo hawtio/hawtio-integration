@@ -9,7 +9,7 @@ namespace SpringBoot {
     }
 
     getLoggerConfiguration(): ng.IPromise<LoggerConfiguration> {
-      return this.jolokiaService.getAttribute(jmxDomain, 'Loggers')
+      return this.jolokiaService.getAttribute(loggersJmxDomain, 'Loggers')
         .then(data => {
           let loggers: Logger[] = [];
 
@@ -32,7 +32,7 @@ namespace SpringBoot {
     }
 
     setLoggerLevel(logger: Logger): ng.IPromise<void> {
-      return this.jolokiaService.execute(jmxDomain, 'setLogLevel', logger.name, logger.configuredLevel);
+      return this.jolokiaService.execute(loggersJmxDomain, 'setLogLevel', logger.name, logger.configuredLevel);
     }
   }
 }

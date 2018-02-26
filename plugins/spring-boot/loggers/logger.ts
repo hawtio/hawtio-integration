@@ -1,6 +1,6 @@
 namespace SpringBoot {
 
-  export const jmxDomain:string = "org.springframework.boot:type=Endpoint,name=loggersEndpoint";
+  export const loggersJmxDomain:string = "org.springframework.boot:type=Endpoint,name=loggersEndpoint";
 
   export interface LoggerConfiguration {
     levels: string[],

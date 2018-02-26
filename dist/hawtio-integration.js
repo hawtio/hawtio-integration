@@ -25930,8 +25930,36 @@ var Osgi;
 })(Osgi || (Osgi = {}));
 var SpringBoot;
 (function (SpringBoot) {
+    var SpringBootLayoutService = /** @class */ (function () {
+        SpringBootLayoutService.$inject = ["workspace"];
+        function SpringBootLayoutService(workspace) {
+            'ngInject';
+            this.workspace = workspace;
+        }
+        SpringBootLayoutService.prototype.getTabs = function () {
+            var tabs = [];
+            var domain = 'org.springframework.boot';
+            var type = 'Endpoint';
+            if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'healthEndpoint' })) {
+                tabs.push(new Core.HawtioTab('Health', '/spring-boot/health'));
+            }
+            if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'loggersEndpoint' })) {
+                tabs.push(new Core.HawtioTab('Loggers', '/spring-boot/loggers'));
+            }
+            if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'traceEndpoint' })) {
+                tabs.push(new Core.HawtioTab('Trace', '/spring-boot/trace'));
+            }
+            return tabs;
+        };
+        return SpringBootLayoutService;
+    }());
+    SpringBoot.SpringBootLayoutService = SpringBootLayoutService;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="layout/layout.service.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
     configureRoutes.$inject = ["$routeProvider"];
-    configureNavigation.$inject = ["viewRegistry", "HawtioNav", "workspace"];
+    configureNavigation.$inject = ["$rootScope", "viewRegistry", "HawtioNav", "workspace", "springBootLayoutService"];
     function configureRoutes($routeProvider) {
         'ngInject';
         $routeProvider
@@ -25941,18 +25969,21 @@ var SpringBoot;
             .when('/spring-boot/loggers', { template: '<spring-boot-loggers></spring-boot-loggers>' });
     }
     SpringBoot.configureRoutes = configureRoutes;
-    function configureNavigation(viewRegistry, HawtioNav, workspace) {
+    function configureNavigation($rootScope, viewRegistry, HawtioNav, workspace, springBootLayoutService) {
         'ngInject';
         viewRegistry['spring-boot'] = 'plugins/spring-boot/layout/layout.html';
-        var valid = false;
-        var tab = HawtioNav.builder()
-            .id('spring-boot')
-            .title(function () { return 'Spring Boot'; })
-            .href(function () { return '/spring-boot'; })
-            .isValid(function () { return workspace.treeContainsDomainAndProperties('org.springframework.boot'); })
-            .isSelected(function () { return workspace.isMainTabActive('spring-boot'); })
-            .build();
-        HawtioNav.add(tab);
+        var unsubscribe = $rootScope.$on('jmxTreeUpdated', function () {
+            unsubscribe();
+            var valid = springBootLayoutService.getTabs().length > 0;
+            var tab = HawtioNav.builder()
+                .id('spring-boot')
+                .title(function () { return 'Spring Boot'; })
+                .href(function () { return '/spring-boot'; })
+                .isValid(function () { return valid; })
+                .isSelected(function () { return workspace.isMainTabActive('spring-boot'); })
+                .build();
+            HawtioNav.add(tab);
+        });
     }
     SpringBoot.configureNavigation = configureNavigation;
 })(SpringBoot || (SpringBoot = {}));
@@ -26290,7 +26321,7 @@ var SpringBoot;
 })(SpringBoot || (SpringBoot = {}));
 var SpringBoot;
 (function (SpringBoot) {
-    SpringBoot.jmxDomain = "org.springframework.boot:type=Endpoint,name=loggersEndpoint";
+    SpringBoot.loggersJmxDomain = "org.springframework.boot:type=Endpoint,name=loggersEndpoint";
 })(SpringBoot || (SpringBoot = {}));
 /// <reference path="logger.ts"/>
 var SpringBoot;
@@ -26302,7 +26333,7 @@ var SpringBoot;
             this.jolokiaService = jolokiaService;
         }
         LoggersService.prototype.getLoggerConfiguration = function () {
-            return this.jolokiaService.getAttribute(SpringBoot.jmxDomain, 'Loggers')
+            return this.jolokiaService.getAttribute(SpringBoot.loggersJmxDomain, 'Loggers')
                 .then(function (data) {
                 var loggers = [];
                 angular.forEach(data.loggers, function (loggerInfo, loggerName) {
@@ -26321,7 +26352,7 @@ var SpringBoot;
             });
         };
         LoggersService.prototype.setLoggerLevel = function (logger) {
-            return this.jolokiaService.execute(SpringBoot.jmxDomain, 'setLogLevel', logger.name, logger.configuredLevel);
+            return this.jolokiaService.execute(SpringBoot.loggersJmxDomain, 'setLogLevel', logger.name, logger.configuredLevel);
         };
         return LoggersService;
     }());
@@ -26436,16 +26467,13 @@ var SpringBoot;
         .service('loggersService', SpringBoot.LoggersService)
         .name;
 })(SpringBoot || (SpringBoot = {}));
+/// <reference path="layout.service.ts"/>
 var SpringBoot;
 (function (SpringBoot) {
-    SpringBootLayoutController.$inject = ["$location"];
-    function SpringBootLayoutController($location) {
+    SpringBootLayoutController.$inject = ["$location", "springBootLayoutService"];
+    function SpringBootLayoutController($location, springBootLayoutService) {
         'ngInject';
-        this.tabs = [
-            new Core.HawtioTab('Health', '/spring-boot/health'),
-            new Core.HawtioTab('Trace', '/spring-boot/trace'),
-            new Core.HawtioTab('Loggers', '/spring-boot/loggers')
-        ];
+        this.tabs = springBootLayoutService.getTabs();
         this.goto = function (tab) {
             $location.path(tab.path);
         };
@@ -26453,11 +26481,13 @@ var SpringBoot;
     SpringBoot.SpringBootLayoutController = SpringBootLayoutController;
 })(SpringBoot || (SpringBoot = {}));
 /// <reference path="layout.controller.ts"/>
+/// <reference path="layout.service.ts"/>
 var SpringBoot;
 (function (SpringBoot) {
     SpringBoot.layoutModule = angular
         .module('spring-boot-layout', [])
         .controller('SpringBootLayoutController', SpringBoot.SpringBootLayoutController)
+        .service('springBootLayoutService', SpringBoot.SpringBootLayoutService)
         .name;
 })(SpringBoot || (SpringBoot = {}));
 /// <reference path="health/health.module.ts"/>

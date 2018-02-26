@@ -1,13 +1,11 @@
+/// <reference path="layout.service.ts"/>
+
 namespace SpringBoot {
 
-  export function SpringBootLayoutController($location: ng.ILocationService) {
+  export function SpringBootLayoutController($location: ng.ILocationService, springBootLayoutService: SpringBootLayoutService) {
     'ngInject';
 
-    this.tabs = [
-      new Core.HawtioTab('Health', '/spring-boot/health'),
-      new Core.HawtioTab('Trace', '/spring-boot/trace'),
-      new Core.HawtioTab('Loggers', '/spring-boot/loggers')
-    ];
+    this.tabs = springBootLayoutService.getTabs();
 
     this.goto = tab => {
       $location.path(tab.path);

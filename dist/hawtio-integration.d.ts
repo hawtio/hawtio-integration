@@ -1816,8 +1816,15 @@ declare namespace Osgi {
     var ServiceController: angular.IModule;
 }
 declare namespace SpringBoot {
+    class SpringBootLayoutService {
+        private workspace;
+        constructor(workspace: Jmx.Workspace);
+        getTabs(): Core.HawtioTab[];
+    }
+}
+declare namespace SpringBoot {
     function configureRoutes($routeProvider: angular.route.IRouteProvider): void;
-    function configureNavigation(viewRegistry: any, HawtioNav: HawtioMainNav.Registry, workspace: Jmx.Workspace): void;
+    function configureNavigation($rootScope: ng.IScope, viewRegistry: any, HawtioNav: HawtioMainNav.Registry, workspace: Jmx.Workspace, springBootLayoutService: SpringBootLayoutService): void;
 }
 declare namespace SpringBoot {
     class Health {
@@ -1909,7 +1916,7 @@ declare namespace SpringBoot {
     const traceModule: string;
 }
 declare namespace SpringBoot {
-    const jmxDomain: string;
+    const loggersJmxDomain: string;
     interface LoggerConfiguration {
         levels: string[];
         loggers: Logger[];
@@ -1954,7 +1961,7 @@ declare namespace SpringBoot {
     const loggersModule: string;
 }
 declare namespace SpringBoot {
-    function SpringBootLayoutController($location: ng.ILocationService): void;
+    function SpringBootLayoutController($location: ng.ILocationService, springBootLayoutService: SpringBootLayoutService): void;
 }
 declare namespace SpringBoot {
     const layoutModule: string;
