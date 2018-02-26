@@ -22406,7 +22406,9 @@ var Karaf;
                                 }
                             });
                             if (dependentRepositories_1.length > 0) {
-                                Core.notification('danger', "Unable to remove repository " + _this.selectedRepository.name + ". It is required by " + dependentRepositories_1 + ".");
+                                var message = dependentRepositories_1.length === 1 ? dependentRepositories_1[0] : dependentRepositories_1.length + ' other features';
+                                Core.notification('danger', "Unable to remove repository " + _this.selectedRepository.name + ". It is required by " + message + ".");
+                                _this.selectedRepository = null;
                                 return;
                             }
                             _this.featuresService.removeFeatureRepository(_this.selectedRepository)

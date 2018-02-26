@@ -116,8 +116,10 @@ namespace Karaf {
               });
 
               if (dependentRepositories.length > 0) {
+                let message = dependentRepositories.length === 1 ? dependentRepositories[0] : dependentRepositories.length + ' other features';
                 Core.notification('danger',
-                  `Unable to remove repository ${this.selectedRepository.name}. It is required by ${dependentRepositories}.`)
+                  `Unable to remove repository ${this.selectedRepository.name}. It is required by ${message}.`)
+                this.selectedRepository = null;
                 return;
               }
 
