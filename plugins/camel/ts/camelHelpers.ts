@@ -692,7 +692,7 @@ namespace Camel {
         if (domain && contextId) {
           var result = tree.navigate(domain, 'Camel Contexts', contextId, 'MBeans', 'services');
           if (result && result.children) {
-            var mbean = _.find(result.children, m => _.startsWith(m.text, 'DefaultTypeConverter'));
+            var mbean = _.find(result.children, m => _.endsWith(m.text, 'TypeConverter'));
             if (mbean) {
               return mbean.objectName;
             }
