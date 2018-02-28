@@ -330,7 +330,7 @@ namespace ActiveMQ {
       });
       return answer;
     }
-    
+
     function createProperties(row) {
       var answer = {};
       angular.forEach(row, (value, key) => {
@@ -499,6 +499,8 @@ namespace ActiveMQ {
     function deselectAll() {
       $scope.gridOptions.selectedItems = [];
     }
+
+    $scope.refresh();
 
   }]);
 }
