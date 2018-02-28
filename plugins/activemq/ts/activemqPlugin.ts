@@ -14,22 +14,25 @@ namespace ActiveMQ {
     ])
     .config(defineRoutes)
     .controller('topicsController', ['$scope', ($scope): void => {
-      $scope.destinationType = 'topic';
+      $scope.destinationType = 'topics';
+    }])
+    .controller('queuesController', ['$scope', ($scope): void => {
+      $scope.destinationType = 'queues';
     }])
     .run(configurePlugin);
 
-  function defineRoutes($routeProvider: ng.route.IRouteProvider): void {
+  function defineRoutes(configManager: Core.ConfigManager): void {
     'ngInject';
-    $routeProvider.
-        when('/activemq/browseQueue',        {templateUrl: 'plugins/activemq/html/browseQueue.html'}).
-        when('/activemq/createDestination',  {template:    '<create-destination></create-destination>'}).
-        when('/activemq/deleteQueue',        {template:    '<delete-queue></delete-queue>'}).
-        when('/activemq/deleteTopic',        {template:    '<delete-topic></delete-topic>'}).
-        when('/activemq/sendMessage',        {templateUrl: 'plugins/camel/html/sendMessage.html'}).
-        when('/activemq/durableSubscribers', {templateUrl: 'plugins/activemq/html/durableSubscribers.html'}).
-        when('/activemq/jobs',               {templateUrl: 'plugins/activemq/html/jobs.html'}).
-        when('/activemq/queues',             {templateUrl: 'app/activemq/html/destinations.html'}).
-        when('/activemq/topics',             {templateUrl: 'app/activemq/html/destinations.html', controller: 'topicsController'})
+    configManager.
+      addRoute('/activemq/browseQueue',        {templateUrl: 'plugins/activemq/html/browseQueue.html'}).
+      addRoute('/activemq/createDestination',  {template:    '<create-destination></create-destination>'}).
+      addRoute('/activemq/deleteQueue',        {template:    '<delete-queue></delete-queue>'}).
+      addRoute('/activemq/deleteTopic',        {template:    '<delete-topic></delete-topic>'}).
+      addRoute('/activemq/sendMessage',        {templateUrl: 'plugins/camel/html/sendMessage.html'}).
+      addRoute('/activemq/durableSubscribers', {templateUrl: 'plugins/activemq/html/durableSubscribers.html'}).
+      addRoute('/activemq/jobs',               {templateUrl: 'plugins/activemq/html/jobs.html'}).
+      addRoute('/activemq/queues',             {templateUrl: 'plugins/activemq/html/destinations.html', controller: 'queuesController'}).
+      addRoute('/activemq/topics',             {templateUrl: 'plugins/activemq/html/destinations.html', controller: 'topicsController'});
   }
 
   function configurePlugin(
@@ -40,7 +43,9 @@ namespace ActiveMQ {
       preferencesRegistry: Core.PreferencesRegistry,
       localStorage: Storage,
       preLogoutTasks: Core.Tasks,
-      documentBase: string): void {
+      documentBase: string,
+      activeMQNavigationService: ActiveMQNavigationService
+    ): void {
     'ngInject';
 
     viewRegistry['{ "main-tab": "activemq" }'] = 'plugins/activemq/html/layoutActiveMQTree.html';
@@ -121,7 +126,7 @@ namespace ActiveMQ {
         isValid: (yes, no) => workspace.treeContainsDomainAndProperties(jmxDomain) ? yes() : no()
       })
       .href(() => '/jmx/attributes')
-      .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
+      .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain) && activeMQNavigationService.getTabs().length > 0)
       .isSelected(() => workspace.isMainTabActive('activemq'))
       .build();
 

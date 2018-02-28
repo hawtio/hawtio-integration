@@ -121,7 +121,8 @@ declare namespace ActiveMQ {
 declare namespace ActiveMQ {
     class ActiveMQNavigationService {
         private workspace;
-        constructor(workspace: Jmx.Workspace);
+        private configManager;
+        constructor(workspace: Jmx.Workspace, configManager: Core.ConfigManager);
         getTabs(): Core.HawtioTab[];
         private shouldShowBrowseTab();
         private shouldShowSendTab();

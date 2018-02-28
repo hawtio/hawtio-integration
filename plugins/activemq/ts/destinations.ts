@@ -1,331 +1,125 @@
 /// <reference path="activemqPlugin.ts"/>
 namespace ActiveMQ {
 
-    _module.controller("ActiveMQ.QueuesController", ["$scope", "workspace", "jolokia", "localStorage", (
-        $scope,
-        workspace: Jmx.Workspace,
-        jolokia: Jolokia.IJolokia,
-        localStorage: Storage) => {
+  _module.controller("ActiveMQ.QueuesController", ["$scope", "workspace", "jolokia", "localStorage", (
+    $scope,
+    workspace: Jmx.Workspace,
+    jolokia: Jolokia.IJolokia,
+    localStorage: Storage) => {
 
-        var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
+    let amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
 
-        $scope.workspace = workspace;
+    $scope.workspace = workspace;
 
-        $scope.destinationType;
+    $scope.destinationType;
 
-        $scope.destinations = [];
+    let allDestinations = [];
+    $scope.destinations = [];
 
-        $scope.totalServerItems = 0;
+    $scope.totalServerItems = 0;
 
-        $scope.pagingOptions = {
-            pageSizes: [50, 100, 200],
-            pageSize: 100,
-            currentPage: 1
-        };
+    const refreshAction = {
+      name: 'Refresh',
+      actionFn: action => $scope.loadTable()
+    };
 
-        $scope.destinationFilter = {
-            name: '',
-            filter: '',
-            sortColumn: '',
-            sortOrder: ''
-        };
+    $scope.toolbarConfig = {
+      filterConfig: {
+        fields: [
+          {
+            id: 'name',
+            title: 'Name',
+            placeholder: 'Filter by name...',
+            filterType: 'text'
+          }
+        ],
+        onFilterChange: (filters: any[]) => {
+          $scope.destinations = Pf.filter(allDestinations, $scope.toolbarConfig.filterConfig);
+        }
+      },
+      actionsConfig: {
+        primaryActions: [refreshAction]
+      },
+      isTableView: true
+    };
 
-        $scope.destinationFilterOptions = [
-            {id: "noConsumer", name: "No Consumer"}
+    $scope.tableConfig = {
+      selectionMatchProp: 'name',
+      showCheckboxes: false
+    };
+
+    $scope.pageConfig = {
+      pageSize: 20,
+      pageNumber: 1
+    };
+
+    if ($scope.destinationType == 'topics') {
+      $scope.tableColumns = [
+        { header: 'Name', itemField: 'name' },
+        { header: 'Producer Count', itemField: 'producerCount' },
+        { header: 'Consumer Count', itemField: 'consumerCount' },
+        { header: 'Enqueue Count', itemField: 'enqueueCount' },
+        { header: 'Dequeue Count', itemField: 'dequeueCount' }
         ];
+    } else {
+      $scope.tableColumns = [
+        { header: 'Name', itemField: 'name', templateFn: value => `<a href="activemq/browseQueue?main-tab=activemq&queueName=${value}">${value}</a>` },
+        { header: 'Queue Size', itemField: 'queueSize' },
+        { header: 'Producer Count', itemField: 'producerCount' },
+        { header: 'Consumer Count', itemField: 'consumerCount' },
+        { header: 'Enqueue Count', itemField: 'enqueueCount' },
+        { header: 'Dequeue Count', itemField: 'dequeueCount' },
+        { header: 'Dispatch Count', itemField: 'dispatchCount' },
+      ];
+    }
 
-        $scope.destinationFilter;
+    $scope.refresh = function() {
+      $scope.loadTable();
+    };
 
-        $scope.sortOptions = {
-            fields: ["name"],
-            directions: ["asc"]
-        };
-
-        var refreshed = false;
-
-        var attributes = [];
-        var hiddenAttributes = [
-            {
-                field: 'inFlightCount',
-                displayName: 'In-flight Count',
-                visible: false
-            },
-            {
-                field: 'expiredCount',
-                displayName: 'Expired Count',
-                visible: false
-            },
-            {
-                field: 'memoryPercentUsage',
-                displayName: 'Memory Percent Usage [%]',
-                visible: false
-            },
-            {
-                field: 'memoryLimit',
-                displayName: 'Memory Limit',
-                visible: false
-            },
-            {
-                field: 'memoryUsageByteCount',
-                displayName: 'Memory Usage Byte Count',
-                visible: false
-            },
-            {
-                field: 'memoryUsagePortion',
-                displayName: 'Memory Usage Portion',
-                visible: false
-            },
-            {
-                field: 'forwardCount',
-                displayName: 'Forward Count',
-                visible: false
-            },
-            {
-                field: 'maxAuditDepth',
-                displayName: 'Max Audit Depth',
-                visible: false
-            },
-            {
-                field: 'maxEnqueueTime',
-                displayName: 'Max Enqueue Time',
-                visible: false
-            },
-            {
-                field: 'maxMessageSize',
-                displayName: 'Max Message Size',
-                visible: false
-            },
-            {
-                field: 'maxPageSize',
-                displayName: 'Max Page Size',
-                visible: false
-            },
-            {
-                field: 'maxProducersToAudit',
-                displayName: 'Max Producers To Audit',
-                visible: false
-            },
-            {
-                field: 'messagesCached',
-                displayName: 'Messages Cached',
-                visible: false
-            },
-            {
-                field: 'minEnqueueTime',
-                displayName: 'Min Enqueue Time',
-                visible: false
-            },
-            {
-                field: 'minMessageSize',
-                displayName: 'Min Message Size',
-                visible: false
-            },
-            {
-                field: 'options',
-                displayName: 'Options',
-                visible: false
-            },
-            {
-                field: 'storeMessageSize',
-                displayName: 'Store Message Size',
-                visible: false
-            },
-            {
-                field: 'totalBlockedTime',
-                displayName: 'Totel Blocked Time',
-                visible: false
-            },
-            {
-                field: 'dlq',
-                displayName: 'DLQ?',
-                visible: false
-            },
-            {
-                field: 'enableAudit',
-                displayName: 'Audit Enabled?',
-                visible: false
-            },
-            {
-                field: 'prioritizedMessages',
-                displayName: 'Prioritized Messages?',
-                visible: false
-            },
-            {
-                field: 'producerFlowControl',
-                displayName: 'Producer Flow Control?',
-                visible: false
-            },
-            {
-                field: 'useCache',
-                displayName: 'Use Cache?',
-                visible: false
-            }
-        ];
-
-        if ($scope.destinationType == 'topic') {
-            $scope.destinationFilterOptions.push({id: "nonAdvisory", name: "No Advisory Topics"});
-            $scope.destinationFilterPlaceholder = "Filter Topic Names...";
-            attributes = [
-                {
-                    field: 'name',
-                    displayName: 'Name',
-                    width: '*'
-                },
-                {
-                    field: 'producerCount',
-                    displayName: 'Producer Count',
-                    width: '10%',
-                },
-                {
-                    field: 'consumerCount',
-                    displayName: 'Consumer Count',
-                    width: '10%',
-                },
-                {
-                    field: 'enqueueCount',
-                    displayName: 'Enqueue Count',
-                    width: '10%',
-                },
-                {
-                    field: 'dequeueCount',
-                    displayName: 'Dequeue Count',
-                    width: '10%',
-                },
-                {
-                    field: 'dispatchCount',
-                    displayName: 'Dispatch Count',
-                    width: '10%',
-                }
-            ];
-            attributes = attributes.concat(hiddenAttributes);
-        } else {
-            $scope.destinationFilterOptions.push({id: "empty", name: "Only Empty"});
-            $scope.destinationFilterOptions.push({id: "nonEmpty", name: "Only Non-Empty"});
-            $scope.destinationFilterPlaceholder = "Filter Queue Names...";
-            attributes = [
-                {
-                    field: 'name',
-                    displayName: 'Name',
-                    width: '*',
-                    cellTemplate: '<div class="ngCellText"><a href="#/activemq/browseQueue?tab=activemq&queueName={{row.entity.name}}">{{row.entity.name}}</a></div>'
-                },
-                {
-                    field: 'queueSize',
-                    displayName: 'Queue Size',
-                    width: '10%'
-                },
-                {
-                    field: 'producerCount',
-                    displayName: 'Producer Count',
-                    width: '10%'
-                },
-                {
-                    field: 'consumerCount',
-                    displayName: 'Consumer Count',
-                    width: '10%'
-                },
-                {
-                    field: 'enqueueCount',
-                    displayName: 'Enqueue Count',
-                    width: '10%'
-                },
-                {
-                    field: 'dequeueCount',
-                    displayName: 'Dequeue Count',
-                    width: '10%'
-                },
-                {
-                    field: 'dispatchCount',
-                    displayName: 'Dispatch Count',
-                    width: '10%'
-                }
-            ];
-            attributes = attributes.concat(hiddenAttributes);
+    $scope.loadTable = function() {
+      let mbean = getBrokerMBean(workspace, jolokia, amqJmxDomain);
+      if (mbean) {
+        let method = 'queryQueues(java.lang.String, int, int)';
+        if ($scope.destinationType == 'topics') {
+          method = 'queryTopics(java.lang.String, int, int)';
         }
 
-        $scope.gridOptions = {
-            selectedItems: [],
-            data: 'destinations',
-            showFooter: true,
-            showFilter: true,
-            showColumnMenu: true,
-            enableCellSelection: false,
-            enableHighlighting: true,
-            enableColumnResize: true,
-            enableColumnReordering: true,
-            selectWithCheckboxOnly: false,
-            showSelectionCheckbox: false,
-            multiSelect: false,
-            displaySelectionCheckbox: false, // old pre 2.0 config!
-            pagingOptions: $scope.pagingOptions,
-            filterOptions: {
-                filterText: '',
-                useExternalFilter: true
-            },
-            enablePaging: true,
-            totalServerItems: 'totalServerItems',
-            maintainColumnRatios: false,
-            columnDefs : attributes,
-            enableFiltering: true,
-            useExternalFiltering: true,
-            sortInfo: $scope.sortOptions,
-            useExternalSorting: true
+        let destinationFilter = {
+          name: '',
+          filter: ''
         };
 
-        $scope.refresh = function() {
-            refreshed = true;
-            $scope.loadTable();
-        };
-
-        $scope.loadTable = function() {
-            $scope.destinationFilter.name = $scope.gridOptions.filterOptions.filterText;
-            $scope.destinationFilter.sortColumn = $scope.sortOptions.fields[0];
-            $scope.destinationFilter.sortOrder = $scope.sortOptions.directions[0];
-            var mbean = getBrokerMBean(workspace, jolokia, amqJmxDomain);
-            if (mbean) {
-                var method = 'queryQueues(java.lang.String, int, int)';
-                if ($scope.destinationType == 'topic') {
-                    method = 'queryTopics(java.lang.String, int, int)';
-                }
-                jolokia.request(
-                    {type: 'exec', mbean: mbean, operation: method, arguments: [JSON.stringify($scope.destinationFilter), $scope.pagingOptions.currentPage, $scope.pagingOptions.pageSize]},
-                    Core.onSuccess(populateTable, {error: onError}));
-
-            }
-        };
-
-        function onError() {
-            Core.notification("danger", "The feature is not available in this broker version!")
-            $scope.workspace.selectParentNode();
+        let appliedFilters: any[] = $scope.toolbarConfig.filterConfig.appliedFilters;
+        if (appliedFilters && appliedFilters.length > 0) {
+          destinationFilter['filter'] = $scope.toolbarConfig.filterConfig.appliedFilters[0].value;
         }
 
-        function populateTable(response) {
-            var data = JSON.parse(response.value);
-            $scope.destinations = [];
-            angular.forEach(data["data"], (value, idx) => {
-                $scope.destinations.push(value);
-            });
-            $scope.totalServerItems = data["count"];
+        jolokia.request(
+          {type: 'exec', mbean: mbean, operation: method, arguments: [JSON.stringify(destinationFilter), $scope.pageConfig.pageNumber, $scope.pageConfig.pageSize]},
+          Core.onSuccess(populateTable, {error: onError}));
+      }
+    };
 
-            if (refreshed == true) {
-                $scope.gridOptions.pagingOptions.currentPage = 1;
-                refreshed = false;
-            }
+    function onError() {
+      Core.notification("danger", "The feature is not available in this broker version!")
+      $scope.workspace.selectParentNode();
+    }
 
-            Core.$apply($scope);
-        }
+    function populateTable(response) {
+      let data = JSON.parse(response.value);
+      $scope.destinations = [];
+      angular.forEach(data["data"], (value, idx) => {
+          $scope.destinations.push(value);
+      });
+      $scope.totalServerItems = data["count"];
 
-        $scope.$watch('sortOptions', function (newVal, oldVal) {
-            if (newVal !== oldVal) {
-                $scope.loadTable();
-            }
-        }, true);
+      allDestinations = $scope.destinations;
+      $scope.destinations = Pf.filter(allDestinations, $scope.toolbarConfig.filterConfig);
 
-        $scope.$watch('pagingOptions', function (newVal, oldVal) {
-            if (parseInt(newVal.currentPage) && newVal !== oldVal && newVal.currentPage !== oldVal.currentPage) {
-                $scope.loadTable();
-            }
-        }, true);
+      Core.$apply($scope);
+    }
 
-    }]);
+    $scope.loadTable();
+  }]);
 }
