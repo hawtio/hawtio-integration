@@ -12,7 +12,7 @@ namespace Camel {
       this.tabs = camelTabsService.getTabs();
     });
 
-    this.goto = (tab: Core.HawtioTab) => {
+    this.goto = (tab: Nav.HawtioTab) => {
       $location.path(tab.path);
     }
   }

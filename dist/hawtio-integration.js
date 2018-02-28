@@ -14484,35 +14484,35 @@ var ActiveMQ;
         }
         ActiveMQNavigationService.prototype.getTabs = function () {
             var tabs = [];
-            tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
-            tabs.push(new Core.HawtioTab('Operations', '/jmx/operations'));
-            tabs.push(new Core.HawtioTab('Chart', '/jmx/charts'));
+            tabs.push(new Nav.HawtioTab('Attributes', '/jmx/attributes'));
+            tabs.push(new Nav.HawtioTab('Operations', '/jmx/operations'));
+            tabs.push(new Nav.HawtioTab('Chart', '/jmx/charts'));
             if (this.shouldShowBrowseTab()) {
-                tabs.push(new Core.HawtioTab('Browse', '/activemq/browseQueue'));
+                tabs.push(new Nav.HawtioTab('Browse', '/activemq/browseQueue'));
             }
             if (this.shouldShowSendTab()) {
-                tabs.push(new Core.HawtioTab('Send', '/activemq/sendMessage'));
+                tabs.push(new Nav.HawtioTab('Send', '/activemq/sendMessage'));
             }
             if (this.shouldShowDurableSubscribersTab()) {
-                tabs.push(new Core.HawtioTab('Durable Subscribers', '/activemq/durableSubscribers'));
+                tabs.push(new Nav.HawtioTab('Durable Subscribers', '/activemq/durableSubscribers'));
             }
             if (this.shouldShowJobsTab()) {
-                tabs.push(new Core.HawtioTab('Jobs', '/activemq/jobs'));
+                tabs.push(new Nav.HawtioTab('Jobs', '/activemq/jobs'));
             }
             if (this.shouldShowCreateTab()) {
-                tabs.push(new Core.HawtioTab('Create', '/activemq/createDestination'));
+                tabs.push(new Nav.HawtioTab('Create', '/activemq/createDestination'));
             }
             if (this.shouldShowDeleteTopicTab()) {
-                tabs.push(new Core.HawtioTab('Delete', '/activemq/deleteTopic'));
+                tabs.push(new Nav.HawtioTab('Delete', '/activemq/deleteTopic'));
             }
             if (this.shouldShowDeleteQueueTab()) {
-                tabs.push(new Core.HawtioTab('Delete', '/activemq/deleteQueue'));
+                tabs.push(new Nav.HawtioTab('Delete', '/activemq/deleteQueue'));
             }
             if (this.shouldShowQueuesTab()) {
-                tabs.push(new Core.HawtioTab('Queues', '/activemq/queues'));
+                tabs.push(new Nav.HawtioTab('Queues', '/activemq/queues'));
             }
             if (this.shouldShowTopicsTab()) {
-                tabs.push(new Core.HawtioTab('Topics', '/activemq/topics'));
+                tabs.push(new Nav.HawtioTab('Topics', '/activemq/topics'));
             }
             return tabs;
         };
@@ -18917,78 +18917,78 @@ var Camel;
             var canSeeEndpointStatistics = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelEndpointRuntimeRegistry(this.workspace), "endpointStatistics");
             var canSendMesssage = this.workspace.hasInvokeRights(this.workspace.selection, this.workspace.selection && this.workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage");
             if (!isContextsFolder && !isRoutesFolder) {
-                tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
+                tabs.push(new Nav.HawtioTab('Attributes', '/jmx/attributes'));
             }
             if (isContextsFolder) {
-                tabs.push(new Core.HawtioTab('Contexts', '/camel/contexts'));
+                tabs.push(new Nav.HawtioTab('Contexts', '/camel/contexts'));
             }
             if (isRoutesFolder) {
-                tabs.push(new Core.HawtioTab('Routes', '/camel/routes'));
+                tabs.push(new Nav.HawtioTab('Routes', '/camel/routes'));
             }
             if ((isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
-                tabs.push(new Core.HawtioTab('Route Diagram', '/camel/routeDiagram'));
+                tabs.push(new Nav.HawtioTab('Route Diagram', '/camel/routeDiagram'));
             }
             if (!isEndpointsFolder && !isEndpoint && (isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
-                tabs.push(new Core.HawtioTab('Source', '/camel/source'));
+                tabs.push(new Nav.HawtioTab('Source', '/camel/source'));
             }
             if (Camel.isRouteNode(this.workspace)) {
-                tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesRoute'));
+                tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesRoute'));
             }
             if (isEndpoint && isCamelVersionEQGT_2_15 && canExplainEndpointJson) {
-                tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesEndpoint'));
+                tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesEndpoint'));
             }
             if (isComponent && isCamelVersionEQGT_2_15 && canExplainComponentJson) {
-                tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesComponent'));
+                tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesComponent'));
             }
             if (isDataformat && isCamelVersionEQGT_2_16 && canExplainDataFormatJson) {
-                tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesDataFormat'));
+                tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesDataFormat'));
             }
             if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder &&
                 !isComponent && (isCamelContext || isRoutesFolder || isRoute) &&
                 isCamelVersionEQGT_2_15 && canBrowse) {
-                tabs.push(new Core.HawtioTab('Exchanges', '/camel/exchanges'));
+                tabs.push(new Nav.HawtioTab('Exchanges', '/camel/exchanges'));
             }
             if (!isEndpointsFolder && !isEndpoint && (isCamelContext || isRoutesFolder) &&
                 isCamelVersionEQGT_2_14 && isRouteMetrics && canDumpStatisticsAsJson) {
-                tabs.push(new Core.HawtioTab('Route Metrics', '/camel/routeMetrics'));
+                tabs.push(new Nav.HawtioTab('Route Metrics', '/camel/routeMetrics'));
             }
             if (!Camel.isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
                 (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_14 && isRestRegistry &&
                 this.hasRestServices && canListRestServices) {
-                tabs.push(new Core.HawtioTab('REST Services', '/camel/restServices'));
+                tabs.push(new Nav.HawtioTab('REST Services', '/camel/restServices'));
             }
             if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
                 (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_16 && inEndpointRuntimeRegistry &&
                 canSeeEndpointStatistics) {
-                tabs.push(new Core.HawtioTab('Endpoints (in/out)', '/camel/endpoints-statistics'));
+                tabs.push(new Nav.HawtioTab('Endpoints (in/out)', '/camel/endpoints-statistics'));
             }
             if (!Camel.isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
                 (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_13 && canListTypeConverters) {
-                tabs.push(new Core.HawtioTab('Type Converters', '/camel/typeConverter'));
+                tabs.push(new Nav.HawtioTab('Type Converters', '/camel/typeConverter'));
             }
             if (isRoute && isTraceMBean && canDumpAllTracedMessagesAsXml) {
-                tabs.push(new Core.HawtioTab('Profile', '/camel/profileRoute'));
+                tabs.push(new Nav.HawtioTab('Profile', '/camel/profileRoute'));
             }
             if (isRoute && isDebugMbean && canGetBreakpoints) {
-                tabs.push(new Core.HawtioTab('Debug', '/camel/debugRoute'));
+                tabs.push(new Nav.HawtioTab('Debug', '/camel/debugRoute'));
             }
             if (isRoute && isTraceMBean && canDumpAllTracedMessagesAsXml) {
-                tabs.push(new Core.HawtioTab('Trace', '/camel/traceRoute'));
+                tabs.push(new Nav.HawtioTab('Trace', '/camel/traceRoute'));
             }
             if (isEndpoint && Camel.isBrowsableEndpoint(this.workspace.selection) && canBrowseAllMessagesAsXml) {
-                tabs.push(new Core.HawtioTab('Browse', '/camel/browseEndpoint'));
+                tabs.push(new Nav.HawtioTab('Browse', '/camel/browseEndpoint'));
             }
             if (isEndpoint && canSendMesssage) {
-                tabs.push(new Core.HawtioTab('Send', '/camel/sendMessage'));
+                tabs.push(new Nav.HawtioTab('Send', '/camel/sendMessage'));
             }
             if (isEndpointsFolder) {
-                tabs.push(new Core.HawtioTab('Endpoints', '/camel/endpoints'));
+                tabs.push(new Nav.HawtioTab('Endpoints', '/camel/endpoints'));
             }
             if (!isContextsFolder && !isRoutesFolder) {
-                tabs.push(new Core.HawtioTab('Operations', '/jmx/operations'));
+                tabs.push(new Nav.HawtioTab('Operations', '/jmx/operations'));
             }
             if (!isContextsFolder && !isRoutesFolder) {
-                tabs.push(new Core.HawtioTab('Chart', '/jmx/charts'));
+                tabs.push(new Nav.HawtioTab('Chart', '/jmx/charts'));
             }
             return tabs;
         };
@@ -25124,18 +25124,18 @@ var Osgi;
             this.tabs = [];
         }
         OsgiNavigationController.prototype.$onInit = function () {
-            this.tabs.push(new Core.HawtioTab('Bundles', '/osgi/bundles'));
+            this.tabs.push(new Nav.HawtioTab('Bundles', '/osgi/bundles'));
             if (Karaf.getSelectionFeaturesMBean(this.workspace)) {
-                this.tabs.push(new Core.HawtioTab('Features', '/osgi/features'));
+                this.tabs.push(new Nav.HawtioTab('Features', '/osgi/features'));
             }
-            this.tabs.push(new Core.HawtioTab('Packages', '/osgi/packages'));
-            this.tabs.push(new Core.HawtioTab('Services', '/osgi/services'));
+            this.tabs.push(new Nav.HawtioTab('Packages', '/osgi/packages'));
+            this.tabs.push(new Nav.HawtioTab('Services', '/osgi/services'));
             if (Karaf.getSelectionScrMBean(this.workspace)) {
-                this.tabs.push(new Core.HawtioTab('Declarative Services', '/osgi/scr-components'));
+                this.tabs.push(new Nav.HawtioTab('Declarative Services', '/osgi/scr-components'));
             }
-            this.tabs.push(new Core.HawtioTab('Server', '/osgi/server'));
-            this.tabs.push(new Core.HawtioTab('Framework', '/osgi/fwk'));
-            this.tabs.push(new Core.HawtioTab('Configuration', '/osgi/configurations'));
+            this.tabs.push(new Nav.HawtioTab('Server', '/osgi/server'));
+            this.tabs.push(new Nav.HawtioTab('Framework', '/osgi/fwk'));
+            this.tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
         };
         OsgiNavigationController.prototype.goto = function (tab) {
             this.$location.path(tab.path);
@@ -26440,9 +26440,9 @@ var SpringBoot;
     function SpringBootLayoutController($location) {
         'ngInject';
         this.tabs = [
-            new Core.HawtioTab('Health', '/spring-boot/health'),
-            new Core.HawtioTab('Trace', '/spring-boot/trace'),
-            new Core.HawtioTab('Loggers', '/spring-boot/loggers')
+            new Nav.HawtioTab('Health', '/spring-boot/health'),
+            new Nav.HawtioTab('Trace', '/spring-boot/trace'),
+            new Nav.HawtioTab('Loggers', '/spring-boot/loggers')
         ];
         this.goto = function (tab) {
             $location.path(tab.path);
@@ -26500,12 +26500,12 @@ $templateCache.put('plugins/camel/html/layoutCamelTree.html','<div class="tree-n
 $templateCache.put('plugins/camel/html/nodePropertiesEdit.html','<div class="row-fluid">\n\n  <!-- the label and input fields needs to be wider -->\n  <style>\n    input, textarea, .uneditable-input {\n      width: 600px;\n    }\n    input, textarea, .editable-input {\n      width: 600px;\n    }\n\n    .form-horizontal .control-label {\n      width: 180px;\n    }\n\n    .form-horizontal .controls {\n      margin-left: 200px;\n    }\n  </style>\n\n  <h3>\n    <img src="{{icon}}" width="48" height="48" ng-show="icon"/> {{model.title}}\n    <span style="margin-left: 10px" ng-repeat="label in labels track by $index" class="pod-label badge" title="{{label}}">{{label}}</span>\n  </h3>\n\n  <div simple-form name="formViewer" mode=\'edit\' entity=\'nodeData\' data=\'model\' schema="schema"\n       showhelp="!hideHelp"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/nodePropertiesView.html','<header class="camel-properties-header">\n  <h2>Properties</h2>\n  <h3>\n    <img ng-src="{{icon}}" width="24" height="24" ng-show="icon"/>\n    <span>{{title}}</span>\n  </h3>\n  <span class="label label-default" ng-repeat="label in labels track by $index">{{label}}<span>\n</header>\n<p>{{description}}</p>\n<property-list title="Defined Properties" properties="definedProperties"></property-list>\n<property-list title="Default Properties" properties="defaultProperties"></property-list>\n<property-list title="Undefined Properties" properties="undefinedProperties"></property-list>\n<div class="camel-properties-empty-space-for-tooltip"></div>');
 $templateCache.put('plugins/camel/html/preferences.html','<form class="form-horizontal camel-preferences-form" ng-controller="Camel.PreferencesController">\n\n  <div class="form-group">\n    <label class="col-md-4 control-label" for="camelHideOptionDocumentation">\n      Hide option documentation\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to hide documentation in the properties view and Camel route editor"></span>\n    </label>\n    <div class="col-md-4">\n      <input type="checkbox" id="camelHideOptionDocumentation" ng-model="camelHideOptionDocumentation">\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-4 control-label" for="camelHideOptionDefaultValue">\n      Hide default option values\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to hide options that are using a default value in the properties view"></span>\n    </label>\n    <div class="col-md-4">\n      <input type="checkbox" id="camelHideOptionDefaultValue" ng-model="camelHideOptionDefaultValue">\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-4 control-label" for="camelHideOptionUnusedValue">\n      Hide unused option values\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to hide unused/empty options in the properties view"></span>\n    </label>\n    <div class="col-md-4">\n      <input type="checkbox" id="camelHideOptionUnusedValue" ng-model="camelHideOptionUnusedValue">\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-4 control-label" for="camelTraceOrDebugIncludeStreams">\n      Include trace / debug streams\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to include stream based message body when using the tracer and debugger"></span>\n    </label>\n    <div class="col-md-4">\n      <input type="checkbox" id="camelTraceOrDebugIncludeStreams" ng-model="camelTraceOrDebugIncludeStreams">\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-4 control-label" for="camelMaximumTraceOrDebugBodyLength">\n      Maximum trace / debug body length\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum length of the body before its clipped when using the tracer and debugger"></span>\n    </label>\n    <div class="col-md-4">\n      <input id="camelMaximumTraceOrDebugBodyLength" type="number" class="form-control" ng-model="camelMaximumTraceOrDebugBodyLength" min="0"/>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-4 control-label" for="camelMaximumLabelWidth">\n      Maximum label width\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum length of a label in Camel diagrams before it is clipped"></span>\n    </label>\n    <div class="col-md-4">\n      <input id="camelMaximumLabelWidth" type="number" class="form-control" ng-model="camelMaximumLabelWidth" min="0"/>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-4 control-label" for="camelIgnoreIdForLabel">\n      Ignore ID for label\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="If enabled then we will ignore the ID value when viewing a pattern in a Camel diagram; otherwise we will use the ID value as the label (the tooltip will show the actual detail"></span>\n    </label>\n    <div class="col-md-4">\n      <input type="checkbox" id="camelIgnoreIdForLabel" ng-model="camelIgnoreIdForLabel">\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-4 control-label" for="camelShowInflightCounter">\n      Show inflight counter\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to show inflight counter in route diagram"></span>\n    </label>\n    <div class="col-md-4">\n      <input type="checkbox" id="camelShowInflightCounter" ng-model="camelShowInflightCounter">\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-4 control-label" for="camelRouteMetricMaxSeconds">\n      Route metric maximum seconds\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum value in seconds used by the route metrics duration and histogram charts"></span>\n    </label>\n    <div class="col-md-4">\n      <input id="camelRouteMetricMaxSeconds" type="number" class="form-control" ng-model="camelRouteMetricMaxSeconds" min="0" max="100"/>\n    </div>\n  </div>\n\n</form>\n');
-$templateCache.put('plugins/camel/html/profileRoute.html','<div class="table-view" ng-controller="Camel.ProfileRouteController">\n  \n  <h2>Profile</h2>\n  \n  <p ng-if="!initDone">Loading...</p>\n  \n  <div ng-if="initDone">\n    <div class="loading-message" ng-if="data.length === 0">\n      No profile data\n    </div>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-profile-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n  \n</div>\n');
+$templateCache.put('plugins/camel/html/profileRoute.html','<div class="table-view" ng-controller="Camel.ProfileRouteController">\n  \n  <h2>Profile</h2>\n  \n  <p ng-if="!initDone">Loading...</p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No profile data\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-profile-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n  \n</div>\n');
 $templateCache.put('plugins/camel/html/propertiesComponent.html','<div class="camel-properties" ng-controller="Camel.PropertiesComponentController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/propertiesDataFormat.html','<div class="camel-properties" ng-controller="Camel.PropertiesDataFormatController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/propertiesEndpoint.html','<div class="camel-properties" ng-controller="Camel.PropertiesEndpointController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
 $templateCache.put('plugins/camel/html/propertiesRoute.html','<div class="camel-properties" ng-controller="Camel.PropertiesRouteController">\n  <div ng-include="viewTemplate"></div>\n</div>\n');
-$templateCache.put('plugins/camel/html/restServices.html','<div ng-controller="Camel.RestServicesController">\n  \n  <h2>REST Services</h2>\n  \n  <p ng-if="!selectedMBean">Loading...</p>\n  \n  <div ng-if="selectedMBean">\n    <div ng-if="data.length === 0" class="loading-message">\n      There are no REST Services registered in this CamelContext.\n    </div>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-rest-services-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n</div>\n');
+$templateCache.put('plugins/camel/html/restServices.html','<div ng-controller="Camel.RestServicesController">\n  \n  <h2>REST Services</h2>\n  \n  <p ng-if="!selectedMBean">Loading...</p>\n  \n  <div ng-if="selectedMBean">\n    <p ng-if="data.length === 0">\n      There are no REST Services registered in this CamelContext.\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered camel-rest-services-table" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n</div>\n');
 $templateCache.put('plugins/camel/html/routeDiagram.html','<div class="camel-route-diagram-canvas" ng-controller="Camel.RouteController">\n  <svg class="camel-diagram" width="100%" height="100%" preserveAspectRatio="xMidYMid">\n    <defs>\n      <marker id="arrowhead"\n              viewBox="0 0 10 10"\n              refX="9"\n              refY="5"\n              markerUnits="strokeWidth"\n              markerWidth="5.3"\n              markerHeight="4"\n              orient="auto">\n        <path d="M 0 0 L 10 5 L 0 10 z"></path>\n      </marker>\n\n      <filter id="drop-shadow" width="300%" height="300%">\n        <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="19"/>\n        <feOffset in="blur-out" result="the-shadow" dx="2" dy="2"/>\n        <feComponentTransfer xmlns="http://www.w3.org/2000/svg">\n          <feFuncA type="linear" slope="0.2"/>\n        </feComponentTransfer>\n        <feMerge xmlns="http://www.w3.org/2000/svg">\n          <feMergeNode/>\n          <feMergeNode in="SourceGraphic"/>\n        </feMerge>\n      </filter>\n      <linearGradient id="rect-gradient" x1="0%" y1="0%" x2="0%" y2="100%">\n        <stop offset="0%" style="stop-color:rgb(254,254,255);stop-opacity:1"/>\n        <stop offset="100%" style="stop-color:rgb(247,247,255);stop-opacity:1"/>\n      </linearGradient>\n      <linearGradient id="rect-select-gradient" x1="0%" y1="0%" x2="0%" y2="100%">\n        <stop offset="0%" style="stop-color: #ffffa0; stop-opacity: 0.7"/>\n        <stop offset="100%" style="stop-color: #f0f0a0; stop-opacity: 0.7"/>\n      </linearGradient>\n    </defs>\n  </svg>\n</div>\n');
 $templateCache.put('plugins/camel/html/routeMetrics.html','<div ng-controller="Camel.RouteMetricsController">\n\n  <h2>Route Metrics</h2>\n \n  <p ng-show="!initDone">Loading...</p>\n\n  <div ng-show="initDone">\n    <p ng-show="metricDivs.length === 0">\n      This Camel context has no route metrics data.\n    </p>\n    <div ng-show="metricDivs.length > 0">\n      <div class="row toolbar-pf">\n        <div class="col-md-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div>\n              <div class="form-group has-clear">\n                <div class="search-pf-input-group">\n                  <label for="search1" class="sr-only">Filter</label>\n                  <input id="search1" type="search" class="form-control" ng-model="filterText"\n                        placeholder="Filter by route ID...">\n                  <button type="button" class="clear" aria-hidden="true" ng-click="filterText = \'\'">\n                    <span class="pficon pficon-close"></span>\n                  </button>\n                </div>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n      <div id="{{metric.id}}" ng-repeat="metric in metricDivs track by metric.id" ng-show="metricVisible(metric)"></div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/sendMessage.html','<div ng-controller="Camel.SendMessageController">\n\n  <h2>Send Message</h2>\n\n  <div class="alert alert-warning" ng-show="noCredentials">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    <strong>No credentials set for endpoint!</strong>\n    Please set your username and password in the\n    <a href="#" class="alert-link" ng-click="openPrefs()">Preferences</a> page.\n  </div>\n\n  <h3>Headers</h3>\n\n  <div class="row camel-message-headers" ng-if="headers.length > 0">\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Name</label>\n          <input type="text" class="form-control" ng-model="header.name" ng-repeat="header in headers"\n                 uib-typeahead="completion for completion in defaultHeaderNames() | filter:$viewValue"\n                 pf-focused="$last">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Value</label>\n          <input type="text" class="form-control" ng-model="header.value" ng-repeat="header in headers">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-2">\n      <form>\n        <div class="form-group">\n          <label>&nbsp;</label>\n          <button type="button" class="btn btn-default" title="Delete" ng-click="removeHeader(header)"\n                  ng-repeat="header in headers">\n            <span class="pficon pficon-delete"></span>\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div>\n    <a href="" ng-click="addHeader()">Add header</a>\n  </div>\n\n  <h3>Body</h3>\n\n  <form>\n    <div class="form-group">\n      <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>\n    </div>\n    <div class="form-group">\n      <select class="form-control camel-send-message-format" ng-model="codeMirrorOptions.mode.name">\n        <option value="javascript">JSON</option>\n        <option value="xml">XML</option>\n      </select>\n      <button class="btn btn-default" ng-click="formatMessage()"\n              title="Automatically pretty prints the message so its easier to read">Format\n      </button>\n    </div>\n  </form>\n\n  <p>\n    <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>\n  </p>\n\n</div>\n');
@@ -26536,5 +26536,5 @@ $templateCache.put('plugins/camel/html/tree/content.html','<div class="tree-nav-
 $templateCache.put('plugins/camel/html/tree/header.html','<div class="tree-nav-sidebar-header">\n  <form role="form" class="search-pf has-button">\n    <div class="form-group has-clear">\n      <div class="search-pf-input-group">\n        <label for="input-search" class="sr-only">Search Tree:</label>\n        <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n          ng-model="$ctrl.filter">\n        <button type="button" class="clear" aria-hidden="true"\n          ng-hide="$ctrl.filter.length === 0"\n          ng-click="$ctrl.filter = \'\'">\n          <span class="pficon pficon-close"></span>\n        </button>\n      </div>\n    </div>\n    <div class="form-group tree-nav-buttons">\n      <span class="badge" ng-class="{positive: $ctrl.result.length > 0}"\n        ng-show="$ctrl.filter.length > 0">\n        {{$ctrl.result.length}}\n      </span>\n      <i class="fa fa-plus-square-o" title="Expand All" ng-click="$ctrl.expandAll()"></i>\n      <i class="fa fa-minus-square-o" title="Collapse All" ng-click="$ctrl.contractAll()"></i>\n    </div>\n  </form>\n</div>\n');
 $templateCache.put('plugins/activemq/doc/help.md','### ActiveMQ\n\nClick [ActiveMQ](#/jmx/attributes?tab=activmemq) in the top navigation bar to see the ActiveMQ specific plugin. (The ActiveMQ tab won\'t appear if there is no broker in this JVM).  The ActiveMQ plugin works very much the same as the JMX plugin however with a focus on interacting with an ActiveMQ broker.\n\nThe tree view on the left-hand side shows the top level JMX tree of each broker instance running in the JVM.  Expanding the tree will show the various MBeans registered by ActiveMQ that you can inspect via the **Attributes** tab.\n\nYou can then click on the **Queue** node to see the queues and **Topic** node to see the topics. From either of these nodes you should see **Create Queue** or **Create Topic** tabs to be able to create new destinations.\n\nOnce you have selected a destination you should be able to **Send** to it, **Browse** a queue or view the  **Attributes** or **Charts**\n\nYou can also see a graphical view of all producers, destinations and consumers for all queues (or if you select a Topic folder then topics) using the **Diagram** tab. Selecting a single queue or topic shows just all the producers and consumers on that destination. This diagram makes it easy to spot if producers are sending messages when there are no consumers, or that consumers are on the wrong destination etc.\n');
 $templateCache.put('plugins/camel/doc/help.md','### Camel\n\nClick [Camel](#/jmx/attributes?tab=camel) in the top navigation bar to view all the running Camel Contexts in the current JVM. (The selection will not appear on the navigation bar if there is no Camel running).\n\nThe Camel plugin allows you to view all the running Camel applications in the current JVM.\nYou can among others see the following details:\n\n* Lists of all running Camel applications\n* Detailed information of each Camel Context such as Camel version number, runtime statics\n* Lists of all routes in each Camel applications and their runtime statistics\n* Manage the lifecycle of all Camel applications and their routes, so you can restart / stop / pause / resume, etc.\n* Graphical representation of the running routes along with real time metrics\n* Live tracing and debugging of running routes\n* Profile the running routes with real time runtime statics; detailed specified per processor\n* Browsing and sending messages to Camel endpoint\n');
-$templateCache.put('plugins/karaf/doc/help.md','### Karaf\n\nThis plugin supports the [Apache Karaf](http://karaf.apache.org/) container');
-$templateCache.put('plugins/osgi/doc/help.md','### OSGi\n\nThis plugin supports the various OSGi standards for working with bundles, Config Admin, services, packages etc.');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");
+$templateCache.put('plugins/karaf/doc/help.md','## Karaf\n\nThis plugin supports the [Apache Karaf](http://karaf.apache.org/) container.');
+$templateCache.put('plugins/osgi/doc/help.md','## OSGi\n\nThis plugin supports the various OSGi standards for working with bundles, Config Admin, services, packages, etc.');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");

@@ -9,7 +9,7 @@ namespace SpringBoot {
       .when('/spring-boot/loggers', {template: '<spring-boot-loggers></spring-boot-loggers>'});
     }
 
-  export function configureNavigation(viewRegistry, HawtioNav: HawtioMainNav.Registry, workspace: Jmx.Workspace) {
+  export function configureNavigation(viewRegistry, HawtioNav: Nav.Registry, workspace: Jmx.Workspace) {
     'ngInject';
 
     viewRegistry['spring-boot'] = 'plugins/spring-boot/layout/layout.html';

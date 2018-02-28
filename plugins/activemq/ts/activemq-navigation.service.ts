@@ -8,47 +8,47 @@ namespace ActiveMQ {
       'ngInject';
     }
 
-    getTabs(): Core.HawtioTab[] {
+    getTabs(): Nav.HawtioTab[] {
       const tabs = [];
       
-      tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
-      tabs.push(new Core.HawtioTab('Operations', '/jmx/operations'));
-      tabs.push(new Core.HawtioTab('Chart', '/jmx/charts'));
+      tabs.push(new Nav.HawtioTab('Attributes', '/jmx/attributes'));
+      tabs.push(new Nav.HawtioTab('Operations', '/jmx/operations'));
+      tabs.push(new Nav.HawtioTab('Chart', '/jmx/charts'));
       
       if (this.shouldShowBrowseTab()) {
-        tabs.push(new Core.HawtioTab('Browse', '/activemq/browseQueue'));
+        tabs.push(new Nav.HawtioTab('Browse', '/activemq/browseQueue'));
       }
 
       if (this.shouldShowSendTab()) {
-        tabs.push(new Core.HawtioTab('Send', '/activemq/sendMessage'));
+        tabs.push(new Nav.HawtioTab('Send', '/activemq/sendMessage'));
       }
 
       if (this.shouldShowDurableSubscribersTab()) {
-        tabs.push(new Core.HawtioTab('Durable Subscribers', '/activemq/durableSubscribers'));
+        tabs.push(new Nav.HawtioTab('Durable Subscribers', '/activemq/durableSubscribers'));
       }
       
       if (this.shouldShowJobsTab()) {
-        tabs.push(new Core.HawtioTab('Jobs', '/activemq/jobs'));
+        tabs.push(new Nav.HawtioTab('Jobs', '/activemq/jobs'));
       }
 
       if (this.shouldShowCreateTab()) {
-        tabs.push(new Core.HawtioTab('Create', '/activemq/createDestination'));
+        tabs.push(new Nav.HawtioTab('Create', '/activemq/createDestination'));
       }
       
       if (this.shouldShowDeleteTopicTab()) {
-        tabs.push(new Core.HawtioTab('Delete', '/activemq/deleteTopic'));
+        tabs.push(new Nav.HawtioTab('Delete', '/activemq/deleteTopic'));
       }
 
       if (this.shouldShowDeleteQueueTab()) {
-        tabs.push(new Core.HawtioTab('Delete', '/activemq/deleteQueue'));
+        tabs.push(new Nav.HawtioTab('Delete', '/activemq/deleteQueue'));
       }
 
       if (this.shouldShowQueuesTab()) {
-        tabs.push(new Core.HawtioTab('Queues', '/activemq/queues'));
+        tabs.push(new Nav.HawtioTab('Queues', '/activemq/queues'));
       }
 
       if (this.shouldShowTopicsTab()) {
-        tabs.push(new Core.HawtioTab('Topics', '/activemq/topics'));
+        tabs.push(new Nav.HawtioTab('Topics', '/activemq/topics'));
       }
       
       return tabs;

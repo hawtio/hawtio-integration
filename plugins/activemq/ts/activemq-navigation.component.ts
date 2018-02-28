@@ -5,7 +5,7 @@ namespace ActiveMQ {
 
   export class ActiveMQNavigationController {
     
-    tabs: Core.HawtioTab[];
+    tabs: Nav.HawtioTab[];
 
     constructor($scope: ng.IScope, private $location: ng.ILocationService,
       private activeMQNavigationService: ActiveMQNavigationService) {
@@ -20,7 +20,7 @@ namespace ActiveMQ {
       this.tabs = this.activeMQNavigationService.getTabs();
     }
 
-    goto(tab: Core.HawtioTab): void {
+    goto(tab: Nav.HawtioTab): void {
       this.$location.path(tab.path);
     }
   }

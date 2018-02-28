@@ -11,7 +11,7 @@ namespace Camel {
       this.hasRestServices = Camel.hasRestServices(workspace, jolokia);
     }
 
-    getTabs(): Core.HawtioTab[] {
+    getTabs(): Nav.HawtioTab[] {
       const tabs = [];
       const isCamelContext = this.workspace.isCamelContext();
       const isCamelVersionEQGT_2_13 = Camel.isCamelVersionEQGT(2, 13, this.workspace, this.jolokia);
@@ -46,99 +46,99 @@ namespace Camel {
       const canSendMesssage = this.workspace.hasInvokeRights(this.workspace.selection, this.workspace.selection && this.workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage");
 
       if (!isContextsFolder && !isRoutesFolder) {
-        tabs.push(new Core.HawtioTab('Attributes', '/jmx/attributes'));
+        tabs.push(new Nav.HawtioTab('Attributes', '/jmx/attributes'));
       }
 
       if (isContextsFolder) {
-        tabs.push(new Core.HawtioTab('Contexts', '/camel/contexts'));
+        tabs.push(new Nav.HawtioTab('Contexts', '/camel/contexts'));
       }
 
       if (isRoutesFolder) {
-        tabs.push(new Core.HawtioTab('Routes', '/camel/routes'));
+        tabs.push(new Nav.HawtioTab('Routes', '/camel/routes'));
       }
 
       if ((isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
-        tabs.push(new Core.HawtioTab('Route Diagram', '/camel/routeDiagram'));
+        tabs.push(new Nav.HawtioTab('Route Diagram', '/camel/routeDiagram'));
       }
 
       if (!isEndpointsFolder && !isEndpoint && (isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
-        tabs.push(new Core.HawtioTab('Source', '/camel/source'));
+        tabs.push(new Nav.HawtioTab('Source', '/camel/source'));
       }
 
       if (isRouteNode(this.workspace)) {
-        tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesRoute'));
+        tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesRoute'));
       }
 
       if (isEndpoint && isCamelVersionEQGT_2_15 && canExplainEndpointJson) {
-        tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesEndpoint'));
+        tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesEndpoint'));
       }
 
       if (isComponent && isCamelVersionEQGT_2_15 && canExplainComponentJson) {
-        tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesComponent'));
+        tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesComponent'));
       }
 
       if (isDataformat && isCamelVersionEQGT_2_16 && canExplainDataFormatJson) {
-        tabs.push(new Core.HawtioTab('Properties', '/camel/propertiesDataFormat'));
+        tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesDataFormat'));
       }
 
       if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder &&
           !isComponent && (isCamelContext || isRoutesFolder || isRoute) &&
           isCamelVersionEQGT_2_15 && canBrowse) {
-        tabs.push(new Core.HawtioTab('Exchanges', '/camel/exchanges'));
+        tabs.push(new Nav.HawtioTab('Exchanges', '/camel/exchanges'));
       }
 
       if (!isEndpointsFolder && !isEndpoint && (isCamelContext || isRoutesFolder) &&
           isCamelVersionEQGT_2_14 && isRouteMetrics && canDumpStatisticsAsJson) {
-        tabs.push(new Core.HawtioTab('Route Metrics', '/camel/routeMetrics'));
+        tabs.push(new Nav.HawtioTab('Route Metrics', '/camel/routeMetrics'));
       }
 
       if (!isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
           (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_14 && isRestRegistry &&
           this.hasRestServices && canListRestServices) {
-        tabs.push(new Core.HawtioTab('REST Services', '/camel/restServices'));
+        tabs.push(new Nav.HawtioTab('REST Services', '/camel/restServices'));
       }
 
       if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
           (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_16 && inEndpointRuntimeRegistry &&
           canSeeEndpointStatistics) {
-        tabs.push(new Core.HawtioTab('Endpoints (in/out)', '/camel/endpoints-statistics'));
+        tabs.push(new Nav.HawtioTab('Endpoints (in/out)', '/camel/endpoints-statistics'));
       }
 
       if (!isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
           (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_13 && canListTypeConverters) {
-        tabs.push(new Core.HawtioTab('Type Converters', '/camel/typeConverter'));
+        tabs.push(new Nav.HawtioTab('Type Converters', '/camel/typeConverter'));
       }
 
       if (isRoute && isTraceMBean && canDumpAllTracedMessagesAsXml) {
-        tabs.push(new Core.HawtioTab('Profile', '/camel/profileRoute'));
+        tabs.push(new Nav.HawtioTab('Profile', '/camel/profileRoute'));
       }
 
       if (isRoute && isDebugMbean && canGetBreakpoints) {
-        tabs.push(new Core.HawtioTab('Debug', '/camel/debugRoute'));
+        tabs.push(new Nav.HawtioTab('Debug', '/camel/debugRoute'));
       }
 
       if (isRoute && isTraceMBean && canDumpAllTracedMessagesAsXml) {
-        tabs.push(new Core.HawtioTab('Trace', '/camel/traceRoute'));
+        tabs.push(new Nav.HawtioTab('Trace', '/camel/traceRoute'));
       }
 
       if (isEndpoint && isBrowsableEndpoint(this.workspace.selection) && canBrowseAllMessagesAsXml) {
-        tabs.push(new Core.HawtioTab('Browse', '/camel/browseEndpoint'));
+        tabs.push(new Nav.HawtioTab('Browse', '/camel/browseEndpoint'));
       }
 
       if (isEndpoint && canSendMesssage) {
-        tabs.push(new Core.HawtioTab('Send', '/camel/sendMessage'));
+        tabs.push(new Nav.HawtioTab('Send', '/camel/sendMessage'));
       }
 
       if (isEndpointsFolder) {
-        tabs.push(new Core.HawtioTab('Endpoints', '/camel/endpoints'));
+        tabs.push(new Nav.HawtioTab('Endpoints', '/camel/endpoints'));
       }
 
       if (!isContextsFolder && !isRoutesFolder) {
-        tabs.push(new Core.HawtioTab('Operations', '/jmx/operations'));
+        tabs.push(new Nav.HawtioTab('Operations', '/jmx/operations'));
       }
 
       if (!isContextsFolder && !isRoutesFolder) {
-        tabs.push(new Core.HawtioTab('Chart', '/jmx/charts'));
+        tabs.push(new Nav.HawtioTab('Chart', '/jmx/charts'));
       }
 
       return tabs;

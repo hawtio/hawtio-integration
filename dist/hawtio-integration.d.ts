@@ -122,7 +122,7 @@ declare namespace ActiveMQ {
     class ActiveMQNavigationService {
         private workspace;
         constructor(workspace: Jmx.Workspace);
-        getTabs(): Core.HawtioTab[];
+        getTabs(): Nav.HawtioTab[];
         private shouldShowBrowseTab();
         private shouldShowSendTab();
         private shouldShowDurableSubscribersTab();
@@ -145,10 +145,10 @@ declare namespace ActiveMQ {
     class ActiveMQNavigationController {
         private $location;
         private activeMQNavigationService;
-        tabs: Core.HawtioTab[];
+        tabs: Nav.HawtioTab[];
         constructor($scope: ng.IScope, $location: ng.ILocationService, activeMQNavigationService: ActiveMQNavigationService);
         $onInit(): void;
-        goto(tab: Core.HawtioTab): void;
+        goto(tab: Nav.HawtioTab): void;
     }
     const activeMQNavigationComponent: angular.IComponentOptions;
 }
@@ -898,7 +898,7 @@ declare namespace Camel {
         private jolokia;
         private hasRestServices;
         constructor(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia);
-        getTabs(): Core.HawtioTab[];
+        getTabs(): Nav.HawtioTab[];
     }
 }
 declare namespace Camel {
@@ -1443,6 +1443,7 @@ declare namespace Karaf {
                     title: string;
                     placeholder: string;
                     filterType: string;
+                    filterValues?: undefined;
                 } | {
                     id: string;
                     title: string;
@@ -1797,10 +1798,10 @@ declare namespace Osgi {
     class OsgiNavigationController {
         private $location;
         private workspace;
-        tabs: Core.HawtioTab[];
+        tabs: Nav.HawtioTab[];
         constructor($location: ng.ILocationService, workspace: Jmx.Workspace);
         $onInit(): void;
-        goto(tab: Core.HawtioTab): void;
+        goto(tab: Nav.HawtioTab): void;
     }
     const osgiNavigationComponent: angular.IComponentOptions;
 }
@@ -1817,7 +1818,7 @@ declare namespace Osgi {
 }
 declare namespace SpringBoot {
     function configureRoutes($routeProvider: angular.route.IRouteProvider): void;
-    function configureNavigation(viewRegistry: any, HawtioNav: HawtioMainNav.Registry, workspace: Jmx.Workspace): void;
+    function configureNavigation(viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace): void;
 }
 declare namespace SpringBoot {
     class Health {

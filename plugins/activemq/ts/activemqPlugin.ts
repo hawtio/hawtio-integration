@@ -33,7 +33,7 @@ namespace ActiveMQ {
   }
 
   function configurePlugin(
-      HawtioNav: HawtioMainNav.Registry,
+      HawtioNav: Nav.Registry,
       workspace: Jmx.Workspace,
       viewRegistry,
       helpRegistry: Help.HelpRegistry,
