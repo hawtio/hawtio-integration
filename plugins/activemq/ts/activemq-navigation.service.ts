@@ -59,7 +59,7 @@ namespace ActiveMQ {
       'ngInject';
     }
 
-    getTabs(): Core.HawtioTab[] {
+    getTabs(): Nav.HawtioTab[] {
       const tabs = [];
 
       let enabledRoutes = Object.keys(TAB_CONFIG)
@@ -67,44 +67,44 @@ namespace ActiveMQ {
         .filter(route => {return _.startsWith(route, '/activemq') && this.configManager.isRouteEnabled(route)});
 
       if (enabledRoutes.length > 0) {
-        tabs.push(new Core.HawtioTab(TAB_CONFIG.attributes.title, TAB_CONFIG.attributes.route));
-        tabs.push(new Core.HawtioTab(TAB_CONFIG.operations.title, TAB_CONFIG.operations.route));
-        tabs.push(new Core.HawtioTab(TAB_CONFIG.chart.title, TAB_CONFIG.chart.route));
+        tabs.push(new Nav.HawtioTab(TAB_CONFIG.attributes.title, TAB_CONFIG.attributes.route));
+        tabs.push(new Nav.HawtioTab(TAB_CONFIG.operations.title, TAB_CONFIG.operations.route));
+        tabs.push(new Nav.HawtioTab(TAB_CONFIG.chart.title, TAB_CONFIG.chart.route));
 
         if (this.shouldShowBrowseTab()) {
-          tabs.push(new Core.HawtioTab(TAB_CONFIG.browse.title, TAB_CONFIG.browse.route));
+          tabs.push(new Nav.HawtioTab(TAB_CONFIG.browse.title, TAB_CONFIG.browse.route));
         }
 
         if (this.shouldShowSendTab()) {
-          tabs.push(new Core.HawtioTab(TAB_CONFIG.sendMessage.title, TAB_CONFIG.sendMessage.route));
+          tabs.push(new Nav.HawtioTab(TAB_CONFIG.sendMessage.title, TAB_CONFIG.sendMessage.route));
         }
 
         if (this.shouldShowDurableSubscribersTab()) {
-          tabs.push(new Core.HawtioTab(TAB_CONFIG.durableSubscribers.title, TAB_CONFIG.durableSubscribers.route));
+          tabs.push(new Nav.HawtioTab(TAB_CONFIG.durableSubscribers.title, TAB_CONFIG.durableSubscribers.route));
         }
 
         if (this.shouldShowJobsTab()) {
-          tabs.push(new Core.HawtioTab(TAB_CONFIG.jobs.title, TAB_CONFIG.jobs.route));
+          tabs.push(new Nav.HawtioTab(TAB_CONFIG.jobs.title, TAB_CONFIG.jobs.route));
         }
 
         if (this.shouldShowCreateTab()) {
-          tabs.push(new Core.HawtioTab(TAB_CONFIG.createDestination.title, TAB_CONFIG.createDestination.route));
+          tabs.push(new Nav.HawtioTab(TAB_CONFIG.createDestination.title, TAB_CONFIG.createDestination.route));
         }
 
         if (this.shouldShowDeleteTopicTab()) {
-          tabs.push(new Core.HawtioTab(TAB_CONFIG.deleteTopic.title, TAB_CONFIG.deleteTopic.route));
+          tabs.push(new Nav.HawtioTab(TAB_CONFIG.deleteTopic.title, TAB_CONFIG.deleteTopic.route));
         }
 
         if (this.shouldShowDeleteQueueTab()) {
-          tabs.push(new Core.HawtioTab(TAB_CONFIG.deleteQueue.title, TAB_CONFIG.deleteQueue.route));
+          tabs.push(new Nav.HawtioTab(TAB_CONFIG.deleteQueue.title, TAB_CONFIG.deleteQueue.route));
         }
 
         if (this.shouldShowQueuesTab()) {
-          tabs.push(new Core.HawtioTab(TAB_CONFIG.queues.title, TAB_CONFIG.queues.route));
+          tabs.push(new Nav.HawtioTab(TAB_CONFIG.queues.title, TAB_CONFIG.queues.route));
         }
 
         if (this.shouldShowTopicsTab()) {
-          tabs.push(new Core.HawtioTab(TAB_CONFIG.topics.title, TAB_CONFIG.topics.route));
+          tabs.push(new Nav.HawtioTab(TAB_CONFIG.topics.title, TAB_CONFIG.topics.route));
         }
       }
 

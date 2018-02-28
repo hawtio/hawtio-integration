@@ -83,7 +83,7 @@ namespace Camel {
     }
 
     private loadContexts() {
-      if (this.workspace.selection) {
+      if (this.workspace.selection && this.workspace.selection.children) {
         let children = this.workspace.selection.children.filter(node => {return node.objectName != null})
         let mbeans = _.map(children, node => node.objectName);
         this.contextsService.getContexts(mbeans)

@@ -6,22 +6,22 @@ namespace SpringBoot {
       'ngInject';
     }
 
-    getTabs(): Core.HawtioTab[] {
-      let tabs: Core.HawtioTab[] = [];
+    getTabs(): Nav.HawtioTab[] {
+      let tabs: Nav.HawtioTab[] = [];
 
       let domain = 'org.springframework.boot';
       let type = 'Endpoint';
 
       if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'healthEndpoint' })) {
-        tabs.push(new Core.HawtioTab('Health', '/spring-boot/health'));
+        tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
       }
 
       if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'loggersEndpoint' })) {
-        tabs.push(new Core.HawtioTab('Loggers', '/spring-boot/loggers'));
+        tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
       }
 
       if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'traceEndpoint' })) {
-        tabs.push(new Core.HawtioTab('Trace', '/spring-boot/trace'));
+        tabs.push(new Nav.HawtioTab('Trace', '/spring-boot/trace'));
       }
 
       return tabs;

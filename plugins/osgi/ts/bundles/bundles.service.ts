@@ -13,7 +13,7 @@ namespace Osgi {
 
     getBundles(): ng.IPromise<Bundle[]> {
       return this.execute(getSelectionBundleMBean(this.workspace), 'listBundles()')
-        .then(value => {
+        .then((value: any) => {
           const bundles: Bundle[] = [];
           angular.forEach(value, (item, key) => {
             var bundle: Bundle = {

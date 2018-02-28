@@ -70,7 +70,7 @@ namespace Camel {
 
 
   _module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", "$rootScope", (
-      nav: HawtioMainNav.Registry,
+      nav: Nav.Registry,
       workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       viewRegistry,

@@ -13,7 +13,7 @@ namespace SpringBoot {
 
   export function configureNavigation($rootScope: ng.IScope,
                                       viewRegistry,
-                                      HawtioNav: HawtioMainNav.Registry,
+                                      HawtioNav: Nav.Registry,
                                       workspace: Jmx.Workspace,
                                       springBootLayoutService: SpringBootLayoutService) {
     'ngInject';

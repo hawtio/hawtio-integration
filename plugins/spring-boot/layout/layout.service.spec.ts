@@ -17,7 +17,7 @@ describe("SpringBootLayoutService", function() {
       workspace.treeContainsDomainAndProperties.and.returnValues(false, true, true);
 
       // when
-      let tabs: Core.HawtioTab[] = layoutService.getTabs();
+      let tabs: Nav.HawtioTab[] = layoutService.getTabs();
 
       // then
       expect(tabs.length).toBe(2);

@@ -5,9 +5,9 @@
   <p ng-if="!selectedMBean">Loading...</p>
   
   <div ng-if="selectedMBean">
-    <div ng-if="data.length === 0" class="loading-message">
+    <p ng-if="data.length === 0">
       There are no REST Services registered in this CamelContext.
-    </div>
+    </p>
     <div ng-if="data.length > 0">
       <div class="row toolbar-pf table-view-pf-toolbar">
         <div class="col-sm-12">

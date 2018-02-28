@@ -378,7 +378,7 @@ namespace Osgi {
 
       // now add all the missing properties...
       var entity = {};
-      angular.forEach($scope.configValues, (value, rawKey) => {
+      angular.forEach($scope.configValues, (value, rawKey: string) => {
         if (isValidProperty(rawKey)) {
           var key = encodeKey(rawKey, pid);
           var attrValue = value;
@@ -501,7 +501,7 @@ namespace Osgi {
       $scope.modelLoaded = true;
       var configValues = {};
       $scope.configValues = configValues;
-      angular.forEach(response, (value, oKey) => {
+      angular.forEach(response, (value, oKey: string) => {
         // lets remove any dodgy characters
         var key = oKey.replace(/:/g, '_').replace(/\//g, '_');
         configValues[key] = {

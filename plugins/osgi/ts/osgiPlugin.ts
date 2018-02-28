@@ -25,7 +25,7 @@ namespace Osgi {
   }]);
 
   _module.run(["HawtioNav", "workspace", "viewRegistry", "helpRegistry", (
-      nav: HawtioMainNav.Registry,
+      nav: Nav.Registry,
       workspace: Jmx.Workspace,
       viewRegistry,
       helpRegistry) => {

@@ -323,7 +323,7 @@ namespace ActiveMQ {
 
     function createHeaders(row) {
       var answer = {};
-      angular.forEach(row, (value, key) => {
+      angular.forEach(row, (value, key: string) => {
         if (!_.some(ignoreColumns, (k) => k === key) && !_.some(flattenColumns, (k) => k === key)) {
             answer[_.escape(key)] = _.escape(value);
         }
@@ -333,9 +333,9 @@ namespace ActiveMQ {
 
     function createProperties(row) {
       var answer = {};
-      angular.forEach(row, (value, key) => {
+      angular.forEach(row, (value, key: string) => {
         if (!_.some(ignoreColumns, (k) => k === key) && _.some(flattenColumns, (k) => k === key)) {
-          angular.forEach(value, (v2, k2) => {
+          angular.forEach(value, (v2, k2: string) => {
             answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + _.escape(k2)] = _.escape(v2)
           });
         }
