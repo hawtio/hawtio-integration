@@ -212,7 +212,7 @@
     "bufferstreams": "1.1.3",
     "@types/angular": "1.6.43",
     "@types/jquery": "2.0.49",
-    "process-nextick-args": "2.0.0",
+    "process-nextick-args": "1.0.7",
     "detect-file": "1.0.0",
     "micromatch": "3.1.9",
     "resolve-dir": "1.0.1",
@@ -238,6 +238,6 @@
     "global-modules": "1.0.0",
     "global-prefix": "1.0.2",
     "combine-source-map": "0.8.0",
-    "readable-stream": "1.0.34"
+    "readable-stream": "2.3.3"
   }
 }
