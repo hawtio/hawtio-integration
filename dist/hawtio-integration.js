@@ -24137,7 +24137,7 @@ var Osgi;
         rv.sort();
         return rv.toString();
     }
-    Osgi._module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokia", function ($scope, $location, workspace, $routeParams, jolokia) {
+    Osgi._module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokiaService", function ($scope, $location, workspace, $routeParams, jolokiaService) {
             $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
             $scope.osgiToolsMBean = Osgi.getHawtioOSGiToolsMBean(workspace);
             $scope.bundleId = $routeParams.bundleId;
@@ -24161,29 +24161,27 @@ var Osgi;
             $scope.executeLoadClass = function (clazz) {
                 var mbean = Osgi.getHawtioOSGiToolsMBean(workspace);
                 if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'getLoadClassOrigin', arguments: [$scope.bundleId, clazz] }, {
-                        success: function (response) {
-                            var resultBundle = response.value;
-                            if (resultBundle === -1) {
-                                $scope.classLoadingAlert = {
-                                    type: 'warning',
-                                    icon: 'pficon-warning-triangle-o',
-                                    message: "Loading class <strong>" + clazz + "</strong> in Bundle " + $scope.bundleId + ".\n                                  Class can not be loaded from this bundle."
-                                };
-                            }
-                            else {
-                                $scope.classLoadingAlert = {
-                                    type: 'success',
-                                    icon: 'pficon-ok',
-                                    message: "Loading class <strong>" + clazz + "</strong> in Bundle " + $scope.bundleId + ".\n                                  Class is served from Bundle " + Osgi.bundleLinks(workspace, resultBundle)
-                                };
-                            }
-                            Core.$apply($scope);
-                        },
-                        error: function (response) {
-                            inspectReportError(response);
-                            Core.$apply($scope);
+                    jolokiaService.execute(mbean, 'getLoadClassOrigin', $scope.bundleId, clazz)
+                        .then(function (response) {
+                        if (response === -1) {
+                            $scope.classLoadingAlert = {
+                                type: 'warning',
+                                icon: 'pficon-warning-triangle-o',
+                                message: "Loading class <strong>" + clazz + "</strong> in Bundle " + $scope.bundleId + ".\n                                Class can not be loaded from this bundle."
+                            };
                         }
+                        else {
+                            $scope.classLoadingAlert = {
+                                type: 'success',
+                                icon: 'pficon-ok',
+                                message: "Loading class <strong>" + clazz + "</strong> in Bundle " + $scope.bundleId + ".\n                                Class is served from " + Osgi.bundleLinks(workspace, response) + "."
+                            };
+                        }
+                        Core.$apply($scope);
+                    })
+                        .catch(function (error) {
+                        inspectReportError(error);
+                        Core.$apply($scope);
                     });
                 }
                 else {
@@ -24193,29 +24191,27 @@ var Osgi;
             $scope.executeFindResource = function (resource) {
                 var mbean = Osgi.getHawtioOSGiToolsMBean(workspace);
                 if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'getResourceURL', arguments: [$scope.bundleId, resource] }, {
-                        success: function (response) {
-                            var resultURL = response.value;
-                            if (resultURL === null) {
-                                $scope.classLoadingAlert = {
-                                    type: 'warning',
-                                    icon: 'pficon-warning-triangle-o',
-                                    message: "Finding resource <strong>" + resource + "</strong> in Bundle " + $scope.bundleId + ".\n                                  Resource can not be found from this bundle."
-                                };
-                            }
-                            else {
-                                $scope.classLoadingAlert = {
-                                    type: 'success',
-                                    icon: 'pficon-ok',
-                                    message: "Finding resource <strong>" + resource + "</strong> in Bundle " + $scope.bundleId + ".\n                                  Resource is available from: " + resultURL
-                                };
-                            }
-                            Core.$apply($scope);
-                        },
-                        error: function (response) {
-                            inspectReportError(response);
-                            Core.$apply($scope);
+                    jolokiaService.execute(mbean, 'getResourceURL', $scope.bundleId, resource)
+                        .then(function (response) {
+                        if (response === null) {
+                            $scope.classLoadingAlert = {
+                                type: 'warning',
+                                icon: 'pficon-warning-triangle-o',
+                                message: "Resource <strong>" + resource + "</strong> can not be found in Bundle " + $scope.bundleId + "."
+                            };
                         }
+                        else {
+                            $scope.classLoadingAlert = {
+                                type: 'success',
+                                icon: 'pficon-ok',
+                                message: "Resource <strong>" + resource + "</strong> in Bundle " + $scope.bundleId + " is available from " + response + "."
+                            };
+                        }
+                        Core.$apply($scope);
+                    })
+                        .catch(function (error) {
+                        inspectReportError(error);
+                        Core.$apply($scope);
                     });
                 }
                 else {
@@ -24223,35 +24219,50 @@ var Osgi;
                 }
             };
             $scope.startBundle = function (bundleId) {
-                jolokia.request([
-                    { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'startBundle', arguments: [bundleId] }
-                ], Core.onSuccess(updateTableContents));
+                jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'startBundle', bundleId)
+                    .then(function (response) {
+                    updateTableContents();
+                })
+                    .catch(function (error) {
+                    Core.notification('danger', error);
+                });
             };
             $scope.stopBundle = function (bundleId) {
-                jolokia.request([
-                    { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'stopBundle', arguments: [bundleId] }
-                ], Core.onSuccess(updateTableContents));
+                jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'stopBundle', bundleId)
+                    .then(function (response) {
+                    updateTableContents();
+                })
+                    .catch(function (error) {
+                    Core.notification('danger', error);
+                });
             };
-            $scope.updatehBundle = function (bundleId) {
-                jolokia.request([
-                    { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'updateBundle', arguments: [bundleId] }
-                ], Core.onSuccess(updateTableContents));
+            $scope.updateBundle = function (bundleId) {
+                jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'updateBundle', bundleId)
+                    .then(function (response) {
+                    updateTableContents();
+                })
+                    .catch(function (error) {
+                    Core.notification('danger', error);
+                });
             };
             $scope.refreshBundle = function (bundleId) {
-                jolokia.request([
-                    { type: 'exec', mbean: Osgi.getSelectionFrameworkMBean(workspace), operation: 'refreshBundle', arguments: [bundleId] }
-                ], Core.onSuccess(updateTableContents));
+                jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'refreshBundle', bundleId)
+                    .then(function (response) {
+                    updateTableContents();
+                })
+                    .catch(function (error) {
+                    Core.notification('danger', error);
+                });
             };
             $scope.uninstallBundle = function (bundleId) {
-                jolokia.request([{
-                        type: 'exec',
-                        mbean: Osgi.getSelectionFrameworkMBean(workspace),
-                        operation: 'uninstallBundle',
-                        arguments: [bundleId]
-                    }], Core.onSuccess(function () {
+                jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'uninstallBundle', bundleId)
+                    .then(function (response) {
                     $location.path("/osgi/bundles");
                     Core.$apply($scope);
-                }));
+                })
+                    .catch(function (error) {
+                    Core.notification('danger', error);
+                });
             };
             function inspectReportNoMBeanFound() {
                 $scope.classLoadingAlert = {
@@ -24268,15 +24279,16 @@ var Osgi;
                 };
             }
             function populateTable(response) {
-                var values = response.value;
-                $scope.bundles = values;
+                $scope.bundles = response;
                 // now find the row based on the selection ui
-                Osgi.defaultBundleValues(workspace, $scope, values);
-                $scope.row = Osgi.findBundle($scope.bundleId, values);
-                createImportPackageSection();
-                createExportPackageSection();
-                populateServicesSection();
-                Core.$apply($scope);
+                Osgi.defaultBundleValues(workspace, $scope, response);
+                $scope.row = Osgi.findBundle($scope.bundleId, response);
+                if ($scope.row) {
+                    createImportPackageSection();
+                    createExportPackageSection();
+                    populateServicesSection();
+                    Core.$apply($scope);
+                }
             }
             function createImportPackageSection() {
                 var importPackageHeaders = Osgi.parseManifestHeader($scope.row.Headers, "Import-Package");
@@ -24295,11 +24307,11 @@ var Osgi;
                     // Delete data so we can see whether there are any unbound optional imports left...
                     delete importPackageHeaders[pkg];
                 }
-                for (var pkg_1 in importPackageHeaders) {
+                for (var pkg in importPackageHeaders) {
                     // Ignore imported packages that are also exported because they are satisfied from the bundle
                     // itself and should not be listed as unsatisfied.
-                    if ($scope.row.ExportData[pkg_1] === undefined) {
-                        $scope.unsatisfiedPackages[pkg_1] = importPackageHeaders[pkg_1];
+                    if ($scope.row.ExportData[pkg] === undefined) {
+                        $scope.unsatisfiedPackages[pkg] = importPackageHeaders[pkg];
                     }
                 }
             }
@@ -24321,56 +24333,69 @@ var Osgi;
                 }
                 var mbean = Osgi.getSelectionServiceMBean(workspace);
                 if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'listServices()' }, Core.onSuccess(updateServices));
+                    jolokiaService.execute(mbean, 'listServices()')
+                        .then(function (response) {
+                        updateServices(response);
+                    })
+                        .catch(function (error) {
+                        Core.notification('danger', error);
+                    });
                 }
             }
             function updateServices(result) {
-                var data = result.value;
-                for (var id in data) {
+                var data = result;
+                var _loop_1 = function (id) {
                     var reg = document.getElementById("registers.service." + id);
                     var uses = document.getElementById("uses.service." + id);
                     if ((reg === undefined || reg === null) && (uses === undefined || uses === null)) {
-                        continue;
+                        return "continue";
                     }
-                    jolokia.request({
-                        type: 'exec', mbean: Osgi.getSelectionServiceMBean(workspace),
-                        operation: 'getProperties', arguments: [id]
-                    }, Core.onSuccess(function (svcId, regEl, usesEl) {
-                        return function (resp) {
-                            var props = resp.value;
-                            var sortedKeys = Object.keys(props).sort();
-                            var po = "<small><table>";
-                            for (var i = 0; i < sortedKeys.length; i++) {
-                                var value = props[sortedKeys[i]];
-                                if (value !== undefined) {
-                                    var fval = value.Value;
-                                    if (fval.length > 15) {
-                                        fval = fval.replace(/[,]/g, ",<br/>&nbsp;&nbsp;");
-                                    }
-                                    po += "<tr><td valign='top'>" + sortedKeys[i] + "</td><td>" + fval + "</td></tr>";
+                    jolokiaService.execute(Osgi.getSelectionServiceMBean(workspace), 'getProperties', id)
+                        .then(function (response) {
+                        var props = response;
+                        var sortedKeys = Object.keys(props).sort();
+                        var po = "<small><table>";
+                        for (var i = 0; i < sortedKeys.length; i++) {
+                            var value = props[sortedKeys[i]];
+                            if (value !== undefined) {
+                                var fval = value.Value;
+                                if (fval.length > 15) {
+                                    fval = fval.replace(/[,]/g, ",<br/>&nbsp;&nbsp;");
                                 }
+                                po += "<tr><td valign='top'>" + sortedKeys[i] + "</td><td>" + fval + "</td></tr>";
                             }
-                            var regBID = data[svcId].BundleIdentifier;
-                            po += "<tr><td>Registered&nbsp;by</td><td>Bundle " + regBID + " <div class='less-big label'>" + $scope.bundles[regBID].SymbolicName
-                                + "</div></td></tr>";
-                            po += "</table></small>";
-                            if (regEl !== undefined && regEl !== null) {
-                                regEl.innerText = " " + formatServiceName(data[svcId].objectClass);
-                                $(regEl).popover({ title: "service properties", content: po, trigger: "hover", html: true });
-                            }
-                            if (usesEl !== undefined && usesEl !== null) {
-                                usesEl.innerText = " " + formatServiceName(data[svcId].objectClass);
-                                $(usesEl).popover({ title: "service properties", content: po, trigger: "hover", html: true });
-                            }
-                        };
-                    }(id, reg, uses)));
+                        }
+                        var regBID = data[id].BundleIdentifier;
+                        po += "<tr><td>Registered&nbsp;by</td><td>Bundle " + regBID + " <div class='less-big label'>" + $scope.bundles[regBID].SymbolicName
+                            + "</div></td></tr>";
+                        po += "</table></small>";
+                        if (reg !== undefined && reg !== null) {
+                            reg.innerText = " " + formatServiceName(data[id].objectClass);
+                            $(reg).popover({ title: "service properties", content: po, trigger: "hover", html: true });
+                        }
+                        if (uses !== undefined && uses !== null) {
+                            uses.innerText = " " + formatServiceName(data[id].objectClass);
+                            $(uses).popover({ title: "service properties", content: po, trigger: "hover", html: true });
+                        }
+                    })
+                        .catch(function (error) {
+                        Osgi.log.error(error);
+                    });
+                };
+                for (var id in data) {
+                    _loop_1(id);
                 }
             }
             function updateTableContents() {
-                //console.log("Loading the bundles");
                 var mbean = Osgi.getSelectionBundleMBean(workspace);
                 if (mbean) {
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'listBundles()' }, Core.onSuccess(populateTable));
+                    jolokiaService.execute(mbean, 'listBundles()')
+                        .then(function (response) {
+                        populateTable(response);
+                    })
+                        .catch(function (error) {
+                        Core.notification('danger', error);
+                    });
                 }
             }
         }]);
@@ -24595,7 +24620,7 @@ var Osgi;
                 });
                 // sort configurations by name        
                 configurations = _.sortBy(configurations, function (configuration) { return configuration.name.toLowerCase(); });
-                var _loop_1 = function (i) {
+                var _loop_2 = function (i) {
                     var config_1 = configurations[i];
                     if (config_1.isFactory) {
                         angular.forEach(config_1.children, function (child) {
@@ -24605,7 +24630,7 @@ var Osgi;
                 };
                 // add children under their parents in array
                 for (var i = configurations.length - 1; i > -1; i--) {
-                    _loop_1(i);
+                    _loop_2(i);
                 }
                 // update UI
                 $scope.configurations = configurations;
@@ -26413,7 +26438,7 @@ $templateCache.put('plugins/karaf/html/features.html','<div class="list-view">\n
 $templateCache.put('plugins/karaf/html/scr-component-details.html','<div class="row toolbar-pf">\n  <div class="col-sm-12">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button class="btn btn-default" \n                ng-click="$ctrl.enableComponent()"\n                ng-disabled="$ctrl.disableComponentEnable()"\n                hawtio-show\n                object-name="{{$ctrl.scrMBean}}"\n                method-name="enableComponent">\n          Enable\n        </button>\n        <button class="btn btn-default" \n                ng-click="$ctrl.disableComponent()"\n                ng-disabled="$ctrl.disableComponentDisable()"\n                hawtio-show\n                object-name="{{$ctrl.scrMBean}}"\n                method-name="disableComponent">\n          Disable\n        </button>\n      </div>\n    </form>\n  </div>\n</div>\n\n<h2>Details</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt ng-if="$ctrl.component.id >= 0">ID</dt>\n      <dd ng-if="$ctrl.component.id >= 0">{{$ctrl.component.id}}</dd>\n      <dt>Bundle ID</dt>\n      <dd><a ng-href="osgi/bundle/{{$ctrl.component.bundleId}}">{{$ctrl.component.bundleId}}</a></dd>\n      <dt>Name</dt>\n      <dd>{{$ctrl.component.name}}</dd>\n      <dt>State</dt>\n      <dd>{{$ctrl.component.state}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>Properties</h2>\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt ng-repeat-start="(key, value) in $ctrl.component.properties">{{key}}</dt>\n      <dd ng-repeat-end>{{value.Value}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>References</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <table class="scr-component-references-table table">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Cardinality</th>\n          <th>Policy</th>\n          <th>Bound Services</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(key, value) in $ctrl.component.references">\n          <td>{{value.Name}}</td>\n          <td>{{value.Cardinality}}</td>\n          <td>{{value.Policy}}</td>\n          <td>\n            <ul class="list-unstyled">\n              <li ng-repeat="id in value[\'BoundServices\']">\n                <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>\n              </li>\n            </ul>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n');
 $templateCache.put('plugins/karaf/html/scr-component.html','<p ng-if="$ctrl.loading">Loading...</p>\n\n<div class="controller-section" ng-if="!$ctrl.loading">\n  <ol class="breadcrumb">\n    <li>\n      <a ng-href="{{$ctrl.srcComponentsUrl}}">Declarative Services</a>\n    </li>\n    <li class="page-title">\n      {{$ctrl.component.name}}\n    </li>\n  </ol>\n  <div ng-include src="\'plugins/karaf/html/scr-component-details.html\'"></div>\n</div>\n');
 $templateCache.put('plugins/karaf/html/server.html','<h1>Server</h1>\n\n<div class="controller-section" ng-controller="Karaf.ServerController">\n\n  <div class="row">\n    <div class="col-md-12">\n      <dl class="dl-horizontal">\n        <dt>Name</dt>\n        <dd>{{data.name}}</dd>\n        <dt>Version</dt>\n        <dd>{{data.version}}</dd>\n        <dt>State</dt>\n        <dd>{{data.state}}</dd>\n        <dt>Is root</dt>\n        <dd>{{data.root}}</dd>\n        <dt>Start Level</dt>\n        <dd>{{data.startLevel}}</dd>\n        <dt>Framework</dt>\n        <dd>{{data.framework}}</dd>\n        <dt>Framework Version</dt>\n        <dd>{{data.frameworkVersion}}</dd>\n        <dt>Location</dt>\n        <dd>{{data.location}}</dd>\n        <dt>SSH Port</dt>\n        <dd>{{data.sshPort}}</dd>\n        <dt>RMI Registry Port</dt>\n        <dd>{{data.rmiRegistryPort}}</dd>\n        <dt>RMI Server Port</dt>\n        <dd>{{data.rmiServerPort}}</dd>\n        <dt>PID</dt>\n        <dd>{{data.pid}}</dd>\n      </dl>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/osgi/html/bundle.html','<div class="controller-section" ng-controller="Osgi.BundleController">\n\n  <ol class="breadcrumb">\n    <li>\n        <a ng-href="osgi/bundles">Bundles</a>\n    </li>\n    <li class="page-title">\n        {{row.Headers[\'Bundle-Name\'].Value}}\n    </li>\n  </ol>  \n\n  <div class="toolbar-pf">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button ng-click="startBundle(bundleId)" \n                ng-disabled="row.State === \'ACTIVE\'"\n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="startBundle">Start</button>\n        <button ng-click="stopBundle(bundleId)" \n                ng-disabled="row.State !== \'ACTIVE\'"\n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="stopBundle">Stop</button>\n        <button ng-click="refreshBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="refreshBundle">Refresh</button>\n        <button ng-click="updateBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="updateBundle">Update</button>\n        <button ng-click="uninstallBundle(bundleId)" \n                class="btn btn-default" \n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="uninstallBundle">Uninstall</button>\n      </div>\n    </form>\n  </div>\n\n  <h2>Details</h2>\n\n  <dl class="dl-horizontal osgi-bundle-details-dl">\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Fragment&nbsp;ID</span>\n      <span ng-switch-default>Bundle&nbsp;ID</span>\n    </dt>\n    <dd>\n      {{row.Identifier}}\n    </dd>\n    <dt>\n      Bundle&nbsp;Name\n    </dt>\n    <dd>\n      {{row.Headers[\'Bundle-Name\'].Value}}\n    </dd>\n    <dt>\n      Symbolic&nbsp;Name\n    </dt>\n    <dd>\n      {{row.SymbolicName}}\n    </dd>\n    <dt>\n      Version\n    </dt>\n    <dd>\n      {{row.Version}}\n    </dd>\n    <dt>\n      Start&nbsp;Level\n    </dt>\n    <dd>\n      {{row.StartLevel}}\n    </dd>\n    <dt>\n      Location\n    </dt>\n    <dd>\n      {{row.Location}}\n    </dd>\n    <dt>\n      State\n    </dt>\n    <dd>\n      {{row.State.toLowerCase()}}\n    </dd>\n    <dt>\n      Last&nbsp;Modified\n    </dt>\n    <dd>\n      {{row.LastModified | date:\'medium\'}}\n    </dd>\n    <div>\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Hosts</span>\n      <span ng-switch-default>Fragments</span>\n    </dt>\n    <dd ng-switch="row.Fragment">\n      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"/>\n      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"/>\n    </dd>\n  </dl>\n\n  <h2>Inspect Classloading</h2>\n\n  <div class="alert alert-dismissable" ng-class="\'alert-\' + classLoadingAlert.type" ng-if="classLoadingAlert">\n    <span class="pficon" ng-class="classLoadingAlert.icon"></span>\n    <button type="button" class="close" aria-hidden="true" ng-click="dismissClassLoadingAlert()">\n      <span class="pficon pficon-close"></span>\n    </button>\n    <span ng-bind-html="classLoadingAlert.message"></span>\n  </div>\n\n  <form class="form-horizontal">\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin" mode="remove">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="classToLoad" class="form-control" ng-model="classToLoad">\n      </div>\n    </div>\n    <div hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin" mode="inverse">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10 alert alert-info">\n        <span class="pficon pficon-info"></span>\n        Loading class is not allowed for this user.\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">\n          Load Class\n        </button>\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL" mode="remove">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="resourceToLoad" class="form-control" ng-model="resourceToLoad">\n      </div>\n    </div>\n    <div hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL" mode="inverse">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10 alert alert-info">\n        <span class="pficon pficon-info"></span>\n        Getting resource is not allowed for this user.\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">\n          Get Resource\n        </button>\n      </div>\n    </div>\n  </form>\n\n  <h2>Imported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Imported Version</th>\n        <th>Version</th>\n        <th>Resolution</th>\n        <th>Dynamic Import</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ImportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td>{{data.headers.Aversion}}</td>\n        <td>{{data.headers.Dresolution}}</td>\n        <td>{{data.headers.reason}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <div ng-if="thereAreUnsatisfiedPackages()">\n    <h3>Imports not satisfied</h3>\n    <table class="table table-striped table-bordered">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Version</th>\n          <th>Resolution</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(package, data) in unsatisfiedPackages">\n          <td>{{package}}</td>\n          <td>{{data.Aversion}}</td>\n          <td>{{data.Dresolution}}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n\n  <h2>Exported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Exported Version</th>\n        <th>Uses</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ExportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td class="osgi-bundle-exported-package-uses">{{data.headers.Duses}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <h2>Services</h2>\n\n  <h3>Registered Services</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.RegisteredServices">\n      <span id="registers.service.{{id}}" class="text-success">{{id}}</span>\n    </li>\n  </ul>\n\n  <h3>Services used by this Bundle</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.ServicesInUse">\n      <span id="uses.service.{{id}}" class="text-info">{{id}}</span>\n    </li>\n  </ul>\n\n  <div ng-if="row.RequiringBundles.length > 0">\n    <h2>Other Bundles using this Bundle</h2>\n\n    <ul class="list-unstyled">\n      <li ng-repeat="bundle in row.RequiringBundles"><a ng-href="{{bundle.url}}">{{bundle.label}}</a></li>\n    </ul>\n  </div>\n\n  <h2>Headers</h2>\n\n  <dl class="dl-horizontal osgi-bundle-headers-dl">\n    <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>\n    <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>\n  </dl>\n\n</div>\n');
+$templateCache.put('plugins/osgi/html/bundle.html','<div class="controller-section" ng-controller="Osgi.BundleController">\n\n  <ol class="breadcrumb">\n    <li>\n        <a ng-href="osgi/bundles">Bundles</a>\n    </li>\n    <li class="page-title">\n        {{row.Headers[\'Bundle-Name\'].Value}}\n    </li>\n  </ol>\n\n  <div class="toolbar-pf">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button ng-click="startBundle(bundleId)"\n                ng-disabled="row.State === \'ACTIVE\'"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="startBundle">Start</button>\n        <button ng-click="stopBundle(bundleId)"\n                ng-disabled="row.State !== \'ACTIVE\'"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="stopBundle">Stop</button>\n        <button ng-click="refreshBundle(bundleId)"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="refreshBundle">Refresh</button>\n        <button ng-click="updateBundle(bundleId)"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="updateBundle">Update</button>\n        <button ng-click="uninstallBundle(bundleId)"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="uninstallBundle">Uninstall</button>\n      </div>\n    </form>\n  </div>\n\n  <h2>Details</h2>\n\n  <dl class="dl-horizontal osgi-bundle-details-dl">\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Fragment&nbsp;ID</span>\n      <span ng-switch-default>Bundle&nbsp;ID</span>\n    </dt>\n    <dd>\n      {{row.Identifier}}\n    </dd>\n    <dt>\n      Bundle&nbsp;Name\n    </dt>\n    <dd>\n      {{row.Headers[\'Bundle-Name\'].Value}}\n    </dd>\n    <dt>\n      Symbolic&nbsp;Name\n    </dt>\n    <dd>\n      {{row.SymbolicName}}\n    </dd>\n    <dt>\n      Version\n    </dt>\n    <dd>\n      {{row.Version}}\n    </dd>\n    <dt>\n      Start&nbsp;Level\n    </dt>\n    <dd>\n      {{row.StartLevel}}\n    </dd>\n    <dt>\n      Location\n    </dt>\n    <dd>\n      {{row.Location}}\n    </dd>\n    <dt>\n      State\n    </dt>\n    <dd>\n      {{row.State.toLowerCase()}}\n    </dd>\n    <dt>\n      Last&nbsp;Modified\n    </dt>\n    <dd>\n      {{row.LastModified | date:\'medium\'}}\n    </dd>\n    <div>\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Hosts</span>\n      <span ng-switch-default>Fragments</span>\n    </dt>\n    <dd ng-switch="row.Fragment">\n      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"/>\n      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"/>\n    </dd>\n  </dl>\n\n  <h2>Inspect Classloading</h2>\n\n  <div class="alert alert-dismissable" ng-class="\'alert-\' + classLoadingAlert.type" ng-if="classLoadingAlert">\n    <span class="pficon" ng-class="classLoadingAlert.icon"></span>\n    <button type="button" class="close" aria-hidden="true" ng-click="dismissClassLoadingAlert()">\n      <span class="pficon pficon-close"></span>\n    </button>\n    <span ng-bind-html="classLoadingAlert.message"></span>\n  </div>\n\n  <form class="form-horizontal">\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin" mode="remove">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="classToLoad" class="form-control" ng-model="classToLoad">\n      </div>\n    </div>\n    <div hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin" mode="inverse">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10 alert alert-info">\n        <span class="pficon pficon-info"></span>\n        Loading class is not allowed for this user.\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">\n          Load Class\n        </button>\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL" mode="remove">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="resourceToLoad" class="form-control" ng-model="resourceToLoad">\n      </div>\n    </div>\n    <div hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL" mode="inverse">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10 alert alert-info">\n        <span class="pficon pficon-info"></span>\n        Getting resource is not allowed for this user.\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">\n          Get Resource\n        </button>\n      </div>\n    </div>\n  </form>\n\n  <h2>Imported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Imported Version</th>\n        <th>Version</th>\n        <th>Resolution</th>\n        <th>Dynamic Import</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ImportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td>{{data.headers.Aversion}}</td>\n        <td>{{data.headers.Dresolution}}</td>\n        <td>{{data.headers.reason}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <div ng-if="thereAreUnsatisfiedPackages()">\n    <h3>Imports not satisfied</h3>\n    <table class="table table-striped table-bordered">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Version</th>\n          <th>Resolution</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(package, data) in unsatisfiedPackages">\n          <td>{{package}}</td>\n          <td>{{data.Aversion}}</td>\n          <td>{{data.Dresolution}}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n\n  <h2>Exported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Exported Version</th>\n        <th>Uses</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ExportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td class="osgi-bundle-exported-package-uses">{{data.headers.Duses}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <h2>Services</h2>\n\n  <h3>Registered Services</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.RegisteredServices">\n      <span id="registers.service.{{id}}" class="text-success">{{id}}</span>\n    </li>\n  </ul>\n\n  <h3>Services used by this Bundle</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.ServicesInUse">\n      <span id="uses.service.{{id}}" class="text-info">{{id}}</span>\n    </li>\n  </ul>\n\n  <div ng-if="row.RequiringBundles.length > 0">\n    <h2>Other Bundles using this Bundle</h2>\n\n    <ul class="list-unstyled">\n      <li ng-repeat="bundle in row.RequiringBundles"><a ng-href="{{bundle.url}}">{{bundle.label}}</a></li>\n    </ul>\n  </div>\n\n  <h2>Headers</h2>\n\n  <dl class="dl-horizontal osgi-bundle-headers-dl">\n    <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>\n    <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>\n  </dl>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/configurations.html','<h1>Configuration</h1>\n\n<div class="controller-section" ng-controller="Osgi.ConfigurationsController">\n\n  <p ng-if="!configurations">Loading...</p>\n  \n  <div ng-if="configurations">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <pf-list-view items="filteredConfigurations" config="listViewConfig" menu-actions="listViewMenuItems">\n      <div class="list-view-pf-left" ng-class="{\'osgi-configuration-factory-instance\': item.isFactoryInstance}">\n        <span class="list-view-pf-icon-sm" ng-class="item.kind.class" title="{{item.kind.title}}"></span>\n      </div>\n      <div class="list-view-pf-body">\n        <div class="list-view-pf-description">\n          <div class="list-group-item-heading" title="{{item.name}}">\n            <a ng-href="{{item.pidLink}}">{{item.name}}</a>\n          </div>\n          <div class="list-group-item-text">\n            {{item.description}}\n          </div>\n        </div>\n      </div>\n    </pf-list-view>\n  </div>\n  \n  <script type="text/ng-template" id="addPidDialog.html">\n    <form class="form-horizontal" ng-submit="$close(newPid)">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Add configuration</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-3 control-label" for="newPid">Configuration ID</label>\n          <div class="col-sm-9">\n            <input type="text" id="newPid" class="form-control" ng-model="newPid" required/>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-primary" ng-disabled="!(newPid !== \'\' && newPid !== undefined)">Add</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="deletePidDialog.html">\n    <form class="form-horizontal" ng-submit="$close()">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4>Delete configuration</h4>\n      </div>\n      <div class="modal-body">\n        <p>Delete \'{{item.name}}\' configuration?</p>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-danger">Delete</button>\n      </div>\n    </form>\n  </script>\n  \n</div>\n');
 $templateCache.put('plugins/osgi/html/framework.html','<div class="framework-main" ng-controller="Osgi.FrameworkController">\n\n  <h1>Framework Configuration</h1>\n\n  <form class="form-horizontal framework-form" ng-submit="save()">\n    <div class="form-group">\n      <label class="col-sm-3 control-label" for="startLevel">Current Framework Start Level</label>\n      <div class="col-sm-2">\n        <input id="startLevel" class="form-control" type="number" min="0" max="100" ng-model="config.startLevel">\n      </div>\n    </div>\n    <div class="form-group">\n      <label class="col-sm-3 control-label" for="initialBundleStartLevel">Initial Bundle Start Level</label>\n      <div class="col-sm-2">\n        <input id="initialBundleStartLevel" class="form-control" type="number" min="0" max="100"\n          ng-model="config.initialBundleStartLevel">\n      </div>\n    </div>\n    <div class="form-group">\n      <div class="col-sm-offset-3 col-sm-2">\n        <!--\n          Use the \'setBundleStartLevel\' method here, as the \'setFrameworkStartLevel\' and\n          \'setInitialBundleStartLevel\' methods are not available for hawtio-show directive\n        -->\n        <button type="submit" class="btn btn-primary"\n                hawtio-show object-name="{{frameworkMBean}}" method-name="setBundleStartLevel">\n        Save\n      </button>\n      </div>\n    </div>\n  </form>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/layoutOsgi.html','<div class="osgi-nav-main">\n  <osgi-navigation></osgi-navigation>\n  <div class="contents" ng-view></div>\n</div>\n');

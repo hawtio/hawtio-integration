@@ -25,9 +25,9 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@~3.2.0":
-  version "3.2.16"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.16.tgz#ebed0dfc860ebbf87ba3aa48b915da2d418eba16"
+"@hawtio/core@3.2.17", "@hawtio/core@~3.2.0":
+  version "3.2.17"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.17.tgz#9426f60d83155caf9b145cae06bc5b5d8c799777"
   dependencies:
     "@hawtio/core-dts" "3.0.18"
     "@types/angular" "1.6.39"
@@ -56,8 +56,8 @@
     "@hawtio/ui" "~3.2.0"
 
 "@hawtio/jmx@~3.2.0":
-  version "3.2.15"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.15.tgz#6ad8bff31994a3b85de080d1334e1e87f66e03d3"
+  version "3.2.16"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.16.tgz#9e89b2e1584b7cc3c37dfe0a9167d985330e4790"
   dependencies:
     "@hawtio/core" "~3.2.0"
     "@hawtio/forms" "~3.2.0"
@@ -85,11 +85,11 @@
     urijs "^1.18.10"
 
 "@hawtio/ui@~3.2.0":
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-3.2.2.tgz#f1e03e91b78f319dc51c57f9f0f17762e6c777e7"
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-3.2.3.tgz#7330a086ac69f759df5964a8b8ea5ed04c8a04a7"
   dependencies:
-    "@hawtio/core" "~3.2.0"
-    "@hawtio/core-dts" "~3.0.0"
+    "@hawtio/core" "3.2.17"
+    "@hawtio/core-dts" "3.0.18"
     "@types/bootstrap" "3.3.36"
     "@types/clipboard" "1.5.35"
     "@types/codemirror" "0.0.40"

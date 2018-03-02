@@ -7,35 +7,35 @@
     <li class="page-title">
         {{row.Headers['Bundle-Name'].Value}}
     </li>
-  </ol>  
+  </ol>
 
   <div class="toolbar-pf">
     <form class="toolbar-pf-actions">
       <div class="form-group">
-        <button ng-click="startBundle(bundleId)" 
+        <button ng-click="startBundle(bundleId)"
                 ng-disabled="row.State === 'ACTIVE'"
-                class="btn btn-default" 
+                class="btn btn-default"
                 hawtio-show
                 object-name="{{frameworkMBean}}"
                 method-name="startBundle">Start</button>
-        <button ng-click="stopBundle(bundleId)" 
+        <button ng-click="stopBundle(bundleId)"
                 ng-disabled="row.State !== 'ACTIVE'"
-                class="btn btn-default" 
+                class="btn btn-default"
                 hawtio-show
                 object-name="{{frameworkMBean}}"
                 method-name="stopBundle">Stop</button>
-        <button ng-click="refreshBundle(bundleId)" 
-                class="btn btn-default" 
+        <button ng-click="refreshBundle(bundleId)"
+                class="btn btn-default"
                 hawtio-show
                 object-name="{{frameworkMBean}}"
                 method-name="refreshBundle">Refresh</button>
-        <button ng-click="updateBundle(bundleId)" 
-                class="btn btn-default" 
+        <button ng-click="updateBundle(bundleId)"
+                class="btn btn-default"
                 hawtio-show
                 object-name="{{frameworkMBean}}"
                 method-name="updateBundle">Update</button>
-        <button ng-click="uninstallBundle(bundleId)" 
-                class="btn btn-default" 
+        <button ng-click="uninstallBundle(bundleId)"
+                class="btn btn-default"
                 hawtio-show
                 object-name="{{frameworkMBean}}"
                 method-name="uninstallBundle">Uninstall</button>
