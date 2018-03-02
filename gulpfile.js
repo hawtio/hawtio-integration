@@ -20,11 +20,10 @@ let Server = require('karma').Server;
 
 const plugins  = gulpLoadPlugins({});
 
-let config = {
+const config = {
   proxyPort: argv.port || 8181,
   targetPath: argv.path || '/hawtio/jolokia',
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
-  ts: ['plugins/**/*.ts'],
   templates: ['plugins/**/*.html', 'plugins/**/*.md'],
   less: ['plugins/**/*.less', 'vendor/**/*.less', 'vendor/**/*.css'],
   templateModule: 'hawtio-integration-templates',
@@ -32,22 +31,23 @@ let config = {
   js: 'hawtio-integration.js',
   dts: 'hawtio-integration.d.ts',
   css: 'hawtio-integration.css',
-  tsProject: typescript.createProject('tsconfig.json'),
   sourceMap: argv.sourcemap,
   vendorJs: './vendor/**/*.js',
   vendorCss: './vendor/**/*.css',
   srcImg: './img/**/*',
-  distImg: './dist/img'
+  distImg: './dist/img',
 };
+
+const tsProject = typescript.createProject('tsconfig.json');
 
 gulp.task('clean-defs', function() {
   return del(config.dist + '*.d.ts');
 });
 
 gulp.task('tsc', ['clean-defs'], function() {
-  var tsResult = config.tsProject.src()
+  var tsResult = tsProject.src()
     .pipe(gulpif(config.sourceMap, sourcemaps.init()))
-    .pipe(config.tsProject());
+    .pipe(tsProject());
 
   return eventStream.merge(
     tsResult.js
@@ -106,7 +106,10 @@ gulp.task('watch-less', function() {
 
 gulp.task('watch', ['build', 'watch-less'], function() {
   gulp.watch(['index.html', config.dist + '*'], ['reload']);
-  gulp.watch([config.ts, config.templates], ['tsc', 'template', 'concat', 'clean']);
+
+  const tsconfig = require('./tsconfig.json');
+  gulp.watch([...tsconfig.include, ...(tsconfig.exclude || []).map(e => `!${e}`), config.templates],
+    ['tsc', 'template', 'concat', 'clean']);
 });
 
 gulp.task('connect', ['watch'], function() {
