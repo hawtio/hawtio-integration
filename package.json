@@ -45,10 +45,11 @@
     "jasmine-core": "~2.8.0",
     "js-logger": "~1.3.0",
     "karma": "~2.0.0",
+    "karma-chrome-launcher": "~2.2.0",
     "karma-jasmine": "~1.1.1",
     "karma-mocha-reporter": "~2.2.5",
-    "karma-phantomjs-launcher": "~1.0.4",
     "karma-typescript-preprocessor": "~0.3.1",
+    "puppeteer": "~1.1.1",
     "run-sequence": "^1.2.2",
     "typescript": "^2.0.0",
     "yargs": "~8.0.0"
@@ -238,6 +239,8 @@
     "global-modules": "1.0.0",
     "global-prefix": "1.0.2",
     "combine-source-map": "0.8.0",
-    "readable-stream": "2.3.3"
+    "readable-stream": "2.3.3",
+    "agent-base": "4.2.0",
+    "https-proxy-agent": "2.1.1"
   }
 }

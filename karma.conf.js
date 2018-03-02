@@ -1,6 +1,8 @@
 // Karma configuration
 // Generated on Thu Nov 23 2017 10:43:14 GMT-0200 (-02)
 
+process.env.CHROME_BIN = require('puppeteer').executablePath()
+
 module.exports = function(config) {
   config.set({
 
@@ -26,36 +28,17 @@ module.exports = function(config) {
       'node_modules/angular-route/angular-route.min.js',
       'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
       'node_modules/angular-resizable/angular-resizable.min.js',
-      'node_modules/angular-animate/angular-animate.min.js',
       'node_modules/angular-drag-and-drop-lists/angular-drag-and-drop-lists.min.js',
       'node_modules/angularjs-datatables/dist/angular-datatables.min.js',
-      'node_modules/angularjs-datatables/dist/plugins/select/angular-datatables.select.min.js',    
+      'node_modules/angularjs-datatables/dist/plugins/select/angular-datatables.select.min.js',
       'node_modules/angular-patternfly/dist/angular-patternfly.js',
       'node_modules/c3/c3.min.js',
       'node_modules/d3/d3.min.js',
       'node_modules/lodash/lodash.min.js',
       'node_modules/urijs/src/URI.min.js',
       'node_modules/js-logger/src/logger.min.js',
-      'node_modules/clipboard/dist/clipboard.js',
       'node_modules/marked/lib/marked.js',
-      'node_modules/js-beautify/js/lib/beautify.js',
-      'node_modules/js-beautify/js/lib/beautify-html.js',
-      'node_modules/codemirror/lib/codemirror.js',
-      'node_modules/codemirror/addon/edit/closetag.js',
-      'node_modules/codemirror/addon/edit/continuelist.js',
-      'node_modules/codemirror/addon/edit/matchbrackets.js',
-      'node_modules/codemirror/addon/fold/foldcode.js',
-      'node_modules/codemirror/addon/fold/brace-fold.js',
-      'node_modules/codemirror/addon/fold/xml-fold.js',
-      'node_modules/codemirror/mode/javascript/javascript.js',
-      'node_modules/codemirror/mode/xml/xml.js',
-      'node_modules/codemirror/mode/css/css.js',
-      'node_modules/codemirror/mode/htmlmixed/htmlmixed.js',
-      'node_modules/codemirror/mode/markdown/markdown.js',
-      'node_modules/codemirror/mode/diff/diff.js',
-      'node_modules/codemirror/mode/properties/properties.js',
-      'node_modules/codemirror/mode/clike/clike.js',
-      'node_modules/codemirror/mode/yaml/yaml.js',
+      'node_modules/clipboard/dist/clipboard.js',
       'node_modules/graphlib/dist/graphlib.core.min.js',
       'node_modules/dagre-layout/dist/dagre-layout.js',
       'node_modules/ng-infinite-scroll/build/ng-infinite-scroll.min.js',
@@ -65,8 +48,14 @@ module.exports = function(config) {
       'node_modules/@hawtio/jmx/dist/hawtio-jmx.js',
       'dist/hawtio-integration.js',
       'node_modules/angular-mocks/angular-mocks.js',
-      'plugins/**/*.spec.ts'
+      'plugins/**/*.spec.ts',
+      {pattern: 'hawtconfig.json', watched: false, included: false, served: true}
     ],
+
+    
+    proxies: {
+      "/hawtconfig.json": "/base/hawtconfig.json"
+    },
 
 
     // list of files to exclude
@@ -105,7 +94,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
 
 
     // Continuous Integration mode
@@ -117,8 +106,7 @@ module.exports = function(config) {
     concurrency: Infinity,
 
 
-    // Add base tag to test pages
-    customContextFile: '.karma/context.html',
-    customDebugFile: '.karma/debug.html'
+    // Add base tag to test page
+    customContextFile: '.karma/context.html'
   })
 }

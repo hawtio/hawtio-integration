@@ -158,12 +158,6 @@ gulp.task('reload', function() {
     .pipe(hawtio.reload());
 });
 
-gulp.task('test', function (done) {
-  new Server({
-    configFile: __dirname + '/karma.conf.js'
-  }, done).start();
-});
-
 gulp.task('site-fonts', () =>
   gulp
     .src(
@@ -265,6 +259,12 @@ gulp.task('serve-site', function () {
   });
 
   return hawtio.listen(server => console.log(`Hawtio console started at http://localhost:${server.address().port}`));
+});
+
+gulp.task('test', ['build'], function (done) {
+  new Server({
+    configFile: __dirname + '/karma.conf.js'
+  }, done).start();
 });
 
 gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean', 'copy-images']);
