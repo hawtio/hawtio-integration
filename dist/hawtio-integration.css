@@ -795,6 +795,14 @@ div.camel-properties {
 .osgi-packages-main .pf-table-view-selected-label {
   display: none;
 }
+.osgi-packages-main .osgi-packages-list .list-view-pf-description,
+.osgi-packages-main .osgi-packages-list .list-group-item-heading,
+.osgi-packages-main .osgi-packages-list .list-group-item-text {
+  width: auto;
+}
+.osgi-packages-main .osgi-packages-list .list-group-item-container {
+  padding: 10px 20px;
+}
 
 .pid-view {
   margin-bottom: 40px;
