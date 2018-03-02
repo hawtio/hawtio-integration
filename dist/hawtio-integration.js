@@ -20125,7 +20125,7 @@ var Camel;
         var labelPadding = 12;
         var minLabelwidth = 80;
         labels.each(function (d) {
-            var bbox = this.getBBox();
+            var bbox = _.pick(this.getBBox(), "width", "height");
             d.bbox = bbox;
             if (bbox.width < minLabelwidth) {
                 bbox.width = minLabelwidth;
