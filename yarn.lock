@@ -25,22 +25,22 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@3.2.17", "@hawtio/core@~3.2.0":
-  version "3.2.17"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.17.tgz#9426f60d83155caf9b145cae06bc5b5d8c799777"
+"@hawtio/core@3.2.17", "@hawtio/core@3.2.18", "@hawtio/core@~3.2.0":
+  version "3.2.18"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.18.tgz#aba045d9eca46a78cb87418e41c71acd90b30573"
   dependencies:
     "@hawtio/core-dts" "3.0.18"
-    "@types/angular" "1.6.39"
+    "@types/angular" "~1.6.0"
     "@types/angular-route" "1.3.4"
     "@types/jasmine" "2.8.2"
     "@types/jquery" "~2.0.0"
     "@types/lodash" "4.14.91"
     "@types/marked" "0.3.0"
     "@types/urijs" "1.15.34"
-    angular "1.6.8"
+    angular "~1.6.0"
     angular-patternfly "^4.0.0"
-    angular-route "1.6.8"
-    angular-sanitize "1.6.8"
+    angular-route "~1.6.0"
+    angular-sanitize "~1.6.0"
     jquery "2.2.4"
     js-logger "1.4.1"
     lodash "4.17.4"
@@ -56,19 +56,20 @@
     "@hawtio/ui" "~3.2.0"
 
 "@hawtio/jmx@~3.2.0":
-  version "3.2.16"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.16.tgz#9e89b2e1584b7cc3c37dfe0a9167d985330e4790"
+  version "3.2.17"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.17.tgz#31f22c10c1873009f20e89eee0213b05201cc178"
   dependencies:
     "@hawtio/core" "~3.2.0"
     "@hawtio/forms" "~3.2.0"
     "@hawtio/ui" "~3.2.0"
-    "@types/jqueryui" "1.12.0"
+    "@types/jasmine" "~2.8.0"
+    "@types/jqueryui" "~1.12.0"
     angular-resizable "1.2.0"
     patternfly-bootstrap-treeview "2.1.5"
 
-"@hawtio/node-backend@3.0.4":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@hawtio/node-backend/-/node-backend-3.0.4.tgz#7902fea86d2eba36ff5b51696d9f1dd9421cdb7d"
+"@hawtio/node-backend@~3.0.0":
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/@hawtio/node-backend/-/node-backend-3.0.8.tgz#33cd104a74165bc22f1975a2cab07b4a1b140aad"
   dependencies:
     "@types/node" "^7.0.31"
     body-parser "^1.17.2"
@@ -112,7 +113,7 @@
   dependencies:
     "@types/angular" "*"
 
-"@types/angular@*", "@types/angular@1.6.39", "@types/angular@1.6.43":
+"@types/angular@*", "@types/angular@1.6.39", "@types/angular@1.6.43", "@types/angular@~1.6.0":
   version "1.6.43"
   resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.43.tgz#6235ef416053a86302970717510a936d889cbb9a"
 
@@ -130,17 +131,17 @@
   version "0.0.40"
   resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.40.tgz#0868ed9ba5bf3ef8072de80e245ecf4a8f0bbdfd"
 
-"@types/jasmine@2.8.2":
-  version "2.8.2"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.8.2.tgz#6ae4d8740c0da5d5a627df725b4eed71b8e36668"
+"@types/jasmine@2.8.2", "@types/jasmine@2.8.6", "@types/jasmine@~2.8.0":
+  version "2.8.6"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.8.6.tgz#14445b6a1613cf4e05dd61c3c3256d0e95c0421e"
 
 "@types/jquery@*", "@types/jquery@2.0.49", "@types/jquery@~2.0.0", "@types/jquery@~2.0.46":
   version "2.0.49"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-2.0.49.tgz#95bd7064caebf65bde10429dff491a1aea05b67d"
 
-"@types/jqueryui@1.12.0":
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/@types/jqueryui/-/jqueryui-1.12.0.tgz#69e6e6e2c1c7b97d0b6405c8f6036db09056bd87"
+"@types/jqueryui@1.12.0", "@types/jqueryui@1.12.2", "@types/jqueryui@~1.12.0":
+  version "1.12.2"
+  resolved "https://registry.yarnpkg.com/@types/jqueryui/-/jqueryui-1.12.2.tgz#8daa7ffa16880c78b1662ff287df058a2aceb651"
   dependencies:
     "@types/jquery" "*"
 
@@ -222,7 +223,7 @@ after@0.8.2:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/after/-/after-0.8.2.tgz#fedb394f9f0e02aa9768e702bda23b505fae7e1f"
 
-agent-base@2, agent-base@^4.1.0:
+agent-base@2, agent-base@4.2.0, agent-base@^4.1.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-4.2.0.tgz#9838b5c3392b962bad031e6a4c5e1024abec45ce"
   dependencies:
@@ -273,7 +274,7 @@ angular-drag-and-drop-lists@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/angular-drag-and-drop-lists/-/angular-drag-and-drop-lists-2.0.0.tgz#a01d44b94cf233c9c2d45a31842cb35a9d0882ca"
 
-angular-mocks@~1.6.8:
+angular-mocks@~1.6.0:
   version "1.6.9"
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.6.9.tgz#4fed8c8293a5080e0919a7ff0dcf0f704864b7ba"
 
@@ -305,13 +306,13 @@ angular-resizable@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/angular-resizable/-/angular-resizable-1.2.0.tgz#9dd29af008f8b54abfc051bd269a8f0b4fe43f1a"
 
-angular-route@1.6.8:
-  version "1.6.8"
-  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.6.8.tgz#82ace773e7b232bf77768370760244a8caab5d36"
+angular-route@1.6.8, angular-route@1.6.9, angular-route@~1.6.0:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.6.9.tgz#73c63cec6a8a6b924698aec635eac32aa41f5e2b"
 
-angular-sanitize@1.5.*, angular-sanitize@1.6.8:
-  version "1.6.8"
-  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.6.8.tgz#68175a1a5853a6439fffcb251a88a538a44a8e70"
+angular-sanitize@1.5.*, angular-sanitize@1.6.8, angular-sanitize@1.6.9, angular-sanitize@~1.6.0:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.6.9.tgz#1adba33f6f513e5f93e3aca8071bef53666739ea"
 
 angular-svg-base-fix@2.0.0:
   version "2.0.0"
@@ -321,9 +322,9 @@ angular-ui-bootstrap@2.3.x, angular-ui-bootstrap@2.5.0, angular-ui-bootstrap@2.5
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.0.tgz#2facefb915386655dc5f44150258032517236d01"
 
-angular@1.5.*, angular@1.6.8, angular@>=1.3.0:
-  version "1.6.8"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.8.tgz#5be378a58be91a5489e78b59c4518cd9fd273ffb"
+angular@1.5.*, angular@1.6.8, angular@1.6.9, angular@>=1.3.0, angular@~1.6.0:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.9.tgz#bc812932e18909038412d594a5990f4bb66c0619"
 
 angularjs-datatables@^0.5.9:
   version "0.5.9"
@@ -350,7 +351,7 @@ ansi-regex@2.1.1, ansi-regex@^2.0.0, ansi-regex@^3.0.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-2.1.1.tgz#c3b33ab5ee360d86e0e628f0468ae7ef27d654df"
 
-ansi-styles@2.2.1, ansi-styles@^2.2.1, ansi-styles@^3.2.0:
+ansi-styles@2.2.1, ansi-styles@^2.2.1, ansi-styles@^3.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-2.2.1.tgz#b432dd3358b634cf75e1e4664368240533c1ddbe"
 
@@ -1147,7 +1148,7 @@ copy-descriptor@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
 
-core-js@^2.2.0:
+core-js@2.5.3, core-js@^2.2.0:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.3.tgz#8acc38345824f16d8365b7c9b4259168e8ed603e"
 
@@ -2655,7 +2656,7 @@ https-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
 
-https-proxy-agent@1, https-proxy-agent@^2.1.0:
+https-proxy-agent@1, https-proxy-agent@2.1.1, https-proxy-agent@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-2.1.1.tgz#a7ce4382a1ba8266ee848578778122d491260fd9"
   dependencies:
@@ -4236,7 +4237,7 @@ pretty-hrtime@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/pretty-hrtime/-/pretty-hrtime-1.0.3.tgz#b7e3ea42435a4c9b2759d99e0f201eb195802ee1"
 
-process-nextick-args@1.0.7, process-nextick-args@^1.0.6, process-nextick-args@~1.0.6, process-nextick-args@~2.0.0:
+process-nextick-args@1.0.7, process-nextick-args@^1.0.6, process-nextick-args@~1.0.6:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-1.0.7.tgz#150e20b756590ad3f91093f25a4f2ad8bff30ba3"
 
@@ -5066,7 +5067,7 @@ subarg@^1.0.0:
   dependencies:
     minimist "^1.1.0"
 
-supports-color@2.0.0, supports-color@^2.0.0, supports-color@^5.2.0:
+supports-color@2.0.0, supports-color@^2.0.0, supports-color@^5.3.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
 

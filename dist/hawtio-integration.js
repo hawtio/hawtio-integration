@@ -25927,25 +25927,38 @@ var SpringBoot;
 var SpringBoot;
 (function (SpringBoot) {
     var HealthController = /** @class */ (function () {
-        HealthController.$inject = ["$interval", "healthService"];
-        function HealthController($interval, healthService) {
+        HealthController.$inject = ["$timeout", "healthService"];
+        function HealthController($timeout, healthService) {
             'ngInject';
-            this.$interval = $interval;
+            this.$timeout = $timeout;
             this.healthService = healthService;
         }
         HealthController.prototype.$onInit = function () {
-            var _this = this;
             this.loadData();
-            this.promise = this.$interval(function () { return _this.loadData(); }, 10000);
+            this.setTimerToReloadData();
         };
         HealthController.prototype.$onDestroy = function () {
-            this.$interval.cancel(this.promise);
+            this.cancelTimer();
         };
         HealthController.prototype.loadData = function () {
             var _this = this;
-            SpringBoot.log.debug('Load health data');
             this.healthService.getHealth()
                 .then(function (health) { return _this.health = health; });
+        };
+        HealthController.prototype.setTimerToReloadData = function () {
+            var _this = this;
+            this.promise = this.$timeout(function () {
+                _this.healthService.getHealth()
+                    .then(function (health) {
+                    _this.health = health;
+                    _this.setTimerToReloadData();
+                });
+            }, 20000);
+        };
+        HealthController.prototype.cancelTimer = function () {
+            console.log('will cancel timer');
+            this.$timeout.cancel(this.promise);
+            console.log('timer cancelled');
         };
         HealthController.prototype.getStatusIcon = function () {
             switch (this.health.status) {

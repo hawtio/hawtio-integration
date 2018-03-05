@@ -1852,14 +1852,16 @@ declare namespace SpringBoot {
 }
 declare namespace SpringBoot {
     class HealthController {
-        private $interval;
+        private $timeout;
         private healthService;
         health: Health;
         promise: ng.IPromise<any>;
-        constructor($interval: ng.IIntervalService, healthService: HealthService);
+        constructor($timeout: ng.ITimeoutService, healthService: HealthService);
         $onInit(): void;
         $onDestroy(): void;
         loadData(): void;
+        setTimerToReloadData(): void;
+        cancelTimer(): void;
         getStatusIcon(): "pficon-error-circle-o" | "pficon-ok" | "pficon-info";
         getStatusClass(): "alert-success" | "alert-danger" | "alert-info";
     }

@@ -8,23 +8,38 @@ namespace SpringBoot {
     health: Health;
     promise: ng.IPromise<any>;
 
-    constructor(private $interval: ng.IIntervalService, private healthService: HealthService) {
+    constructor(private $timeout: ng.ITimeoutService, private healthService: HealthService) {
       'ngInject';
     }
 
     $onInit() {
       this.loadData();
-      this.promise = this.$interval(() => this.loadData(), 10000);
+      this.setTimerToReloadData();
     }
 
     $onDestroy() {
-      this.$interval.cancel(this.promise);
+      this.cancelTimer();
     }
 
     loadData(): void {
-      log.debug('Load health data');
       this.healthService.getHealth()
         .then(health => this.health = health);
+    }
+
+    setTimerToReloadData() {
+      this.promise = this.$timeout(() => {
+        this.healthService.getHealth()
+          .then(health => {
+            this.health = health;
+            this.setTimerToReloadData();
+          });
+      }, 20000);
+    }
+
+    cancelTimer() {
+      console.log('will cancel timer');
+      this.$timeout.cancel(this.promise);
+      console.log('timer cancelled');
     }
 
     getStatusIcon() {

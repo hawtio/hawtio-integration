@@ -3,16 +3,16 @@
 
 describe("HealthController", function() {
 
-  let $interval;
+  let $timeout;
   let healthService: jasmine.SpyObj<SpringBoot.HealthService>;
   let healthController: SpringBoot.HealthController;
   let $q: ng.IQService;
   let $rootScope: ng.IRootScopeService;
 
   beforeEach(inject(function(_$q_, _$rootScope_) {
-    $interval = jasmine.createSpy('$interval');
+    $timeout = jasmine.createSpy('$timeout');
     healthService = jasmine.createSpyObj('jolokiaService', ['getHealth']);
-    healthController = new SpringBoot.HealthController($interval, healthService);
+    healthController = new SpringBoot.HealthController($timeout, healthService);
     $q = _$q_;
     $rootScope = _$rootScope_;
   }));
@@ -28,23 +28,23 @@ describe("HealthController", function() {
       $rootScope.$apply();
       // then
       expect(healthController.health).toBe(health);
-      expect($interval).toHaveBeenCalledWith(jasmine.any(Function), 10000);
+      expect($timeout).toHaveBeenCalledWith(jasmine.any(Function), 20000);
     });
 
   });
 
   describe("$onDestroy()", function() {
   
-    it("should cancel $interval", function() {
+    it("should cancel $timeout", function() {
       // given
-      $interval.cancel = function(promise) {};
-      spyOn($interval, 'cancel');
+      $timeout.cancel = function(promise) {};
+      spyOn($timeout, 'cancel');
       const promise = <ng.IPromise<any>> {};
       healthController.promise = promise;
       // when
       healthController.$onDestroy();
       // then
-      expect($interval.cancel).toHaveBeenCalledWith(promise);
+      expect($timeout.cancel).toHaveBeenCalledWith(promise);
     });
 
   });
