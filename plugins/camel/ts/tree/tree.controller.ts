@@ -18,8 +18,8 @@ namespace Camel {
     $onInit(): void {
       this.$scope.$on('$destroy', () => this.removeTree());
       this.$scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL(this.$location, $(treeElementId)));
-      this.$scope.$watch(angular.bind(this, () => this.workspace.tree), () => this.populateTree());
       this.$scope.$on('jmxTreeUpdated', () => this.populateTree());
+      this.populateTree();
     }
 
     treeFetched(): boolean {
