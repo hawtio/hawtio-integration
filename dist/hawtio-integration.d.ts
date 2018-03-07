@@ -1818,15 +1818,28 @@ declare namespace Osgi {
     var ServiceController: angular.IModule;
 }
 declare namespace SpringBoot {
-    class SpringBootLayoutService {
+    class SpringBootService {
         private workspace;
         constructor(workspace: Jmx.Workspace);
         getTabs(): Nav.HawtioTab[];
     }
 }
 declare namespace SpringBoot {
+    class SpringBootController {
+        private $scope;
+        private $location;
+        private workspace;
+        private springBootService;
+        tabs: Nav.HawtioTab[];
+        constructor($scope: ng.IScope, $location: ng.ILocationService, workspace: Jmx.Workspace, springBootService: SpringBootService);
+        $onInit(): void;
+        goto(tab: Nav.HawtioTab): void;
+    }
+    const springBootComponent: angular.IComponentOptions;
+}
+declare namespace SpringBoot {
     function configureRoutes($routeProvider: angular.route.IRouteProvider): void;
-    function configureNavigation($rootScope: ng.IScope, viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace, springBootLayoutService: SpringBootLayoutService): void;
+    function configureLayout($rootScope: ng.IScope, $templateCache: ng.ITemplateCacheService, viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace, springBootService: SpringBootService): void;
 }
 declare namespace SpringBoot {
     class Health {
@@ -1963,12 +1976,6 @@ declare namespace SpringBoot {
 }
 declare namespace SpringBoot {
     const loggersModule: string;
-}
-declare namespace SpringBoot {
-    function SpringBootLayoutController($location: ng.ILocationService, springBootLayoutService: SpringBootLayoutService): void;
-}
-declare namespace SpringBoot {
-    const layoutModule: string;
 }
 declare namespace SpringBoot {
     const log: Logging.Logger;

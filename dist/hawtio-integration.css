@@ -178,6 +178,10 @@ caption {
   content: url("img/icons/activemq/topic_folder.png");
 }
 
+.scr-component-references-table td:nth-child(3) {
+  text-transform: capitalize;
+}
+
 .form-inline.camel-forward-message {
   margin-bottom: 20px;
 }
@@ -689,10 +693,6 @@ div.camel-properties {
   width: 111px;
 }
 
-.scr-component-references-table td:nth-child(3) {
-  text-transform: capitalize;
-}
-
 .install-bundle {
   margin-bottom: 10px;
 }
@@ -828,26 +828,6 @@ div.camel-properties {
 .spring-boot-health-main .container-cards-pf {
   padding-top: 20px;
   padding-bottom: 20px;
-}
-
-.spring-boot-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: auto;
-}
-.spring-boot-layout .nav-tabs {
-  flex: 0 0 auto;
-  padding-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-.spring-boot-layout .contents {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  position: relative;
-  padding-left: 20px;
-  padding-right: 20px;
 }
 
 .spring-boot-loggers-list-group li {

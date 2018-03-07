@@ -1,13 +1,13 @@
-describe("SpringBootLayoutService", function() {
+describe("SpringBootService", function() {
 
   let workspace: jasmine.SpyObj<Jmx.workspace>;
-  let layoutService: SpringBoot.SpringBootLayoutService;
+  let springBootService: SpringBoot.SpringBootService;
   let $q: ng.IQService;
   let $rootScope: ng.IRootScopeService;
 
   beforeEach(inject(function(_$q_, _$rootScope_) {
     workspace = jasmine.createSpyObj('workspace', ['treeContainsDomainAndProperties']);
-    layoutService = new SpringBoot.SpringBootLayoutService(workspace);
+    springBootService = new SpringBoot.SpringBootService(workspace);
   }));
 
   describe("getTabs()", function() {
@@ -17,7 +17,7 @@ describe("SpringBootLayoutService", function() {
       workspace.treeContainsDomainAndProperties.and.returnValues(false, true, true);
 
       // when
-      let tabs: Nav.HawtioTab[] = layoutService.getTabs();
+      let tabs: Nav.HawtioTab[] = springBootService.getTabs();
 
       // then
       expect(tabs.length).toBe(2);

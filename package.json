@@ -70,7 +70,6 @@
     "underscore.string": "3.3.4",
     "yargs": "8.0.2",
     "angular-ui-bootstrap": "2.5.0",
-    "patternfly": "3.26.1",
     "bootstrap-select": "1.12.4",
     "datatables.net": "1.10.15",
     "moment": "2.18.1",
@@ -244,7 +243,7 @@
     "https-proxy-agent": "2.1.1",
     "core-js": "2.5.3",
     "@types/jqueryui": "1.12.2",
-    "@hawtio/core": "3.2.18",
+    "@hawtio/core": "3.2.19",
     "@types/jasmine": "2.8.6"
   }
 }

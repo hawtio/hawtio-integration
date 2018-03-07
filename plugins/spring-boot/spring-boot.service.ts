@@ -1,16 +1,15 @@
 namespace SpringBoot {
 
-  export class SpringBootLayoutService {
+  export class SpringBootService {
 
     constructor(private workspace: Jmx.Workspace) {
       'ngInject';
     }
 
     getTabs(): Nav.HawtioTab[] {
-      let tabs: Nav.HawtioTab[] = [];
-
       let domain = 'org.springframework.boot';
       let type = 'Endpoint';
+      let tabs = [];
 
       if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'healthEndpoint' })) {
         tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
