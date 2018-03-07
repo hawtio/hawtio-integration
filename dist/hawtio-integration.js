@@ -25843,25 +25843,34 @@ var Osgi;
 var SpringBoot;
 (function (SpringBoot) {
     var SpringBootService = /** @class */ (function () {
-        SpringBootService.$inject = ["workspace"];
-        function SpringBootService(workspace) {
+        SpringBootService.$inject = ["$q", "treeService"];
+        function SpringBootService($q, treeService) {
             'ngInject';
-            this.workspace = workspace;
+            this.$q = $q;
+            this.treeService = treeService;
         }
         SpringBootService.prototype.getTabs = function () {
-            var domain = 'org.springframework.boot';
-            var type = 'Endpoint';
-            var tabs = [];
-            if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'healthEndpoint' })) {
-                tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
-            }
-            if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'loggersEndpoint' })) {
-                tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
-            }
-            if (this.workspace.treeContainsDomainAndProperties(domain, { type: type, name: 'traceEndpoint' })) {
-                tabs.push(new Nav.HawtioTab('Trace', '/spring-boot/trace'));
-            }
-            return tabs;
+            return this.$q.all([
+                this.hasEndpoint('healthEndpoint'),
+                this.hasEndpoint('loggersEndpoint'),
+                this.hasEndpoint('traceEndpoint')
+            ])
+                .then(function (results) {
+                var tabs = [];
+                if (results[0]) {
+                    tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
+                }
+                if (results[1]) {
+                    tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
+                }
+                if (results[2]) {
+                    tabs.push(new Nav.HawtioTab('Trace', '/spring-boot/trace'));
+                }
+                return tabs;
+            });
+        };
+        SpringBootService.prototype.hasEndpoint = function (name) {
+            return this.treeService.treeContainsDomainAndProperties('org.springframework.boot', { type: 'Endpoint', name: name });
         };
         return SpringBootService;
     }());
@@ -25871,24 +25880,16 @@ var SpringBoot;
 var SpringBoot;
 (function (SpringBoot) {
     var SpringBootController = /** @class */ (function () {
-        SpringBootController.$inject = ["$scope", "$location", "workspace", "springBootService"];
-        function SpringBootController($scope, $location, workspace, springBootService) {
+        SpringBootController.$inject = ["$location", "springBootService"];
+        function SpringBootController($location, springBootService) {
             'ngInject';
-            this.$scope = $scope;
             this.$location = $location;
-            this.workspace = workspace;
             this.springBootService = springBootService;
         }
         SpringBootController.prototype.$onInit = function () {
             var _this = this;
-            if (this.workspace.tree.children.length > 0) {
-                this.tabs = this.springBootService.getTabs();
-            }
-            else {
-                this.$scope.$on('jmxTreeUpdated', function () {
-                    _this.tabs = _this.springBootService.getTabs();
-                });
-            }
+            this.springBootService.getTabs()
+                .then(function (tabs) { return _this.tabs = tabs; });
         };
         SpringBootController.prototype.goto = function (tab) {
             this.$location.path(tab.path);
@@ -25905,7 +25906,7 @@ var SpringBoot;
 var SpringBoot;
 (function (SpringBoot) {
     configureRoutes.$inject = ["$routeProvider"];
-    configureLayout.$inject = ["$rootScope", "$templateCache", "viewRegistry", "HawtioNav", "workspace", "springBootService"];
+    configureLayout.$inject = ["$templateCache", "viewRegistry", "HawtioNav", "workspace", "springBootService"];
     function configureRoutes($routeProvider) {
         'ngInject';
         $routeProvider
@@ -25915,14 +25916,14 @@ var SpringBoot;
             .when('/spring-boot/loggers', { template: '<spring-boot-loggers></spring-boot-loggers>' });
     }
     SpringBoot.configureRoutes = configureRoutes;
-    function configureLayout($rootScope, $templateCache, viewRegistry, HawtioNav, workspace, springBootService) {
+    function configureLayout($templateCache, viewRegistry, HawtioNav, workspace, springBootService) {
         'ngInject';
         var templateCacheKey = 'spring-boot.html';
         $templateCache.put(templateCacheKey, '<spring-boot></spring-boot>');
         viewRegistry['spring-boot'] = templateCacheKey;
-        var unsubscribe = $rootScope.$on('jmxTreeUpdated', function () {
-            unsubscribe();
-            var valid = springBootService.getTabs().length > 0;
+        springBootService.getTabs()
+            .then(function (tabs) {
+            var valid = tabs.length > 0;
             var tab = HawtioNav.builder()
                 .id('spring-boot')
                 .title(function () { return 'Spring Boot'; })
@@ -26016,9 +26017,7 @@ var SpringBoot;
             }, 20000);
         };
         HealthController.prototype.cancelTimer = function () {
-            console.log('will cancel timer');
             this.$timeout.cancel(this.promise);
-            console.log('timer cancelled');
         };
         HealthController.prototype.getStatusIcon = function () {
             switch (this.health.status) {

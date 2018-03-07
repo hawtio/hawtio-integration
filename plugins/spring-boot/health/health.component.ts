@@ -37,9 +37,7 @@ namespace SpringBoot {
     }
 
     cancelTimer() {
-      console.log('will cancel timer');
       this.$timeout.cancel(this.promise);
-      console.log('timer cancelled');
     }
 
     getStatusIcon() {

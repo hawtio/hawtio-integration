@@ -5,19 +5,13 @@ namespace SpringBoot {
   export class SpringBootController {
     tabs: Nav.HawtioTab[];
 
-    constructor(private $scope: ng.IScope, private $location: ng.ILocationService,
-      private workspace: Jmx.Workspace, private springBootService: SpringBootService) {
+    constructor(private $location: ng.ILocationService, private springBootService: SpringBootService) {
       'ngInject';
     }
 
     $onInit() {
-      if (this.workspace.tree.children.length > 0) {
-        this.tabs = this.springBootService.getTabs();
-      } else {
-        this.$scope.$on('jmxTreeUpdated', () => {
-          this.tabs = this.springBootService.getTabs();
-        });
-      }
+      this.springBootService.getTabs()
+        .then(tabs => this.tabs = tabs);
     }
 
     goto(tab: Nav.HawtioTab) {

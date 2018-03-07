@@ -11,8 +11,7 @@ namespace SpringBoot {
       .when('/spring-boot/loggers', {template: '<spring-boot-loggers></spring-boot-loggers>'});
     }
 
-  export function configureLayout($rootScope: ng.IScope,
-                                  $templateCache: ng.ITemplateCacheService,
+  export function configureLayout($templateCache: ng.ITemplateCacheService,
                                   viewRegistry,
                                   HawtioNav: Nav.Registry,
                                   workspace: Jmx.Workspace,
@@ -23,18 +22,18 @@ namespace SpringBoot {
     $templateCache.put(templateCacheKey, '<spring-boot></spring-boot>');
     viewRegistry['spring-boot'] = templateCacheKey;
 
-    const unsubscribe = $rootScope.$on('jmxTreeUpdated', () => {
-      unsubscribe();
-      let valid = springBootService.getTabs().length > 0;
-      const tab = HawtioNav.builder()
-      .id('spring-boot')
-      .title(() => 'Spring Boot')
-      .href(() => '/spring-boot')
-      .isValid(() => valid)
-      .isSelected(() => workspace.isMainTabActive('spring-boot'))
-      .build();
-      HawtioNav.add(tab);
-    });
+    springBootService.getTabs()
+      .then(tabs => {
+        let valid = tabs.length > 0;
+        const tab = HawtioNav.builder()
+          .id('spring-boot')
+          .title(() => 'Spring Boot')
+          .href(() => '/spring-boot')
+          .isValid(() => valid)
+          .isSelected(() => workspace.isMainTabActive('spring-boot'))
+          .build();
+        HawtioNav.add(tab);
+      });
   }
 
 }

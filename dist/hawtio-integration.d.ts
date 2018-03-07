@@ -1829,19 +1829,19 @@ declare namespace Osgi {
 }
 declare namespace SpringBoot {
     class SpringBootService {
-        private workspace;
-        constructor(workspace: Jmx.Workspace);
-        getTabs(): Nav.HawtioTab[];
+        private $q;
+        private treeService;
+        constructor($q: ng.IQService, treeService: Jmx.TreeService);
+        getTabs(): ng.IPromise<Nav.HawtioTab[]>;
+        private hasEndpoint(name);
     }
 }
 declare namespace SpringBoot {
     class SpringBootController {
-        private $scope;
         private $location;
-        private workspace;
         private springBootService;
         tabs: Nav.HawtioTab[];
-        constructor($scope: ng.IScope, $location: ng.ILocationService, workspace: Jmx.Workspace, springBootService: SpringBootService);
+        constructor($location: ng.ILocationService, springBootService: SpringBootService);
         $onInit(): void;
         goto(tab: Nav.HawtioTab): void;
     }
@@ -1849,7 +1849,7 @@ declare namespace SpringBoot {
 }
 declare namespace SpringBoot {
     function configureRoutes($routeProvider: angular.route.IRouteProvider): void;
-    function configureLayout($rootScope: ng.IScope, $templateCache: ng.ITemplateCacheService, viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace, springBootService: SpringBootService): void;
+    function configureLayout($templateCache: ng.ITemplateCacheService, viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace, springBootService: SpringBootService): void;
 }
 declare namespace SpringBoot {
     class Health {
