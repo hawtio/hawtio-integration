@@ -4,18 +4,23 @@
 namespace ActiveMQ {
 
   export class ActiveMQNavigationController {
-    
+
     tabs: Nav.HawtioTab[];
 
     constructor($scope: ng.IScope, private $location: ng.ILocationService,
       private activeMQNavigationService: ActiveMQNavigationService) {
       'ngInject';
-      
+
       $scope.$on('jmxTreeClicked', () => {
         this.tabs = activeMQNavigationService.getTabs();
+        let tab = _.find(this.tabs, {path: this.$location.path()});
+        if (!tab) {
+          tab = this.tabs[0];
+        }
+        this.$location.path(tab.path);
       });
     }
-    
+
     $onInit() {
       this.tabs = this.activeMQNavigationService.getTabs();
     }

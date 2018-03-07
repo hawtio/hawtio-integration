@@ -56,8 +56,8 @@
     "@hawtio/ui" "~3.2.0"
 
 "@hawtio/jmx@~3.2.0":
-  version "3.2.18"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.18.tgz#cb20563902cdb2e107cc3d60e9cc3beb5d06622d"
+  version "3.2.19"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.19.tgz#e7af297f7e5384b52c8c81b275f55d99ebf67fa3"
   dependencies:
     "@hawtio/core" "~3.2.0"
     "@hawtio/forms" "~3.2.0"
@@ -1295,7 +1295,7 @@ datatables.net-select@~1.2.0:
     datatables.net "^1.10.15"
     jquery ">=1.7"
 
-datatables.net@1.10.15, datatables.net@1.10.16, datatables.net@>=1.10.9, datatables.net@^1.10.11, datatables.net@^1.10.12, datatables.net@^1.10.15:
+datatables.net@1.10.15, datatables.net@1.10.16, datatables.net@^1.10.11, datatables.net@^1.10.12, datatables.net@^1.10.15:
   version "1.10.15"
   resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.10.15.tgz#c789077bbfe385e75ff5a233fa5f23251a72df68"
   dependencies:

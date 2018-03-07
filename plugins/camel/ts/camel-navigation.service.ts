@@ -2,7 +2,7 @@
 
 namespace Camel {
 
-  export class CamelTabsService {
+  export class CamelNavigationService {
 
     private hasRestServices: boolean;
 
@@ -146,6 +146,6 @@ namespace Camel {
 
   }
 
-  _module.service('camelTabsService', CamelTabsService);
+  _module.service('camelNavigationService', CamelNavigationService);
 
 }

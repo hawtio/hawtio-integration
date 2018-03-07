@@ -178,10 +178,6 @@ caption {
   content: url("img/icons/activemq/topic_folder.png");
 }
 
-.scr-component-references-table td:nth-child(3) {
-  text-transform: capitalize;
-}
-
 .form-inline.camel-forward-message {
   margin-bottom: 20px;
 }
@@ -691,6 +687,10 @@ div.camel-properties {
 }
 .camel-type-converters-enable-statistics-button {
   width: 111px;
+}
+
+.scr-component-references-table td:nth-child(3) {
+  text-transform: capitalize;
 }
 
 .install-bundle {

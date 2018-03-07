@@ -9,9 +9,7 @@
       <route-actions></route-actions>
       <jmx-header></jmx-header>
     </div>
-    <div ng-controller="CamelTabsController as $ctrl">
-      <hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>
-    </div>
+    <camel-navigation></camel-navigation>
     <div class="contents" ng-view></div>
   </div>
 </div>

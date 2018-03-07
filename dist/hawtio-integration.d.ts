@@ -891,16 +891,26 @@ declare namespace Camel {
     var BrowseEndpointController: angular.IModule;
 }
 declare namespace Camel {
-    function CamelTabsController($scope: ng.IScope, $location: ng.ILocationService, camelTabsService: CamelTabsService): void;
-}
-declare namespace Camel {
-    class CamelTabsService {
+    class CamelNavigationService {
         private workspace;
         private jolokia;
         private hasRestServices;
         constructor(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia);
         getTabs(): Nav.HawtioTab[];
     }
+}
+declare namespace Camel {
+    class CamelNavigationController {
+        private $scope;
+        private $location;
+        private camelNavigationService;
+        private workspace;
+        private tabs;
+        constructor($scope: ng.IScope, $location: ng.ILocationService, camelNavigationService: CamelNavigationService, workspace: Jmx.Workspace);
+        $onInit(): void;
+        goto(tab: Nav.HawtioTab): void;
+    }
+    const camelNavigationComponent: angular.IComponentOptions;
 }
 declare namespace Camel {
     var camelHeaderSchema: {
