@@ -4,7 +4,7 @@ namespace Camel {
 
     selected = false;
 
-    constructor(public name: string, public state: string, public mbean: string) {
+    constructor(public name: string, public state: string, public mbeanName: string) {
     }
 
     isStarted() {

@@ -6,119 +6,56 @@ namespace Camel {
 
     private log: Logging.Logger = Logger.get("Camel");
     
-    constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia) {
+    constructor(private jolokiaService: JVM.JolokiaService, private treeService: Jmx.TreeService) {
       'ngInject';
     }
 
-    getContext(mbean: string): ng.IPromise<Context> {
-      let request = {
-        type: "read",
-        mbean: mbean,
-        ignoreErrors: true
-      };
-
-      return this.$q((resolve, reject) => {
-        let contexts = [];
-        this.jolokia.request(request, {
-          success: function(response) {
-            let object = response.value;
-            let context = new Context(object.CamelId, object.State, response.request.mbean);
-            resolve(context);
-          }
-        }, {
-          error: (response) => {
-            this.log.debug('ContextsService.getContext() failed: ' + response.error);
-            reject(response.error);
-          }
+    getContexts(): ng.IPromise<Context[]> {
+      return this.treeService.getSelectedMBean()
+        .then((nodeSelection: Jmx.NodeSelection) => {
+          const mbeanNames = nodeSelection.children.filter(node => node.objectName).map(node => node.objectName);
+          return this.jolokiaService.getMBeans(mbeanNames)
+            .then(mbeans => mbeans.map((mbean, i) => new Context(mbean.CamelId, mbean.State, mbeanNames[i])));
         });
-      });
+    }
+    
+    getContext(mbeanName: string): ng.IPromise<Context> {
+      return this.jolokiaService.getMBean(mbeanName)
+        .then(mbean => new Context(mbean.CamelId, mbean.State, mbeanName));
     }
 
-    getContexts(mbeans: string[]): ng.IPromise<Context[]> {
-      if (mbeans.length === 0) {
-        return this.$q.resolve([]);
-      }
-
-      let requests = mbeans.map(mbean => ({
-        type: "read",
-        mbean: mbean,
-        ignoreErrors: true
-      }));
-
-      return this.$q((resolve, reject) => {
-        let contexts = [];
-        this.jolokia.request(requests, {
-          success: function(response) {
-            let object = response.value;
-            let context = new Context(object.CamelId, object.State, response.request.mbean);
-            contexts.push(context);
-            if (contexts.length === requests.length) {
-              resolve(contexts);
-            }
-          }
-        }, {
-          error: (response) => {
-            this.log.debug('ContextsService.getContexts() failed: ' + response.error);
-            reject(response.error);
-          }
-        });
-      });
+    startContext(context: Context): ng.IPromise<any> {
+      return this.executeOperationOnContext('start()', context);
     }
 
-    startContext(context: Context): ng.IPromise<String> {
-      return this.startContexts([context]);
-    }
-
-    startContexts(contexts: Context[]): ng.IPromise<String> {
+    startContexts(contexts: Context[]): ng.IPromise<any[]> {
       return this.executeOperationOnContexts('start()', contexts);
     }
 
-    suspendContext(context: Context): ng.IPromise<String> {
-      return this.suspendContexts([context]);
+    suspendContext(context: Context): ng.IPromise<any> {
+      return this.executeOperationOnContext('suspend()', context);
     }
 
-    suspendContexts(contexts: Context[]): ng.IPromise<String> {
+    suspendContexts(contexts: Context[]): ng.IPromise<any[]> {
       return this.executeOperationOnContexts('suspend()', contexts);
     }
 
-    stopContext(context: Context): ng.IPromise<String> {
-      return this.stopContexts([context]);
+    stopContext(context: Context): ng.IPromise<any> {
+      return this.executeOperationOnContext('stop()', context);
     }
 
-    stopContexts(contexts: Context[]): ng.IPromise<String> {
+    stopContexts(contexts: Context[]): ng.IPromise<any[]> {
       return this.executeOperationOnContexts('stop()', contexts);
     }
 
-    executeOperationOnContexts(operation: string, contexts: Context[]): ng.IPromise<String> {
-      if (contexts.length === 0) {
-        return this.$q.resolve('success');
-      }
-
-      let requests = contexts.map(context => ({
-        type: 'exec',
-        operation: operation,
-        mbean: context.mbean
-      }));
-      
-      return this.$q((resolve, reject) => {
-        let contexts = [];
-        let responseCount = 0;
-        this.jolokia.request(requests, {
-          success: function(response) {
-            responseCount++;
-            if (responseCount === requests.length) {
-              resolve('success');
-            }
-          }
-        }, {
-          error: (response) => {
-            this.log.debug('ContextsService.executeOperationOnContexts() failed: ' + response.error);
-            reject(response.error);
-          }
-        });
-      });
+    executeOperationOnContext(operation: string, context: Context): ng.IPromise<any> {
+      return this.jolokiaService.execute(context.mbeanName, operation);
     }
-
+    
+    executeOperationOnContexts(operation: string, contexts: Context[]): ng.IPromise<any[]> {
+      const objectNames = contexts.map(context => context.mbeanName);
+      return this.jolokiaService.executeMany(objectNames, operation);
+    }
   }
 
 }

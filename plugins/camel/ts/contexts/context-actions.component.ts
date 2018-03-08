@@ -4,20 +4,27 @@
 namespace Camel {
 
   export class ContextActionsController {
-
     context: Context = null;
+    unsubscribe;
 
     constructor(private $scope, private $uibModal, private $timeout: ng.ITimeoutService,
       private workspace: Jmx.Workspace, private contextsService: ContextsService) {
       'ngInject';
-      $scope.$on('jmxTreeClicked', (event, selectedNode) => {
-        if (workspace.isCamelContext()) {
-          contextsService.getContext(selectedNode.objectName)
+    }
+    
+    $onInit() {
+      this.unsubscribe = this.$scope.$on(Jmx.TreeEvent.NodeSelected, (event, selectedNode: Jmx.NodeSelection) => {
+        if (selectedNode.typeName === 'context' && selectedNode.objectName) {
+          this.contextsService.getContext(selectedNode.objectName)
             .then(context => this.context = context);
         } else {
           this.context = null;
         }
       });
+    }
+
+    $onDestroy() {
+      this.unsubscribe();
     }
 
     isVisible(): boolean {
@@ -27,7 +34,7 @@ namespace Camel {
     start(): void {
       this.contextsService.startContext(this.context)
         .then(response => {
-          this.contextsService.getContext(this.context.mbean)
+          this.contextsService.getContext(this.context.mbeanName)
             .then(context => this.context = context);
         });
     }
@@ -35,7 +42,7 @@ namespace Camel {
     suspend(): void {
       this.contextsService.suspendContext(this.context)
         .then(response => {
-          this.contextsService.getContext(this.context.mbean)
+          this.contextsService.getContext(this.context.mbeanName)
             .then(context => this.context = context);
         });
     }

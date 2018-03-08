@@ -17252,10 +17252,10 @@ var Camel;
 var Camel;
 (function (Camel) {
     var Context = /** @class */ (function () {
-        function Context(name, state, mbean) {
+        function Context(name, state, mbeanName) {
             this.name = name;
             this.state = state;
-            this.mbean = mbean;
+            this.mbeanName = mbeanName;
             this.selected = false;
         }
         Context.prototype.isStarted = function () {
@@ -17272,110 +17272,50 @@ var Camel;
 var Camel;
 (function (Camel) {
     var ContextsService = /** @class */ (function () {
-        ContextsService.$inject = ["$q", "jolokia"];
-        function ContextsService($q, jolokia) {
+        ContextsService.$inject = ["jolokiaService", "treeService"];
+        function ContextsService(jolokiaService, treeService) {
             'ngInject';
-            this.$q = $q;
-            this.jolokia = jolokia;
+            this.jolokiaService = jolokiaService;
+            this.treeService = treeService;
             this.log = Logger.get("Camel");
         }
-        ContextsService.prototype.getContext = function (mbean) {
+        ContextsService.prototype.getContexts = function () {
             var _this = this;
-            var request = {
-                type: "read",
-                mbean: mbean,
-                ignoreErrors: true
-            };
-            return this.$q(function (resolve, reject) {
-                var contexts = [];
-                _this.jolokia.request(request, {
-                    success: function (response) {
-                        var object = response.value;
-                        var context = new Camel.Context(object.CamelId, object.State, response.request.mbean);
-                        resolve(context);
-                    }
-                }, {
-                    error: function (response) {
-                        _this.log.debug('ContextsService.getContext() failed: ' + response.error);
-                        reject(response.error);
-                    }
-                });
+            return this.treeService.getSelectedMBean()
+                .then(function (nodeSelection) {
+                var mbeanNames = nodeSelection.children.filter(function (node) { return node.objectName; }).map(function (node) { return node.objectName; });
+                return _this.jolokiaService.getMBeans(mbeanNames)
+                    .then(function (mbeans) { return mbeans.map(function (mbean, i) { return new Camel.Context(mbean.CamelId, mbean.State, mbeanNames[i]); }); });
             });
         };
-        ContextsService.prototype.getContexts = function (mbeans) {
-            var _this = this;
-            if (mbeans.length === 0) {
-                return this.$q.resolve([]);
-            }
-            var requests = mbeans.map(function (mbean) { return ({
-                type: "read",
-                mbean: mbean,
-                ignoreErrors: true
-            }); });
-            return this.$q(function (resolve, reject) {
-                var contexts = [];
-                _this.jolokia.request(requests, {
-                    success: function (response) {
-                        var object = response.value;
-                        var context = new Camel.Context(object.CamelId, object.State, response.request.mbean);
-                        contexts.push(context);
-                        if (contexts.length === requests.length) {
-                            resolve(contexts);
-                        }
-                    }
-                }, {
-                    error: function (response) {
-                        _this.log.debug('ContextsService.getContexts() failed: ' + response.error);
-                        reject(response.error);
-                    }
-                });
-            });
+        ContextsService.prototype.getContext = function (mbeanName) {
+            return this.jolokiaService.getMBean(mbeanName)
+                .then(function (mbean) { return new Camel.Context(mbean.CamelId, mbean.State, mbeanName); });
         };
         ContextsService.prototype.startContext = function (context) {
-            return this.startContexts([context]);
+            return this.executeOperationOnContext('start()', context);
         };
         ContextsService.prototype.startContexts = function (contexts) {
             return this.executeOperationOnContexts('start()', contexts);
         };
         ContextsService.prototype.suspendContext = function (context) {
-            return this.suspendContexts([context]);
+            return this.executeOperationOnContext('suspend()', context);
         };
         ContextsService.prototype.suspendContexts = function (contexts) {
             return this.executeOperationOnContexts('suspend()', contexts);
         };
         ContextsService.prototype.stopContext = function (context) {
-            return this.stopContexts([context]);
+            return this.executeOperationOnContext('stop()', context);
         };
         ContextsService.prototype.stopContexts = function (contexts) {
             return this.executeOperationOnContexts('stop()', contexts);
         };
+        ContextsService.prototype.executeOperationOnContext = function (operation, context) {
+            return this.jolokiaService.execute(context.mbeanName, operation);
+        };
         ContextsService.prototype.executeOperationOnContexts = function (operation, contexts) {
-            var _this = this;
-            if (contexts.length === 0) {
-                return this.$q.resolve('success');
-            }
-            var requests = contexts.map(function (context) { return ({
-                type: 'exec',
-                operation: operation,
-                mbean: context.mbean
-            }); });
-            return this.$q(function (resolve, reject) {
-                var contexts = [];
-                var responseCount = 0;
-                _this.jolokia.request(requests, {
-                    success: function (response) {
-                        responseCount++;
-                        if (responseCount === requests.length) {
-                            resolve('success');
-                        }
-                    }
-                }, {
-                    error: function (response) {
-                        _this.log.debug('ContextsService.executeOperationOnContexts() failed: ' + response.error);
-                        reject(response.error);
-                    }
-                });
-            });
+            var objectNames = contexts.map(function (context) { return context.mbeanName; });
+            return this.jolokiaService.executeMany(objectNames, operation);
         };
         return ContextsService;
     }());
@@ -17447,7 +17387,9 @@ var Camel;
             ];
         }
         ContextsController.prototype.$onInit = function () {
-            this.loadContexts();
+            var _this = this;
+            this.contextsService.getContexts()
+                .then(function (contexts) { return _this.contexts = contexts; });
         };
         ContextsController.prototype.getSelectedContexts = function () {
             return this.contexts.filter(function (context) { return context.selected; });
@@ -17458,19 +17400,9 @@ var Camel;
             this.suspendAction.isDisabled = !selectedContexts.some(function (context) { return context.state === 'Started'; });
             this.deleteAction.isDisabled = selectedContexts.length === 0;
         };
-        ContextsController.prototype.loadContexts = function () {
-            var _this = this;
-            if (this.workspace.selection && this.workspace.selection.children) {
-                var children = this.workspace.selection.children.filter(function (node) { return node.objectName != null; });
-                var mbeans = _.map(children, function (node) { return node.objectName; });
-                this.contextsService.getContexts(mbeans)
-                    .then(function (contexts) { return _this.contexts = contexts; });
-            }
-        };
         ContextsController.prototype.updateContexts = function () {
             var _this = this;
-            var mbeans = _.map(this.contexts, function (context) { return context.mbean; });
-            this.contextsService.getContexts(mbeans)
+            this.contextsService.getContexts()
                 .then(function (contexts) {
                 for (var i = 0; i < contexts.length; i++) {
                     if (_this.contexts[i].state !== contexts[i].state) {
@@ -17501,23 +17433,28 @@ var Camel;
         ContextActionsController.$inject = ["$scope", "$uibModal", "$timeout", "workspace", "contextsService"];
         function ContextActionsController($scope, $uibModal, $timeout, workspace, contextsService) {
             'ngInject';
-            var _this = this;
             this.$scope = $scope;
             this.$uibModal = $uibModal;
             this.$timeout = $timeout;
             this.workspace = workspace;
             this.contextsService = contextsService;
             this.context = null;
-            $scope.$on('jmxTreeClicked', function (event, selectedNode) {
-                if (workspace.isCamelContext()) {
-                    contextsService.getContext(selectedNode.objectName)
+        }
+        ContextActionsController.prototype.$onInit = function () {
+            var _this = this;
+            this.unsubscribe = this.$scope.$on(Jmx.TreeEvent.NodeSelected, function (event, selectedNode) {
+                if (selectedNode.typeName === 'context' && selectedNode.objectName) {
+                    _this.contextsService.getContext(selectedNode.objectName)
                         .then(function (context) { return _this.context = context; });
                 }
                 else {
                     _this.context = null;
                 }
             });
-        }
+        };
+        ContextActionsController.prototype.$onDestroy = function () {
+            this.unsubscribe();
+        };
         ContextActionsController.prototype.isVisible = function () {
             return this.context !== null;
         };
@@ -17525,7 +17462,7 @@ var Camel;
             var _this = this;
             this.contextsService.startContext(this.context)
                 .then(function (response) {
-                _this.contextsService.getContext(_this.context.mbean)
+                _this.contextsService.getContext(_this.context.mbeanName)
                     .then(function (context) { return _this.context = context; });
             });
         };
@@ -17533,7 +17470,7 @@ var Camel;
             var _this = this;
             this.contextsService.suspendContext(this.context)
                 .then(function (response) {
-                _this.contextsService.getContext(_this.context.mbean)
+                _this.contextsService.getContext(_this.context.mbeanName)
                     .then(function (context) { return _this.context = context; });
             });
         };

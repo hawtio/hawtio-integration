@@ -68,7 +68,8 @@ namespace Camel {
     }
 
     $onInit() {
-      this.loadContexts();
+      this.contextsService.getContexts()
+        .then(contexts => this.contexts = contexts);
     }
 
     private getSelectedContexts(): Context[] {
@@ -82,18 +83,8 @@ namespace Camel {
       this.deleteAction.isDisabled = selectedContexts.length === 0;
     }
 
-    private loadContexts() {
-      if (this.workspace.selection && this.workspace.selection.children) {
-        let children = this.workspace.selection.children.filter(node => {return node.objectName != null})
-        let mbeans = _.map(children, node => node.objectName);
-        this.contextsService.getContexts(mbeans)
-          .then(contexts => this.contexts = contexts);
-      }
-    }
-
     private updateContexts() {
-      let mbeans = _.map(this.contexts, context => context.mbean);
-      this.contextsService.getContexts(mbeans)
+      this.contextsService.getContexts()
         .then(contexts => {
           for (let i = 0; i < contexts.length; i++) {
             if (this.contexts[i].state !== contexts[i].state) {
@@ -109,7 +100,6 @@ namespace Camel {
       this.workspace.loadTree();
       this.enableDisableActions();
     }
-
   }
 
   export const contextsComponent = <angular.IComponentOptions>{
