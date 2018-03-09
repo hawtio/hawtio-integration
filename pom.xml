@@ -24,7 +24,7 @@
 
   <name>hawtio-integration</name>
   <description>HawtIO Integration :: ${project.artifactId}</description>
-  
+
   <properties>
     <fabric8.maven.plugin.version>3.5.33</fabric8.maven.plugin.version>
     <maven.exec.plugin.version>1.2.1</maven.exec.plugin.version>
@@ -32,6 +32,7 @@
     <frontend-maven-plugin-version>1.6</frontend-maven-plugin-version>
     <node.version>v8.9.1</node.version>
     <yarn.version>v1.2.1</yarn.version>
+    <yarn.install.args>--no-progress</yarn.install.args>
     <image.ui>hawtio-integration</image.ui>
   </properties>
 
@@ -67,7 +68,7 @@
               <goal>yarn</goal>
             </goals>
             <configuration>
-              <arguments>install --no-progress</arguments>
+              <arguments>install ${yarn.install.args}</arguments>
             </configuration>
           </execution>
           <execution>
