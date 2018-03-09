@@ -663,10 +663,9 @@ declare namespace Camel {
 }
 declare namespace Camel {
     class EndpointsStatisticsService {
-        private $q;
         private jolokiaService;
-        private workspace;
-        constructor($q: ng.IQService, jolokiaService: JVM.JolokiaService, workspace: Jmx.Workspace);
+        private treeService;
+        constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService);
         getStatistics(): ng.IPromise<any[]>;
     }
 }

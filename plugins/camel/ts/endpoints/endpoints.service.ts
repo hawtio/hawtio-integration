@@ -14,7 +14,7 @@ namespace Camel {
     getEndpoints(): ng.IPromise<Endpoint[]> {
       if (this.workspace.selection && this.workspace.selection.children && this.workspace.selection.children.length > 0) {
         let mbeans = this.workspace.selection.children.map(node => node.objectName);
-        return this.jolokiaService.readMany(mbeans)
+        return this.jolokiaService.getMBeans(mbeans)
           .then(objects => objects.map((object, i) => new Endpoint(object.EndpointUri, object.State, mbeans[i])));
       } else {
         return this.$q.resolve([]);

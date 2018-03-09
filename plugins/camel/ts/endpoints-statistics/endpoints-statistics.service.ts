@@ -2,19 +2,16 @@ namespace Camel {
 
   export class EndpointsStatisticsService {
 
-    constructor(
-      private $q: ng.IQService,
-      private jolokiaService: JVM.JolokiaService,
-      private workspace: Jmx.Workspace) {
+    constructor(private jolokiaService: JVM.JolokiaService, private treeService: Jmx.TreeService) {
       'ngInject';
     }
 
     getStatistics(): ng.IPromise<any[]> {
-      var mbean = getSelectionCamelEndpointRuntimeRegistry(this.workspace);
-      return this.jolokiaService.execute(mbean, 'endpointStatistics')
-        .then(response => _.values(response));
-    }    
-
+      return this.treeService.findMBeanWithProperties('org.apache.camel', {type: 'services', name: 'DefaultRuntimeEndpointRegistry'})
+        .then(mbean => this.jolokiaService.execute(mbean.objectName, 'endpointStatistics')
+          .then(response => _.values(response))
+        );
+    }
   }
 
 }

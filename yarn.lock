@@ -25,9 +25,9 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@3.2.17", "@hawtio/core@3.2.19", "@hawtio/core@~3.2.0":
-  version "3.2.19"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.19.tgz#b7d7ef17b3ca3a9e472b41627b0bbac2b5726ba7"
+"@hawtio/core@3.2.17", "@hawtio/core@~3.2.0":
+  version "3.2.20"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.20.tgz#bf741eecc70e67c0f6c2f1f8f00fe8a59bbb9fd8"
   dependencies:
     "@hawtio/core-dts" "3.0.18"
     "@types/angular" "~1.6.0"
@@ -56,8 +56,8 @@
     "@hawtio/ui" "~3.2.0"
 
 "@hawtio/jmx@~3.2.0":
-  version "3.2.20"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.20.tgz#f7e335ac876c31873552cdb8ed7674bf8682698a"
+  version "3.2.21"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.21.tgz#ac52a8a7f299638fa89d6c9d924ef38b79fb895e"
   dependencies:
     "@hawtio/core" "~3.2.0"
     "@hawtio/forms" "~3.2.0"
@@ -4142,8 +4142,8 @@ patternfly-bootstrap-treeview@2.1.5, patternfly-bootstrap-treeview@~2.1.0:
     jquery ">= 2.1.x"
 
 patternfly@^3.37.1:
-  version "3.41.3"
-  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.41.3.tgz#1f9552b61bd36c6b18bd1f2e75956a25920d48f0"
+  version "3.41.6"
+  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.41.6.tgz#e060cf75ad118bc51859a05d8e73061c880447ef"
   dependencies:
     bootstrap "~3.3.7"
     font-awesome "^4.7.0"

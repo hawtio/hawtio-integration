@@ -2,12 +2,10 @@
 
 namespace Camel {
 
-  _module.controller("Camel.TypeConverterController", ["$scope", "$location", "$timeout", "workspace", "jolokia", (
-      $scope,
-      $location: ng.ILocationService,
-      $timeout: ng.ITimeoutService,
-      workspace: Jmx.Workspace,
-      jolokia: Jolokia.IJolokia) => {
+  _module.controller("Camel.TypeConverterController", ($scope, $location: ng.ILocationService,
+    $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia,
+    treeService: Jmx.TreeService) => {
+    'ngInject';
 
     $scope.data = [];
     $scope.selectedMBean = null;
@@ -109,26 +107,26 @@ namespace Camel {
 
     function loadConverters() {
       console.log("Loading TypeConverter data...");
-      var mbean = getSelectionCamelTypeConverter(workspace);
-      if (mbean) {
-        // grab attributes in real time
-        var query = {
-          type: "read",
-          mbean: mbean,
-          attribute: ["AttemptCounter", "FailedCounter", "HitCounter", "MissCounter", "NumberOfTypeConverters", "StatisticsEnabled"]
-        };
-
-        jolokia.request(query, Core.onSuccess(onAttributes));
-
-        Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onAttributes, query));
-
-        // and list of converters
-        jolokia.request({type: 'exec', mbean: mbean, operation: 'listTypeConverters'}, Core.onSuccess(onConverters));
-      }
+      return treeService.findMBeanWithProperties('org.apache.camel', {type: 'services', name: '*TypeConverter'})
+        .then(mbean => {
+          // grab attributes in real time
+          var query = {
+            type: "read",
+            mbean: mbean.objectName,
+            attribute: ["AttemptCounter", "FailedCounter", "HitCounter", "MissCounter", "NumberOfTypeConverters", "StatisticsEnabled"]
+          };
+  
+          jolokia.request(query, Core.onSuccess(onAttributes));
+  
+          Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onAttributes, query));
+  
+          // and list of converters
+          jolokia.request({type: 'exec', mbean: mbean.objectName, operation: 'listTypeConverters'}, Core.onSuccess(onConverters));
+        });
     }
 
     // load converters
     loadConverters();
-  }]);
+  });
 
 }

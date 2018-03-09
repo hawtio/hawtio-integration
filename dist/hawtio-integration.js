@@ -17510,17 +17510,17 @@ var Camel;
 var Camel;
 (function (Camel) {
     var EndpointsStatisticsService = /** @class */ (function () {
-        EndpointsStatisticsService.$inject = ["$q", "jolokiaService", "workspace"];
-        function EndpointsStatisticsService($q, jolokiaService, workspace) {
+        EndpointsStatisticsService.$inject = ["jolokiaService", "treeService"];
+        function EndpointsStatisticsService(jolokiaService, treeService) {
             'ngInject';
-            this.$q = $q;
             this.jolokiaService = jolokiaService;
-            this.workspace = workspace;
+            this.treeService = treeService;
         }
         EndpointsStatisticsService.prototype.getStatistics = function () {
-            var mbean = Camel.getSelectionCamelEndpointRuntimeRegistry(this.workspace);
-            return this.jolokiaService.execute(mbean, 'endpointStatistics')
-                .then(function (response) { return _.values(response); });
+            var _this = this;
+            return this.treeService.findMBeanWithProperties('org.apache.camel', { type: 'services', name: 'DefaultRuntimeEndpointRegistry' })
+                .then(function (mbean) { return _this.jolokiaService.execute(mbean.objectName, 'endpointStatistics')
+                .then(function (response) { return _.values(response); }); });
         };
         return EndpointsStatisticsService;
     }());
@@ -17637,7 +17637,7 @@ var Camel;
         EndpointsService.prototype.getEndpoints = function () {
             if (this.workspace.selection && this.workspace.selection.children && this.workspace.selection.children.length > 0) {
                 var mbeans_1 = this.workspace.selection.children.map(function (node) { return node.objectName; });
-                return this.jolokiaService.readMany(mbeans_1)
+                return this.jolokiaService.getMBeans(mbeans_1)
                     .then(function (objects) { return objects.map(function (object, i) { return new Camel.Endpoint(object.EndpointUri, object.State, mbeans_1[i]); }); });
             }
             else {
@@ -21046,110 +21046,111 @@ var Camel;
 /// <reference path="camelPlugin.ts"/>
 var Camel;
 (function (Camel) {
-    Camel._module.controller("Camel.TypeConverterController", ["$scope", "$location", "$timeout", "workspace", "jolokia", function ($scope, $location, $timeout, workspace, jolokia) {
-            $scope.data = [];
-            $scope.selectedMBean = null;
-            $scope.enableTypeConvertersStats = false;
-            $scope.disableTypeConvertersStats = false;
-            $scope.defaultTimeout = 5000;
-            $scope.mbeanAttributes = {};
-            var columnDefs = [
-                {
-                    field: 'from',
-                    displayName: 'From',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                },
-                {
-                    field: 'to',
-                    displayName: 'To',
-                    cellFilter: null,
-                    width: "*",
-                    resizable: true
-                }
-            ];
-            $scope.gridOptions = {
-                data: 'data',
-                displayFooter: true,
-                displaySelectionCheckbox: false,
-                canSelectRows: false,
-                enableSorting: true,
-                columnDefs: columnDefs,
-                selectedItems: [],
-                filterOptions: {
-                    filterText: ''
-                },
-                primaryKeyFn: function (entity) { return entity.from + '/' + entity.to; }
-            };
-            function onAttributes(response) {
-                var obj = response.value;
-                if (obj) {
-                    $scope.mbeanAttributes = obj;
-                    // ensure web page is updated
-                    Core.$apply($scope);
-                }
+    Camel._module.controller("Camel.TypeConverterController", ["$scope", "$location", "$timeout", "workspace", "jolokia", "treeService", function ($scope, $location, $timeout, workspace, jolokia, treeService) {
+        'ngInject';
+        $scope.data = [];
+        $scope.selectedMBean = null;
+        $scope.enableTypeConvertersStats = false;
+        $scope.disableTypeConvertersStats = false;
+        $scope.defaultTimeout = 5000;
+        $scope.mbeanAttributes = {};
+        var columnDefs = [
+            {
+                field: 'from',
+                displayName: 'From',
+                cellFilter: null,
+                width: "*",
+                resizable: true
+            },
+            {
+                field: 'to',
+                displayName: 'To',
+                cellFilter: null,
+                width: "*",
+                resizable: true
             }
-            function onConverters(response) {
-                var obj = response.value;
-                if (obj) {
-                    // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
-                    var arr = [];
-                    for (var key in obj) {
-                        var values = obj[key];
-                        for (var v in values) {
-                            arr.push({ from: key, to: v });
-                        }
+        ];
+        $scope.gridOptions = {
+            data: 'data',
+            displayFooter: true,
+            displaySelectionCheckbox: false,
+            canSelectRows: false,
+            enableSorting: true,
+            columnDefs: columnDefs,
+            selectedItems: [],
+            filterOptions: {
+                filterText: ''
+            },
+            primaryKeyFn: function (entity) { return entity.from + '/' + entity.to; }
+        };
+        function onAttributes(response) {
+            var obj = response.value;
+            if (obj) {
+                $scope.mbeanAttributes = obj;
+                // ensure web page is updated
+                Core.$apply($scope);
+            }
+        }
+        function onConverters(response) {
+            var obj = response.value;
+            if (obj) {
+                // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
+                var arr = [];
+                for (var key in obj) {
+                    var values = obj[key];
+                    for (var v in values) {
+                        arr.push({ from: key, to: v });
                     }
-                    arr = _.sortBy(arr, "from");
-                    $scope.data = arr;
-                    // okay we have the data then set the selected mbean which allows UI to display data
-                    $scope.selectedMBean = response.request.mbean;
-                    // ensure web page is updated
-                    Core.$apply($scope);
                 }
+                arr = _.sortBy(arr, "from");
+                $scope.data = arr;
+                // okay we have the data then set the selected mbean which allows UI to display data
+                $scope.selectedMBean = response.request.mbean;
+                // ensure web page is updated
+                Core.$apply($scope);
             }
-            $scope.renderIcon = function (state) {
-                return Camel.iconClass(state);
-            };
-            $scope.disableStatistics = function () {
-                $scope.disableTypeConvertersStats = true;
-                if ($scope.selectedMBean) {
-                    jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", false);
-                }
-                $timeout(function () { $scope.disableTypeConvertersStats = false; }, $scope.defaultTimeout);
-            };
-            $scope.enableStatistics = function () {
-                $scope.enableTypeConvertersStats = true;
-                if ($scope.selectedMBean) {
-                    jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", true);
-                }
-                $timeout(function () { $scope.enableTypeConvertersStats = false; }, $scope.defaultTimeout);
-            };
-            $scope.resetStatistics = function () {
-                if ($scope.selectedMBean) {
-                    jolokia.request({ type: 'exec', mbean: $scope.selectedMBean, operation: 'resetTypeConversionCounters' }, Core.onSuccess(null, { silent: true }));
-                }
-            };
-            function loadConverters() {
-                console.log("Loading TypeConverter data...");
-                var mbean = Camel.getSelectionCamelTypeConverter(workspace);
-                if (mbean) {
-                    // grab attributes in real time
-                    var query = {
-                        type: "read",
-                        mbean: mbean,
-                        attribute: ["AttemptCounter", "FailedCounter", "HitCounter", "MissCounter", "NumberOfTypeConverters", "StatisticsEnabled"]
-                    };
-                    jolokia.request(query, Core.onSuccess(onAttributes));
-                    Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onAttributes, query));
-                    // and list of converters
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'listTypeConverters' }, Core.onSuccess(onConverters));
-                }
+        }
+        $scope.renderIcon = function (state) {
+            return Camel.iconClass(state);
+        };
+        $scope.disableStatistics = function () {
+            $scope.disableTypeConvertersStats = true;
+            if ($scope.selectedMBean) {
+                jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", false);
             }
-            // load converters
-            loadConverters();
-        }]);
+            $timeout(function () { $scope.disableTypeConvertersStats = false; }, $scope.defaultTimeout);
+        };
+        $scope.enableStatistics = function () {
+            $scope.enableTypeConvertersStats = true;
+            if ($scope.selectedMBean) {
+                jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", true);
+            }
+            $timeout(function () { $scope.enableTypeConvertersStats = false; }, $scope.defaultTimeout);
+        };
+        $scope.resetStatistics = function () {
+            if ($scope.selectedMBean) {
+                jolokia.request({ type: 'exec', mbean: $scope.selectedMBean, operation: 'resetTypeConversionCounters' }, Core.onSuccess(null, { silent: true }));
+            }
+        };
+        function loadConverters() {
+            console.log("Loading TypeConverter data...");
+            return treeService.findMBeanWithProperties('org.apache.camel', { type: 'services', name: '*TypeConverter' })
+                .then(function (mbean) {
+                // grab attributes in real time
+                var query = {
+                    type: "read",
+                    mbean: mbean.objectName,
+                    attribute: ["AttemptCounter", "FailedCounter", "HitCounter", "MissCounter", "NumberOfTypeConverters", "StatisticsEnabled"]
+                };
+                jolokia.request(query, Core.onSuccess(onAttributes));
+                Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onAttributes, query));
+                // and list of converters
+                jolokia.request({ type: 'exec', mbean: mbean.objectName, operation: 'listTypeConverters' }, Core.onSuccess(onConverters));
+            });
+        }
+        // load converters
+        loadConverters();
+    }]);
 })(Camel || (Camel = {}));
 /// <reference path="../camelPlugin.ts"/>
 var Camel;
