@@ -761,6 +761,59 @@ declare namespace Camel {
     const endpointsModule: string;
 }
 declare namespace Camel {
+    const exchangesComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    class ExchangesService {
+        private jolokiaService;
+        private treeService;
+        private workspace;
+        constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService, workspace: Jmx.Workspace);
+        getInflightExchanges(): ng.IPromise<any[]>;
+        getBlockedExchanges(): ng.IPromise<any[]>;
+        private getExchanges(serviceName);
+        unblockExchange(exchange: any): angular.IPromise<any>;
+    }
+}
+declare namespace Camel {
+    class InflightExchangesController {
+        private $timeout;
+        private exchangesService;
+        readonly reloadDelay: number;
+        exchanges: any[];
+        promise: ng.IPromise<any>;
+        constructor($timeout: ng.ITimeoutService, exchangesService: ExchangesService);
+        $onInit(): void;
+        $onDestroy(): void;
+        loadDataPeriodically(): void;
+        cancelTimer(): void;
+    }
+    const inflightExchangesComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    class BlockedExchangesController {
+        private $timeout;
+        private $uibModal;
+        private exchangesService;
+        readonly reloadDelay: number;
+        exchanges: any[];
+        promise: ng.IPromise<any>;
+        constructor($timeout: ng.ITimeoutService, $uibModal: any, exchangesService: ExchangesService);
+        $onInit(): void;
+        $onDestroy(): void;
+        loadDataPeriodically(): void;
+        cancelTimer(): void;
+        unblock(exchange: any): void;
+    }
+    const blockedExchangesComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const confirmUnblockExchangeComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const exchangesModule: string;
+}
+declare namespace Camel {
     class Route {
         name: string;
         state: string;
@@ -1334,8 +1387,6 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Camel {
-}
-declare namespace Camel {
     class Property {
         name: string;
         value: string;
@@ -1879,13 +1930,13 @@ declare namespace SpringBoot {
     class HealthController {
         private $timeout;
         private healthService;
+        readonly reloadDelay: number;
         health: Health;
         promise: ng.IPromise<any>;
         constructor($timeout: ng.ITimeoutService, healthService: HealthService);
         $onInit(): void;
         $onDestroy(): void;
-        loadData(): void;
-        setTimerToReloadData(): void;
+        loadDataPeriodically(): void;
         cancelTimer(): void;
         getStatusIcon(): "pficon-error-circle-o" | "pficon-ok" | "pficon-info";
         getStatusClass(): "alert-success" | "alert-danger" | "alert-info";

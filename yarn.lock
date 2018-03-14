@@ -25,7 +25,7 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@3.2.17", "@hawtio/core@~3.2.0":
+"@hawtio/core@3.2.17", "@hawtio/core@3.2.20", "@hawtio/core@~3.2.0":
   version "3.2.20"
   resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.20.tgz#bf741eecc70e67c0f6c2f1f8f00fe8a59bbb9fd8"
   dependencies:

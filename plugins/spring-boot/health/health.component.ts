@@ -4,7 +4,7 @@
 namespace SpringBoot {
 
   export class HealthController {
-
+    readonly reloadDelay = 20000;
     health: Health;
     promise: ng.IPromise<any>;
 
@@ -13,29 +13,19 @@ namespace SpringBoot {
     }
 
     $onInit() {
-      this.loadData();
-      this.setTimerToReloadData();
+      this.loadDataPeriodically();
     }
 
     $onDestroy() {
       this.cancelTimer();
     }
 
-    loadData(): void {
+    loadDataPeriodically() {
       this.healthService.getHealth()
-        .then(health => this.health = health);
+        .then(health => this.health = health)
+        .then(() => this.promise = this.$timeout(() => this.loadDataPeriodically(), this.reloadDelay));
     }
-
-    setTimerToReloadData() {
-      this.promise = this.$timeout(() => {
-        this.healthService.getHealth()
-          .then(health => {
-            this.health = health;
-            this.setTimerToReloadData();
-          });
-      }, 20000);
-    }
-
+    
     cancelTimer() {
       this.$timeout.cancel(this.promise);
     }

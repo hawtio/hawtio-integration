@@ -7,7 +7,7 @@ namespace Camel {
     }
 
     getStatistics(): ng.IPromise<any[]> {
-      return this.treeService.findMBeanWithProperties('org.apache.camel', {type: 'services', name: 'DefaultRuntimeEndpointRegistry'})
+      return this.treeService.findMBeanWithProperties('org.apache.camel', {type: 'services', name: 'DefaultRuntimeEndpointRegistry*'})
         .then(mbean => this.jolokiaService.execute(mbean.objectName, 'endpointStatistics')
           .then(response => _.values(response))
         );

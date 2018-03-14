@@ -346,22 +346,6 @@ caption {
   width: 60px;
 }
 
-.camel-inflight-exchanges-table th:nth-child(1) {
-  width: 40%;
-}
-.camel-inflight-exchanges-table th:nth-child(2) {
-  width: auto;
-}
-.camel-inflight-exchanges-table th:nth-child(3) {
-  width: auto;
-}
-.camel-inflight-exchanges-table th:nth-child(4) {
-  width: 80px;
-}
-.camel-inflight-exchanges-table th:nth-child(5) {
-  width: 80px;
-}
-
 context-actions,
 route-actions {
   float: right;
@@ -813,6 +797,14 @@ div.camel-properties {
   border: none;
 }
 
+.spring-boot-loggers-list-group li {
+  display: flex;
+  word-break: break-all;
+}
+.spring-boot-loggers-list-group li select {
+  margin-right: 30px;
+}
+
 .spring-boot-health-main {
   margin-bottom: 20px;
 }
@@ -828,14 +820,6 @@ div.camel-properties {
 .spring-boot-health-main .container-cards-pf {
   padding-top: 20px;
   padding-bottom: 20px;
-}
-
-.spring-boot-loggers-list-group li {
-  display: flex;
-  word-break: break-all;
-}
-.spring-boot-loggers-list-group li select {
-  margin-right: 30px;
 }
 
 div[ng-view],
