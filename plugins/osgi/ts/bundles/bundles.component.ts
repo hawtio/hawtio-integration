@@ -21,7 +21,7 @@ namespace Osgi {
       }
     };
 
-    private startAction = {
+    private readonly startAction = {
       name: 'Start',
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
@@ -35,7 +35,7 @@ namespace Osgi {
       isDisabled: true
     }
 
-    private stopAction = {
+    private readonly stopAction = {
       name: 'Stop',
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
@@ -49,7 +49,7 @@ namespace Osgi {
       isDisabled: true
     }
 
-    private refreshAction = {
+    private readonly refreshAction = {
       name: 'Refresh',
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
@@ -63,7 +63,7 @@ namespace Osgi {
       isDisabled: true
     }
 
-    private updateAction = {
+    private readonly updateAction = {
       name: 'Update',
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
@@ -77,7 +77,7 @@ namespace Osgi {
       isDisabled: true
     }
 
-    private uninstallAction = {
+    private readonly uninstallAction = {
       name: 'Uninstall',
       actionFn: action => {
         let selectedBundles = this.getSelectedBundles();
@@ -91,7 +91,13 @@ namespace Osgi {
       isDisabled: true
     }
 
-    private toolbarConfig = {
+    private readonly tableConfig = {
+      selectionMatchProp: 'id',
+      showCheckboxes: true,
+      onCheckBoxChange: item => this.enableDisableActions()
+    };
+
+    private readonly toolbarConfig = {
       filterConfig: {
         fields: [
           {
@@ -143,12 +149,7 @@ namespace Osgi {
       isTableView: true
     };
 
-    private tableConfig = {
-      selectionMatchProp: 'id',
-      onCheckBoxChange: item => this.enableDisableActions()
-    };
-
-    private tableColumns = [
+    private readonly tableColumns = [
       { header: 'ID', itemField: 'id', templateFn: value => `<a href="osgi/bundle/${value}">${value}</a>` },
       { header: 'State', itemField: 'state' },
       { header: 'Name', itemField: 'name' },
@@ -200,6 +201,12 @@ namespace Osgi {
         actions.push(this.uninstallAction);
       }
       log.debug("RBAC - Rendered bundles actions:", actions);
+
+      if (_.isEmpty(actions)) {
+        log.debug("RBAC - Disable checkboxes");
+        this.tableConfig.showCheckboxes = false;
+      }
+
       return actions;
     }
 
