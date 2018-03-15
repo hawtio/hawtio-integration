@@ -13,9 +13,13 @@ namespace Camel {
     getContexts(): ng.IPromise<Context[]> {
       return this.treeService.getSelectedMBean()
         .then((nodeSelection: Jmx.NodeSelection) => {
-          const mbeanNames = nodeSelection.children.filter(node => node.objectName).map(node => node.objectName);
-          return this.jolokiaService.getMBeans(mbeanNames)
-            .then(mbeans => mbeans.map((mbean, i) => new Context(mbean.CamelId, mbean.State, mbeanNames[i])));
+          if (nodeSelection.children) {
+            const mbeanNames = nodeSelection.children.filter(node => node.objectName).map(node => node.objectName);
+            return this.jolokiaService.getMBeans(mbeanNames)
+              .then(mbeans => mbeans.map((mbean, i) => new Context(mbean.CamelId, mbean.State, mbeanNames[i])));
+          } else {
+            return [];
+          }
         });
     }
     

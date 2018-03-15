@@ -21,11 +21,11 @@ namespace Camel {
       this.$scope.$on('jmxTreeUpdated', () => this.populateTree());
       this.populateTree();
     }
-
+    
     treeFetched(): boolean {
       return this.workspace.treeFetched;
     }
-
+    
     private updateSelectionFromURL(): void {
       Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $(treeElementId), (first: Jmx.Folder) => {
         // use function to auto select first Camel context routes if there is only one Camel context
@@ -42,6 +42,7 @@ namespace Camel {
         }
         return null;
       }, true);
+      this.workspace.broadcastSelectionNode();
     }
 
     private populateTree(): void {
