@@ -23883,6 +23883,11 @@ var Osgi;
                 },
                 isDisabled: true
             };
+            this.tableConfig = {
+                selectionMatchProp: 'id',
+                showCheckboxes: true,
+                onCheckBoxChange: function (item) { return _this.enableDisableActions(); }
+            };
             this.toolbarConfig = {
                 filterConfig: {
                     fields: [
@@ -23934,10 +23939,6 @@ var Osgi;
                 },
                 isTableView: true
             };
-            this.tableConfig = {
-                selectionMatchProp: 'id',
-                onCheckBoxChange: function (item) { return _this.enableDisableActions(); }
-            };
             this.tableColumns = [
                 { header: 'ID', itemField: 'id', templateFn: function (value) { return "<a href=\"osgi/bundle/" + value + "\">" + value + "</a>"; } },
                 { header: 'State', itemField: 'state' },
@@ -23981,6 +23982,10 @@ var Osgi;
                 actions.push(this.uninstallAction);
             }
             Osgi.log.debug("RBAC - Rendered bundles actions:", actions);
+            if (_.isEmpty(actions)) {
+                Osgi.log.debug("RBAC - Disable checkboxes");
+                this.tableConfig.showCheckboxes = false;
+            }
             return actions;
         };
         BundlesController.prototype.applyFilters = function (filters) {

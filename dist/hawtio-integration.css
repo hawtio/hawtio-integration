@@ -797,14 +797,6 @@ div.camel-properties {
   border: none;
 }
 
-.spring-boot-loggers-list-group li {
-  display: flex;
-  word-break: break-all;
-}
-.spring-boot-loggers-list-group li select {
-  margin-right: 30px;
-}
-
 .spring-boot-health-main {
   margin-bottom: 20px;
 }
@@ -820,6 +812,14 @@ div.camel-properties {
 .spring-boot-health-main .container-cards-pf {
   padding-top: 20px;
   padding-bottom: 20px;
+}
+
+.spring-boot-loggers-list-group li {
+  display: flex;
+  word-break: break-all;
+}
+.spring-boot-loggers-list-group li select {
+  margin-right: 30px;
 }
 
 div[ng-view],
