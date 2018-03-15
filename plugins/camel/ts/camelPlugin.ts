@@ -36,7 +36,6 @@ namespace Camel {
             .when('/camel/routeMetrics', {templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false})
             .when('/camel/exchanges', {template: '<exchanges></exchanges>'})
             .when('/camel/sendMessage', {templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false})
-            .when('/camel/source', {templateUrl: 'plugins/camel/html/source.html'})
             .when('/camel/traceRoute', {templateUrl: 'plugins/camel/html/traceRoute.html'})
             .when('/camel/debugRoute', {templateUrl: 'plugins/camel/html/debug.html'})
             .when('/camel/profileRoute', {templateUrl: 'plugins/camel/html/profileRoute.html'})
@@ -91,7 +90,7 @@ namespace Camel {
       return workspace.treeContainsDomainAndProperties(jmxDomain);
     });
     preferencesRegistry.addTab('Camel', 'plugins/camel/html/preferences.html', () => {
-      return workspace.treeContainsDomainAndProperties(jmxDomain); 
+      return workspace.treeContainsDomainAndProperties(jmxDomain);
     });
 
     // register default attribute views

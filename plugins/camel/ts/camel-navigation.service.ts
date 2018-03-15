@@ -61,10 +61,6 @@ namespace Camel {
         tabs.push(new Nav.HawtioTab('Route Diagram', '/camel/routeDiagram'));
       }
 
-      if (!isEndpointsFolder && !isEndpoint && (isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
-        tabs.push(new Nav.HawtioTab('Source', '/camel/source'));
-      }
-
       if (isRouteNode(this.workspace)) {
         tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesRoute'));
       }

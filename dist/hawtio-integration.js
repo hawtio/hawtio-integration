@@ -18380,7 +18380,6 @@ var Camel;
                 .when('/camel/routeMetrics', { templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false })
                 .when('/camel/exchanges', { template: '<exchanges></exchanges>' })
                 .when('/camel/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false })
-                .when('/camel/source', { templateUrl: 'plugins/camel/html/source.html' })
                 .when('/camel/traceRoute', { templateUrl: 'plugins/camel/html/traceRoute.html' })
                 .when('/camel/debugRoute', { templateUrl: 'plugins/camel/html/debug.html' })
                 .when('/camel/profileRoute', { templateUrl: 'plugins/camel/html/profileRoute.html' })
@@ -18877,9 +18876,6 @@ var Camel;
             }
             if ((isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
                 tabs.push(new Nav.HawtioTab('Route Diagram', '/camel/routeDiagram'));
-            }
-            if (!isEndpointsFolder && !isEndpoint && (isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
-                tabs.push(new Nav.HawtioTab('Source', '/camel/source'));
             }
             if (Camel.isRouteNode(this.workspace)) {
                 tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesRoute'));
