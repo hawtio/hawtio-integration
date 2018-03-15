@@ -184,7 +184,7 @@ namespace Osgi {
       $scope.classLoadingAlert = <Alert>{
         type: 'danger',
         icon: 'pficon-error-circle-o',
-        message: `<strong>Problem invoking hawtio.OSGiTools MBean:</strong> ${response.error}`
+        message: `<strong>Problem invoking hawtio.OSGiTools MBean:</strong> ${response}`
       };
     }
 
