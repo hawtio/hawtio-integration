@@ -825,24 +825,24 @@ declare namespace Camel {
 }
 declare namespace Camel {
     class RoutesService {
-        private $q;
-        private jolokia;
-        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia);
-        getRoute(mbean: string): ng.IPromise<Route>;
-        getRoutes(mbeans: string[]): ng.IPromise<Route[]>;
-        startRoute(route: Route): ng.IPromise<String>;
-        startRoutes(routes: Route[]): ng.IPromise<String>;
-        stopRoute(route: Route): ng.IPromise<String>;
-        stopRoutes(routes: Route[]): ng.IPromise<String>;
-        removeRoute(route: Route): ng.IPromise<String>;
-        removeRoutes(routes: Route[]): ng.IPromise<String>;
-        executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<String>;
+        private jolokiaService;
+        constructor(jolokiaService: JVM.JolokiaService);
+        getRoute(objectName: string): ng.IPromise<Route>;
+        getRoutes(objectNames: string[]): ng.IPromise<Route[]>;
+        startRoute(route: Route): ng.IPromise<any>;
+        startRoutes(routes: Route[]): ng.IPromise<any>;
+        stopRoute(route: Route): ng.IPromise<any>;
+        stopRoutes(routes: Route[]): ng.IPromise<any>;
+        removeRoute(route: Route): ng.IPromise<any>;
+        removeRoutes(routes: Route[]): ng.IPromise<any>;
+        executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<any>;
     }
 }
 declare namespace Camel {
     class RoutesController {
         private $uibModal;
         private workspace;
+        private treeService;
         private routesService;
         private startAction;
         private stopAction;
@@ -871,7 +871,7 @@ declare namespace Camel {
             itemField: string;
         }[];
         routes: Route[];
-        constructor($uibModal: any, workspace: Jmx.Workspace, routesService: RoutesService);
+        constructor($uibModal: any, workspace: Jmx.Workspace, treeService: Jmx.TreeService, routesService: RoutesService);
         $onInit(): void;
         private getSelectedRoutes();
         private enableDisableActions();

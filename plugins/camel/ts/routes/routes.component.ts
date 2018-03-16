@@ -10,8 +10,7 @@ namespace Camel {
       actionFn: action => {
         let selectedRoutes = this.getSelectedRoutes();
         this.routesService.startRoutes(selectedRoutes)
-          .then(response => this.updateRoutes())
-          .catch(error => log.error(error));
+          .then(response => this.updateRoutes());
       },
       isDisabled: true
     };
@@ -20,8 +19,7 @@ namespace Camel {
       actionFn: action => {
         let selectedRoutes = this.getSelectedRoutes();
         this.routesService.stopRoutes(selectedRoutes)
-          .then(response => this.updateRoutes())
-          .catch(error => log.error(error));
+          .then(response => this.updateRoutes());
       },
       isDisabled: true
     };
@@ -34,8 +32,7 @@ namespace Camel {
         })
         .result.then(() => {
           this.routesService.removeRoutes(selectedRoutes)
-            .then(response => this.removeSelectedRoutes())
-            .catch(error => log.error(error));
+            .then(response => this.removeSelectedRoutes());
         });
       },
       isDisabled: true
@@ -66,7 +63,8 @@ namespace Camel {
 
     routes: Route[];
 
-    constructor(private $uibModal, private workspace: Jmx.Workspace, private routesService: RoutesService) {
+    constructor(private $uibModal, private workspace: Jmx.Workspace, private treeService: Jmx.TreeService,
+      private routesService: RoutesService) {
       'ngInject';
     }
 
@@ -86,12 +84,15 @@ namespace Camel {
     }
 
     private loadRoutes() {
-      if (this.workspace.selection && this.workspace.selection.children) {
-        let children = this.workspace.selection.children.filter(node => {return node.objectName != null})
-        let mbeans = _.map(children, node => node.objectName);
-        this.routesService.getRoutes(mbeans)
-          .then(routes => this.routes = routes);
-      }
+      this.treeService.getSelectedMBean()
+        .then(mbean => {
+          if (mbean.children) {
+            let children = mbean.children.filter(node => {return node.objectName != null})
+            let mbeanNames = _.map(children, node => node.objectName);
+            this.routesService.getRoutes(mbeanNames)
+              .then(routes => this.routes = routes);
+          }
+        });
     }
 
     private updateRoutes() {

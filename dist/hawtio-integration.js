@@ -17902,62 +17902,18 @@ var Camel;
 var Camel;
 (function (Camel) {
     var RoutesService = /** @class */ (function () {
-        RoutesService.$inject = ["$q", "jolokia"];
-        function RoutesService($q, jolokia) {
+        RoutesService.$inject = ["jolokiaService"];
+        function RoutesService(jolokiaService) {
             'ngInject';
-            this.$q = $q;
-            this.jolokia = jolokia;
+            this.jolokiaService = jolokiaService;
         }
-        RoutesService.prototype.getRoute = function (mbean) {
-            var _this = this;
-            var request = {
-                type: "read",
-                mbean: mbean,
-                ignoreErrors: true
-            };
-            return this.$q(function (resolve, reject) {
-                _this.jolokia.request(request, {
-                    success: function (response) {
-                        var object = response.value;
-                        var route = new Camel.Route(object.RouteId, object.State, response.request.mbean);
-                        resolve(route);
-                    }
-                }, {
-                    error: function (response) {
-                        Camel.log.error('RoutesService.getRoute() failed: ' + response.error);
-                        reject(response.error);
-                    }
-                });
-            });
+        RoutesService.prototype.getRoute = function (objectName) {
+            return this.jolokiaService.getMBean(objectName)
+                .then(function (mbean) { return new Camel.Route(mbean.RouteId, mbean.State, objectName); });
         };
-        RoutesService.prototype.getRoutes = function (mbeans) {
-            var _this = this;
-            if (mbeans.length === 0) {
-                return this.$q.resolve([]);
-            }
-            var requests = mbeans.map(function (mbean) { return ({
-                type: "read",
-                mbean: mbean,
-                ignoreErrors: true
-            }); });
-            return this.$q(function (resolve, reject) {
-                var routes = [];
-                _this.jolokia.request(requests, {
-                    success: function (response) {
-                        var object = response.value;
-                        var route = new Camel.Route(object.RouteId, object.State, mbeans[routes.length]);
-                        routes.push(route);
-                        if (routes.length === requests.length) {
-                            resolve(routes);
-                        }
-                    }
-                }, {
-                    error: function (response) {
-                        Camel.log.error('RoutesService.getRoutes() failed: ' + response.error);
-                        reject(response.error);
-                    }
-                });
-            });
+        RoutesService.prototype.getRoutes = function (objectNames) {
+            return this.jolokiaService.getMBeans(objectNames)
+                .then(function (mbeans) { return mbeans.map(function (mbean, i) { return new Camel.Route(mbean.RouteId, mbean.State, objectNames[i]); }); });
         };
         RoutesService.prototype.startRoute = function (route) {
             return this.startRoutes([route]);
@@ -17978,31 +17934,8 @@ var Camel;
             return this.executeOperationOnRoutes('remove()', routes);
         };
         RoutesService.prototype.executeOperationOnRoutes = function (operation, routes) {
-            var _this = this;
-            if (routes.length === 0) {
-                return this.$q.resolve('success');
-            }
-            var requests = routes.map(function (route) { return ({
-                type: 'exec',
-                operation: operation,
-                mbean: route.mbean
-            }); });
-            return this.$q(function (resolve, reject) {
-                var responseCount = 0;
-                _this.jolokia.request(requests, {
-                    success: function (response) {
-                        responseCount++;
-                        if (responseCount === requests.length) {
-                            resolve('success');
-                        }
-                    }
-                }, {
-                    error: function (response) {
-                        Camel.log.error('RoutesService.executeOperationOnRoutes() failed: ' + response.error);
-                        reject(response.error);
-                    }
-                });
-            });
+            var objectNames = routes.map(function (route) { return route.mbean; });
+            return this.jolokiaService.executeMany(objectNames, operation);
         };
         return RoutesService;
     }());
@@ -18013,20 +17946,20 @@ var Camel;
 var Camel;
 (function (Camel) {
     var RoutesController = /** @class */ (function () {
-        RoutesController.$inject = ["$uibModal", "workspace", "routesService"];
-        function RoutesController($uibModal, workspace, routesService) {
+        RoutesController.$inject = ["$uibModal", "workspace", "treeService", "routesService"];
+        function RoutesController($uibModal, workspace, treeService, routesService) {
             'ngInject';
             var _this = this;
             this.$uibModal = $uibModal;
             this.workspace = workspace;
+            this.treeService = treeService;
             this.routesService = routesService;
             this.startAction = {
                 name: 'Start',
                 actionFn: function (action) {
                     var selectedRoutes = _this.getSelectedRoutes();
                     _this.routesService.startRoutes(selectedRoutes)
-                        .then(function (response) { return _this.updateRoutes(); })
-                        .catch(function (error) { return Camel.log.error(error); });
+                        .then(function (response) { return _this.updateRoutes(); });
                 },
                 isDisabled: true
             };
@@ -18035,8 +17968,7 @@ var Camel;
                 actionFn: function (action) {
                     var selectedRoutes = _this.getSelectedRoutes();
                     _this.routesService.stopRoutes(selectedRoutes)
-                        .then(function (response) { return _this.updateRoutes(); })
-                        .catch(function (error) { return Camel.log.error(error); });
+                        .then(function (response) { return _this.updateRoutes(); });
                 },
                 isDisabled: true
             };
@@ -18049,8 +17981,7 @@ var Camel;
                     })
                         .result.then(function () {
                         _this.routesService.removeRoutes(selectedRoutes)
-                            .then(function (response) { return _this.removeSelectedRoutes(); })
-                            .catch(function (error) { return Camel.log.error(error); });
+                            .then(function (response) { return _this.removeSelectedRoutes(); });
                     });
                 },
                 isDisabled: true
@@ -18090,12 +18021,15 @@ var Camel;
         };
         RoutesController.prototype.loadRoutes = function () {
             var _this = this;
-            if (this.workspace.selection && this.workspace.selection.children) {
-                var children = this.workspace.selection.children.filter(function (node) { return node.objectName != null; });
-                var mbeans = _.map(children, function (node) { return node.objectName; });
-                this.routesService.getRoutes(mbeans)
-                    .then(function (routes) { return _this.routes = routes; });
-            }
+            this.treeService.getSelectedMBean()
+                .then(function (mbean) {
+                if (mbean.children) {
+                    var children = mbean.children.filter(function (node) { return node.objectName != null; });
+                    var mbeanNames = _.map(children, function (node) { return node.objectName; });
+                    _this.routesService.getRoutes(mbeanNames)
+                        .then(function (routes) { return _this.routes = routes; });
+                }
+            });
         };
         RoutesController.prototype.updateRoutes = function () {
             var _this = this;

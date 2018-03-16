@@ -4,117 +4,48 @@ namespace Camel {
 
   export class RoutesService {
 
-    constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia) {
+    constructor(private jolokiaService: JVM.JolokiaService) {
       'ngInject';
     }
 
-    getRoute(mbean: string): ng.IPromise<Route> {
-      let request = {
-        type: "read",
-        mbean: mbean,
-        ignoreErrors: true
-      };
-
-      return this.$q((resolve, reject) => {
-        this.jolokia.request(request, {
-          success: response => {
-            let object = response.value;
-            let route = new Route(object.RouteId, object.State, response.request.mbean);
-            resolve(route);
-          }
-        }, {
-          error: response => {
-            log.error('RoutesService.getRoute() failed: ' + response.error);
-            reject(response.error);
-          }
-        });
-      });
+    getRoute(objectName: string): ng.IPromise<Route> {
+      return this.jolokiaService.getMBean(objectName)
+        .then(mbean => new Route(mbean.RouteId, mbean.State, objectName));
     }
 
-    getRoutes(mbeans: string[]): ng.IPromise<Route[]> {
-      if (mbeans.length === 0) {
-        return this.$q.resolve([]);
-      }
-
-      let requests = mbeans.map(mbean => ({
-        type: "read",
-        mbean: mbean,
-        ignoreErrors: true
-      }));
-
-      return this.$q((resolve, reject) => {
-        let routes = [];
-        this.jolokia.request(requests, {
-          success: response => {
-            let object = response.value;
-            let route = new Route(object.RouteId, object.State, mbeans[routes.length]);
-            routes.push(route);
-            if (routes.length === requests.length) {
-              resolve(routes);
-            }
-          }
-        }, {
-          error: response => {
-            log.error('RoutesService.getRoutes() failed: ' + response.error);
-            reject(response.error);
-          }
-        });
-      });
+    getRoutes(objectNames: string[]): ng.IPromise<Route[]> {
+      return this.jolokiaService.getMBeans(objectNames)
+        .then(mbeans => mbeans.map((mbean, i) => new Route(mbean.RouteId, mbean.State, objectNames[i])));
     }
 
-    startRoute(route: Route): ng.IPromise<String> {
+    startRoute(route: Route): ng.IPromise<any> {
       return this.startRoutes([route]);
     }
 
-    startRoutes(routes: Route[]): ng.IPromise<String> {
+    startRoutes(routes: Route[]): ng.IPromise<any> {
       return this.executeOperationOnRoutes('start()', routes);
     }
 
-    stopRoute(route: Route): ng.IPromise<String> {
+    stopRoute(route: Route): ng.IPromise<any> {
       return this.stopRoutes([route]);
     }
 
-    stopRoutes(routes: Route[]): ng.IPromise<String> {
+    stopRoutes(routes: Route[]): ng.IPromise<any> {
       return this.executeOperationOnRoutes('stop()', routes);
     }
 
-    removeRoute(route: Route): ng.IPromise<String> {
+    removeRoute(route: Route): ng.IPromise<any> {
       return this.removeRoutes([route]);
     }
 
-    removeRoutes(routes: Route[]): ng.IPromise<String> {
+    removeRoutes(routes: Route[]): ng.IPromise<any> {
       return this.executeOperationOnRoutes('remove()', routes);
     }
 
-    executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<String> {
-      if (routes.length === 0) {
-        return this.$q.resolve('success');
-      }
-
-      let requests = routes.map(route => ({
-        type: 'exec',
-        operation: operation,
-        mbean: route.mbean
-      }));
-      
-      return this.$q((resolve, reject) => {
-        let responseCount = 0;
-        this.jolokia.request(requests, {
-          success: response => {
-            responseCount++;
-            if (responseCount === requests.length) {
-              resolve('success');
-            }
-          }
-        }, {
-          error: response => {
-            log.error('RoutesService.executeOperationOnRoutes() failed: ' + response.error);
-            reject(response.error);
-          }
-        });
-      });
+    executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<any> {
+      const objectNames = routes.map(route => route.mbean);
+      return this.jolokiaService.executeMany(objectNames, operation);
     }
-
   }
 
 }
