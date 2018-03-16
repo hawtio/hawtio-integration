@@ -164,6 +164,374 @@ declare namespace ActiveMQ {
 declare namespace ActiveMQ {
 }
 declare namespace Camel {
+    class Context {
+        name: string;
+        state: string;
+        mbeanName: string;
+        selected: boolean;
+        constructor(name: string, state: string, mbeanName: string);
+        isStarted(): boolean;
+        isSuspended(): boolean;
+    }
+}
+declare namespace Camel {
+    class ContextsService {
+        private jolokiaService;
+        private treeService;
+        constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService);
+        getContexts(): ng.IPromise<Context[]>;
+        getContext(mbeanName: string): ng.IPromise<Context>;
+        startContext(context: Context): ng.IPromise<any>;
+        startContexts(contexts: Context[]): ng.IPromise<any[]>;
+        suspendContext(context: Context): ng.IPromise<any>;
+        suspendContexts(contexts: Context[]): ng.IPromise<any[]>;
+        stopContext(context: Context): ng.IPromise<any>;
+        stopContexts(contexts: Context[]): ng.IPromise<any[]>;
+        executeOperationOnContext(operation: string, context: Context): ng.IPromise<any>;
+        executeOperationOnContexts(operation: string, contexts: Context[]): ng.IPromise<any[]>;
+    }
+}
+declare namespace Camel {
+    class ContextsController {
+        private $uibModal;
+        private workspace;
+        private contextsService;
+        private startAction;
+        private suspendAction;
+        private deleteAction;
+        toolbarConfig: {
+            actionsConfig: {
+                primaryActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+                moreActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+            };
+            isTableView: boolean;
+        };
+        tableConfig: {
+            selectionMatchProp: string;
+            onCheckBoxChange: (item: any) => void;
+        };
+        tableColumns: {
+            header: string;
+            itemField: string;
+        }[];
+        contexts: Context[];
+        constructor($uibModal: any, workspace: Jmx.Workspace, contextsService: ContextsService);
+        $onInit(): void;
+        private getSelectedContexts();
+        private enableDisableActions();
+        private updateContexts();
+        private removeSelectedContexts();
+    }
+    const contextsComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    class ContextActionsController {
+        private $scope;
+        private $uibModal;
+        private $timeout;
+        private workspace;
+        private contextsService;
+        context: Context;
+        unsubscribe: any;
+        constructor($scope: any, $uibModal: any, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, contextsService: ContextsService);
+        $onInit(): void;
+        $onDestroy(): void;
+        isVisible(): boolean;
+        start(): void;
+        suspend(): void;
+        delete(): void;
+    }
+    const contextActionsComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const contextsModule: string;
+}
+declare namespace Camel {
+    class EndpointsStatisticsService {
+        private jolokiaService;
+        private treeService;
+        constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService);
+        getStatistics(): ng.IPromise<any[]>;
+    }
+}
+declare namespace Camel {
+    class EndpointsStatisticsController {
+        private endpointsStatisticsService;
+        allItems: any[];
+        filteredItems: any[];
+        toolbarConfig: {
+            filterConfig: {
+                fields: {
+                    id: string;
+                    title: string;
+                    placeholder: string;
+                    filterType: string;
+                }[];
+                onFilterChange: (filters: any[]) => void;
+                appliedFilters: any[];
+                resultsCount: number;
+            };
+            isTableView: boolean;
+        };
+        tableConfig: {
+            selectionMatchProp: string;
+            showCheckboxes: boolean;
+        };
+        tableDtOptions: {
+            order: (string | number)[][];
+        };
+        tableColumns: {
+            itemField: string;
+            header: string;
+        }[];
+        constructor(endpointsStatisticsService: EndpointsStatisticsService);
+        $onInit(): void;
+    }
+    const endpointsStatisticsComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const endpointsStatisticsModule: string;
+}
+declare namespace Camel {
+    class Endpoint {
+        uri: string;
+        state: string;
+        mbean: string;
+        constructor(uri: string, state: string, mbean: string);
+    }
+}
+declare namespace Camel {
+    class EndpointsService {
+        private $q;
+        private jolokiaService;
+        private workspace;
+        constructor($q: ng.IQService, jolokiaService: JVM.JolokiaService, workspace: Jmx.Workspace);
+        getEndpoints(): ng.IPromise<Endpoint[]>;
+        canCreateEndpoints(): boolean;
+    }
+}
+declare namespace Camel {
+    class EndpointsController {
+        private $location;
+        private endpointsService;
+        private addAction;
+        toolbarConfig: {
+            actionsConfig: {
+                primaryActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+            };
+            isTableView: boolean;
+        };
+        tableConfig: {
+            selectionMatchProp: string;
+            showCheckboxes: boolean;
+        };
+        tableDtOptions: {
+            order: (string | number)[][];
+        };
+        tableColumns: {
+            header: string;
+            itemField: string;
+        }[];
+        endpoints: Endpoint[];
+        constructor($location: ng.ILocationService, endpointsService: EndpointsService);
+        $onInit(): void;
+    }
+    const endpointsComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const endpointsModule: string;
+}
+declare namespace Camel {
+    const exchangesComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    class ExchangesService {
+        private jolokiaService;
+        private treeService;
+        private workspace;
+        constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService, workspace: Jmx.Workspace);
+        getInflightExchanges(): ng.IPromise<any[]>;
+        getBlockedExchanges(): ng.IPromise<any[]>;
+        private getExchanges(serviceName);
+        unblockExchange(exchange: any): angular.IPromise<any>;
+    }
+}
+declare namespace Camel {
+    class InflightExchangesController {
+        private $timeout;
+        private exchangesService;
+        readonly reloadDelay: number;
+        exchanges: any[];
+        promise: ng.IPromise<any>;
+        constructor($timeout: ng.ITimeoutService, exchangesService: ExchangesService);
+        $onInit(): void;
+        $onDestroy(): void;
+        loadDataPeriodically(): void;
+        cancelTimer(): void;
+    }
+    const inflightExchangesComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    class BlockedExchangesController {
+        private $timeout;
+        private $uibModal;
+        private exchangesService;
+        readonly reloadDelay: number;
+        exchanges: any[];
+        promise: ng.IPromise<any>;
+        constructor($timeout: ng.ITimeoutService, $uibModal: any, exchangesService: ExchangesService);
+        $onInit(): void;
+        $onDestroy(): void;
+        loadDataPeriodically(): void;
+        cancelTimer(): void;
+        unblock(exchange: any): void;
+    }
+    const blockedExchangesComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const confirmUnblockExchangeComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const exchangesModule: string;
+}
+declare namespace Camel {
+    class Route {
+        name: string;
+        state: string;
+        mbean: string;
+        selected: boolean;
+        constructor(name: string, state: string, mbean: string);
+        isStarted(): boolean;
+        isStopped(): boolean;
+    }
+}
+declare namespace Camel {
+    class RoutesService {
+        private jolokiaService;
+        constructor(jolokiaService: JVM.JolokiaService);
+        getRoute(objectName: string): ng.IPromise<Route>;
+        getRoutes(objectNames: string[]): ng.IPromise<Route[]>;
+        startRoute(route: Route): ng.IPromise<any>;
+        startRoutes(routes: Route[]): ng.IPromise<any>;
+        stopRoute(route: Route): ng.IPromise<any>;
+        stopRoutes(routes: Route[]): ng.IPromise<any>;
+        removeRoute(route: Route): ng.IPromise<any>;
+        removeRoutes(routes: Route[]): ng.IPromise<any>;
+        executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<any>;
+    }
+}
+declare namespace Camel {
+    class RoutesController {
+        private $uibModal;
+        private workspace;
+        private treeService;
+        private routesService;
+        private startAction;
+        private stopAction;
+        private deleteAction;
+        toolbarConfig: {
+            actionsConfig: {
+                primaryActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+                moreActions: {
+                    name: string;
+                    actionFn: (action: any) => void;
+                    isDisabled: boolean;
+                }[];
+            };
+            isTableView: boolean;
+        };
+        tableConfig: {
+            selectionMatchProp: string;
+            onCheckBoxChange: (item: any) => void;
+        };
+        tableColumns: {
+            header: string;
+            itemField: string;
+        }[];
+        routes: Route[];
+        constructor($uibModal: any, workspace: Jmx.Workspace, treeService: Jmx.TreeService, routesService: RoutesService);
+        $onInit(): void;
+        private getSelectedRoutes();
+        private enableDisableActions();
+        private loadRoutes();
+        private updateRoutes();
+        private removeSelectedRoutes();
+    }
+    const routesComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    class RouteActionsController {
+        private $scope;
+        private $uibModal;
+        private $timeout;
+        private workspace;
+        private routesService;
+        route: Route;
+        constructor($scope: any, $uibModal: any, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, routesService: RoutesService);
+        isVisible(): boolean;
+        start(): void;
+        stop(): void;
+        delete(): void;
+    }
+    const routeActionsComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const routesModule: string;
+}
+declare namespace Camel {
+    class TreeController {
+        private $scope;
+        private $location;
+        private workspace;
+        private jolokia;
+        private $element;
+        constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, $element: JQuery);
+        $onInit(): void;
+        treeFetched(): boolean;
+        private updateSelectionFromURL();
+        private populateTree();
+        private removeTree();
+    }
+}
+declare namespace Camel {
+    class TreeHeaderController {
+        private $scope;
+        private $element;
+        filter: string;
+        result: any[];
+        constructor($scope: any, $element: JQuery);
+        $onInit(): void;
+        private search(filter);
+        private tree();
+        expandAll(): any;
+        contractAll(): any;
+    }
+}
+declare namespace Camel {
+    const treeHeaderComponent: angular.IComponentOptions;
+    const treeComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const treeModule: string;
+    const treeElementId = "#cameltree";
+}
+declare namespace Camel {
     /**
      * Define the default categories for endpoints and map them to endpoint names
      * @property
@@ -570,372 +938,11 @@ declare namespace Camel {
     function isBrowsableEndpoint(endpoint: Jmx.NodeSelection): boolean;
 }
 declare namespace Camel {
-    class Context {
-        name: string;
-        state: string;
-        mbeanName: string;
-        selected: boolean;
-        constructor(name: string, state: string, mbeanName: string);
-        isStarted(): boolean;
-        isSuspended(): boolean;
-    }
-}
-declare namespace Camel {
-    class ContextsService {
-        private jolokiaService;
+    class CamelTreeService {
         private treeService;
-        constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService);
-        getContexts(): ng.IPromise<Context[]>;
-        getContext(mbeanName: string): ng.IPromise<Context>;
-        startContext(context: Context): ng.IPromise<any>;
-        startContexts(contexts: Context[]): ng.IPromise<any[]>;
-        suspendContext(context: Context): ng.IPromise<any>;
-        suspendContexts(contexts: Context[]): ng.IPromise<any[]>;
-        stopContext(context: Context): ng.IPromise<any>;
-        stopContexts(contexts: Context[]): ng.IPromise<any[]>;
-        executeOperationOnContext(operation: string, context: Context): ng.IPromise<any>;
-        executeOperationOnContexts(operation: string, contexts: Context[]): ng.IPromise<any[]>;
+        constructor(treeService: Jmx.TreeService);
+        getSelectedRouteId(): ng.IPromise<string>;
     }
-}
-declare namespace Camel {
-    class ContextsController {
-        private $uibModal;
-        private workspace;
-        private contextsService;
-        private startAction;
-        private suspendAction;
-        private deleteAction;
-        toolbarConfig: {
-            actionsConfig: {
-                primaryActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                    isDisabled: boolean;
-                }[];
-                moreActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                    isDisabled: boolean;
-                }[];
-            };
-            isTableView: boolean;
-        };
-        tableConfig: {
-            selectionMatchProp: string;
-            onCheckBoxChange: (item: any) => void;
-        };
-        tableColumns: {
-            header: string;
-            itemField: string;
-        }[];
-        contexts: Context[];
-        constructor($uibModal: any, workspace: Jmx.Workspace, contextsService: ContextsService);
-        $onInit(): void;
-        private getSelectedContexts();
-        private enableDisableActions();
-        private updateContexts();
-        private removeSelectedContexts();
-    }
-    const contextsComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    class ContextActionsController {
-        private $scope;
-        private $uibModal;
-        private $timeout;
-        private workspace;
-        private contextsService;
-        context: Context;
-        unsubscribe: any;
-        constructor($scope: any, $uibModal: any, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, contextsService: ContextsService);
-        $onInit(): void;
-        $onDestroy(): void;
-        isVisible(): boolean;
-        start(): void;
-        suspend(): void;
-        delete(): void;
-    }
-    const contextActionsComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    const contextsModule: string;
-}
-declare namespace Camel {
-    class EndpointsStatisticsService {
-        private jolokiaService;
-        private treeService;
-        constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService);
-        getStatistics(): ng.IPromise<any[]>;
-    }
-}
-declare namespace Camel {
-    class EndpointsStatisticsController {
-        private endpointsStatisticsService;
-        allItems: any[];
-        filteredItems: any[];
-        toolbarConfig: {
-            filterConfig: {
-                fields: {
-                    id: string;
-                    title: string;
-                    placeholder: string;
-                    filterType: string;
-                }[];
-                onFilterChange: (filters: any[]) => void;
-                appliedFilters: any[];
-                resultsCount: number;
-            };
-            isTableView: boolean;
-        };
-        tableConfig: {
-            selectionMatchProp: string;
-            showCheckboxes: boolean;
-        };
-        tableDtOptions: {
-            order: (string | number)[][];
-        };
-        tableColumns: {
-            itemField: string;
-            header: string;
-        }[];
-        constructor(endpointsStatisticsService: EndpointsStatisticsService);
-        $onInit(): void;
-    }
-    const endpointsStatisticsComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    const endpointsStatisticsModule: string;
-}
-declare namespace Camel {
-    class Endpoint {
-        uri: string;
-        state: string;
-        mbean: string;
-        constructor(uri: string, state: string, mbean: string);
-    }
-}
-declare namespace Camel {
-    class EndpointsService {
-        private $q;
-        private jolokiaService;
-        private workspace;
-        constructor($q: ng.IQService, jolokiaService: JVM.JolokiaService, workspace: Jmx.Workspace);
-        getEndpoints(): ng.IPromise<Endpoint[]>;
-        canCreateEndpoints(): boolean;
-    }
-}
-declare namespace Camel {
-    class EndpointsController {
-        private $location;
-        private endpointsService;
-        private addAction;
-        toolbarConfig: {
-            actionsConfig: {
-                primaryActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                    isDisabled: boolean;
-                }[];
-            };
-            isTableView: boolean;
-        };
-        tableConfig: {
-            selectionMatchProp: string;
-            showCheckboxes: boolean;
-        };
-        tableDtOptions: {
-            order: (string | number)[][];
-        };
-        tableColumns: {
-            header: string;
-            itemField: string;
-        }[];
-        endpoints: Endpoint[];
-        constructor($location: ng.ILocationService, endpointsService: EndpointsService);
-        $onInit(): void;
-    }
-    const endpointsComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    const endpointsModule: string;
-}
-declare namespace Camel {
-    const exchangesComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    class ExchangesService {
-        private jolokiaService;
-        private treeService;
-        private workspace;
-        constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService, workspace: Jmx.Workspace);
-        getInflightExchanges(): ng.IPromise<any[]>;
-        getBlockedExchanges(): ng.IPromise<any[]>;
-        private getExchanges(serviceName);
-        unblockExchange(exchange: any): angular.IPromise<any>;
-    }
-}
-declare namespace Camel {
-    class InflightExchangesController {
-        private $timeout;
-        private exchangesService;
-        readonly reloadDelay: number;
-        exchanges: any[];
-        promise: ng.IPromise<any>;
-        constructor($timeout: ng.ITimeoutService, exchangesService: ExchangesService);
-        $onInit(): void;
-        $onDestroy(): void;
-        loadDataPeriodically(): void;
-        cancelTimer(): void;
-    }
-    const inflightExchangesComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    class BlockedExchangesController {
-        private $timeout;
-        private $uibModal;
-        private exchangesService;
-        readonly reloadDelay: number;
-        exchanges: any[];
-        promise: ng.IPromise<any>;
-        constructor($timeout: ng.ITimeoutService, $uibModal: any, exchangesService: ExchangesService);
-        $onInit(): void;
-        $onDestroy(): void;
-        loadDataPeriodically(): void;
-        cancelTimer(): void;
-        unblock(exchange: any): void;
-    }
-    const blockedExchangesComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    const confirmUnblockExchangeComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    const exchangesModule: string;
-}
-declare namespace Camel {
-    class Route {
-        name: string;
-        state: string;
-        mbean: string;
-        selected: boolean;
-        constructor(name: string, state: string, mbean: string);
-        isStarted(): boolean;
-        isStopped(): boolean;
-    }
-}
-declare namespace Camel {
-    class RoutesService {
-        private jolokiaService;
-        constructor(jolokiaService: JVM.JolokiaService);
-        getRoute(objectName: string): ng.IPromise<Route>;
-        getRoutes(objectNames: string[]): ng.IPromise<Route[]>;
-        startRoute(route: Route): ng.IPromise<any>;
-        startRoutes(routes: Route[]): ng.IPromise<any>;
-        stopRoute(route: Route): ng.IPromise<any>;
-        stopRoutes(routes: Route[]): ng.IPromise<any>;
-        removeRoute(route: Route): ng.IPromise<any>;
-        removeRoutes(routes: Route[]): ng.IPromise<any>;
-        executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<any>;
-    }
-}
-declare namespace Camel {
-    class RoutesController {
-        private $uibModal;
-        private workspace;
-        private treeService;
-        private routesService;
-        private startAction;
-        private stopAction;
-        private deleteAction;
-        toolbarConfig: {
-            actionsConfig: {
-                primaryActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                    isDisabled: boolean;
-                }[];
-                moreActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                    isDisabled: boolean;
-                }[];
-            };
-            isTableView: boolean;
-        };
-        tableConfig: {
-            selectionMatchProp: string;
-            onCheckBoxChange: (item: any) => void;
-        };
-        tableColumns: {
-            header: string;
-            itemField: string;
-        }[];
-        routes: Route[];
-        constructor($uibModal: any, workspace: Jmx.Workspace, treeService: Jmx.TreeService, routesService: RoutesService);
-        $onInit(): void;
-        private getSelectedRoutes();
-        private enableDisableActions();
-        private loadRoutes();
-        private updateRoutes();
-        private removeSelectedRoutes();
-    }
-    const routesComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    class RouteActionsController {
-        private $scope;
-        private $uibModal;
-        private $timeout;
-        private workspace;
-        private routesService;
-        route: Route;
-        constructor($scope: any, $uibModal: any, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, routesService: RoutesService);
-        isVisible(): boolean;
-        start(): void;
-        stop(): void;
-        delete(): void;
-    }
-    const routeActionsComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    const routesModule: string;
-}
-declare namespace Camel {
-    class TreeController {
-        private $scope;
-        private $location;
-        private workspace;
-        private jolokia;
-        private $element;
-        constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, $element: JQuery);
-        $onInit(): void;
-        treeFetched(): boolean;
-        private updateSelectionFromURL();
-        private populateTree();
-        private removeTree();
-    }
-}
-declare namespace Camel {
-    class TreeHeaderController {
-        private $scope;
-        private $element;
-        filter: string;
-        result: any[];
-        constructor($scope: any, $element: JQuery);
-        $onInit(): void;
-        private search(filter);
-        private tree();
-        expandAll(): any;
-        contractAll(): any;
-    }
-}
-declare namespace Camel {
-    const treeHeaderComponent: angular.IComponentOptions;
-    const treeComponent: angular.IComponentOptions;
-}
-declare namespace Camel {
-    const treeModule: string;
-    const treeElementId = "#cameltree";
 }
 declare namespace Camel {
     const _module: angular.IModule;
@@ -1369,8 +1376,6 @@ declare namespace Camel {
         graph: graphlib.Graph;
     };
     function dagreUpdateGraphData(): void;
-}
-declare namespace Camel {
 }
 declare namespace Camel {
 }

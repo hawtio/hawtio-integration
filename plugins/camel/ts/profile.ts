@@ -1,12 +1,14 @@
 /// <reference path="camelPlugin.ts"/>
+/// <reference path="camel-tree.service.ts"/>
 
 namespace Camel {
 
-  _module.controller("Camel.ProfileRouteController", ["$scope", "$location", "workspace", "jolokia", (
+  _module.controller("Camel.ProfileRouteController", ["$scope", "$location", "workspace", "jolokia", "camelTreeService", (
       $scope,
       $location: ng.ILocationService,
       workspace: Jmx.Workspace,
-      jolokia: Jolokia.IJolokia) => {
+      jolokia: Jolokia.IJolokia,
+      camelTreeService: CamelTreeService) => {
 
     $scope.initDone = false;
     $scope.data = [];
@@ -209,19 +211,21 @@ namespace Camel {
     function loadData() {
       console.log("Loading Camel route profile data...");
 
-      var selectedRouteId = getSelectedRouteId(workspace);
-      var routeMBean = getSelectionRouteMBean(workspace, selectedRouteId);
-
-      // schedule update the profile data, based on the configured interval
-      if (routeMBean) {
-        var query = {
-          type: 'exec',
-          mbean: routeMBean,
-          operation: 'dumpRouteStatsAsXml(boolean,boolean)',
-          arguments: [false, true]
-        };
-        Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onProfile, query));
-      }
+      camelTreeService.getSelectedRouteId()
+        .then(selectedRouteId => {
+          var routeMBean = getSelectionRouteMBean(workspace, selectedRouteId);
+    
+          // schedule update the profile data, based on the configured interval
+          if (routeMBean) {
+            var query = {
+              type: 'exec',
+              mbean: routeMBean,
+              operation: 'dumpRouteStatsAsXml(boolean,boolean)',
+              arguments: [false, true]
+            };
+            Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onProfile, query));
+          }
+        });
     }
 
     // load data

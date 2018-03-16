@@ -1,10 +1,11 @@
-/// <reference path="camelHelpers.ts"/>
 /// <reference path="contexts/contexts.module.ts"/>
 /// <reference path="endpoints-statistics/endpoints-statistics.module.ts"/>
 /// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="exchanges/exchanges.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
+/// <reference path="camelHelpers.ts"/>
+/// <reference path="camel-tree.service.ts"/>
 
 namespace Camel {
 
@@ -42,6 +43,8 @@ namespace Camel {
             .when('/camel/propertiesDataFormat', {templateUrl: 'plugins/camel/html/propertiesDataFormat.html'})
             .when('/camel/propertiesEndpoint', {templateUrl: 'plugins/camel/html/propertiesEndpoint.html'});
   }]);
+
+  _module.service('camelTreeService', CamelTreeService);
 
   _module.factory('tracerStatus',function () {
     return {
