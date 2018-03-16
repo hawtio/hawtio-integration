@@ -7,6 +7,7 @@ declare namespace Pf {
     function filter(items: object[], filterConfig: any): object[];
 }
 declare namespace ActiveMQ {
+    const pluginName: string;
     const log: Logging.Logger;
     const jmxDomain: string;
     function retrieveQueueNames(workspace: Jmx.Workspace, ascend: boolean): string[];
@@ -42,7 +43,6 @@ declare namespace ActiveMQ {
         private $location;
         private jolokia;
         private localStorage;
-        private log;
         amqJmxDomain: any;
         message: string;
         destinationName: string;
@@ -115,7 +115,6 @@ declare namespace ActiveMQ {
     const treeElementId = "#activemqtree";
 }
 declare namespace ActiveMQ {
-    const pluginName: string;
     const _module: angular.IModule;
 }
 declare namespace ActiveMQ {
@@ -290,6 +289,7 @@ declare namespace Camel {
 }
 declare var _apacheCamelModel: any;
 declare namespace Camel {
+    const pluginName: string;
     const log: Logging.Logger;
     const jmxDomain: string;
     const defaultMaximumLabelWidth = 34;
@@ -584,7 +584,6 @@ declare namespace Camel {
     class ContextsService {
         private jolokiaService;
         private treeService;
-        private log;
         constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService);
         getContexts(): ng.IPromise<Context[]>;
         getContext(mbeanName: string): ng.IPromise<Context>;
@@ -939,7 +938,6 @@ declare namespace Camel {
     const treeElementId = "#cameltree";
 }
 declare namespace Camel {
-    const pluginName: string;
     const _module: angular.IModule;
 }
 declare namespace Camel {
@@ -1413,7 +1411,8 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Karaf {
-    var log: Logging.Logger;
+    const pluginName: string;
+    const log: Logging.Logger;
     function setSelect(selection: any, group: any): any;
     function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
     function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
@@ -1465,7 +1464,6 @@ declare namespace Karaf {
         private $q;
         private jolokia;
         private workspace;
-        private log;
         constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
         getFeatureRepositories(): ng.IPromise<FeatureRepository[]>;
         installFeature(feature: Feature): ng.IPromise<string>;
@@ -1552,7 +1550,6 @@ declare namespace Karaf {
         private $q;
         private jolokia;
         private workspace;
-        private log;
         constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
         getComponents(): ng.IPromise<ScrComponent[]>;
         enableComponents(components: ScrComponent[]): ng.IPromise<string>;
@@ -1609,7 +1606,7 @@ declare namespace Karaf {
     const scrComponentsModule: string;
 }
 declare namespace Karaf {
-    var _module: angular.IModule;
+    const _module: angular.IModule;
 }
 declare namespace Karaf {
 }
@@ -1620,7 +1617,8 @@ declare namespace Karaf {
 declare namespace Karaf {
 }
 declare namespace Osgi {
-    var log: Logging.Logger;
+    const pluginName: string;
+    const log: Logging.Logger;
     function defaultBundleValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
     function getStateStyle(prefix: string, state: string): string;
     function defaultServiceValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
@@ -1701,7 +1699,6 @@ declare namespace Osgi {
         private $q;
         private jolokia;
         private workspace;
-        private log;
         constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
         getBundles(): ng.IPromise<Bundle[]>;
         startBundles(bundles: Bundle[]): ng.IPromise<string>;
@@ -1758,8 +1755,7 @@ declare namespace Osgi {
     const bundlesModule: string;
 }
 declare namespace Osgi {
-    var pluginName: string;
-    var _module: angular.IModule;
+    const _module: angular.IModule;
 }
 declare namespace Osgi {
     function formatServiceName(objClass: any): string;

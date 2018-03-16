@@ -13806,7 +13806,8 @@ var Pf;
 })(Pf || (Pf = {}));
 var ActiveMQ;
 (function (ActiveMQ) {
-    ActiveMQ.log = Logger.get("ActiveMQ");
+    ActiveMQ.pluginName = 'hawtio-integration-activemq';
+    ActiveMQ.log = Logger.get(ActiveMQ.pluginName);
     ActiveMQ.jmxDomain = 'org.apache.activemq';
     function findFolder(node, titles, ascend) {
         if (!node) {
@@ -13966,7 +13967,6 @@ var ActiveMQ;
             this.$location = $location;
             this.jolokia = jolokia;
             this.localStorage = localStorage;
-            this.log = Logger.get("ActiveMQ");
             this.amqJmxDomain = this.localStorage['activemqJmxDomain'] || "org.apache.activemq";
             this.message = "";
             this.destinationName = "";
@@ -14324,7 +14324,6 @@ var ActiveMQ;
 (function (ActiveMQ) {
     defineRoutes.$inject = ["configManager"];
     configurePlugin.$inject = ["HawtioNav", "workspace", "viewRegistry", "helpRegistry", "preferencesRegistry", "localStorage", "preLogoutTasks", "documentBase", "activeMQNavigationService"];
-    ActiveMQ.pluginName = 'activemq';
     ActiveMQ._module = angular
         .module(ActiveMQ.pluginName, [
         'angularResizable',
@@ -15860,7 +15859,8 @@ var Camel;
 /// <reference path="endpointChooser.ts"/>
 var Camel;
 (function (Camel) {
-    Camel.log = Logger.get("Camel");
+    Camel.pluginName = 'hawtio-integration-camel';
+    Camel.log = Logger.get(Camel.pluginName);
     Camel.jmxDomain = 'org.apache.camel';
     Camel.defaultMaximumLabelWidth = 34;
     Camel.defaultCamelMaximumTraceOrDebugBodyLength = 5000;
@@ -17277,7 +17277,6 @@ var Camel;
             'ngInject';
             this.jolokiaService = jolokiaService;
             this.treeService = treeService;
-            this.log = Logger.get("Camel");
         }
         ContextsService.prototype.getContexts = function () {
             var _this = this;
@@ -18360,7 +18359,6 @@ var Camel;
 /// <reference path="tree/tree.module.ts"/>
 var Camel;
 (function (Camel) {
-    Camel.pluginName = 'camel';
     Camel._module = angular.module(Camel.pluginName, [
         'angularResizable',
         Camel.contextsModule,
@@ -19328,8 +19326,8 @@ var Camel;
 /// <reference path="camelPlugin.ts"/>
 var Camel;
 (function (Camel) {
+    var log = Logger.get("hawtio-integration-camel-debugger");
     Camel._module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", function ($scope, $element, workspace, jolokia, localStorage, documentBase) {
-            var log = Logger.get("CamelDebugger");
             var breakpointImageUrl = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint.png");
             // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
             $scope.debugging = false;
@@ -19458,7 +19456,7 @@ var Camel;
             function loadCurrentStack() {
                 var mbean = Camel.getSelectionCamelDebugMBean(workspace);
                 if (mbean) {
-                    console.log("getting suspended breakpoints!");
+                    log.info("Getting suspended breakpoints!");
                     jolokia.execute(mbean, "getSuspendedBreakpointNodeIds", Core.onSuccess(onSuspendedBreakpointNodeIds));
                 }
             }
@@ -19477,7 +19475,7 @@ var Camel;
                 Core.$apply($scope);
             }
             function onMessages(response) {
-                log.debug("onMessage -> " + response);
+                log.debug("onMessage ->", response);
                 $scope.messages = [];
                 if (response) {
                     var xml = response;
@@ -19508,7 +19506,7 @@ var Camel;
                 updateMessageSelection();
                 updateBreakpointNodes();
                 onSelectionChanged();
-                log.debug("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
+                log.debug("has messages", $scope.messages.length, "selected row", $scope.row, "index", $scope.rowIndex);
                 Core.$apply($scope);
             }
             function updateMessageSelection() {
@@ -20350,7 +20348,6 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.RouteController", ["$scope", "$routeParams", "$element", "$timeout", "workspace", "$location", "jolokia", "localStorage", function ($scope, $routeParams, $element, $timeout, workspace, $location, jolokia, localStorage) {
-            var log = Logger.get("Camel");
             $scope.routes = [];
             $scope.routeNodes = {};
             // if we are in dashboard then $routeParams may be null
@@ -20403,7 +20400,7 @@ var Camel;
                     jolokia.request({ type: 'exec', mbean: $scope.mbean, operation: 'dumpRoutesAsXml()' }, Core.onSuccess(populateTable));
                 }
                 else {
-                    log.info("No camel context bean! Selection: " + workspace.selection);
+                    Camel.log.info("No camel context bean! Selection:", workspace.selection);
                 }
             }
             var populateTable = function (response) {
@@ -20425,7 +20422,7 @@ var Camel;
                     showGraph(nodes, links);
                 }
                 else {
-                    console.log("No data from route XML!");
+                    Camel.log.info("No data from route XML!");
                 }
                 Core.$apply($scope);
             };
@@ -20458,7 +20455,7 @@ var Camel;
                 return answer;
             }
             function onClickGraphNode(node) {
-                log.debug("Clicked on Camel Route Diagram node: " + node.cid);
+                Camel.log.debug("Clicked on Camel Route Diagram node:", node.cid);
                 if (workspace.isRoutesFolder()) {
                     // Handle nodes selection from a diagram displaying multiple routes
                     handleGraphNode(node);
@@ -20513,7 +20510,7 @@ var Camel;
                         }
                     }
                     else {
-                        log.debug("No route found for " + cid);
+                        Camel.log.debug("No route found for", cid);
                     }
                 }
             }
@@ -20671,13 +20668,12 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.RouteMetricsController", ["$scope", "$location", "workspace", "jolokia", "metricsWatcher", function ($scope, $location, workspace, jolokia, metricsWatcher) {
-            var log = Logger.get("Camel");
             $scope.maxSeconds = Camel.routeMetricMaxSeconds(localStorage);
             $scope.filterText = null;
             $scope.initDone = false;
             $scope.metricDivs = [];
             $scope.metricVisible = function (metric) {
-                log.debug("Filter by route " + metric);
+                Camel.log.debug("Filter by route", metric);
                 return Core.matchFilterIgnoreCase(metric.routeId, $scope.filterText);
             };
             function populateRouteStatistics(response) {
@@ -20711,19 +20707,19 @@ var Camel;
                                     routeId: routeId
                                 });
                                 counter++;
-                                log.info("Added timer: " + div + " (" + className + "." + metricsName + ") for route: " + routeId + " with max seconds: " + $scope.maxSeconds);
+                                Camel.log.info("Added timer:", div, "(" + className + "." + metricsName + ") for route:", routeId, "with max seconds:", $scope.maxSeconds);
                                 metricsWatcher.addTimer(div, className, metricsName, $scope.maxSeconds, title, "Histogram", $scope.maxSeconds * 1000);
                             }
                             // ensure web page is updated at this point, as we need the metricDivs in the HTML before we call init graphs later
-                            log.info("Pre-init graphs");
+                            Camel.log.info("Pre-init graphs");
                             Core.$apply($scope);
                         }
-                        log.info("Init graphs");
+                        Camel.log.info("Init graphs");
                         metricsWatcher.initGraphs();
                     }
                     $scope.initDone = true;
                     // update graphs
-                    log.debug("Updating graphs: " + json);
+                    Camel.log.debug("Updating graphs:", json);
                     metricsWatcher.updateGraphs(json);
                 }
                 $scope.initDone = true;
@@ -20740,7 +20736,7 @@ var Camel;
                 setTimeout(loadData, 50);
             });
             function loadData() {
-                log.info("Loading RouteMetrics data...");
+                Camel.log.info("Loading RouteMetrics data...");
                 // pre-select filter if we have selected a route
                 var routeId = Camel.getSelectedRouteId(workspace);
                 if (routeId != null) {
@@ -20766,7 +20762,6 @@ var Camel;
 (function (Camel) {
     var DELIVERY_PERSISTENT = "2";
     Camel._module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", function ($route, $scope, $element, $timeout, workspace, jolokia, localStorage, $location, activeMQMessage) {
-            var log = Logger.get("Camel");
             $scope.noCredentials = false;
             $scope.container = {};
             $scope.message = "";
@@ -20861,7 +20856,7 @@ var Camel;
                                     headers[key] = object.value;
                                 }
                             });
-                            log.info("About to send headers: " + JSON.stringify(headers));
+                            Camel.log.info("About to send headers:", JSON.stringify(headers));
                         }
                         var callback = Core.onSuccess(onSendCompleteFn);
                         if (selection.domain === "org.apache.camel") {
@@ -20894,7 +20889,7 @@ var Camel;
                                 else {
                                     Core.notification("danger", "Failed to determine endpoint name!");
                                 }
-                                log.debug("Parsed context and endpoint: ", target);
+                                Camel.log.debug("Parsed context and endpoint:", target);
                             }
                         }
                         else {
@@ -21031,8 +21026,8 @@ var Camel;
 /// <reference path="camelPlugin.ts"/>
 var Camel;
 (function (Camel) {
+    var log = Logger.get("hawtio-integration-camel-tracer");
     Camel._module.controller("Camel.TraceRouteController", ["$scope", "$timeout", "workspace", "jolokia", "localStorage", "tracerStatus", function ($scope, $timeout, workspace, jolokia, localStorage, tracerStatus) {
-            var log = Logger.get("CamelTracer");
             var MESSAGES_LIMIT = 500;
             $scope.tracing = false;
             $scope.messages = [];
@@ -21122,7 +21117,7 @@ var Camel;
                 }
             }
             function populateRouteMessages(response) {
-                log.debug("Populating response " + response);
+                log.debug("Populating response", response);
                 // filter messages due CAMEL-7045 but in camel-core
                 // see https://github.com/hawtio/hawtio/issues/292
                 var selectedRouteId = Camel.getSelectedRouteId(workspace);
@@ -21144,7 +21139,7 @@ var Camel;
                             if (toNode) {
                                 messageData["toNode"] = toNode;
                             }
-                            log.debug("Adding new message to trace table with id " + messageData["id"]);
+                            log.debug("Adding new message to trace table with id", messageData["id"]);
                             $scope.messages.push(messageData);
                         }
                     });
@@ -21203,7 +21198,7 @@ var Camel;
                     jolokia.setAttribute(mbean, "Enabled", flag, Core.onSuccess(tracingChanged));
                 }
             }
-            log.info("Re-activating tracer with " + tracerStatus.messages.length + " existing messages");
+            log.info("Re-activating tracer with", tracerStatus.messages.length, "existing messages");
             $scope.messages = tracerStatus.messages;
             $scope.tracing = tracerStatus.jhandle != null;
         }]);
@@ -21321,7 +21316,6 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.BlockedExchangesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            var log = Logger.get("Camel");
             $scope.data = [];
             $scope.initDone = false;
             $scope.mbeanAttributes = {};
@@ -21390,7 +21384,7 @@ var Camel;
                     var exchangeId = selectedItems[0].exchangeId;
                     var threadId = selectedItems[0].threadId;
                     var threadName = selectedItems[0].threadName;
-                    log.info("Unblocking thread (" + threadId + "/" + threadName + ") for exchangeId: " + exchangeId);
+                    Camel.log.info("Unblocking thread (" + threadId + "/" + threadName + ") for exchangeId:", exchangeId);
                     jolokia.execute(mbean, "interrupt(java.lang.String)", exchangeId, Core.onSuccess(onUnblocked));
                 }
             };
@@ -21404,7 +21398,7 @@ var Camel;
                     var arr = [];
                     for (var key in obj) {
                         var entry = obj[key];
-                        console.log('blocked: ' + JSON.stringify(entry));
+                        Camel.log.debug('blocked:', JSON.stringify(entry));
                         arr.push({
                             exchangeId: entry.exchangeId,
                             routeId: entry.routeId,
@@ -21428,7 +21422,7 @@ var Camel;
                 Core.$apply($scope);
             }
             function loadBlockedData() {
-                log.info("Loading blocked exchanges data...");
+                Camel.log.info("Loading blocked exchanges data...");
                 // pre-select filter if we have selected a route
                 var routeId = Camel.getSelectedRouteId(workspace);
                 if (routeId != null) {
@@ -21514,7 +21508,6 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.PropertiesComponentController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', function ($scope, workspace, localStorage, jolokia, documentBase, propertiesService) {
-            var log = Logger.get("Camel");
             function updateData() {
                 var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
                 var componentMBeanName = null;
@@ -21527,7 +21520,7 @@ var Camel;
                     var name = reply.value["ComponentName"];
                     if (name) {
                         $scope.componentName = name;
-                        log.info("Calling explainComponentJson for name: " + name);
+                        Camel.log.info("Calling explainComponentJson for name:", name);
                         var query = {
                             type: 'exec',
                             mbean: contextMBean,
@@ -21539,7 +21532,7 @@ var Camel;
                 }
             }
             function populateData(response) {
-                log.debug("Populate data " + response);
+                Camel.log.debug("Populate data", response);
                 if (response.value) {
                     var schema = JSON.parse(response.value);
                     $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
@@ -21564,14 +21557,13 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.PropertiesDataFormatController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', function ($scope, workspace, localStorage, jolokia, documentBase, propertiesService) {
-            var log = Logger.get("Camel");
             function updateData() {
                 var dataFormatMBeanName = null;
                 if (!dataFormatMBeanName) {
                     dataFormatMBeanName = workspace.getSelectedMBeanName();
                 }
                 if (dataFormatMBeanName) {
-                    log.info("Calling informationJson");
+                    Camel.log.info("Calling informationJson");
                     var query = {
                         type: 'exec',
                         mbean: dataFormatMBeanName,
@@ -21581,7 +21573,7 @@ var Camel;
                 }
             }
             function populateData(response) {
-                log.debug("Populate data " + response);
+                Camel.log.debug("Populate data", response);
                 if (response.value) {
                     var schema = JSON.parse(response.value);
                     $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/marshal24.png");
@@ -21606,7 +21598,6 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.PropertiesEndpointController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', function ($scope, workspace, localStorage, jolokia, documentBase, propertiesService) {
-            var log = Logger.get("Camel");
             function updateData() {
                 var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
                 var endpointMBean = null;
@@ -21629,7 +21620,7 @@ var Camel;
                     var url = reply.value["EndpointUri"];
                     if (url) {
                         $scope.endpointUrl = url;
-                        log.info("Calling explainEndpointJson for url: " + url);
+                        Camel.log.info("Calling explainEndpointJson for url:", url);
                         var query = {
                             type: 'exec',
                             mbean: contextMBean,
@@ -21641,7 +21632,7 @@ var Camel;
                 }
             }
             function populateData(response) {
-                log.debug("Populate data " + response);
+                Camel.log.debug("Populate data", response);
                 if (response.value) {
                     var schema = JSON.parse(response.value);
                     $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
@@ -21666,15 +21657,14 @@ var Camel;
 var Camel;
 (function (Camel) {
     Camel._module.controller("Camel.PropertiesRouteController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia", "propertiesService", function ($scope, $rootScope, workspace, localStorage, jolokia, propertiesService) {
-            var log = Logger.get("Camel");
             var routeXmlNode = Camel.getSelectedRouteNode(workspace);
             if (routeXmlNode) {
                 var data = Camel.getRouteNodeJSON(routeXmlNode);
                 var schema = Camel.getCamelSchema(routeXmlNode.nodeName);
                 addValueToProperties(data, schema);
-                if (log.enabledFor(Logger.DEBUG)) {
-                    log.debug("Properties - data: " + JSON.stringify(data, null, "  "));
-                    log.debug("Properties - schema: " + JSON.stringify(schema, null, "  "));
+                if (Camel.log.enabledFor(Logger.DEBUG)) {
+                    Camel.log.debug("Properties - data:", JSON.stringify(data, null, "  "));
+                    Camel.log.debug("Properties - schema:", JSON.stringify(schema, null, "  "));
                 }
                 $scope.icon = Camel.getRouteNodeIcon(routeXmlNode);
                 $scope.title = schema.title;
@@ -21711,7 +21701,8 @@ var Camel;
 })(Camel || (Camel = {}));
 var Karaf;
 (function (Karaf) {
-    Karaf.log = Logger.get("Karaf");
+    Karaf.pluginName = 'hawtio-integration-karaf';
+    Karaf.log = Logger.get(Karaf.pluginName);
     function setSelect(selection, group) {
         if (!angular.isDefined(selection)) {
             return group[0];
@@ -22103,7 +22094,6 @@ var Karaf;
             this.$q = $q;
             this.jolokia = jolokia;
             this.workspace = workspace;
-            this.log = Logger.get("Karaf");
         }
         FeaturesService.prototype.getFeatureRepositories = function () {
             var _this = this;
@@ -22451,7 +22441,6 @@ var Karaf;
             this.$q = $q;
             this.jolokia = jolokia;
             this.workspace = workspace;
-            this.log = Logger.get("Karaf");
         }
         ScrComponentsService.prototype.getComponents = function () {
             return this.execute(Karaf.getSelectionScrMBean(this.workspace), undefined, 'read')
@@ -22537,7 +22526,7 @@ var Karaf;
                     method: "post",
                     success: function (response) { return resolve(response.value); },
                     error: function (response) {
-                        _this.log.error("ScrComponentsService.execute() failed. " + response);
+                        Karaf.log.error('ScrComponentsService.execute() failed:', response);
                         reject(response.error);
                     }
                 });
@@ -22772,8 +22761,7 @@ var Karaf;
 /// <reference path="scr-components/scr-component-detail.component.ts"/>
 var Karaf;
 (function (Karaf) {
-    var pluginName = 'karaf';
-    Karaf._module = angular.module(pluginName, [
+    Karaf._module = angular.module(Karaf.pluginName, [
         'infinite-scroll',
         Karaf.featuresModule,
         Karaf.scrComponentsModule
@@ -22791,7 +22779,7 @@ var Karaf;
                 return workspace.treeContainsDomainAndProperties('org.apache.karaf');
             });
         }]);
-    hawtioPluginLoader.addModule(pluginName);
+    hawtioPluginLoader.addModule(Karaf.pluginName);
 })(Karaf || (Karaf = {}));
 /// <reference path="karafPlugin.ts"/>
 var Karaf;
@@ -23232,7 +23220,8 @@ var Karaf;
 })(Karaf || (Karaf = {}));
 var Osgi;
 (function (Osgi) {
-    Osgi.log = Logger.get("OSGi");
+    Osgi.pluginName = 'hawtio-integration-osgi';
+    Osgi.log = Logger.get(Osgi.pluginName);
     function defaultBundleValues(workspace, $scope, values) {
         var allValues = values;
         angular.forEach(values, function (row) {
@@ -23718,7 +23707,6 @@ var Osgi;
             this.$q = $q;
             this.jolokia = jolokia;
             this.workspace = workspace;
-            this.log = Logger.get("Osgi");
         }
         BundlesService.prototype.getBundles = function () {
             return this.execute(Osgi.getSelectionBundleMBean(this.workspace), 'listBundles()')
@@ -23791,7 +23779,7 @@ var Osgi;
                     method: "post",
                     success: function (response) { return resolve(response.value); },
                     error: function (response) {
-                        _this.log.error("BundlesService.execute() failed. " + response);
+                        Osgi.log.error('BundlesService.execute() failed:', response);
                         reject(response.error);
                     }
                 });
@@ -24104,7 +24092,6 @@ var Osgi;
 /// <reference path="bundles/bundles.module.ts"/>
 var Osgi;
 (function (Osgi) {
-    Osgi.pluginName = 'osgi';
     Osgi._module = angular.module(Osgi.pluginName, [
         'infinite-scroll',
         Osgi.bundlesModule
@@ -26428,7 +26415,7 @@ var SpringBoot;
 var SpringBoot;
 (function (SpringBoot) {
     var springBootModule = angular
-        .module('hawtio-spring-boot', [
+        .module('hawtio-integration-spring-boot', [
         SpringBoot.healthModule,
         SpringBoot.loggersModule,
         SpringBoot.traceModule
