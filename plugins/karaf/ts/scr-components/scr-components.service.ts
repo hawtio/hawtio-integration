@@ -5,8 +5,6 @@ namespace Karaf {
 
   export class ScrComponentsService {
 
-    private log: Logging.Logger = Logger.get("Karaf");
-    
     constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia, private workspace: Jmx.Workspace) {
       'ngInject';
     }
@@ -101,7 +99,7 @@ namespace Karaf {
           method: "post",
           success: response => resolve(response.value),
           error: response => {
-            this.log.error(`ScrComponentsService.execute() failed. ${response}`);
+            log.error('ScrComponentsService.execute() failed:', response);
             reject(response.error);
           }
         });

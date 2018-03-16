@@ -6,8 +6,6 @@ namespace Karaf {
 
     export class FeaturesService {
 
-      private log: Logging.Logger = Logger.get("Karaf");
-
       constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia, private workspace: Jmx.Workspace) {
         'ngInject';
       }

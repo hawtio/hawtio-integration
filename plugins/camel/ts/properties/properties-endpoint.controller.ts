@@ -10,8 +10,6 @@ namespace Camel {
       jolokia: Jolokia.IJolokia,
       documentBase: string,
       propertiesService: PropertiesService) => {
-    
-    var log: Logging.Logger = Logger.get("Camel");
 
     function updateData() {
       var contextMBean = getSelectionCamelContextMBean(workspace);
@@ -36,7 +34,7 @@ namespace Camel {
         var url:string = reply.value["EndpointUri"];
         if (url) {
           $scope.endpointUrl = url;
-          log.info("Calling explainEndpointJson for url: " + url);
+          log.info("Calling explainEndpointJson for url:", url);
           var query = {
             type: 'exec',
             mbean: contextMBean,
@@ -49,7 +47,7 @@ namespace Camel {
     }
 
     function populateData(response) {
-      log.debug("Populate data " + response);
+      log.debug("Populate data", response);
 
       if (response.value) {
         let schema = JSON.parse(response.value);

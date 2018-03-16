@@ -4,8 +4,6 @@
 
 namespace ActiveMQ {
 
-  export const pluginName: string = 'activemq';
-
   export const _module = angular
     .module(pluginName, [
       'angularResizable',

@@ -10,8 +10,6 @@ namespace Camel {
       jolokia: Jolokia.IJolokia,
       documentBase: string,
       propertiesService: PropertiesService) => {
-    
-    var log: Logging.Logger = Logger.get("Camel");
 
     function updateData() {
       var dataFormatMBeanName:string = null;
@@ -30,7 +28,7 @@ namespace Camel {
     }
 
     function populateData(response) {
-      log.debug("Populate data " + response);
+      log.debug("Populate data", response);
 
       if (response.value) {
         let schema = JSON.parse(response.value);

@@ -8,8 +8,6 @@
 
 namespace Camel {
 
-  export const pluginName: string = 'camel';
-
   export const _module = angular.module(pluginName, [
     'angularResizable',
     contextsModule,

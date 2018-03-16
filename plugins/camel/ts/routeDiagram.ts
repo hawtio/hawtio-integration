@@ -13,8 +13,6 @@ namespace Camel {
       jolokia: Jolokia.IJolokia,
       localStorage: Storage) => {
 
-    var log: Logging.Logger = Logger.get("Camel");
-
     $scope.routes = [];
     $scope.routeNodes = {};
 
@@ -73,7 +71,7 @@ namespace Camel {
                 {type: 'exec', mbean: $scope.mbean, operation: 'dumpRoutesAsXml()'},
                 Core.onSuccess(populateTable));
       } else {
-        log.info("No camel context bean! Selection: " + workspace.selection);
+        log.info("No camel context bean! Selection:", workspace.selection);
       }
     }
 
@@ -95,7 +93,7 @@ namespace Camel {
         Camel.loadRouteXmlNodes($scope, doc, selectedRouteId, nodes, links, $element.width());
         showGraph(nodes, links);
       } else {
-        console.log("No data from route XML!")
+        log.info("No data from route XML!");
       }
       Core.$apply($scope);
     };
@@ -131,7 +129,7 @@ namespace Camel {
     }
 
     function onClickGraphNode(node) {
-      log.debug("Clicked on Camel Route Diagram node: " + node.cid);
+      log.debug("Clicked on Camel Route Diagram node:", node.cid);
       if (workspace.isRoutesFolder()) {
         // Handle nodes selection from a diagram displaying multiple routes
         handleGraphNode(node);
@@ -188,7 +186,7 @@ namespace Camel {
             }
           }
         } else {
-          log.debug("No route found for " + cid);
+          log.debug("No route found for", cid);
         }
       }
     }

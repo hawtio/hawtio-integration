@@ -1,6 +1,8 @@
 namespace ActiveMQ {
 
-  export const log: Logging.Logger = Logger.get("ActiveMQ");
+  export const pluginName: string = 'hawtio-integration-activemq';
+
+  export const log: Logging.Logger = Logger.get(pluginName);
 
   export const jmxDomain: string = 'org.apache.activemq';
 
@@ -42,7 +44,7 @@ namespace ActiveMQ {
 
   export function retrieveTopicNames(workspace: Jmx.Workspace, ascend: boolean): string[] {
     let selection = workspace.selection;
-    let topicFolder =  selection ? findFolder(selection, ["Topics", "Topic"], ascend) : null;
+    let topicFolder = selection ? findFolder(selection, ["Topics", "Topic"], ascend) : null;
     return topicFolder ? topicFolder.children.map(n => n.text) : [];
   }
 
@@ -58,7 +60,7 @@ namespace ActiveMQ {
    * @param key unique key inside message that distinguishes between values
    * @param $scope
    */
-  export function selectCurrentMessage(message:any, key:string, $scope) {
+  export function selectCurrentMessage(message: any, key: string, $scope) {
     // clicking on message's link would interfere with messages selected with checkboxes
     if ('selectAll' in $scope.gridOptions) {
       $scope.gridOptions.selectAll(false);

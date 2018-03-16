@@ -5,8 +5,7 @@
 
 namespace Osgi {
 
-  export var pluginName = 'osgi';
-  export var _module = angular.module(pluginName, [
+  export const _module = angular.module(pluginName, [
     'infinite-scroll',
     bundlesModule
   ]);

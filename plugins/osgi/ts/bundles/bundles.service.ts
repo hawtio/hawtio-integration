@@ -5,8 +5,6 @@ namespace Osgi {
 
   export class BundlesService {
 
-    private log: Logging.Logger = Logger.get("Osgi");
-
     constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia, private workspace: Jmx.Workspace) {
       'ngInject';
     }
@@ -86,7 +84,7 @@ namespace Osgi {
           method: "post",
           success: response => resolve(response.value),
           error: response => {
-            this.log.error(`BundlesService.execute() failed. ${response}`);
+            log.error('BundlesService.execute() failed:', response);
             reject(response.error);
           }
         });

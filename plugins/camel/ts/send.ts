@@ -17,8 +17,6 @@ namespace Camel {
       $location: ng.ILocationService,
       activeMQMessage) => {
 
-    var log: Logging.Logger = Logger.get("Camel");
-
     $scope.noCredentials = false;
     $scope.container = {};
     $scope.message = "";
@@ -133,7 +131,7 @@ namespace Camel {
                 headers[key] = object.value;
               }
             });
-            log.info("About to send headers: " + JSON.stringify(headers));
+            log.info("About to send headers:", JSON.stringify(headers));
           }
 
           var callback = Core.onSuccess(onSendCompleteFn);
@@ -166,7 +164,7 @@ namespace Camel {
               } else {
                 Core.notification("danger", "Failed to determine endpoint name!");
               }
-              log.debug("Parsed context and endpoint: ", target);
+              log.debug("Parsed context and endpoint:", target);
             }
           } else {
             var user = localStorage["activemqUserName"];

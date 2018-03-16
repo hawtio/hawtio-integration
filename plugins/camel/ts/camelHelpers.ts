@@ -4,7 +4,9 @@ declare var _apacheCamelModel:any;
 
 namespace Camel {
 
-  export const log: Logging.Logger = Logger.get("Camel");
+  export const pluginName: string = 'hawtio-integration-camel';
+
+  export const log: Logging.Logger = Logger.get(pluginName);
 
   export const jmxDomain: string = 'org.apache.camel';
 

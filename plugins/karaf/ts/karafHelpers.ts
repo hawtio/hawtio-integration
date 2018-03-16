@@ -1,6 +1,8 @@
 namespace Karaf {
 
-  export var log: Logging.Logger = Logger.get("Karaf");
+  export const pluginName: string = 'hawtio-integration-karaf';
+
+  export const log: Logging.Logger = Logger.get(pluginName);
 
   export function setSelect(selection, group) {
     if (!angular.isDefined(selection)) {

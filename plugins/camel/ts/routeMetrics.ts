@@ -9,8 +9,6 @@ namespace Camel {
       jolokia: Jolokia.IJolokia,
       metricsWatcher: MetricsWatcher.IMetricsWatcher) => {
 
-    var log:Logging.Logger = Logger.get("Camel");
-
     $scope.maxSeconds = Camel.routeMetricMaxSeconds(localStorage);
 
     $scope.filterText = null;
@@ -18,7 +16,7 @@ namespace Camel {
     $scope.metricDivs = [];
 
     $scope.metricVisible = (metric) => {
-      log.debug("Filter by route " + metric);
+      log.debug("Filter by route", metric);
       return Core.matchFilterIgnoreCase(metric.routeId, $scope.filterText);
     }
 
@@ -60,7 +58,7 @@ namespace Camel {
 
               counter++;
 
-              log.info("Added timer: " + div + " (" + className + "." + metricsName + ") for route: " + routeId + " with max seconds: " + $scope.maxSeconds);
+              log.info("Added timer:", div, "(" + className + "." + metricsName + ") for route:", routeId, "with max seconds:", $scope.maxSeconds);
               metricsWatcher.addTimer(div, className, metricsName, $scope.maxSeconds, title, "Histogram", $scope.maxSeconds * 1000);
             }
 
@@ -76,7 +74,7 @@ namespace Camel {
         $scope.initDone = true;
 
         // update graphs
-        log.debug("Updating graphs: " + json)
+        log.debug("Updating graphs:", json)
         metricsWatcher.updateGraphs(json)
       }
 

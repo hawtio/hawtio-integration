@@ -3,8 +3,6 @@
 namespace Camel {
 
   export class ContextsService {
-
-    private log: Logging.Logger = Logger.get("Camel");
     
     constructor(private jolokiaService: JVM.JolokiaService, private treeService: Jmx.TreeService) {
       'ngInject';

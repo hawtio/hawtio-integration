@@ -11,8 +11,6 @@ namespace Camel {
       jolokia: Jolokia.IJolokia,
       propertiesService: PropertiesService) => {
 
-      var log: Logging.Logger = Logger.get("Camel");
-
       let routeXmlNode = getSelectedRouteNode(workspace);
 
       if (routeXmlNode) {
@@ -21,8 +19,8 @@ namespace Camel {
         addValueToProperties(data, schema);
         
         if (log.enabledFor(Logger.DEBUG)) {
-          log.debug("Properties - data: " + JSON.stringify(data, null, "  "));
-          log.debug("Properties - schema: " + JSON.stringify(schema, null, "  "));
+          log.debug("Properties - data:", JSON.stringify(data, null, "  "));
+          log.debug("Properties - schema:", JSON.stringify(schema, null, "  "));
         }
 
         $scope.icon = getRouteNodeIcon(routeXmlNode);

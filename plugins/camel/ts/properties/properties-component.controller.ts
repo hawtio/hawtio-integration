@@ -10,8 +10,6 @@ namespace Camel {
       jolokia: Jolokia.IJolokia,
       documentBase: string,
       propertiesService: PropertiesService) => {
-    
-    var log: Logging.Logger = Logger.get("Camel");
 
     function updateData() {
       var contextMBean = getSelectionCamelContextMBean(workspace);
@@ -26,7 +24,7 @@ namespace Camel {
         var name:string = reply.value["ComponentName"];
         if (name) {
           $scope.componentName = name;
-          log.info("Calling explainComponentJson for name: " + name);
+          log.info("Calling explainComponentJson for name:", name);
           var query = {
             type: 'exec',
             mbean: contextMBean,
@@ -39,7 +37,7 @@ namespace Camel {
     }
 
     function populateData(response) {
-      log.debug("Populate data " + response);
+      log.debug("Populate data", response);
 
       if (response.value) {
         let schema = JSON.parse(response.value);

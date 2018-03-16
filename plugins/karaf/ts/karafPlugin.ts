@@ -5,9 +5,7 @@
 
 namespace Karaf {
 
-  var pluginName = 'karaf';
-
-  export var _module = angular.module(pluginName, [
+  export const _module = angular.module(pluginName, [
     'infinite-scroll',
     featuresModule,
     scrComponentsModule

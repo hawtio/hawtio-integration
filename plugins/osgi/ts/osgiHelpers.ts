@@ -1,6 +1,8 @@
 namespace Osgi {
 
-  export var log: Logging.Logger = Logger.get("OSGi");
+  export const pluginName: string = 'hawtio-integration-osgi';
+
+  export const log: Logging.Logger = Logger.get(pluginName);
 
   export function defaultBundleValues(workspace: Jmx.Workspace, $scope, values) {
     var allValues = values;

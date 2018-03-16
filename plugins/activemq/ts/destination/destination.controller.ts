@@ -4,8 +4,6 @@ namespace ActiveMQ {
 
   export class DestinationController {
 
-    private log: Logging.Logger = Logger.get("ActiveMQ");
-
     amqJmxDomain = this.localStorage['activemqJmxDomain'] || "org.apache.activemq";
 
     message: string = "";

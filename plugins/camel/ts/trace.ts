@@ -3,6 +3,8 @@
 
 namespace Camel {
 
+  const log: Logging.Logger = Logger.get("hawtio-integration-camel-tracer");
+
   _module.controller("Camel.TraceRouteController", ["$scope", "$timeout", "workspace", "jolokia", "localStorage", "tracerStatus", (
     $scope,
     $timeout: ng.ITimeoutService,
@@ -11,7 +13,6 @@ namespace Camel {
     localStorage: Storage,
     tracerStatus) => {
 
-    const log: Logging.Logger = Logger.get("CamelTracer");
     const MESSAGES_LIMIT = 500;
 
     $scope.tracing = false;
@@ -114,7 +115,7 @@ namespace Camel {
     }
 
     function populateRouteMessages(response) {
-      log.debug("Populating response " + response);
+      log.debug("Populating response", response);
 
       // filter messages due CAMEL-7045 but in camel-core
       // see https://github.com/hawtio/hawtio/issues/292
@@ -140,7 +141,7 @@ namespace Camel {
             if (toNode) {
               messageData["toNode"] = toNode;
             }
-            log.debug("Adding new message to trace table with id " + messageData["id"]);
+            log.debug("Adding new message to trace table with id", messageData["id"]);
             $scope.messages.push(messageData);
           }
         });
@@ -210,7 +211,7 @@ namespace Camel {
       }
     }
 
-    log.info("Re-activating tracer with " + tracerStatus.messages.length + " existing messages");
+    log.info("Re-activating tracer with", tracerStatus.messages.length, "existing messages");
     $scope.messages = tracerStatus.messages;
     $scope.tracing = tracerStatus.jhandle != null;
   }]);

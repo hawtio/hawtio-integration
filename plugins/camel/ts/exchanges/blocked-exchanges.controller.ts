@@ -8,8 +8,6 @@ namespace Camel {
       workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia) => {
 
-    var log: Logging.Logger = Logger.get("Camel");
-
     $scope.data = [];
     $scope.initDone = false;
 
@@ -84,7 +82,7 @@ namespace Camel {
         var threadId = selectedItems[0].threadId;
         var threadName = selectedItems[0].threadName;
 
-        log.info("Unblocking thread (" + threadId + "/" + threadName + ") for exchangeId: " + exchangeId);
+        log.info("Unblocking thread (" + threadId + "/" + threadName + ") for exchangeId:", exchangeId);
 
         jolokia.execute(mbean, "interrupt(java.lang.String)", exchangeId, Core.onSuccess(onUnblocked));
       }
@@ -102,7 +100,7 @@ namespace Camel {
         var arr = [];
         for (var key in obj) {
           var entry = obj[key];
-          console.log('blocked: ' + JSON.stringify(entry));
+          log.debug('blocked:', JSON.stringify(entry));
           arr.push(
             {
               exchangeId: entry.exchangeId,

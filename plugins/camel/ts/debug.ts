@@ -2,6 +2,8 @@
 
 namespace Camel {
 
+  const log: Logging.Logger = Logger.get("hawtio-integration-camel-debugger");
+
   _module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", (
     $scope,
     $element,
@@ -10,7 +12,6 @@ namespace Camel {
     localStorage: Storage,
     documentBase: string) => {
 
-    const log: Logging.Logger = Logger.get("CamelDebugger");
     const breakpointImageUrl = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint.png");
 
     // ignore the cached stuff in camel.ts as it seems to bork the node ids for some reason...
@@ -159,7 +160,7 @@ namespace Camel {
     function loadCurrentStack() {
       var mbean = getSelectionCamelDebugMBean(workspace);
       if (mbean) {
-        console.log("getting suspended breakpoints!");
+        log.info("Getting suspended breakpoints!");
         jolokia.execute(mbean, "getSuspendedBreakpointNodeIds", Core.onSuccess(onSuspendedBreakpointNodeIds));
       }
     }
@@ -180,7 +181,7 @@ namespace Camel {
     }
 
     function onMessages(response: Jolokia.IResponse): void {
-      log.debug("onMessage -> " + response);
+      log.debug("onMessage ->", response);
       $scope.messages = [];
       if (response) {
         var xml = response;
@@ -212,7 +213,7 @@ namespace Camel {
       updateMessageSelection();
       updateBreakpointNodes();
       onSelectionChanged();
-      log.debug("has messages " + $scope.messages.length + " selected row " + $scope.row + " index " + $scope.rowIndex);
+      log.debug("has messages", $scope.messages.length, "selected row", $scope.row, "index", $scope.rowIndex);
       Core.$apply($scope);
     }
 
