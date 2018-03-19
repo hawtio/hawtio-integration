@@ -1903,7 +1903,7 @@ declare namespace SpringBoot {
 }
 declare namespace SpringBoot {
     function configureRoutes($routeProvider: angular.route.IRouteProvider): void;
-    function configureLayout($templateCache: ng.ITemplateCacheService, viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace, springBootService: SpringBootService): void;
+    function configureLayout($templateCache: ng.ITemplateCacheService, viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace, treeService: Jmx.TreeService, springBootService: SpringBootService): void;
 }
 declare namespace SpringBoot {
     class Health {
