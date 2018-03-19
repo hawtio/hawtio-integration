@@ -329,10 +329,10 @@ namespace Camel {
             });
           }
           if (node) {
-            var total = 0 + parseInt(completed);
+            var total = _.toInteger(completed) + _.toInteger(inflight);
             var failed = stat.getAttribute("exchangesFailed");
             if (failed) {
-              total += parseInt(failed);
+              total += _.toInteger(failed);
             }
             var last = stat.getAttribute("lastProcessingTime");
             var mean = stat.getAttribute("meanProcessingTime");
