@@ -56,8 +56,8 @@
     "@hawtio/ui" "~3.2.0"
 
 "@hawtio/jmx@~3.2.0":
-  version "3.2.22"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.22.tgz#853a03662c4a361e80817e9f9c7f2092ed45589f"
+  version "3.2.23"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.23.tgz#5e783e3896922bbe3038d6b33f43b23143ff8659"
   dependencies:
     "@hawtio/core" "~3.2.0"
     "@hawtio/forms" "~3.2.0"
@@ -279,8 +279,8 @@ angular-mocks@~1.6.0:
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.6.9.tgz#4fed8c8293a5080e0919a7ff0dcf0f704864b7ba"
 
 angular-patternfly@^4.0.0:
-  version "4.15.0"
-  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.15.0.tgz#17fd980f7ce84217e4bbbe7d773fcf655b7e912c"
+  version "4.15.1"
+  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.15.1.tgz#ed02c2724a0d11624346c7e9cf044b3f895412a8"
   dependencies:
     angular "1.5.*"
     angular-animate "1.5.*"
@@ -4143,8 +4143,8 @@ patternfly-bootstrap-treeview@2.1.5, patternfly-bootstrap-treeview@~2.1.0:
     jquery ">= 2.1.x"
 
 patternfly@^3.37.1:
-  version "3.41.6"
-  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.41.6.tgz#e060cf75ad118bc51859a05d8e73061c880447ef"
+  version "3.42.0"
+  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.42.0.tgz#bdf9b1171ff7e2f4395094c4a7cb58e44122232e"
   dependencies:
     bootstrap "~3.3.7"
     font-awesome "^4.7.0"
