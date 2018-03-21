@@ -1373,7 +1373,7 @@ declare namespace Camel {
     function createGraphStates(nodes: any, links: any, transitions: any): any;
     function dagreLayoutGraph(nodes: any, links: any, svgElement: any, allowDrag?: boolean, onClick?: any): {
         nodes: any;
-        graph: graphlib.Graph;
+        graph: dagre.graphlib.Graph;
     };
     function dagreUpdateGraphData(): void;
 }

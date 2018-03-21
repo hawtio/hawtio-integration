@@ -153,9 +153,9 @@ namespace Camel {
 
     counters.attr("x", d => d.bbox.width / 2);
 
-    var g = new graphlib.Graph({
+    var g = new dagre.graphlib.Graph({
         multigraph: false,
-        compound: false
+        compound: false,
       })
       .setGraph({
         ranker: 'longest-path',

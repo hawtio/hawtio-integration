@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@hawtio/node-backend": "~3.0.0",
+    "@types/dagre-layout": "0.8.0",
     "angular-mocks": "~1.6.0",
     "del": "~3.0.0",
     "event-stream": "~3.3.0",

@@ -20222,9 +20222,9 @@ var Camel;
             .attr("x", function (d) { return -d.bbox.width / 2; })
             .attr("y", function (d) { return -d.bbox.height / 2; });
         counters.attr("x", function (d) { return d.bbox.width / 2; });
-        var g = new graphlib.Graph({
+        var g = new dagre.graphlib.Graph({
             multigraph: false,
-            compound: false
+            compound: false,
         })
             .setGraph({
             ranker: 'longest-path',
