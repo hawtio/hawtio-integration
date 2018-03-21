@@ -16579,6 +16579,262 @@ var Camel;
 })(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
+    Camel.typeConvertersComponent = {
+        template: "\n      <h2>Type Converters</h2>\n      <type-converters-statistics></type-converters-statistics>\n      <type-converters-table></type-converters-table>\n    "
+    };
+})(Camel || (Camel = {}));
+var Camel;
+(function (Camel) {
+    var TypeConvertersStatistics = /** @class */ (function () {
+        function TypeConvertersStatistics(object) {
+            angular.extend(this, object);
+        }
+        TypeConvertersStatistics.prototype.reset = function () {
+            this.AttemptCounter = 0;
+            this.HitCounter = 0;
+            this.MissCounter = 0;
+            this.FailedCounter = 0;
+        };
+        return TypeConvertersStatistics;
+    }());
+    Camel.TypeConvertersStatistics = TypeConvertersStatistics;
+})(Camel || (Camel = {}));
+var Camel;
+(function (Camel) {
+    var TypeConverter = /** @class */ (function () {
+        function TypeConverter(from, to) {
+            this.from = from;
+            this.to = to;
+        }
+        return TypeConverter;
+    }());
+    Camel.TypeConverter = TypeConverter;
+})(Camel || (Camel = {}));
+/// <reference path='type-converters-statistics.ts'/>
+/// <reference path="type-converter.ts"/>
+var Camel;
+(function (Camel) {
+    var TypeConvertersService = /** @class */ (function () {
+        TypeConvertersService.$inject = ["jolokiaService", "treeService"];
+        function TypeConvertersService(jolokiaService, treeService) {
+            'ngInject';
+            this.jolokiaService = jolokiaService;
+            this.treeService = treeService;
+        }
+        TypeConvertersService.prototype.enableStatistics = function () {
+            var _this = this;
+            return this.getTypeConverterObjectName()
+                .then(function (objectName) { return _this.jolokiaService.setAttribute(objectName, 'StatisticsEnabled', true); });
+        };
+        TypeConvertersService.prototype.disableStatistics = function () {
+            var _this = this;
+            return this.getTypeConverterObjectName()
+                .then(function (objectName) { return _this.jolokiaService.setAttribute(objectName, 'StatisticsEnabled', false); });
+        };
+        TypeConvertersService.prototype.resetStatistics = function () {
+            var _this = this;
+            return this.getTypeConverterObjectName()
+                .then(function (objectName) { return _this.jolokiaService.execute(objectName, 'resetTypeConversionCounters'); });
+        };
+        TypeConvertersService.prototype.getStatistics = function () {
+            var _this = this;
+            var attributes = ['AttemptCounter', 'HitCounter', 'MissCounter', 'FailedCounter'];
+            return this.getTypeConverterObjectName()
+                .then(function (objectName) { return _this.jolokiaService.getAttributes(objectName, attributes); })
+                .then(function (object) { return new Camel.TypeConvertersStatistics(object); });
+        };
+        TypeConvertersService.prototype.getTypeConverters = function () {
+            var _this = this;
+            return this.getTypeConverterObjectName()
+                .then(function (objectName) { return _this.jolokiaService.execute(objectName, 'listTypeConverters')
+                .then(function (object) {
+                var typeConverters = [];
+                for (var from in object) {
+                    var tos = object[from];
+                    for (var to in tos) {
+                        typeConverters.push(new Camel.TypeConverter(from, to));
+                    }
+                }
+                return typeConverters;
+            }); });
+        };
+        TypeConvertersService.prototype.getTypeConverterObjectName = function () {
+            return this.treeService.findMBeanWithProperties('org.apache.camel', { type: 'services', name: '*TypeConverter' })
+                .then(function (mbean) { return mbean.objectName; });
+        };
+        return TypeConvertersService;
+    }());
+    Camel.TypeConvertersService = TypeConvertersService;
+})(Camel || (Camel = {}));
+/// <reference path="type-converters.service.ts"/>
+/// <reference path='type-converters-statistics.ts'/>
+var Camel;
+(function (Camel) {
+    var TypeCovertersStatisticsController = /** @class */ (function () {
+        TypeCovertersStatisticsController.$inject = ["$timeout", "typeConvertersService"];
+        function TypeCovertersStatisticsController($timeout, typeConvertersService) {
+            'ngInject';
+            var _this = this;
+            this.$timeout = $timeout;
+            this.typeConvertersService = typeConvertersService;
+            this.reloadDelay = 10000;
+            this.enableStatisticsAction = {
+                name: 'Enable statistics',
+                actionFn: function () { return _this.enableStatistics(); }
+            };
+            this.disableStatisticsAction = {
+                name: 'Disable statistics',
+                actionFn: function () { return _this.disableStatistics(); }
+            };
+            this.resetStatisticsAction = {
+                name: 'Reset statistics',
+                actionFn: function () { return _this.resetStatistics(); },
+                isDisabled: true
+            };
+            this.toolbarConfig = {
+                actionsConfig: {
+                    primaryActions: [
+                        this.enableStatisticsAction,
+                        this.resetStatisticsAction
+                    ]
+                }
+            };
+        }
+        TypeCovertersStatisticsController.prototype.enableStatistics = function () {
+            this.typeConvertersService.enableStatistics();
+            this.loadDataPeriodically();
+            this.showDisableStatisticsButton();
+        };
+        TypeCovertersStatisticsController.prototype.showDisableStatisticsButton = function () {
+            this.toolbarConfig.actionsConfig.primaryActions[0] = this.disableStatisticsAction;
+            this.resetStatisticsAction.isDisabled = false;
+        };
+        TypeCovertersStatisticsController.prototype.disableStatistics = function () {
+            this.cancelTimer();
+            this.typeConvertersService.disableStatistics();
+            this.showEnableStatisticsButton();
+        };
+        TypeCovertersStatisticsController.prototype.showEnableStatisticsButton = function () {
+            this.toolbarConfig.actionsConfig.primaryActions[0] = this.enableStatisticsAction;
+            this.resetStatisticsAction.isDisabled = true;
+            this.statistics = null;
+        };
+        TypeCovertersStatisticsController.prototype.resetStatistics = function () {
+            this.typeConvertersService.resetStatistics();
+            this.statistics.reset();
+        };
+        TypeCovertersStatisticsController.prototype.$onDestroy = function () {
+            this.cancelTimer();
+        };
+        TypeCovertersStatisticsController.prototype.loadDataPeriodically = function () {
+            var _this = this;
+            this.typeConvertersService.getStatistics()
+                .then(function (statistics) { return _this.statistics = statistics; })
+                .then(function () { return _this.promise = _this.$timeout(function () { return _this.loadDataPeriodically(); }, _this.reloadDelay); });
+        };
+        TypeCovertersStatisticsController.prototype.cancelTimer = function () {
+            this.$timeout.cancel(this.promise);
+        };
+        return TypeCovertersStatisticsController;
+    }());
+    Camel.TypeCovertersStatisticsController = TypeCovertersStatisticsController;
+    Camel.typeConvertersStatisticsComponent = {
+        template: "\n      <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n      <dl class=\"dl-horizontal camel-type-converters-statistics\">\n        <dt>Attempts</dt>\n        <dd>{{$ctrl.statistics ? $ctrl.statistics.AttemptCounter : '-'}}</dd>\n        <dt>Hits</dt>\n        <dd>{{$ctrl.statistics ? $ctrl.statistics.HitCounter : '-'}}</dd>\n        <dt>Misses</dt>\n        <dd>{{$ctrl.statistics ? $ctrl.statistics.MissCounter : '-'}}</dd>\n        <dt>Failures</dt>\n        <dd>{{$ctrl.statistics ? $ctrl.statistics.FailedCounter : '-'}}</dd>\n      </dl>\n    ",
+        controller: TypeCovertersStatisticsController
+    };
+})(Camel || (Camel = {}));
+/// <reference path="type-converter.ts"/>
+var Camel;
+(function (Camel) {
+    var TypeCovertersTableController = /** @class */ (function () {
+        TypeCovertersTableController.$inject = ["typeConvertersService"];
+        function TypeCovertersTableController(typeConvertersService) {
+            'ngInject';
+            var _this = this;
+            this.typeConvertersService = typeConvertersService;
+            this.toolbarConfig = {
+                filterConfig: {
+                    fields: [
+                        {
+                            id: 'from',
+                            title: 'From',
+                            placeholder: 'Filter by from...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'to',
+                            title: 'To',
+                            placeholder: 'Filter by to...',
+                            filterType: 'text'
+                        }
+                    ],
+                    onFilterChange: function (filters) {
+                        _this.applyFilters(filters);
+                    },
+                    resultsCount: 0
+                },
+                isTableView: true
+            };
+            this.tableConfig = {
+                selectionMatchProp: 'from',
+                showCheckboxes: false
+            };
+            this.tableDtOptions = {
+                order: [[0, "asc"], [1, "asc"]],
+            };
+            this.tableColumns = [
+                { header: 'From', itemField: 'from' },
+                { header: 'To', itemField: 'to' }
+            ];
+        }
+        TypeCovertersTableController.prototype.$onInit = function () {
+            var _this = this;
+            this.typeConvertersService.getTypeConverters()
+                .then(function (typeConverters) {
+                _this.allTypeConverters = typeConverters;
+                _this.applyFilters([]);
+            });
+        };
+        TypeCovertersTableController.prototype.applyFilters = function (filters) {
+            var _this = this;
+            this.typeConverters = this.allTypeConverters;
+            filters.forEach(function (filter) {
+                var regExp = new RegExp(filter.value, 'i');
+                switch (filter.id) {
+                    case 'from':
+                        _this.typeConverters = _this.typeConverters.filter(function (typeConverter) { return regExp.test(typeConverter.from); });
+                        break;
+                    case 'to':
+                        _this.typeConverters = _this.typeConverters.filter(function (typeConverter) { return regExp.test(typeConverter.to); });
+                        break;
+                }
+            });
+            this.toolbarConfig.filterConfig.resultsCount = this.typeConverters.length;
+        };
+        return TypeCovertersTableController;
+    }());
+    Camel.TypeCovertersTableController = TypeCovertersTableController;
+    Camel.typeConvertersTableComponent = {
+        template: "\n      <div class=\"table-view\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <pf-table-view config=\"$ctrl.tableConfig\"\n                       dt-options=\"$ctrl.tableDtOptions\"\n                       columns=\"$ctrl.tableColumns\"\n                       items=\"$ctrl.typeConverters\"></pf-table-view>\n      </div>\n    ",
+        controller: TypeCovertersTableController
+    };
+})(Camel || (Camel = {}));
+/// <reference path="type-converters.component.ts"/>
+/// <reference path="type-converters-statistics.component.ts"/>
+/// <reference path="type-converters-table.component.ts"/>
+/// <reference path="type-converters.service.ts"/>
+var Camel;
+(function (Camel) {
+    Camel.typeConvertersModule = angular
+        .module('hawtio-camel-type-converters', [])
+        .component('typeConverters', Camel.typeConvertersComponent)
+        .component('typeConvertersStatistics', Camel.typeConvertersStatisticsComponent)
+        .component('typeConvertersTable', Camel.typeConvertersTableComponent)
+        .service('typeConvertersService', Camel.TypeConvertersService)
+        .name;
+})(Camel || (Camel = {}));
+var Camel;
+(function (Camel) {
     /**
      * Define the default categories for endpoints and map them to endpoint names
      * @property
@@ -18306,6 +18562,7 @@ var Camel;
 /// <reference path="exchanges/exchanges.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
+/// <reference path="type-converters/type-converters.module.ts"/>
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="camel-tree.service.ts"/>
 var Camel;
@@ -18318,6 +18575,7 @@ var Camel;
         Camel.exchangesModule,
         Camel.routesModule,
         Camel.treeModule,
+        Camel.typeConvertersModule
     ]);
     Camel._module.config(["$routeProvider", function ($routeProvider) {
             $routeProvider
@@ -18329,7 +18587,7 @@ var Camel;
                 .when('/camel/createEndpoint', { templateUrl: 'plugins/camel/html/createEndpoint.html' })
                 .when('/camel/route/diagram/:contextId/:routeId', { templateUrl: 'plugins/camel/html/routeDiagram.html' })
                 .when('/camel/routeDiagram', { templateUrl: 'plugins/camel/html/routeDiagram.html' })
-                .when('/camel/typeConverter', { templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false })
+                .when('/camel/typeConverter', { template: '<type-converters></type-converters>' })
                 .when('/camel/restServices', { templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false })
                 .when('/camel/endpoints-statistics', { template: '<endpoints-statistics></endpoints-statistics>' })
                 .when('/camel/routeMetrics', { templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false })
@@ -21147,115 +21405,6 @@ var Camel;
             $scope.messages = tracerStatus.messages;
             $scope.tracing = tracerStatus.jhandle != null;
         }]);
-})(Camel || (Camel = {}));
-/// <reference path="camelPlugin.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.TypeConverterController", ["$scope", "$location", "$timeout", "workspace", "jolokia", "treeService", function ($scope, $location, $timeout, workspace, jolokia, treeService) {
-        'ngInject';
-        $scope.data = [];
-        $scope.selectedMBean = null;
-        $scope.enableTypeConvertersStats = false;
-        $scope.disableTypeConvertersStats = false;
-        $scope.defaultTimeout = 5000;
-        $scope.mbeanAttributes = {};
-        var columnDefs = [
-            {
-                field: 'from',
-                displayName: 'From',
-                cellFilter: null,
-                width: "*",
-                resizable: true
-            },
-            {
-                field: 'to',
-                displayName: 'To',
-                cellFilter: null,
-                width: "*",
-                resizable: true
-            }
-        ];
-        $scope.gridOptions = {
-            data: 'data',
-            displayFooter: true,
-            displaySelectionCheckbox: false,
-            canSelectRows: false,
-            enableSorting: true,
-            columnDefs: columnDefs,
-            selectedItems: [],
-            filterOptions: {
-                filterText: ''
-            },
-            primaryKeyFn: function (entity) { return entity.from + '/' + entity.to; }
-        };
-        function onAttributes(response) {
-            var obj = response.value;
-            if (obj) {
-                $scope.mbeanAttributes = obj;
-                // ensure web page is updated
-                Core.$apply($scope);
-            }
-        }
-        function onConverters(response) {
-            var obj = response.value;
-            if (obj) {
-                // the JMX tabular data has 2 indexes so we need to dive 2 levels down to grab the data
-                var arr = [];
-                for (var key in obj) {
-                    var values = obj[key];
-                    for (var v in values) {
-                        arr.push({ from: key, to: v });
-                    }
-                }
-                arr = _.sortBy(arr, "from");
-                $scope.data = arr;
-                // okay we have the data then set the selected mbean which allows UI to display data
-                $scope.selectedMBean = response.request.mbean;
-                // ensure web page is updated
-                Core.$apply($scope);
-            }
-        }
-        $scope.renderIcon = function (state) {
-            return Camel.iconClass(state);
-        };
-        $scope.disableStatistics = function () {
-            $scope.disableTypeConvertersStats = true;
-            if ($scope.selectedMBean) {
-                jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", false);
-            }
-            $timeout(function () { $scope.disableTypeConvertersStats = false; }, $scope.defaultTimeout);
-        };
-        $scope.enableStatistics = function () {
-            $scope.enableTypeConvertersStats = true;
-            if ($scope.selectedMBean) {
-                jolokia.setAttribute($scope.selectedMBean, "StatisticsEnabled", true);
-            }
-            $timeout(function () { $scope.enableTypeConvertersStats = false; }, $scope.defaultTimeout);
-        };
-        $scope.resetStatistics = function () {
-            if ($scope.selectedMBean) {
-                jolokia.request({ type: 'exec', mbean: $scope.selectedMBean, operation: 'resetTypeConversionCounters' }, Core.onSuccess(null, { silent: true }));
-            }
-        };
-        function loadConverters() {
-            console.log("Loading TypeConverter data...");
-            return treeService.findMBeanWithProperties('org.apache.camel', { type: 'services', name: '*TypeConverter' })
-                .then(function (mbean) {
-                // grab attributes in real time
-                var query = {
-                    type: "read",
-                    mbean: mbean.objectName,
-                    attribute: ["AttemptCounter", "FailedCounter", "HitCounter", "MissCounter", "NumberOfTypeConverters", "StatisticsEnabled"]
-                };
-                jolokia.request(query, Core.onSuccess(onAttributes));
-                Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(onAttributes, query));
-                // and list of converters
-                jolokia.request({ type: 'exec', mbean: mbean.objectName, operation: 'listTypeConverters' }, Core.onSuccess(onConverters));
-            });
-        }
-        // load converters
-        loadConverters();
-    }]);
 })(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
@@ -26282,7 +26431,6 @@ $templateCache.put('plugins/camel/html/routeMetrics.html','<div ng-controller="C
 $templateCache.put('plugins/camel/html/sendMessage.html','<div ng-controller="Camel.SendMessageController">\n\n  <h2>Send Message</h2>\n\n  <div class="alert alert-warning" ng-show="noCredentials">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    <strong>No credentials set for endpoint!</strong>\n    Please set your username and password in the\n    <a href="#" class="alert-link" ng-click="openPrefs()">Preferences</a> page.\n  </div>\n\n  <h3>Headers</h3>\n\n  <div class="row camel-message-headers" ng-if="headers.length > 0">\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Name</label>\n          <input type="text" class="form-control" ng-model="header.name" ng-repeat="header in headers"\n                 uib-typeahead="completion for completion in defaultHeaderNames() | filter:$viewValue"\n                 pf-focused="$last">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Value</label>\n          <input type="text" class="form-control" ng-model="header.value" ng-repeat="header in headers">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-2">\n      <form>\n        <div class="form-group">\n          <label>&nbsp;</label>\n          <button type="button" class="btn btn-default" title="Delete" ng-click="removeHeader(header)"\n                  ng-repeat="header in headers">\n            <span class="pficon pficon-delete"></span>\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div>\n    <a href="" ng-click="addHeader()">Add header</a>\n  </div>\n\n  <h3>Body</h3>\n\n  <form>\n    <div class="form-group">\n      <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>\n    </div>\n    <div class="form-group">\n      <select class="form-control camel-send-message-format" ng-model="codeMirrorOptions.mode.name">\n        <option value="javascript">JSON</option>\n        <option value="xml">XML</option>\n      </select>\n      <button class="btn btn-default" ng-click="formatMessage()"\n              title="Automatically pretty prints the message so its easier to read">Format\n      </button>\n    </div>\n  </form>\n\n  <p>\n    <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>\n  </p>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/source.html','<div class="table-view" ng-controller="Camel.SourceController">\n  \n  <h2>Source</h2>\n  \n  <form>\n    <div class="form-group">\n      <div hawtio-editor="source" mode="\'xml\'" read-only="!showUpdateButton"></div>\n    </div>\n  </form>\n  \n  <button class="btn btn-primary" hawtio-show object-name="{{camelContextMBean}}"\n          method-name="addOrUpdateRoutesFromXml" ng-click="saveRouteXml()" ng-if="showUpdateButton">\n    Update\n  </button>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/traceRoute.html','<div class="camel-trace-main" ng-controller="Camel.TraceRouteController">\n  \n  <div class="row camel-trace-header">\n    <div class="col-sm-6">\n      <h2>Trace</h2>\n    </div>\n    <div class="col-sm-6">\n      <button type="button" class="btn btn-primary pull-right" ng-if="tracing" ng-click="stopTracing()">\n        Stop tracing\n      </button>\n    </div>\n  </div>\n  \n  <div ng-if="!tracing">\n    <p>Tracing allows you to send messages to a route and then step through and see the messages flow through a route\n      to aid debugging and to help diagnose issues.\n    </p>\n    <p>Once you start tracing, you can send messages to the input endpoints, then come back to this page and see the\n      flow of messages through your route.\n    </p>\n    <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up\n      and down in the message table lets you see the flow of the message through the diagram.\n    </p>\n    <button type="button" class="btn btn-primary" ng-click="startTracing()"\n      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="remove">\n      Start tracing\n    </button>\n    <div class="alert alert-info"\n      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="inverse">\n      <span class="pficon pficon-info"></span>\n      Tracing is not allowed for this user.\n    </div>\n  </div>\n  \n  <div class="camel-trace-diagram-wrapper" ng-include src="graphView" ng-if="tracing"></div>\n\n  <div class="camel-trace-bottom-panel" resizable r-directions="[\'top\']" r-flex="true" ng-if="tracing">\n    <table class="table table-striped table-bordered camel-trace-messages-table-header" ng-show="!message">\n      <thead>\n        <tr>\n          <th>ID</th>\n          <th>To Node</th>\n        </tr>\n      </thead>\n    </table>\n    <div class="camel-trace-messages-table-body-container" ng-show="!message">\n      <table class="table table-striped table-bordered">\n        <tbody>\n          <tr ng-repeat="message in messages">\n            <td>\n              <a href="" title="View message" ng-click="openMessageDialog(message, $index)">\n                {{message.headers.breadcrumbId}}\n              </a>\n            </td>\n            <td>{{message.toNode}}</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n    <div class="camel-trace-message-details" ng-if="message">\n      <button type="button" class="close" aria-hidden="true" ng-click="closeMessageDetails()">\n        <span class="pficon pficon-close"></span>\n      </button>\n      <ul class="pagination">\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="First" ng-disabled="messageIndex === 0" ng-click="changeMessage(0)">\n            <span class="i fa fa-angle-double-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="Previous" ng-disabled="messageIndex === 0" ng-click="changeMessage(messageIndex - 1)">\n            <span class="i fa fa-angle-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Next" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messageIndex + 1)">\n            <span class="i fa fa-angle-right"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Last" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messages.length - 1)">\n            <span class="i fa fa-angle-double-right"></span>\n          </a>\n        </li>\n      </ul>\n      <ul class="nav nav-tabs" ng-init="activeTab = \'headers\'">\n        <li ng-class="{\'active\': activeTab === \'headers\'}">\n          <a href="" ng-click="activeTab = \'headers\'">Headers</a>\n        </li>\n        <li ng-class="{\'active\': activeTab === \'body\'}">\n          <a href="" ng-click="activeTab = \'body\'">Body</a>\n        </li>\n      </ul>\n      <div class="camel-trace-headers-contents" ng-show="activeTab === \'headers\'">\n        <div ng-repeat="(key, value) in message.headers"><label>{{key}}:</label> {{value}}</div>\n      </div>\n      <div class="camel-trace-body-contents" ng-show="activeTab === \'body\'">\n        <em class="camel-trace-no-body-text" ng-show="message.body === \'[Body is null]\'">No Body</em>\n        <pre ng-show="message.body !== \'[Body is null]\'">{{message.body}}</pre>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/camel/html/typeConverter.html','<div class="table-view" ng-controller="Camel.TypeConverterController">\n  \n  <h2>Type Converters</h2>\n  \n  <div class="toolbar-pf">\n      <form class="toolbar-pf-actions">\n        <div class="form-group">\n          <button type="button" class="btn btn-default camel-type-converters-enable-statistics-button"\n            ng-click="enableStatistics()" ng-if="!mbeanAttributes.StatisticsEnabled">\n            <span ng-show="enableTypeConvertersStats" class="spinner spinner-xs spinner-inline"></span>\n            <span ng-show="!enableTypeConvertersStats">Enable statistics</span>\n          </button>\n          <button type="button" class="btn btn-default camel-type-converters-enable-statistics-button"\n            ng-click="disableStatistics()" ng-if="mbeanAttributes.StatisticsEnabled">\n            <span ng-show="disableTypeConvertersStats" class="spinner spinner-xs spinner-inline"></span>\n            <span ng-show="!disableTypeConvertersStats">Disable statistics</span>\n          </button>\n          <button type="button" class="btn btn-default" ng-click="resetStatistics()"\n            ng-disabled="!mbeanAttributes.StatisticsEnabled">Reset statistics</button>\n        </div>\n      </form>\n  </div>\n  \n  <div>\n    <dl class="dl-horizontal camel-type-converters-dl">\n      <dt>Number of Type Converters</dt>\n      <dd>{{mbeanAttributes.NumberOfTypeConverters}}</dd>\n      <dt># Attempts</dt>\n      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.AttemptCounter : \'-\'}}</dd>\n      <dt># Hit</dt>\n      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.HitCounter : \'-\'}}</dd>\n      <dt># Miss</dt>\n      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.MissCounter : \'-\'}}</dd>\n      <dt># Failed</dt>\n      <dd>{{mbeanAttributes.StatisticsEnabled ? mbeanAttributes.FailedCounter : \'-\'}}</dd>\n    </dl>\n  </div>\n\n  <div class="row toolbar-pf table-view-pf-toolbar">\n    <div class="col-sm-12">\n      <form class="toolbar-pf-actions search-pf">\n        <div class="form-group has-clear">\n          <div class="search-pf-input-group">\n            <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n            <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n            <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n              <span class="pficon pficon-close"></span>\n            </button>\n          </div>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>\n\n</div>\n');
 $templateCache.put('plugins/karaf/html/feature-details.html','<div class="toolbar-pf">\n  <form class="toolbar-pf-actions">\n    <div class="form-group">\n      <button ng-click="install(name,version)"\n              class="btn btn-default"\n              title="install"\n              hawtio-show\n              object-name="{{featuresMBean}}"\n              method-name="installFeature">Install</button>\n      <button ng-click="uninstall(name,version)"\n              class="btn btn-default"\n              title="uninstall"\n              hawtio-show\n              object-name="{{featuresMBean}}"\n              method-name="uninstallFeature">Uninstall</button>\n    </div>\n  </form>\n</div>\n\n<h2>Details</h2>\n<dl class="dl-horizontal">\n  <dt>ID</dt>\n  <dd>{{row.Id}}</dd>\n  <dt>Name</dt>\n  <dd>{{row.Name}}</dd>\n  <dt>State</dt>\n  <dd>{{row.Installed === \'true\' ? \'Installed\' : \'Uninstalled\'}}</dd>\n  <dt>Repository Name</dt>\n  <dd>{{row.RepositoryName}}</dd>\n  <dt>Repository URI</dt>\n  <dd>{{row.RepositoryURI}}</dd>\n  <dt>Version</dt>\n  <dd>{{row.Version}}</dd>\n</dl>\n\n<h2>Dependencies</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="feature in row.Dependencies">\n    <a href=\'osgi/feature/{{feature.Name}}/{{feature.Version}}\'>{{feature.Name}}/{{feature.Version}}</a>\n  </li>\n</ul>\n\n<h2>Bundles</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="bundle in row.BundleDetails">\n    <div ng-switch="bundle.Installed">\n      <a ng-switch-when="true" href=\'osgi/bundle/{{bundle.Identifier}}\'>{{bundle.Location}}</a>\n      <span ng-switch-default>{{bundle.Location}}</span>\n    </div>\n  </li>\n</ul>\n\n<h2>Configurations</h2>\n<table class="table table-striped table-bordered">\n  <thead>\n    <tr>\n      <th>PID</th>\n      <th>Properties</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr ng-repeat="(pid, value) in row.Configurations">\n      <td><a href="osgi/pid/{{value.Pid}}">{{value.Pid}}</a></td>\n      <td>\n        <ul class="list-unstyled">\n          <li ng-repeat="(key, value) in value.Elements">{{key}} = {{value.Value}}</li>\n        </ul>\n    </tr>\n  </tbody>\n</table>\n\n<h2>Configuration Files</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="(key, value) in row[\'Configuration Files\']">{{value.Files}}</li>\n</ul>\n');
 $templateCache.put('plugins/karaf/html/feature.html','<div class="controller-section" ng-controller="Karaf.FeatureController">\n\n  <ol class="breadcrumb">\n    <li>\n      <a ng-href="osgi/features">Features</a>\n    </li>\n    <li class="page-title">\n      {{row.Id}}\n    </li>\n  </ol>\n\n  <div ng-include src="\'plugins/karaf/html/feature-details.html\'"></div>\n\n</div>\n\n');
 $templateCache.put('plugins/karaf/html/features.html','<div class="list-view">\n\n  <h1>Features</h1>\n\n  <p ng-if="$ctrl.loading">Loading...</p>\n\n  <div ng-if="!$ctrl.loading">\n    <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>\n    <pf-list-view items="$ctrl.listItems"\n                  config="$ctrl.listConfig"\n                  action-buttons="$ctrl.listItemActionButtons"\n                  enable-button-for-item-fn="$ctrl.enableButtonForItem">\n      <div class="list-view-pf-description">\n        <div class="list-view-pf-left">\n          <span class="list-view-pf-icon-sm fa"\n                ng-class="{\'list-view-pf-icon-success fa-check\': item.installed}"\n                title="Feature {{item.id}} {{item.getState()}}">\n          </span>\n        </div>\n        <div class="list-group-item-heading"><a ng-href=osgi/feature/{{item.id}}>{{item.id}}</a></div>\n      </div>\n      </pf-list-view>\n  </div>\n\n  <script type="text/ng-template" id="addRepositoryDialog.html">\n    <form name="addProperty" class="form-horizontal">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4 class="modal-title">Add feature repository</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-3 control-label" for="repositoryUri">Repository URI</label>\n          <div class="col-sm-9">\n            <input type="text" class="form-control" id="repositoryUri" ng-model="$ctrl.repositoryUri" placeholder="mvn:foo/bar/1.0/xml/features" required>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-primary" ng-click="$close()">Add</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="removeRepositoryDialog.html">\n    <form name="addProperty" class="form-horizontal">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4 class="modal-title">Remove feature repository</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-3 control-label" for="repository">Repository</label>\n          <div class="col-sm-9">\n            <select ng-model="$ctrl.selectedRepository" ng-options="repository.name for repository in $ctrl.repositories" required></select>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-primary" ng-click="$close()">Remove</button>\n      </div>\n    </form>\n  </script>\n</div>\n');

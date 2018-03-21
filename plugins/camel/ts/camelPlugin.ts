@@ -4,6 +4,7 @@
 /// <reference path="exchanges/exchanges.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
+/// <reference path="type-converters/type-converters.module.ts"/>
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="camel-tree.service.ts"/>
 
@@ -17,6 +18,7 @@ namespace Camel {
     exchangesModule,
     routesModule,
     treeModule,
+    typeConvertersModule
   ]);
 
   _module.config(["$routeProvider", ($routeProvider) => {
@@ -29,7 +31,7 @@ namespace Camel {
             .when('/camel/createEndpoint', {templateUrl: 'plugins/camel/html/createEndpoint.html'})
             .when('/camel/route/diagram/:contextId/:routeId', {templateUrl: 'plugins/camel/html/routeDiagram.html'})
             .when('/camel/routeDiagram', {templateUrl: 'plugins/camel/html/routeDiagram.html'})
-            .when('/camel/typeConverter', {templateUrl: 'plugins/camel/html/typeConverter.html', reloadOnSearch: false})
+            .when('/camel/typeConverter', {template: '<type-converters></type-converters>'})
             .when('/camel/restServices', {templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false})
             .when('/camel/endpoints-statistics', {template: '<endpoints-statistics></endpoints-statistics>'})
             .when('/camel/routeMetrics', {templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false})

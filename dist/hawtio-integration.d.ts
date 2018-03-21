@@ -532,6 +532,117 @@ declare namespace Camel {
     const treeElementId = "#cameltree";
 }
 declare namespace Camel {
+    const typeConvertersComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    class TypeConvertersStatistics {
+        AttemptCounter: number;
+        HitCounter: number;
+        MissCounter: number;
+        FailedCounter: number;
+        constructor(object: any);
+        reset(): void;
+    }
+}
+declare namespace Camel {
+    class TypeConverter {
+        from: string;
+        to: string;
+        constructor(from: string, to: string);
+    }
+}
+declare namespace Camel {
+    class TypeConvertersService {
+        private jolokiaService;
+        private treeService;
+        constructor(jolokiaService: JVM.JolokiaService, treeService: Jmx.TreeService);
+        enableStatistics(): ng.IPromise<any>;
+        disableStatistics(): ng.IPromise<any>;
+        resetStatistics(): ng.IPromise<any>;
+        getStatistics(): ng.IPromise<any>;
+        getTypeConverters(): ng.IPromise<TypeConverter[]>;
+        private getTypeConverterObjectName();
+    }
+}
+declare namespace Camel {
+    class TypeCovertersStatisticsController {
+        private $timeout;
+        private typeConvertersService;
+        reloadDelay: number;
+        statistics: TypeConvertersStatistics;
+        promise: any;
+        enableStatisticsAction: {
+            name: string;
+            actionFn: () => void;
+        };
+        disableStatisticsAction: {
+            name: string;
+            actionFn: () => void;
+        };
+        resetStatisticsAction: {
+            name: string;
+            actionFn: () => void;
+            isDisabled: boolean;
+        };
+        toolbarConfig: {
+            actionsConfig: {
+                primaryActions: {
+                    name: string;
+                    actionFn: () => void;
+                }[];
+            };
+        };
+        constructor($timeout: ng.ITimeoutService, typeConvertersService: TypeConvertersService);
+        enableStatistics(): void;
+        showDisableStatisticsButton(): void;
+        disableStatistics(): void;
+        showEnableStatisticsButton(): void;
+        resetStatistics(): void;
+        $onDestroy(): void;
+        loadDataPeriodically(): void;
+        cancelTimer(): void;
+    }
+    const typeConvertersStatisticsComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    class TypeCovertersTableController {
+        private typeConvertersService;
+        allTypeConverters: TypeConverter[];
+        typeConverters: TypeConverter[];
+        toolbarConfig: {
+            filterConfig: {
+                fields: {
+                    id: string;
+                    title: string;
+                    placeholder: string;
+                    filterType: string;
+                }[];
+                onFilterChange: (filters: any[]) => void;
+                resultsCount: number;
+            };
+            isTableView: boolean;
+        };
+        tableConfig: {
+            selectionMatchProp: string;
+            showCheckboxes: boolean;
+        };
+        tableDtOptions: {
+            order: (string | number)[][];
+        };
+        tableColumns: {
+            header: string;
+            itemField: string;
+        }[];
+        constructor(typeConvertersService: TypeConvertersService);
+        $onInit(): void;
+        applyFilters(filters: any[]): void;
+    }
+    const typeConvertersTableComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const typeConvertersModule: string;
+}
+declare namespace Camel {
     /**
      * Define the default categories for endpoints and map them to endpoint names
      * @property
@@ -1362,8 +1473,6 @@ declare namespace Camel {
             };
         };
     };
-}
-declare namespace Camel {
 }
 declare namespace Camel {
 }
