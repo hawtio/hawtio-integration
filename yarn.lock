@@ -19,9 +19,9 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@hawtio/core-dts@3.0.18", "@hawtio/core-dts@~3.0.0":
-  version "3.0.18"
-  resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.0.18.tgz#20d1ff7e839c0e3180c18e954ad7a305c4ba2b24"
+"@hawtio/core-dts@3.0.18", "@hawtio/core-dts@3.1.0", "@hawtio/core-dts@~3.0.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.1.0.tgz#23b73d0f7f884fb1e1e8d9537d36d42bbdee18df"
   dependencies:
     "@types/jquery" "~2.0.46"
 
