@@ -56,12 +56,13 @@
     "@hawtio/ui" "~3.2.0"
 
 "@hawtio/jmx@~3.2.0":
-  version "3.2.24"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.24.tgz#842ff8a46dfb86d22fc63729e1822c4b849fee60"
+  version "3.2.25"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.25.tgz#08b3f9d30d361183a2f2f35295c107e20ffe5129"
   dependencies:
     "@hawtio/core" "~3.2.0"
     "@hawtio/forms" "~3.2.0"
     "@hawtio/ui" "~3.2.0"
+    "@types/angular-ui-bootstrap" "~0.13.46"
     angular-resizable "1.2.0"
     patternfly-bootstrap-treeview "2.1.5"
 
@@ -108,6 +109,12 @@
 "@types/angular-route@1.3.4":
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/@types/angular-route/-/angular-route-1.3.4.tgz#10d3f7eb313fb8a4b832041f9401869803dcd4df"
+  dependencies:
+    "@types/angular" "*"
+
+"@types/angular-ui-bootstrap@~0.13.46":
+  version "0.13.46"
+  resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-0.13.46.tgz#67b2bc2801cdaec515567840c9d82cc649c34656"
   dependencies:
     "@types/angular" "*"
 
