@@ -7,7 +7,7 @@
 
 namespace SpringBoot {
 
-  const springBootModule = angular
+  export const springBootModule = angular
     .module('hawtio-integration-spring-boot', [
       healthModule,
       loggersModule,
@@ -18,8 +18,6 @@ namespace SpringBoot {
     .component('springBoot', springBootComponent)
     .service('springBootService', SpringBootService)
     .name;
-
-  hawtioPluginLoader.addModule(springBootModule);
 
   export const log: Logging.Logger = Logger.get(springBootModule);
 

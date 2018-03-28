@@ -13778,32 +13778,15 @@ var _apacheCamelModel ={
 
 }(window.metricsWatcher = window.metricsWatcher || {}, jQuery));
 
-var Pf;
-(function (Pf) {
-    function filter(items, filterConfig) {
-        var filteredItems = items;
-        if (filterConfig.appliedFilters) {
-            filterConfig.appliedFilters.forEach(function (filter) {
-                var filterType = _.find(filterConfig.fields, { 'id': filter.id }).filterType;
-                switch (filterType) {
-                    case 'text':
-                        var regExp_1 = new RegExp(filter.value, 'i');
-                        filteredItems = filteredItems.filter(function (item) { return regExp_1.test(item[filter.id]); });
-                        break;
-                    case 'number':
-                        filteredItems = filteredItems.filter(function (item) { return item[filter.id] === parseInt(filter.value); });
-                        break;
-                    case 'select':
-                        filteredItems = filteredItems.filter(function (item) { return item[filter.id] === filter.value; });
-                        break;
-                }
-            });
-        }
-        filterConfig.resultsCount = filteredItems.length;
-        return filteredItems;
+var Integration;
+(function (Integration) {
+    configureAboutPage.$inject = ["aboutService"];
+    function configureAboutPage(aboutService) {
+        'ngInject';
+        aboutService.addProductInfo('Hawtio Integration', 'PACKAGE_VERSION_PLACEHOLDER');
     }
-    Pf.filter = filter;
-})(Pf || (Pf = {}));
+    Integration.configureAboutPage = configureAboutPage;
+})(Integration || (Integration = {}));
 var ActiveMQ;
 (function (ActiveMQ) {
     ActiveMQ.pluginName = 'hawtio-integration-activemq';
@@ -14475,1073 +14458,6 @@ var ActiveMQ;
     }
     hawtioPluginLoader.addModule(ActiveMQ.pluginName);
 })(ActiveMQ || (ActiveMQ = {}));
-/// <reference path="activemqHelpers.ts"/>
-var ActiveMQ;
-(function (ActiveMQ) {
-    var TAB_CONFIG = {
-        attributes: {
-            title: 'Attributes',
-            route: '/jmx/attributes'
-        },
-        operations: {
-            title: 'Operations',
-            route: '/jmx/operations'
-        },
-        chart: {
-            title: 'Chart',
-            route: '/jmx/charts'
-        },
-        browse: {
-            title: 'Browse',
-            route: '/activemq/browseQueue'
-        },
-        sendMessage: {
-            title: 'Send',
-            route: '/activemq/sendMessage'
-        },
-        durableSubscribers: {
-            title: 'Durable Subscribers',
-            route: '/activemq/durableSubscribers'
-        },
-        jobs: {
-            title: 'Jobs',
-            route: '/activemq/jobs'
-        },
-        createDestination: {
-            title: 'Create',
-            route: '/activemq/createDestination'
-        },
-        deleteTopic: {
-            title: 'Delete',
-            route: '/activemq/deleteTopic'
-        },
-        deleteQueue: {
-            title: 'Delete',
-            route: '/activemq/deleteQueue'
-        },
-        queues: {
-            title: 'Queues',
-            route: '/activemq/queues'
-        },
-        topics: {
-            title: 'Topics',
-            route: '/activemq/topics'
-        },
-    };
-    var ActiveMQNavigationService = /** @class */ (function () {
-        ActiveMQNavigationService.$inject = ["workspace", "configManager"];
-        function ActiveMQNavigationService(workspace, configManager) {
-            'ngInject';
-            this.workspace = workspace;
-            this.configManager = configManager;
-        }
-        ActiveMQNavigationService.prototype.getTabs = function () {
-            var _this = this;
-            var tabs = [];
-            var enabledRoutes = Object.keys(TAB_CONFIG)
-                .map(function (config) { return TAB_CONFIG[config].route; })
-                .filter(function (route) { return _.startsWith(route, '/activemq') && _this.configManager.isRouteEnabled(route); });
-            if (enabledRoutes.length > 0) {
-                tabs.push(new Nav.HawtioTab(TAB_CONFIG.attributes.title, TAB_CONFIG.attributes.route));
-                tabs.push(new Nav.HawtioTab(TAB_CONFIG.operations.title, TAB_CONFIG.operations.route));
-                tabs.push(new Nav.HawtioTab(TAB_CONFIG.chart.title, TAB_CONFIG.chart.route));
-                if (this.shouldShowBrowseTab()) {
-                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.browse.title, TAB_CONFIG.browse.route));
-                }
-                if (this.shouldShowSendTab()) {
-                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.sendMessage.title, TAB_CONFIG.sendMessage.route));
-                }
-                if (this.shouldShowDurableSubscribersTab()) {
-                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.durableSubscribers.title, TAB_CONFIG.durableSubscribers.route));
-                }
-                if (this.shouldShowJobsTab()) {
-                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.jobs.title, TAB_CONFIG.jobs.route));
-                }
-                if (this.shouldShowCreateTab()) {
-                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.createDestination.title, TAB_CONFIG.createDestination.route));
-                }
-                if (this.shouldShowDeleteTopicTab()) {
-                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.deleteTopic.title, TAB_CONFIG.deleteTopic.route));
-                }
-                if (this.shouldShowDeleteQueueTab()) {
-                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.deleteQueue.title, TAB_CONFIG.deleteQueue.route));
-                }
-                if (this.shouldShowQueuesTab()) {
-                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.queues.title, TAB_CONFIG.queues.route));
-                }
-                if (this.shouldShowTopicsTab()) {
-                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.topics.title, TAB_CONFIG.topics.route));
-                }
-            }
-            return tabs;
-        };
-        ActiveMQNavigationService.prototype.shouldShowBrowseTab = function () {
-            return this.configManager.isRouteEnabled(TAB_CONFIG.browse.route) && this.isQueue() &&
-                this.workspace.hasInvokeRights(this.workspace.selection, 'browse()');
-        };
-        ActiveMQNavigationService.prototype.shouldShowSendTab = function () {
-            return this.configManager.isRouteEnabled(TAB_CONFIG.sendMessage.route) && (this.isQueue() || this.isTopic()) &&
-                this.workspace.hasInvokeRights(this.workspace.selection, 'sendTextMessage(java.util.Map,java.lang.String,java.lang.String,java.lang.String)');
-        };
-        ActiveMQNavigationService.prototype.shouldShowDurableSubscribersTab = function () {
-            return this.configManager.isRouteEnabled(TAB_CONFIG.durableSubscribers.route) && this.isBroker();
-        };
-        ActiveMQNavigationService.prototype.shouldShowJobsTab = function () {
-            return this.configManager.isRouteEnabled(TAB_CONFIG.jobs.route) && this.isJobScheduler();
-        };
-        ActiveMQNavigationService.prototype.shouldShowCreateTab = function () {
-            return this.configManager.isRouteEnabled(TAB_CONFIG.createDestination.route) && this.isBroker() &&
-                this.workspace.hasInvokeRights(this.getBroker(), 'addQueue', 'addTopic');
-        };
-        ActiveMQNavigationService.prototype.shouldShowDeleteTopicTab = function () {
-            return this.configManager.isRouteEnabled(TAB_CONFIG.deleteTopic.route) && this.isTopic() &&
-                this.workspace.hasInvokeRights(this.getBroker(), 'removeTopic');
-        };
-        ActiveMQNavigationService.prototype.shouldShowDeleteQueueTab = function () {
-            return this.configManager.isRouteEnabled(TAB_CONFIG.deleteQueue.route) && this.isQueue() &&
-                this.workspace.hasInvokeRights(this.getBroker(), 'removeQueue');
-        };
-        ActiveMQNavigationService.prototype.shouldShowQueuesTab = function () {
-            return this.configManager.isRouteEnabled(TAB_CONFIG.queues.route) && this.isBroker();
-        };
-        ActiveMQNavigationService.prototype.shouldShowTopicsTab = function () {
-            return this.configManager.isRouteEnabled(TAB_CONFIG.topics.route) && this.isBroker();
-        };
-        ActiveMQNavigationService.prototype.isQueue = function () {
-            return this.workspace.hasDomainAndProperties(ActiveMQ.jmxDomain, { 'destinationType': 'Queue' }, 4) ||
-                this.workspace.selectionHasDomainAndType(ActiveMQ.jmxDomain, 'Queue');
-        };
-        ActiveMQNavigationService.prototype.isTopic = function () {
-            return this.workspace.hasDomainAndProperties(ActiveMQ.jmxDomain, { 'destinationType': 'Topic' }, 4) || this.workspace.selectionHasDomainAndType(ActiveMQ.jmxDomain, 'Topic');
-        };
-        ActiveMQNavigationService.prototype.isQueuesFolder = function () {
-            return this.workspace.selectionHasDomainAndLastFolderName(ActiveMQ.jmxDomain, 'Queue');
-        };
-        ActiveMQNavigationService.prototype.isTopicsFolder = function () {
-            return this.workspace.selectionHasDomainAndLastFolderName(ActiveMQ.jmxDomain, 'Topic');
-        };
-        ActiveMQNavigationService.prototype.isJobScheduler = function () {
-            return this.workspace.hasDomainAndProperties(ActiveMQ.jmxDomain, { 'service': 'JobScheduler' }, 4);
-        };
-        ActiveMQNavigationService.prototype.isBroker = function () {
-            if (this.workspace.selectionHasDomainAndType(ActiveMQ.jmxDomain, 'Broker')) {
-                var self = Core.pathGet(this.workspace, ["selection"]);
-                var parent = Core.pathGet(this.workspace, ["selection", "parent"]);
-                return !(parent && (parent.ancestorHasType('Broker') || self.ancestorHasType('Broker')));
-            }
-            return false;
-        };
-        ActiveMQNavigationService.prototype.getBroker = function () {
-            var answer = null;
-            var selection = this.workspace.selection;
-            if (selection) {
-                answer = selection.findAncestor(function (current) {
-                    var entries = current.entries;
-                    if (entries) {
-                        return (('type' in entries && entries.type === 'Broker') && 'brokerName' in entries && !('destinationName' in entries) && !('destinationType' in entries));
-                    }
-                    else {
-                        return false;
-                    }
-                });
-            }
-            return answer;
-        };
-        return ActiveMQNavigationService;
-    }());
-    ActiveMQ.ActiveMQNavigationService = ActiveMQNavigationService;
-    ActiveMQ._module.service('activeMQNavigationService', ActiveMQNavigationService);
-})(ActiveMQ || (ActiveMQ = {}));
-/// <reference path="activemqPlugin.ts"/>
-/// <reference path="activemq-navigation.service.ts"/>
-var ActiveMQ;
-(function (ActiveMQ) {
-    var ActiveMQNavigationController = /** @class */ (function () {
-        ActiveMQNavigationController.$inject = ["$scope", "$location", "activeMQNavigationService"];
-        function ActiveMQNavigationController($scope, $location, activeMQNavigationService) {
-            'ngInject';
-            var _this = this;
-            this.$location = $location;
-            this.activeMQNavigationService = activeMQNavigationService;
-            $scope.$on('jmxTreeClicked', function () {
-                _this.tabs = activeMQNavigationService.getTabs();
-                var tab = _.find(_this.tabs, { path: _this.$location.path() });
-                if (!tab) {
-                    tab = _this.tabs[0];
-                }
-                _this.$location.path(tab.path);
-            });
-        }
-        ActiveMQNavigationController.prototype.$onInit = function () {
-            this.tabs = this.activeMQNavigationService.getTabs();
-        };
-        ActiveMQNavigationController.prototype.goto = function (tab) {
-            this.$location.path(tab.path);
-        };
-        return ActiveMQNavigationController;
-    }());
-    ActiveMQ.ActiveMQNavigationController = ActiveMQNavigationController;
-    ActiveMQ.activeMQNavigationComponent = {
-        template: '<hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>',
-        controller: ActiveMQNavigationController
-    };
-    ActiveMQ._module.component('activemqNavigation', ActiveMQ.activeMQNavigationComponent);
-})(ActiveMQ || (ActiveMQ = {}));
-/// <reference path="activemqHelpers.ts"/>
-/// <reference path="activemqPlugin.ts"/>
-var ActiveMQ;
-(function (ActiveMQ) {
-    ActiveMQ.BrowseQueueController = ActiveMQ._module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$routeParams", "$dialog", "$templateCache", function ($scope, workspace, jolokia, localStorage, $location, activeMQMessage, $timeout, $routeParams, $dialog, $templateCache) {
-            var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
-            // all the queue names from the tree
-            $scope.queueNames = [];
-            // selected queue name in move dialog
-            $scope.queueName = $routeParams["queueName"];
-            $scope.searchText = '';
-            $scope.workspace = workspace;
-            $scope.allMessages = [];
-            $scope.messages = [];
-            $scope.headers = {};
-            $scope.mode = 'text';
-            $scope.showButtons = true;
-            $scope.deleteDialog = false;
-            $scope.moveDialog = false;
-            $scope.gridOptions = {
-                selectedItems: [],
-                data: 'messages',
-                displayFooter: false,
-                showFilter: false,
-                showColumnMenu: true,
-                enableColumnResize: true,
-                enableColumnReordering: true,
-                enableHighlighting: true,
-                filterOptions: {
-                    filterText: '',
-                    useExternalFilter: true
-                },
-                selectWithCheckboxOnly: true,
-                showSelectionCheckbox: true,
-                maintainColumnRatios: false,
-                columnDefs: [
-                    {
-                        field: 'JMSMessageID',
-                        displayName: 'Message ID',
-                        cellTemplate: '<div class="ngCellText"><a href="" ng-click="row.entity.openMessageDialog(row)">{{row.entity.JMSMessageID}}</a></div>',
-                        // for ng-grid
-                        width: '34%'
-                        // for hawtio-datatable
-                        // width: "22em"
-                    },
-                    {
-                        field: 'JMSType',
-                        displayName: 'Type',
-                        width: '10%'
-                    },
-                    {
-                        field: 'JMSPriority',
-                        displayName: 'Priority',
-                        width: '7%'
-                    },
-                    {
-                        field: 'JMSTimestamp',
-                        displayName: 'Timestamp',
-                        width: '19%'
-                    },
-                    {
-                        field: 'JMSExpiration',
-                        displayName: 'Expires',
-                        width: '10%'
-                    },
-                    {
-                        field: 'JMSReplyTo',
-                        displayName: 'Reply To',
-                        width: '10%'
-                    },
-                    {
-                        field: 'JMSCorrelationID',
-                        displayName: 'Correlation ID',
-                        width: '10%'
-                    }
-                ],
-                primaryKeyFn: function (entity) { return entity.JMSMessageID; }
-            };
-            $scope.showMessageDetails = false;
-            // openMessageDialog is for the dialog itself so we should skip that guy
-            var ignoreColumns = ["PropertiesText", "BodyPreview", "Text", "openMessageDialog"];
-            var flattenColumns = ["BooleanProperties", "ByteProperties", "ShortProperties", "IntProperties", "LongProperties", "FloatProperties",
-                "DoubleProperties", "StringProperties"];
-            $scope.$watch('gridOptions.filterOptions.filterText', function (filterText) {
-                filterMessages(filterText);
-            });
-            $scope.openMessageDialog = function (message) {
-                ActiveMQ.selectCurrentMessage(message, "JMSMessageID", $scope);
-                if ($scope.row) {
-                    $scope.mode = CodeEditor.detectTextFormat($scope.row.Text);
-                    $scope.showMessageDetails = true;
-                }
-            };
-            $scope.refresh = loadTable;
-            ActiveMQ.decorate($scope);
-            $scope.moveMessages = function () {
-                var selection = workspace.selection;
-                var mbean = selection.objectName;
-                if (!mbean || !selection || !$scope.queueName) {
-                    return;
-                }
-                var selectedItems = $scope.gridOptions.selectedItems;
-                $scope.message = "Moved " + Core.maybePlural(selectedItems.length, "message") + " to " + $scope.queueName;
-                var operation = "moveMessageTo(java.lang.String, java.lang.String)";
-                angular.forEach(selectedItems, function (item, idx) {
-                    var id = item.JMSMessageID;
-                    if (id) {
-                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
-                        jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
-                    }
-                });
-            };
-            $scope.resendMessage = function () {
-                var selection = workspace.selection;
-                var mbean = selection.objectName;
-                if (mbean && selection) {
-                    var selectedItems = $scope.gridOptions.selectedItems;
-                    //always assume a single message
-                    activeMQMessage.message = selectedItems[0];
-                    $location.path('activemq/sendMessage');
-                }
-            };
-            $scope.deleteMessages = function () {
-                var selection = workspace.selection;
-                var mbean = selection.objectName;
-                if (!mbean || !selection) {
-                    return;
-                }
-                var selectedItems = $scope.gridOptions.selectedItems;
-                if (!selectedItems || selectedItems.length === 0) {
-                    return;
-                }
-                $scope.message = "Deleted " + Core.maybePlural(selectedItems.length, "message");
-                var operation = "removeMessage(java.lang.String)";
-                angular.forEach(selectedItems, function (item, idx) {
-                    var id = item.JMSMessageID;
-                    if (id) {
-                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
-                        jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
-                    }
-                });
-            };
-            $scope.retryMessages = function () {
-                var selection = workspace.selection;
-                var mbean = selection.objectName;
-                if (mbean && selection) {
-                    var selectedItems = $scope.gridOptions.selectedItems;
-                    $scope.message = "Retry " + Core.maybePlural(selectedItems.length, "message");
-                    var operation = "retryMessage(java.lang.String)";
-                    angular.forEach(selectedItems, function (item, idx) {
-                        var id = item.JMSMessageID;
-                        if (id) {
-                            var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
-                            jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
-                        }
-                    });
-                }
-            };
-            function populateTable(response) {
-                // setup queue names
-                if ($scope.queueNames.length === 0) {
-                    var queueNames = ActiveMQ.retrieveQueueNames(workspace, true);
-                    var selectedQueue = workspace.selection.text;
-                    $scope.queueNames = queueNames.filter(function (name) { return name !== selectedQueue; });
-                }
-                var data = response.value;
-                if (!angular.isArray(data)) {
-                    $scope.allMessages = [];
-                    angular.forEach(data, function (value, idx) {
-                        $scope.allMessages.push(value);
-                    });
-                }
-                else {
-                    $scope.allMessages = data;
-                }
-                angular.forEach($scope.allMessages, function (message) {
-                    message.openMessageDialog = $scope.openMessageDialog;
-                    message.headerHtml = createHeaderHtml(message);
-                    message.bodyText = createBodyText(message);
-                });
-                filterMessages($scope.gridOptions.filterOptions.filterText);
-                Core.$apply($scope);
-            }
-            /*
-             * For some reason using ng-repeat in the modal dialog doesn't work so lets
-             * just create the HTML in code :)
-             */
-            function createBodyText(message) {
-                if (message.Text) {
-                    var body = message.Text;
-                    var lenTxt = "" + body.length;
-                    message.textMode = "text (" + lenTxt + " chars)";
-                    return body;
-                }
-                else if (message.BodyPreview) {
-                    var code = Core.parseIntValue(localStorage["activemqBrowseBytesMessages"] || "1", "browse bytes messages");
-                    var body;
-                    message.textMode = "bytes (turned off)";
-                    if (code != 99) {
-                        var bytesArr = [];
-                        var textArr = [];
-                        message.BodyPreview.forEach(function (b) {
-                            if (code === 1 || code === 2) {
-                                // text
-                                textArr.push(String.fromCharCode(b));
-                            }
-                            if (code === 1 || code === 4) {
-                                // hex and must be 2 digit so they space out evenly
-                                var s = b.toString(16);
-                                if (s.length === 1) {
-                                    s = "0" + s;
-                                }
-                                bytesArr.push(s);
-                            }
-                            else {
-                                // just show as is without spacing out, as that is usually more used for hex than decimal
-                                var s = b.toString(10);
-                                bytesArr.push(s);
-                            }
-                        });
-                        var bytesData = bytesArr.join(" ");
-                        var textData = textArr.join("");
-                        if (code === 1 || code === 2) {
-                            // bytes and text
-                            var len = message.BodyPreview.length;
-                            var lenTxt = "" + textArr.length;
-                            body = "bytes:\n" + bytesData + "\n\ntext:\n" + textData;
-                            message.textMode = "bytes (" + len + " bytes) and text (" + lenTxt + " chars)";
-                        }
-                        else {
-                            // bytes only
-                            var len = message.BodyPreview.length;
-                            body = bytesData;
-                            message.textMode = "bytes (" + len + " bytes)";
-                        }
-                    }
-                    return body;
-                }
-                else {
-                    message.textMode = "unsupported";
-                    return "Unsupported message body type which cannot be displayed by hawtio";
-                }
-            }
-            /*
-             * For some reason using ng-repeat in the modal dialog doesn't work so lets
-             * just create the HTML in code :)
-             */
-            function createHeaderHtml(message) {
-                var headers = createHeaders(message);
-                var properties = createProperties(message);
-                var headerKeys = _.keys(headers);
-                function sort(a, b) {
-                    if (a > b)
-                        return 1;
-                    if (a < b)
-                        return -1;
-                    return 0;
-                }
-                var propertiesKeys = _.keys(properties).sort(sort);
-                var jmsHeaders = _.filter(headerKeys, function (key) { return _.startsWith(key, "JMS"); }).sort(sort);
-                var remaining = _.difference(headerKeys, jmsHeaders.concat(propertiesKeys)).sort(sort);
-                var buffer = [];
-                function appendHeader(key) {
-                    var value = headers[key];
-                    if (value === null) {
-                        value = '';
-                    }
-                    buffer.push('<tr><td class="propertyName"><span class="green">Header</span> - ' +
-                        key +
-                        '</td><td class="property-value">' +
-                        value +
-                        '</td></tr>');
-                }
-                function appendProperty(key) {
-                    var value = properties[key];
-                    if (value === null) {
-                        value = '';
-                    }
-                    buffer.push('<tr><td class="propertyName">' +
-                        key +
-                        '</td><td class="property-value">' +
-                        value +
-                        '</td></tr>');
-                }
-                jmsHeaders.forEach(appendHeader);
-                remaining.forEach(appendHeader);
-                propertiesKeys.forEach(appendProperty);
-                return buffer.join("\n");
-            }
-            function createHeaders(row) {
-                var answer = {};
-                angular.forEach(row, function (value, key) {
-                    if (!_.some(ignoreColumns, function (k) { return k === key; }) && !_.some(flattenColumns, function (k) { return k === key; })) {
-                        answer[_.escape(key)] = _.escape(value);
-                    }
-                });
-                return answer;
-            }
-            function createProperties(row) {
-                var answer = {};
-                angular.forEach(row, function (value, key) {
-                    if (!_.some(ignoreColumns, function (k) { return k === key; }) && _.some(flattenColumns, function (k) { return k === key; })) {
-                        angular.forEach(value, function (v2, k2) {
-                            answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + _.escape(k2)] = _.escape(v2);
-                        });
-                    }
-                });
-                return answer;
-            }
-            function loadTable() {
-                var objName;
-                if ($scope.queueName) {
-                    $scope.showButtons = false;
-                    $scope.dlq = false;
-                    var mbean = ActiveMQ.getBrokerMBean(workspace, jolokia, amqJmxDomain);
-                    // browseQueue(java.lang.String) is not available until ActiveMQ 5.15.0
-                    // https://issues.apache.org/jira/browse/AMQ-6435
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'browseQueue(java.lang.String)', arguments: [$scope.queueName] }, Core.onSuccess(populateTable, {
-                        error: function (response) {
-                            // try again with the old ActiveMQ API
-                            $scope.queueName = null;
-                            $scope.showButtons = true;
-                            loadTable();
-                        }
-                    }));
-                    $scope.queueName = null;
-                }
-                else {
-                    if (workspace.selection) {
-                        objName = workspace.selection.objectName;
-                    }
-                    else {
-                        // in case of refresh
-                        var key = $location.search()['nid'];
-                        var node = workspace.keyToNodeMap[key];
-                        objName = node.objectName;
-                    }
-                    if (objName) {
-                        $scope.dlq = false;
-                        jolokia.getAttribute(objName, "DLQ", Core.onSuccess(onDlq, { silent: true }));
-                        jolokia.request({ type: 'exec', mbean: objName, operation: 'browse()' }, Core.onSuccess(populateTable));
-                    }
-                }
-            }
-            function onDlq(response) {
-                $scope.dlq = response;
-                Core.$apply($scope);
-            }
-            function intermediateResult() {
-            }
-            function operationSuccess() {
-                deselectAll();
-                Core.notification("success", $scope.message);
-                setTimeout(loadTable, 50);
-            }
-            function moveSuccess() {
-                operationSuccess();
-                workspace.loadTree();
-            }
-            function filterMessages(filter) {
-                var searchConditions = buildSearchConditions(filter);
-                evalFilter(searchConditions);
-            }
-            function evalFilter(searchConditions) {
-                if (!searchConditions || searchConditions.length === 0) {
-                    $scope.messages = $scope.allMessages;
-                }
-                else {
-                    ActiveMQ.log.debug("Filtering conditions:", searchConditions);
-                    $scope.messages = $scope.allMessages.filter(function (message) {
-                        ActiveMQ.log.debug("Message:", message);
-                        var matched = true;
-                        $.each(searchConditions, function (index, condition) {
-                            if (!condition.column) {
-                                matched = matched && evalMessage(message, condition.regex);
-                            }
-                            else {
-                                matched = matched &&
-                                    (message[condition.column] && condition.regex.test(message[condition.column])) ||
-                                    (message.StringProperties && message.StringProperties[condition.column] && condition.regex.test(message.StringProperties[condition.column]));
-                            }
-                        });
-                        return matched;
-                    });
-                }
-            }
-            function evalMessage(message, regex) {
-                var jmsHeaders = ['JMSDestination', 'JMSDeliveryMode', 'JMSExpiration', 'JMSPriority', 'JMSMessageID', 'JMSTimestamp', 'JMSCorrelationID', 'JMSReplyTo', 'JMSType', 'JMSRedelivered'];
-                for (var i = 0; i < jmsHeaders.length; i++) {
-                    var header = jmsHeaders[i];
-                    if (message[header] && regex.test(message[header])) {
-                        return true;
-                    }
-                }
-                if (message.StringProperties) {
-                    for (var property in message.StringProperties) {
-                        if (regex.test(message.StringProperties[property])) {
-                            return true;
-                        }
-                    }
-                }
-                if (message.bodyText && regex.test(message.bodyText)) {
-                    return true;
-                }
-                return false;
-            }
-            function getRegExp(str, modifiers) {
-                try {
-                    return new RegExp(str, modifiers);
-                }
-                catch (err) {
-                    return new RegExp(str.replace(/(\^|\$|\(|\)|<|>|\[|\]|\{|\}|\\|\||\.|\*|\+|\?)/g, '\\$1'));
-                }
-            }
-            function buildSearchConditions(filterText) {
-                var searchConditions = [];
-                var qStr;
-                if (!(qStr = $.trim(filterText))) {
-                    return;
-                }
-                var columnFilters = qStr.split(";");
-                for (var i = 0; i < columnFilters.length; i++) {
-                    var args = columnFilters[i].split(':');
-                    if (args.length > 1) {
-                        var columnName = $.trim(args[0]);
-                        var columnValue = $.trim(args[1]);
-                        if (columnName && columnValue) {
-                            searchConditions.push({
-                                column: columnName,
-                                columnDisplay: columnName.replace(/\s+/g, '').toLowerCase(),
-                                regex: getRegExp(columnValue, 'i')
-                            });
-                        }
-                    }
-                    else {
-                        var val = $.trim(args[0]);
-                        if (val) {
-                            searchConditions.push({
-                                column: '',
-                                regex: getRegExp(val, 'i')
-                            });
-                        }
-                    }
-                }
-                return searchConditions;
-            }
-            function deselectAll() {
-                $scope.gridOptions.selectedItems = [];
-            }
-            $scope.refresh();
-        }]);
-})(ActiveMQ || (ActiveMQ = {}));
-/// <reference path="activemqPlugin.ts"/>
-var ActiveMQ;
-(function (ActiveMQ) {
-    ActiveMQ._module.controller("ActiveMQ.QueuesController", ["$scope", "workspace", "jolokia", "localStorage", function ($scope, workspace, jolokia, localStorage) {
-            var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
-            $scope.workspace = workspace;
-            $scope.destinationType;
-            var allDestinations = [];
-            $scope.destinations = [];
-            $scope.totalServerItems = 0;
-            var refreshAction = {
-                name: 'Refresh',
-                actionFn: function (action) { return $scope.loadTable(); }
-            };
-            $scope.toolbarConfig = {
-                filterConfig: {
-                    fields: [
-                        {
-                            id: 'name',
-                            title: 'Name',
-                            placeholder: 'Filter by name...',
-                            filterType: 'text'
-                        }
-                    ],
-                    onFilterChange: function (filters) {
-                        $scope.destinations = Pf.filter(allDestinations, $scope.toolbarConfig.filterConfig);
-                    }
-                },
-                actionsConfig: {
-                    primaryActions: [refreshAction]
-                },
-                isTableView: true
-            };
-            $scope.tableConfig = {
-                selectionMatchProp: 'name',
-                showCheckboxes: false
-            };
-            $scope.pageConfig = {
-                pageSize: 20,
-                pageNumber: 1
-            };
-            if ($scope.destinationType == 'topics') {
-                $scope.tableColumns = [
-                    { header: 'Name', itemField: 'name' },
-                    { header: 'Producer Count', itemField: 'producerCount' },
-                    { header: 'Consumer Count', itemField: 'consumerCount' },
-                    { header: 'Enqueue Count', itemField: 'enqueueCount' },
-                    { header: 'Dequeue Count', itemField: 'dequeueCount' }
-                ];
-            }
-            else {
-                $scope.tableColumns = [
-                    { header: 'Name', itemField: 'name', templateFn: function (value) { return "<a href=\"activemq/browseQueue?main-tab=activemq&queueName=" + value + "\">" + value + "</a>"; } },
-                    { header: 'Queue Size', itemField: 'queueSize' },
-                    { header: 'Producer Count', itemField: 'producerCount' },
-                    { header: 'Consumer Count', itemField: 'consumerCount' },
-                    { header: 'Enqueue Count', itemField: 'enqueueCount' },
-                    { header: 'Dequeue Count', itemField: 'dequeueCount' },
-                    { header: 'Dispatch Count', itemField: 'dispatchCount' },
-                ];
-            }
-            $scope.refresh = function () {
-                $scope.loadTable();
-            };
-            $scope.loadTable = function () {
-                var mbean = ActiveMQ.getBrokerMBean(workspace, jolokia, amqJmxDomain);
-                if (mbean) {
-                    var method = 'queryQueues(java.lang.String, int, int)';
-                    if ($scope.destinationType == 'topics') {
-                        method = 'queryTopics(java.lang.String, int, int)';
-                    }
-                    var destinationFilter = {
-                        name: '',
-                        filter: ''
-                    };
-                    var appliedFilters = $scope.toolbarConfig.filterConfig.appliedFilters;
-                    if (appliedFilters && appliedFilters.length > 0) {
-                        destinationFilter['filter'] = $scope.toolbarConfig.filterConfig.appliedFilters[0].value;
-                    }
-                    jolokia.request({ type: 'exec', mbean: mbean, operation: method, arguments: [JSON.stringify(destinationFilter), $scope.pageConfig.pageNumber, $scope.pageConfig.pageSize] }, Core.onSuccess(populateTable, { error: onError }));
-                }
-            };
-            function onError() {
-                Core.notification("danger", "The feature is not available in this broker version!");
-                $scope.workspace.selectParentNode();
-            }
-            function populateTable(response) {
-                var data = JSON.parse(response.value);
-                $scope.destinations = [];
-                angular.forEach(data["data"], function (value, idx) {
-                    $scope.destinations.push(value);
-                });
-                $scope.totalServerItems = data["count"];
-                allDestinations = $scope.destinations;
-                $scope.destinations = Pf.filter(allDestinations, $scope.toolbarConfig.filterConfig);
-                Core.$apply($scope);
-            }
-            $scope.loadTable();
-        }]);
-})(ActiveMQ || (ActiveMQ = {}));
-/// <reference path="activemqHelpers.ts"/>
-/// <reference path="activemqPlugin.ts"/>
-var ActiveMQ;
-(function (ActiveMQ) {
-    ActiveMQ._module.controller("ActiveMQ.DurableSubscriberController", ["$scope", "$uibModal", "workspace", "jolokia", function ($scope, $uibModal, workspace, jolokia) {
-            var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
-            var allSubscribers = null;
-            $scope.durableSubscribers = null;
-            $scope.selectedSubscriber;
-            $scope.createSubscriberDialog;
-            $scope.deleteSubscriberDialog = new UI.Dialog();
-            $scope.showSubscriberDialog;
-            $scope.topicName = '';
-            $scope.clientId = '';
-            $scope.subscriberName = '';
-            $scope.subSelector = '';
-            $scope.model = {
-                allSelected: false
-            };
-            $scope.uiModalInstance;
-            var refreshAction = {
-                name: 'Refresh',
-                actionFn: function (action) { return loadTable(); }
-            };
-            var createAction = {
-                name: 'Create',
-                actionFn: function (action) {
-                    $scope.createSubscriberDialog = $uibModal.open({
-                        templateUrl: 'createSubscriberDialog.html',
-                        scope: $scope
-                    });
-                }
-            };
-            var deleteAction = {
-                name: 'Delete',
-                actionFn: function (action) { return $scope.deleteSubscriberDialog.open(); },
-                isDisabled: true
-            };
-            $scope.toolbarConfig = {
-                filterConfig: {
-                    fields: [
-                        {
-                            id: 'destinationName',
-                            title: 'Topic',
-                            placeholder: 'Filter by topic...',
-                            filterType: 'text'
-                        },
-                        {
-                            id: 'clientId',
-                            title: 'Client ID',
-                            placeholder: 'Filter by client id...',
-                            filterType: 'text'
-                        },
-                        {
-                            id: 'consumerId',
-                            title: 'Consumer ID',
-                            placeholder: 'Filter by consumer id...',
-                            filterType: 'text'
-                        },
-                        {
-                            id: 'status',
-                            title: 'Status',
-                            placeholder: 'Filter by status...',
-                            filterType: 'select',
-                            filterValues: ['Active', 'Offline']
-                        },
-                    ],
-                    onFilterChange: function (filters) {
-                        $scope.durableSubscribers = Pf.filter(allSubscribers, $scope.toolbarConfig.filterConfig);
-                    }
-                },
-                actionsConfig: {
-                    primaryActions: [refreshAction, createAction, deleteAction]
-                },
-                isTableView: true
-            };
-            $scope.selectAll = function () {
-                $scope.durableSubscribers.forEach(function (subscriber) { return subscriber.selected = $scope.model.allSelected; });
-                deleteAction.isDisabled = !$scope.model.allSelected;
-            };
-            $scope.toggleDeleteActionDisabled = function () {
-                deleteAction.isDisabled = !$scope.durableSubscribers.some(function (subscriber) { return subscriber.selected; });
-            };
-            $scope.doCreateSubscriber = function (clientId, subscriberName, topicName, subSelector) {
-                $scope.createSubscriberDialog.close();
-                $scope.clientId = clientId;
-                $scope.subscriberName = subscriberName;
-                $scope.topicName = topicName;
-                $scope.subSelector = subSelector;
-                if (Core.isBlank($scope.subSelector)) {
-                    $scope.subSelector = null;
-                }
-                var mbean = ActiveMQ.getBrokerMBean(workspace, jolokia, amqJmxDomain);
-                if (mbean) {
-                    jolokia.execute(mbean, "createDurableSubscriber(java.lang.String, java.lang.String, java.lang.String, java.lang.String)", $scope.clientId, $scope.subscriberName, $scope.topicName, $scope.subSelector, Core.onSuccess(function () {
-                        Core.notification('success', "Created durable subscriber " + clientId);
-                        $scope.clientId = '';
-                        $scope.subscriberName = '';
-                        $scope.topicName = '';
-                        $scope.subSelector = '';
-                        loadTable();
-                    }));
-                }
-                else {
-                    Core.notification("danger", "Could not find the Broker MBean!");
-                }
-            };
-            $scope.deleteSubscribers = function () {
-                var selectedItems = $scope.durableSubscribers.filter(function (subscriber) { return subscriber.selected; });
-                var requests = selectedItems.map(function (subscriber) { return ({
-                    type: 'exec',
-                    operation: 'destroy()',
-                    mbean: subscriber._id
-                }); });
-                jolokia.request(requests, Core.onSuccess(function () {
-                    Core.notification('success', "Operation successful");
-                    loadTable();
-                }));
-            };
-            $scope.openSubscriberDialog = function (subscriber) {
-                jolokia.request({ type: "read", mbean: subscriber._id }, Core.onSuccess(function (response) {
-                    $scope.selectedSubscriber = response.value;
-                    $scope.selectedSubscriber.Status = subscriber.status;
-                    $scope.showSubscriberDialog = $uibModal.open({
-                        templateUrl: 'showSubscriberDialog.html',
-                        scope: $scope
-                    });
-                }));
-            };
-            $scope.topicNames = function (completionText) { return ActiveMQ.retrieveTopicNames(workspace, false); };
-            function loadTable() {
-                var mbean = ActiveMQ.getBrokerMBean(workspace, jolokia, amqJmxDomain);
-                if (mbean) {
-                    allSubscribers = [];
-                    jolokia.request({ type: "read", mbean: mbean, attribute: ["DurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "DurableTopicSubscribers", "Active"); }));
-                    jolokia.request({ type: "read", mbean: mbean, attribute: ["InactiveDurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "InactiveDurableTopicSubscribers", "Offline"); }));
-                }
-            }
-            function populateTable(response, attr, status) {
-                var data = response.value;
-                ActiveMQ.log.debug("Got data: ", data);
-                allSubscribers.push.apply(allSubscribers, data[attr].map(function (o) {
-                    var objectName = o["objectName"];
-                    var entries = Core.objectNameProperties(objectName);
-                    if (!('objectName' in o)) {
-                        if ('canonicalName' in o) {
-                            objectName = o['canonicalName'];
-                        }
-                        entries = _.cloneDeep(o['keyPropertyList']);
-                    }
-                    entries["_id"] = objectName;
-                    entries["status"] = status;
-                    return entries;
-                }));
-                $scope.durableSubscribers = Pf.filter(allSubscribers, $scope.toolbarConfig.filterConfig);
-                $scope.model.allSelected = false;
-                Core.$apply($scope);
-            }
-            loadTable();
-        }]);
-})(ActiveMQ || (ActiveMQ = {}));
-/// <reference path="activemqHelpers.ts"/>
-/// <reference path="activemqPlugin.ts"/>
-var ActiveMQ;
-(function (ActiveMQ) {
-    ActiveMQ._module.controller("ActiveMQ.JobSchedulerController", ["$scope", "workspace", "jolokia", function ($scope, workspace, jolokia) {
-            $scope.refresh = loadTable;
-            $scope.jobs = [];
-            $scope.deleteJobsDialog = new UI.Dialog();
-            $scope.gridOptions = {
-                selectedItems: [],
-                data: 'jobs',
-                displayFooter: false,
-                showFilter: false,
-                showColumnMenu: true,
-                enableColumnResize: true,
-                enableColumnReordering: true,
-                filterOptions: {
-                    filterText: ''
-                },
-                selectWithCheckboxOnly: true,
-                showSelectionCheckbox: true,
-                maintainColumnRatios: false,
-                columnDefs: [
-                    {
-                        field: 'jobId',
-                        displayName: 'Job ID',
-                        width: '25%'
-                    },
-                    {
-                        field: 'cronEntry',
-                        displayName: 'Cron Entry',
-                        width: '10%'
-                    },
-                    {
-                        field: 'delay',
-                        displayName: 'Delay',
-                        width: '5%'
-                    },
-                    {
-                        field: 'repeat',
-                        displayName: 'repeat',
-                        width: '5%'
-                    },
-                    {
-                        field: 'period',
-                        displayName: 'period',
-                        width: '5%'
-                    },
-                    {
-                        field: 'start',
-                        displayName: 'Start',
-                        width: '25%'
-                    },
-                    {
-                        field: 'next',
-                        displayName: 'Next',
-                        width: '25%'
-                    }
-                ],
-                primaryKeyFn: function (entity) { return entity.jobId; }
-            };
-            function loadTable() {
-                var selection = workspace.selection;
-                if (selection) {
-                    var mbean = selection.objectName;
-                    if (mbean) {
-                        jolokia.request({ type: 'read', mbean: mbean, attribute: "AllJobs" }, Core.onSuccess(populateTable));
-                    }
-                }
-                Core.$apply($scope);
-            }
-            function populateTable(response) {
-                var data = response.value;
-                if (!angular.isArray(data)) {
-                    $scope.jobs = [];
-                    angular.forEach(data, function (value, idx) {
-                        $scope.jobs.push(value);
-                    });
-                }
-                else {
-                    $scope.jobs = data;
-                }
-                Core.$apply($scope);
-            }
-            $scope.deleteJobs = function () {
-                var selection = workspace.selection;
-                var mbean = selection.objectName;
-                if (mbean && selection) {
-                    var selectedItems = $scope.gridOptions.selectedItems;
-                    $scope.message = "Deleted " + Core.maybePlural(selectedItems.length, "job");
-                    var operation = "removeJob(java.lang.String)";
-                    angular.forEach(selectedItems, function (item, idx) {
-                        var id = item.jobId;
-                        if (id) {
-                            var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
-                            jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
-                        }
-                    });
-                }
-            };
-            function intermediateResult() {
-            }
-            function operationSuccess() {
-                $scope.gridOptions.selectedItems.splice(0);
-                Core.notification("success", $scope.message);
-                setTimeout(loadTable, 50);
-            }
-        }]);
-})(ActiveMQ || (ActiveMQ = {}));
-/// <reference path="activemqHelpers.ts"/>
-/// <reference path="activemqPlugin.ts"/>
-var ActiveMQ;
-(function (ActiveMQ) {
-    ActiveMQ._module.controller("ActiveMQ.PreferencesController", ["$scope", "localStorage", "userDetails", "$rootScope", function ($scope, localStorage, userDetails, $rootScope) {
-            $scope.messageBodyDisplayOptions = {
-                'Hex and text': 1,
-                'Decimal and text': 2,
-                'Hex': 4,
-                'Decimal': 8,
-                'Off': 99
-            };
-            Core.initPreferenceScope($scope, localStorage, {
-                'activemqUserName': {
-                    'value': userDetails.username ? userDetails.username : ""
-                },
-                'activemqPassword': {
-                    'value': userDetails.password ? userDetails.password : ""
-                },
-                'activemqBrowseBytesMessages': {
-                    'value': 1,
-                    'converter': parseInt
-                },
-                'activemqFilterAdvisoryTopics': {
-                    'value': false,
-                    'converter': Core.parseBooleanValue,
-                    'post': function (newValue) {
-                        $rootScope.$broadcast('jmxTreeUpdated');
-                    }
-                }
-            });
-        }]);
-})(ActiveMQ || (ActiveMQ = {}));
 var Camel;
 (function (Camel) {
     var Context = /** @class */ (function () {
@@ -15804,6 +14720,32 @@ var Camel;
         .service('contextsService', Camel.ContextsService)
         .name;
 })(Camel || (Camel = {}));
+var Pf;
+(function (Pf) {
+    function filter(items, filterConfig) {
+        var filteredItems = items;
+        if (filterConfig.appliedFilters) {
+            filterConfig.appliedFilters.forEach(function (filter) {
+                var filterType = _.find(filterConfig.fields, { 'id': filter.id }).filterType;
+                switch (filterType) {
+                    case 'text':
+                        var regExp_1 = new RegExp(filter.value, 'i');
+                        filteredItems = filteredItems.filter(function (item) { return regExp_1.test(item[filter.id]); });
+                        break;
+                    case 'number':
+                        filteredItems = filteredItems.filter(function (item) { return item[filter.id] === parseInt(filter.value); });
+                        break;
+                    case 'select':
+                        filteredItems = filteredItems.filter(function (item) { return item[filter.id] === filter.value; });
+                        break;
+                }
+            });
+        }
+        filterConfig.resultsCount = filteredItems.length;
+        return filteredItems;
+    }
+    Pf.filter = filter;
+})(Pf || (Pf = {}));
 var Camel;
 (function (Camel) {
     var EndpointsStatisticsService = /** @class */ (function () {
@@ -18874,6 +17816,2954 @@ var Camel;
         task();
     });
 })(Camel || (Camel = {}));
+var Osgi;
+(function (Osgi) {
+    Osgi.pluginName = 'hawtio-integration-osgi';
+    Osgi.log = Logger.get(Osgi.pluginName);
+    function defaultBundleValues(workspace, $scope, values) {
+        var allValues = values;
+        angular.forEach(values, function (row) {
+            row["ImportData"] = parseActualPackages(row["ImportedPackages"]);
+            row["ExportData"] = parseActualPackages(row["ExportedPackages"]);
+            row["IdentifierLink"] = bundleLinks(workspace, row["Identifier"]);
+            row["Hosts"] = labelBundleLinks(workspace, row["Hosts"], allValues);
+            row["Fragments"] = labelBundleLinks(workspace, row["Fragments"], allValues);
+            row["ImportedPackages"] = _.uniq(row["ImportedPackages"]);
+            row["StateStyle"] = getStateStyle("label", row["State"]);
+            row["RequiringBundles"] = labelBundleLinks(workspace, row["RequiringBundles"], allValues);
+        });
+        return values;
+    }
+    Osgi.defaultBundleValues = defaultBundleValues;
+    function getStateStyle(prefix, state) {
+        switch (state) {
+            case "INSTALLED":
+                return prefix + "-important";
+            case "RESOLVED":
+                return prefix + "-inverse";
+            case "STARTING":
+                return prefix + "-warning";
+            case "ACTIVE":
+                return prefix + "-success";
+            case "STOPPING":
+                return prefix + "-info";
+            case "UNINSTALLED":
+                return ""; // the default color, which is grey
+            default:
+                return prefix + "-important";
+        }
+    }
+    Osgi.getStateStyle = getStateStyle;
+    function defaultServiceValues(workspace, $scope, values) {
+        angular.forEach(values, function (row) {
+            row["BundleLinks"] = bundleLinks(workspace, row["BundleIdentifier"]);
+        });
+        return values;
+    }
+    Osgi.defaultServiceValues = defaultServiceValues;
+    function defaultPackageValues(workspace, $scope, values) {
+        var packages = [];
+        function onPackageEntry(packageEntry, row) {
+            if (!row)
+                row = packageEntry;
+            var name = packageEntry["Name"];
+            var version = packageEntry["Version"];
+            if (name && !_.startsWith(name, "#")) {
+                var importingBundles = row["ImportingBundles"] || packageEntry["ImportingBundles"];
+                var exportingBundles = row["ExportingBundles"] || packageEntry["ExportingBundles"];
+                packageEntry["ImportingBundleUrls"] = bundleUrls(workspace, importingBundles);
+                packageEntry["ExportingBundleUrls"] = bundleUrls(workspace, exportingBundles);
+                packages.push(packageEntry);
+            }
+        }
+        // the values could contain a child 'values' array of objects so use those directly
+        var childValues = values.values;
+        if (childValues) {
+            angular.forEach(childValues, onPackageEntry);
+        }
+        angular.forEach(values, function (row) {
+            angular.forEach(row, function (version) {
+                angular.forEach(version, function (packageEntry) {
+                    onPackageEntry(packageEntry, row);
+                });
+            });
+        });
+        return packages;
+    }
+    Osgi.defaultPackageValues = defaultPackageValues;
+    function defaultConfigurationValues(workspace, $scope, values) {
+        var array = [];
+        angular.forEach(values, function (row) {
+            var map = {};
+            map["Pid"] = row[0];
+            map["PidLink"] = "<a href='" + Core.url("/osgi/pid/" + row[0] + workspace.hash()) + "'>" + row[0] + "</a>";
+            map["Bundle"] = row[1];
+            array.push(map);
+        });
+        return array;
+    }
+    Osgi.defaultConfigurationValues = defaultConfigurationValues;
+    function parseActualPackages(packages) {
+        var result = {};
+        for (var i = 0; i < packages.length; i++) {
+            var pkg = packages[i];
+            var idx = pkg.indexOf(";");
+            if (idx > 0) {
+                var name = pkg.substring(0, idx);
+                var ver = pkg.substring(idx + 1);
+                var data = result[name];
+                if (data === undefined) {
+                    data = {};
+                    result[name] = data;
+                }
+                data["ReportedVersion"] = ver;
+            }
+        }
+        return result;
+    }
+    Osgi.parseActualPackages = parseActualPackages;
+    function parseManifestHeader(headers, name) {
+        var result = {};
+        var data = {};
+        var hdr = headers[name];
+        if (hdr === undefined) {
+            return result;
+        }
+        var ephdr = hdr.Value;
+        var inPkg = true;
+        var inQuotes = false;
+        var pkgName = "";
+        var daDecl = "";
+        for (var i = 0; i < ephdr.length; i++) {
+            var c = ephdr[i];
+            if (c === '"') {
+                inQuotes = !inQuotes;
+                continue;
+            }
+            if (inQuotes) {
+                daDecl += c;
+                continue;
+            }
+            // from here on we are never inside quotes
+            if (c === ';') {
+                if (inPkg) {
+                    inPkg = false;
+                }
+                else {
+                    handleDADecl(data, daDecl);
+                    // reset directive and attribute variable
+                    daDecl = "";
+                }
+                continue;
+            }
+            if (c === ',') {
+                handleDADecl(data, daDecl);
+                result[pkgName] = data;
+                // reset data
+                data = {};
+                pkgName = "";
+                daDecl = "";
+                inPkg = true;
+                continue;
+            }
+            if (inPkg) {
+                pkgName += c;
+            }
+            else {
+                daDecl += c;
+            }
+        }
+        handleDADecl(data, daDecl);
+        result[pkgName] = data;
+        return result;
+    }
+    Osgi.parseManifestHeader = parseManifestHeader;
+    function handleDADecl(data, daDecl) {
+        var didx = daDecl.indexOf(":=");
+        if (didx > 0) {
+            data["D" + daDecl.substring(0, didx)] = daDecl.substring(didx + 2);
+            return;
+        }
+        var aidx = daDecl.indexOf("=");
+        if (aidx > 0) {
+            data["A" + daDecl.substring(0, aidx)] = daDecl.substring(aidx + 1);
+            return;
+        }
+    }
+    function toCollection(values) {
+        var collection = values;
+        if (!angular.isArray(values)) {
+            collection = [values];
+        }
+        return collection;
+    }
+    Osgi.toCollection = toCollection;
+    function labelBundleLinks(workspace, values, allValues) {
+        var answer = [];
+        var sorted = toCollection(values).sort(function (a, b) { return a - b; });
+        angular.forEach(sorted, function (value, key) {
+            answer.push({
+                label: allValues[value].SymbolicName,
+                url: Core.url("/osgi/bundle/" + value + workspace.hash())
+            });
+        });
+        return answer;
+    }
+    Osgi.labelBundleLinks = labelBundleLinks;
+    function bundleLinks(workspace, values) {
+        var answer = "";
+        var sorted = toCollection(values).sort(function (a, b) { return a - b; });
+        angular.forEach(sorted, function (value, key) {
+            var prefix = "";
+            if (answer.length > 0) {
+                prefix = " ";
+            }
+            answer += prefix + "<a href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>Bundle " + value + "</a>";
+        });
+        return answer;
+    }
+    Osgi.bundleLinks = bundleLinks;
+    function bundleUrls(workspace, values) {
+        var answer = [];
+        angular.forEach(values, function (value, key) {
+            answer.push(Core.url("/osgi/bundle/" + value + workspace.hash()));
+        });
+        return answer;
+    }
+    Osgi.bundleUrls = bundleUrls;
+    function pidLinks(workspace, values) {
+        var answer = "";
+        angular.forEach(toCollection(values), function (value, key) {
+            var prefix = "";
+            if (answer.length > 0) {
+                prefix = " ";
+            }
+            answer += prefix + "<a href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + value + "</a>";
+        });
+        return answer;
+    }
+    Osgi.pidLinks = pidLinks;
+    /**
+     * Finds a bundle by id
+     *
+     * @method findBundle
+     * @for Osgi
+     * @param {String} bundleId
+     * @param {Array} values
+     * @return {any}
+     *
+     */
+    function findBundle(bundleId, values) {
+        var answer = "";
+        angular.forEach(values, function (row) {
+            var id = row["Identifier"];
+            if (bundleId === id.toString()) {
+                answer = row;
+                return answer;
+            }
+        });
+        return answer;
+    }
+    Osgi.findBundle = findBundle;
+    function getSelectionBundleMBean(workspace) {
+        if (workspace) {
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("osgi.core", "bundleState");
+            return Osgi.findFirstObjectName(folder);
+        }
+        return null;
+    }
+    Osgi.getSelectionBundleMBean = getSelectionBundleMBean;
+    /**
+     * Walks the tree looking in the first child all the way down until we find an objectName
+     * @method findFirstObjectName
+     * @for Osgi
+     * @param {Folder} node
+     * @return {String}
+     *
+     */
+    function findFirstObjectName(node) {
+        if (node) {
+            var answer = node.objectName;
+            if (answer) {
+                return answer;
+            }
+            else {
+                var children = node.children;
+                if (children && children.length) {
+                    return findFirstObjectName(children[0]);
+                }
+            }
+        }
+        return null;
+    }
+    Osgi.findFirstObjectName = findFirstObjectName;
+    function getSelectionFrameworkMBean(workspace) {
+        if (workspace) {
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("osgi.core", "framework");
+            return Osgi.findFirstObjectName(folder);
+        }
+        return null;
+    }
+    Osgi.getSelectionFrameworkMBean = getSelectionFrameworkMBean;
+    function getSelectionServiceMBean(workspace) {
+        if (workspace) {
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("osgi.core", "serviceState");
+            return Osgi.findFirstObjectName(folder);
+        }
+        return null;
+    }
+    Osgi.getSelectionServiceMBean = getSelectionServiceMBean;
+    function getSelectionPackageMBean(workspace) {
+        if (workspace) {
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("osgi.core", "packageState");
+            return Osgi.findFirstObjectName(folder);
+        }
+        return null;
+    }
+    Osgi.getSelectionPackageMBean = getSelectionPackageMBean;
+    function getSelectionConfigAdminMBean(workspace) {
+        if (workspace) {
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("osgi.compendium", "cm");
+            return Osgi.findFirstObjectName(folder);
+        }
+        return null;
+    }
+    Osgi.getSelectionConfigAdminMBean = getSelectionConfigAdminMBean;
+    function getMetaTypeMBean(workspace) {
+        if (workspace) {
+            var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
+            var typeFolder = mbeanTypesToDomain["MetaTypeFacade"] || {};
+            var mbeanFolder = typeFolder["io.fabric8"] || {};
+            return mbeanFolder["objectName"];
+        }
+        return null;
+    }
+    Osgi.getMetaTypeMBean = getMetaTypeMBean;
+    function getProfileMetadataMBean(workspace) {
+        if (workspace) {
+            var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
+            var typeFolder = mbeanTypesToDomain["ProfileMetadata"] || {};
+            var mbeanFolder = typeFolder["io.fabric8"] || {};
+            return mbeanFolder["objectName"];
+        }
+        return null;
+    }
+    Osgi.getProfileMetadataMBean = getProfileMetadataMBean;
+    function getHawtioOSGiToolsMBean(workspace) {
+        if (workspace) {
+            var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
+            var toolsFacades = mbeanTypesToDomain["OSGiTools"] || {};
+            var hawtioFolder = toolsFacades["hawtio"] || {};
+            return hawtioFolder["objectName"];
+        }
+        return null;
+    }
+    Osgi.getHawtioOSGiToolsMBean = getHawtioOSGiToolsMBean;
+    function getHawtioConfigAdminMBean(workspace) {
+        if (workspace) {
+            var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
+            var typeFolder = mbeanTypesToDomain["ConfigAdmin"] || {};
+            var mbeanFolder = typeFolder["hawtio"] || {};
+            return mbeanFolder["objectName"];
+        }
+        return null;
+    }
+    Osgi.getHawtioConfigAdminMBean = getHawtioConfigAdminMBean;
+    /**
+     * Creates a link to the given configuration pid and/or factoryPid
+     */
+    function createConfigPidLink($scope, workspace, pid, isFactory) {
+        if (isFactory === void 0) { isFactory = false; }
+        return createConfigPidPath($scope, pid, isFactory) + workspace.hash();
+    }
+    Osgi.createConfigPidLink = createConfigPidLink;
+    /**
+     * Creates a path to the given configuration pid and/or factoryPid
+     */
+    function createConfigPidPath($scope, pid, isFactory) {
+        if (isFactory === void 0) { isFactory = false; }
+        var link = pid;
+        var versionId = $scope.versionId;
+        var profileId = $scope.profileId;
+        if (versionId && versionId) {
+            var configPage = isFactory ? "/newConfiguration/" : "/configuration/";
+            return "/wiki/branch/" + versionId + configPage + link + "/" + $scope.pageId;
+        }
+        else {
+            return "osgi/pid/" + link;
+        }
+    }
+    Osgi.createConfigPidPath = createConfigPidPath;
+    function getConfigurationProperties(workspace, jolokia, pid, onDataFn) {
+        var mbean = getSelectionConfigAdminMBean(workspace);
+        var answer = null;
+        if (jolokia && mbean) {
+            answer = jolokia.execute(mbean, 'getProperties', pid, Core.onSuccess(onDataFn));
+        }
+        return answer;
+    }
+    Osgi.getConfigurationProperties = getConfigurationProperties;
+    /**
+     * For a pid of the form "foo.generatedId" for a pid "foo" or "foo.bar" remove the "foo." prefix
+     */
+    function removeFactoryPidPrefix(pid, factoryPid) {
+        if (pid && factoryPid) {
+            if (_.startsWith(pid, factoryPid)) {
+                return pid.substring(factoryPid.length + 1);
+            }
+            var idx = factoryPid.lastIndexOf(".");
+            if (idx > 0) {
+                var prefix = factoryPid.substring(0, idx + 1);
+                return Core.trimLeading(pid, prefix);
+            }
+        }
+        return pid;
+    }
+    Osgi.removeFactoryPidPrefix = removeFactoryPidPrefix;
+})(Osgi || (Osgi = {}));
+/// <reference path="osgiHelpers.ts"/>
+/// <reference path="osgiPlugin.ts"/>
+var Osgi;
+(function (Osgi) {
+    var OsgiDataService = /** @class */ (function () {
+        function OsgiDataService(workspace, jolokia) {
+            this.jolokia = jolokia;
+            this.workspace = workspace;
+        }
+        OsgiDataService.prototype.getBundles = function () {
+            var bundles = {};
+            // TODO make this async,especially given this returns lots of data
+            var response = this.jolokia.request({
+                type: 'exec',
+                mbean: Osgi.getSelectionBundleMBean(this.workspace),
+                operation: 'listBundles()'
+            }, Core.onSuccess(null));
+            angular.forEach(response.value, function (value, key) {
+                var obj = {
+                    Identifier: value.Identifier,
+                    Name: "",
+                    SymbolicName: value.SymbolicName,
+                    Fragment: value.Fragment,
+                    State: value.State,
+                    Version: value.Version,
+                    LastModified: new Date(Number(value.LastModified)),
+                    Location: value.Location,
+                    StartLevel: undefined,
+                    RegisteredServices: value.RegisteredServices,
+                    ServicesInUse: value.ServicesInUse
+                };
+                if (value.Headers['Bundle-Name']) {
+                    obj.Name = value.Headers['Bundle-Name']['Value'];
+                }
+                bundles[value.Identifier] = obj;
+            });
+            return bundles;
+        };
+        OsgiDataService.prototype.getServices = function () {
+            var services = {};
+            var response = this.jolokia.request({
+                type: 'exec',
+                mbean: Osgi.getSelectionServiceMBean(this.workspace),
+                operation: 'listServices()'
+            }, Core.onSuccess(null));
+            var answer = response.value;
+            angular.forEach(answer, function (value, key) {
+                services[value.Identifier] = value;
+            });
+            return services;
+        };
+        OsgiDataService.prototype.getPackages = function () {
+            var packages = {};
+            var response = this.jolokia.request({
+                type: 'exec',
+                mbean: Osgi.getSelectionPackageMBean(this.workspace),
+                operation: 'listPackages()'
+            }, Core.onSuccess(null));
+            var answer = response.value.values;
+            answer.forEach(function (value) {
+                packages[value.Name + "-" + value.Version] = value;
+            });
+            return packages;
+        };
+        return OsgiDataService;
+    }());
+    Osgi.OsgiDataService = OsgiDataService;
+})(Osgi || (Osgi = {}));
+var Karaf;
+(function (Karaf) {
+    Karaf.pluginName = 'hawtio-integration-karaf';
+    Karaf.log = Logger.get(Karaf.pluginName);
+    function setSelect(selection, group) {
+        if (!angular.isDefined(selection)) {
+            return group[0];
+        }
+        var answer = _.findIndex(group, function (item) { return item.id === selection.id; });
+        if (answer !== -1) {
+            return group[answer];
+        }
+        else {
+            return group[0];
+        }
+    }
+    Karaf.setSelect = setSelect;
+    function installRepository(workspace, jolokia, uri, success, error) {
+        Karaf.log.info("installing URI: ", uri);
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'addRepository(java.lang.String)',
+            arguments: [uri]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.installRepository = installRepository;
+    function uninstallRepository(workspace, jolokia, uri, success, error) {
+        Karaf.log.info("uninstalling URI: ", uri);
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'removeRepository(java.lang.String)',
+            arguments: [uri]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.uninstallRepository = uninstallRepository;
+    function installFeature(workspace, jolokia, feature, version, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'installFeature(java.lang.String, java.lang.String)',
+            arguments: [feature, version]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.installFeature = installFeature;
+    function uninstallFeature(workspace, jolokia, feature, version, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
+            operation: 'uninstallFeature(java.lang.String, java.lang.String)',
+            arguments: [feature, version]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.uninstallFeature = uninstallFeature;
+    // TODO move to core?
+    function toCollection(values) {
+        var collection = values;
+        if (!angular.isArray(values)) {
+            collection = [values];
+        }
+        return collection;
+    }
+    Karaf.toCollection = toCollection;
+    function featureLinks(workspace, name, version) {
+        return "<a href='" + Core.url("#/karaf/feature/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
+    }
+    Karaf.featureLinks = featureLinks;
+    function extractFeature(attributes, name, version) {
+        var features = [];
+        var repos = [];
+        populateFeaturesAndRepos(attributes, features, repos);
+        return _.find(features, function (feature) { return feature.Name == name && feature.Version == version; });
+    }
+    Karaf.extractFeature = extractFeature;
+    var platformBundlePatterns = [
+        "^org.apache.aries",
+        "^org.apache.karaf",
+        "^activemq-karaf",
+        "^org.apache.commons",
+        "^org.apache.felix",
+        "^io.fabric8",
+        "^io.fabric8.fab",
+        "^io.fabric8.insight",
+        "^io.fabric8.mq",
+        "^io.fabric8.patch",
+        "^io.fabric8.runtime",
+        "^io.fabric8.security",
+        "^org.apache.geronimo.specs",
+        "^org.apache.servicemix.bundles",
+        "^org.objectweb.asm",
+        "^io.hawt",
+        "^javax.mail",
+        "^javax",
+        "^org.jvnet",
+        "^org.mvel2",
+        "^org.apache.mina.core",
+        "^org.apache.sshd.core",
+        "^org.apache.neethi",
+        "^org.apache.servicemix.specs",
+        "^org.apache.xbean",
+        "^org.apache.santuario.xmlsec",
+        "^biz.aQute.bndlib",
+        "^groovy-all",
+        "^com.google.guava",
+        "jackson-\\w+-asl",
+        "^com.fasterxml.jackson",
+        "^org.ops4j",
+        "^org.springframework",
+        "^bcprov$",
+        "^jline$",
+        "scala-library$",
+        "^org.scala-lang",
+        "^stax2-api$",
+        "^woodstox-core-asl",
+        "^org.jboss.amq.mq-fabric",
+        "^gravia-",
+        "^joda-time$",
+        "^org.apache.ws",
+        "-commands$",
+        "patch.patch",
+        "org.fusesource.insight",
+        "activeio-core",
+        "activemq-osgi",
+        "^org.eclipse.jetty",
+        "org.codehaus.jettison.jettison",
+        "org.jledit.core",
+        "org.fusesource.jansi",
+        "org.eclipse.equinox.region"
+    ];
+    var platformBundleRegex = new RegExp(platformBundlePatterns.join('|'));
+    var camelBundlePatterns = ["^org.apache.camel", "camel-karaf-commands$", "activemq-camel$"];
+    var camelBundleRegex = new RegExp(camelBundlePatterns.join('|'));
+    var cxfBundlePatterns = ["^org.apache.cxf"];
+    var cxfBundleRegex = new RegExp(cxfBundlePatterns.join('|'));
+    var activemqBundlePatterns = ["^org.apache.activemq", "activemq-camel$"];
+    var activemqBundleRegex = new RegExp(activemqBundlePatterns.join('|'));
+    function isPlatformBundle(symbolicName) {
+        return platformBundleRegex.test(symbolicName);
+    }
+    Karaf.isPlatformBundle = isPlatformBundle;
+    function isActiveMQBundle(symbolicName) {
+        return activemqBundleRegex.test(symbolicName);
+    }
+    Karaf.isActiveMQBundle = isActiveMQBundle;
+    function isCamelBundle(symbolicName) {
+        return camelBundleRegex.test(symbolicName);
+    }
+    Karaf.isCamelBundle = isCamelBundle;
+    function isCxfBundle(symbolicName) {
+        return cxfBundleRegex.test(symbolicName);
+    }
+    Karaf.isCxfBundle = isCxfBundle;
+    function populateFeaturesAndRepos(attributes, features, repositories) {
+        var fullFeatures = attributes["Features"];
+        angular.forEach(attributes["Repositories"], function (repo) {
+            repositories.push({
+                id: repo["Name"],
+                uri: repo["Uri"]
+            });
+            if (!fullFeatures) {
+                return;
+            }
+            angular.forEach(repo["Features"], function (feature) {
+                angular.forEach(feature, function (entry) {
+                    if (fullFeatures[entry['Name']] !== undefined) {
+                        var f = _.cloneDeep(fullFeatures[entry['Name']][entry['Version']]);
+                        f["Id"] = entry["Name"] + "/" + entry["Version"];
+                        f["RepositoryName"] = repo["Name"];
+                        f["RepositoryURI"] = repo["Uri"];
+                        features.push(f);
+                    }
+                });
+            });
+        });
+    }
+    Karaf.populateFeaturesAndRepos = populateFeaturesAndRepos;
+    function createScrComponentsView(workspace, jolokia, components) {
+        var result = [];
+        angular.forEach(components, function (component) {
+            result.push({
+                Name: component,
+                State: getComponentStateDescription(getComponentState(workspace, jolokia, component))
+            });
+        });
+        return result;
+    }
+    Karaf.createScrComponentsView = createScrComponentsView;
+    function getComponentStateDescription(state) {
+        switch (state) {
+            case 2:
+                return "Enabled";
+            case 4:
+                return "Unsatisfied";
+            case 8:
+                return "Activating";
+            case 16:
+                return "Active";
+            case 32:
+                return "Registered";
+            case 64:
+                return "Factory";
+            case 128:
+                return "Deactivating";
+            case 256:
+                return "Destroying";
+            case 1024:
+                return "Disabling";
+            case 2048:
+                return "Disposing";
+        }
+        return "Unknown";
+    }
+    Karaf.getComponentStateDescription = getComponentStateDescription;
+    ;
+    function getAllComponents(workspace, jolokia) {
+        var scrMBean = getSelectionScrMBean(workspace);
+        var response = jolokia.request({
+            type: 'read', mbean: scrMBean,
+            arguments: []
+        });
+        //Check if the MBean provides the Components attribute.
+        if (!('Components' in response.value)) {
+            response = jolokia.request({
+                type: 'exec', mbean: scrMBean, operation: 'listComponents()'
+            });
+            return createScrComponentsView(workspace, jolokia, response.value);
+        }
+        return response.value['Components'].values;
+    }
+    Karaf.getAllComponents = getAllComponents;
+    function getComponentByName(workspace, jolokia, componentName) {
+        var components = getAllComponents(workspace, jolokia);
+        return _.find(components, function (c) { return c.Name == componentName; });
+    }
+    Karaf.getComponentByName = getComponentByName;
+    function isComponentActive(workspace, jolokia, component) {
+        var response = jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'isComponentActive(java.lang.String)',
+            arguments: [component]
+        });
+        return response.value;
+    }
+    Karaf.isComponentActive = isComponentActive;
+    function getComponentState(workspace, jolokia, component) {
+        var response = jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'componentState(java.lang.String)',
+            arguments: [component]
+        });
+        return response.value;
+    }
+    Karaf.getComponentState = getComponentState;
+    function activateComponent(workspace, jolokia, component, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'activateComponent(java.lang.String)',
+            arguments: [component]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.activateComponent = activateComponent;
+    function deactivateComponent(workspace, jolokia, component, success, error) {
+        jolokia.request({
+            type: 'exec', mbean: getSelectionScrMBean(workspace),
+            operation: 'deactivateComponent(java.lang.String)',
+            arguments: [component]
+        }, Core.onSuccess(success, { error: error }));
+    }
+    Karaf.deactivateComponent = deactivateComponent;
+    function populateDependencies(attributes, dependencies, features) {
+        angular.forEach(dependencies, function (feature) {
+            angular.forEach(feature, function (entry) {
+                var enhancedFeature = extractFeature(attributes, entry["Name"], entry["Version"]);
+                enhancedFeature["id"] = entry["Name"] + "/" + entry["Version"];
+                //enhancedFeature["repository"] = repo["Name"];
+                features.push(enhancedFeature);
+            });
+        });
+    }
+    Karaf.populateDependencies = populateDependencies;
+    function getSelectionFeaturesMBean(workspace) {
+        if (workspace) {
+            var featuresStuff = workspace.mbeanTypesToDomain["features"] || workspace.mbeanTypesToDomain['feature'] || {};
+            var karaf = featuresStuff["org.apache.karaf"] || {};
+            var mbean = karaf.objectName;
+            if (mbean) {
+                return mbean;
+            }
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("org.apache.karaf", "features");
+            if (!folder) {
+                // sometimes the features mbean is inside the 'root' folder
+                folder = workspace.tree.navigate("org.apache.karaf");
+                if (folder) {
+                    var children = folder.children;
+                    folder = null;
+                    angular.forEach(children, function (child) {
+                        if (!folder) {
+                            folder = child.navigate("features");
+                        }
+                    });
+                }
+            }
+            if (folder) {
+                var children = folder.children;
+                if (children) {
+                    var node = children[0];
+                    if (node) {
+                        return node.objectName;
+                    }
+                }
+                return folder.objectName;
+            }
+        }
+        return null;
+    }
+    Karaf.getSelectionFeaturesMBean = getSelectionFeaturesMBean;
+    function getSelectionScrMBean(workspace) {
+        if (workspace) {
+            var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
+            var karaf = scrStuff["org.apache.karaf"] || {};
+            var mbean = karaf.objectName;
+            if (mbean) {
+                return mbean;
+            }
+            // lets navigate to the tree item based on paths
+            var folder = workspace.tree.navigate("org.apache.karaf", "scr");
+            if (!folder) {
+                // sometimes the features mbean is inside the 'root' folder
+                folder = workspace.tree.navigate("org.apache.karaf");
+                if (folder) {
+                    var children = folder.children;
+                    folder = null;
+                    angular.forEach(children, function (child) {
+                        if (!folder) {
+                            folder = child.navigate("scr");
+                        }
+                    });
+                }
+            }
+            if (folder) {
+                var children = folder.children;
+                if (children) {
+                    var node = children[0];
+                    if (node) {
+                        return node.objectName;
+                    }
+                }
+                return folder.objectName;
+            }
+        }
+        return null;
+    }
+    Karaf.getSelectionScrMBean = getSelectionScrMBean;
+})(Karaf || (Karaf = {}));
+/// <reference path="../osgiHelpers.ts"/>
+/// <reference path="bundle.ts"/>
+var Osgi;
+(function (Osgi) {
+    var BundlesService = /** @class */ (function () {
+        BundlesService.$inject = ["$q", "jolokia", "workspace"];
+        function BundlesService($q, jolokia, workspace) {
+            'ngInject';
+            this.$q = $q;
+            this.jolokia = jolokia;
+            this.workspace = workspace;
+        }
+        BundlesService.prototype.getBundles = function () {
+            return this.execute(Osgi.getSelectionBundleMBean(this.workspace), 'listBundles()')
+                .then(function (value) {
+                var bundles = [];
+                angular.forEach(value, function (item, key) {
+                    var bundle = {
+                        id: item.Identifier,
+                        name: item.Headers['Bundle-Name'] ? item.Headers['Bundle-Name']['Value'] : '',
+                        location: item.Location,
+                        symbolicName: item.SymbolicName,
+                        state: item.State.toLowerCase(),
+                        version: item.Version
+                    };
+                    bundles.push(bundle);
+                });
+                return bundles;
+            });
+        };
+        BundlesService.prototype.startBundles = function (bundles) {
+            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
+            var ids = bundles.map(function (bundle) { return bundle.id; });
+            return this.execute(mbean, 'startBundles([J)', ids)
+                .then(this.handleResponse);
+        };
+        BundlesService.prototype.stopBundles = function (bundles) {
+            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
+            var ids = bundles.map(function (bundle) { return bundle.id; });
+            return this.execute(mbean, 'stopBundles([J)', ids)
+                .then(this.handleResponse);
+        };
+        BundlesService.prototype.updateBundles = function (bundles) {
+            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
+            var ids = bundles.map(function (bundle) { return bundle.id; });
+            return this.execute(mbean, 'updateBundles([J)', ids)
+                .then(this.handleResponse);
+        };
+        BundlesService.prototype.refreshBundles = function (bundles) {
+            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
+            var ids = bundles.map(function (bundle) { return bundle.id; });
+            return this.execute(mbean, 'refreshBundles([J)', ids)
+                .then(this.handleResponse);
+        };
+        BundlesService.prototype.uninstallBundles = function (bundles) {
+            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
+            var ids = bundles.map(function (bundle) { return bundle.id; });
+            return this.execute(mbean, 'uninstallBundles([J)', ids)
+                .then(this.handleResponse);
+        };
+        BundlesService.prototype.installBundle = function (bundleUrl) {
+            var _this = this;
+            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
+            return this.execute(mbean, 'installBundle(java.lang.String)', bundleUrl)
+                .then(function (response) { return _this.execute(mbean, 'startBundles([J)', response); })
+                .then(this.handleResponse);
+        };
+        BundlesService.prototype.execute = function (mbean, operation, args) {
+            var _this = this;
+            if (args === void 0) { args = undefined; }
+            var request = {
+                type: 'exec',
+                mbean: mbean,
+                operation: operation
+            };
+            if (args) {
+                request['arguments'] = [args];
+            }
+            return this.$q(function (resolve, reject) {
+                _this.jolokia.request(request, {
+                    method: "post",
+                    success: function (response) { return resolve(response.value); },
+                    error: function (response) {
+                        Osgi.log.error('BundlesService.execute() failed:', response);
+                        reject(response.error);
+                    }
+                });
+            });
+        };
+        BundlesService.prototype.handleResponse = function (response) {
+            if (response && response['Error']) {
+                throw response['Error'];
+            }
+            else {
+                return "The operation completed successfully";
+            }
+        };
+        return BundlesService;
+    }());
+    Osgi.BundlesService = BundlesService;
+})(Osgi || (Osgi = {}));
+/// <reference path="bundle.ts"/>
+/// <reference path="bundles.service.ts"/>
+var Osgi;
+(function (Osgi) {
+    var BundlesController = /** @class */ (function () {
+        BundlesController.$inject = ["bundlesService", "workspace"];
+        function BundlesController(bundlesService, workspace) {
+            'ngInject';
+            var _this = this;
+            this.bundlesService = bundlesService;
+            this.workspace = workspace;
+            this.startAction = {
+                name: 'Start',
+                actionFn: function (action) {
+                    var selectedBundles = _this.getSelectedBundles();
+                    _this.bundlesService.startBundles(selectedBundles)
+                        .then(function (response) {
+                        Core.notification('success', response);
+                        _this.loadBundles();
+                    })
+                        .catch(function (error) { return Core.notification('danger', error); });
+                },
+                isDisabled: true
+            };
+            this.stopAction = {
+                name: 'Stop',
+                actionFn: function (action) {
+                    var selectedBundles = _this.getSelectedBundles();
+                    _this.bundlesService.stopBundles(selectedBundles)
+                        .then(function (response) {
+                        Core.notification('success', response);
+                        _this.loadBundles();
+                    })
+                        .catch(function (error) { return Core.notification('danger', error); });
+                },
+                isDisabled: true
+            };
+            this.refreshAction = {
+                name: 'Refresh',
+                actionFn: function (action) {
+                    var selectedBundles = _this.getSelectedBundles();
+                    _this.bundlesService.refreshBundles(selectedBundles)
+                        .then(function (response) {
+                        Core.notification('success', response);
+                        _this.loadBundles();
+                    })
+                        .catch(function (error) { return Core.notification('danger', error); });
+                },
+                isDisabled: true
+            };
+            this.updateAction = {
+                name: 'Update',
+                actionFn: function (action) {
+                    var selectedBundles = _this.getSelectedBundles();
+                    _this.bundlesService.updateBundles(selectedBundles)
+                        .then(function (response) {
+                        Core.notification('success', response);
+                        _this.loadBundles();
+                    })
+                        .catch(function (error) { return Core.notification('danger', error); });
+                },
+                isDisabled: true
+            };
+            this.uninstallAction = {
+                name: 'Uninstall',
+                actionFn: function (action) {
+                    var selectedBundles = _this.getSelectedBundles();
+                    _this.bundlesService.uninstallBundles(selectedBundles)
+                        .then(function (response) {
+                        Core.notification('success', response);
+                        _this.loadBundles();
+                    })
+                        .catch(function (error) { return Core.notification('danger', error); });
+                },
+                isDisabled: true
+            };
+            this.tableConfig = {
+                selectionMatchProp: 'id',
+                showCheckboxes: true,
+                onCheckBoxChange: function (item) { return _this.enableDisableActions(); }
+            };
+            this.toolbarConfig = {
+                filterConfig: {
+                    fields: [
+                        {
+                            id: 'state',
+                            title: 'State',
+                            placeholder: 'Filter by state...',
+                            filterType: 'select',
+                            filterValues: [
+                                'active',
+                                'installed',
+                                'resolved',
+                                'signers_all',
+                                'signers_trusted',
+                                'start_activation_policy',
+                                'start_transient',
+                                'starting',
+                                'stop_transient',
+                                'stopping',
+                                'uninstalled'
+                            ]
+                        },
+                        {
+                            id: 'name',
+                            title: 'Name',
+                            placeholder: 'Filter by name...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'symbolicName',
+                            title: 'Symbolic Name',
+                            placeholder: 'Filter by symbolic name...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'version',
+                            title: 'Version',
+                            placeholder: 'Filter by version...',
+                            filterType: 'text'
+                        }
+                    ],
+                    onFilterChange: function (filters) {
+                        _this.applyFilters(filters);
+                    },
+                    resultsCount: 0
+                },
+                actionsConfig: {
+                    primaryActions: this.toolbarActions()
+                },
+                isTableView: true
+            };
+            this.tableColumns = [
+                { header: 'ID', itemField: 'id', templateFn: function (value) { return "<a href=\"osgi/bundle/" + value + "\">" + value + "</a>"; } },
+                { header: 'State', itemField: 'state' },
+                { header: 'Name', itemField: 'name' },
+                { header: 'Symbolic Name', itemField: 'symbolicName' },
+                { header: 'Version', itemField: 'version' }
+            ];
+            this.tableItems = null;
+            this.loading = true;
+        }
+        BundlesController.prototype.$onInit = function () {
+            this.loadBundles();
+        };
+        BundlesController.prototype.loadBundles = function () {
+            var _this = this;
+            this.bundlesService.getBundles()
+                .then(function (bundles) {
+                _this.bundles = bundles;
+                _this.tableItems = bundles;
+                _this.toolbarConfig.filterConfig.resultsCount = bundles.length;
+                _this.enableDisableActions();
+                _this.loading = false;
+            });
+        };
+        BundlesController.prototype.toolbarActions = function () {
+            var actions = [];
+            var frameworkMBean = Osgi.getSelectionFrameworkMBean(this.workspace);
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'startBundle')) {
+                actions.push(this.startAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'stopBundle')) {
+                actions.push(this.stopAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'refreshBundle')) {
+                actions.push(this.refreshAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'updateBundle')) {
+                actions.push(this.updateAction);
+            }
+            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'uninstallBundle')) {
+                actions.push(this.uninstallAction);
+            }
+            Osgi.log.debug("RBAC - Rendered bundles actions:", actions);
+            if (_.isEmpty(actions)) {
+                Osgi.log.debug("RBAC - Disable checkboxes");
+                this.tableConfig.showCheckboxes = false;
+            }
+            return actions;
+        };
+        BundlesController.prototype.applyFilters = function (filters) {
+            var filteredBundles = this.bundles;
+            filters.forEach(function (filter) {
+                filteredBundles = BundlesController.FILTER_FUNCTIONS[filter.id](filteredBundles, filter.value);
+            });
+            this.tableItems = filteredBundles;
+            this.toolbarConfig.filterConfig.resultsCount = filteredBundles.length;
+        };
+        BundlesController.prototype.getSelectedBundles = function () {
+            var _this = this;
+            return this.tableItems
+                .map(function (tableItem, i) { return angular.extend(_this.bundles[i], { selected: tableItem['selected'] }); })
+                .filter(function (bundle) { return bundle.selected; });
+        };
+        BundlesController.prototype.enableDisableActions = function () {
+            var selectedBundles = this.getSelectedBundles();
+            var noBundlesSelected = selectedBundles.length === 0;
+            this.startAction.isDisabled = noBundlesSelected || selectedBundles.every(function (bundle) { return bundle.state === 'active'; });
+            this.stopAction.isDisabled = noBundlesSelected || selectedBundles.every(function (bundle) { return bundle.state !== 'active'; });
+            this.refreshAction.isDisabled = noBundlesSelected;
+            this.updateAction.isDisabled = noBundlesSelected;
+            this.uninstallAction.isDisabled = noBundlesSelected;
+        };
+        BundlesController.FILTER_FUNCTIONS = {
+            state: function (bundles, state) { return bundles.filter(function (bundle) { return bundle.state === state; }); },
+            name: function (bundles, name) {
+                var regExp = new RegExp(name, 'i');
+                return bundles.filter(function (bundle) { return regExp.test(bundle.name); });
+            },
+            symbolicName: function (bundles, symbolicName) {
+                var regExp = new RegExp(symbolicName, 'i');
+                return bundles.filter(function (bundle) { return regExp.test(bundle.symbolicName); });
+            },
+            version: function (bundles, version) {
+                var regExp = new RegExp(version, 'i');
+                return bundles.filter(function (bundle) { return regExp.test(bundle.version); });
+            }
+        };
+        return BundlesController;
+    }());
+    Osgi.BundlesController = BundlesController;
+    Osgi.bundlesComponent = {
+        template: "\n      <div class=\"table-view\">\n        <h1>Bundles</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <install-bundle bundles=\"$ctrl.bundles\" on-install=\"$ctrl.loadBundles()\"></install-bundle>\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <pf-table-view config=\"$ctrl.tableConfig\"\n                         columns=\"$ctrl.tableColumns\"\n                         items=\"$ctrl.tableItems\"></pf-table-view>\n        </div>\n      </div>\n    ",
+        controller: BundlesController
+    };
+})(Osgi || (Osgi = {}));
+/// <reference path="bundle.ts"/>
+var Osgi;
+(function (Osgi) {
+    var InstallBundleController = /** @class */ (function () {
+        InstallBundleController.$inject = ["bundlesService", "workspace"];
+        function InstallBundleController(bundlesService, workspace) {
+            'ngInject';
+            this.bundlesService = bundlesService;
+            this.workspace = workspace;
+            this.loading = false;
+            this.bundles = [];
+            this.frameworkMBean = Osgi.getSelectionFrameworkMBean(this.workspace);
+        }
+        InstallBundleController.prototype.install = function (bundleUrl) {
+            var _this = this;
+            var bundle = this.findBundleByUrl(bundleUrl);
+            if (bundle) {
+                Core.notification('warning', "Bundle " + bundle.name + " " + bundle.version + " is already installed");
+                return;
+            }
+            this.loading = true;
+            this.bundlesService.installBundle(bundleUrl)
+                .then(function (response) {
+                _this.loading = false;
+                Core.notification('success', response);
+                _this['onInstall']();
+            })
+                .catch(function (error) {
+                _this.loading = false;
+                Core.notification('danger', error);
+            });
+        };
+        InstallBundleController.prototype.findBundleByUrl = function (bundleUrl) {
+            return this.bundles.filter(function (bundle) { return bundle.location === bundleUrl.trim(); })[0];
+        };
+        InstallBundleController.prototype.installDisabled = function (bundleUrl) {
+            return this.loading || (!bundleUrl || bundleUrl.trim().length === 0);
+        };
+        return InstallBundleController;
+    }());
+    Osgi.InstallBundleController = InstallBundleController;
+    Osgi.installBundleComponent = {
+        template: "\n      <div class=\"row install-bundle\"\n          hawtio-show object-name=\"{{$ctrl.frameworkMBean}}\" method-name=\"installBundle\">\n        <div class=\"col-lg-6\">\n          <div class=\"input-group\">\n            <input type=\"text\" class=\"form-control\" placeholder=\"Bundle URL...\" ng-model=\"bundleUrl\">\n            <span class=\"input-group-btn\">\n              <button type=\"button\" class=\"btn btn-default\" ng-click=\"$ctrl.install(bundleUrl)\" ng-disabled=\"$ctrl.installDisabled(bundleUrl)\">\n                Install\n              </button>\n            </span>\n          </div>\n        </div>\n        <div class=\"col-lg-6\">\n        </div>\n      </div>\n    ",
+        controller: InstallBundleController,
+        bindings: {
+            onInstall: '&',
+            bundles: '<'
+        }
+    };
+})(Osgi || (Osgi = {}));
+/// <reference path="bundles.component.ts"/>
+/// <reference path="install-bundle.component.ts"/>
+/// <reference path="bundles.service.ts"/>
+var Osgi;
+(function (Osgi) {
+    Osgi.bundlesModule = angular
+        .module('hawtio-osgi-bundles', [])
+        .component('bundles', Osgi.bundlesComponent)
+        .component('installBundle', Osgi.installBundleComponent)
+        .service('bundlesService', Osgi.BundlesService)
+        .name;
+})(Osgi || (Osgi = {}));
+/// <reference path="osgiData.ts"/>
+/// <reference path="osgiHelpers.ts"/>
+/// <reference path="../../karaf/ts/karafHelpers.ts"/>
+/// <reference path="bundles/bundles.module.ts"/>
+var Osgi;
+(function (Osgi) {
+    Osgi._module = angular.module(Osgi.pluginName, [
+        'infinite-scroll',
+        Osgi.bundlesModule
+    ]);
+    Osgi._module.config(["$routeProvider", function ($routeProvider) {
+            $routeProvider
+                .when('/osgi', { redirectTo: '/osgi/bundles' })
+                .when('/osgi/bundles', { template: '<bundles></bundles>' })
+                .when('/osgi/bundle/:bundleId', { templateUrl: 'plugins/osgi/html/bundle.html' })
+                .when('/osgi/services', { templateUrl: 'plugins/osgi/html/services.html' })
+                .when('/osgi/packages', { templateUrl: 'plugins/osgi/html/packages.html' })
+                .when('/osgi/configurations', { templateUrl: 'plugins/osgi/html/configurations.html' })
+                .when('/osgi/pid/:pid/:factoryPid', { templateUrl: 'plugins/osgi/html/pid.html' })
+                .when('/osgi/pid/:pid', { templateUrl: 'plugins/osgi/html/pid.html' })
+                .when('/osgi/fwk', { templateUrl: 'plugins/osgi/html/framework.html' });
+        }]);
+    Osgi._module.run(["HawtioNav", "workspace", "viewRegistry", "helpRegistry", function (nav, workspace, viewRegistry, helpRegistry) {
+            viewRegistry['osgi'] = "plugins/osgi/html/layoutOsgi.html";
+            helpRegistry.addUserDoc('osgi', 'plugins/osgi/doc/help.md', function () {
+                return workspace.treeContainsDomainAndProperties("osgi.core");
+            });
+            var builder = nav.builder();
+            var tab = builder.id('osgi')
+                .title(function () { return 'OSGi'; })
+                .href(function () { return '/osgi'; })
+                .isValid(function () { return workspace.treeContainsDomainAndProperties("osgi.core"); })
+                .isSelected(function () { return workspace.isLinkActive('osgi'); })
+                .build();
+            nav.add(tab);
+        }]);
+    Osgi._module.factory('osgiDataService', ["workspace", "jolokia", function (workspace, jolokia) {
+            return new Osgi.OsgiDataService(workspace, jolokia);
+        }]);
+    hawtioPluginLoader.addModule(Osgi.pluginName);
+})(Osgi || (Osgi = {}));
+var SpringBoot;
+(function (SpringBoot) {
+    var Health = /** @class */ (function () {
+        function Health(status, items) {
+            this.status = status;
+            this.items = items;
+        }
+        return Health;
+    }());
+    SpringBoot.Health = Health;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="health.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var HealthService = /** @class */ (function () {
+        HealthService.$inject = ["jolokiaService", "humanizeService"];
+        function HealthService(jolokiaService, humanizeService) {
+            'ngInject';
+            this.jolokiaService = jolokiaService;
+            this.humanizeService = humanizeService;
+        }
+        HealthService.prototype.getHealth = function () {
+            var _this = this;
+            SpringBoot.log.debug('Fetch health data');
+            return this.jolokiaService.getAttribute('org.springframework.boot:type=Endpoint,name=healthEndpoint', 'Data')
+                .then(function (data) {
+                var status = _this.toHealthStatus(data.status);
+                var items = _this.toItems(data);
+                return new SpringBoot.Health(status, items);
+            });
+        };
+        HealthService.prototype.toHealthStatus = function (str) {
+            return this.humanizeService.toUpperCase(str);
+        };
+        HealthService.prototype.toItems = function (data) {
+            var _this = this;
+            return _.toPairs(data)
+                .filter(function (pair) { return _.isObject(pair[1]); })
+                .map(function (pair) { return ({
+                title: _this.humanizeService.toSentenceCase(pair[0]),
+                info: _.toPairs(pair[1]).map(function (pair) { return _this.humanizeService.toSentenceCase(pair[0]) + ': ' + pair[1]; })
+            }); });
+        };
+        return HealthService;
+    }());
+    SpringBoot.HealthService = HealthService;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="health.service.ts"/>
+/// <reference path="health.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var HealthController = /** @class */ (function () {
+        HealthController.$inject = ["$timeout", "healthService"];
+        function HealthController($timeout, healthService) {
+            'ngInject';
+            this.$timeout = $timeout;
+            this.healthService = healthService;
+            this.reloadDelay = 20000;
+        }
+        HealthController.prototype.$onInit = function () {
+            this.loadDataPeriodically();
+        };
+        HealthController.prototype.$onDestroy = function () {
+            this.cancelTimer();
+        };
+        HealthController.prototype.loadDataPeriodically = function () {
+            var _this = this;
+            this.healthService.getHealth()
+                .then(function (health) { return _this.health = health; })
+                .then(function () { return _this.promise = _this.$timeout(function () { return _this.loadDataPeriodically(); }, _this.reloadDelay); });
+        };
+        HealthController.prototype.cancelTimer = function () {
+            this.$timeout.cancel(this.promise);
+        };
+        HealthController.prototype.getStatusIcon = function () {
+            switch (this.health.status) {
+                case 'UP':
+                    return 'pficon-ok';
+                case 'FATAL':
+                    return 'pficon-error-circle-o';
+                default:
+                    return 'pficon-info';
+            }
+        };
+        HealthController.prototype.getStatusClass = function () {
+            switch (this.health.status) {
+                case 'UP':
+                    return 'alert-success';
+                case 'FATAL':
+                    return 'alert-danger';
+                default:
+                    return 'alert-info';
+            }
+        };
+        return HealthController;
+    }());
+    SpringBoot.HealthController = HealthController;
+    SpringBoot.healthComponent = {
+        template: "\n      <div class=\"spring-boot-health-main\">\n        <h1>Health</h1>\n        <div class=\"cards-pf\" ng-if=\"$ctrl.health\">\n          <div class=\"container-fluid container-cards-pf\">\n            <div class=\"row row-cards-pf\">\n              <div class=\"col-lg-12\">\n                <div class=\"toast-pf alert\" ng-class=\"$ctrl.getStatusClass()\">\n                  <span class=\"pficon\" ng-class=\"$ctrl.getStatusIcon()\"></span>\n                  <strong>{{$ctrl.health.status}}</strong>\n                </div>\n              </div>\n              <div class=\"col-xs-12 col-sm-6 col-md-4 col-lg-3\" ng-repeat=\"item in $ctrl.health.items\">\n                <pf-info-status-card status=\"item\"></pf-info-status-card>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    ",
+        controller: HealthController
+    };
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="health.component.ts"/>
+/// <reference path="health.service.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    SpringBoot.healthModule = angular
+        .module('spring-boot-health', [])
+        .component('springBootHealth', SpringBoot.healthComponent)
+        .service('healthService', SpringBoot.HealthService)
+        .name;
+})(SpringBoot || (SpringBoot = {}));
+var SpringBoot;
+(function (SpringBoot) {
+    var Trace = /** @class */ (function () {
+        function Trace(trace) {
+            this.timestamp = trace.timestamp;
+            this.method = trace.info.method;
+            this.path = trace.info.path;
+            this.info = trace.info;
+            if (this.info.timeTaken) {
+                this.timeTaken = parseInt(this.info.timeTaken);
+            }
+            if (this.info.headers.response) {
+                this.httpStatusCode = parseInt(this.info.headers.response.status);
+            }
+        }
+        return Trace;
+    }());
+    SpringBoot.Trace = Trace;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="trace.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var TraceService = /** @class */ (function () {
+        TraceService.$inject = ["jolokiaService"];
+        function TraceService(jolokiaService) {
+            'ngInject';
+            this.jolokiaService = jolokiaService;
+        }
+        TraceService.prototype.getTraces = function () {
+            return this.jolokiaService.getAttribute('org.springframework.boot:type=Endpoint,name=traceEndpoint', 'Data')
+                .then(function (data) {
+                var traces = [];
+                // Avoid including our own jolokia requests in the results
+                var filteredTraces = data.filter(function (trace) { return /^\/jolokia\/?(?:\/.*(?=$))?$/.test(trace.info.path) === false; });
+                angular.forEach(filteredTraces, function (traceEvent) {
+                    traces.push(new SpringBoot.Trace(traceEvent));
+                });
+                return traces;
+            });
+        };
+        return TraceService;
+    }());
+    SpringBoot.TraceService = TraceService;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="trace.service.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var TraceController = /** @class */ (function () {
+        TraceController.$inject = ["traceService", "$scope", "$filter", "$timeout", "$interval", "$uibModal"];
+        function TraceController(traceService, $scope, $filter, $timeout, $interval, $uibModal) {
+            'ngInject';
+            var _this = this;
+            this.traceService = traceService;
+            this.$scope = $scope;
+            this.$filter = $filter;
+            this.$timeout = $timeout;
+            this.$interval = $interval;
+            this.$uibModal = $uibModal;
+            this.toolbarConfig = {
+                isTableView: true,
+                filterConfig: {
+                    fields: [
+                        {
+                            id: 'timestamp',
+                            title: 'Timestamp',
+                            placeholder: 'Filter by timestamp...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'status',
+                            title: 'HTTP Status',
+                            placeholder: 'Filter by HTTP status...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'method',
+                            title: 'HTTP Method',
+                            placeholder: 'Filter by HTTP method...',
+                            filterType: 'select',
+                            filterValues: ['GET', 'DELETE', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', 'TRACE']
+                        },
+                        {
+                            id: 'path',
+                            title: 'Path',
+                            placeholder: 'Filter by path...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'timeTaken',
+                            title: 'Time Taken',
+                            placeholder: 'Filter by time taken...',
+                            filterType: 'number'
+                        },
+                    ],
+                    onFilterChange: function (filters) {
+                        _this.applyFilters(filters);
+                    },
+                    appliedFilters: [],
+                    resultsCount: 0
+                },
+            };
+            this.loading = true;
+            this.traces = [];
+            this.tableItems = [];
+            this.dateFormat = "yyyy-MM-dd HH:mm:ss.sss";
+        }
+        TraceController.prototype.$onInit = function () {
+            var _this = this;
+            this.loadTraces();
+            this.promise = this.$interval(function () { return _this.loadTraces(); }, 10000);
+        };
+        TraceController.prototype.$onDestroy = function () {
+            this.$interval.cancel(this.promise);
+        };
+        TraceController.prototype.loadTraces = function () {
+            var _this = this;
+            this.loading = true;
+            this.traceService.getTraces()
+                .then(function (traces) {
+                (_a = _this.traces).unshift.apply(_a, _this.aggregateTraces(traces));
+                if (_this.traces.length > TraceController.CACHE_SIZE) {
+                    var spliceFrom = (_this.traces.length) - (_this.traces.length - TraceController.CACHE_SIZE);
+                    var splitAmount = _this.traces.length - TraceController.CACHE_SIZE;
+                    _this.traces.splice(spliceFrom, splitAmount);
+                }
+                _this.applyFilters(_this.toolbarConfig.filterConfig.appliedFilters);
+                _this.scrollIfRequired();
+                _this.loading = false;
+                var _a;
+            });
+        };
+        TraceController.prototype.applyFilters = function (filters) {
+            var _this = this;
+            var filteredTraces = this.traces;
+            var dateFilter = this.$filter('date');
+            filters.forEach(function (filter) {
+                var regExp = new RegExp(filter.value, 'i');
+                switch (filter.id) {
+                    case 'timestamp':
+                        filteredTraces = filteredTraces.filter(function (trace) { return regExp.test(dateFilter(trace.timestamp, _this.dateFormat)); });
+                        break;
+                    case 'status':
+                        filteredTraces = filteredTraces.filter(function (trace) { return parseInt(filter.value) === trace.httpStatusCode; });
+                        break;
+                    case 'method':
+                        filteredTraces = filteredTraces.filter(function (trace) { return regExp.test(trace.method); });
+                        break;
+                    case 'path':
+                        filteredTraces = filteredTraces.filter(function (trace) { return regExp.test(trace.path); });
+                        break;
+                    case 'timeTaken':
+                        filteredTraces = filteredTraces.filter(function (trace) { return parseInt(filter.value) === trace.timeTaken; });
+                        break;
+                }
+            });
+            this.tableItems = filteredTraces;
+            this.toolbarConfig.filterConfig.resultsCount = filteredTraces.length;
+        };
+        TraceController.prototype.getStatusClass = function (trace) {
+            if (trace.httpStatusCode) {
+                if (trace.httpStatusCode < 400) {
+                    return 'http-status-code-icon pficon pficon-ok';
+                }
+                else {
+                    return 'http-status-code-icon pficon pficon-error-circle-o';
+                }
+            }
+            return '';
+        };
+        TraceController.prototype.openTraceModal = function (trace) {
+            this.$scope.trace = trace;
+            this.$uibModal.open({
+                templateUrl: 'traceDetailsModal.html',
+                scope: this.$scope,
+                size: 'lg',
+                appendTo: $(document.querySelector('.spring-boot-trace-main'))
+            });
+        };
+        TraceController.prototype.aggregateTraces = function (traces) {
+            var _this = this;
+            var aggregatedTraces = [];
+            traces.forEach(function (trace) {
+                var match = false;
+                _this.traces.forEach(function (existingTrace) {
+                    if (existingTrace.timestamp === trace.timestamp &&
+                        existingTrace.method === trace.method &&
+                        existingTrace.path === trace.path) {
+                        match = true;
+                        return;
+                    }
+                });
+                if (!match) {
+                    aggregatedTraces.push(trace);
+                }
+            });
+            return aggregatedTraces;
+        };
+        TraceController.prototype.scrollIfRequired = function () {
+            var scrollableTable = document.querySelector('.spring-boot-trace-scrollable-table');
+            if (scrollableTable !== null && scrollableTable.scrollTop === 0) {
+                this.$timeout(function () { return scrollableTable.scrollTop = 0; }, 0);
+            }
+        };
+        TraceController.CACHE_SIZE = 500;
+        return TraceController;
+    }());
+    SpringBoot.TraceController = TraceController;
+    SpringBoot.traceComponent = {
+        templateUrl: 'plugins/spring-boot/trace/trace.html',
+        controller: TraceController,
+    };
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="trace.component.ts"/>
+/// <reference path="trace.service.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    SpringBoot.traceModule = angular
+        .module('spring-boot-trace', [])
+        .component('springBootTrace', SpringBoot.traceComponent)
+        .service('traceService', SpringBoot.TraceService)
+        .name;
+})(SpringBoot || (SpringBoot = {}));
+var SpringBoot;
+(function (SpringBoot) {
+    SpringBoot.loggersJmxDomain = "org.springframework.boot:type=Endpoint,name=loggersEndpoint";
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="logger.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var LoggersService = /** @class */ (function () {
+        LoggersService.$inject = ["jolokiaService"];
+        function LoggersService(jolokiaService) {
+            'ngInject';
+            this.jolokiaService = jolokiaService;
+        }
+        LoggersService.prototype.getLoggerConfiguration = function () {
+            return this.jolokiaService.getAttribute(SpringBoot.loggersJmxDomain, 'Loggers')
+                .then(function (data) {
+                var loggers = [];
+                angular.forEach(data.loggers, function (loggerInfo, loggerName) {
+                    var logger = {
+                        name: loggerName,
+                        configuredLevel: loggerInfo.configuredLevel == null ? loggerInfo.effectiveLevel : loggerInfo.configuredLevel,
+                        effectiveLevel: loggerInfo.effectiveLevel
+                    };
+                    loggers.push(logger);
+                });
+                var loggerConfiguration = {
+                    levels: data.levels,
+                    loggers: loggers
+                };
+                return loggerConfiguration;
+            });
+        };
+        LoggersService.prototype.setLoggerLevel = function (logger) {
+            return this.jolokiaService.execute(SpringBoot.loggersJmxDomain, 'setLogLevel', logger.name, logger.configuredLevel);
+        };
+        return LoggersService;
+    }());
+    SpringBoot.LoggersService = LoggersService;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="loggers.service.ts"/>
+/// <reference path="logger.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var LoggersController = /** @class */ (function () {
+        LoggersController.$inject = ["loggersService"];
+        function LoggersController(loggersService) {
+            'ngInject';
+            var _this = this;
+            this.loggersService = loggersService;
+            this.filterFields = [
+                {
+                    id: 'name',
+                    title: 'Logger Name',
+                    placeholder: 'Filter by logger name...',
+                    filterType: 'text'
+                },
+                {
+                    id: 'level',
+                    title: 'Log Level',
+                    placeholder: 'Filter by log level...',
+                    filterType: 'select',
+                    filterValues: []
+                }
+            ];
+            this.filterConfig = {
+                fields: this.filterFields,
+                onFilterChange: function (filters) {
+                    _this.applyFilters(filters);
+                },
+                appliedFilters: [],
+                resultsCount: 0
+            };
+            this.toolbarConfig = {
+                filterConfig: this.filterConfig,
+                isTableView: false
+            };
+            this.pageSize = 10;
+            this.pageNumber = 1;
+            this.loading = true;
+            this.loggers = [];
+            this.tableItems = [];
+        }
+        LoggersController.prototype.$onInit = function () {
+            this.loadData();
+        };
+        LoggersController.prototype.loadData = function () {
+            var _this = this;
+            this.loggersService.getLoggerConfiguration().then(function (logConfiguration) {
+                _this.loggers = logConfiguration.loggers;
+                _this.loggerLevels = logConfiguration.levels;
+                _this.tableItems = logConfiguration.loggers;
+                _this.filterConfig.resultsCount = logConfiguration.loggers.length;
+                _this.filterFields[1]['filterValues'] = logConfiguration.levels;
+                _this.numTotalItems = _this.tableItems.length;
+                if (_this.filterConfig.appliedFilters.length > 0) {
+                    _this.applyFilters(_this.filterConfig.appliedFilters);
+                }
+                _this.loading = false;
+            }).catch(function (error) { return Core.notification('danger', error); });
+        };
+        LoggersController.prototype.setLoggerLevel = function (logger) {
+            var _this = this;
+            this.loggersService.setLoggerLevel(logger).then(function () {
+                _this.loadData();
+            }).catch(function (error) { return Core.notification('danger', error); });
+        };
+        LoggersController.prototype.applyFilters = function (filters) {
+            var filteredLoggers = this.loggers;
+            filters.forEach(function (filter) {
+                var regExp = new RegExp(filter.value, 'i');
+                switch (filter.id) {
+                    case 'name':
+                        filteredLoggers = filteredLoggers.filter(function (logger) { return logger.name.match(regExp) !== null; });
+                        break;
+                    case 'level':
+                        filteredLoggers = filteredLoggers.filter(function (logger) { return logger.effectiveLevel.match(regExp) !== null; });
+                        break;
+                }
+            });
+            this.tableItems = filteredLoggers;
+            this.numTotalItems = filteredLoggers.length;
+            this.toolbarConfig.filterConfig.resultsCount = filteredLoggers.length;
+        };
+        LoggersController.prototype.orderLoggers = function (item) {
+            if (item.name === 'ROOT') {
+                return -1;
+            }
+            else
+                return item.name;
+        };
+        return LoggersController;
+    }());
+    SpringBoot.LoggersController = LoggersController;
+    SpringBoot.loggersComponent = {
+        template: "\n      <div class=\"spring-boot-loggers-main\">\n        <h1>Loggers</h1>\n        <div class=\"blank-slate-pf no-border\" ng-if=\"$ctrl.loading === false && $ctrl.loggers.length === 0\">\n          <div class=\"blank-slate-pf-icon\">\n            <span class=\"pficon pficon pficon-warning-triangle-o\"></span>\n          </div>\n          <h1>No Spring Boot Loggers</h1>\n          <p>There are no loggers to display for this application.</p>\n          <p>Check your Spring Boot logging configuration.</p>\n        </div>\n        <div ng-show=\"$ctrl.loggers.length > 0\">\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <ul class=\"list-group spring-boot-loggers-list-group\">\n            <li class=\"list-group-item\"\n                ng-repeat=\"item in $ctrl.tableItems | orderBy : $ctrl.orderLoggers | startFrom:($ctrl.pageNumber - 1) * $ctrl.pageSize | limitTo: $ctrl.pageSize\">\n                <div title=\"Logger Level\">\n                  <select ng-model=\"item.configuredLevel\"\n                          ng-options=\"level for level in $ctrl.loggerLevels\"\n                          ng-change=\"$ctrl.setLoggerLevel(item)\"\n                          ng-selected=\"item.effectiveLevel === level\">\n                  </select>\n                </div>\n                <div class=\"list-group-item-heading\">{{item.name}}</div>\n            </li>\n          </ul>\n          <pf-pagination\n            page-size=\"$ctrl.pageSize\"\n            page-number=\"$ctrl.pageNumber\"\n            num-total-items=\"$ctrl.numTotalItems\">\n          </pf-pagination>\n        </div>\n      </div>\n    ",
+        controller: LoggersController
+    };
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="loggers.component.ts"/>
+/// <reference path="loggers.service.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    SpringBoot.loggersModule = angular
+        .module('spring-boot-loggers', [])
+        .component('springBootLoggers', SpringBoot.loggersComponent)
+        .service('loggersService', SpringBoot.LoggersService)
+        .name;
+})(SpringBoot || (SpringBoot = {}));
+var SpringBoot;
+(function (SpringBoot) {
+    var SpringBootService = /** @class */ (function () {
+        SpringBootService.$inject = ["$q", "treeService"];
+        function SpringBootService($q, treeService) {
+            'ngInject';
+            this.$q = $q;
+            this.treeService = treeService;
+        }
+        SpringBootService.prototype.getTabs = function () {
+            return this.$q.all([
+                this.hasEndpoint('healthEndpoint'),
+                this.hasEndpoint('loggersEndpoint'),
+                this.hasEndpoint('traceEndpoint')
+            ])
+                .then(function (results) {
+                var tabs = [];
+                if (results[0]) {
+                    tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
+                }
+                if (results[1]) {
+                    tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
+                }
+                if (results[2]) {
+                    tabs.push(new Nav.HawtioTab('Trace', '/spring-boot/trace'));
+                }
+                return tabs;
+            });
+        };
+        SpringBootService.prototype.hasEndpoint = function (name) {
+            return this.treeService.treeContainsDomainAndProperties('org.springframework.boot', { type: 'Endpoint', name: name });
+        };
+        return SpringBootService;
+    }());
+    SpringBoot.SpringBootService = SpringBootService;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="spring-boot.service.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    configureRoutes.$inject = ["$routeProvider"];
+    configureLayout.$inject = ["$templateCache", "viewRegistry", "HawtioNav", "workspace", "treeService", "springBootService"];
+    function configureRoutes($routeProvider) {
+        'ngInject';
+        $routeProvider
+            .when('/spring-boot', { redirectTo: '/spring-boot/health' })
+            .when('/spring-boot/health', { template: '<spring-boot-health></spring-boot-health>' })
+            .when('/spring-boot/trace', { template: '<spring-boot-trace></spring-boot-trace>' })
+            .when('/spring-boot/loggers', { template: '<spring-boot-loggers></spring-boot-loggers>' });
+    }
+    SpringBoot.configureRoutes = configureRoutes;
+    function configureLayout($templateCache, viewRegistry, HawtioNav, workspace, treeService, springBootService) {
+        'ngInject';
+        var templateCacheKey = 'spring-boot.html';
+        $templateCache.put(templateCacheKey, '<spring-boot></spring-boot>');
+        viewRegistry['spring-boot'] = templateCacheKey;
+        treeService.treeContainsDomainAndProperties('org.springframework.boot')
+            .then(function (isSpringBoot) {
+            if (isSpringBoot) {
+                springBootService.getTabs()
+                    .then(function (tabs) {
+                    var tab = HawtioNav.builder()
+                        .id('spring-boot')
+                        .title(function () { return 'Spring Boot'; })
+                        .href(function () { return '/spring-boot'; })
+                        .isValid(function () { return tabs.length > 0; })
+                        .isSelected(function () { return workspace.isMainTabActive('spring-boot'); })
+                        .build();
+                    HawtioNav.add(tab);
+                });
+            }
+        });
+    }
+    SpringBoot.configureLayout = configureLayout;
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="spring-boot.service.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    var SpringBootController = /** @class */ (function () {
+        SpringBootController.$inject = ["$location", "springBootService"];
+        function SpringBootController($location, springBootService) {
+            'ngInject';
+            this.$location = $location;
+            this.springBootService = springBootService;
+        }
+        SpringBootController.prototype.$onInit = function () {
+            var _this = this;
+            this.springBootService.getTabs()
+                .then(function (tabs) { return _this.tabs = tabs; });
+        };
+        SpringBootController.prototype.goto = function (tab) {
+            this.$location.path(tab.path);
+        };
+        return SpringBootController;
+    }());
+    SpringBoot.SpringBootController = SpringBootController;
+    SpringBoot.springBootComponent = {
+        template: "\n      <div class=\"nav-tabs-main\">\n        <hawtio-tabs tabs=\"$ctrl.tabs\" on-change=\"$ctrl.goto(tab)\"></hawtio-tabs>\n        <div class=\"contents\" ng-view></div>\n      </div>\n    ",
+        controller: SpringBootController
+    };
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="health/health.module.ts"/>
+/// <reference path="trace/trace.module.ts"/>
+/// <reference path="loggers/loggers.module.ts"/>
+/// <reference path="spring-boot.config.ts"/>
+/// <reference path="spring-boot.component.ts"/>
+/// <reference path="spring-boot.service.ts"/>
+var SpringBoot;
+(function (SpringBoot) {
+    SpringBoot.springBootModule = angular
+        .module('hawtio-integration-spring-boot', [
+        SpringBoot.healthModule,
+        SpringBoot.loggersModule,
+        SpringBoot.traceModule
+    ])
+        .config(SpringBoot.configureRoutes)
+        .run(SpringBoot.configureLayout)
+        .component('springBoot', SpringBoot.springBootComponent)
+        .service('springBootService', SpringBoot.SpringBootService)
+        .name;
+    SpringBoot.log = Logger.get(SpringBoot.springBootModule);
+})(SpringBoot || (SpringBoot = {}));
+/// <reference path="activemq/ts/activemqPlugin.ts"/>
+/// <reference path="camel/ts/camelPlugin.ts"/>
+/// <reference path="osgi/ts/osgiPlugin.ts"/>
+/// <reference path="spring-boot/spring-boot.module.ts"/>
+var Integration;
+(function (Integration) {
+    Integration.integrationModule = angular
+        .module('hawtio-integration', [
+        ActiveMQ._module.name,
+        Camel._module.name,
+        Osgi._module.name,
+        SpringBoot.springBootModule
+    ])
+        .run(Integration.configureAboutPage)
+        .name;
+    hawtioPluginLoader.addModule(Integration.integrationModule);
+})(Integration || (Integration = {}));
+/// <reference path="activemqHelpers.ts"/>
+var ActiveMQ;
+(function (ActiveMQ) {
+    var TAB_CONFIG = {
+        attributes: {
+            title: 'Attributes',
+            route: '/jmx/attributes'
+        },
+        operations: {
+            title: 'Operations',
+            route: '/jmx/operations'
+        },
+        chart: {
+            title: 'Chart',
+            route: '/jmx/charts'
+        },
+        browse: {
+            title: 'Browse',
+            route: '/activemq/browseQueue'
+        },
+        sendMessage: {
+            title: 'Send',
+            route: '/activemq/sendMessage'
+        },
+        durableSubscribers: {
+            title: 'Durable Subscribers',
+            route: '/activemq/durableSubscribers'
+        },
+        jobs: {
+            title: 'Jobs',
+            route: '/activemq/jobs'
+        },
+        createDestination: {
+            title: 'Create',
+            route: '/activemq/createDestination'
+        },
+        deleteTopic: {
+            title: 'Delete',
+            route: '/activemq/deleteTopic'
+        },
+        deleteQueue: {
+            title: 'Delete',
+            route: '/activemq/deleteQueue'
+        },
+        queues: {
+            title: 'Queues',
+            route: '/activemq/queues'
+        },
+        topics: {
+            title: 'Topics',
+            route: '/activemq/topics'
+        },
+    };
+    var ActiveMQNavigationService = /** @class */ (function () {
+        ActiveMQNavigationService.$inject = ["workspace", "configManager"];
+        function ActiveMQNavigationService(workspace, configManager) {
+            'ngInject';
+            this.workspace = workspace;
+            this.configManager = configManager;
+        }
+        ActiveMQNavigationService.prototype.getTabs = function () {
+            var _this = this;
+            var tabs = [];
+            var enabledRoutes = Object.keys(TAB_CONFIG)
+                .map(function (config) { return TAB_CONFIG[config].route; })
+                .filter(function (route) { return _.startsWith(route, '/activemq') && _this.configManager.isRouteEnabled(route); });
+            if (enabledRoutes.length > 0) {
+                tabs.push(new Nav.HawtioTab(TAB_CONFIG.attributes.title, TAB_CONFIG.attributes.route));
+                tabs.push(new Nav.HawtioTab(TAB_CONFIG.operations.title, TAB_CONFIG.operations.route));
+                tabs.push(new Nav.HawtioTab(TAB_CONFIG.chart.title, TAB_CONFIG.chart.route));
+                if (this.shouldShowBrowseTab()) {
+                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.browse.title, TAB_CONFIG.browse.route));
+                }
+                if (this.shouldShowSendTab()) {
+                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.sendMessage.title, TAB_CONFIG.sendMessage.route));
+                }
+                if (this.shouldShowDurableSubscribersTab()) {
+                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.durableSubscribers.title, TAB_CONFIG.durableSubscribers.route));
+                }
+                if (this.shouldShowJobsTab()) {
+                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.jobs.title, TAB_CONFIG.jobs.route));
+                }
+                if (this.shouldShowCreateTab()) {
+                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.createDestination.title, TAB_CONFIG.createDestination.route));
+                }
+                if (this.shouldShowDeleteTopicTab()) {
+                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.deleteTopic.title, TAB_CONFIG.deleteTopic.route));
+                }
+                if (this.shouldShowDeleteQueueTab()) {
+                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.deleteQueue.title, TAB_CONFIG.deleteQueue.route));
+                }
+                if (this.shouldShowQueuesTab()) {
+                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.queues.title, TAB_CONFIG.queues.route));
+                }
+                if (this.shouldShowTopicsTab()) {
+                    tabs.push(new Nav.HawtioTab(TAB_CONFIG.topics.title, TAB_CONFIG.topics.route));
+                }
+            }
+            return tabs;
+        };
+        ActiveMQNavigationService.prototype.shouldShowBrowseTab = function () {
+            return this.configManager.isRouteEnabled(TAB_CONFIG.browse.route) && this.isQueue() &&
+                this.workspace.hasInvokeRights(this.workspace.selection, 'browse()');
+        };
+        ActiveMQNavigationService.prototype.shouldShowSendTab = function () {
+            return this.configManager.isRouteEnabled(TAB_CONFIG.sendMessage.route) && (this.isQueue() || this.isTopic()) &&
+                this.workspace.hasInvokeRights(this.workspace.selection, 'sendTextMessage(java.util.Map,java.lang.String,java.lang.String,java.lang.String)');
+        };
+        ActiveMQNavigationService.prototype.shouldShowDurableSubscribersTab = function () {
+            return this.configManager.isRouteEnabled(TAB_CONFIG.durableSubscribers.route) && this.isBroker();
+        };
+        ActiveMQNavigationService.prototype.shouldShowJobsTab = function () {
+            return this.configManager.isRouteEnabled(TAB_CONFIG.jobs.route) && this.isJobScheduler();
+        };
+        ActiveMQNavigationService.prototype.shouldShowCreateTab = function () {
+            return this.configManager.isRouteEnabled(TAB_CONFIG.createDestination.route) && this.isBroker() &&
+                this.workspace.hasInvokeRights(this.getBroker(), 'addQueue', 'addTopic');
+        };
+        ActiveMQNavigationService.prototype.shouldShowDeleteTopicTab = function () {
+            return this.configManager.isRouteEnabled(TAB_CONFIG.deleteTopic.route) && this.isTopic() &&
+                this.workspace.hasInvokeRights(this.getBroker(), 'removeTopic');
+        };
+        ActiveMQNavigationService.prototype.shouldShowDeleteQueueTab = function () {
+            return this.configManager.isRouteEnabled(TAB_CONFIG.deleteQueue.route) && this.isQueue() &&
+                this.workspace.hasInvokeRights(this.getBroker(), 'removeQueue');
+        };
+        ActiveMQNavigationService.prototype.shouldShowQueuesTab = function () {
+            return this.configManager.isRouteEnabled(TAB_CONFIG.queues.route) && this.isBroker();
+        };
+        ActiveMQNavigationService.prototype.shouldShowTopicsTab = function () {
+            return this.configManager.isRouteEnabled(TAB_CONFIG.topics.route) && this.isBroker();
+        };
+        ActiveMQNavigationService.prototype.isQueue = function () {
+            return this.workspace.hasDomainAndProperties(ActiveMQ.jmxDomain, { 'destinationType': 'Queue' }, 4) ||
+                this.workspace.selectionHasDomainAndType(ActiveMQ.jmxDomain, 'Queue');
+        };
+        ActiveMQNavigationService.prototype.isTopic = function () {
+            return this.workspace.hasDomainAndProperties(ActiveMQ.jmxDomain, { 'destinationType': 'Topic' }, 4) || this.workspace.selectionHasDomainAndType(ActiveMQ.jmxDomain, 'Topic');
+        };
+        ActiveMQNavigationService.prototype.isQueuesFolder = function () {
+            return this.workspace.selectionHasDomainAndLastFolderName(ActiveMQ.jmxDomain, 'Queue');
+        };
+        ActiveMQNavigationService.prototype.isTopicsFolder = function () {
+            return this.workspace.selectionHasDomainAndLastFolderName(ActiveMQ.jmxDomain, 'Topic');
+        };
+        ActiveMQNavigationService.prototype.isJobScheduler = function () {
+            return this.workspace.hasDomainAndProperties(ActiveMQ.jmxDomain, { 'service': 'JobScheduler' }, 4);
+        };
+        ActiveMQNavigationService.prototype.isBroker = function () {
+            if (this.workspace.selectionHasDomainAndType(ActiveMQ.jmxDomain, 'Broker')) {
+                var self = Core.pathGet(this.workspace, ["selection"]);
+                var parent = Core.pathGet(this.workspace, ["selection", "parent"]);
+                return !(parent && (parent.ancestorHasType('Broker') || self.ancestorHasType('Broker')));
+            }
+            return false;
+        };
+        ActiveMQNavigationService.prototype.getBroker = function () {
+            var answer = null;
+            var selection = this.workspace.selection;
+            if (selection) {
+                answer = selection.findAncestor(function (current) {
+                    var entries = current.entries;
+                    if (entries) {
+                        return (('type' in entries && entries.type === 'Broker') && 'brokerName' in entries && !('destinationName' in entries) && !('destinationType' in entries));
+                    }
+                    else {
+                        return false;
+                    }
+                });
+            }
+            return answer;
+        };
+        return ActiveMQNavigationService;
+    }());
+    ActiveMQ.ActiveMQNavigationService = ActiveMQNavigationService;
+    ActiveMQ._module.service('activeMQNavigationService', ActiveMQNavigationService);
+})(ActiveMQ || (ActiveMQ = {}));
+/// <reference path="activemqPlugin.ts"/>
+/// <reference path="activemq-navigation.service.ts"/>
+var ActiveMQ;
+(function (ActiveMQ) {
+    var ActiveMQNavigationController = /** @class */ (function () {
+        ActiveMQNavigationController.$inject = ["$scope", "$location", "activeMQNavigationService"];
+        function ActiveMQNavigationController($scope, $location, activeMQNavigationService) {
+            'ngInject';
+            var _this = this;
+            this.$location = $location;
+            this.activeMQNavigationService = activeMQNavigationService;
+            $scope.$on('jmxTreeClicked', function () {
+                _this.tabs = activeMQNavigationService.getTabs();
+                var tab = _.find(_this.tabs, { path: _this.$location.path() });
+                if (!tab) {
+                    tab = _this.tabs[0];
+                }
+                _this.$location.path(tab.path);
+            });
+        }
+        ActiveMQNavigationController.prototype.$onInit = function () {
+            this.tabs = this.activeMQNavigationService.getTabs();
+        };
+        ActiveMQNavigationController.prototype.goto = function (tab) {
+            this.$location.path(tab.path);
+        };
+        return ActiveMQNavigationController;
+    }());
+    ActiveMQ.ActiveMQNavigationController = ActiveMQNavigationController;
+    ActiveMQ.activeMQNavigationComponent = {
+        template: '<hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>',
+        controller: ActiveMQNavigationController
+    };
+    ActiveMQ._module.component('activemqNavigation', ActiveMQ.activeMQNavigationComponent);
+})(ActiveMQ || (ActiveMQ = {}));
+/// <reference path="activemqHelpers.ts"/>
+/// <reference path="activemqPlugin.ts"/>
+var ActiveMQ;
+(function (ActiveMQ) {
+    ActiveMQ.BrowseQueueController = ActiveMQ._module.controller("ActiveMQ.BrowseQueueController", ["$scope", "workspace", "jolokia", "localStorage", '$location', "activeMQMessage", "$timeout", "$routeParams", "$dialog", "$templateCache", function ($scope, workspace, jolokia, localStorage, $location, activeMQMessage, $timeout, $routeParams, $dialog, $templateCache) {
+            var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
+            // all the queue names from the tree
+            $scope.queueNames = [];
+            // selected queue name in move dialog
+            $scope.queueName = $routeParams["queueName"];
+            $scope.searchText = '';
+            $scope.workspace = workspace;
+            $scope.allMessages = [];
+            $scope.messages = [];
+            $scope.headers = {};
+            $scope.mode = 'text';
+            $scope.showButtons = true;
+            $scope.deleteDialog = false;
+            $scope.moveDialog = false;
+            $scope.gridOptions = {
+                selectedItems: [],
+                data: 'messages',
+                displayFooter: false,
+                showFilter: false,
+                showColumnMenu: true,
+                enableColumnResize: true,
+                enableColumnReordering: true,
+                enableHighlighting: true,
+                filterOptions: {
+                    filterText: '',
+                    useExternalFilter: true
+                },
+                selectWithCheckboxOnly: true,
+                showSelectionCheckbox: true,
+                maintainColumnRatios: false,
+                columnDefs: [
+                    {
+                        field: 'JMSMessageID',
+                        displayName: 'Message ID',
+                        cellTemplate: '<div class="ngCellText"><a href="" ng-click="row.entity.openMessageDialog(row)">{{row.entity.JMSMessageID}}</a></div>',
+                        // for ng-grid
+                        width: '34%'
+                        // for hawtio-datatable
+                        // width: "22em"
+                    },
+                    {
+                        field: 'JMSType',
+                        displayName: 'Type',
+                        width: '10%'
+                    },
+                    {
+                        field: 'JMSPriority',
+                        displayName: 'Priority',
+                        width: '7%'
+                    },
+                    {
+                        field: 'JMSTimestamp',
+                        displayName: 'Timestamp',
+                        width: '19%'
+                    },
+                    {
+                        field: 'JMSExpiration',
+                        displayName: 'Expires',
+                        width: '10%'
+                    },
+                    {
+                        field: 'JMSReplyTo',
+                        displayName: 'Reply To',
+                        width: '10%'
+                    },
+                    {
+                        field: 'JMSCorrelationID',
+                        displayName: 'Correlation ID',
+                        width: '10%'
+                    }
+                ],
+                primaryKeyFn: function (entity) { return entity.JMSMessageID; }
+            };
+            $scope.showMessageDetails = false;
+            // openMessageDialog is for the dialog itself so we should skip that guy
+            var ignoreColumns = ["PropertiesText", "BodyPreview", "Text", "openMessageDialog"];
+            var flattenColumns = ["BooleanProperties", "ByteProperties", "ShortProperties", "IntProperties", "LongProperties", "FloatProperties",
+                "DoubleProperties", "StringProperties"];
+            $scope.$watch('gridOptions.filterOptions.filterText', function (filterText) {
+                filterMessages(filterText);
+            });
+            $scope.openMessageDialog = function (message) {
+                ActiveMQ.selectCurrentMessage(message, "JMSMessageID", $scope);
+                if ($scope.row) {
+                    $scope.mode = CodeEditor.detectTextFormat($scope.row.Text);
+                    $scope.showMessageDetails = true;
+                }
+            };
+            $scope.refresh = loadTable;
+            ActiveMQ.decorate($scope);
+            $scope.moveMessages = function () {
+                var selection = workspace.selection;
+                var mbean = selection.objectName;
+                if (!mbean || !selection || !$scope.queueName) {
+                    return;
+                }
+                var selectedItems = $scope.gridOptions.selectedItems;
+                $scope.message = "Moved " + Core.maybePlural(selectedItems.length, "message") + " to " + $scope.queueName;
+                var operation = "moveMessageTo(java.lang.String, java.lang.String)";
+                angular.forEach(selectedItems, function (item, idx) {
+                    var id = item.JMSMessageID;
+                    if (id) {
+                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
+                        jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
+                    }
+                });
+            };
+            $scope.resendMessage = function () {
+                var selection = workspace.selection;
+                var mbean = selection.objectName;
+                if (mbean && selection) {
+                    var selectedItems = $scope.gridOptions.selectedItems;
+                    //always assume a single message
+                    activeMQMessage.message = selectedItems[0];
+                    $location.path('activemq/sendMessage');
+                }
+            };
+            $scope.deleteMessages = function () {
+                var selection = workspace.selection;
+                var mbean = selection.objectName;
+                if (!mbean || !selection) {
+                    return;
+                }
+                var selectedItems = $scope.gridOptions.selectedItems;
+                if (!selectedItems || selectedItems.length === 0) {
+                    return;
+                }
+                $scope.message = "Deleted " + Core.maybePlural(selectedItems.length, "message");
+                var operation = "removeMessage(java.lang.String)";
+                angular.forEach(selectedItems, function (item, idx) {
+                    var id = item.JMSMessageID;
+                    if (id) {
+                        var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
+                        jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
+                    }
+                });
+            };
+            $scope.retryMessages = function () {
+                var selection = workspace.selection;
+                var mbean = selection.objectName;
+                if (mbean && selection) {
+                    var selectedItems = $scope.gridOptions.selectedItems;
+                    $scope.message = "Retry " + Core.maybePlural(selectedItems.length, "message");
+                    var operation = "retryMessage(java.lang.String)";
+                    angular.forEach(selectedItems, function (item, idx) {
+                        var id = item.JMSMessageID;
+                        if (id) {
+                            var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
+                            jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
+                        }
+                    });
+                }
+            };
+            function populateTable(response) {
+                // setup queue names
+                if ($scope.queueNames.length === 0) {
+                    var queueNames = ActiveMQ.retrieveQueueNames(workspace, true);
+                    var selectedQueue = workspace.selection.text;
+                    $scope.queueNames = queueNames.filter(function (name) { return name !== selectedQueue; });
+                }
+                var data = response.value;
+                if (!angular.isArray(data)) {
+                    $scope.allMessages = [];
+                    angular.forEach(data, function (value, idx) {
+                        $scope.allMessages.push(value);
+                    });
+                }
+                else {
+                    $scope.allMessages = data;
+                }
+                angular.forEach($scope.allMessages, function (message) {
+                    message.openMessageDialog = $scope.openMessageDialog;
+                    message.headerHtml = createHeaderHtml(message);
+                    message.bodyText = createBodyText(message);
+                });
+                filterMessages($scope.gridOptions.filterOptions.filterText);
+                Core.$apply($scope);
+            }
+            /*
+             * For some reason using ng-repeat in the modal dialog doesn't work so lets
+             * just create the HTML in code :)
+             */
+            function createBodyText(message) {
+                if (message.Text) {
+                    var body = message.Text;
+                    var lenTxt = "" + body.length;
+                    message.textMode = "text (" + lenTxt + " chars)";
+                    return body;
+                }
+                else if (message.BodyPreview) {
+                    var code = Core.parseIntValue(localStorage["activemqBrowseBytesMessages"] || "1", "browse bytes messages");
+                    var body;
+                    message.textMode = "bytes (turned off)";
+                    if (code != 99) {
+                        var bytesArr = [];
+                        var textArr = [];
+                        message.BodyPreview.forEach(function (b) {
+                            if (code === 1 || code === 2) {
+                                // text
+                                textArr.push(String.fromCharCode(b));
+                            }
+                            if (code === 1 || code === 4) {
+                                // hex and must be 2 digit so they space out evenly
+                                var s = b.toString(16);
+                                if (s.length === 1) {
+                                    s = "0" + s;
+                                }
+                                bytesArr.push(s);
+                            }
+                            else {
+                                // just show as is without spacing out, as that is usually more used for hex than decimal
+                                var s = b.toString(10);
+                                bytesArr.push(s);
+                            }
+                        });
+                        var bytesData = bytesArr.join(" ");
+                        var textData = textArr.join("");
+                        if (code === 1 || code === 2) {
+                            // bytes and text
+                            var len = message.BodyPreview.length;
+                            var lenTxt = "" + textArr.length;
+                            body = "bytes:\n" + bytesData + "\n\ntext:\n" + textData;
+                            message.textMode = "bytes (" + len + " bytes) and text (" + lenTxt + " chars)";
+                        }
+                        else {
+                            // bytes only
+                            var len = message.BodyPreview.length;
+                            body = bytesData;
+                            message.textMode = "bytes (" + len + " bytes)";
+                        }
+                    }
+                    return body;
+                }
+                else {
+                    message.textMode = "unsupported";
+                    return "Unsupported message body type which cannot be displayed by hawtio";
+                }
+            }
+            /*
+             * For some reason using ng-repeat in the modal dialog doesn't work so lets
+             * just create the HTML in code :)
+             */
+            function createHeaderHtml(message) {
+                var headers = createHeaders(message);
+                var properties = createProperties(message);
+                var headerKeys = _.keys(headers);
+                function sort(a, b) {
+                    if (a > b)
+                        return 1;
+                    if (a < b)
+                        return -1;
+                    return 0;
+                }
+                var propertiesKeys = _.keys(properties).sort(sort);
+                var jmsHeaders = _.filter(headerKeys, function (key) { return _.startsWith(key, "JMS"); }).sort(sort);
+                var remaining = _.difference(headerKeys, jmsHeaders.concat(propertiesKeys)).sort(sort);
+                var buffer = [];
+                function appendHeader(key) {
+                    var value = headers[key];
+                    if (value === null) {
+                        value = '';
+                    }
+                    buffer.push('<tr><td class="propertyName"><span class="green">Header</span> - ' +
+                        key +
+                        '</td><td class="property-value">' +
+                        value +
+                        '</td></tr>');
+                }
+                function appendProperty(key) {
+                    var value = properties[key];
+                    if (value === null) {
+                        value = '';
+                    }
+                    buffer.push('<tr><td class="propertyName">' +
+                        key +
+                        '</td><td class="property-value">' +
+                        value +
+                        '</td></tr>');
+                }
+                jmsHeaders.forEach(appendHeader);
+                remaining.forEach(appendHeader);
+                propertiesKeys.forEach(appendProperty);
+                return buffer.join("\n");
+            }
+            function createHeaders(row) {
+                var answer = {};
+                angular.forEach(row, function (value, key) {
+                    if (!_.some(ignoreColumns, function (k) { return k === key; }) && !_.some(flattenColumns, function (k) { return k === key; })) {
+                        answer[_.escape(key)] = _.escape(value);
+                    }
+                });
+                return answer;
+            }
+            function createProperties(row) {
+                var answer = {};
+                angular.forEach(row, function (value, key) {
+                    if (!_.some(ignoreColumns, function (k) { return k === key; }) && _.some(flattenColumns, function (k) { return k === key; })) {
+                        angular.forEach(value, function (v2, k2) {
+                            answer['<span class="green">' + key.replace('Properties', ' Property') + '</span> - ' + _.escape(k2)] = _.escape(v2);
+                        });
+                    }
+                });
+                return answer;
+            }
+            function loadTable() {
+                var objName;
+                if ($scope.queueName) {
+                    $scope.showButtons = false;
+                    $scope.dlq = false;
+                    var mbean = ActiveMQ.getBrokerMBean(workspace, jolokia, amqJmxDomain);
+                    // browseQueue(java.lang.String) is not available until ActiveMQ 5.15.0
+                    // https://issues.apache.org/jira/browse/AMQ-6435
+                    jolokia.request({ type: 'exec', mbean: mbean, operation: 'browseQueue(java.lang.String)', arguments: [$scope.queueName] }, Core.onSuccess(populateTable, {
+                        error: function (response) {
+                            // try again with the old ActiveMQ API
+                            $scope.queueName = null;
+                            $scope.showButtons = true;
+                            loadTable();
+                        }
+                    }));
+                    $scope.queueName = null;
+                }
+                else {
+                    if (workspace.selection) {
+                        objName = workspace.selection.objectName;
+                    }
+                    else {
+                        // in case of refresh
+                        var key = $location.search()['nid'];
+                        var node = workspace.keyToNodeMap[key];
+                        objName = node.objectName;
+                    }
+                    if (objName) {
+                        $scope.dlq = false;
+                        jolokia.getAttribute(objName, "DLQ", Core.onSuccess(onDlq, { silent: true }));
+                        jolokia.request({ type: 'exec', mbean: objName, operation: 'browse()' }, Core.onSuccess(populateTable));
+                    }
+                }
+            }
+            function onDlq(response) {
+                $scope.dlq = response;
+                Core.$apply($scope);
+            }
+            function intermediateResult() {
+            }
+            function operationSuccess() {
+                deselectAll();
+                Core.notification("success", $scope.message);
+                setTimeout(loadTable, 50);
+            }
+            function moveSuccess() {
+                operationSuccess();
+                workspace.loadTree();
+            }
+            function filterMessages(filter) {
+                var searchConditions = buildSearchConditions(filter);
+                evalFilter(searchConditions);
+            }
+            function evalFilter(searchConditions) {
+                if (!searchConditions || searchConditions.length === 0) {
+                    $scope.messages = $scope.allMessages;
+                }
+                else {
+                    ActiveMQ.log.debug("Filtering conditions:", searchConditions);
+                    $scope.messages = $scope.allMessages.filter(function (message) {
+                        ActiveMQ.log.debug("Message:", message);
+                        var matched = true;
+                        $.each(searchConditions, function (index, condition) {
+                            if (!condition.column) {
+                                matched = matched && evalMessage(message, condition.regex);
+                            }
+                            else {
+                                matched = matched &&
+                                    (message[condition.column] && condition.regex.test(message[condition.column])) ||
+                                    (message.StringProperties && message.StringProperties[condition.column] && condition.regex.test(message.StringProperties[condition.column]));
+                            }
+                        });
+                        return matched;
+                    });
+                }
+            }
+            function evalMessage(message, regex) {
+                var jmsHeaders = ['JMSDestination', 'JMSDeliveryMode', 'JMSExpiration', 'JMSPriority', 'JMSMessageID', 'JMSTimestamp', 'JMSCorrelationID', 'JMSReplyTo', 'JMSType', 'JMSRedelivered'];
+                for (var i = 0; i < jmsHeaders.length; i++) {
+                    var header = jmsHeaders[i];
+                    if (message[header] && regex.test(message[header])) {
+                        return true;
+                    }
+                }
+                if (message.StringProperties) {
+                    for (var property in message.StringProperties) {
+                        if (regex.test(message.StringProperties[property])) {
+                            return true;
+                        }
+                    }
+                }
+                if (message.bodyText && regex.test(message.bodyText)) {
+                    return true;
+                }
+                return false;
+            }
+            function getRegExp(str, modifiers) {
+                try {
+                    return new RegExp(str, modifiers);
+                }
+                catch (err) {
+                    return new RegExp(str.replace(/(\^|\$|\(|\)|<|>|\[|\]|\{|\}|\\|\||\.|\*|\+|\?)/g, '\\$1'));
+                }
+            }
+            function buildSearchConditions(filterText) {
+                var searchConditions = [];
+                var qStr;
+                if (!(qStr = $.trim(filterText))) {
+                    return;
+                }
+                var columnFilters = qStr.split(";");
+                for (var i = 0; i < columnFilters.length; i++) {
+                    var args = columnFilters[i].split(':');
+                    if (args.length > 1) {
+                        var columnName = $.trim(args[0]);
+                        var columnValue = $.trim(args[1]);
+                        if (columnName && columnValue) {
+                            searchConditions.push({
+                                column: columnName,
+                                columnDisplay: columnName.replace(/\s+/g, '').toLowerCase(),
+                                regex: getRegExp(columnValue, 'i')
+                            });
+                        }
+                    }
+                    else {
+                        var val = $.trim(args[0]);
+                        if (val) {
+                            searchConditions.push({
+                                column: '',
+                                regex: getRegExp(val, 'i')
+                            });
+                        }
+                    }
+                }
+                return searchConditions;
+            }
+            function deselectAll() {
+                $scope.gridOptions.selectedItems = [];
+            }
+            $scope.refresh();
+        }]);
+})(ActiveMQ || (ActiveMQ = {}));
+/// <reference path="activemqPlugin.ts"/>
+var ActiveMQ;
+(function (ActiveMQ) {
+    ActiveMQ._module.controller("ActiveMQ.QueuesController", ["$scope", "workspace", "jolokia", "localStorage", function ($scope, workspace, jolokia, localStorage) {
+            var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
+            $scope.workspace = workspace;
+            $scope.destinationType;
+            var allDestinations = [];
+            $scope.destinations = [];
+            $scope.totalServerItems = 0;
+            var refreshAction = {
+                name: 'Refresh',
+                actionFn: function (action) { return $scope.loadTable(); }
+            };
+            $scope.toolbarConfig = {
+                filterConfig: {
+                    fields: [
+                        {
+                            id: 'name',
+                            title: 'Name',
+                            placeholder: 'Filter by name...',
+                            filterType: 'text'
+                        }
+                    ],
+                    onFilterChange: function (filters) {
+                        $scope.destinations = Pf.filter(allDestinations, $scope.toolbarConfig.filterConfig);
+                    }
+                },
+                actionsConfig: {
+                    primaryActions: [refreshAction]
+                },
+                isTableView: true
+            };
+            $scope.tableConfig = {
+                selectionMatchProp: 'name',
+                showCheckboxes: false
+            };
+            $scope.pageConfig = {
+                pageSize: 20,
+                pageNumber: 1
+            };
+            if ($scope.destinationType == 'topics') {
+                $scope.tableColumns = [
+                    { header: 'Name', itemField: 'name' },
+                    { header: 'Producer Count', itemField: 'producerCount' },
+                    { header: 'Consumer Count', itemField: 'consumerCount' },
+                    { header: 'Enqueue Count', itemField: 'enqueueCount' },
+                    { header: 'Dequeue Count', itemField: 'dequeueCount' }
+                ];
+            }
+            else {
+                $scope.tableColumns = [
+                    { header: 'Name', itemField: 'name', templateFn: function (value) { return "<a href=\"activemq/browseQueue?main-tab=activemq&queueName=" + value + "\">" + value + "</a>"; } },
+                    { header: 'Queue Size', itemField: 'queueSize' },
+                    { header: 'Producer Count', itemField: 'producerCount' },
+                    { header: 'Consumer Count', itemField: 'consumerCount' },
+                    { header: 'Enqueue Count', itemField: 'enqueueCount' },
+                    { header: 'Dequeue Count', itemField: 'dequeueCount' },
+                    { header: 'Dispatch Count', itemField: 'dispatchCount' },
+                ];
+            }
+            $scope.refresh = function () {
+                $scope.loadTable();
+            };
+            $scope.loadTable = function () {
+                var mbean = ActiveMQ.getBrokerMBean(workspace, jolokia, amqJmxDomain);
+                if (mbean) {
+                    var method = 'queryQueues(java.lang.String, int, int)';
+                    if ($scope.destinationType == 'topics') {
+                        method = 'queryTopics(java.lang.String, int, int)';
+                    }
+                    var destinationFilter = {
+                        name: '',
+                        filter: ''
+                    };
+                    var appliedFilters = $scope.toolbarConfig.filterConfig.appliedFilters;
+                    if (appliedFilters && appliedFilters.length > 0) {
+                        destinationFilter['filter'] = $scope.toolbarConfig.filterConfig.appliedFilters[0].value;
+                    }
+                    jolokia.request({ type: 'exec', mbean: mbean, operation: method, arguments: [JSON.stringify(destinationFilter), $scope.pageConfig.pageNumber, $scope.pageConfig.pageSize] }, Core.onSuccess(populateTable, { error: onError }));
+                }
+            };
+            function onError() {
+                Core.notification("danger", "The feature is not available in this broker version!");
+                $scope.workspace.selectParentNode();
+            }
+            function populateTable(response) {
+                var data = JSON.parse(response.value);
+                $scope.destinations = [];
+                angular.forEach(data["data"], function (value, idx) {
+                    $scope.destinations.push(value);
+                });
+                $scope.totalServerItems = data["count"];
+                allDestinations = $scope.destinations;
+                $scope.destinations = Pf.filter(allDestinations, $scope.toolbarConfig.filterConfig);
+                Core.$apply($scope);
+            }
+            $scope.loadTable();
+        }]);
+})(ActiveMQ || (ActiveMQ = {}));
+/// <reference path="activemqHelpers.ts"/>
+/// <reference path="activemqPlugin.ts"/>
+var ActiveMQ;
+(function (ActiveMQ) {
+    ActiveMQ._module.controller("ActiveMQ.DurableSubscriberController", ["$scope", "$uibModal", "workspace", "jolokia", function ($scope, $uibModal, workspace, jolokia) {
+            var amqJmxDomain = localStorage['activemqJmxDomain'] || "org.apache.activemq";
+            var allSubscribers = null;
+            $scope.durableSubscribers = null;
+            $scope.selectedSubscriber;
+            $scope.createSubscriberDialog;
+            $scope.deleteSubscriberDialog = new UI.Dialog();
+            $scope.showSubscriberDialog;
+            $scope.topicName = '';
+            $scope.clientId = '';
+            $scope.subscriberName = '';
+            $scope.subSelector = '';
+            $scope.model = {
+                allSelected: false
+            };
+            $scope.uiModalInstance;
+            var refreshAction = {
+                name: 'Refresh',
+                actionFn: function (action) { return loadTable(); }
+            };
+            var createAction = {
+                name: 'Create',
+                actionFn: function (action) {
+                    $scope.createSubscriberDialog = $uibModal.open({
+                        templateUrl: 'createSubscriberDialog.html',
+                        scope: $scope
+                    });
+                }
+            };
+            var deleteAction = {
+                name: 'Delete',
+                actionFn: function (action) { return $scope.deleteSubscriberDialog.open(); },
+                isDisabled: true
+            };
+            $scope.toolbarConfig = {
+                filterConfig: {
+                    fields: [
+                        {
+                            id: 'destinationName',
+                            title: 'Topic',
+                            placeholder: 'Filter by topic...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'clientId',
+                            title: 'Client ID',
+                            placeholder: 'Filter by client id...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'consumerId',
+                            title: 'Consumer ID',
+                            placeholder: 'Filter by consumer id...',
+                            filterType: 'text'
+                        },
+                        {
+                            id: 'status',
+                            title: 'Status',
+                            placeholder: 'Filter by status...',
+                            filterType: 'select',
+                            filterValues: ['Active', 'Offline']
+                        },
+                    ],
+                    onFilterChange: function (filters) {
+                        $scope.durableSubscribers = Pf.filter(allSubscribers, $scope.toolbarConfig.filterConfig);
+                    }
+                },
+                actionsConfig: {
+                    primaryActions: [refreshAction, createAction, deleteAction]
+                },
+                isTableView: true
+            };
+            $scope.selectAll = function () {
+                $scope.durableSubscribers.forEach(function (subscriber) { return subscriber.selected = $scope.model.allSelected; });
+                deleteAction.isDisabled = !$scope.model.allSelected;
+            };
+            $scope.toggleDeleteActionDisabled = function () {
+                deleteAction.isDisabled = !$scope.durableSubscribers.some(function (subscriber) { return subscriber.selected; });
+            };
+            $scope.doCreateSubscriber = function (clientId, subscriberName, topicName, subSelector) {
+                $scope.createSubscriberDialog.close();
+                $scope.clientId = clientId;
+                $scope.subscriberName = subscriberName;
+                $scope.topicName = topicName;
+                $scope.subSelector = subSelector;
+                if (Core.isBlank($scope.subSelector)) {
+                    $scope.subSelector = null;
+                }
+                var mbean = ActiveMQ.getBrokerMBean(workspace, jolokia, amqJmxDomain);
+                if (mbean) {
+                    jolokia.execute(mbean, "createDurableSubscriber(java.lang.String, java.lang.String, java.lang.String, java.lang.String)", $scope.clientId, $scope.subscriberName, $scope.topicName, $scope.subSelector, Core.onSuccess(function () {
+                        Core.notification('success', "Created durable subscriber " + clientId);
+                        $scope.clientId = '';
+                        $scope.subscriberName = '';
+                        $scope.topicName = '';
+                        $scope.subSelector = '';
+                        loadTable();
+                    }));
+                }
+                else {
+                    Core.notification("danger", "Could not find the Broker MBean!");
+                }
+            };
+            $scope.deleteSubscribers = function () {
+                var selectedItems = $scope.durableSubscribers.filter(function (subscriber) { return subscriber.selected; });
+                var requests = selectedItems.map(function (subscriber) { return ({
+                    type: 'exec',
+                    operation: 'destroy()',
+                    mbean: subscriber._id
+                }); });
+                jolokia.request(requests, Core.onSuccess(function () {
+                    Core.notification('success', "Operation successful");
+                    loadTable();
+                }));
+            };
+            $scope.openSubscriberDialog = function (subscriber) {
+                jolokia.request({ type: "read", mbean: subscriber._id }, Core.onSuccess(function (response) {
+                    $scope.selectedSubscriber = response.value;
+                    $scope.selectedSubscriber.Status = subscriber.status;
+                    $scope.showSubscriberDialog = $uibModal.open({
+                        templateUrl: 'showSubscriberDialog.html',
+                        scope: $scope
+                    });
+                }));
+            };
+            $scope.topicNames = function (completionText) { return ActiveMQ.retrieveTopicNames(workspace, false); };
+            function loadTable() {
+                var mbean = ActiveMQ.getBrokerMBean(workspace, jolokia, amqJmxDomain);
+                if (mbean) {
+                    allSubscribers = [];
+                    jolokia.request({ type: "read", mbean: mbean, attribute: ["DurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "DurableTopicSubscribers", "Active"); }));
+                    jolokia.request({ type: "read", mbean: mbean, attribute: ["InactiveDurableTopicSubscribers"] }, Core.onSuccess(function (response) { return populateTable(response, "InactiveDurableTopicSubscribers", "Offline"); }));
+                }
+            }
+            function populateTable(response, attr, status) {
+                var data = response.value;
+                ActiveMQ.log.debug("Got data: ", data);
+                allSubscribers.push.apply(allSubscribers, data[attr].map(function (o) {
+                    var objectName = o["objectName"];
+                    var entries = Core.objectNameProperties(objectName);
+                    if (!('objectName' in o)) {
+                        if ('canonicalName' in o) {
+                            objectName = o['canonicalName'];
+                        }
+                        entries = _.cloneDeep(o['keyPropertyList']);
+                    }
+                    entries["_id"] = objectName;
+                    entries["status"] = status;
+                    return entries;
+                }));
+                $scope.durableSubscribers = Pf.filter(allSubscribers, $scope.toolbarConfig.filterConfig);
+                $scope.model.allSelected = false;
+                Core.$apply($scope);
+            }
+            loadTable();
+        }]);
+})(ActiveMQ || (ActiveMQ = {}));
+/// <reference path="activemqHelpers.ts"/>
+/// <reference path="activemqPlugin.ts"/>
+var ActiveMQ;
+(function (ActiveMQ) {
+    ActiveMQ._module.controller("ActiveMQ.JobSchedulerController", ["$scope", "workspace", "jolokia", function ($scope, workspace, jolokia) {
+            $scope.refresh = loadTable;
+            $scope.jobs = [];
+            $scope.deleteJobsDialog = new UI.Dialog();
+            $scope.gridOptions = {
+                selectedItems: [],
+                data: 'jobs',
+                displayFooter: false,
+                showFilter: false,
+                showColumnMenu: true,
+                enableColumnResize: true,
+                enableColumnReordering: true,
+                filterOptions: {
+                    filterText: ''
+                },
+                selectWithCheckboxOnly: true,
+                showSelectionCheckbox: true,
+                maintainColumnRatios: false,
+                columnDefs: [
+                    {
+                        field: 'jobId',
+                        displayName: 'Job ID',
+                        width: '25%'
+                    },
+                    {
+                        field: 'cronEntry',
+                        displayName: 'Cron Entry',
+                        width: '10%'
+                    },
+                    {
+                        field: 'delay',
+                        displayName: 'Delay',
+                        width: '5%'
+                    },
+                    {
+                        field: 'repeat',
+                        displayName: 'repeat',
+                        width: '5%'
+                    },
+                    {
+                        field: 'period',
+                        displayName: 'period',
+                        width: '5%'
+                    },
+                    {
+                        field: 'start',
+                        displayName: 'Start',
+                        width: '25%'
+                    },
+                    {
+                        field: 'next',
+                        displayName: 'Next',
+                        width: '25%'
+                    }
+                ],
+                primaryKeyFn: function (entity) { return entity.jobId; }
+            };
+            function loadTable() {
+                var selection = workspace.selection;
+                if (selection) {
+                    var mbean = selection.objectName;
+                    if (mbean) {
+                        jolokia.request({ type: 'read', mbean: mbean, attribute: "AllJobs" }, Core.onSuccess(populateTable));
+                    }
+                }
+                Core.$apply($scope);
+            }
+            function populateTable(response) {
+                var data = response.value;
+                if (!angular.isArray(data)) {
+                    $scope.jobs = [];
+                    angular.forEach(data, function (value, idx) {
+                        $scope.jobs.push(value);
+                    });
+                }
+                else {
+                    $scope.jobs = data;
+                }
+                Core.$apply($scope);
+            }
+            $scope.deleteJobs = function () {
+                var selection = workspace.selection;
+                var mbean = selection.objectName;
+                if (mbean && selection) {
+                    var selectedItems = $scope.gridOptions.selectedItems;
+                    $scope.message = "Deleted " + Core.maybePlural(selectedItems.length, "job");
+                    var operation = "removeJob(java.lang.String)";
+                    angular.forEach(selectedItems, function (item, idx) {
+                        var id = item.jobId;
+                        if (id) {
+                            var callback = (idx + 1 < selectedItems.length) ? intermediateResult : operationSuccess;
+                            jolokia.execute(mbean, operation, id, Core.onSuccess(callback));
+                        }
+                    });
+                }
+            };
+            function intermediateResult() {
+            }
+            function operationSuccess() {
+                $scope.gridOptions.selectedItems.splice(0);
+                Core.notification("success", $scope.message);
+                setTimeout(loadTable, 50);
+            }
+        }]);
+})(ActiveMQ || (ActiveMQ = {}));
+/// <reference path="activemqHelpers.ts"/>
+/// <reference path="activemqPlugin.ts"/>
+var ActiveMQ;
+(function (ActiveMQ) {
+    ActiveMQ._module.controller("ActiveMQ.PreferencesController", ["$scope", "localStorage", "userDetails", "$rootScope", function ($scope, localStorage, userDetails, $rootScope) {
+            $scope.messageBodyDisplayOptions = {
+                'Hex and text': 1,
+                'Decimal and text': 2,
+                'Hex': 4,
+                'Decimal': 8,
+                'Off': 99
+            };
+            Core.initPreferenceScope($scope, localStorage, {
+                'activemqUserName': {
+                    'value': userDetails.username ? userDetails.username : ""
+                },
+                'activemqPassword': {
+                    'value': userDetails.password ? userDetails.password : ""
+                },
+                'activemqBrowseBytesMessages': {
+                    'value': 1,
+                    'converter': parseInt
+                },
+                'activemqFilterAdvisoryTopics': {
+                    'value': false,
+                    'converter': Core.parseBooleanValue,
+                    'post': function (newValue) {
+                        $rootScope.$broadcast('jmxTreeUpdated');
+                    }
+                }
+            });
+        }]);
+})(ActiveMQ || (ActiveMQ = {}));
 /// <reference path="camelPlugin.ts"/>
 var Camel;
 (function (Camel) {
@@ -20740,8 +22630,11 @@ var Camel;
         // Append rectangles to the nodes. We do this before laying out the text
         // because we want the text above the rectangle.
         var rects = nodes.append("rect")
+            // rounded corners
             .attr("rx", "4")
             .attr("ry", "4")
+            // lets add shadow (do not add shadow as the filter does not work in firefox browser
+            /*.attr("filter", "url(#drop-shadow)")*/
             .attr("class", function (d) { return d.type; });
         var images = nodes.append("image")
             .attr("xlink:href", function (d) { return d.imageUrl; })
@@ -20810,6 +22703,7 @@ var Camel;
             .y(function (d) { return d.y; })
             .interpolate("linear");
         edges
+            // Set the id. of the SVG element to have access to it later
             .attr('id', function (e) { return e.id; })
             .attr("d", function (e) { return line(e.points); });
         var svgNode = svg.node();
@@ -20820,6 +22714,7 @@ var Camel;
         if (allowDrag) {
             // Drag handlers
             var nodeDrag = d3.behavior.drag()
+                // Set the right origin (based on the Dagre layout or the current position)
                 .origin(function (d) { return d.pos ? { x: d.pos.x, y: d.pos.y } : { x: d.x, y: d.y }; })
                 .on('drag', function (d, i) {
                 var prevX = d.x, prevY = d.y;
@@ -21665,358 +23560,6 @@ var Camel;
         template: "\n      <div ng-show=\"$ctrl.properties.length > 0\">\n        <h3 title=\"\">{{$ctrl.title}}</h3>\n        <dl class=\"dl-horizontal\">\n          <dt ng-repeat-start=\"property in $ctrl.properties\" title=\"{{property.name}}\">\n            {{property.name}}\n          </dt>\n          <dd class=\"camel-properties-value\" title=\"\" ng-repeat-end>\n            <span class=\"pficon pficon-info camel-properties-info-circle\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{{property.description}}\"></span>\n            {{property.value}}\n          </dd>\n        </dl>\n      </div>\n    "
     });
 })(Camel || (Camel = {}));
-var Karaf;
-(function (Karaf) {
-    Karaf.pluginName = 'hawtio-integration-karaf';
-    Karaf.log = Logger.get(Karaf.pluginName);
-    function setSelect(selection, group) {
-        if (!angular.isDefined(selection)) {
-            return group[0];
-        }
-        var answer = _.findIndex(group, function (item) { return item.id === selection.id; });
-        if (answer !== -1) {
-            return group[answer];
-        }
-        else {
-            return group[0];
-        }
-    }
-    Karaf.setSelect = setSelect;
-    function installRepository(workspace, jolokia, uri, success, error) {
-        Karaf.log.info("installing URI: ", uri);
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'addRepository(java.lang.String)',
-            arguments: [uri]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.installRepository = installRepository;
-    function uninstallRepository(workspace, jolokia, uri, success, error) {
-        Karaf.log.info("uninstalling URI: ", uri);
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'removeRepository(java.lang.String)',
-            arguments: [uri]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.uninstallRepository = uninstallRepository;
-    function installFeature(workspace, jolokia, feature, version, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'installFeature(java.lang.String, java.lang.String)',
-            arguments: [feature, version]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.installFeature = installFeature;
-    function uninstallFeature(workspace, jolokia, feature, version, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
-            operation: 'uninstallFeature(java.lang.String, java.lang.String)',
-            arguments: [feature, version]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.uninstallFeature = uninstallFeature;
-    // TODO move to core?
-    function toCollection(values) {
-        var collection = values;
-        if (!angular.isArray(values)) {
-            collection = [values];
-        }
-        return collection;
-    }
-    Karaf.toCollection = toCollection;
-    function featureLinks(workspace, name, version) {
-        return "<a href='" + Core.url("#/karaf/feature/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
-    }
-    Karaf.featureLinks = featureLinks;
-    function extractFeature(attributes, name, version) {
-        var features = [];
-        var repos = [];
-        populateFeaturesAndRepos(attributes, features, repos);
-        return _.find(features, function (feature) { return feature.Name == name && feature.Version == version; });
-    }
-    Karaf.extractFeature = extractFeature;
-    var platformBundlePatterns = [
-        "^org.apache.aries",
-        "^org.apache.karaf",
-        "^activemq-karaf",
-        "^org.apache.commons",
-        "^org.apache.felix",
-        "^io.fabric8",
-        "^io.fabric8.fab",
-        "^io.fabric8.insight",
-        "^io.fabric8.mq",
-        "^io.fabric8.patch",
-        "^io.fabric8.runtime",
-        "^io.fabric8.security",
-        "^org.apache.geronimo.specs",
-        "^org.apache.servicemix.bundles",
-        "^org.objectweb.asm",
-        "^io.hawt",
-        "^javax.mail",
-        "^javax",
-        "^org.jvnet",
-        "^org.mvel2",
-        "^org.apache.mina.core",
-        "^org.apache.sshd.core",
-        "^org.apache.neethi",
-        "^org.apache.servicemix.specs",
-        "^org.apache.xbean",
-        "^org.apache.santuario.xmlsec",
-        "^biz.aQute.bndlib",
-        "^groovy-all",
-        "^com.google.guava",
-        "jackson-\\w+-asl",
-        "^com.fasterxml.jackson",
-        "^org.ops4j",
-        "^org.springframework",
-        "^bcprov$",
-        "^jline$",
-        "scala-library$",
-        "^org.scala-lang",
-        "^stax2-api$",
-        "^woodstox-core-asl",
-        "^org.jboss.amq.mq-fabric",
-        "^gravia-",
-        "^joda-time$",
-        "^org.apache.ws",
-        "-commands$",
-        "patch.patch",
-        "org.fusesource.insight",
-        "activeio-core",
-        "activemq-osgi",
-        "^org.eclipse.jetty",
-        "org.codehaus.jettison.jettison",
-        "org.jledit.core",
-        "org.fusesource.jansi",
-        "org.eclipse.equinox.region"
-    ];
-    var platformBundleRegex = new RegExp(platformBundlePatterns.join('|'));
-    var camelBundlePatterns = ["^org.apache.camel", "camel-karaf-commands$", "activemq-camel$"];
-    var camelBundleRegex = new RegExp(camelBundlePatterns.join('|'));
-    var cxfBundlePatterns = ["^org.apache.cxf"];
-    var cxfBundleRegex = new RegExp(cxfBundlePatterns.join('|'));
-    var activemqBundlePatterns = ["^org.apache.activemq", "activemq-camel$"];
-    var activemqBundleRegex = new RegExp(activemqBundlePatterns.join('|'));
-    function isPlatformBundle(symbolicName) {
-        return platformBundleRegex.test(symbolicName);
-    }
-    Karaf.isPlatformBundle = isPlatformBundle;
-    function isActiveMQBundle(symbolicName) {
-        return activemqBundleRegex.test(symbolicName);
-    }
-    Karaf.isActiveMQBundle = isActiveMQBundle;
-    function isCamelBundle(symbolicName) {
-        return camelBundleRegex.test(symbolicName);
-    }
-    Karaf.isCamelBundle = isCamelBundle;
-    function isCxfBundle(symbolicName) {
-        return cxfBundleRegex.test(symbolicName);
-    }
-    Karaf.isCxfBundle = isCxfBundle;
-    function populateFeaturesAndRepos(attributes, features, repositories) {
-        var fullFeatures = attributes["Features"];
-        angular.forEach(attributes["Repositories"], function (repo) {
-            repositories.push({
-                id: repo["Name"],
-                uri: repo["Uri"]
-            });
-            if (!fullFeatures) {
-                return;
-            }
-            angular.forEach(repo["Features"], function (feature) {
-                angular.forEach(feature, function (entry) {
-                    if (fullFeatures[entry['Name']] !== undefined) {
-                        var f = _.cloneDeep(fullFeatures[entry['Name']][entry['Version']]);
-                        f["Id"] = entry["Name"] + "/" + entry["Version"];
-                        f["RepositoryName"] = repo["Name"];
-                        f["RepositoryURI"] = repo["Uri"];
-                        features.push(f);
-                    }
-                });
-            });
-        });
-    }
-    Karaf.populateFeaturesAndRepos = populateFeaturesAndRepos;
-    function createScrComponentsView(workspace, jolokia, components) {
-        var result = [];
-        angular.forEach(components, function (component) {
-            result.push({
-                Name: component,
-                State: getComponentStateDescription(getComponentState(workspace, jolokia, component))
-            });
-        });
-        return result;
-    }
-    Karaf.createScrComponentsView = createScrComponentsView;
-    function getComponentStateDescription(state) {
-        switch (state) {
-            case 2:
-                return "Enabled";
-            case 4:
-                return "Unsatisfied";
-            case 8:
-                return "Activating";
-            case 16:
-                return "Active";
-            case 32:
-                return "Registered";
-            case 64:
-                return "Factory";
-            case 128:
-                return "Deactivating";
-            case 256:
-                return "Destroying";
-            case 1024:
-                return "Disabling";
-            case 2048:
-                return "Disposing";
-        }
-        return "Unknown";
-    }
-    Karaf.getComponentStateDescription = getComponentStateDescription;
-    ;
-    function getAllComponents(workspace, jolokia) {
-        var scrMBean = getSelectionScrMBean(workspace);
-        var response = jolokia.request({
-            type: 'read', mbean: scrMBean,
-            arguments: []
-        });
-        //Check if the MBean provides the Components attribute.
-        if (!('Components' in response.value)) {
-            response = jolokia.request({
-                type: 'exec', mbean: scrMBean, operation: 'listComponents()'
-            });
-            return createScrComponentsView(workspace, jolokia, response.value);
-        }
-        return response.value['Components'].values;
-    }
-    Karaf.getAllComponents = getAllComponents;
-    function getComponentByName(workspace, jolokia, componentName) {
-        var components = getAllComponents(workspace, jolokia);
-        return _.find(components, function (c) { return c.Name == componentName; });
-    }
-    Karaf.getComponentByName = getComponentByName;
-    function isComponentActive(workspace, jolokia, component) {
-        var response = jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'isComponentActive(java.lang.String)',
-            arguments: [component]
-        });
-        return response.value;
-    }
-    Karaf.isComponentActive = isComponentActive;
-    function getComponentState(workspace, jolokia, component) {
-        var response = jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'componentState(java.lang.String)',
-            arguments: [component]
-        });
-        return response.value;
-    }
-    Karaf.getComponentState = getComponentState;
-    function activateComponent(workspace, jolokia, component, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'activateComponent(java.lang.String)',
-            arguments: [component]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.activateComponent = activateComponent;
-    function deactivateComponent(workspace, jolokia, component, success, error) {
-        jolokia.request({
-            type: 'exec', mbean: getSelectionScrMBean(workspace),
-            operation: 'deactivateComponent(java.lang.String)',
-            arguments: [component]
-        }, Core.onSuccess(success, { error: error }));
-    }
-    Karaf.deactivateComponent = deactivateComponent;
-    function populateDependencies(attributes, dependencies, features) {
-        angular.forEach(dependencies, function (feature) {
-            angular.forEach(feature, function (entry) {
-                var enhancedFeature = extractFeature(attributes, entry["Name"], entry["Version"]);
-                enhancedFeature["id"] = entry["Name"] + "/" + entry["Version"];
-                //enhancedFeature["repository"] = repo["Name"];
-                features.push(enhancedFeature);
-            });
-        });
-    }
-    Karaf.populateDependencies = populateDependencies;
-    function getSelectionFeaturesMBean(workspace) {
-        if (workspace) {
-            var featuresStuff = workspace.mbeanTypesToDomain["features"] || workspace.mbeanTypesToDomain['feature'] || {};
-            var karaf = featuresStuff["org.apache.karaf"] || {};
-            var mbean = karaf.objectName;
-            if (mbean) {
-                return mbean;
-            }
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("org.apache.karaf", "features");
-            if (!folder) {
-                // sometimes the features mbean is inside the 'root' folder
-                folder = workspace.tree.navigate("org.apache.karaf");
-                if (folder) {
-                    var children = folder.children;
-                    folder = null;
-                    angular.forEach(children, function (child) {
-                        if (!folder) {
-                            folder = child.navigate("features");
-                        }
-                    });
-                }
-            }
-            if (folder) {
-                var children = folder.children;
-                if (children) {
-                    var node = children[0];
-                    if (node) {
-                        return node.objectName;
-                    }
-                }
-                return folder.objectName;
-            }
-        }
-        return null;
-    }
-    Karaf.getSelectionFeaturesMBean = getSelectionFeaturesMBean;
-    function getSelectionScrMBean(workspace) {
-        if (workspace) {
-            var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
-            var karaf = scrStuff["org.apache.karaf"] || {};
-            var mbean = karaf.objectName;
-            if (mbean) {
-                return mbean;
-            }
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("org.apache.karaf", "scr");
-            if (!folder) {
-                // sometimes the features mbean is inside the 'root' folder
-                folder = workspace.tree.navigate("org.apache.karaf");
-                if (folder) {
-                    var children = folder.children;
-                    folder = null;
-                    angular.forEach(children, function (child) {
-                        if (!folder) {
-                            folder = child.navigate("scr");
-                        }
-                    });
-                }
-            }
-            if (folder) {
-                var children = folder.children;
-                if (children) {
-                    var node = children[0];
-                    if (node) {
-                        return node.objectName;
-                    }
-                }
-                return folder.objectName;
-            }
-        }
-        return null;
-    }
-    Karaf.getSelectionScrMBean = getSelectionScrMBean;
-})(Karaf || (Karaf = {}));
 var Karaf;
 (function (Karaf) {
     var Feature = /** @class */ (function () {
@@ -23184,915 +24727,6 @@ var Karaf;
             }
         }]);
 })(Karaf || (Karaf = {}));
-var Osgi;
-(function (Osgi) {
-    Osgi.pluginName = 'hawtio-integration-osgi';
-    Osgi.log = Logger.get(Osgi.pluginName);
-    function defaultBundleValues(workspace, $scope, values) {
-        var allValues = values;
-        angular.forEach(values, function (row) {
-            row["ImportData"] = parseActualPackages(row["ImportedPackages"]);
-            row["ExportData"] = parseActualPackages(row["ExportedPackages"]);
-            row["IdentifierLink"] = bundleLinks(workspace, row["Identifier"]);
-            row["Hosts"] = labelBundleLinks(workspace, row["Hosts"], allValues);
-            row["Fragments"] = labelBundleLinks(workspace, row["Fragments"], allValues);
-            row["ImportedPackages"] = _.uniq(row["ImportedPackages"]);
-            row["StateStyle"] = getStateStyle("label", row["State"]);
-            row["RequiringBundles"] = labelBundleLinks(workspace, row["RequiringBundles"], allValues);
-        });
-        return values;
-    }
-    Osgi.defaultBundleValues = defaultBundleValues;
-    function getStateStyle(prefix, state) {
-        switch (state) {
-            case "INSTALLED":
-                return prefix + "-important";
-            case "RESOLVED":
-                return prefix + "-inverse";
-            case "STARTING":
-                return prefix + "-warning";
-            case "ACTIVE":
-                return prefix + "-success";
-            case "STOPPING":
-                return prefix + "-info";
-            case "UNINSTALLED":
-                return ""; // the default color, which is grey
-            default:
-                return prefix + "-important";
-        }
-    }
-    Osgi.getStateStyle = getStateStyle;
-    function defaultServiceValues(workspace, $scope, values) {
-        angular.forEach(values, function (row) {
-            row["BundleLinks"] = bundleLinks(workspace, row["BundleIdentifier"]);
-        });
-        return values;
-    }
-    Osgi.defaultServiceValues = defaultServiceValues;
-    function defaultPackageValues(workspace, $scope, values) {
-        var packages = [];
-        function onPackageEntry(packageEntry, row) {
-            if (!row)
-                row = packageEntry;
-            var name = packageEntry["Name"];
-            var version = packageEntry["Version"];
-            if (name && !_.startsWith(name, "#")) {
-                var importingBundles = row["ImportingBundles"] || packageEntry["ImportingBundles"];
-                var exportingBundles = row["ExportingBundles"] || packageEntry["ExportingBundles"];
-                packageEntry["ImportingBundleUrls"] = bundleUrls(workspace, importingBundles);
-                packageEntry["ExportingBundleUrls"] = bundleUrls(workspace, exportingBundles);
-                packages.push(packageEntry);
-            }
-        }
-        // the values could contain a child 'values' array of objects so use those directly
-        var childValues = values.values;
-        if (childValues) {
-            angular.forEach(childValues, onPackageEntry);
-        }
-        angular.forEach(values, function (row) {
-            angular.forEach(row, function (version) {
-                angular.forEach(version, function (packageEntry) {
-                    onPackageEntry(packageEntry, row);
-                });
-            });
-        });
-        return packages;
-    }
-    Osgi.defaultPackageValues = defaultPackageValues;
-    function defaultConfigurationValues(workspace, $scope, values) {
-        var array = [];
-        angular.forEach(values, function (row) {
-            var map = {};
-            map["Pid"] = row[0];
-            map["PidLink"] = "<a href='" + Core.url("/osgi/pid/" + row[0] + workspace.hash()) + "'>" + row[0] + "</a>";
-            map["Bundle"] = row[1];
-            array.push(map);
-        });
-        return array;
-    }
-    Osgi.defaultConfigurationValues = defaultConfigurationValues;
-    function parseActualPackages(packages) {
-        var result = {};
-        for (var i = 0; i < packages.length; i++) {
-            var pkg = packages[i];
-            var idx = pkg.indexOf(";");
-            if (idx > 0) {
-                var name = pkg.substring(0, idx);
-                var ver = pkg.substring(idx + 1);
-                var data = result[name];
-                if (data === undefined) {
-                    data = {};
-                    result[name] = data;
-                }
-                data["ReportedVersion"] = ver;
-            }
-        }
-        return result;
-    }
-    Osgi.parseActualPackages = parseActualPackages;
-    function parseManifestHeader(headers, name) {
-        var result = {};
-        var data = {};
-        var hdr = headers[name];
-        if (hdr === undefined) {
-            return result;
-        }
-        var ephdr = hdr.Value;
-        var inPkg = true;
-        var inQuotes = false;
-        var pkgName = "";
-        var daDecl = "";
-        for (var i = 0; i < ephdr.length; i++) {
-            var c = ephdr[i];
-            if (c === '"') {
-                inQuotes = !inQuotes;
-                continue;
-            }
-            if (inQuotes) {
-                daDecl += c;
-                continue;
-            }
-            // from here on we are never inside quotes
-            if (c === ';') {
-                if (inPkg) {
-                    inPkg = false;
-                }
-                else {
-                    handleDADecl(data, daDecl);
-                    // reset directive and attribute variable
-                    daDecl = "";
-                }
-                continue;
-            }
-            if (c === ',') {
-                handleDADecl(data, daDecl);
-                result[pkgName] = data;
-                // reset data
-                data = {};
-                pkgName = "";
-                daDecl = "";
-                inPkg = true;
-                continue;
-            }
-            if (inPkg) {
-                pkgName += c;
-            }
-            else {
-                daDecl += c;
-            }
-        }
-        handleDADecl(data, daDecl);
-        result[pkgName] = data;
-        return result;
-    }
-    Osgi.parseManifestHeader = parseManifestHeader;
-    function handleDADecl(data, daDecl) {
-        var didx = daDecl.indexOf(":=");
-        if (didx > 0) {
-            data["D" + daDecl.substring(0, didx)] = daDecl.substring(didx + 2);
-            return;
-        }
-        var aidx = daDecl.indexOf("=");
-        if (aidx > 0) {
-            data["A" + daDecl.substring(0, aidx)] = daDecl.substring(aidx + 1);
-            return;
-        }
-    }
-    function toCollection(values) {
-        var collection = values;
-        if (!angular.isArray(values)) {
-            collection = [values];
-        }
-        return collection;
-    }
-    Osgi.toCollection = toCollection;
-    function labelBundleLinks(workspace, values, allValues) {
-        var answer = [];
-        var sorted = toCollection(values).sort(function (a, b) { return a - b; });
-        angular.forEach(sorted, function (value, key) {
-            answer.push({
-                label: allValues[value].SymbolicName,
-                url: Core.url("/osgi/bundle/" + value + workspace.hash())
-            });
-        });
-        return answer;
-    }
-    Osgi.labelBundleLinks = labelBundleLinks;
-    function bundleLinks(workspace, values) {
-        var answer = "";
-        var sorted = toCollection(values).sort(function (a, b) { return a - b; });
-        angular.forEach(sorted, function (value, key) {
-            var prefix = "";
-            if (answer.length > 0) {
-                prefix = " ";
-            }
-            answer += prefix + "<a href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>Bundle " + value + "</a>";
-        });
-        return answer;
-    }
-    Osgi.bundleLinks = bundleLinks;
-    function bundleUrls(workspace, values) {
-        var answer = [];
-        angular.forEach(values, function (value, key) {
-            answer.push(Core.url("/osgi/bundle/" + value + workspace.hash()));
-        });
-        return answer;
-    }
-    Osgi.bundleUrls = bundleUrls;
-    function pidLinks(workspace, values) {
-        var answer = "";
-        angular.forEach(toCollection(values), function (value, key) {
-            var prefix = "";
-            if (answer.length > 0) {
-                prefix = " ";
-            }
-            answer += prefix + "<a href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + value + "</a>";
-        });
-        return answer;
-    }
-    Osgi.pidLinks = pidLinks;
-    /**
-     * Finds a bundle by id
-     *
-     * @method findBundle
-     * @for Osgi
-     * @param {String} bundleId
-     * @param {Array} values
-     * @return {any}
-     *
-     */
-    function findBundle(bundleId, values) {
-        var answer = "";
-        angular.forEach(values, function (row) {
-            var id = row["Identifier"];
-            if (bundleId === id.toString()) {
-                answer = row;
-                return answer;
-            }
-        });
-        return answer;
-    }
-    Osgi.findBundle = findBundle;
-    function getSelectionBundleMBean(workspace) {
-        if (workspace) {
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("osgi.core", "bundleState");
-            return Osgi.findFirstObjectName(folder);
-        }
-        return null;
-    }
-    Osgi.getSelectionBundleMBean = getSelectionBundleMBean;
-    /**
-     * Walks the tree looking in the first child all the way down until we find an objectName
-     * @method findFirstObjectName
-     * @for Osgi
-     * @param {Folder} node
-     * @return {String}
-     *
-     */
-    function findFirstObjectName(node) {
-        if (node) {
-            var answer = node.objectName;
-            if (answer) {
-                return answer;
-            }
-            else {
-                var children = node.children;
-                if (children && children.length) {
-                    return findFirstObjectName(children[0]);
-                }
-            }
-        }
-        return null;
-    }
-    Osgi.findFirstObjectName = findFirstObjectName;
-    function getSelectionFrameworkMBean(workspace) {
-        if (workspace) {
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("osgi.core", "framework");
-            return Osgi.findFirstObjectName(folder);
-        }
-        return null;
-    }
-    Osgi.getSelectionFrameworkMBean = getSelectionFrameworkMBean;
-    function getSelectionServiceMBean(workspace) {
-        if (workspace) {
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("osgi.core", "serviceState");
-            return Osgi.findFirstObjectName(folder);
-        }
-        return null;
-    }
-    Osgi.getSelectionServiceMBean = getSelectionServiceMBean;
-    function getSelectionPackageMBean(workspace) {
-        if (workspace) {
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("osgi.core", "packageState");
-            return Osgi.findFirstObjectName(folder);
-        }
-        return null;
-    }
-    Osgi.getSelectionPackageMBean = getSelectionPackageMBean;
-    function getSelectionConfigAdminMBean(workspace) {
-        if (workspace) {
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("osgi.compendium", "cm");
-            return Osgi.findFirstObjectName(folder);
-        }
-        return null;
-    }
-    Osgi.getSelectionConfigAdminMBean = getSelectionConfigAdminMBean;
-    function getMetaTypeMBean(workspace) {
-        if (workspace) {
-            var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
-            var typeFolder = mbeanTypesToDomain["MetaTypeFacade"] || {};
-            var mbeanFolder = typeFolder["io.fabric8"] || {};
-            return mbeanFolder["objectName"];
-        }
-        return null;
-    }
-    Osgi.getMetaTypeMBean = getMetaTypeMBean;
-    function getProfileMetadataMBean(workspace) {
-        if (workspace) {
-            var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
-            var typeFolder = mbeanTypesToDomain["ProfileMetadata"] || {};
-            var mbeanFolder = typeFolder["io.fabric8"] || {};
-            return mbeanFolder["objectName"];
-        }
-        return null;
-    }
-    Osgi.getProfileMetadataMBean = getProfileMetadataMBean;
-    function getHawtioOSGiToolsMBean(workspace) {
-        if (workspace) {
-            var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
-            var toolsFacades = mbeanTypesToDomain["OSGiTools"] || {};
-            var hawtioFolder = toolsFacades["hawtio"] || {};
-            return hawtioFolder["objectName"];
-        }
-        return null;
-    }
-    Osgi.getHawtioOSGiToolsMBean = getHawtioOSGiToolsMBean;
-    function getHawtioConfigAdminMBean(workspace) {
-        if (workspace) {
-            var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
-            var typeFolder = mbeanTypesToDomain["ConfigAdmin"] || {};
-            var mbeanFolder = typeFolder["hawtio"] || {};
-            return mbeanFolder["objectName"];
-        }
-        return null;
-    }
-    Osgi.getHawtioConfigAdminMBean = getHawtioConfigAdminMBean;
-    /**
-     * Creates a link to the given configuration pid and/or factoryPid
-     */
-    function createConfigPidLink($scope, workspace, pid, isFactory) {
-        if (isFactory === void 0) { isFactory = false; }
-        return createConfigPidPath($scope, pid, isFactory) + workspace.hash();
-    }
-    Osgi.createConfigPidLink = createConfigPidLink;
-    /**
-     * Creates a path to the given configuration pid and/or factoryPid
-     */
-    function createConfigPidPath($scope, pid, isFactory) {
-        if (isFactory === void 0) { isFactory = false; }
-        var link = pid;
-        var versionId = $scope.versionId;
-        var profileId = $scope.profileId;
-        if (versionId && versionId) {
-            var configPage = isFactory ? "/newConfiguration/" : "/configuration/";
-            return "/wiki/branch/" + versionId + configPage + link + "/" + $scope.pageId;
-        }
-        else {
-            return "osgi/pid/" + link;
-        }
-    }
-    Osgi.createConfigPidPath = createConfigPidPath;
-    function getConfigurationProperties(workspace, jolokia, pid, onDataFn) {
-        var mbean = getSelectionConfigAdminMBean(workspace);
-        var answer = null;
-        if (jolokia && mbean) {
-            answer = jolokia.execute(mbean, 'getProperties', pid, Core.onSuccess(onDataFn));
-        }
-        return answer;
-    }
-    Osgi.getConfigurationProperties = getConfigurationProperties;
-    /**
-     * For a pid of the form "foo.generatedId" for a pid "foo" or "foo.bar" remove the "foo." prefix
-     */
-    function removeFactoryPidPrefix(pid, factoryPid) {
-        if (pid && factoryPid) {
-            if (_.startsWith(pid, factoryPid)) {
-                return pid.substring(factoryPid.length + 1);
-            }
-            var idx = factoryPid.lastIndexOf(".");
-            if (idx > 0) {
-                var prefix = factoryPid.substring(0, idx + 1);
-                return Core.trimLeading(pid, prefix);
-            }
-        }
-        return pid;
-    }
-    Osgi.removeFactoryPidPrefix = removeFactoryPidPrefix;
-})(Osgi || (Osgi = {}));
-/// <reference path="osgiHelpers.ts"/>
-/// <reference path="osgiPlugin.ts"/>
-var Osgi;
-(function (Osgi) {
-    var OsgiDataService = /** @class */ (function () {
-        function OsgiDataService(workspace, jolokia) {
-            this.jolokia = jolokia;
-            this.workspace = workspace;
-        }
-        OsgiDataService.prototype.getBundles = function () {
-            var bundles = {};
-            // TODO make this async,especially given this returns lots of data
-            var response = this.jolokia.request({
-                type: 'exec',
-                mbean: Osgi.getSelectionBundleMBean(this.workspace),
-                operation: 'listBundles()'
-            }, Core.onSuccess(null));
-            angular.forEach(response.value, function (value, key) {
-                var obj = {
-                    Identifier: value.Identifier,
-                    Name: "",
-                    SymbolicName: value.SymbolicName,
-                    Fragment: value.Fragment,
-                    State: value.State,
-                    Version: value.Version,
-                    LastModified: new Date(Number(value.LastModified)),
-                    Location: value.Location,
-                    StartLevel: undefined,
-                    RegisteredServices: value.RegisteredServices,
-                    ServicesInUse: value.ServicesInUse
-                };
-                if (value.Headers['Bundle-Name']) {
-                    obj.Name = value.Headers['Bundle-Name']['Value'];
-                }
-                bundles[value.Identifier] = obj;
-            });
-            return bundles;
-        };
-        OsgiDataService.prototype.getServices = function () {
-            var services = {};
-            var response = this.jolokia.request({
-                type: 'exec',
-                mbean: Osgi.getSelectionServiceMBean(this.workspace),
-                operation: 'listServices()'
-            }, Core.onSuccess(null));
-            var answer = response.value;
-            angular.forEach(answer, function (value, key) {
-                services[value.Identifier] = value;
-            });
-            return services;
-        };
-        OsgiDataService.prototype.getPackages = function () {
-            var packages = {};
-            var response = this.jolokia.request({
-                type: 'exec',
-                mbean: Osgi.getSelectionPackageMBean(this.workspace),
-                operation: 'listPackages()'
-            }, Core.onSuccess(null));
-            var answer = response.value.values;
-            answer.forEach(function (value) {
-                packages[value.Name + "-" + value.Version] = value;
-            });
-            return packages;
-        };
-        return OsgiDataService;
-    }());
-    Osgi.OsgiDataService = OsgiDataService;
-})(Osgi || (Osgi = {}));
-/// <reference path="../osgiHelpers.ts"/>
-/// <reference path="bundle.ts"/>
-var Osgi;
-(function (Osgi) {
-    var BundlesService = /** @class */ (function () {
-        BundlesService.$inject = ["$q", "jolokia", "workspace"];
-        function BundlesService($q, jolokia, workspace) {
-            'ngInject';
-            this.$q = $q;
-            this.jolokia = jolokia;
-            this.workspace = workspace;
-        }
-        BundlesService.prototype.getBundles = function () {
-            return this.execute(Osgi.getSelectionBundleMBean(this.workspace), 'listBundles()')
-                .then(function (value) {
-                var bundles = [];
-                angular.forEach(value, function (item, key) {
-                    var bundle = {
-                        id: item.Identifier,
-                        name: item.Headers['Bundle-Name'] ? item.Headers['Bundle-Name']['Value'] : '',
-                        location: item.Location,
-                        symbolicName: item.SymbolicName,
-                        state: item.State.toLowerCase(),
-                        version: item.Version
-                    };
-                    bundles.push(bundle);
-                });
-                return bundles;
-            });
-        };
-        BundlesService.prototype.startBundles = function (bundles) {
-            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
-            var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'startBundles([J)', ids)
-                .then(this.handleResponse);
-        };
-        BundlesService.prototype.stopBundles = function (bundles) {
-            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
-            var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'stopBundles([J)', ids)
-                .then(this.handleResponse);
-        };
-        BundlesService.prototype.updateBundles = function (bundles) {
-            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
-            var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'updateBundles([J)', ids)
-                .then(this.handleResponse);
-        };
-        BundlesService.prototype.refreshBundles = function (bundles) {
-            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
-            var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'refreshBundles([J)', ids)
-                .then(this.handleResponse);
-        };
-        BundlesService.prototype.uninstallBundles = function (bundles) {
-            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
-            var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'uninstallBundles([J)', ids)
-                .then(this.handleResponse);
-        };
-        BundlesService.prototype.installBundle = function (bundleUrl) {
-            var _this = this;
-            var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
-            return this.execute(mbean, 'installBundle(java.lang.String)', bundleUrl)
-                .then(function (response) { return _this.execute(mbean, 'startBundles([J)', response); })
-                .then(this.handleResponse);
-        };
-        BundlesService.prototype.execute = function (mbean, operation, args) {
-            var _this = this;
-            if (args === void 0) { args = undefined; }
-            var request = {
-                type: 'exec',
-                mbean: mbean,
-                operation: operation
-            };
-            if (args) {
-                request['arguments'] = [args];
-            }
-            return this.$q(function (resolve, reject) {
-                _this.jolokia.request(request, {
-                    method: "post",
-                    success: function (response) { return resolve(response.value); },
-                    error: function (response) {
-                        Osgi.log.error('BundlesService.execute() failed:', response);
-                        reject(response.error);
-                    }
-                });
-            });
-        };
-        BundlesService.prototype.handleResponse = function (response) {
-            if (response && response['Error']) {
-                throw response['Error'];
-            }
-            else {
-                return "The operation completed successfully";
-            }
-        };
-        return BundlesService;
-    }());
-    Osgi.BundlesService = BundlesService;
-})(Osgi || (Osgi = {}));
-/// <reference path="bundle.ts"/>
-/// <reference path="bundles.service.ts"/>
-var Osgi;
-(function (Osgi) {
-    var BundlesController = /** @class */ (function () {
-        BundlesController.$inject = ["bundlesService", "workspace"];
-        function BundlesController(bundlesService, workspace) {
-            'ngInject';
-            var _this = this;
-            this.bundlesService = bundlesService;
-            this.workspace = workspace;
-            this.startAction = {
-                name: 'Start',
-                actionFn: function (action) {
-                    var selectedBundles = _this.getSelectedBundles();
-                    _this.bundlesService.startBundles(selectedBundles)
-                        .then(function (response) {
-                        Core.notification('success', response);
-                        _this.loadBundles();
-                    })
-                        .catch(function (error) { return Core.notification('danger', error); });
-                },
-                isDisabled: true
-            };
-            this.stopAction = {
-                name: 'Stop',
-                actionFn: function (action) {
-                    var selectedBundles = _this.getSelectedBundles();
-                    _this.bundlesService.stopBundles(selectedBundles)
-                        .then(function (response) {
-                        Core.notification('success', response);
-                        _this.loadBundles();
-                    })
-                        .catch(function (error) { return Core.notification('danger', error); });
-                },
-                isDisabled: true
-            };
-            this.refreshAction = {
-                name: 'Refresh',
-                actionFn: function (action) {
-                    var selectedBundles = _this.getSelectedBundles();
-                    _this.bundlesService.refreshBundles(selectedBundles)
-                        .then(function (response) {
-                        Core.notification('success', response);
-                        _this.loadBundles();
-                    })
-                        .catch(function (error) { return Core.notification('danger', error); });
-                },
-                isDisabled: true
-            };
-            this.updateAction = {
-                name: 'Update',
-                actionFn: function (action) {
-                    var selectedBundles = _this.getSelectedBundles();
-                    _this.bundlesService.updateBundles(selectedBundles)
-                        .then(function (response) {
-                        Core.notification('success', response);
-                        _this.loadBundles();
-                    })
-                        .catch(function (error) { return Core.notification('danger', error); });
-                },
-                isDisabled: true
-            };
-            this.uninstallAction = {
-                name: 'Uninstall',
-                actionFn: function (action) {
-                    var selectedBundles = _this.getSelectedBundles();
-                    _this.bundlesService.uninstallBundles(selectedBundles)
-                        .then(function (response) {
-                        Core.notification('success', response);
-                        _this.loadBundles();
-                    })
-                        .catch(function (error) { return Core.notification('danger', error); });
-                },
-                isDisabled: true
-            };
-            this.tableConfig = {
-                selectionMatchProp: 'id',
-                showCheckboxes: true,
-                onCheckBoxChange: function (item) { return _this.enableDisableActions(); }
-            };
-            this.toolbarConfig = {
-                filterConfig: {
-                    fields: [
-                        {
-                            id: 'state',
-                            title: 'State',
-                            placeholder: 'Filter by state...',
-                            filterType: 'select',
-                            filterValues: [
-                                'active',
-                                'installed',
-                                'resolved',
-                                'signers_all',
-                                'signers_trusted',
-                                'start_activation_policy',
-                                'start_transient',
-                                'starting',
-                                'stop_transient',
-                                'stopping',
-                                'uninstalled'
-                            ]
-                        },
-                        {
-                            id: 'name',
-                            title: 'Name',
-                            placeholder: 'Filter by name...',
-                            filterType: 'text'
-                        },
-                        {
-                            id: 'symbolicName',
-                            title: 'Symbolic Name',
-                            placeholder: 'Filter by symbolic name...',
-                            filterType: 'text'
-                        },
-                        {
-                            id: 'version',
-                            title: 'Version',
-                            placeholder: 'Filter by version...',
-                            filterType: 'text'
-                        }
-                    ],
-                    onFilterChange: function (filters) {
-                        _this.applyFilters(filters);
-                    },
-                    resultsCount: 0
-                },
-                actionsConfig: {
-                    primaryActions: this.toolbarActions()
-                },
-                isTableView: true
-            };
-            this.tableColumns = [
-                { header: 'ID', itemField: 'id', templateFn: function (value) { return "<a href=\"osgi/bundle/" + value + "\">" + value + "</a>"; } },
-                { header: 'State', itemField: 'state' },
-                { header: 'Name', itemField: 'name' },
-                { header: 'Symbolic Name', itemField: 'symbolicName' },
-                { header: 'Version', itemField: 'version' }
-            ];
-            this.tableItems = null;
-            this.loading = true;
-        }
-        BundlesController.prototype.$onInit = function () {
-            this.loadBundles();
-        };
-        BundlesController.prototype.loadBundles = function () {
-            var _this = this;
-            this.bundlesService.getBundles()
-                .then(function (bundles) {
-                _this.bundles = bundles;
-                _this.tableItems = bundles;
-                _this.toolbarConfig.filterConfig.resultsCount = bundles.length;
-                _this.enableDisableActions();
-                _this.loading = false;
-            });
-        };
-        BundlesController.prototype.toolbarActions = function () {
-            var actions = [];
-            var frameworkMBean = Osgi.getSelectionFrameworkMBean(this.workspace);
-            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'startBundle')) {
-                actions.push(this.startAction);
-            }
-            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'stopBundle')) {
-                actions.push(this.stopAction);
-            }
-            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'refreshBundle')) {
-                actions.push(this.refreshAction);
-            }
-            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'updateBundle')) {
-                actions.push(this.updateAction);
-            }
-            if (this.workspace.hasInvokeRightsForName(frameworkMBean, 'uninstallBundle')) {
-                actions.push(this.uninstallAction);
-            }
-            Osgi.log.debug("RBAC - Rendered bundles actions:", actions);
-            if (_.isEmpty(actions)) {
-                Osgi.log.debug("RBAC - Disable checkboxes");
-                this.tableConfig.showCheckboxes = false;
-            }
-            return actions;
-        };
-        BundlesController.prototype.applyFilters = function (filters) {
-            var filteredBundles = this.bundles;
-            filters.forEach(function (filter) {
-                filteredBundles = BundlesController.FILTER_FUNCTIONS[filter.id](filteredBundles, filter.value);
-            });
-            this.tableItems = filteredBundles;
-            this.toolbarConfig.filterConfig.resultsCount = filteredBundles.length;
-        };
-        BundlesController.prototype.getSelectedBundles = function () {
-            var _this = this;
-            return this.tableItems
-                .map(function (tableItem, i) { return angular.extend(_this.bundles[i], { selected: tableItem['selected'] }); })
-                .filter(function (bundle) { return bundle.selected; });
-        };
-        BundlesController.prototype.enableDisableActions = function () {
-            var selectedBundles = this.getSelectedBundles();
-            var noBundlesSelected = selectedBundles.length === 0;
-            this.startAction.isDisabled = noBundlesSelected || selectedBundles.every(function (bundle) { return bundle.state === 'active'; });
-            this.stopAction.isDisabled = noBundlesSelected || selectedBundles.every(function (bundle) { return bundle.state !== 'active'; });
-            this.refreshAction.isDisabled = noBundlesSelected;
-            this.updateAction.isDisabled = noBundlesSelected;
-            this.uninstallAction.isDisabled = noBundlesSelected;
-        };
-        BundlesController.FILTER_FUNCTIONS = {
-            state: function (bundles, state) { return bundles.filter(function (bundle) { return bundle.state === state; }); },
-            name: function (bundles, name) {
-                var regExp = new RegExp(name, 'i');
-                return bundles.filter(function (bundle) { return regExp.test(bundle.name); });
-            },
-            symbolicName: function (bundles, symbolicName) {
-                var regExp = new RegExp(symbolicName, 'i');
-                return bundles.filter(function (bundle) { return regExp.test(bundle.symbolicName); });
-            },
-            version: function (bundles, version) {
-                var regExp = new RegExp(version, 'i');
-                return bundles.filter(function (bundle) { return regExp.test(bundle.version); });
-            }
-        };
-        return BundlesController;
-    }());
-    Osgi.BundlesController = BundlesController;
-    Osgi.bundlesComponent = {
-        template: "\n      <div class=\"table-view\">\n        <h1>Bundles</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <install-bundle bundles=\"$ctrl.bundles\" on-install=\"$ctrl.loadBundles()\"></install-bundle>\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <pf-table-view config=\"$ctrl.tableConfig\"\n                         columns=\"$ctrl.tableColumns\"\n                         items=\"$ctrl.tableItems\"></pf-table-view>\n        </div>\n      </div>\n    ",
-        controller: BundlesController
-    };
-})(Osgi || (Osgi = {}));
-/// <reference path="bundle.ts"/>
-var Osgi;
-(function (Osgi) {
-    var InstallBundleController = /** @class */ (function () {
-        InstallBundleController.$inject = ["bundlesService", "workspace"];
-        function InstallBundleController(bundlesService, workspace) {
-            'ngInject';
-            this.bundlesService = bundlesService;
-            this.workspace = workspace;
-            this.loading = false;
-            this.bundles = [];
-            this.frameworkMBean = Osgi.getSelectionFrameworkMBean(this.workspace);
-        }
-        InstallBundleController.prototype.install = function (bundleUrl) {
-            var _this = this;
-            var bundle = this.findBundleByUrl(bundleUrl);
-            if (bundle) {
-                Core.notification('warning', "Bundle " + bundle.name + " " + bundle.version + " is already installed");
-                return;
-            }
-            this.loading = true;
-            this.bundlesService.installBundle(bundleUrl)
-                .then(function (response) {
-                _this.loading = false;
-                Core.notification('success', response);
-                _this['onInstall']();
-            })
-                .catch(function (error) {
-                _this.loading = false;
-                Core.notification('danger', error);
-            });
-        };
-        InstallBundleController.prototype.findBundleByUrl = function (bundleUrl) {
-            return this.bundles.filter(function (bundle) { return bundle.location === bundleUrl.trim(); })[0];
-        };
-        InstallBundleController.prototype.installDisabled = function (bundleUrl) {
-            return this.loading || (!bundleUrl || bundleUrl.trim().length === 0);
-        };
-        return InstallBundleController;
-    }());
-    Osgi.InstallBundleController = InstallBundleController;
-    Osgi.installBundleComponent = {
-        template: "\n      <div class=\"row install-bundle\"\n          hawtio-show object-name=\"{{$ctrl.frameworkMBean}}\" method-name=\"installBundle\">\n        <div class=\"col-lg-6\">\n          <div class=\"input-group\">\n            <input type=\"text\" class=\"form-control\" placeholder=\"Bundle URL...\" ng-model=\"bundleUrl\">\n            <span class=\"input-group-btn\">\n              <button type=\"button\" class=\"btn btn-default\" ng-click=\"$ctrl.install(bundleUrl)\" ng-disabled=\"$ctrl.installDisabled(bundleUrl)\">\n                Install\n              </button>\n            </span>\n          </div>\n        </div>\n        <div class=\"col-lg-6\">\n        </div>\n      </div>\n    ",
-        controller: InstallBundleController,
-        bindings: {
-            onInstall: '&',
-            bundles: '<'
-        }
-    };
-})(Osgi || (Osgi = {}));
-/// <reference path="bundles.component.ts"/>
-/// <reference path="install-bundle.component.ts"/>
-/// <reference path="bundles.service.ts"/>
-var Osgi;
-(function (Osgi) {
-    Osgi.bundlesModule = angular
-        .module('hawtio-osgi-bundles', [])
-        .component('bundles', Osgi.bundlesComponent)
-        .component('installBundle', Osgi.installBundleComponent)
-        .service('bundlesService', Osgi.BundlesService)
-        .name;
-})(Osgi || (Osgi = {}));
-/// <reference path="osgiData.ts"/>
-/// <reference path="osgiHelpers.ts"/>
-/// <reference path="../../karaf/ts/karafHelpers.ts"/>
-/// <reference path="bundles/bundles.module.ts"/>
-var Osgi;
-(function (Osgi) {
-    Osgi._module = angular.module(Osgi.pluginName, [
-        'infinite-scroll',
-        Osgi.bundlesModule
-    ]);
-    Osgi._module.config(["$routeProvider", function ($routeProvider) {
-            $routeProvider
-                .when('/osgi', { redirectTo: '/osgi/bundles' })
-                .when('/osgi/bundles', { template: '<bundles></bundles>' })
-                .when('/osgi/bundle/:bundleId', { templateUrl: 'plugins/osgi/html/bundle.html' })
-                .when('/osgi/services', { templateUrl: 'plugins/osgi/html/services.html' })
-                .when('/osgi/packages', { templateUrl: 'plugins/osgi/html/packages.html' })
-                .when('/osgi/configurations', { templateUrl: 'plugins/osgi/html/configurations.html' })
-                .when('/osgi/pid/:pid/:factoryPid', { templateUrl: 'plugins/osgi/html/pid.html' })
-                .when('/osgi/pid/:pid', { templateUrl: 'plugins/osgi/html/pid.html' })
-                .when('/osgi/fwk', { templateUrl: 'plugins/osgi/html/framework.html' });
-        }]);
-    Osgi._module.run(["HawtioNav", "workspace", "viewRegistry", "helpRegistry", function (nav, workspace, viewRegistry, helpRegistry) {
-            viewRegistry['osgi'] = "plugins/osgi/html/layoutOsgi.html";
-            helpRegistry.addUserDoc('osgi', 'plugins/osgi/doc/help.md', function () {
-                return workspace.treeContainsDomainAndProperties("osgi.core");
-            });
-            var builder = nav.builder();
-            var tab = builder.id('osgi')
-                .title(function () { return 'OSGi'; })
-                .href(function () { return '/osgi'; })
-                .isValid(function () { return workspace.treeContainsDomainAndProperties("osgi.core"); })
-                .isSelected(function () { return workspace.isLinkActive('osgi'); })
-                .build();
-            nav.add(tab);
-        }]);
-    Osgi._module.factory('osgiDataService', ["workspace", "jolokia", function (workspace, jolokia) {
-            return new Osgi.OsgiDataService(workspace, jolokia);
-        }]);
-    hawtioPluginLoader.addModule(Osgi.pluginName);
-})(Osgi || (Osgi = {}));
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
 var Osgi;
@@ -25794,610 +26428,6 @@ var Osgi;
             loadServices();
         }]);
 })(Osgi || (Osgi = {}));
-var SpringBoot;
-(function (SpringBoot) {
-    var SpringBootService = /** @class */ (function () {
-        SpringBootService.$inject = ["$q", "treeService"];
-        function SpringBootService($q, treeService) {
-            'ngInject';
-            this.$q = $q;
-            this.treeService = treeService;
-        }
-        SpringBootService.prototype.getTabs = function () {
-            return this.$q.all([
-                this.hasEndpoint('healthEndpoint'),
-                this.hasEndpoint('loggersEndpoint'),
-                this.hasEndpoint('traceEndpoint')
-            ])
-                .then(function (results) {
-                var tabs = [];
-                if (results[0]) {
-                    tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
-                }
-                if (results[1]) {
-                    tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
-                }
-                if (results[2]) {
-                    tabs.push(new Nav.HawtioTab('Trace', '/spring-boot/trace'));
-                }
-                return tabs;
-            });
-        };
-        SpringBootService.prototype.hasEndpoint = function (name) {
-            return this.treeService.treeContainsDomainAndProperties('org.springframework.boot', { type: 'Endpoint', name: name });
-        };
-        return SpringBootService;
-    }());
-    SpringBoot.SpringBootService = SpringBootService;
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="spring-boot.service.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    var SpringBootController = /** @class */ (function () {
-        SpringBootController.$inject = ["$location", "springBootService"];
-        function SpringBootController($location, springBootService) {
-            'ngInject';
-            this.$location = $location;
-            this.springBootService = springBootService;
-        }
-        SpringBootController.prototype.$onInit = function () {
-            var _this = this;
-            this.springBootService.getTabs()
-                .then(function (tabs) { return _this.tabs = tabs; });
-        };
-        SpringBootController.prototype.goto = function (tab) {
-            this.$location.path(tab.path);
-        };
-        return SpringBootController;
-    }());
-    SpringBoot.SpringBootController = SpringBootController;
-    SpringBoot.springBootComponent = {
-        template: "\n      <div class=\"nav-tabs-main\">\n        <hawtio-tabs tabs=\"$ctrl.tabs\" on-change=\"$ctrl.goto(tab)\"></hawtio-tabs>\n        <div class=\"contents\" ng-view></div>\n      </div>\n    ",
-        controller: SpringBootController
-    };
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="spring-boot.service.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    configureRoutes.$inject = ["$routeProvider"];
-    configureLayout.$inject = ["$templateCache", "viewRegistry", "HawtioNav", "workspace", "treeService", "springBootService"];
-    function configureRoutes($routeProvider) {
-        'ngInject';
-        $routeProvider
-            .when('/spring-boot', { redirectTo: '/spring-boot/health' })
-            .when('/spring-boot/health', { template: '<spring-boot-health></spring-boot-health>' })
-            .when('/spring-boot/trace', { template: '<spring-boot-trace></spring-boot-trace>' })
-            .when('/spring-boot/loggers', { template: '<spring-boot-loggers></spring-boot-loggers>' });
-    }
-    SpringBoot.configureRoutes = configureRoutes;
-    function configureLayout($templateCache, viewRegistry, HawtioNav, workspace, treeService, springBootService) {
-        'ngInject';
-        var templateCacheKey = 'spring-boot.html';
-        $templateCache.put(templateCacheKey, '<spring-boot></spring-boot>');
-        viewRegistry['spring-boot'] = templateCacheKey;
-        treeService.treeContainsDomainAndProperties('org.springframework.boot')
-            .then(function (isSpringBoot) {
-            if (isSpringBoot) {
-                springBootService.getTabs()
-                    .then(function (tabs) {
-                    var tab = HawtioNav.builder()
-                        .id('spring-boot')
-                        .title(function () { return 'Spring Boot'; })
-                        .href(function () { return '/spring-boot'; })
-                        .isValid(function () { return tabs.length > 0; })
-                        .isSelected(function () { return workspace.isMainTabActive('spring-boot'); })
-                        .build();
-                    HawtioNav.add(tab);
-                });
-            }
-        });
-    }
-    SpringBoot.configureLayout = configureLayout;
-})(SpringBoot || (SpringBoot = {}));
-var SpringBoot;
-(function (SpringBoot) {
-    var Health = /** @class */ (function () {
-        function Health(status, items) {
-            this.status = status;
-            this.items = items;
-        }
-        return Health;
-    }());
-    SpringBoot.Health = Health;
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="health.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    var HealthService = /** @class */ (function () {
-        HealthService.$inject = ["jolokiaService", "humanizeService"];
-        function HealthService(jolokiaService, humanizeService) {
-            'ngInject';
-            this.jolokiaService = jolokiaService;
-            this.humanizeService = humanizeService;
-        }
-        HealthService.prototype.getHealth = function () {
-            var _this = this;
-            SpringBoot.log.debug('Fetch health data');
-            return this.jolokiaService.getAttribute('org.springframework.boot:type=Endpoint,name=healthEndpoint', 'Data')
-                .then(function (data) {
-                var status = _this.toHealthStatus(data.status);
-                var items = _this.toItems(data);
-                return new SpringBoot.Health(status, items);
-            });
-        };
-        HealthService.prototype.toHealthStatus = function (str) {
-            return this.humanizeService.toUpperCase(str);
-        };
-        HealthService.prototype.toItems = function (data) {
-            var _this = this;
-            return _.toPairs(data)
-                .filter(function (pair) { return _.isObject(pair[1]); })
-                .map(function (pair) { return ({
-                title: _this.humanizeService.toSentenceCase(pair[0]),
-                info: _.toPairs(pair[1]).map(function (pair) { return _this.humanizeService.toSentenceCase(pair[0]) + ': ' + pair[1]; })
-            }); });
-        };
-        return HealthService;
-    }());
-    SpringBoot.HealthService = HealthService;
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="health.service.ts"/>
-/// <reference path="health.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    var HealthController = /** @class */ (function () {
-        HealthController.$inject = ["$timeout", "healthService"];
-        function HealthController($timeout, healthService) {
-            'ngInject';
-            this.$timeout = $timeout;
-            this.healthService = healthService;
-            this.reloadDelay = 20000;
-        }
-        HealthController.prototype.$onInit = function () {
-            this.loadDataPeriodically();
-        };
-        HealthController.prototype.$onDestroy = function () {
-            this.cancelTimer();
-        };
-        HealthController.prototype.loadDataPeriodically = function () {
-            var _this = this;
-            this.healthService.getHealth()
-                .then(function (health) { return _this.health = health; })
-                .then(function () { return _this.promise = _this.$timeout(function () { return _this.loadDataPeriodically(); }, _this.reloadDelay); });
-        };
-        HealthController.prototype.cancelTimer = function () {
-            this.$timeout.cancel(this.promise);
-        };
-        HealthController.prototype.getStatusIcon = function () {
-            switch (this.health.status) {
-                case 'UP':
-                    return 'pficon-ok';
-                case 'FATAL':
-                    return 'pficon-error-circle-o';
-                default:
-                    return 'pficon-info';
-            }
-        };
-        HealthController.prototype.getStatusClass = function () {
-            switch (this.health.status) {
-                case 'UP':
-                    return 'alert-success';
-                case 'FATAL':
-                    return 'alert-danger';
-                default:
-                    return 'alert-info';
-            }
-        };
-        return HealthController;
-    }());
-    SpringBoot.HealthController = HealthController;
-    SpringBoot.healthComponent = {
-        template: "\n      <div class=\"spring-boot-health-main\">\n        <h1>Health</h1>\n        <div class=\"cards-pf\" ng-if=\"$ctrl.health\">\n          <div class=\"container-fluid container-cards-pf\">\n            <div class=\"row row-cards-pf\">\n              <div class=\"col-lg-12\">\n                <div class=\"toast-pf alert\" ng-class=\"$ctrl.getStatusClass()\">\n                  <span class=\"pficon\" ng-class=\"$ctrl.getStatusIcon()\"></span>\n                  <strong>{{$ctrl.health.status}}</strong>\n                </div>\n              </div>\n              <div class=\"col-xs-12 col-sm-6 col-md-4 col-lg-3\" ng-repeat=\"item in $ctrl.health.items\">\n                <pf-info-status-card status=\"item\"></pf-info-status-card>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    ",
-        controller: HealthController
-    };
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="health.component.ts"/>
-/// <reference path="health.service.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    SpringBoot.healthModule = angular
-        .module('spring-boot-health', [])
-        .component('springBootHealth', SpringBoot.healthComponent)
-        .service('healthService', SpringBoot.HealthService)
-        .name;
-})(SpringBoot || (SpringBoot = {}));
-var SpringBoot;
-(function (SpringBoot) {
-    var Trace = /** @class */ (function () {
-        function Trace(trace) {
-            this.timestamp = trace.timestamp;
-            this.method = trace.info.method;
-            this.path = trace.info.path;
-            this.info = trace.info;
-            if (this.info.timeTaken) {
-                this.timeTaken = parseInt(this.info.timeTaken);
-            }
-            if (this.info.headers.response) {
-                this.httpStatusCode = parseInt(this.info.headers.response.status);
-            }
-        }
-        return Trace;
-    }());
-    SpringBoot.Trace = Trace;
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="trace.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    var TraceService = /** @class */ (function () {
-        TraceService.$inject = ["jolokiaService"];
-        function TraceService(jolokiaService) {
-            'ngInject';
-            this.jolokiaService = jolokiaService;
-        }
-        TraceService.prototype.getTraces = function () {
-            return this.jolokiaService.getAttribute('org.springframework.boot:type=Endpoint,name=traceEndpoint', 'Data')
-                .then(function (data) {
-                var traces = [];
-                // Avoid including our own jolokia requests in the results
-                var filteredTraces = data.filter(function (trace) { return /^\/jolokia\/?(?:\/.*(?=$))?$/.test(trace.info.path) === false; });
-                angular.forEach(filteredTraces, function (traceEvent) {
-                    traces.push(new SpringBoot.Trace(traceEvent));
-                });
-                return traces;
-            });
-        };
-        return TraceService;
-    }());
-    SpringBoot.TraceService = TraceService;
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="trace.service.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    var TraceController = /** @class */ (function () {
-        TraceController.$inject = ["traceService", "$scope", "$filter", "$timeout", "$interval", "$uibModal"];
-        function TraceController(traceService, $scope, $filter, $timeout, $interval, $uibModal) {
-            'ngInject';
-            var _this = this;
-            this.traceService = traceService;
-            this.$scope = $scope;
-            this.$filter = $filter;
-            this.$timeout = $timeout;
-            this.$interval = $interval;
-            this.$uibModal = $uibModal;
-            this.toolbarConfig = {
-                isTableView: true,
-                filterConfig: {
-                    fields: [
-                        {
-                            id: 'timestamp',
-                            title: 'Timestamp',
-                            placeholder: 'Filter by timestamp...',
-                            filterType: 'text'
-                        },
-                        {
-                            id: 'status',
-                            title: 'HTTP Status',
-                            placeholder: 'Filter by HTTP status...',
-                            filterType: 'text'
-                        },
-                        {
-                            id: 'method',
-                            title: 'HTTP Method',
-                            placeholder: 'Filter by HTTP method...',
-                            filterType: 'select',
-                            filterValues: ['GET', 'DELETE', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', 'TRACE']
-                        },
-                        {
-                            id: 'path',
-                            title: 'Path',
-                            placeholder: 'Filter by path...',
-                            filterType: 'text'
-                        },
-                        {
-                            id: 'timeTaken',
-                            title: 'Time Taken',
-                            placeholder: 'Filter by time taken...',
-                            filterType: 'number'
-                        },
-                    ],
-                    onFilterChange: function (filters) {
-                        _this.applyFilters(filters);
-                    },
-                    appliedFilters: [],
-                    resultsCount: 0
-                },
-            };
-            this.loading = true;
-            this.traces = [];
-            this.tableItems = [];
-            this.dateFormat = "yyyy-MM-dd HH:mm:ss.sss";
-        }
-        TraceController.prototype.$onInit = function () {
-            var _this = this;
-            this.loadTraces();
-            this.promise = this.$interval(function () { return _this.loadTraces(); }, 10000);
-        };
-        TraceController.prototype.$onDestroy = function () {
-            this.$interval.cancel(this.promise);
-        };
-        TraceController.prototype.loadTraces = function () {
-            var _this = this;
-            this.loading = true;
-            this.traceService.getTraces()
-                .then(function (traces) {
-                (_a = _this.traces).unshift.apply(_a, _this.aggregateTraces(traces));
-                if (_this.traces.length > TraceController.CACHE_SIZE) {
-                    var spliceFrom = (_this.traces.length) - (_this.traces.length - TraceController.CACHE_SIZE);
-                    var splitAmount = _this.traces.length - TraceController.CACHE_SIZE;
-                    _this.traces.splice(spliceFrom, splitAmount);
-                }
-                _this.applyFilters(_this.toolbarConfig.filterConfig.appliedFilters);
-                _this.scrollIfRequired();
-                _this.loading = false;
-                var _a;
-            });
-        };
-        TraceController.prototype.applyFilters = function (filters) {
-            var _this = this;
-            var filteredTraces = this.traces;
-            var dateFilter = this.$filter('date');
-            filters.forEach(function (filter) {
-                var regExp = new RegExp(filter.value, 'i');
-                switch (filter.id) {
-                    case 'timestamp':
-                        filteredTraces = filteredTraces.filter(function (trace) { return regExp.test(dateFilter(trace.timestamp, _this.dateFormat)); });
-                        break;
-                    case 'status':
-                        filteredTraces = filteredTraces.filter(function (trace) { return parseInt(filter.value) === trace.httpStatusCode; });
-                        break;
-                    case 'method':
-                        filteredTraces = filteredTraces.filter(function (trace) { return regExp.test(trace.method); });
-                        break;
-                    case 'path':
-                        filteredTraces = filteredTraces.filter(function (trace) { return regExp.test(trace.path); });
-                        break;
-                    case 'timeTaken':
-                        filteredTraces = filteredTraces.filter(function (trace) { return parseInt(filter.value) === trace.timeTaken; });
-                        break;
-                }
-            });
-            this.tableItems = filteredTraces;
-            this.toolbarConfig.filterConfig.resultsCount = filteredTraces.length;
-        };
-        TraceController.prototype.getStatusClass = function (trace) {
-            if (trace.httpStatusCode) {
-                if (trace.httpStatusCode < 400) {
-                    return 'http-status-code-icon pficon pficon-ok';
-                }
-                else {
-                    return 'http-status-code-icon pficon pficon-error-circle-o';
-                }
-            }
-            return '';
-        };
-        TraceController.prototype.openTraceModal = function (trace) {
-            this.$scope.trace = trace;
-            this.$uibModal.open({
-                templateUrl: 'traceDetailsModal.html',
-                scope: this.$scope,
-                size: 'lg',
-                appendTo: $(document.querySelector('.spring-boot-trace-main'))
-            });
-        };
-        TraceController.prototype.aggregateTraces = function (traces) {
-            var _this = this;
-            var aggregatedTraces = [];
-            traces.forEach(function (trace) {
-                var match = false;
-                _this.traces.forEach(function (existingTrace) {
-                    if (existingTrace.timestamp === trace.timestamp &&
-                        existingTrace.method === trace.method &&
-                        existingTrace.path === trace.path) {
-                        match = true;
-                        return;
-                    }
-                });
-                if (!match) {
-                    aggregatedTraces.push(trace);
-                }
-            });
-            return aggregatedTraces;
-        };
-        TraceController.prototype.scrollIfRequired = function () {
-            var scrollableTable = document.querySelector('.spring-boot-trace-scrollable-table');
-            if (scrollableTable !== null && scrollableTable.scrollTop === 0) {
-                this.$timeout(function () { return scrollableTable.scrollTop = 0; }, 0);
-            }
-        };
-        TraceController.CACHE_SIZE = 500;
-        return TraceController;
-    }());
-    SpringBoot.TraceController = TraceController;
-    SpringBoot.traceComponent = {
-        templateUrl: 'plugins/spring-boot/trace/trace.html',
-        controller: TraceController,
-    };
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="trace.component.ts"/>
-/// <reference path="trace.service.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    SpringBoot.traceModule = angular
-        .module('spring-boot-trace', [])
-        .component('springBootTrace', SpringBoot.traceComponent)
-        .service('traceService', SpringBoot.TraceService)
-        .name;
-})(SpringBoot || (SpringBoot = {}));
-var SpringBoot;
-(function (SpringBoot) {
-    SpringBoot.loggersJmxDomain = "org.springframework.boot:type=Endpoint,name=loggersEndpoint";
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="logger.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    var LoggersService = /** @class */ (function () {
-        LoggersService.$inject = ["jolokiaService"];
-        function LoggersService(jolokiaService) {
-            'ngInject';
-            this.jolokiaService = jolokiaService;
-        }
-        LoggersService.prototype.getLoggerConfiguration = function () {
-            return this.jolokiaService.getAttribute(SpringBoot.loggersJmxDomain, 'Loggers')
-                .then(function (data) {
-                var loggers = [];
-                angular.forEach(data.loggers, function (loggerInfo, loggerName) {
-                    var logger = {
-                        name: loggerName,
-                        configuredLevel: loggerInfo.configuredLevel == null ? loggerInfo.effectiveLevel : loggerInfo.configuredLevel,
-                        effectiveLevel: loggerInfo.effectiveLevel
-                    };
-                    loggers.push(logger);
-                });
-                var loggerConfiguration = {
-                    levels: data.levels,
-                    loggers: loggers
-                };
-                return loggerConfiguration;
-            });
-        };
-        LoggersService.prototype.setLoggerLevel = function (logger) {
-            return this.jolokiaService.execute(SpringBoot.loggersJmxDomain, 'setLogLevel', logger.name, logger.configuredLevel);
-        };
-        return LoggersService;
-    }());
-    SpringBoot.LoggersService = LoggersService;
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="loggers.service.ts"/>
-/// <reference path="logger.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    var LoggersController = /** @class */ (function () {
-        LoggersController.$inject = ["loggersService"];
-        function LoggersController(loggersService) {
-            'ngInject';
-            var _this = this;
-            this.loggersService = loggersService;
-            this.filterFields = [
-                {
-                    id: 'name',
-                    title: 'Logger Name',
-                    placeholder: 'Filter by logger name...',
-                    filterType: 'text'
-                },
-                {
-                    id: 'level',
-                    title: 'Log Level',
-                    placeholder: 'Filter by log level...',
-                    filterType: 'select',
-                    filterValues: []
-                }
-            ];
-            this.filterConfig = {
-                fields: this.filterFields,
-                onFilterChange: function (filters) {
-                    _this.applyFilters(filters);
-                },
-                appliedFilters: [],
-                resultsCount: 0
-            };
-            this.toolbarConfig = {
-                filterConfig: this.filterConfig,
-                isTableView: false
-            };
-            this.pageSize = 10;
-            this.pageNumber = 1;
-            this.loading = true;
-            this.loggers = [];
-            this.tableItems = [];
-        }
-        LoggersController.prototype.$onInit = function () {
-            this.loadData();
-        };
-        LoggersController.prototype.loadData = function () {
-            var _this = this;
-            this.loggersService.getLoggerConfiguration().then(function (logConfiguration) {
-                _this.loggers = logConfiguration.loggers;
-                _this.loggerLevels = logConfiguration.levels;
-                _this.tableItems = logConfiguration.loggers;
-                _this.filterConfig.resultsCount = logConfiguration.loggers.length;
-                _this.filterFields[1]['filterValues'] = logConfiguration.levels;
-                _this.numTotalItems = _this.tableItems.length;
-                if (_this.filterConfig.appliedFilters.length > 0) {
-                    _this.applyFilters(_this.filterConfig.appliedFilters);
-                }
-                _this.loading = false;
-            }).catch(function (error) { return Core.notification('danger', error); });
-        };
-        LoggersController.prototype.setLoggerLevel = function (logger) {
-            var _this = this;
-            this.loggersService.setLoggerLevel(logger).then(function () {
-                _this.loadData();
-            }).catch(function (error) { return Core.notification('danger', error); });
-        };
-        LoggersController.prototype.applyFilters = function (filters) {
-            var filteredLoggers = this.loggers;
-            filters.forEach(function (filter) {
-                var regExp = new RegExp(filter.value, 'i');
-                switch (filter.id) {
-                    case 'name':
-                        filteredLoggers = filteredLoggers.filter(function (logger) { return logger.name.match(regExp) !== null; });
-                        break;
-                    case 'level':
-                        filteredLoggers = filteredLoggers.filter(function (logger) { return logger.effectiveLevel.match(regExp) !== null; });
-                        break;
-                }
-            });
-            this.tableItems = filteredLoggers;
-            this.numTotalItems = filteredLoggers.length;
-            this.toolbarConfig.filterConfig.resultsCount = filteredLoggers.length;
-        };
-        LoggersController.prototype.orderLoggers = function (item) {
-            if (item.name === 'ROOT') {
-                return -1;
-            }
-            else
-                return item.name;
-        };
-        return LoggersController;
-    }());
-    SpringBoot.LoggersController = LoggersController;
-    SpringBoot.loggersComponent = {
-        template: "\n      <div class=\"spring-boot-loggers-main\">\n        <h1>Loggers</h1>\n        <div class=\"blank-slate-pf no-border\" ng-if=\"$ctrl.loading === false && $ctrl.loggers.length === 0\">\n          <div class=\"blank-slate-pf-icon\">\n            <span class=\"pficon pficon pficon-warning-triangle-o\"></span>\n          </div>\n          <h1>No Spring Boot Loggers</h1>\n          <p>There are no loggers to display for this application.</p>\n          <p>Check your Spring Boot logging configuration.</p>\n        </div>\n        <div ng-show=\"$ctrl.loggers.length > 0\">\n          <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n          <ul class=\"list-group spring-boot-loggers-list-group\">\n            <li class=\"list-group-item\"\n                ng-repeat=\"item in $ctrl.tableItems | orderBy : $ctrl.orderLoggers | startFrom:($ctrl.pageNumber - 1) * $ctrl.pageSize | limitTo: $ctrl.pageSize\">\n                <div title=\"Logger Level\">\n                  <select ng-model=\"item.configuredLevel\"\n                          ng-options=\"level for level in $ctrl.loggerLevels\"\n                          ng-change=\"$ctrl.setLoggerLevel(item)\"\n                          ng-selected=\"item.effectiveLevel === level\">\n                  </select>\n                </div>\n                <div class=\"list-group-item-heading\">{{item.name}}</div>\n            </li>\n          </ul>\n          <pf-pagination\n            page-size=\"$ctrl.pageSize\"\n            page-number=\"$ctrl.pageNumber\"\n            num-total-items=\"$ctrl.numTotalItems\">\n          </pf-pagination>\n        </div>\n      </div>\n    ",
-        controller: LoggersController
-    };
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="loggers.component.ts"/>
-/// <reference path="loggers.service.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    SpringBoot.loggersModule = angular
-        .module('spring-boot-loggers', [])
-        .component('springBootLoggers', SpringBoot.loggersComponent)
-        .service('loggersService', SpringBoot.LoggersService)
-        .name;
-})(SpringBoot || (SpringBoot = {}));
-/// <reference path="health/health.module.ts"/>
-/// <reference path="trace/trace.module.ts"/>
-/// <reference path="loggers/loggers.module.ts"/>
-/// <reference path="spring-boot.config.ts"/>
-/// <reference path="spring-boot.component.ts"/>
-/// <reference path="spring-boot.service.ts"/>
-var SpringBoot;
-(function (SpringBoot) {
-    var springBootModule = angular
-        .module('hawtio-integration-spring-boot', [
-        SpringBoot.healthModule,
-        SpringBoot.loggersModule,
-        SpringBoot.traceModule
-    ])
-        .config(SpringBoot.configureRoutes)
-        .run(SpringBoot.configureLayout)
-        .component('springBoot', SpringBoot.springBootComponent)
-        .service('springBootService', SpringBoot.SpringBootService)
-        .name;
-    hawtioPluginLoader.addModule(springBootModule);
-    SpringBoot.log = Logger.get(springBootModule);
-})(SpringBoot || (SpringBoot = {}));
 
 angular.module('hawtio-integration-templates', []).run(['$templateCache', function($templateCache) {$templateCache.put('plugins/activemq/html/browseQueue.html','<div ng-controller="ActiveMQ.BrowseQueueController">\n\n  <h1>Browse Queue</h1>\n\n  <div ng-hide="showMessageDetails">\n    <div class="row toolbar-pf table-view-pf-toolbar">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group toolbar-pf-filter has-clear">\n            <div class="search-pf-input-group">\n              <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n              <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n              <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                <span class="pficon pficon-close"></span>\n              </button>\n            </div>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="dlq" ng-click="retryMessages()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="retryMessage" mode="remove"\n                title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">\n                Retry\n              </button>\n              <button class="btn btn-default" ng-disabled="gridOptions.selectedItems.length !== 1" ng-show="showButtons" ng-click="resendMessage()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendTextMessage" mode="remove"\n                title="Edit the message to resend it" data-placement="bottom">\n                Resend\n              </button>\n\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n              <button class="btn btn-default" ng-click="refresh()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="browse" mode="remove"\n                title="Refreshes the list of messages">\n                <i class="fa fa-refresh"></i>\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n    <table class="table table-striped table-bordered table-hover activemq-browse-table" hawtio-simple-table="gridOptions"></table>\n  </div>\n\n  <div ng-show="showMessageDetails">\n    <div class="row toolbar-pf">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions">\n          <div class="form-group">\n            <button class="btn btn-primary" ng-click="showMessageDetails = false">\n              Back\n            </button>\n          </div>\n\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>\n\n    <div class="expandable closed">\n      <div title="Headers" class="title">\n        <h3><i class="expandable-indicator"></i> Headers & Properties</h3>\n      </div>\n      <div class="expandable-body well">\n        <table class="table table-condensed table-striped table-bordered table-hover">\n          <thead>\n            <tr>\n              <th>Header</th>\n              <th>Value</th>\n            </tr>\n          </thead>\n          <tbody compile="row.headerHtml"></tbody>\n        </table>\n      </div>\n    </div>\n\n    <h3>Displaying body as <span ng-bind="row.textMode"></span></h3>\n    <div hawtio-editor="row.bodyText" read-only="true" mode=\'mode\'></div>\n\n  </div>\n\n  <div hawtio-confirm-dialog="deleteDialog" title="Delete messages?"\n       ok-button-text="Delete"\n       cancel-button-text="Cancel"\n       on-ok="deleteMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        This operation cannot be undone so please be careful.\n      </p>\n      <p>You are about to delete\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'a message!\', \'other\': \'{} messages!\'}">\n        </ng-pluralize>\n      </p>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="moveDialog" title="Move messages?"\n       ok-button-text="Move"\n       cancel-button-text="Cancel"\n       on-ok="moveMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        You cannot undo this operation.<br/>\n        Though after the move you can always move the\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'messages\'}"></ng-pluralize>\n        back again.\n      </p>\n      <p>Move\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'{} messages\'}"></ng-pluralize>\n        to: <select ng-model="queueName" ng-options="qn for qn in queueNames" ng-init="queueName=queueNames[0]"></select>\n      </p>\n    </div>\n  </div>\n\n</div>\n\n');
 $templateCache.put('plugins/activemq/html/destinations.html','<div class="table-view" ng-controller="ActiveMQ.QueuesController">\n\n  <h2 class="destination-heading">{{destinationType}}</h2>\n\n  <div>\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n    <pf-table-view config="tableConfig"\n                   page-config="pageConfig"\n                   columns="tableColumns"\n                   items="destinations">\n    </pf-table-view>\n  </div>\n</div>');

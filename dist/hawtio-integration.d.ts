@@ -1,10 +1,10 @@
+/// <reference types="core" />
 /// <reference types="jmx" />
 /// <reference types="angular" />
-/// <reference types="core" />
 /// <reference types="angular-mocks" />
 /// <reference types="angular-route" />
-declare namespace Pf {
-    function filter(items: object[], filterConfig: any): object[];
+declare namespace Integration {
+    function configureAboutPage(aboutService: About.AboutService): void;
 }
 declare namespace ActiveMQ {
     const pluginName: string;
@@ -117,52 +117,6 @@ declare namespace ActiveMQ {
 declare namespace ActiveMQ {
     const _module: angular.IModule;
 }
-declare namespace ActiveMQ {
-    class ActiveMQNavigationService {
-        private workspace;
-        private configManager;
-        constructor(workspace: Jmx.Workspace, configManager: Core.ConfigManager);
-        getTabs(): Nav.HawtioTab[];
-        private shouldShowBrowseTab();
-        private shouldShowSendTab();
-        private shouldShowDurableSubscribersTab();
-        private shouldShowJobsTab();
-        private shouldShowCreateTab();
-        private shouldShowDeleteTopicTab();
-        private shouldShowDeleteQueueTab();
-        private shouldShowQueuesTab();
-        private shouldShowTopicsTab();
-        private isQueue();
-        private isTopic();
-        private isQueuesFolder();
-        private isTopicsFolder();
-        private isJobScheduler();
-        private isBroker();
-        private getBroker();
-    }
-}
-declare namespace ActiveMQ {
-    class ActiveMQNavigationController {
-        private $location;
-        private activeMQNavigationService;
-        tabs: Nav.HawtioTab[];
-        constructor($scope: ng.IScope, $location: ng.ILocationService, activeMQNavigationService: ActiveMQNavigationService);
-        $onInit(): void;
-        goto(tab: Nav.HawtioTab): void;
-    }
-    const activeMQNavigationComponent: angular.IComponentOptions;
-}
-declare namespace ActiveMQ {
-    var BrowseQueueController: angular.IModule;
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
-declare namespace ActiveMQ {
-}
 declare namespace Camel {
     class Context {
         name: string;
@@ -253,6 +207,9 @@ declare namespace Camel {
 }
 declare namespace Camel {
     const contextsModule: string;
+}
+declare namespace Pf {
+    function filter(items: object[], filterConfig: any): object[];
 }
 declare namespace Camel {
     class EndpointsStatisticsService {
@@ -1058,6 +1015,388 @@ declare namespace Camel {
 declare namespace Camel {
     const _module: angular.IModule;
 }
+declare namespace Osgi {
+    const pluginName: string;
+    const log: Logging.Logger;
+    function defaultBundleValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
+    function getStateStyle(prefix: string, state: string): string;
+    function defaultServiceValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
+    function defaultPackageValues(workspace: Jmx.Workspace, $scope: any, values: any): any[];
+    function defaultConfigurationValues(workspace: Jmx.Workspace, $scope: any, values: any): any[];
+    function parseActualPackages(packages: string[]): {};
+    function parseManifestHeader(headers: {}, name: string): {};
+    function toCollection(values: any): any;
+    function labelBundleLinks(workspace: any, values: any, allValues: any): any[];
+    function bundleLinks(workspace: any, values: any): string;
+    function bundleUrls(workspace: any, values: any): any[];
+    function pidLinks(workspace: any, values: any): string;
+    /**
+     * Finds a bundle by id
+     *
+     * @method findBundle
+     * @for Osgi
+     * @param {String} bundleId
+     * @param {Array} values
+     * @return {any}
+     *
+     */
+    function findBundle(bundleId: any, values: any): string;
+    function getSelectionBundleMBean(workspace: Jmx.Workspace): string;
+    /**
+     * Walks the tree looking in the first child all the way down until we find an objectName
+     * @method findFirstObjectName
+     * @for Osgi
+     * @param {Folder} node
+     * @return {String}
+     *
+     */
+    function findFirstObjectName(node: any): any;
+    function getSelectionFrameworkMBean(workspace: Jmx.Workspace): string;
+    function getSelectionServiceMBean(workspace: Jmx.Workspace): string;
+    function getSelectionPackageMBean(workspace: Jmx.Workspace): string;
+    function getSelectionConfigAdminMBean(workspace: Jmx.Workspace): string;
+    function getMetaTypeMBean(workspace: Jmx.Workspace): string;
+    function getProfileMetadataMBean(workspace: Jmx.Workspace): string;
+    function getHawtioOSGiToolsMBean(workspace: Jmx.Workspace): string;
+    function getHawtioConfigAdminMBean(workspace: Jmx.Workspace): string;
+    /**
+     * Creates a link to the given configuration pid and/or factoryPid
+     */
+    function createConfigPidLink($scope: any, workspace: any, pid: any, isFactory?: boolean): string;
+    /**
+     * Creates a path to the given configuration pid and/or factoryPid
+     */
+    function createConfigPidPath($scope: any, pid: any, isFactory?: boolean): string;
+    function getConfigurationProperties(workspace: any, jolokia: any, pid: any, onDataFn: any): any;
+    /**
+     * For a pid of the form "foo.generatedId" for a pid "foo" or "foo.bar" remove the "foo." prefix
+     */
+    function removeFactoryPidPrefix(pid: any, factoryPid: any): any;
+}
+declare namespace Osgi {
+    class OsgiDataService {
+        private jolokia;
+        private workspace;
+        constructor(workspace: Jmx.Workspace, jolokia: any);
+        getBundles(): {};
+        getServices(): {};
+        getPackages(): {};
+    }
+}
+declare namespace Karaf {
+    const pluginName: string;
+    const log: Logging.Logger;
+    function setSelect(selection: any, group: any): any;
+    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function toCollection(values: any): any;
+    function featureLinks(workspace: any, name: any, version: any): string;
+    function extractFeature(attributes: any, name: any, version: any): any;
+    function isPlatformBundle(symbolicName: string): boolean;
+    function isActiveMQBundle(symbolicName: string): boolean;
+    function isCamelBundle(symbolicName: string): boolean;
+    function isCxfBundle(symbolicName: string): boolean;
+    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
+    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
+    function getComponentStateDescription(state: any): "Active" | "Enabled" | "Unsatisfied" | "Activating" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
+    function getAllComponents(workspace: any, jolokia: any): any;
+    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
+    function isComponentActive(workspace: any, jolokia: any, component: any): any;
+    function getComponentState(workspace: any, jolokia: any, component: any): any;
+    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function populateDependencies(attributes: any, dependencies: any, features: any): void;
+    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
+    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
+}
+declare namespace Osgi {
+    interface Bundle {
+        id: number;
+        name: string;
+        location: string;
+        symbolicName: string;
+        state: string;
+        version: string;
+    }
+}
+declare namespace Osgi {
+    class BundlesService {
+        private $q;
+        private jolokia;
+        private workspace;
+        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
+        getBundles(): ng.IPromise<Bundle[]>;
+        startBundles(bundles: Bundle[]): ng.IPromise<string>;
+        stopBundles(bundles: Bundle[]): ng.IPromise<string>;
+        updateBundles(bundles: Bundle[]): ng.IPromise<string>;
+        refreshBundles(bundles: Bundle[]): ng.IPromise<string>;
+        uninstallBundles(bundles: Bundle[]): ng.IPromise<string>;
+        installBundle(bundleUrl: string): ng.IPromise<string>;
+        private execute(mbean, operation, args?);
+        private handleResponse(response);
+    }
+}
+declare namespace Osgi {
+    class BundlesController {
+        private bundlesService;
+        private workspace;
+        private static FILTER_FUNCTIONS;
+        private readonly startAction;
+        private readonly stopAction;
+        private readonly refreshAction;
+        private readonly updateAction;
+        private readonly uninstallAction;
+        private readonly tableConfig;
+        private readonly toolbarConfig;
+        private readonly tableColumns;
+        private tableItems;
+        private bundles;
+        private loading;
+        constructor(bundlesService: BundlesService, workspace: Jmx.Workspace);
+        $onInit(): void;
+        private loadBundles();
+        private toolbarActions();
+        private applyFilters(filters);
+        private getSelectedBundles();
+        private enableDisableActions();
+    }
+    const bundlesComponent: angular.IComponentOptions;
+}
+declare namespace Osgi {
+    class InstallBundleController {
+        private bundlesService;
+        private workspace;
+        loading: boolean;
+        frameworkMBean: string;
+        bundles: Bundle[];
+        constructor(bundlesService: BundlesService, workspace: Jmx.Workspace);
+        install(bundleUrl: string): void;
+        findBundleByUrl(bundleUrl: string): Bundle;
+        installDisabled(bundleUrl: string): boolean;
+    }
+    const installBundleComponent: angular.IComponentOptions;
+}
+declare namespace Osgi {
+    const bundlesModule: string;
+}
+declare namespace Osgi {
+    const _module: angular.IModule;
+}
+declare namespace SpringBoot {
+    class Health {
+        status: HealthStatus;
+        items: HealthItem[];
+        constructor(status: HealthStatus, items: HealthItem[]);
+    }
+    type HealthStatus = 'FATAL' | 'DOWN' | 'OUT OF SERVICE' | 'UNKNOWN' | 'UP';
+    interface HealthItem {
+        title: string;
+        info: string[];
+    }
+}
+declare namespace SpringBoot {
+    class HealthService {
+        private jolokiaService;
+        private humanizeService;
+        constructor(jolokiaService: JVM.JolokiaService, humanizeService: Core.HumanizeService);
+        getHealth(): ng.IPromise<Health>;
+        private toHealthStatus(str);
+        private toItems(data);
+    }
+}
+declare namespace SpringBoot {
+    class HealthController {
+        private $timeout;
+        private healthService;
+        readonly reloadDelay: number;
+        health: Health;
+        promise: ng.IPromise<any>;
+        constructor($timeout: ng.ITimeoutService, healthService: HealthService);
+        $onInit(): void;
+        $onDestroy(): void;
+        loadDataPeriodically(): void;
+        cancelTimer(): void;
+        getStatusIcon(): "pficon-ok" | "pficon-error-circle-o" | "pficon-info";
+        getStatusClass(): "alert-success" | "alert-danger" | "alert-info";
+    }
+    const healthComponent: angular.IComponentOptions;
+}
+declare namespace SpringBoot {
+    const healthModule: string;
+}
+declare namespace SpringBoot {
+    class Trace {
+        timestamp: string;
+        method: string;
+        path: string;
+        httpStatusCode: number;
+        timeTaken: number;
+        info: any;
+        constructor(trace: any);
+    }
+}
+declare namespace SpringBoot {
+    class TraceService {
+        private jolokiaService;
+        constructor(jolokiaService: JVM.JolokiaService);
+        getTraces(): ng.IPromise<Trace[]>;
+    }
+}
+declare namespace SpringBoot {
+    class TraceController {
+        private traceService;
+        private $scope;
+        private $filter;
+        private $timeout;
+        private $interval;
+        private $uibModal;
+        private static CACHE_SIZE;
+        private toolbarConfig;
+        loading: boolean;
+        traces: Trace[];
+        tableItems: Trace[];
+        selectedTrace: Trace;
+        promise: ng.IPromise<any>;
+        dateFormat: string;
+        constructor(traceService: TraceService, $scope: any, $filter: ng.IFilterService, $timeout: ng.ITimeoutService, $interval: ng.IIntervalService, $uibModal: any);
+        $onInit(): void;
+        $onDestroy(): void;
+        loadTraces(): void;
+        applyFilters(filters: any[]): void;
+        getStatusClass(trace: Trace): string;
+        openTraceModal(trace: Trace): void;
+        private aggregateTraces(traces);
+        private scrollIfRequired();
+    }
+    const traceComponent: angular.IComponentOptions;
+}
+declare namespace SpringBoot {
+    const traceModule: string;
+}
+declare namespace SpringBoot {
+    const loggersJmxDomain: string;
+    interface LoggerConfiguration {
+        levels: string[];
+        loggers: Logger[];
+    }
+    interface Logger {
+        name: string;
+        configuredLevel: string;
+        effectiveLevel: string;
+    }
+}
+declare namespace SpringBoot {
+    class LoggersService {
+        private jolokiaService;
+        constructor(jolokiaService: JVM.JolokiaService);
+        getLoggerConfiguration(): ng.IPromise<LoggerConfiguration>;
+        setLoggerLevel(logger: Logger): ng.IPromise<void>;
+    }
+}
+declare namespace SpringBoot {
+    class LoggersController {
+        private loggersService;
+        private filterFields;
+        private filterConfig;
+        private toolbarConfig;
+        private pageSize;
+        private pageNumber;
+        private numTotalItems;
+        loading: boolean;
+        loggers: Logger[];
+        tableItems: Logger[];
+        loggerLevels: string[];
+        constructor(loggersService: LoggersService);
+        $onInit(): void;
+        loadData(): void;
+        setLoggerLevel(logger: Logger): void;
+        applyFilters(filters: any[]): void;
+        private orderLoggers(item);
+    }
+    const loggersComponent: angular.IComponentOptions;
+}
+declare namespace SpringBoot {
+    const loggersModule: string;
+}
+declare namespace SpringBoot {
+    class SpringBootService {
+        private $q;
+        private treeService;
+        constructor($q: ng.IQService, treeService: Jmx.TreeService);
+        getTabs(): ng.IPromise<Nav.HawtioTab[]>;
+        private hasEndpoint(name);
+    }
+}
+declare namespace SpringBoot {
+    function configureRoutes($routeProvider: angular.route.IRouteProvider): void;
+    function configureLayout($templateCache: ng.ITemplateCacheService, viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace, treeService: Jmx.TreeService, springBootService: SpringBootService): void;
+}
+declare namespace SpringBoot {
+    class SpringBootController {
+        private $location;
+        private springBootService;
+        tabs: Nav.HawtioTab[];
+        constructor($location: ng.ILocationService, springBootService: SpringBootService);
+        $onInit(): void;
+        goto(tab: Nav.HawtioTab): void;
+    }
+    const springBootComponent: angular.IComponentOptions;
+}
+declare namespace SpringBoot {
+    const springBootModule: string;
+    const log: Logging.Logger;
+}
+declare namespace Integration {
+    const integrationModule: string;
+}
+declare namespace ActiveMQ {
+    class ActiveMQNavigationService {
+        private workspace;
+        private configManager;
+        constructor(workspace: Jmx.Workspace, configManager: Core.ConfigManager);
+        getTabs(): Nav.HawtioTab[];
+        private shouldShowBrowseTab();
+        private shouldShowSendTab();
+        private shouldShowDurableSubscribersTab();
+        private shouldShowJobsTab();
+        private shouldShowCreateTab();
+        private shouldShowDeleteTopicTab();
+        private shouldShowDeleteQueueTab();
+        private shouldShowQueuesTab();
+        private shouldShowTopicsTab();
+        private isQueue();
+        private isTopic();
+        private isQueuesFolder();
+        private isTopicsFolder();
+        private isJobScheduler();
+        private isBroker();
+        private getBroker();
+    }
+}
+declare namespace ActiveMQ {
+    class ActiveMQNavigationController {
+        private $location;
+        private activeMQNavigationService;
+        tabs: Nav.HawtioTab[];
+        constructor($scope: ng.IScope, $location: ng.ILocationService, activeMQNavigationService: ActiveMQNavigationService);
+        $onInit(): void;
+        goto(tab: Nav.HawtioTab): void;
+    }
+    const activeMQNavigationComponent: angular.IComponentOptions;
+}
+declare namespace ActiveMQ {
+    var BrowseQueueController: angular.IModule;
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
+declare namespace ActiveMQ {
+}
 declare namespace Camel {
     var BrowseEndpointController: angular.IModule;
 }
@@ -1517,34 +1856,6 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Karaf {
-    const pluginName: string;
-    const log: Logging.Logger;
-    function setSelect(selection: any, group: any): any;
-    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function toCollection(values: any): any;
-    function featureLinks(workspace: any, name: any, version: any): string;
-    function extractFeature(attributes: any, name: any, version: any): any;
-    function isPlatformBundle(symbolicName: string): boolean;
-    function isActiveMQBundle(symbolicName: string): boolean;
-    function isCamelBundle(symbolicName: string): boolean;
-    function isCxfBundle(symbolicName: string): boolean;
-    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
-    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
-    function getComponentStateDescription(state: any): "Active" | "Enabled" | "Unsatisfied" | "Activating" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
-    function getAllComponents(workspace: any, jolokia: any): any;
-    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
-    function isComponentActive(workspace: any, jolokia: any, component: any): any;
-    function getComponentState(workspace: any, jolokia: any, component: any): any;
-    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function populateDependencies(attributes: any, dependencies: any, features: any): void;
-    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
-    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
-}
-declare namespace Karaf {
     class Feature {
         id: string;
         name: string;
@@ -1723,147 +2034,6 @@ declare namespace Karaf {
 declare namespace Karaf {
 }
 declare namespace Osgi {
-    const pluginName: string;
-    const log: Logging.Logger;
-    function defaultBundleValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
-    function getStateStyle(prefix: string, state: string): string;
-    function defaultServiceValues(workspace: Jmx.Workspace, $scope: any, values: any): any;
-    function defaultPackageValues(workspace: Jmx.Workspace, $scope: any, values: any): any[];
-    function defaultConfigurationValues(workspace: Jmx.Workspace, $scope: any, values: any): any[];
-    function parseActualPackages(packages: string[]): {};
-    function parseManifestHeader(headers: {}, name: string): {};
-    function toCollection(values: any): any;
-    function labelBundleLinks(workspace: any, values: any, allValues: any): any[];
-    function bundleLinks(workspace: any, values: any): string;
-    function bundleUrls(workspace: any, values: any): any[];
-    function pidLinks(workspace: any, values: any): string;
-    /**
-     * Finds a bundle by id
-     *
-     * @method findBundle
-     * @for Osgi
-     * @param {String} bundleId
-     * @param {Array} values
-     * @return {any}
-     *
-     */
-    function findBundle(bundleId: any, values: any): string;
-    function getSelectionBundleMBean(workspace: Jmx.Workspace): string;
-    /**
-     * Walks the tree looking in the first child all the way down until we find an objectName
-     * @method findFirstObjectName
-     * @for Osgi
-     * @param {Folder} node
-     * @return {String}
-     *
-     */
-    function findFirstObjectName(node: any): any;
-    function getSelectionFrameworkMBean(workspace: Jmx.Workspace): string;
-    function getSelectionServiceMBean(workspace: Jmx.Workspace): string;
-    function getSelectionPackageMBean(workspace: Jmx.Workspace): string;
-    function getSelectionConfigAdminMBean(workspace: Jmx.Workspace): string;
-    function getMetaTypeMBean(workspace: Jmx.Workspace): string;
-    function getProfileMetadataMBean(workspace: Jmx.Workspace): string;
-    function getHawtioOSGiToolsMBean(workspace: Jmx.Workspace): string;
-    function getHawtioConfigAdminMBean(workspace: Jmx.Workspace): string;
-    /**
-     * Creates a link to the given configuration pid and/or factoryPid
-     */
-    function createConfigPidLink($scope: any, workspace: any, pid: any, isFactory?: boolean): string;
-    /**
-     * Creates a path to the given configuration pid and/or factoryPid
-     */
-    function createConfigPidPath($scope: any, pid: any, isFactory?: boolean): string;
-    function getConfigurationProperties(workspace: any, jolokia: any, pid: any, onDataFn: any): any;
-    /**
-     * For a pid of the form "foo.generatedId" for a pid "foo" or "foo.bar" remove the "foo." prefix
-     */
-    function removeFactoryPidPrefix(pid: any, factoryPid: any): any;
-}
-declare namespace Osgi {
-    class OsgiDataService {
-        private jolokia;
-        private workspace;
-        constructor(workspace: Jmx.Workspace, jolokia: any);
-        getBundles(): {};
-        getServices(): {};
-        getPackages(): {};
-    }
-}
-declare namespace Osgi {
-    interface Bundle {
-        id: number;
-        name: string;
-        location: string;
-        symbolicName: string;
-        state: string;
-        version: string;
-    }
-}
-declare namespace Osgi {
-    class BundlesService {
-        private $q;
-        private jolokia;
-        private workspace;
-        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
-        getBundles(): ng.IPromise<Bundle[]>;
-        startBundles(bundles: Bundle[]): ng.IPromise<string>;
-        stopBundles(bundles: Bundle[]): ng.IPromise<string>;
-        updateBundles(bundles: Bundle[]): ng.IPromise<string>;
-        refreshBundles(bundles: Bundle[]): ng.IPromise<string>;
-        uninstallBundles(bundles: Bundle[]): ng.IPromise<string>;
-        installBundle(bundleUrl: string): ng.IPromise<string>;
-        private execute(mbean, operation, args?);
-        private handleResponse(response);
-    }
-}
-declare namespace Osgi {
-    class BundlesController {
-        private bundlesService;
-        private workspace;
-        private static FILTER_FUNCTIONS;
-        private readonly startAction;
-        private readonly stopAction;
-        private readonly refreshAction;
-        private readonly updateAction;
-        private readonly uninstallAction;
-        private readonly tableConfig;
-        private readonly toolbarConfig;
-        private readonly tableColumns;
-        private tableItems;
-        private bundles;
-        private loading;
-        constructor(bundlesService: BundlesService, workspace: Jmx.Workspace);
-        $onInit(): void;
-        private loadBundles();
-        private toolbarActions();
-        private applyFilters(filters);
-        private getSelectedBundles();
-        private enableDisableActions();
-    }
-    const bundlesComponent: angular.IComponentOptions;
-}
-declare namespace Osgi {
-    class InstallBundleController {
-        private bundlesService;
-        private workspace;
-        loading: boolean;
-        frameworkMBean: string;
-        bundles: Bundle[];
-        constructor(bundlesService: BundlesService, workspace: Jmx.Workspace);
-        install(bundleUrl: string): void;
-        findBundleByUrl(bundleUrl: string): Bundle;
-        installDisabled(bundleUrl: string): boolean;
-    }
-    const installBundleComponent: angular.IComponentOptions;
-}
-declare namespace Osgi {
-    const bundlesModule: string;
-}
-declare namespace Osgi {
-    const _module: angular.IModule;
-}
-declare namespace Osgi {
     function formatServiceName(objClass: any): string;
 }
 declare namespace Osgi {
@@ -1981,167 +2151,4 @@ declare namespace Osgi {
 }
 declare namespace Osgi {
     var ServiceController: angular.IModule;
-}
-declare namespace SpringBoot {
-    class SpringBootService {
-        private $q;
-        private treeService;
-        constructor($q: ng.IQService, treeService: Jmx.TreeService);
-        getTabs(): ng.IPromise<Nav.HawtioTab[]>;
-        private hasEndpoint(name);
-    }
-}
-declare namespace SpringBoot {
-    class SpringBootController {
-        private $location;
-        private springBootService;
-        tabs: Nav.HawtioTab[];
-        constructor($location: ng.ILocationService, springBootService: SpringBootService);
-        $onInit(): void;
-        goto(tab: Nav.HawtioTab): void;
-    }
-    const springBootComponent: angular.IComponentOptions;
-}
-declare namespace SpringBoot {
-    function configureRoutes($routeProvider: angular.route.IRouteProvider): void;
-    function configureLayout($templateCache: ng.ITemplateCacheService, viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace, treeService: Jmx.TreeService, springBootService: SpringBootService): void;
-}
-declare namespace SpringBoot {
-    class Health {
-        status: HealthStatus;
-        items: HealthItem[];
-        constructor(status: HealthStatus, items: HealthItem[]);
-    }
-    type HealthStatus = 'FATAL' | 'DOWN' | 'OUT OF SERVICE' | 'UNKNOWN' | 'UP';
-    interface HealthItem {
-        title: string;
-        info: string[];
-    }
-}
-declare namespace SpringBoot {
-    class HealthService {
-        private jolokiaService;
-        private humanizeService;
-        constructor(jolokiaService: JVM.JolokiaService, humanizeService: Core.HumanizeService);
-        getHealth(): ng.IPromise<Health>;
-        private toHealthStatus(str);
-        private toItems(data);
-    }
-}
-declare namespace SpringBoot {
-    class HealthController {
-        private $timeout;
-        private healthService;
-        readonly reloadDelay: number;
-        health: Health;
-        promise: ng.IPromise<any>;
-        constructor($timeout: ng.ITimeoutService, healthService: HealthService);
-        $onInit(): void;
-        $onDestroy(): void;
-        loadDataPeriodically(): void;
-        cancelTimer(): void;
-        getStatusIcon(): "pficon-error-circle-o" | "pficon-ok" | "pficon-info";
-        getStatusClass(): "alert-success" | "alert-danger" | "alert-info";
-    }
-    const healthComponent: angular.IComponentOptions;
-}
-declare namespace SpringBoot {
-    const healthModule: string;
-}
-declare namespace SpringBoot {
-    class Trace {
-        timestamp: string;
-        method: string;
-        path: string;
-        httpStatusCode: number;
-        timeTaken: number;
-        info: any;
-        constructor(trace: any);
-    }
-}
-declare namespace SpringBoot {
-    class TraceService {
-        private jolokiaService;
-        constructor(jolokiaService: JVM.JolokiaService);
-        getTraces(): ng.IPromise<Trace[]>;
-    }
-}
-declare namespace SpringBoot {
-    class TraceController {
-        private traceService;
-        private $scope;
-        private $filter;
-        private $timeout;
-        private $interval;
-        private $uibModal;
-        private static CACHE_SIZE;
-        private toolbarConfig;
-        loading: boolean;
-        traces: Trace[];
-        tableItems: Trace[];
-        selectedTrace: Trace;
-        promise: ng.IPromise<any>;
-        dateFormat: string;
-        constructor(traceService: TraceService, $scope: any, $filter: ng.IFilterService, $timeout: ng.ITimeoutService, $interval: ng.IIntervalService, $uibModal: any);
-        $onInit(): void;
-        $onDestroy(): void;
-        loadTraces(): void;
-        applyFilters(filters: any[]): void;
-        getStatusClass(trace: Trace): string;
-        openTraceModal(trace: Trace): void;
-        private aggregateTraces(traces);
-        private scrollIfRequired();
-    }
-    const traceComponent: angular.IComponentOptions;
-}
-declare namespace SpringBoot {
-    const traceModule: string;
-}
-declare namespace SpringBoot {
-    const loggersJmxDomain: string;
-    interface LoggerConfiguration {
-        levels: string[];
-        loggers: Logger[];
-    }
-    interface Logger {
-        name: string;
-        configuredLevel: string;
-        effectiveLevel: string;
-    }
-}
-declare namespace SpringBoot {
-    class LoggersService {
-        private jolokiaService;
-        constructor(jolokiaService: JVM.JolokiaService);
-        getLoggerConfiguration(): ng.IPromise<LoggerConfiguration>;
-        setLoggerLevel(logger: Logger): ng.IPromise<void>;
-    }
-}
-declare namespace SpringBoot {
-    class LoggersController {
-        private loggersService;
-        private filterFields;
-        private filterConfig;
-        private toolbarConfig;
-        private pageSize;
-        private pageNumber;
-        private numTotalItems;
-        loading: boolean;
-        loggers: Logger[];
-        tableItems: Logger[];
-        loggerLevels: string[];
-        constructor(loggersService: LoggersService);
-        $onInit(): void;
-        loadData(): void;
-        setLoggerLevel(logger: Logger): void;
-        applyFilters(filters: any[]): void;
-        private orderLoggers(item);
-    }
-    const loggersComponent: angular.IComponentOptions;
-}
-declare namespace SpringBoot {
-    const loggersModule: string;
-}
-declare namespace SpringBoot {
-    const log: Logging.Logger;
 }

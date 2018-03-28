@@ -68,7 +68,7 @@ namespace Camel {
           var selectedRoute = routes[0];
 
           // Copy any XML namespaces over from the routes parent tag to the selected route child node
-          var routeParent = selectedRoute.parentNode;
+          var routeParent: any = selectedRoute.parentNode;
           if (routeParent && routeParent.nodeName === 'routes') {
             if (routeParent.attributes) {
               angular.forEach(routeParent.attributes, (attr) => {
