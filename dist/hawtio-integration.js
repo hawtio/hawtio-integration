@@ -13783,7 +13783,7 @@ var Integration;
     configureAboutPage.$inject = ["aboutService"];
     function configureAboutPage(aboutService) {
         'ngInject';
-        aboutService.addProductInfo('Hawtio Integration', '3.2.27');
+        aboutService.addProductInfo('Hawtio Integration', 'PACKAGE_VERSION_PLACEHOLDER');
     }
     Integration.configureAboutPage = configureAboutPage;
 })(Integration || (Integration = {}));
@@ -18074,6 +18074,10 @@ var Osgi;
         return null;
     }
     Osgi.getSelectionBundleMBean = getSelectionBundleMBean;
+    function getSelectionBundleMBeanAsync(workspace, $q) {
+        return runWhenTreeReady(function () { return getSelectionBundleMBean(workspace); }, workspace, $q);
+    }
+    Osgi.getSelectionBundleMBeanAsync = getSelectionBundleMBeanAsync;
     /**
      * Walks the tree looking in the first child all the way down until we find an objectName
      * @method findFirstObjectName
@@ -18107,6 +18111,10 @@ var Osgi;
         return null;
     }
     Osgi.getSelectionFrameworkMBean = getSelectionFrameworkMBean;
+    function getSelectionFrameworkMBeanAsync(workspace, $q) {
+        return runWhenTreeReady(function () { return getSelectionFrameworkMBean(workspace); }, workspace, $q);
+    }
+    Osgi.getSelectionFrameworkMBeanAsync = getSelectionFrameworkMBeanAsync;
     function getSelectionServiceMBean(workspace) {
         if (workspace) {
             // lets navigate to the tree item based on paths
@@ -18116,6 +18124,10 @@ var Osgi;
         return null;
     }
     Osgi.getSelectionServiceMBean = getSelectionServiceMBean;
+    function getSelectionServiceMBeanAsync(workspace, $q) {
+        return runWhenTreeReady(function () { return getSelectionServiceMBean(workspace); }, workspace, $q);
+    }
+    Osgi.getSelectionServiceMBeanAsync = getSelectionServiceMBeanAsync;
     function getSelectionPackageMBean(workspace) {
         if (workspace) {
             // lets navigate to the tree item based on paths
@@ -18125,6 +18137,10 @@ var Osgi;
         return null;
     }
     Osgi.getSelectionPackageMBean = getSelectionPackageMBean;
+    function getSelectionPackageMBeanAsync(workspace, $q) {
+        return runWhenTreeReady(function () { return getSelectionPackageMBean(workspace); }, workspace, $q);
+    }
+    Osgi.getSelectionPackageMBeanAsync = getSelectionPackageMBeanAsync;
     function getSelectionConfigAdminMBean(workspace) {
         if (workspace) {
             // lets navigate to the tree item based on paths
@@ -18134,6 +18150,10 @@ var Osgi;
         return null;
     }
     Osgi.getSelectionConfigAdminMBean = getSelectionConfigAdminMBean;
+    function getSelectionConfigAdminMBeanAsync(workspace, $q) {
+        return runWhenTreeReady(function () { return getSelectionConfigAdminMBean(workspace); }, workspace, $q);
+    }
+    Osgi.getSelectionConfigAdminMBeanAsync = getSelectionConfigAdminMBeanAsync;
     function getMetaTypeMBean(workspace) {
         if (workspace) {
             var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
@@ -18225,6 +18245,20 @@ var Osgi;
         return pid;
     }
     Osgi.removeFactoryPidPrefix = removeFactoryPidPrefix;
+    function runWhenTreeReady(fn, workspace, $q) {
+        return $q(function (resolve, reject) {
+            if (workspace.treeFetched) {
+                resolve(fn());
+            }
+            else {
+                var unsubscribe_1 = workspace.$rootScope.$on(Jmx.TreeEvent.Updated, function () {
+                    unsubscribe_1();
+                    resolve(fn());
+                });
+            }
+        });
+    }
+    Osgi.runWhenTreeReady = runWhenTreeReady;
 })(Osgi || (Osgi = {}));
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
@@ -18608,6 +18642,10 @@ var Karaf;
         return null;
     }
     Karaf.getSelectionFeaturesMBean = getSelectionFeaturesMBean;
+    function getSelectionFeaturesMBeanAsync(workspace, $q) {
+        return Osgi.runWhenTreeReady(function () { return getSelectionFeaturesMBean(workspace); }, workspace, $q);
+    }
+    Karaf.getSelectionFeaturesMBeanAsync = getSelectionFeaturesMBeanAsync;
     function getSelectionScrMBean(workspace) {
         if (workspace) {
             var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
@@ -18645,95 +18683,72 @@ var Karaf;
         return null;
     }
     Karaf.getSelectionScrMBean = getSelectionScrMBean;
+    function getSelectionScrMBeanAsync(workspace, $q) {
+        return Osgi.runWhenTreeReady(function () { return getSelectionScrMBean(workspace); }, workspace, $q);
+    }
+    Karaf.getSelectionScrMBeanAsync = getSelectionScrMBeanAsync;
 })(Karaf || (Karaf = {}));
 /// <reference path="../osgiHelpers.ts"/>
 /// <reference path="bundle.ts"/>
 var Osgi;
 (function (Osgi) {
     var BundlesService = /** @class */ (function () {
-        BundlesService.$inject = ["$q", "jolokia", "workspace"];
-        function BundlesService($q, jolokia, workspace) {
+        BundlesService.$inject = ["$q", "workspace", "jolokiaService"];
+        function BundlesService($q, workspace, jolokiaService) {
             'ngInject';
             this.$q = $q;
-            this.jolokia = jolokia;
             this.workspace = workspace;
+            this.jolokiaService = jolokiaService;
         }
         BundlesService.prototype.getBundles = function () {
-            return this.execute(Osgi.getSelectionBundleMBean(this.workspace), 'listBundles()')
-                .then(function (value) {
-                var bundles = [];
-                angular.forEach(value, function (item, key) {
-                    var bundle = {
-                        id: item.Identifier,
-                        name: item.Headers['Bundle-Name'] ? item.Headers['Bundle-Name']['Value'] : '',
-                        location: item.Location,
-                        symbolicName: item.SymbolicName,
-                        state: item.State.toLowerCase(),
-                        version: item.Version
-                    };
-                    bundles.push(bundle);
-                });
-                return bundles;
-            });
+            var _this = this;
+            return Osgi.getSelectionBundleMBeanAsync(this.workspace, this.$q)
+                .then(function (objectName) { return _this.jolokiaService.execute(objectName, 'listBundles()'); })
+                .then(function (result) { return _.values(result).map(function (item) { return ({
+                id: item.Identifier,
+                name: item.Headers['Bundle-Name'] ? item.Headers['Bundle-Name']['Value'] : '',
+                location: item.Location,
+                symbolicName: item.SymbolicName,
+                state: item.State.toLowerCase(),
+                version: item.Version
+            }); }); });
         };
         BundlesService.prototype.startBundles = function (bundles) {
             var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
             var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'startBundles([J)', ids)
+            return this.jolokiaService.execute(mbean, 'startBundles([J)', ids)
                 .then(this.handleResponse);
         };
         BundlesService.prototype.stopBundles = function (bundles) {
             var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
             var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'stopBundles([J)', ids)
+            return this.jolokiaService.execute(mbean, 'stopBundles([J)', ids)
                 .then(this.handleResponse);
         };
         BundlesService.prototype.updateBundles = function (bundles) {
             var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
             var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'updateBundles([J)', ids)
+            return this.jolokiaService.execute(mbean, 'updateBundles([J)', ids)
                 .then(this.handleResponse);
         };
         BundlesService.prototype.refreshBundles = function (bundles) {
             var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
             var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'refreshBundles([J)', ids)
+            return this.jolokiaService.execute(mbean, 'refreshBundles([J)', ids)
                 .then(this.handleResponse);
         };
         BundlesService.prototype.uninstallBundles = function (bundles) {
             var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
             var ids = bundles.map(function (bundle) { return bundle.id; });
-            return this.execute(mbean, 'uninstallBundles([J)', ids)
+            return this.jolokiaService.execute(mbean, 'uninstallBundles([J)', ids)
                 .then(this.handleResponse);
         };
         BundlesService.prototype.installBundle = function (bundleUrl) {
             var _this = this;
             var mbean = Osgi.getSelectionFrameworkMBean(this.workspace);
-            return this.execute(mbean, 'installBundle(java.lang.String)', bundleUrl)
-                .then(function (response) { return _this.execute(mbean, 'startBundles([J)', response); })
+            return this.jolokiaService.execute(mbean, 'installBundle(java.lang.String)', bundleUrl)
+                .then(function (response) { return _this.jolokiaService.execute(mbean, 'startBundles([J)', response); })
                 .then(this.handleResponse);
-        };
-        BundlesService.prototype.execute = function (mbean, operation, args) {
-            var _this = this;
-            if (args === void 0) { args = undefined; }
-            var request = {
-                type: 'exec',
-                mbean: mbean,
-                operation: operation
-            };
-            if (args) {
-                request['arguments'] = [args];
-            }
-            return this.$q(function (resolve, reject) {
-                _this.jolokia.request(request, {
-                    method: "post",
-                    success: function (response) { return resolve(response.value); },
-                    error: function (response) {
-                        Osgi.log.error('BundlesService.execute() failed:', response);
-                        reject(response.error);
-                    }
-                });
-            });
         };
         BundlesService.prototype.handleResponse = function (response) {
             if (response && response['Error']) {
@@ -23606,7 +23621,8 @@ var Karaf;
         }
         FeaturesService.prototype.getFeatureRepositories = function () {
             var _this = this;
-            return this.execute(Karaf.getSelectionFeaturesMBean(this.workspace), undefined, undefined, 'read')
+            return Karaf.getSelectionFeaturesMBeanAsync(this.workspace, this.$q)
+                .then(function (mbean) { return _this.execute(mbean, undefined, undefined, 'read'); })
                 .then(function (value) {
                 var repositories = [];
                 angular.forEach(value['Repositories'], function (repository) {
@@ -23952,7 +23968,9 @@ var Karaf;
             this.workspace = workspace;
         }
         ScrComponentsService.prototype.getComponents = function () {
-            return this.execute(Karaf.getSelectionScrMBean(this.workspace), undefined, 'read')
+            var _this = this;
+            return Karaf.getSelectionScrMBeanAsync(this.workspace, this.$q)
+                .then(function (mbean) { return _this.execute(mbean, undefined, 'read'); })
                 .then(function (value) {
                 var components = [];
                 angular.forEach(value['Components'].values, function (item, key) {
@@ -24377,243 +24395,6 @@ var Karaf;
             }
         }]);
 })(Karaf || (Karaf = {}));
-/// <reference path="karafPlugin.ts"/>
-var Karaf;
-(function (Karaf) {
-    Karaf._module.controller("Karaf.FeaturesController", ["$scope", "$location", "workspace", "jolokia", function ($scope, $location, workspace, jolokia) {
-            $scope.responseJson = '';
-            $scope.filter = '';
-            $scope.installedFeatures = [];
-            $scope.features = [];
-            $scope.repositories = [];
-            $scope.selectedRepositoryId = '';
-            $scope.selectedRepository = {};
-            $scope.newRepositoryURI = '';
-            $scope.init = function () {
-                var selectedRepositoryId = $location.search()['repositoryId'];
-                if (selectedRepositoryId) {
-                    $scope.selectedRepositoryId = selectedRepositoryId;
-                }
-                var filter = $location.search()['filter'];
-                if (filter) {
-                    $scope.filter = filter;
-                }
-            };
-            $scope.init();
-            $scope.$watch('selectedRepository', function (newValue, oldValue) {
-                //log.debug("selectedRepository: ", $scope.selectedRepository);
-                if (newValue !== oldValue) {
-                    if (!newValue) {
-                        $scope.selectedRepositoryId = '';
-                    }
-                    else {
-                        $scope.selectedRepositoryId = newValue['repository'];
-                    }
-                    $location.search('repositoryId', $scope.selectedRepositoryId);
-                }
-            }, true);
-            $scope.$watch('filter', function (newValue, oldValue) {
-                if (newValue !== oldValue) {
-                    $location.search('filter', newValue);
-                }
-            });
-            var featuresMBean = Karaf.getSelectionFeaturesMBean(workspace);
-            Karaf.log.debug("Features mbean: ", featuresMBean);
-            if (featuresMBean) {
-                Core.register(jolokia, $scope, {
-                    type: 'read', mbean: featuresMBean
-                }, Core.onSuccess(render));
-            }
-            $scope.inSelectedRepository = function (feature) {
-                if (!$scope.selectedRepository || !('repository' in $scope.selectedRepository)) {
-                    return "";
-                }
-                if (!feature || !('RepositoryName' in feature)) {
-                    return "";
-                }
-                if (feature['RepositoryName'] === $scope.selectedRepository['repository']) {
-                    return "in-selected-repository";
-                }
-                return "";
-            };
-            $scope.isValidRepository = function () {
-                return Core.isBlank($scope.newRepositoryURI);
-            };
-            $scope.installRepository = function () {
-                var repoURL = $scope.newRepositoryURI;
-                Core.notification('info', 'Adding feature repository URL');
-                Karaf.installRepository(workspace, jolokia, repoURL, function () {
-                    Core.notification('success', 'Added feature repository URL');
-                    $scope.selectedRepository = {};
-                    $scope.selectedRepositoryId = '';
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                }, function (response) {
-                    Karaf.log.error('Failed to add feature repository URL ', repoURL, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.uninstallRepository = function () {
-                var repoURI = $scope.selectedRepository['uri'];
-                Core.notification('info', 'Removing feature repository ' + repoURI);
-                Karaf.uninstallRepository(workspace, jolokia, repoURI, function () {
-                    Core.notification('success', 'Removed feature repository ' + repoURI);
-                    $scope.responseJson = null;
-                    $scope.selectedRepositoryId = '';
-                    $scope.selectedRepository = {};
-                    $scope.triggerRefresh();
-                }, function (response) {
-                    Karaf.log.error('Failed to remove feature repository ', repoURI, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.triggerRefresh = function () {
-                jolokia.request({
-                    type: 'read',
-                    method: 'POST',
-                    mbean: featuresMBean
-                }, Core.onSuccess(render));
-            };
-            $scope.install = function (feature) {
-                //$('.popover').remove();
-                Core.notification('info', 'Installing feature ' + feature.Name);
-                Karaf.installFeature(workspace, jolokia, feature.Name, feature.Version, function () {
-                    Core.notification('success', 'Installed feature ' + feature.Name);
-                    $scope.installedFeatures.add(feature);
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                    //Core.$apply($scope);
-                }, function (response) {
-                    Karaf.log.error('Failed to install feature ', feature.Name, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.uninstall = function (feature) {
-                //$('.popover').remove();
-                Core.notification('info', 'Uninstalling feature ' + feature.Name);
-                Karaf.uninstallFeature(workspace, jolokia, feature.Name, feature.Version, function () {
-                    Core.notification('success', 'Uninstalled feature ' + feature.Name);
-                    $scope.installedFeatures.remove(feature);
-                    $scope.responseJson = null;
-                    $scope.triggerRefresh();
-                    //Core.$apply($scope);
-                }, function (response) {
-                    Karaf.log.error('Failed to uninstall feature ', feature.Name, ' due to ', response.error);
-                    Karaf.log.info('stack trace: ', response.stacktrace);
-                    Core.$apply($scope);
-                });
-            };
-            $scope.filteredRows = ['Bundles', 'Configurations', 'Configuration Files', 'Dependencies'];
-            $scope.showRow = function (key, value) {
-                if ($scope.filteredRows.indexOf(key) !== -1) {
-                    return false;
-                }
-                if (angular.isArray(value)) {
-                    if (value.length === 0) {
-                        return false;
-                    }
-                }
-                if (angular.isString(value)) {
-                    if (Core.isBlank(value)) {
-                        return false;
-                    }
-                }
-                if (angular.isObject(value)) {
-                    if (!value || angular.equals(value, {})) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            $scope.installed = function (installed) {
-                var answer = Core.parseBooleanValue(installed);
-                return answer;
-            };
-            $scope.showValue = function (value) {
-                if (angular.isArray(value)) {
-                    var answer = ['<ul class="zebra-list">'];
-                    value.forEach(function (v) { answer.push('<li>' + v + '</li>'); });
-                    answer.push('</ul>');
-                    return answer.join('\n');
-                }
-                if (angular.isObject(value)) {
-                    var answer = ['<table class="table">', '<tbody>'];
-                    angular.forEach(value, function (value, key) {
-                        answer.push('<tr>');
-                        answer.push('<td>' + key + '</td>');
-                        answer.push('<td>' + value + '</td>');
-                        answer.push('</tr>');
-                    });
-                    answer.push('</tbody>');
-                    answer.push('</table>');
-                    return answer.join('\n');
-                }
-                return "" + value;
-            };
-            $scope.getStateStyle = function (feature) {
-                if (Core.parseBooleanValue(feature.Installed)) {
-                    return "badge badge-success";
-                }
-                return "badge";
-            };
-            $scope.filterFeature = function (feature) {
-                if (Core.isBlank($scope.filter)) {
-                    return true;
-                }
-                if (feature.Id.has($scope.filter)) {
-                    return true;
-                }
-                return false;
-            };
-            function render(response) {
-                var responseJson = angular.toJson(response.value);
-                if ($scope.responseJson !== responseJson) {
-                    $scope.responseJson = responseJson;
-                    //log.debug("Got response: ", response.value);
-                    if (response['value']['Features'] === null) {
-                        $scope.featuresError = true;
-                    }
-                    else {
-                        $scope.featuresError = false;
-                    }
-                    $scope.features = [];
-                    $scope.repositories = [];
-                    var features = [];
-                    var repositories = [];
-                    Karaf.populateFeaturesAndRepos(response.value, features, repositories);
-                    var installedFeatures = features.filter(function (f) { return Core.parseBooleanValue(f.Installed); });
-                    var uninstalledFeatures = features.filter(function (f) { return !Core.parseBooleanValue(f.Installed); });
-                    //log.debug("repositories: ", repositories);
-                    $scope.installedFeatures = _.sortBy(installedFeatures, function (f) { return f['Name']; });
-                    uninstalledFeatures = _.sortBy(uninstalledFeatures, function (f) { return f['Name']; });
-                    _.sortBy(repositories, 'id').forEach(function (repo) {
-                        $scope.repositories.push({
-                            repository: repo['id'],
-                            uri: repo['uri'],
-                            features: _.filter(uninstalledFeatures, function (f) { return f['RepositoryName'] === repo['id']; })
-                        });
-                    });
-                    if (!Core.isBlank($scope.newRepositoryURI)) {
-                        var selectedRepo = _.find(repositories, function (r) { return r['uri'] === $scope.newRepositoryURI; });
-                        if (selectedRepo) {
-                            $scope.selectedRepositoryId = selectedRepo['id'];
-                        }
-                        $scope.newRepositoryURI = '';
-                    }
-                    if (Core.isBlank($scope.selectedRepositoryId)) {
-                        $scope.selectedRepository = _.first($scope.repositories);
-                    }
-                    else {
-                        $scope.selectedRepository = _.find($scope.repositories, function (r) { return r.repository === $scope.selectedRepositoryId; });
-                    }
-                    Core.$apply($scope);
-                }
-            }
-        }]);
-})(Karaf || (Karaf = {}));
 /// <reference path="karafHelpers.ts"/>
 /// <reference path="karafPlugin.ts"/>
 var Karaf;
@@ -25017,7 +24798,7 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi._module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia",
-        "$uibModal", function ($scope, $routeParams, $location, workspace, jolokia, $uibModal) {
+        "$uibModal", "$q", function ($scope, $routeParams, $location, workspace, jolokia, $uibModal, $q) {
             $scope.configurations = null;
             $scope.filteredConfigurations = [];
             /** the kinds of config */
@@ -25297,10 +25078,12 @@ var Osgi;
                 }
                 else {
                     if (jolokia) {
-                        var mbean = Osgi.getSelectionConfigAdminMBean(workspace);
-                        if (mbean) {
-                            jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
-                        }
+                        Osgi.getSelectionConfigAdminMBeanAsync(workspace, $q)
+                            .then(function (mbean) {
+                            if (mbean) {
+                                jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
+                            }
+                        });
                     }
                 }
             }
@@ -25459,8 +25242,8 @@ var Osgi;
 /// <reference path="osgiPlugin.ts"/>
 var Osgi;
 (function (Osgi) {
-    Osgi._module.controller("Osgi.FrameworkController", ["$scope", "workspace", function ($scope, workspace) {
-            $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
+    Osgi._module.controller("Osgi.FrameworkController", ["$scope", "workspace", "$q", function ($scope, workspace, $q) {
+            $scope.frameworkMBean = null;
             var showNotification;
             $scope.save = function () {
                 if (parseInt($scope.config.startLevel) < parseInt($scope.config.initialBundleStartLevel)) {
@@ -25491,18 +25274,21 @@ var Osgi;
                 }
             };
             function updateContents() {
-                var mbean = Osgi.getSelectionFrameworkMBean(workspace);
-                if (mbean) {
-                    var jolokia = workspace.jolokia;
-                    jolokia.request({ type: 'read', mbean: mbean }, { success: function (response) {
-                            $scope.config = {
-                                startLevel: response.value.FrameworkStartLevel,
-                                initialBundleStartLevel: response.value.InitialBundleStartLevel
-                            };
-                            Core.$apply($scope);
-                        }
-                    });
-                }
+                Osgi.getSelectionFrameworkMBeanAsync(workspace, $q)
+                    .then(function (mbean) {
+                    if (mbean) {
+                        $scope.frameworkMBean = mbean;
+                        var jolokia = workspace.jolokia;
+                        jolokia.request({ type: 'read', mbean: mbean }, { success: function (response) {
+                                $scope.config = {
+                                    startLevel: response.value.FrameworkStartLevel,
+                                    initialBundleStartLevel: response.value.InitialBundleStartLevel
+                                };
+                                Core.$apply($scope);
+                            }
+                        });
+                    }
+                });
             }
             updateContents();
         }]);
@@ -25618,26 +25404,31 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     var OsgiNavigationController = /** @class */ (function () {
-        OsgiNavigationController.$inject = ["$location", "workspace"];
-        function OsgiNavigationController($location, workspace) {
+        OsgiNavigationController.$inject = ["$location", "workspace", "treeService"];
+        function OsgiNavigationController($location, workspace, treeService) {
             'ngInject';
             this.$location = $location;
             this.workspace = workspace;
-            this.tabs = [];
+            this.treeService = treeService;
         }
         OsgiNavigationController.prototype.$onInit = function () {
-            this.tabs.push(new Nav.HawtioTab('Bundles', '/osgi/bundles'));
-            if (Karaf.getSelectionFeaturesMBean(this.workspace)) {
-                this.tabs.push(new Nav.HawtioTab('Features', '/osgi/features'));
-            }
-            this.tabs.push(new Nav.HawtioTab('Packages', '/osgi/packages'));
-            this.tabs.push(new Nav.HawtioTab('Services', '/osgi/services'));
-            if (Karaf.getSelectionScrMBean(this.workspace)) {
-                this.tabs.push(new Nav.HawtioTab('Declarative Services', '/osgi/scr-components'));
-            }
-            this.tabs.push(new Nav.HawtioTab('Server', '/osgi/server'));
-            this.tabs.push(new Nav.HawtioTab('Framework', '/osgi/fwk'));
-            this.tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
+            var _this = this;
+            this.treeService.runWhenTreeReady(function () {
+                var tabs = [];
+                tabs.push(new Nav.HawtioTab('Bundles', '/osgi/bundles'));
+                if (Karaf.getSelectionFeaturesMBean(_this.workspace)) {
+                    tabs.push(new Nav.HawtioTab('Features', '/osgi/features'));
+                }
+                tabs.push(new Nav.HawtioTab('Packages', '/osgi/packages'));
+                tabs.push(new Nav.HawtioTab('Services', '/osgi/services'));
+                if (Karaf.getSelectionScrMBean(_this.workspace)) {
+                    tabs.push(new Nav.HawtioTab('Declarative Services', '/osgi/scr-components'));
+                }
+                tabs.push(new Nav.HawtioTab('Server', '/osgi/server'));
+                tabs.push(new Nav.HawtioTab('Framework', '/osgi/fwk'));
+                tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
+                _this.tabs = tabs;
+            });
         };
         OsgiNavigationController.prototype.goto = function (tab) {
             this.$location.path(tab.path);
@@ -25666,7 +25457,7 @@ var Osgi;
 /// <reference path="osgiPlugin.ts"/>
 var Osgi;
 (function (Osgi) {
-    Osgi.PackagesController = Osgi._module.controller("Osgi.PackagesController", ["$scope", "workspace", function ($scope, workspace) {
+    Osgi.PackagesController = Osgi._module.controller("Osgi.PackagesController", ["$scope", "workspace", "$q", function ($scope, workspace, $q) {
             var INFINITE_SCROLL_INITIAL_SIZE = 50;
             var INFINITE_SCROLL_APPEND_SIZE = 10;
             $scope.packages = null;
@@ -25809,21 +25600,23 @@ var Osgi;
                 $scope.scrollablePackages = $scope.filteredPackages.slice(0, INFINITE_SCROLL_INITIAL_SIZE);
             }
             function loadTableContents() {
-                var mbean = Osgi.getSelectionPackageMBean(workspace);
-                if (mbean) {
-                    var jolokia = workspace.jolokia;
-                    // bundles first:
-                    jolokia.request({
-                        type: 'exec',
-                        mbean: mbean,
-                        operation: 'listPackages'
-                    }, {
-                        success: populateTable,
-                        error: function (response) {
-                            Osgi.log.debug('Osgi.PackagesController.loadTableContents() failed: ' + response.error);
-                        }
-                    });
-                }
+                Osgi.getSelectionPackageMBeanAsync(workspace, $q)
+                    .then(function (mbean) {
+                    if (mbean) {
+                        var jolokia = workspace.jolokia;
+                        // bundles first:
+                        jolokia.request({
+                            type: 'exec',
+                            mbean: mbean,
+                            operation: 'listPackages'
+                        }, {
+                            success: populateTable,
+                            error: function (response) {
+                                Osgi.log.debug('Osgi.PackagesController.loadTableContents() failed: ' + response.error);
+                            }
+                        });
+                    }
+                });
             }
             loadTableContents();
         }]);
@@ -26308,7 +26101,7 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     Osgi.ServiceController = Osgi._module.controller("Osgi.ServiceController", ["$scope", "$filter", "workspace",
-        "$templateCache", "$compile", function ($scope, $filter, workspace, $templateCache, $compile) {
+        "$templateCache", "$compile", "$q", function ($scope, $filter, workspace, $templateCache, $compile, $q) {
             $scope.services = null;
             $scope.filteredServices = [];
             $scope.toolbarConfig = {
@@ -26410,20 +26203,22 @@ var Osgi;
                 });
             }
             function loadServices() {
-                var mbean = Osgi.getSelectionServiceMBean(workspace);
-                if (mbean) {
-                    var jolokia = workspace.jolokia;
-                    jolokia.request({
-                        type: 'exec',
-                        mbean: mbean,
-                        operation: 'listServices()'
-                    }, {
-                        success: populateTable,
-                        error: function (response) {
-                            Osgi.log.debug('Osgi.ServiceController.loadServices() failed: ' + response.error);
-                        }
-                    });
-                }
+                Osgi.getSelectionServiceMBeanAsync(workspace, $q)
+                    .then(function (mbean) {
+                    if (mbean) {
+                        var jolokia = workspace.jolokia;
+                        jolokia.request({
+                            type: 'exec',
+                            mbean: mbean,
+                            operation: 'listServices()'
+                        }, {
+                            success: populateTable,
+                            error: function (response) {
+                                Osgi.log.debug('Osgi.ServiceController.loadServices() failed: ' + response.error);
+                            }
+                        });
+                    }
+                });
             }
             loadServices();
         }]);

@@ -3,8 +3,8 @@
 
 namespace Osgi {
 
-  export var PackagesController = _module.controller("Osgi.PackagesController", ["$scope", "workspace", (
-    $scope, workspace: Jmx.Workspace) => {
+  export var PackagesController = _module.controller("Osgi.PackagesController", ["$scope", "workspace", "$q", (
+    $scope, workspace: Jmx.Workspace, $q: ng.IQService) => {
 
     const INFINITE_SCROLL_INITIAL_SIZE = 50;
     const INFINITE_SCROLL_APPEND_SIZE = 10;
@@ -161,21 +161,23 @@ namespace Osgi {
     }
 
     function loadTableContents() {
-      var mbean = getSelectionPackageMBean(workspace);
-      if (mbean) {
-        var jolokia = workspace.jolokia;
-        // bundles first:
-        jolokia.request({
-          type: 'exec',
-          mbean: mbean,
-          operation: 'listPackages'
-        }, {
-          success: populateTable,
-          error: (response) => {
-            log.debug('Osgi.PackagesController.loadTableContents() failed: ' + response.error);
+      getSelectionPackageMBeanAsync(workspace, $q)
+        .then(mbean => {
+          if (mbean) {
+            var jolokia = workspace.jolokia;
+            // bundles first:
+            jolokia.request({
+              type: 'exec',
+              mbean: mbean,
+              operation: 'listPackages'
+            }, {
+              success: populateTable,
+              error: (response) => {
+                log.debug('Osgi.PackagesController.loadTableContents() failed: ' + response.error);
+              }
+            });
           }
         });
-      }
     }
 
     loadTableContents();

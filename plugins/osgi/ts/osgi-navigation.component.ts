@@ -5,29 +5,36 @@ namespace Osgi {
 
   export class OsgiNavigationController {
     
-    tabs: Nav.HawtioTab[] = [];
+    tabs: Nav.HawtioTab[];
 
-    constructor(private $location: ng.ILocationService, private workspace: Jmx.Workspace) {
+    constructor(private $location: ng.ILocationService, private workspace: Jmx.Workspace,
+      private treeService: Jmx.TreeService) {
       'ngInject';
     }
     
     $onInit() {
-      this.tabs.push(new Nav.HawtioTab('Bundles', '/osgi/bundles'));
-      
-      if (Karaf.getSelectionFeaturesMBean(this.workspace)) {
-        this.tabs.push(new Nav.HawtioTab('Features', '/osgi/features'));
-      }
-      
-      this.tabs.push(new Nav.HawtioTab('Packages', '/osgi/packages'));
-      this.tabs.push(new Nav.HawtioTab('Services', '/osgi/services'));
-      
-      if (Karaf.getSelectionScrMBean(this.workspace)) {
-        this.tabs.push(new Nav.HawtioTab('Declarative Services', '/osgi/scr-components'));
-      }
-      
-      this.tabs.push(new Nav.HawtioTab('Server', '/osgi/server'));
-      this.tabs.push(new Nav.HawtioTab('Framework', '/osgi/fwk'));
-      this.tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
+      this.treeService.runWhenTreeReady(() => {
+        const tabs = [];
+
+        tabs.push(new Nav.HawtioTab('Bundles', '/osgi/bundles'));
+        
+        if (Karaf.getSelectionFeaturesMBean(this.workspace)) {
+          tabs.push(new Nav.HawtioTab('Features', '/osgi/features'));
+        }
+        
+        tabs.push(new Nav.HawtioTab('Packages', '/osgi/packages'));
+        tabs.push(new Nav.HawtioTab('Services', '/osgi/services'));
+        
+        if (Karaf.getSelectionScrMBean(this.workspace)) {
+          tabs.push(new Nav.HawtioTab('Declarative Services', '/osgi/scr-components'));
+        }
+        
+        tabs.push(new Nav.HawtioTab('Server', '/osgi/server'));
+        tabs.push(new Nav.HawtioTab('Framework', '/osgi/fwk'));
+        tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
+
+        this.tabs = tabs;
+      });
     }
 
     goto(tab: Nav.HawtioTab): void {

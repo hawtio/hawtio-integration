@@ -4,8 +4,8 @@
 namespace Osgi {
 
   export var ServiceController = _module.controller("Osgi.ServiceController", ["$scope", "$filter", "workspace",
-    "$templateCache", "$compile", ($scope, $filter: ng.IFilterService, workspace: Jmx.Workspace,
-    $templateCache: ng.ITemplateCacheService, $compile: ng.IAttributes) => {
+    "$templateCache", "$compile", "$q", ($scope, $filter: ng.IFilterService, workspace: Jmx.Workspace,
+    $templateCache: ng.ITemplateCacheService, $compile: ng.IAttributes, $q: ng.IQService) => {
 
     $scope.services = null;
     $scope.filteredServices = [];
@@ -115,20 +115,22 @@ namespace Osgi {
     }
 
     function loadServices() {
-      var mbean = getSelectionServiceMBean(workspace);
-      if (mbean) {
-        var jolokia = workspace.jolokia;
-        jolokia.request({
-          type: 'exec',
-          mbean: mbean,
-          operation: 'listServices()'
-        }, {
-          success: populateTable,
-          error: (response) => {
-            log.debug('Osgi.ServiceController.loadServices() failed: ' + response.error);
+      getSelectionServiceMBeanAsync(workspace, $q)
+        .then(mbean => {
+          if (mbean) {
+            var jolokia = workspace.jolokia;
+            jolokia.request({
+              type: 'exec',
+              mbean: mbean,
+              operation: 'listServices()'
+            }, {
+              success: populateTable,
+              error: (response) => {
+                log.debug('Osgi.ServiceController.loadServices() failed: ' + response.error);
+              }
+            });
           }
         });
-      }
     }
 
     loadServices();

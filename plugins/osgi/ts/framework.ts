@@ -3,11 +3,12 @@
 
 namespace Osgi {
   
-  _module.controller("Osgi.FrameworkController", ["$scope", "workspace", (
+  _module.controller("Osgi.FrameworkController", ["$scope", "workspace", "$q", (
       $scope,
-      workspace: Jmx.Workspace) => {
+      workspace: Jmx.Workspace,
+      $q: ng.IQService) => {
 
-    $scope.frameworkMBean = getSelectionFrameworkMBean(workspace);
+    $scope.frameworkMBean = null;
     let showNotification: boolean;
 
     $scope.save = function() {
@@ -39,20 +40,23 @@ namespace Osgi {
     }
 
     function updateContents() {
-      var mbean = getSelectionFrameworkMBean(workspace);
-      if (mbean) {
-        var jolokia = workspace.jolokia;
-        jolokia.request(
-          { type: 'read', mbean: mbean },
-          { success: response => {
-              $scope.config = {
-                startLevel: response.value.FrameworkStartLevel,
-                initialBundleStartLevel: response.value.InitialBundleStartLevel
-              }
-              Core.$apply($scope);
-            }
-          });
-      }
+      getSelectionFrameworkMBeanAsync(workspace, $q)
+        .then(mbean => {
+          if (mbean) {
+            $scope.frameworkMBean = mbean;
+            var jolokia = workspace.jolokia;
+            jolokia.request(
+              { type: 'read', mbean: mbean },
+              { success: response => {
+                  $scope.config = {
+                    startLevel: response.value.FrameworkStartLevel,
+                    initialBundleStartLevel: response.value.InitialBundleStartLevel
+                  }
+                  Core.$apply($scope);
+                }
+              });
+          }
+        });
     }
 
     updateContents();

@@ -1042,6 +1042,7 @@ declare namespace Osgi {
      */
     function findBundle(bundleId: any, values: any): string;
     function getSelectionBundleMBean(workspace: Jmx.Workspace): string;
+    function getSelectionBundleMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
     /**
      * Walks the tree looking in the first child all the way down until we find an objectName
      * @method findFirstObjectName
@@ -1052,9 +1053,13 @@ declare namespace Osgi {
      */
     function findFirstObjectName(node: any): any;
     function getSelectionFrameworkMBean(workspace: Jmx.Workspace): string;
+    function getSelectionFrameworkMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
     function getSelectionServiceMBean(workspace: Jmx.Workspace): string;
+    function getSelectionServiceMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
     function getSelectionPackageMBean(workspace: Jmx.Workspace): string;
+    function getSelectionPackageMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
     function getSelectionConfigAdminMBean(workspace: Jmx.Workspace): string;
+    function getSelectionConfigAdminMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
     function getMetaTypeMBean(workspace: Jmx.Workspace): string;
     function getProfileMetadataMBean(workspace: Jmx.Workspace): string;
     function getHawtioOSGiToolsMBean(workspace: Jmx.Workspace): string;
@@ -1072,6 +1077,7 @@ declare namespace Osgi {
      * For a pid of the form "foo.generatedId" for a pid "foo" or "foo.bar" remove the "foo." prefix
      */
     function removeFactoryPidPrefix(pid: any, factoryPid: any): any;
+    function runWhenTreeReady(fn: () => any, workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<any>;
 }
 declare namespace Osgi {
     class OsgiDataService {
@@ -1109,7 +1115,9 @@ declare namespace Karaf {
     function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
     function populateDependencies(attributes: any, dependencies: any, features: any): void;
     function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
+    function getSelectionFeaturesMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
     function getSelectionScrMBean(workspace: Jmx.Workspace): string;
+    function getSelectionScrMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
 }
 declare namespace Osgi {
     interface Bundle {
@@ -1124,9 +1132,9 @@ declare namespace Osgi {
 declare namespace Osgi {
     class BundlesService {
         private $q;
-        private jolokia;
         private workspace;
-        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
+        private jolokiaService;
+        constructor($q: ng.IQService, workspace: Jmx.Workspace, jolokiaService: JVM.JolokiaService);
         getBundles(): ng.IPromise<Bundle[]>;
         startBundles(bundles: Bundle[]): ng.IPromise<string>;
         stopBundles(bundles: Bundle[]): ng.IPromise<string>;
@@ -1134,7 +1142,6 @@ declare namespace Osgi {
         refreshBundles(bundles: Bundle[]): ng.IPromise<string>;
         uninstallBundles(bundles: Bundle[]): ng.IPromise<string>;
         installBundle(bundleUrl: string): ng.IPromise<string>;
-        private execute(mbean, operation, args?);
         private handleResponse(response);
     }
 }
@@ -2031,8 +2038,6 @@ declare namespace Karaf {
 }
 declare namespace Karaf {
 }
-declare namespace Karaf {
-}
 declare namespace Osgi {
     function formatServiceName(objClass: any): string;
 }
@@ -2134,8 +2139,9 @@ declare namespace Osgi {
     class OsgiNavigationController {
         private $location;
         private workspace;
+        private treeService;
         tabs: Nav.HawtioTab[];
-        constructor($location: ng.ILocationService, workspace: Jmx.Workspace);
+        constructor($location: ng.ILocationService, workspace: Jmx.Workspace, treeService: Jmx.TreeService);
         $onInit(): void;
         goto(tab: Nav.HawtioTab): void;
     }

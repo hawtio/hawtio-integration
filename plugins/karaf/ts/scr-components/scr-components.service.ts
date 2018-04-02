@@ -10,7 +10,8 @@ namespace Karaf {
     }
 
     getComponents(): ng.IPromise<ScrComponent[]> {
-      return this.execute(getSelectionScrMBean(this.workspace), undefined, 'read')
+      return getSelectionScrMBeanAsync(this.workspace, this.$q)
+        .then(mbean => this.execute(mbean, undefined, 'read'))
         .then(value => {
           const components: ScrComponent[] = [];
           angular.forEach(value['Components'].values, (item, key) => {

@@ -111,6 +111,12 @@
   dependencies:
     "@types/angular" "*"
 
+"@types/angular-ui-bootstrap@~0.13.46":
+  version "0.13.46"
+  resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-0.13.46.tgz#67b2bc2801cdaec515567840c9d82cc649c34656"
+  dependencies:
+    "@types/angular" "*"
+
 "@types/angular@*", "@types/angular@1.6.43", "@types/angular@~1.6.0":
   version "1.6.43"
   resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.43.tgz#6235ef416053a86302970717510a936d889cbb9a"
@@ -213,7 +219,7 @@ acorn-node@^1.2.0:
     acorn "^5.4.1"
     xtend "^4.0.1"
 
-acorn@4.0.13, acorn@4.X, acorn@5.X, acorn@^4.0.3, acorn@^5.0.3, acorn@^5.2.1, acorn@^5.4.1, acorn@~2.6.4:
+acorn@4.0.13, acorn@4.X, acorn@^4.0.3, acorn@^5.0.3, acorn@^5.2.1, acorn@^5.4.1, acorn@~2.6.4:
   version "4.0.13"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-4.0.13.tgz#105495ae5361d697bd195c825192e1ad7f253787"
 
@@ -1318,7 +1324,7 @@ dateformat@1.0.12, dateformat@^1.0.11:
     get-stdin "^4.0.1"
     meow "^3.3.0"
 
-debug-fabulous@0.1.2, debug-fabulous@0.1.X, debug-fabulous@1.X:
+debug-fabulous@0.1.2, debug-fabulous@0.1.X:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/debug-fabulous/-/debug-fabulous-0.1.2.tgz#c63ac4df92a13690b8b79d511401d653b0a31767"
   dependencies:
@@ -1326,7 +1332,7 @@ debug-fabulous@0.1.2, debug-fabulous@0.1.X, debug-fabulous@1.X:
     memoizee "0.4.X"
     object-assign "4.X"
 
-debug@2, debug@2.6.7, debug@2.6.8, debug@2.6.9, debug@3.X, debug@^2.2.0, debug@^2.3.3, debug@^2.6.8, debug@^2.6.9, debug@^3.1.0, debug@~2.2.0, debug@~2.6.4, debug@~2.6.6, debug@~2.6.7, debug@~3.1.0:
+debug@2, debug@2.6.7, debug@2.6.8, debug@2.6.9, debug@^2.2.0, debug@^2.3.3, debug@^2.6.8, debug@^2.6.9, debug@^3.1.0, debug@~2.2.0, debug@~2.6.4, debug@~2.6.6, debug@~2.6.7, debug@~3.1.0:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.7.tgz#92bad1f6d05bbb6bba22cca88bcd0ec894c2861e"
   dependencies:
@@ -4859,7 +4865,7 @@ source-map-url@0.4.0, source-map-url@^0.4.0, source-map-url@~0.3.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/source-map-url/-/source-map-url-0.4.0.tgz#3e935d7ddd73631b97659956d55128e87b5084a3"
 
-source-map@0.4.x, source-map@0.5.6, source-map@0.X, source-map@^0.1.38, source-map@^0.5.1, source-map@^0.5.3, source-map@^0.5.6, source-map@^0.6.1, source-map@~0.5.1, source-map@~0.5.3, source-map@~0.6.0, source-map@~0.6.1:
+source-map@0.4.x, source-map@0.5.6, source-map@0.X, source-map@^0.1.38, source-map@^0.5.1, source-map@^0.5.3, source-map@^0.5.6, source-map@^0.6.1, source-map@~0.5.1, source-map@~0.5.3, source-map@~0.6.1:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.6.tgz#75ce38f52bf0733c5a7f0c118d81334a2bb5f412"
 
@@ -5272,7 +5278,7 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@^2.0.0, typescript@^2.1.4:
+typescript@2.8.1, typescript@^2.0.0, typescript@^2.1.4:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.8.1.tgz#6160e4f8f195d5ba81d4876f9c0cc1fbc0820624"
 

@@ -266,6 +266,10 @@ namespace Osgi {
     return null;
   }
 
+  export function getSelectionBundleMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
+    return runWhenTreeReady(() => getSelectionBundleMBean(workspace), workspace, $q);
+  }
+
   /**
    * Walks the tree looking in the first child all the way down until we find an objectName
    * @method findFirstObjectName
@@ -297,6 +301,11 @@ namespace Osgi {
     }
     return null;
   }
+
+  export function getSelectionFrameworkMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
+    return runWhenTreeReady(() => getSelectionFrameworkMBean(workspace), workspace, $q);
+  }
+  
   export function getSelectionServiceMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       // lets navigate to the tree item based on paths
@@ -304,6 +313,10 @@ namespace Osgi {
       return Osgi.findFirstObjectName(folder);
     }
     return null;
+  }
+
+  export function getSelectionServiceMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
+    return runWhenTreeReady(() => getSelectionServiceMBean(workspace), workspace, $q);
   }
 
   export function getSelectionPackageMBean(workspace: Jmx.Workspace):string {
@@ -315,6 +328,10 @@ namespace Osgi {
     return null;
   }
 
+  export function getSelectionPackageMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
+    return runWhenTreeReady(() => getSelectionPackageMBean(workspace), workspace, $q);
+  }
+
   export function getSelectionConfigAdminMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       // lets navigate to the tree item based on paths
@@ -324,6 +341,10 @@ namespace Osgi {
     return null;
   }
 
+  export function getSelectionConfigAdminMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
+    return runWhenTreeReady(() => getSelectionConfigAdminMBean(workspace), workspace, $q);
+  }
+  
   export function getMetaTypeMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
@@ -411,4 +432,18 @@ namespace Osgi {
     }
     return pid;
   }
+
+  export function runWhenTreeReady(fn: () => any, workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<any> {
+    return $q((resolve, reject) => {
+      if (workspace.treeFetched) {
+        resolve(fn());
+      } else {
+        const unsubscribe = workspace.$rootScope.$on(Jmx.TreeEvent.Updated, () => {
+          unsubscribe();
+          resolve(fn());
+        });
+      }
+    });
+  }
+
 }

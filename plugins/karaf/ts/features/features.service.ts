@@ -11,7 +11,8 @@ namespace Karaf {
       }
 
       getFeatureRepositories(): ng.IPromise<FeatureRepository[]> {
-        return this.execute(getSelectionFeaturesMBean(this.workspace), undefined, undefined, 'read')
+        return getSelectionFeaturesMBeanAsync(this.workspace, this.$q)
+          .then(mbean => this.execute(mbean, undefined, undefined, 'read'))
           .then(value => {
             const repositories: FeatureRepository[] = [];
             angular.forEach(value['Repositories'], (repository) => {

@@ -337,40 +337,49 @@ namespace Karaf {
     return null;
   }
 
-    export function getSelectionScrMBean(workspace: Jmx.Workspace):string {
-        if (workspace) {
-            var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
-            var karaf = scrStuff["org.apache.karaf"] || {};
-            var mbean = karaf.objectName;
-            if (mbean) {
-                return mbean;
-            }
-            // lets navigate to the tree item based on paths
-            var folder = workspace.tree.navigate("org.apache.karaf", "scr");
+  export function getSelectionFeaturesMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
+    return Osgi.runWhenTreeReady(() => getSelectionFeaturesMBean(workspace), workspace, $q);
+  }
+
+  export function getSelectionScrMBean(workspace: Jmx.Workspace): string {
+    if (workspace) {
+      var scrStuff = workspace.mbeanTypesToDomain["scr"] || {};
+      var karaf = scrStuff["org.apache.karaf"] || {};
+      var mbean = karaf.objectName;
+      if (mbean) {
+        return mbean;
+      }
+      // lets navigate to the tree item based on paths
+      var folder = workspace.tree.navigate("org.apache.karaf", "scr");
+      if (!folder) {
+        // sometimes the features mbean is inside the 'root' folder
+        folder = workspace.tree.navigate("org.apache.karaf");
+        if (folder) {
+          var children = folder.children;
+          folder = null;
+          angular.forEach(children, (child: Jmx.Folder) => {
             if (!folder) {
-                // sometimes the features mbean is inside the 'root' folder
-                folder = workspace.tree.navigate("org.apache.karaf");
-                if (folder) {
-                  var children = folder.children;
-                  folder = null;
-                  angular.forEach(children, (child: Jmx.Folder) => {
-                      if (!folder) {
-                          folder = child.navigate("scr");
-                      }
-                  });
-                }
+              folder = child.navigate("scr");
             }
-            if (folder) {
-                var children = folder.children;
-                if (children) {
-                    var node = children[0];
-                    if (node) {
-                        return node.objectName;
-                    }
-                }
-                return folder.objectName;
-            }
+          });
         }
-        return null;
+      }
+      if (folder) {
+        var children = folder.children;
+        if (children) {
+          var node = children[0];
+          if (node) {
+            return node.objectName;
+          }
+        }
+        return folder.objectName;
+      }
     }
+    return null;
+  }
+
+  export function getSelectionScrMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
+    return Osgi.runWhenTreeReady(() => getSelectionScrMBean(workspace), workspace, $q);
+  }
+  
 }

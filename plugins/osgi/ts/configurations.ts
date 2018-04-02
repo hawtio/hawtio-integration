@@ -4,13 +4,14 @@
 namespace Osgi {
 
   _module.controller("Osgi.ConfigurationsController", ["$scope", "$routeParams", "$location", "workspace", "jolokia",
-    "$uibModal", (
+    "$uibModal", "$q", (
       $scope,
       $routeParams: angular.route.IRouteParamsService,
       $location: ng.ILocationService,
       workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
-      $uibModal) => {
+      $uibModal,
+      $q: ng.IQService) => {
 
       $scope.configurations = null;
       $scope.filteredConfigurations = [];
@@ -305,10 +306,12 @@ namespace Osgi {
             $scope.versionId, $scope.profileId, Core.onSuccess(onProfileMetaType, { silent: true }));
         } else {
           if (jolokia) {
-            var mbean = getSelectionConfigAdminMBean(workspace);
-            if (mbean) {
-              jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
-            }
+            getSelectionConfigAdminMBeanAsync(workspace, $q)
+              .then(mbean => {
+                if (mbean) {
+                  jolokia.execute(mbean, 'getConfigurations', '(service.pid=*)', Core.onSuccess(onConfigPids, errorHandler("Failed to load PID configurations: ")));
+                }
+              })
           }
         }
       }
