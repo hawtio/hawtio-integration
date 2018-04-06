@@ -17999,15 +17999,13 @@ var Osgi;
     }
     Osgi.toCollection = toCollection;
     function labelBundleLinks(workspace, values, allValues) {
-        var answer = [];
-        var sorted = toCollection(values).sort(function (a, b) { return a - b; });
-        angular.forEach(sorted, function (value, key) {
-            answer.push({
-                label: allValues[value].SymbolicName,
-                url: Core.url("/osgi/bundle/" + value + workspace.hash())
-            });
-        });
-        return answer;
+        return toCollection(values)
+            .sort(function (a, b) { return a - b; })
+            .filter(function (value) { return allValues.hasOwnProperty(value); })
+            .map(function (value) { return ({
+            label: allValues[value].SymbolicName,
+            url: Core.url("/osgi/bundle/" + value + workspace.hash())
+        }); });
     }
     Osgi.labelBundleLinks = labelBundleLinks;
     function bundleLinks(workspace, values) {

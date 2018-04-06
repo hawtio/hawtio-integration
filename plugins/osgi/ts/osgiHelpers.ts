@@ -182,7 +182,7 @@ namespace Osgi {
     }
   }
 
-  export function toCollection(values) {
+  export function toCollection(values): any[] {
     var collection = values;
     if (!angular.isArray(values)) {
       collection = [values];
@@ -191,15 +191,13 @@ namespace Osgi {
   }
 
   export function labelBundleLinks(workspace, values, allValues) {
-    let answer = [];
-    var sorted = toCollection(values).sort((a,b) => {return a-b});
-    angular.forEach(sorted, function (value, key) {
-      answer.push({
+    return toCollection(values)
+      .sort((a, b) => a - b)
+      .filter(value => allValues.hasOwnProperty(value))
+      .map(value => ({
         label: allValues[value].SymbolicName,
         url: Core.url("/osgi/bundle/" + value + workspace.hash())
-      });
-    });
-    return answer;
+      }));
   }
 
   export function bundleLinks(workspace, values) {

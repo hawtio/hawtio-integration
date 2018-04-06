@@ -1025,8 +1025,11 @@ declare namespace Osgi {
     function defaultConfigurationValues(workspace: Jmx.Workspace, $scope: any, values: any): any[];
     function parseActualPackages(packages: string[]): {};
     function parseManifestHeader(headers: {}, name: string): {};
-    function toCollection(values: any): any;
-    function labelBundleLinks(workspace: any, values: any, allValues: any): any[];
+    function toCollection(values: any): any[];
+    function labelBundleLinks(workspace: any, values: any, allValues: any): {
+        label: any;
+        url: string;
+    }[];
     function bundleLinks(workspace: any, values: any): string;
     function bundleUrls(workspace: any, values: any): any[];
     function pidLinks(workspace: any, values: any): string;
