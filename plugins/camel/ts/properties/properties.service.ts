@@ -1,4 +1,3 @@
-/// <reference path="../camelPlugin.ts"/>
 /// <reference path="property.ts"/>
 
 namespace Camel {
@@ -40,7 +39,5 @@ namespace Camel {
         .sort(Property.sortByName);
     }
   }
-
-  _module.service('propertiesService', PropertiesService);
 
 }

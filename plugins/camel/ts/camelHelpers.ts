@@ -335,7 +335,8 @@ namespace Camel {
    */
   export function isRouteNode(workspace: Jmx.Workspace) {
     var selection = workspace.selection || workspace.getSelectedMBean();
-    return selection && jmxDomain === selection.domain && "routeXmlNode" in selection;
+    return selection && selection.domain === jmxDomain && selection.text !== 'routes' &&
+      (selection.typeName === 'routes' || selection.typeName === 'routeNode');
   }
 
   /**
@@ -371,13 +372,14 @@ namespace Camel {
    * Adds the route children to the given folder for each step in the route
    * @method
    */
-  export function loadRouteChildren(folder: Jmx.Folder, route: Element): Jmx.NodeSelection[] {
+  export function loadRouteChildren(folder: Jmx.Folder, route: Element, workspace: Jmx.Workspace): Jmx.NodeSelection[] {
     folder['routeXmlNode'] = route;
     route.setAttribute('_cid', folder.key);
     const children = [];
     $(route).children('*').each((idx, node) => {
-      children.push(loadRouteChild(folder, node))
+      children.push(loadRouteChild(folder, node, workspace))
     });
+    workspace.$rootScope.$broadcast('routeXmlNode', route);
     return _.compact(children);
   }
 
@@ -385,7 +387,7 @@ namespace Camel {
    * Adds a child to the given folder / route
    * @method
    */
-  function loadRouteChild(parent: Jmx.Folder, route: Element): Jmx.NodeSelection | void {
+  function loadRouteChild(parent: Jmx.Folder, route: Element, workspace: Jmx.Workspace): Jmx.NodeSelection | void {
     const nodeName = route.localName;
     var nodeSettings = getCamelSchema(nodeName);
     if (nodeSettings) {
@@ -416,7 +418,7 @@ namespace Camel {
       node.key = key;
       node.image = imageUrl;
       node['routeXmlNode'] = route;
-      const children = loadRouteChildren(node, route);
+      const children = loadRouteChildren(node, route, workspace);
       children.forEach(child => node.moveChild(child));
       return node;
     }

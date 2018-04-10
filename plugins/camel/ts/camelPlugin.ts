@@ -2,6 +2,7 @@
 /// <reference path="endpoints-statistics/endpoints-statistics.module.ts"/>
 /// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="exchanges/exchanges.module.ts"/>
+/// <reference path="properties/properties.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
 /// <reference path="type-converters/type-converters.module.ts"/>
@@ -16,6 +17,7 @@ namespace Camel {
     endpointsStatisticsModule,
     endpointsModule,
     exchangesModule,
+    propertiesModule,
     routesModule,
     treeModule,
     typeConvertersModule
@@ -336,7 +338,7 @@ namespace Camel {
         return (workspace, parent: Jmx.Folder, onComplete: (children: Jmx.NodeSelection[]) => void) => {
           if ('routes' === parent.typeName) {
             processRouteXml(workspace, workspace.jolokia, parent, route => onComplete(route ?
-              loadRouteChildren(parent, route) :
+              loadRouteChildren(parent, route, workspace) :
               new Array<Jmx.NodeSelection>()));
           } else {
             onComplete(new Array<Jmx.NodeSelection>());

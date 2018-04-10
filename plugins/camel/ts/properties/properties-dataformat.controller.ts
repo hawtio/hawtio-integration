@@ -3,13 +3,9 @@
 
 namespace Camel {
 
-  _module.controller("Camel.PropertiesDataFormatController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', (
-      $scope,
-      workspace: Jmx.Workspace,
-      localStorage: Storage,
-      jolokia: Jolokia.IJolokia,
-      documentBase: string,
-      propertiesService: PropertiesService) => {
+  export function PropertiesDataFormatController($scope, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia,
+    documentBase: string, propertiesService: PropertiesService) {
+    'ngInject';
 
     function updateData() {
       var dataFormatMBeanName:string = null;
@@ -51,7 +47,6 @@ namespace Camel {
     }, 1000);
 
     updateData();
-
-  }]);
+  }
 
 }

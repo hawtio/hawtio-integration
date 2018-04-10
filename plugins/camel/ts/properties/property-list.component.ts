@@ -2,7 +2,7 @@
 
 namespace Camel {
 
-  _module.component('propertyList', {
+  export const propertyListComponent: angular.IComponentOptions = {
     bindings: {
       title: '@',
       properties: '<'
@@ -21,6 +21,6 @@ namespace Camel {
         </dl>
       </div>
     `
-  });
+  };
 
 }

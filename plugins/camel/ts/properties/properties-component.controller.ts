@@ -3,13 +3,9 @@
 
 namespace Camel {
 
-  _module.controller("Camel.PropertiesComponentController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', (
-      $scope,
-      workspace: Jmx.Workspace,
-      localStorage: Storage,
-      jolokia: Jolokia.IJolokia,
-      documentBase: string,
-      propertiesService: PropertiesService) => {
+  export function PropertiesComponentController($scope, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia,
+    documentBase: string, propertiesService: PropertiesService) {
+    'ngInject';
 
     function updateData() {
       var contextMBean = getSelectionCamelContextMBean(workspace);
@@ -60,7 +56,6 @@ namespace Camel {
     }, 1000);
 
     updateData();
-
-  }]);
+  }
 
 }

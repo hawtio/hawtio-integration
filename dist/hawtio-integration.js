@@ -15116,6 +15116,302 @@ var Camel;
 })(Camel || (Camel = {}));
 var Camel;
 (function (Camel) {
+    var Property = /** @class */ (function () {
+        function Property(name, value, description) {
+            this.name = name;
+            this.value = value;
+            this.description = description;
+        }
+        Property.sortByName = function (a, b) {
+            if (a.name < b.name)
+                return -1;
+            if (a.name > b.name)
+                return 1;
+            return 0;
+        };
+        return Property;
+    }());
+    Camel.Property = Property;
+})(Camel || (Camel = {}));
+/// <reference path="property.ts"/>
+var Camel;
+(function (Camel) {
+    var PropertiesService = /** @class */ (function () {
+        function PropertiesService() {
+        }
+        PropertiesService.prototype.getDefinedProperties = function (schemaProperties) {
+            return Object.keys(schemaProperties)
+                .filter(function (key) { return schemaProperties[key]['value']; })
+                .map(function (key) {
+                var propertySchema = schemaProperties[key];
+                var name = propertySchema['title'] || key;
+                return new Camel.Property(name, propertySchema['value'], propertySchema['description']);
+            })
+                .sort(Camel.Property.sortByName);
+        };
+        PropertiesService.prototype.getDefaultProperties = function (schemaProperties) {
+            return Object.keys(schemaProperties)
+                .filter(function (key) { return !schemaProperties[key]['value']; })
+                .filter(function (key) { return 'defaultValue' in schemaProperties[key]; })
+                .map(function (key) {
+                var propertySchema = schemaProperties[key];
+                var name = propertySchema['title'] || key;
+                return new Camel.Property(name, propertySchema['defaultValue'], propertySchema['description']);
+            })
+                .sort(Camel.Property.sortByName);
+        };
+        PropertiesService.prototype.getUndefinedProperties = function (schemaProperties) {
+            return Object.keys(schemaProperties)
+                .filter(function (key) { return !schemaProperties[key]['value']; })
+                .filter(function (key) { return !('defaultValue' in schemaProperties[key]); })
+                .map(function (key) {
+                var propertySchema = schemaProperties[key];
+                var name = propertySchema['title'] || key;
+                return new Camel.Property(name, null, propertySchema['description']);
+            })
+                .sort(Camel.Property.sortByName);
+        };
+        return PropertiesService;
+    }());
+    Camel.PropertiesService = PropertiesService;
+})(Camel || (Camel = {}));
+/// <reference path="../camelPlugin.ts"/>
+/// <reference path="properties.service.ts"/>
+var Camel;
+(function (Camel) {
+    PropertiesComponentController.$inject = ["$scope", "workspace", "jolokia", "documentBase", "propertiesService"];
+    function PropertiesComponentController($scope, workspace, jolokia, documentBase, propertiesService) {
+        'ngInject';
+        function updateData() {
+            var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
+            var componentMBeanName = null;
+            if (!componentMBeanName) {
+                componentMBeanName = workspace.getSelectedMBeanName();
+            }
+            if (componentMBeanName && contextMBean) {
+                // TODO: grab name from tree instead? avoids a JMX call
+                var reply = jolokia.request({ type: "read", mbean: componentMBeanName, attribute: ["ComponentName"] });
+                var name = reply.value["ComponentName"];
+                if (name) {
+                    $scope.componentName = name;
+                    Camel.log.info("Calling explainComponentJson for name:", name);
+                    var query = {
+                        type: 'exec',
+                        mbean: contextMBean,
+                        operation: 'explainComponentJson(java.lang.String,boolean)',
+                        arguments: [name, true]
+                    };
+                    jolokia.request(query, Core.onSuccess(populateData));
+                }
+            }
+        }
+        function populateData(response) {
+            Camel.log.debug("Populate data", response);
+            if (response.value) {
+                var schema = JSON.parse(response.value);
+                $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
+                $scope.title = schema.component.title;
+                $scope.description = schema.component.description;
+                $scope.labels = schema.component.label ? schema.component.label.split(',') : [];
+                $scope.definedProperties = propertiesService.getDefinedProperties(schema['componentProperties']);
+                $scope.defaultProperties = propertiesService.getDefaultProperties(schema['componentProperties']);
+                $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['componentProperties']);
+                $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
+                Core.$apply($scope);
+            }
+        }
+        setTimeout(function () {
+            $('[data-toggle=tooltip]').tooltip();
+        }, 1000);
+        updateData();
+    }
+    Camel.PropertiesComponentController = PropertiesComponentController;
+})(Camel || (Camel = {}));
+/// <reference path="../camelPlugin.ts"/>
+/// <reference path="properties.service.ts"/>
+var Camel;
+(function (Camel) {
+    PropertiesDataFormatController.$inject = ["$scope", "workspace", "jolokia", "documentBase", "propertiesService"];
+    function PropertiesDataFormatController($scope, workspace, jolokia, documentBase, propertiesService) {
+        'ngInject';
+        function updateData() {
+            var dataFormatMBeanName = null;
+            if (!dataFormatMBeanName) {
+                dataFormatMBeanName = workspace.getSelectedMBeanName();
+            }
+            if (dataFormatMBeanName) {
+                Camel.log.info("Calling informationJson");
+                var query = {
+                    type: 'exec',
+                    mbean: dataFormatMBeanName,
+                    operation: 'informationJson'
+                };
+                jolokia.request(query, Core.onSuccess(populateData));
+            }
+        }
+        function populateData(response) {
+            Camel.log.debug("Populate data", response);
+            if (response.value) {
+                var schema = JSON.parse(response.value);
+                $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/marshal24.png");
+                $scope.title = schema.dataformat.title + " (" + schema.dataformat.name + ")";
+                $scope.labels = schema.dataformat.label ? schema.dataformat.label.split(',') : [];
+                $scope.description = schema.dataformat.description;
+                $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
+                $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
+                $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
+                $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
+                Core.$apply($scope);
+            }
+        }
+        setTimeout(function () {
+            $('[data-toggle=tooltip]').tooltip();
+        }, 1000);
+        updateData();
+    }
+    Camel.PropertiesDataFormatController = PropertiesDataFormatController;
+})(Camel || (Camel = {}));
+/// <reference path="../camelPlugin.ts"/>
+/// <reference path="properties.service.ts"/>
+var Camel;
+(function (Camel) {
+    PropertiesEndpointController.$inject = ["$scope", "workspace", "jolokia", "documentBase", "propertiesService"];
+    function PropertiesEndpointController($scope, workspace, jolokia, documentBase, propertiesService) {
+        'ngInject';
+        function updateData() {
+            var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
+            var endpointMBean = null;
+            if ($scope.contextId && $scope.endpointPath) {
+                var node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
+                    context: $scope.contextId,
+                    type: "endpoints",
+                    name: $scope.endpointPath
+                });
+                if (node) {
+                    endpointMBean = node.objectName;
+                }
+            }
+            if (!endpointMBean) {
+                endpointMBean = workspace.getSelectedMBeanName();
+            }
+            if (endpointMBean && contextMBean) {
+                // TODO: grab url from tree instead? avoids a JMX call
+                var reply = jolokia.request({ type: "read", mbean: endpointMBean, attribute: ["EndpointUri"] });
+                var url = reply.value["EndpointUri"];
+                if (url) {
+                    $scope.endpointUrl = url;
+                    Camel.log.info("Calling explainEndpointJson for url:", url);
+                    var query = {
+                        type: 'exec',
+                        mbean: contextMBean,
+                        operation: 'explainEndpointJson(java.lang.String,boolean)',
+                        arguments: [url, true]
+                    };
+                    jolokia.request(query, Core.onSuccess(populateData));
+                }
+            }
+        }
+        function populateData(response) {
+            Camel.log.debug("Populate data", response);
+            if (response.value) {
+                var schema = JSON.parse(response.value);
+                $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
+                $scope.title = $scope.endpointUrl;
+                $scope.labels = schema.component.label ? schema.component.label.split(',') : [];
+                $scope.description = schema.component.description;
+                $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
+                $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
+                $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
+                $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
+                Core.$apply($scope);
+            }
+        }
+        setTimeout(function () {
+            $('[data-toggle=tooltip]').tooltip();
+        }, 1000);
+        updateData();
+    }
+    Camel.PropertiesEndpointController = PropertiesEndpointController;
+})(Camel || (Camel = {}));
+/// <reference path="properties.service.ts"/>
+var Camel;
+(function (Camel) {
+    PropertiesRouteController.$inject = ["$scope", "workspace", "propertiesService"];
+    function PropertiesRouteController($scope, workspace, propertiesService) {
+        'ngInject';
+        var routeXmlNode = Camel.getSelectedRouteNode(workspace);
+        if (routeXmlNode) {
+            init(routeXmlNode);
+        }
+        else {
+            var unsubscribe_1 = $scope.$on('routeXmlNode', function () {
+                unsubscribe_1();
+                routeXmlNode = Camel.getSelectedRouteNode(workspace);
+                init(routeXmlNode);
+            });
+        }
+        function init(routeXmlNode) {
+            var data = Camel.getRouteNodeJSON(routeXmlNode);
+            var schema = Camel.getCamelSchema(routeXmlNode.nodeName);
+            addValueToProperties(data, schema);
+            if (Camel.log.enabledFor(Logger.DEBUG)) {
+                Camel.log.debug("Properties - data:", JSON.stringify(data, null, "  "));
+                Camel.log.debug("Properties - schema:", JSON.stringify(schema, null, "  "));
+            }
+            $scope.icon = Camel.getRouteNodeIcon(routeXmlNode);
+            $scope.title = schema.title;
+            $scope.labels = schema.group ? schema.group.split(',') : [];
+            $scope.description = schema.description;
+            $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
+            $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
+            $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
+            $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
+        }
+        function addValueToProperties(data, schema) {
+            for (var key in data) {
+                var property = schema.properties[key];
+                if (property) {
+                    property.value = data[key];
+                }
+            }
+        }
+        setTimeout(function () {
+            $('[data-toggle=tooltip]').tooltip();
+        }, 1000);
+    }
+    Camel.PropertiesRouteController = PropertiesRouteController;
+})(Camel || (Camel = {}));
+/// <reference path="../camelPlugin.ts"/>
+var Camel;
+(function (Camel) {
+    Camel.propertyListComponent = {
+        bindings: {
+            title: '@',
+            properties: '<'
+        },
+        template: "\n      <div ng-show=\"$ctrl.properties.length > 0\">\n        <h3 title=\"\">{{$ctrl.title}}</h3>\n        <dl class=\"dl-horizontal\">\n          <dt ng-repeat-start=\"property in $ctrl.properties\" title=\"{{property.name}}\">\n            {{property.name}}\n          </dt>\n          <dd class=\"camel-properties-value\" title=\"\" ng-repeat-end>\n            <span class=\"pficon pficon-info camel-properties-info-circle\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{{property.description}}\"></span>\n            {{property.value}}\n          </dd>\n        </dl>\n      </div>\n    "
+    };
+})(Camel || (Camel = {}));
+/// <reference path="properties-component.controller.ts"/>
+/// <reference path="properties-dataformat.controller.ts"/>
+/// <reference path="properties-endpoint.controller.ts"/>
+/// <reference path="properties-route.controller.ts"/>
+/// <reference path="properties.service.ts"/>
+/// <reference path="property-list.component.ts"/>
+var Camel;
+(function (Camel) {
+    Camel.propertiesModule = angular
+        .module('hawtio-camel-properties', [])
+        .controller("Camel.PropertiesComponentController", Camel.PropertiesComponentController)
+        .controller("Camel.PropertiesDataFormatController", Camel.PropertiesDataFormatController)
+        .controller("Camel.PropertiesEndpointController", Camel.PropertiesEndpointController)
+        .controller("Camel.PropertiesRouteController", Camel.PropertiesRouteController)
+        .service('propertiesService', Camel.PropertiesService)
+        .component('propertyList', Camel.propertyListComponent)
+        .name;
+})(Camel || (Camel = {}));
+var Camel;
+(function (Camel) {
     var Route = /** @class */ (function () {
         function Route(name, state, mbean) {
             this.name = name;
@@ -16425,7 +16721,8 @@ var Camel;
      */
     function isRouteNode(workspace) {
         var selection = workspace.selection || workspace.getSelectedMBean();
-        return selection && Camel.jmxDomain === selection.domain && "routeXmlNode" in selection;
+        return selection && selection.domain === Camel.jmxDomain && selection.text !== 'routes' &&
+            (selection.typeName === 'routes' || selection.typeName === 'routeNode');
     }
     Camel.isRouteNode = isRouteNode;
     /**
@@ -16461,13 +16758,14 @@ var Camel;
      * Adds the route children to the given folder for each step in the route
      * @method
      */
-    function loadRouteChildren(folder, route) {
+    function loadRouteChildren(folder, route, workspace) {
         folder['routeXmlNode'] = route;
         route.setAttribute('_cid', folder.key);
         var children = [];
         $(route).children('*').each(function (idx, node) {
-            children.push(loadRouteChild(folder, node));
+            children.push(loadRouteChild(folder, node, workspace));
         });
+        workspace.$rootScope.$broadcast('routeXmlNode', route);
         return _.compact(children);
     }
     Camel.loadRouteChildren = loadRouteChildren;
@@ -16475,7 +16773,7 @@ var Camel;
      * Adds a child to the given folder / route
      * @method
      */
-    function loadRouteChild(parent, route) {
+    function loadRouteChild(parent, route, workspace) {
         var nodeName = route.localName;
         var nodeSettings = getCamelSchema(nodeName);
         if (nodeSettings) {
@@ -16504,7 +16802,7 @@ var Camel;
             node.key = key;
             node.image = imageUrl;
             node['routeXmlNode'] = route;
-            var children = loadRouteChildren(node, route);
+            var children = loadRouteChildren(node, route, workspace);
             children.forEach(function (child) { return node.moveChild(child); });
             return node;
         }
@@ -17502,6 +17800,7 @@ var Camel;
 /// <reference path="endpoints-statistics/endpoints-statistics.module.ts"/>
 /// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="exchanges/exchanges.module.ts"/>
+/// <reference path="properties/properties.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
 /// <reference path="type-converters/type-converters.module.ts"/>
@@ -17515,6 +17814,7 @@ var Camel;
         Camel.endpointsStatisticsModule,
         Camel.endpointsModule,
         Camel.exchangesModule,
+        Camel.propertiesModule,
         Camel.routesModule,
         Camel.treeModule,
         Camel.typeConvertersModule
@@ -17803,7 +18103,7 @@ var Camel;
                 return function (workspace, parent, onComplete) {
                     if ('routes' === parent.typeName) {
                         Camel.processRouteXml(workspace, workspace.jolokia, parent, function (route) { return onComplete(route ?
-                            Camel.loadRouteChildren(parent, route) :
+                            Camel.loadRouteChildren(parent, route, workspace) :
                             new Array()); });
                     }
                     else {
@@ -18249,8 +18549,8 @@ var Osgi;
                 resolve(fn());
             }
             else {
-                var unsubscribe_1 = workspace.$rootScope.$on(Jmx.TreeEvent.Updated, function () {
-                    unsubscribe_1();
+                var unsubscribe_2 = workspace.$rootScope.$on(Jmx.TreeEvent.Updated, function () {
+                    unsubscribe_2();
                     resolve(fn());
                 });
             }
@@ -23313,265 +23613,6 @@ var Camel;
             $scope.messages = tracerStatus.messages;
             $scope.tracing = tracerStatus.jhandle != null;
         }]);
-})(Camel || (Camel = {}));
-var Camel;
-(function (Camel) {
-    var Property = /** @class */ (function () {
-        function Property(name, value, description) {
-            this.name = name;
-            this.value = value;
-            this.description = description;
-        }
-        Property.sortByName = function (a, b) {
-            if (a.name < b.name)
-                return -1;
-            if (a.name > b.name)
-                return 1;
-            return 0;
-        };
-        return Property;
-    }());
-    Camel.Property = Property;
-})(Camel || (Camel = {}));
-/// <reference path="../camelPlugin.ts"/>
-/// <reference path="property.ts"/>
-var Camel;
-(function (Camel) {
-    var PropertiesService = /** @class */ (function () {
-        function PropertiesService() {
-        }
-        PropertiesService.prototype.getDefinedProperties = function (schemaProperties) {
-            return Object.keys(schemaProperties)
-                .filter(function (key) { return schemaProperties[key]['value']; })
-                .map(function (key) {
-                var propertySchema = schemaProperties[key];
-                var name = propertySchema['title'] || key;
-                return new Camel.Property(name, propertySchema['value'], propertySchema['description']);
-            })
-                .sort(Camel.Property.sortByName);
-        };
-        PropertiesService.prototype.getDefaultProperties = function (schemaProperties) {
-            return Object.keys(schemaProperties)
-                .filter(function (key) { return !schemaProperties[key]['value']; })
-                .filter(function (key) { return 'defaultValue' in schemaProperties[key]; })
-                .map(function (key) {
-                var propertySchema = schemaProperties[key];
-                var name = propertySchema['title'] || key;
-                return new Camel.Property(name, propertySchema['defaultValue'], propertySchema['description']);
-            })
-                .sort(Camel.Property.sortByName);
-        };
-        PropertiesService.prototype.getUndefinedProperties = function (schemaProperties) {
-            return Object.keys(schemaProperties)
-                .filter(function (key) { return !schemaProperties[key]['value']; })
-                .filter(function (key) { return !('defaultValue' in schemaProperties[key]); })
-                .map(function (key) {
-                var propertySchema = schemaProperties[key];
-                var name = propertySchema['title'] || key;
-                return new Camel.Property(name, null, propertySchema['description']);
-            })
-                .sort(Camel.Property.sortByName);
-        };
-        return PropertiesService;
-    }());
-    Camel.PropertiesService = PropertiesService;
-    Camel._module.service('propertiesService', PropertiesService);
-})(Camel || (Camel = {}));
-/// <reference path="../camelPlugin.ts"/>
-/// <reference path="properties.service.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.PropertiesComponentController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', function ($scope, workspace, localStorage, jolokia, documentBase, propertiesService) {
-            function updateData() {
-                var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
-                var componentMBeanName = null;
-                if (!componentMBeanName) {
-                    componentMBeanName = workspace.getSelectedMBeanName();
-                }
-                if (componentMBeanName && contextMBean) {
-                    // TODO: grab name from tree instead? avoids a JMX call
-                    var reply = jolokia.request({ type: "read", mbean: componentMBeanName, attribute: ["ComponentName"] });
-                    var name = reply.value["ComponentName"];
-                    if (name) {
-                        $scope.componentName = name;
-                        Camel.log.info("Calling explainComponentJson for name:", name);
-                        var query = {
-                            type: 'exec',
-                            mbean: contextMBean,
-                            operation: 'explainComponentJson(java.lang.String,boolean)',
-                            arguments: [name, true]
-                        };
-                        jolokia.request(query, Core.onSuccess(populateData));
-                    }
-                }
-            }
-            function populateData(response) {
-                Camel.log.debug("Populate data", response);
-                if (response.value) {
-                    var schema = JSON.parse(response.value);
-                    $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
-                    $scope.title = schema.component.title;
-                    $scope.description = schema.component.description;
-                    $scope.labels = schema.component.label ? schema.component.label.split(',') : [];
-                    $scope.definedProperties = propertiesService.getDefinedProperties(schema['componentProperties']);
-                    $scope.defaultProperties = propertiesService.getDefaultProperties(schema['componentProperties']);
-                    $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['componentProperties']);
-                    $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
-                    Core.$apply($scope);
-                }
-            }
-            setTimeout(function () {
-                $('[data-toggle=tooltip]').tooltip();
-            }, 1000);
-            updateData();
-        }]);
-})(Camel || (Camel = {}));
-/// <reference path="../camelPlugin.ts"/>
-/// <reference path="properties.service.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.PropertiesDataFormatController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', function ($scope, workspace, localStorage, jolokia, documentBase, propertiesService) {
-            function updateData() {
-                var dataFormatMBeanName = null;
-                if (!dataFormatMBeanName) {
-                    dataFormatMBeanName = workspace.getSelectedMBeanName();
-                }
-                if (dataFormatMBeanName) {
-                    Camel.log.info("Calling informationJson");
-                    var query = {
-                        type: 'exec',
-                        mbean: dataFormatMBeanName,
-                        operation: 'informationJson'
-                    };
-                    jolokia.request(query, Core.onSuccess(populateData));
-                }
-            }
-            function populateData(response) {
-                Camel.log.debug("Populate data", response);
-                if (response.value) {
-                    var schema = JSON.parse(response.value);
-                    $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/marshal24.png");
-                    $scope.title = schema.dataformat.title + " (" + schema.dataformat.name + ")";
-                    $scope.labels = schema.dataformat.label ? schema.dataformat.label.split(',') : [];
-                    $scope.description = schema.dataformat.description;
-                    $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
-                    $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
-                    $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
-                    $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
-                    Core.$apply($scope);
-                }
-            }
-            setTimeout(function () {
-                $('[data-toggle=tooltip]').tooltip();
-            }, 1000);
-            updateData();
-        }]);
-})(Camel || (Camel = {}));
-/// <reference path="../camelPlugin.ts"/>
-/// <reference path="properties.service.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.PropertiesEndpointController", ["$scope", "workspace", "localStorage", "jolokia", "documentBase", 'propertiesService', function ($scope, workspace, localStorage, jolokia, documentBase, propertiesService) {
-            function updateData() {
-                var contextMBean = Camel.getSelectionCamelContextMBean(workspace);
-                var endpointMBean = null;
-                if ($scope.contextId && $scope.endpointPath) {
-                    var node = workspace.findMBeanWithProperties(Camel.jmxDomain, {
-                        context: $scope.contextId,
-                        type: "endpoints",
-                        name: $scope.endpointPath
-                    });
-                    if (node) {
-                        endpointMBean = node.objectName;
-                    }
-                }
-                if (!endpointMBean) {
-                    endpointMBean = workspace.getSelectedMBeanName();
-                }
-                if (endpointMBean && contextMBean) {
-                    // TODO: grab url from tree instead? avoids a JMX call
-                    var reply = jolokia.request({ type: "read", mbean: endpointMBean, attribute: ["EndpointUri"] });
-                    var url = reply.value["EndpointUri"];
-                    if (url) {
-                        $scope.endpointUrl = url;
-                        Camel.log.info("Calling explainEndpointJson for url:", url);
-                        var query = {
-                            type: 'exec',
-                            mbean: contextMBean,
-                            operation: 'explainEndpointJson(java.lang.String,boolean)',
-                            arguments: [url, true]
-                        };
-                        jolokia.request(query, Core.onSuccess(populateData));
-                    }
-                }
-            }
-            function populateData(response) {
-                Camel.log.debug("Populate data", response);
-                if (response.value) {
-                    var schema = JSON.parse(response.value);
-                    $scope.icon = UrlHelpers.join(documentBase, "/img/icons/camel/endpoint24.png");
-                    $scope.title = $scope.endpointUrl;
-                    $scope.labels = schema.component.label ? schema.component.label.split(',') : [];
-                    $scope.description = schema.component.description;
-                    $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
-                    $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
-                    $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
-                    $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
-                    Core.$apply($scope);
-                }
-            }
-            setTimeout(function () {
-                $('[data-toggle=tooltip]').tooltip();
-            }, 1000);
-            updateData();
-        }]);
-})(Camel || (Camel = {}));
-/// <reference path="../camelPlugin.ts"/>
-/// <reference path="properties.service.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.controller("Camel.PropertiesRouteController", ["$scope", "$rootScope", "workspace", "localStorage", "jolokia", "propertiesService", function ($scope, $rootScope, workspace, localStorage, jolokia, propertiesService) {
-            var routeXmlNode = Camel.getSelectedRouteNode(workspace);
-            if (routeXmlNode) {
-                var data = Camel.getRouteNodeJSON(routeXmlNode);
-                var schema = Camel.getCamelSchema(routeXmlNode.nodeName);
-                addValueToProperties(data, schema);
-                if (Camel.log.enabledFor(Logger.DEBUG)) {
-                    Camel.log.debug("Properties - data:", JSON.stringify(data, null, "  "));
-                    Camel.log.debug("Properties - schema:", JSON.stringify(schema, null, "  "));
-                }
-                $scope.icon = Camel.getRouteNodeIcon(routeXmlNode);
-                $scope.title = schema.title;
-                $scope.labels = schema.group ? schema.group.split(',') : [];
-                $scope.description = schema.description;
-                $scope.definedProperties = propertiesService.getDefinedProperties(schema['properties']);
-                $scope.defaultProperties = propertiesService.getDefaultProperties(schema['properties']);
-                $scope.undefinedProperties = propertiesService.getUndefinedProperties(schema['properties']);
-                $scope.viewTemplate = "plugins/camel/html/nodePropertiesView.html";
-            }
-            function addValueToProperties(data, schema) {
-                for (var key in data) {
-                    var property = schema.properties[key];
-                    if (property) {
-                        property.value = data[key];
-                    }
-                }
-            }
-            setTimeout(function () {
-                $('[data-toggle=tooltip]').tooltip();
-            }, 1000);
-        }]);
-})(Camel || (Camel = {}));
-/// <reference path="../camelPlugin.ts"/>
-var Camel;
-(function (Camel) {
-    Camel._module.component('propertyList', {
-        bindings: {
-            title: '@',
-            properties: '<'
-        },
-        template: "\n      <div ng-show=\"$ctrl.properties.length > 0\">\n        <h3 title=\"\">{{$ctrl.title}}</h3>\n        <dl class=\"dl-horizontal\">\n          <dt ng-repeat-start=\"property in $ctrl.properties\" title=\"{{property.name}}\">\n            {{property.name}}\n          </dt>\n          <dd class=\"camel-properties-value\" title=\"\" ng-repeat-end>\n            <span class=\"pficon pficon-info camel-properties-info-circle\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{{property.description}}\"></span>\n            {{property.value}}\n          </dd>\n        </dl>\n      </div>\n    "
-    });
 })(Camel || (Camel = {}));
 var Karaf;
 (function (Karaf) {

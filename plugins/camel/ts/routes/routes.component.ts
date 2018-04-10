@@ -116,7 +116,7 @@ namespace Camel {
 
   }
 
-  export const routesComponent = <angular.IComponentOptions>{
+  export const routesComponent: angular.IComponentOptions = {
     template: `
       <h2>Routes</h2>
       <p ng-if="!$ctrl.routes">Loading...</p>

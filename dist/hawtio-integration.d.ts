@@ -364,6 +364,40 @@ declare namespace Camel {
     const exchangesModule: string;
 }
 declare namespace Camel {
+    class Property {
+        name: string;
+        value: string;
+        description: string;
+        constructor(name: string, value: string, description: string);
+        static sortByName(a: any, b: any): 0 | 1 | -1;
+    }
+}
+declare namespace Camel {
+    class PropertiesService {
+        getDefinedProperties(schemaProperties: {}): Property[];
+        getDefaultProperties(schemaProperties: {}): Property[];
+        getUndefinedProperties(schemaProperties: {}): Property[];
+    }
+}
+declare namespace Camel {
+    function PropertiesComponentController($scope: any, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, documentBase: string, propertiesService: PropertiesService): void;
+}
+declare namespace Camel {
+    function PropertiesDataFormatController($scope: any, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, documentBase: string, propertiesService: PropertiesService): void;
+}
+declare namespace Camel {
+    function PropertiesEndpointController($scope: any, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, documentBase: string, propertiesService: PropertiesService): void;
+}
+declare namespace Camel {
+    function PropertiesRouteController($scope: any, workspace: Jmx.Workspace, propertiesService: PropertiesService): void;
+}
+declare namespace Camel {
+    const propertyListComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const propertiesModule: string;
+}
+declare namespace Camel {
     class Route {
         name: string;
         state: string;
@@ -828,7 +862,7 @@ declare namespace Camel {
      * Adds the route children to the given folder for each step in the route
      * @method
      */
-    function loadRouteChildren(folder: Jmx.Folder, route: Element): Jmx.NodeSelection[];
+    function loadRouteChildren(folder: Jmx.Folder, route: Element, workspace: Jmx.Workspace): Jmx.NodeSelection[];
     /**
      * Returns the root JMX Folder of the camel mbeans
      */
@@ -1828,32 +1862,6 @@ declare namespace Camel {
 declare namespace Camel {
 }
 declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-}
-declare namespace Camel {
-    class Property {
-        name: string;
-        value: string;
-        description: string;
-        constructor(name: string, value: string, description: string);
-        static sortByName(a: any, b: any): 0 | 1 | -1;
-    }
-}
-declare namespace Camel {
-    class PropertiesService {
-        getDefinedProperties(schemaProperties: {}): Property[];
-        getDefaultProperties(schemaProperties: {}): Property[];
-        getUndefinedProperties(schemaProperties: {}): Property[];
-    }
 }
 declare namespace Camel {
 }
