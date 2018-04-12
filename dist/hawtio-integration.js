@@ -16721,8 +16721,7 @@ var Camel;
      */
     function isRouteNode(workspace) {
         var selection = workspace.selection || workspace.getSelectedMBean();
-        return selection && selection.domain === Camel.jmxDomain && selection.text !== 'routes' &&
-            (selection.typeName === 'routes' || selection.typeName === 'routeNode');
+        return selection && selection.domain === Camel.jmxDomain && selection.typeName === 'routeNode';
     }
     Camel.isRouteNode = isRouteNode;
     /**
@@ -21282,7 +21281,7 @@ var Camel;
             var canListTypeConverters = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelTypeConverter(this.workspace), "listTypeConverters");
             var canSeeEndpointStatistics = this.workspace.hasInvokeRightsForName(Camel.getSelectionCamelEndpointRuntimeRegistry(this.workspace), "endpointStatistics");
             var canSendMesssage = this.workspace.hasInvokeRights(this.workspace.selection, this.workspace.selection && this.workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage");
-            if (!isContextsFolder && !isRoutesFolder) {
+            if (!isContextsFolder && !isRoutesFolder && !Camel.isRouteNode(this.workspace)) {
                 tabs.push(new Nav.HawtioTab('Attributes', '/jmx/attributes'));
             }
             if (isContextsFolder) {
@@ -21294,7 +21293,7 @@ var Camel;
             if ((isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
                 tabs.push(new Nav.HawtioTab('Route Diagram', '/camel/routeDiagram'));
             }
-            if (Camel.isRouteNode(this.workspace)) {
+            if (isRoute || Camel.isRouteNode(this.workspace)) {
                 tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesRoute'));
             }
             if (isEndpoint && isCamelVersionEQGT_2_15 && canExplainEndpointJson) {
@@ -21315,7 +21314,7 @@ var Camel;
                 isCamelVersionEQGT_2_14 && isRouteMetrics && canDumpStatisticsAsJson) {
                 tabs.push(new Nav.HawtioTab('Route Metrics', '/camel/routeMetrics'));
             }
-            if (!Camel.isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
+            if (!isRoute && !Camel.isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
                 (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_14 && isRestRegistry &&
                 this.hasRestServices && canListRestServices) {
                 tabs.push(new Nav.HawtioTab('REST Services', '/camel/restServices'));
@@ -21325,7 +21324,7 @@ var Camel;
                 canSeeEndpointStatistics) {
                 tabs.push(new Nav.HawtioTab('Endpoints (in/out)', '/camel/endpoints-statistics'));
             }
-            if (!Camel.isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
+            if (!isRoute && !Camel.isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
                 (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_13 && canListTypeConverters) {
                 tabs.push(new Nav.HawtioTab('Type Converters', '/camel/typeConverter'));
             }
@@ -21347,10 +21346,10 @@ var Camel;
             if (isEndpointsFolder) {
                 tabs.push(new Nav.HawtioTab('Endpoints', '/camel/endpoints'));
             }
-            if (!isContextsFolder && !isRoutesFolder) {
+            if (!isContextsFolder && !isRoutesFolder && !Camel.isRouteNode(this.workspace)) {
                 tabs.push(new Nav.HawtioTab('Operations', '/jmx/operations'));
             }
-            if (!isContextsFolder && !isRoutesFolder) {
+            if (!isContextsFolder && !isRoutesFolder && !Camel.isRouteNode(this.workspace)) {
                 tabs.push(new Nav.HawtioTab('Chart', '/jmx/charts'));
             }
             return tabs;

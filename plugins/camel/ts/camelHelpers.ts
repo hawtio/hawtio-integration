@@ -335,8 +335,7 @@ namespace Camel {
    */
   export function isRouteNode(workspace: Jmx.Workspace) {
     var selection = workspace.selection || workspace.getSelectedMBean();
-    return selection && selection.domain === jmxDomain && selection.text !== 'routes' &&
-      (selection.typeName === 'routes' || selection.typeName === 'routeNode');
+    return selection && selection.domain === jmxDomain && selection.typeName === 'routeNode';
   }
 
   /**

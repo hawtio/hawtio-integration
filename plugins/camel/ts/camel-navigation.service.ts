@@ -45,7 +45,7 @@ namespace Camel {
       const canSeeEndpointStatistics = this.workspace.hasInvokeRightsForName(getSelectionCamelEndpointRuntimeRegistry(this.workspace), "endpointStatistics");
       const canSendMesssage = this.workspace.hasInvokeRights(this.workspace.selection, this.workspace.selection && this.workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage");
 
-      if (!isContextsFolder && !isRoutesFolder) {
+      if (!isContextsFolder && !isRoutesFolder && !isRouteNode(this.workspace)) {
         tabs.push(new Nav.HawtioTab('Attributes', '/jmx/attributes'));
       }
 
@@ -61,7 +61,7 @@ namespace Camel {
         tabs.push(new Nav.HawtioTab('Route Diagram', '/camel/routeDiagram'));
       }
 
-      if (isRouteNode(this.workspace)) {
+      if (isRoute || isRouteNode(this.workspace)) {
         tabs.push(new Nav.HawtioTab('Properties', '/camel/propertiesRoute'));
       }
 
@@ -88,7 +88,7 @@ namespace Camel {
         tabs.push(new Nav.HawtioTab('Route Metrics', '/camel/routeMetrics'));
       }
 
-      if (!isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
+      if (!isRoute && !isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
           (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_14 && isRestRegistry &&
           this.hasRestServices && canListRestServices) {
         tabs.push(new Nav.HawtioTab('REST Services', '/camel/restServices'));
@@ -100,7 +100,7 @@ namespace Camel {
         tabs.push(new Nav.HawtioTab('Endpoints (in/out)', '/camel/endpoints-statistics'));
       }
 
-      if (!isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
+      if (!isRoute && !isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
           (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_13 && canListTypeConverters) {
         tabs.push(new Nav.HawtioTab('Type Converters', '/camel/typeConverter'));
       }
@@ -129,11 +129,11 @@ namespace Camel {
         tabs.push(new Nav.HawtioTab('Endpoints', '/camel/endpoints'));
       }
 
-      if (!isContextsFolder && !isRoutesFolder) {
+      if (!isContextsFolder && !isRoutesFolder && !isRouteNode(this.workspace)) {
         tabs.push(new Nav.HawtioTab('Operations', '/jmx/operations'));
       }
 
-      if (!isContextsFolder && !isRoutesFolder) {
+      if (!isContextsFolder && !isRoutesFolder && !isRouteNode(this.workspace)) {
         tabs.push(new Nav.HawtioTab('Chart', '/jmx/charts'));
       }
 
