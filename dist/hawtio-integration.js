@@ -13783,7 +13783,7 @@ var Integration;
     configureAboutPage.$inject = ["aboutService"];
     function configureAboutPage(aboutService) {
         'ngInject';
-        aboutService.addProductInfo('Hawtio Integration', '3.2.28');
+        aboutService.addProductInfo('Hawtio Integration', 'PACKAGE_VERSION_PLACEHOLDER');
     }
     Integration.configureAboutPage = configureAboutPage;
 })(Integration || (Integration = {}));
@@ -25442,18 +25442,20 @@ var Osgi;
 var Osgi;
 (function (Osgi) {
     var OsgiNavigationController = /** @class */ (function () {
-        OsgiNavigationController.$inject = ["$location", "workspace", "treeService"];
-        function OsgiNavigationController($location, workspace, treeService) {
+        OsgiNavigationController.$inject = ["$location", "workspace", "treeService", "$scope"];
+        function OsgiNavigationController($location, workspace, treeService, $scope) {
             'ngInject';
             this.$location = $location;
             this.workspace = workspace;
             this.treeService = treeService;
+            this.$scope = $scope;
         }
         OsgiNavigationController.prototype.$onInit = function () {
             var _this = this;
             this.treeService.runWhenTreeReady(function () {
                 var tabs = [];
-                tabs.push(new Nav.HawtioTab('Bundles', '/osgi/bundles'));
+                var bundlesTab = new Nav.HawtioTab('Bundles', '/osgi/bundles');
+                tabs.push(bundlesTab);
                 if (Karaf.getSelectionFeaturesMBean(_this.workspace)) {
                     tabs.push(new Nav.HawtioTab('Features', '/osgi/features'));
                 }
@@ -25466,6 +25468,14 @@ var Osgi;
                 tabs.push(new Nav.HawtioTab('Framework', '/osgi/fwk'));
                 tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
                 _this.tabs = tabs;
+                _this.$scope.$on('$routeChangeSuccess', function (event, current, previous) {
+                    if (_.startsWith(_this.$location.path(), '/osgi/bundle/')) {
+                        _this.activeTab = bundlesTab;
+                    }
+                    else {
+                        _this.activeTab = null;
+                    }
+                });
             });
         };
         OsgiNavigationController.prototype.goto = function (tab) {
@@ -25475,7 +25485,7 @@ var Osgi;
     }());
     Osgi.OsgiNavigationController = OsgiNavigationController;
     Osgi.osgiNavigationComponent = {
-        template: '<hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>',
+        template: "\n      <hawtio-tabs tabs=\"$ctrl.tabs\"\n        active-tab=\"$ctrl.activeTab\"\n        on-change=\"$ctrl.goto(tab)\">\n      </hawtio-tabs>",
         controller: OsgiNavigationController
     };
     Osgi._module.component('osgiNavigation', Osgi.osgiNavigationComponent);

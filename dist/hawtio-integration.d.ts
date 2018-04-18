@@ -2151,8 +2151,10 @@ declare namespace Osgi {
         private $location;
         private workspace;
         private treeService;
+        private $scope;
         tabs: Nav.HawtioTab[];
-        constructor($location: ng.ILocationService, workspace: Jmx.Workspace, treeService: Jmx.TreeService);
+        activeTab: Nav.HawtioTab;
+        constructor($location: ng.ILocationService, workspace: Jmx.Workspace, treeService: Jmx.TreeService, $scope: ng.IScope);
         $onInit(): void;
         goto(tab: Nav.HawtioTab): void;
     }

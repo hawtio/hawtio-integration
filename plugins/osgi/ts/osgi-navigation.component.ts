@@ -6,9 +6,13 @@ namespace Osgi {
   export class OsgiNavigationController {
     
     tabs: Nav.HawtioTab[];
+    activeTab: Nav.HawtioTab;
 
-    constructor(private $location: ng.ILocationService, private workspace: Jmx.Workspace,
-      private treeService: Jmx.TreeService) {
+    constructor(
+      private $location: ng.ILocationService,
+      private workspace: Jmx.Workspace,
+      private treeService: Jmx.TreeService,
+      private $scope: ng.IScope) {
       'ngInject';
     }
     
@@ -16,7 +20,8 @@ namespace Osgi {
       this.treeService.runWhenTreeReady(() => {
         const tabs = [];
 
-        tabs.push(new Nav.HawtioTab('Bundles', '/osgi/bundles'));
+        const bundlesTab = new Nav.HawtioTab('Bundles', '/osgi/bundles');
+        tabs.push(bundlesTab);
         
         if (Karaf.getSelectionFeaturesMBean(this.workspace)) {
           tabs.push(new Nav.HawtioTab('Features', '/osgi/features'));
@@ -34,6 +39,14 @@ namespace Osgi {
         tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
 
         this.tabs = tabs;
+
+        this.$scope.$on('$routeChangeSuccess', (event, current, previous) => {
+          if (_.startsWith(this.$location.path(), '/osgi/bundle/')) {
+            this.activeTab = bundlesTab;
+          } else {
+            this.activeTab = null;
+          }
+        });
       });
     }
 
@@ -43,7 +56,11 @@ namespace Osgi {
   }
 
   export const osgiNavigationComponent: angular.IComponentOptions = {
-    template: '<hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>',
+    template: `
+      <hawtio-tabs tabs="$ctrl.tabs"
+        active-tab="$ctrl.activeTab"
+        on-change="$ctrl.goto(tab)">
+      </hawtio-tabs>`,
     controller: OsgiNavigationController
   };
 
