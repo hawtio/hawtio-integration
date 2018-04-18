@@ -41,11 +41,7 @@ const config = {
 
 const tsProject = typescript.createProject('tsconfig.json');
 
-gulp.task('clean-defs', function() {
-  return del(config.dist + '*.d.ts');
-});
-
-gulp.task('tsc', ['clean-defs'], function() {
+gulp.task('tsc', function() {
   var tsResult = tsProject.src()
     .pipe(gulpif(config.sourceMap, sourcemaps.init()))
     .pipe(tsProject());
