@@ -250,6 +250,7 @@
     "@types/jasmine": "2.8.6",
     "@hawtio/core-dts": "3.1.0",
     "@hawtio/core": "3.2.25",
-    "typescript": "2.8.1"
+    "typescript": "2.8.1",
+    "angular-animate": "1.6.10"
   }
 }

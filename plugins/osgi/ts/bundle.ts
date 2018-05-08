@@ -39,6 +39,7 @@ namespace Osgi {
     $scope.osgiToolsMBean = getHawtioOSGiToolsMBean(workspace);
     $scope.bundleId = $routeParams.bundleId;
     $scope.classLoadingAlert = null;
+    const notificationMsg = 'The operation completed successfully';
 
     updateTableContents();
 
@@ -124,6 +125,7 @@ namespace Osgi {
     $scope.startBundle = (bundleId) => {
       jolokiaService.execute(getSelectionFrameworkMBean(workspace), 'startBundle', bundleId)
         .then((response) => {
+          Core.notification('success', notificationMsg);
           updateTableContents();
         })
         .catch((error) => {
@@ -134,6 +136,7 @@ namespace Osgi {
     $scope.stopBundle = (bundleId) => {
       jolokiaService.execute(getSelectionFrameworkMBean(workspace), 'stopBundle', bundleId)
         .then((response) => {
+          Core.notification('success', notificationMsg);
           updateTableContents();
         })
         .catch((error) => {
@@ -144,6 +147,7 @@ namespace Osgi {
     $scope.updateBundle = (bundleId) => {
       jolokiaService.execute(getSelectionFrameworkMBean(workspace), 'updateBundle', bundleId)
         .then((response) => {
+          Core.notification('success', notificationMsg);
           updateTableContents();
         })
         .catch((error) => {
@@ -154,6 +158,7 @@ namespace Osgi {
     $scope.refreshBundle = (bundleId) => {
       jolokiaService.execute(getSelectionFrameworkMBean(workspace), 'refreshBundle', bundleId)
         .then((response) => {
+          Core.notification('success', notificationMsg);
           updateTableContents();
         })
         .catch((error) => {
@@ -164,6 +169,7 @@ namespace Osgi {
     $scope.uninstallBundle = (bundleId) => {
       jolokiaService.execute(getSelectionFrameworkMBean(workspace), 'uninstallBundle', bundleId)
         .then((response) => {
+          Core.notification('success', notificationMsg);
           $location.path("/osgi/bundles");
           Core.$apply($scope);
         })

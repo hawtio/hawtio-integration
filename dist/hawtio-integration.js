@@ -13783,7 +13783,7 @@ var Integration;
     configureAboutPage.$inject = ["aboutService"];
     function configureAboutPage(aboutService) {
         'ngInject';
-        aboutService.addProductInfo('Hawtio Integration', '3.2.29');
+        aboutService.addProductInfo('Hawtio Integration', 'PACKAGE_VERSION_PLACEHOLDER');
     }
     Integration.configureAboutPage = configureAboutPage;
 })(Integration || (Integration = {}));
@@ -24573,6 +24573,7 @@ var Osgi;
             $scope.osgiToolsMBean = Osgi.getHawtioOSGiToolsMBean(workspace);
             $scope.bundleId = $routeParams.bundleId;
             $scope.classLoadingAlert = null;
+            var notificationMsg = 'The operation completed successfully';
             updateTableContents();
             $scope.showValue = function (key) {
                 switch (key) {
@@ -24652,6 +24653,7 @@ var Osgi;
             $scope.startBundle = function (bundleId) {
                 jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'startBundle', bundleId)
                     .then(function (response) {
+                    Core.notification('success', notificationMsg);
                     updateTableContents();
                 })
                     .catch(function (error) {
@@ -24661,6 +24663,7 @@ var Osgi;
             $scope.stopBundle = function (bundleId) {
                 jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'stopBundle', bundleId)
                     .then(function (response) {
+                    Core.notification('success', notificationMsg);
                     updateTableContents();
                 })
                     .catch(function (error) {
@@ -24670,6 +24673,7 @@ var Osgi;
             $scope.updateBundle = function (bundleId) {
                 jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'updateBundle', bundleId)
                     .then(function (response) {
+                    Core.notification('success', notificationMsg);
                     updateTableContents();
                 })
                     .catch(function (error) {
@@ -24679,6 +24683,7 @@ var Osgi;
             $scope.refreshBundle = function (bundleId) {
                 jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'refreshBundle', bundleId)
                     .then(function (response) {
+                    Core.notification('success', notificationMsg);
                     updateTableContents();
                 })
                     .catch(function (error) {
@@ -24688,6 +24693,7 @@ var Osgi;
             $scope.uninstallBundle = function (bundleId) {
                 jolokiaService.execute(Osgi.getSelectionFrameworkMBean(workspace), 'uninstallBundle', bundleId)
                     .then(function (response) {
+                    Core.notification('success', notificationMsg);
                     $location.path("/osgi/bundles");
                     Core.$apply($scope);
                 })
