@@ -45,13 +45,14 @@ namespace Karaf {
       if ($scope.row) {
         addBundleDetails($scope.row);
         var dependencies = [];
-        //TODO - if the version isn't set or is 0.0.0 then maybe we show the highest available?
-        angular.forEach($scope.row.Dependencies, (version, name) => {
-          angular.forEach(version, (data, version) => {
-            dependencies.push({
-              Name: name,
-              Version: version
-            });
+        angular.forEach($scope.row.Dependencies, dependency => {
+          angular.forEach(dependency, dependency => {
+            if (dependency.Version === '0.0.0') {
+              angular.forEach(response.value.Features[dependency.Name], feature => {
+                dependency.Version = feature.Version;
+              });
+            }
+            dependencies.push(dependency);
           });
         });
         $scope.row.Dependencies = dependencies;
