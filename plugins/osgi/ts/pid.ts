@@ -381,6 +381,8 @@ namespace Osgi {
       angular.forEach($scope.configValues, (value, rawKey: string) => {
         if (isValidProperty(rawKey)) {
           var key = encodeKey(rawKey, pid);
+          //comply with Forms.safeIdentifier in 'forms/js/formHelpers.ts'
+          key = convertToSafeFormsIdentifier(key);
           var attrValue = value;
           var attrType = "string";
           if (angular.isObject(value)) {
@@ -414,9 +416,6 @@ namespace Osgi {
           if (disableHumanizeLabel) {
             property.title = rawKey;
           }
-
-          //comply with Forms.safeIdentifier in 'forms/js/formHelpers.ts'
-          key = key.replace(/-/g, "_");
           entity[key] = attrValue;
         }
       });
@@ -436,6 +435,17 @@ namespace Osgi {
       $scope.entity = entity;
       $scope.schema = schema;
       $scope.fullSchema = schema;
+    }
+
+    function convertToSafeFormsIdentifier(key) {
+      return key
+        .replace(/-/g, "_")
+        .replace(/:/g, '_')
+        .replace(/\//g, '_')
+        .replace(/,/g, '_')
+        .replace(/\[/g, '_')
+        .replace(/\)/g, '_')
+        .replace(/\*/g, '_');
     }
 
     /**
