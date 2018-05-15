@@ -28,12 +28,13 @@ namespace Osgi {
     message: string
   }
 
-  _module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokiaService", (
+  _module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokiaService", "$q", (
     $scope,
     $location: ng.ILocationService,
     workspace: Jmx.Workspace,
     $routeParams,
-    jolokiaService: JVM.JolokiaService) => {
+    jolokiaService: JVM.JolokiaService,
+    $q: ng.IQService) => {
 
     $scope.frameworkMBean = getSelectionFrameworkMBean(workspace);
     $scope.osgiToolsMBean = getHawtioOSGiToolsMBean(workspace);
@@ -315,16 +316,16 @@ namespace Osgi {
     }
 
     function updateTableContents() {
-      let mbean = getSelectionBundleMBean(workspace);
-      if (mbean) {
+      runWhenTreeReady(() => {
+        let mbean = getSelectionBundleMBean(workspace);
         jolokiaService.execute(mbean, 'listBundles()')
           .then((response) => {
             populateTable(response);
           })
           .catch((error) => {
             Core.notification('danger', error);
-          });
-      }
+          })
+      }, workspace, $q);
     }
   }]);
 }

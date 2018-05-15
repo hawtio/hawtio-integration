@@ -24569,7 +24569,7 @@ var Osgi;
         rv.sort();
         return rv.toString();
     }
-    Osgi._module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokiaService", function ($scope, $location, workspace, $routeParams, jolokiaService) {
+    Osgi._module.controller("Osgi.BundleController", ["$scope", "$location", "workspace", "$routeParams", "jolokiaService", "$q", function ($scope, $location, workspace, $routeParams, jolokiaService, $q) {
             $scope.frameworkMBean = Osgi.getSelectionFrameworkMBean(workspace);
             $scope.osgiToolsMBean = Osgi.getHawtioOSGiToolsMBean(workspace);
             $scope.bundleId = $routeParams.bundleId;
@@ -24825,8 +24825,8 @@ var Osgi;
                 }
             }
             function updateTableContents() {
-                var mbean = Osgi.getSelectionBundleMBean(workspace);
-                if (mbean) {
+                Osgi.runWhenTreeReady(function () {
+                    var mbean = Osgi.getSelectionBundleMBean(workspace);
                     jolokiaService.execute(mbean, 'listBundles()')
                         .then(function (response) {
                         populateTable(response);
@@ -24834,7 +24834,7 @@ var Osgi;
                         .catch(function (error) {
                         Core.notification('danger', error);
                     });
-                }
+                }, workspace, $q);
             }
         }]);
 })(Osgi || (Osgi = {}));
