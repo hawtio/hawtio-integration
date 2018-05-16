@@ -221,8 +221,7 @@ namespace Osgi {
 
     private getSelectedBundles(): Bundle[] {
       return this.tableItems
-        .map((tableItem, i) => angular.extend(this.bundles[i], { selected: tableItem['selected'] }))
-        .filter(bundle => bundle.selected);
+        .filter(tableItem => tableItem.selected);
     }
 
     private enableDisableActions() {
