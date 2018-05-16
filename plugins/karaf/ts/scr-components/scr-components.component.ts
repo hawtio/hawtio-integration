@@ -138,7 +138,6 @@ namespace Karaf {
 
     private getSelectedComponents(): ScrComponent[] {
       return this.tableItems
-        .map((tableItem, i) => angular.extend(this.components[i], { selected: tableItem['selected'] }))
         .filter(component => component.selected);
     }
 

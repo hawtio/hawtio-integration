@@ -19249,10 +19249,8 @@ var Osgi;
             this.toolbarConfig.filterConfig.resultsCount = filteredBundles.length;
         };
         BundlesController.prototype.getSelectedBundles = function () {
-            var _this = this;
             return this.tableItems
-                .map(function (tableItem, i) { return angular.extend(_this.bundles[i], { selected: tableItem['selected'] }); })
-                .filter(function (bundle) { return bundle.selected; });
+                .filter(function (tableItem) { return tableItem.selected; });
         };
         BundlesController.prototype.enableDisableActions = function () {
             var selectedBundles = this.getSelectedBundles();
@@ -24228,9 +24226,7 @@ var Karaf;
             this.disableAction.isDisabled = noComponentsSelected || selectedComponents.every(function (component) { return component.state !== 'Enabled'; });
         };
         ScrComponentsController.prototype.getSelectedComponents = function () {
-            var _this = this;
             return this.tableItems
-                .map(function (tableItem, i) { return angular.extend(_this.components[i], { selected: tableItem['selected'] }); })
                 .filter(function (component) { return component.selected; });
         };
         ScrComponentsController.FILTER_FUNCTIONS = {
