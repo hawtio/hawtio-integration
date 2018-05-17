@@ -2,12 +2,14 @@
   <form class="toolbar-pf-actions">
     <div class="form-group">
       <button ng-click="install(name,version)"
+              ng-disabled="row.Installed"
               class="btn btn-default"
               title="install"
               hawtio-show
               object-name="{{featuresMBean}}"
               method-name="installFeature">Install</button>
       <button ng-click="uninstall(name,version)"
+              ng-disabled="!row.Installed"
               class="btn btn-default"
               title="uninstall"
               hawtio-show
@@ -24,7 +26,7 @@
   <dt>Name</dt>
   <dd>{{row.Name}}</dd>
   <dt>State</dt>
-  <dd>{{row.Installed === 'true' ? 'Installed' : 'Uninstalled'}}</dd>
+  <dd>{{row.Installed ? 'Installed' : 'Uninstalled'}}</dd>
   <dt>Repository Name</dt>
   <dd>{{row.RepositoryName}}</dd>
   <dt>Repository URI</dt>
