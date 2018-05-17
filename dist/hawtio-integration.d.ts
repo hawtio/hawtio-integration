@@ -1202,7 +1202,7 @@ declare namespace Osgi {
         $onInit(): void;
         private loadBundles();
         private toolbarActions();
-        private applyFilters(filters);
+        private applyFilters(filters?);
         private getSelectedBundles();
         private enableDisableActions();
     }

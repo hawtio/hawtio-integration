@@ -141,6 +141,7 @@ namespace Osgi {
         onFilterChange: (filters: any[]) => {
           this.applyFilters(filters);
         },
+        appliedFilters: [],
         resultsCount: 0
       },
       actionsConfig: {
@@ -175,8 +176,7 @@ namespace Osgi {
       this.bundlesService.getBundles()
         .then(bundles => {
           this.bundles = bundles;
-          this.tableItems = bundles;
-          this.toolbarConfig.filterConfig.resultsCount = bundles.length;
+          this.applyFilters(this.toolbarConfig.filterConfig.appliedFilters);
           this.enableDisableActions();
           this.loading = false;
         });
@@ -210,7 +210,7 @@ namespace Osgi {
       return actions;
     }
 
-    private applyFilters(filters: any[]) {
+    private applyFilters(filters: any[] = []) {
       let filteredBundles = this.bundles;
       filters.forEach(filter => {
         filteredBundles = BundlesController.FILTER_FUNCTIONS[filter.id](filteredBundles, filter.value);
