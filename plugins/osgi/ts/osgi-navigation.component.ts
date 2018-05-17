@@ -41,7 +41,7 @@ namespace Osgi {
         this.tabs = tabs;
 
         this.$scope.$on('$routeChangeSuccess', (event, current, previous) => {
-          if (_.startsWith(this.$location.path(), '/osgi/bundle/')) {
+          if (_.startsWith(this.$location.path(), '/osgi/bundle')) {
             this.activeTab = bundlesTab;
           } else {
             this.activeTab = null;

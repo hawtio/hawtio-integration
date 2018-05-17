@@ -25473,7 +25473,7 @@ var Osgi;
                 tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
                 _this.tabs = tabs;
                 _this.$scope.$on('$routeChangeSuccess', function (event, current, previous) {
-                    if (_.startsWith(_this.$location.path(), '/osgi/bundle/')) {
+                    if (_.startsWith(_this.$location.path(), '/osgi/bundle')) {
                         _this.activeTab = bundlesTab;
                     }
                     else {
