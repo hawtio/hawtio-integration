@@ -1925,6 +1925,7 @@ declare namespace Karaf {
         listConfig: {
             showSelectBox: boolean;
             useExpandingRows: boolean;
+            updateInProgress: boolean;
         };
         loading: boolean;
         listItems: any;

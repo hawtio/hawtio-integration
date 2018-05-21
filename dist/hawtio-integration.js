@@ -23762,23 +23762,25 @@ var Karaf;
             this.repositoryFilterValues = [];
             this.listConfig = {
                 showSelectBox: false,
-                useExpandingRows: false
+                useExpandingRows: false,
+                updateInProgress: false
             };
             this.loading = true;
             this.listItems = null;
             this.installButton = {
                 name: 'Install',
                 actionFn: function (action, item) {
-                    action.selectedId = item.id;
+                    Core.notification('info', "Installing feature " + item.name);
+                    _this.listConfig.updateInProgress = true;
                     _this.featuresService.installFeature(item)
-                        .then(function (response) {
-                        Core.notification('success', response);
+                        .then(function () {
+                        Core.notification('success', "Installed feature " + item.name);
                         _this.loadFeatureRepositories();
-                        action.selectedId = null;
+                        _this.listConfig.updateInProgress = false;
                     })
                         .catch(function (error) {
                         Core.notification('danger', error);
-                        action.selectedId = null;
+                        _this.listConfig.updateInProgress = true;
                     });
                 },
                 selectedId: null
@@ -23786,16 +23788,17 @@ var Karaf;
             this.uninstallButton = {
                 name: 'Uninstall',
                 actionFn: function (action, item) {
-                    action.selectedId = item.id;
+                    Core.notification('info', "Uninstalling feature " + item.name);
+                    _this.listConfig.updateInProgress = true;
                     _this.featuresService.uninstallFeature(item)
-                        .then(function (response) {
-                        Core.notification('success', response);
+                        .then(function () {
+                        Core.notification('success', "Uninstalled feature " + item.name);
                         _this.loadFeatureRepositories();
-                        action.selectedId = null;
+                        _this.listConfig.updateInProgress = false;
                     })
                         .catch(function (error) {
                         Core.notification('danger', error);
-                        action.selectedId = null;
+                        _this.listConfig.updateInProgress = false;
                     });
                 },
                 selectedId: null
@@ -23954,7 +23957,7 @@ var Karaf;
             this.toolbarConfig.filterConfig.resultsCount = filteredFeatures.length;
         };
         FeaturesController.prototype.enableButtonForItem = function (action, item) {
-            if (action.selectedId && action.selectedId === item.id) {
+            if (this['config']['updateInProgress'] === true) {
                 return false;
             }
             if (action.name === 'Install') {

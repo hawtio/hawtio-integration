@@ -28,7 +28,8 @@ namespace Karaf {
 
     listConfig = {
       showSelectBox: false,
-      useExpandingRows: false
+      useExpandingRows: false,
+      updateInProgress: false
     };
 
     loading = true;
@@ -38,16 +39,18 @@ namespace Karaf {
     private readonly installButton = {
       name: 'Install',
       actionFn: (action, item) => {
-        action.selectedId = item.id;
+        Core.notification('info', `Installing feature ${item.name}`);
+
+        this.listConfig.updateInProgress = true;
         this.featuresService.installFeature(item)
-          .then(response => {
-            Core.notification('success', response);
+          .then(() => {
+            Core.notification('success', `Installed feature ${item.name}`);
             this.loadFeatureRepositories();
-            action.selectedId = null;
+            this.listConfig.updateInProgress = false;
           })
           .catch(error => {
             Core.notification('danger', error)
-            action.selectedId = null;
+            this.listConfig.updateInProgress = true;
           });
       },
       selectedId: null
@@ -56,16 +59,18 @@ namespace Karaf {
     private readonly uninstallButton = {
       name: 'Uninstall',
       actionFn: (action, item) => {
-        action.selectedId = item.id;
+        Core.notification('info', `Uninstalling feature ${item.name}`);
+
+        this.listConfig.updateInProgress = true;
         this.featuresService.uninstallFeature(item)
-          .then(response => {
-            Core.notification('success', response);
+          .then(() => {
+            Core.notification('success', `Uninstalled feature ${item.name}`);
             this.loadFeatureRepositories();
-            action.selectedId = null;
+            this.listConfig.updateInProgress = false;
           })
           .catch(error => {
             Core.notification('danger', error)
-            action.selectedId = null;
+            this.listConfig.updateInProgress = false;
           });
       },
       selectedId: null
@@ -245,7 +250,7 @@ namespace Karaf {
     }
 
     enableButtonForItem(action, item) {
-      if (action.selectedId && action.selectedId === item.id) {
+      if (this['config']['updateInProgress'] === true) {
         return false;
       }
 
