@@ -3,6 +3,7 @@
 /// <reference types="angular" />
 /// <reference types="angular-mocks" />
 /// <reference types="angular-route" />
+/// <reference types="angular-ui-bootstrap" />
 declare namespace Integration {
     function configureAboutPage(aboutService: About.AboutService): void;
 }
@@ -1914,13 +1915,10 @@ declare namespace Karaf {
     class FeaturesController {
         private featuresService;
         private $uibModal;
-        private $scope;
         private workspace;
         private static FILTER_FUNCTIONS;
         private features;
         private repositories;
-        private selectedRepository;
-        private repositoryUri;
         private repositoryFilterValues;
         listConfig: {
             showSelectBox: boolean;
@@ -1958,7 +1956,7 @@ declare namespace Karaf {
             };
             isTableView: boolean;
         };
-        constructor(featuresService: FeaturesService, $uibModal: any, $scope: any, workspace: Jmx.Workspace);
+        constructor(featuresService: FeaturesService, $uibModal: angular.ui.bootstrap.IModalService, workspace: Jmx.Workspace);
         $onInit(): void;
         private itemActionButtons();
         private toolbarActions();
@@ -1967,6 +1965,26 @@ declare namespace Karaf {
         enableButtonForItem(action: any, item: any): boolean;
     }
     const featuresComponent: angular.IComponentOptions;
+}
+declare namespace Karaf {
+    class FeatureRepositoryAddModalController {
+        private featuresService;
+        private modalInstance;
+        constructor(featuresService: FeaturesService);
+        addRepository(uri: string): void;
+    }
+    const featureRepositoryAddModalComponent: angular.IComponentOptions;
+}
+declare namespace Karaf {
+    class FeatureRepositoryRemoveModalController {
+        private modalInstance;
+        private resolve;
+        private repositories;
+        constructor();
+        $onInit(): void;
+        removeRepository(repository: FeatureRepository): void;
+    }
+    const featureRepositoryRemoveModalComponent: angular.IComponentOptions;
 }
 declare namespace Karaf {
     const featuresModule: string;

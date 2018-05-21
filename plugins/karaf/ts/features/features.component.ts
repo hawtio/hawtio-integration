@@ -20,10 +20,6 @@ namespace Karaf {
 
     private repositories: FeatureRepository[];
 
-    private selectedRepository: FeatureRepository;
-
-    private repositoryUri: string;
-
     private repositoryFilterValues: string[] = [];
 
     listConfig = {
@@ -82,19 +78,23 @@ namespace Karaf {
       name: 'Add repository',
       actionFn: action => {
         this.$uibModal.open({
-          templateUrl: 'addRepositoryDialog.html',
-          scope: this.$scope
+          component: 'featureRepositoryAddModal'
         })
-          .result.then(() => {
-            if (this.repositoryUri) {
-              this.featuresService.addFeatureRepository(this.repositoryUri)
-                .then(response => {
-                  Core.notification('success', response);
+          .result.then((repository: any) => {
+            if (repository.uri && repository.uri.trim().length > 0) {
+              let repositoryMatch:FeatureRepository = this.repositories.filter(match => match.uri === repository.uri.trim())[0]
+              if (repositoryMatch) {
+                Core.notification('warning',`Feature repository ${repositoryMatch.uri} is already installed`);
+              } else {
+                Core.notification('info', `Adding feature repository ${repository.uri}`);
+                this.featuresService.addFeatureRepository(repository.uri)
+                .then(() => {
+                  Core.notification('success', `Added feature repository ${repository.uri}`);
                   this.loadFeatureRepositories();
                 })
                 .catch(error => Core.notification('danger', error));
+              }
             }
-            this.repositoryUri = null;
           });
       }
     };
@@ -103,17 +103,17 @@ namespace Karaf {
       name: 'Remove repository',
       actionFn: action => {
         this.$uibModal.open({
-          templateUrl: 'removeRepositoryDialog.html',
-          scope: this.$scope
+          component: 'featureRepositoryRemoveModal',
+          resolve: {repositories: () => {return this.repositories}}
         })
-          .result.then(() => {
-            if (this.selectedRepository) {
+          .result.then((selectedRepository: FeatureRepository) => {
+            if (selectedRepository) {
               let dependentRepositories = [];
 
               angular.forEach(this.repositories, repository => {
-                if (repository.name !== this.selectedRepository.name) {
+                if (repository.name !== selectedRepository.name) {
                   angular.forEach(repository.dependencies, dependency => {
-                    if (dependency === this.selectedRepository.uri) {
+                    if (dependency === selectedRepository.uri) {
                       dependentRepositories.push(repository.name);
                     }
                   });
@@ -123,19 +123,18 @@ namespace Karaf {
               if (dependentRepositories.length > 0) {
                 let message = dependentRepositories.length === 1 ? dependentRepositories[0] : dependentRepositories.length + ' other features';
                 Core.notification('danger',
-                  `Unable to remove repository ${this.selectedRepository.name}. It is required by ${message}.`)
-                this.selectedRepository = null;
+                  `Unable to remove repository ${selectedRepository.name}. It is required by ${message}.`)
                 return;
               }
 
-              this.featuresService.removeFeatureRepository(this.selectedRepository)
-                .then(response => {
-                  Core.notification('success', response);
+              Core.notification('info', `Removing feature repository ${selectedRepository.uri}`);
+              this.featuresService.removeFeatureRepository(selectedRepository)
+                .then(() => {
+                  Core.notification('success', `Removed feature repository ${selectedRepository.uri}`);
                   this.loadFeatureRepositories();
                 })
                 .catch(error => Core.notification('danger', error));
             }
-            this.selectedRepository = null;
           });
       }
     };
@@ -178,8 +177,7 @@ namespace Karaf {
       isTableView: false
     };
 
-    constructor(private featuresService: FeaturesService, private $uibModal, private $scope,
-      private workspace: Jmx.Workspace) {
+    constructor(private featuresService: FeaturesService, private $uibModal: angular.ui.bootstrap.IModalService, private workspace: Jmx.Workspace) {
       'ngInject';
     }
 
