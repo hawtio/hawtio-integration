@@ -14568,7 +14568,7 @@ var Camel;
                 name: 'Delete',
                 actionFn: function (action) {
                     _this.$uibModal.open({
-                        templateUrl: 'plugins/camel/html/deleteContextModal.html'
+                        templateUrl: 'plugins/camel/html/deleteContextWarningModal.html'
                     })
                         .result.then(function () {
                         var selectedContexts = _this.getSelectedContexts();

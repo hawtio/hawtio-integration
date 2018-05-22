@@ -27,7 +27,7 @@ namespace Camel {
       name: 'Delete',
       actionFn: action => {
         this.$uibModal.open({
-          templateUrl: 'plugins/camel/html/deleteContextModal.html'
+          templateUrl: 'plugins/camel/html/deleteContextWarningModal.html'
         })
         .result.then(() => {
           let selectedContexts = this.getSelectedContexts();
