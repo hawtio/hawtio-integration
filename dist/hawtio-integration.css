@@ -787,6 +787,10 @@ div.camel-properties {
   background-color: inherit;
   border: none;
 }
+.pid-form .control-label {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
 
 .spring-boot-health-main {
   margin-bottom: 20px;

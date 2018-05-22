@@ -180,9 +180,9 @@ namespace Osgi {
 
     $scope.addPropertyConfirmed = (key: string, value: string) => {
       key = key.trim();
-      const propertyKeyRegex = RegExp('^[A-Za-z]{1}[A-Za-z0-9]*$');
-      const valid = propertyKeyRegex.test(key);
-      if (valid) {
+      if (key.indexOf(' ') !== -1) {
+        $scope.propertyKeyErrorMsg = `Spaces are not allowed`;
+      } else {
         uibModalInstance.close();
         $scope.configValues[key] = {
           Key: key,
@@ -191,8 +191,6 @@ namespace Osgi {
         };
         updateSchema();
         $scope.pidSave();
-      } else {
-        $scope.propertyKeyErrorMsg = `Use only letters and numbers and don't start with a number`;
       }
     };
 
@@ -298,8 +296,6 @@ namespace Osgi {
         schema["name"] = Core.pathGet(pidMetadata, [pid, "name"]) || metaType.name;
         schema["description"] = Core.pathGet(pidMetadata, [pid, "description"]) || metaType.description;
 
-        var disableHumanizeLabel = Core.pathGet(pidMetadata, [pid, "schemaExtensions", "disableHumanizeLabel"]);
-
         angular.forEach(metaType.attributes, (attribute) => {
           var id = attribute.id;
           if (isValidProperty(id)) {
@@ -314,12 +310,10 @@ namespace Osgi {
               'label-attributes': {
                 class: labelClass
               },
-              type: typeName
+              type: typeName,
+              label: id
 
             };
-            if (disableHumanizeLabel) {
-              attributeProperties.title = id;
-            }
             if (attribute.typeName === "char") {
               attributeProperties["maxLength"] = 1;
               attributeProperties["minLength"] = 1;
@@ -398,7 +392,8 @@ namespace Osgi {
               'label-attributes': {
                 class: labelClass
               },
-              type: attrType
+              type: attrType,
+              label: rawKey
             };
             properties[key] = property;
             if (rawKey == 'org.osgi.service.http.port') {
@@ -412,9 +407,6 @@ namespace Osgi {
                 attrValue = attrValue ? attrValue.split(",") : [];
               }
             }
-          }
-          if (disableHumanizeLabel) {
-            property.title = rawKey;
           }
           entity[key] = attrValue;
         }
