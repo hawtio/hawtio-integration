@@ -1,6 +1,6 @@
 ### Camel
 
-Click [Camel](#/jmx/attributes?tab=camel) in the top navigation bar to view all the running Camel Contexts in the current JVM. (The selection will not appear on the navigation bar if there is no Camel running).
+Click [Camel](jmx/attributes?main-tab=camel) in the top navigation bar to view all the running Camel Contexts in the current JVM. (The selection will not appear on the navigation bar if there is no Camel running).
 
 The Camel plugin allows you to view all the running Camel applications in the current JVM.
 You can among others see the following details:
