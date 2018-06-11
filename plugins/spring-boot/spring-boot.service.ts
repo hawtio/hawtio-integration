@@ -2,32 +2,26 @@ namespace SpringBoot {
 
   export class SpringBootService {
 
-    constructor(private $q: ng.IQService, private treeService: Jmx.TreeService) {
+    constructor(private workspace: Jmx.Workspace) {
       'ngInject';
     }
 
-    getTabs(): ng.IPromise<Nav.HawtioTab[]> {
-      return this.$q.all([
-        this.hasEndpoint('healthEndpoint'),
-        this.hasEndpoint('loggersEndpoint'),
-        this.hasEndpoint('traceEndpoint')])
-      .then(results => {
-        const tabs = [];
-        if (results[0]) {
-          tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
-        }
-        if (results[1]) {
-          tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
-        }
-        if (results[2]) {
-          tabs.push(new Nav.HawtioTab('Trace', '/spring-boot/trace'));
-        }
-        return tabs;
-      });
+    getTabs(): Nav.HawtioTab[] {
+      const tabs = [];
+      if (this.hasEndpoint('healthEndpoint')) {
+        tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
+      }
+      if (this.hasEndpoint('loggersEndpoint')) {
+        tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
+      }
+      if (this.hasEndpoint('traceEndpoint')) {
+        tabs.push(new Nav.HawtioTab('Trace', '/spring-boot/trace'));
+      }
+      return tabs;
     }
 
-    private hasEndpoint(name: string): ng.IPromise<boolean> {
-      return this.treeService.treeContainsDomainAndProperties('org.springframework.boot',
+    private hasEndpoint(name: string): boolean {
+      return this.workspace.treeContainsDomainAndProperties('org.springframework.boot',
         {type: 'Endpoint', name: name});
     }
 

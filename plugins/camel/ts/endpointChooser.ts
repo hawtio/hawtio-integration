@@ -281,12 +281,38 @@ namespace Camel {
       }
     }
 
+    /**
+     * Creates a remote workspace given a remote jolokia for querying the JMX MBeans inside the jolokia
+     * @param remoteJolokia
+     * @param remoteJolokiaStatus
+     * @param $location
+     * @param localStorage
+     * @return {Workspace}
+     */
+    function createRemoteWorkspace(remoteJolokia: Jolokia.IJolokia, remoteJolokiaStatus: JVM.JolokiaStatus,
+      $location: ng.ILocationService, localStorage: Storage, $rootScope: ng.IRootScopeService = null,
+      $compile: ng.ICompileService = null, $templateCache: ng.ITemplateCacheService = null): Jmx.Workspace {
+      // lets create a child workspace object for the remote container
+      let jolokiaStatus: JVM.JolokiaStatus = {
+        xhr: null,
+        listMethod: remoteJolokiaStatus.listMethod,
+        listMBean: remoteJolokiaStatus.listMBean
+      };
+      // disable reload notifications
+      let jmxTreeLazyLoadRegistry = Core.lazyLoaders;
+      let profileWorkspace = new Jmx.Workspace(remoteJolokia, jolokiaStatus, jmxTreeLazyLoadRegistry, $location, $compile, $templateCache, localStorage, $rootScope);
+  
+      log.info("Loading the profile using jolokia: " + remoteJolokia);
+      profileWorkspace.loadTree();
+      return profileWorkspace;
+    }
+    
     function findCamelContextMBean() {
       let profileWorkspace = $scope.profileWorkspace;
       if (!profileWorkspace) {
         var remoteJolokia = $scope.jolokia;
         if (remoteJolokia) {
-          profileWorkspace = Jmx.createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location, localStorage);
+          profileWorkspace = createRemoteWorkspace(remoteJolokia, workspace.jolokiaStatus, $location, localStorage);
           $scope.profileWorkspace = profileWorkspace;
         }
       }

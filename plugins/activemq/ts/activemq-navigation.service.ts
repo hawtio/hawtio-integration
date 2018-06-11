@@ -200,6 +200,4 @@ namespace ActiveMQ {
 
   }
 
-  _module.service('activeMQNavigationService', ActiveMQNavigationService);
-
 }

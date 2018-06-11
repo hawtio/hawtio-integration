@@ -10,8 +10,7 @@ namespace SpringBoot {
     }
 
     $onInit() {
-      this.springBootService.getTabs()
-        .then(tabs => this.tabs = tabs);
+      this.tabs = this.springBootService.getTabs();
     }
 
     goto(tab: Nav.HawtioTab) {

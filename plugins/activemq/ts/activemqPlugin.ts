@@ -1,6 +1,9 @@
-/// <reference path="activemqHelpers.ts"/>
 /// <reference path="destination/destination.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
+/// <reference path="activemq.component.ts"/>
+/// <reference path="activemq-navigation.component.ts"/>
+/// <reference path="activemq-navigation.service.ts"/>
+/// <reference path="activemqHelpers.ts"/>
 
 namespace ActiveMQ {
 
@@ -17,6 +20,9 @@ namespace ActiveMQ {
     .controller('queuesController', ['$scope', ($scope): void => {
       $scope.destinationType = 'queues';
     }])
+    .component('activemq', activeMQComponent)
+    .component('activemqNavigation', activeMQNavigationComponent)
+    .service('activeMQNavigationService', ActiveMQNavigationService)
     .run(configurePlugin);
 
   function defineRoutes(configManager: Core.ConfigManager): void {
@@ -34,9 +40,8 @@ namespace ActiveMQ {
   }
 
   function configurePlugin(
-      HawtioNav: Nav.Registry,
+      mainNavService: Nav.MainNavService,
       workspace: Jmx.Workspace,
-      viewRegistry,
       helpRegistry: Help.HelpRegistry,
       preferencesRegistry: Core.PreferencesRegistry,
       localStorage: Storage,
@@ -46,13 +51,19 @@ namespace ActiveMQ {
     ): void {
     'ngInject';
 
-    viewRegistry['{ "main-tab": "activemq" }'] = 'plugins/activemq/html/layoutActiveMQTree.html';
     helpRegistry.addUserDoc('activemq', 'plugins/activemq/doc/help.md', () => {
       return workspace.treeContainsDomainAndProperties("org.apache.activemq");
     });
 
     preferencesRegistry.addTab("ActiveMQ", "plugins/activemq/html/preferences.html", () => {
       return workspace.treeContainsDomainAndProperties("org.apache.activemq");
+    });
+
+    mainNavService.addItem({
+      title: 'ActiveMQ',
+      href: '/jmx/attributes',
+      template: '<activemq></activemq>',
+      isValid: () => workspace.treeContainsDomainAndProperties(jmxDomain) && activeMQNavigationService.getTabs().length > 0
     });
 
     workspace.addTreePostProcessor(postProcessTree);
@@ -116,19 +127,6 @@ namespace ActiveMQ {
       {field: 'IndexDirectory', displayName: 'Index Directory', width: "**"},
       {field: 'LogDirectory', displayName: 'Log Directory', width: "**"}
     ];
-
-    const tab = HawtioNav.builder().id('activemq')
-      .title(() => 'ActiveMQ')
-      .defaultPage({
-        rank: 15,
-        isValid: (yes, no) => workspace.treeContainsDomainAndProperties(jmxDomain) ? yes() : no()
-      })
-      .href(() => '/jmx/attributes')
-      .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain) && activeMQNavigationService.getTabs().length > 0)
-      .isSelected(() => workspace.isMainTabActive('activemq'))
-      .build();
-
-    HawtioNav.add(tab);
 
     function postProcessTree(tree: Jmx.Folder) {
       var activemq = tree.get("org.apache.activemq");

@@ -1,82 +1,58 @@
 /// <reference path="spring-boot.service.ts"/>
 
-describe("SpringBootService", function() {
+describe("SpringBootService", () => {
 
   const healthTab = new Nav.HawtioTab('Health', '/spring-boot/health');
   const loggersTab = new Nav.HawtioTab('Loggers', '/spring-boot/loggers');
   const traceTab = new Nav.HawtioTab('Trace', '/spring-boot/trace');
   
-  let $q: ng.IQService;
-  let $rootScope: ng.IRootScopeService;
-  let treeService: jasmine.SpyObj<Jmx.TreeService>;
+  let workspace: jasmine.SpyObj<Jmx.Workspace>;
   let springBootService: SpringBoot.SpringBootService;
 
-  beforeEach(inject(function(_$q_, _$rootScope_) {
-    $q = _$q_;
-    $rootScope = _$rootScope_;
-    treeService = jasmine.createSpyObj('treeService', ['treeContainsDomainAndProperties']);
-    springBootService = new SpringBoot.SpringBootService($q, treeService);
-  }));
+  beforeEach(() => {
+    workspace = jasmine.createSpyObj('workspace', ['treeContainsDomainAndProperties']);
+    springBootService = new SpringBoot.SpringBootService(workspace);
+  });
 
-  describe("getTabs()", function() {
+  describe("getTabs()", () => {
 
-    it("should return all tabs", function(done) {
+    it("should return all tabs", () => {
       // given
-      treeService.treeContainsDomainAndProperties.and.returnValues(
-        $q.resolve(true), $q.resolve(true), $q.resolve(true));
+      workspace.treeContainsDomainAndProperties.and.returnValues(true, true, true);
       // when
-      springBootService.getTabs()
-        .then(tabs => {
-          // then
-          expect(tabs[0]).toEqual(healthTab);
-          expect(tabs[1]).toEqual(loggersTab);
-          expect(tabs[2]).toEqual(traceTab);
-          done();
-        });
-      $rootScope.$apply();
+      const tabs = springBootService.getTabs();
+      // then
+      expect(tabs[0]).toEqual(healthTab);
+      expect(tabs[1]).toEqual(loggersTab);
+      expect(tabs[2]).toEqual(traceTab);
     });
 
-    it("should return two tabs", function(done) {
+    it("should return two tabs", () => {
       // given
-      treeService.treeContainsDomainAndProperties.and.returnValues(
-        $q.resolve(true), $q.resolve(false), $q.resolve(true));
+      workspace.treeContainsDomainAndProperties.and.returnValues(true, false, true);
       // when
-      springBootService.getTabs()
-        .then(tabs => {
-          // then
-          expect(tabs[0]).toEqual(healthTab);
-          expect(tabs[1]).toEqual(traceTab);
-          done();
-        });
-      $rootScope.$apply();
+      const tabs = springBootService.getTabs();
+      // then
+      expect(tabs[0]).toEqual(healthTab);
+      expect(tabs[1]).toEqual(traceTab);
     });
 
-    it("should return one tab", function(done) {
+    it("should return one tab", () => {
       // given
-      treeService.treeContainsDomainAndProperties.and.returnValues(
-        $q.resolve(false), $q.resolve(false), $q.resolve(true));
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, true);
       // when
-      springBootService.getTabs()
-        .then(tabs => {
-          // then
-          expect(tabs[0]).toEqual(traceTab);
-          done();
-        });
-      $rootScope.$apply();
+      const tabs = springBootService.getTabs();
+      // then
+      expect(tabs[0]).toEqual(traceTab);
     });
 
-    it("should return zero tabs", function(done) {
+    it("should return zero tabs", () => {
       // given
-      treeService.treeContainsDomainAndProperties.and.returnValues(
-        $q.resolve(false), $q.resolve(false), $q.resolve(false));
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false);
       // when
-      springBootService.getTabs()
-        .then(tabs => {
-          // then
-          expect(tabs.length).toBe(0);
-          done();
-        });
-      $rootScope.$apply();
+      const tabs = springBootService.getTabs();
+      // then
+      expect(tabs.length).toBe(0);
     });
   });
 });

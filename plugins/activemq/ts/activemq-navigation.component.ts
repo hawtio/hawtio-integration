@@ -1,4 +1,3 @@
-/// <reference path="activemqPlugin.ts"/>
 /// <reference path="activemq-navigation.service.ts"/>
 
 namespace ActiveMQ {
@@ -34,7 +33,5 @@ namespace ActiveMQ {
     template: '<hawtio-tabs tabs="$ctrl.tabs" on-change="$ctrl.goto(tab)"></hawtio-tabs>',
     controller: ActiveMQNavigationController
   };
-
-  _module.component('activemqNavigation', activeMQNavigationComponent);
 
 }

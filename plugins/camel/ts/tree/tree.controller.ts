@@ -22,10 +22,6 @@ namespace Camel {
       this.populateTree();
     }
     
-    treeFetched(): boolean {
-      return this.workspace.treeFetched;
-    }
-    
     private updateSelectionFromURL(): void {
       Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $(treeElementId), (first: Jmx.Folder) => {
         // use function to auto select first Camel context routes if there is only one Camel context

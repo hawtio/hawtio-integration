@@ -8,6 +8,9 @@
 /// <reference path="type-converters/type-converters.module.ts"/>
 /// <reference path="camelHelpers.ts"/>
 /// <reference path="camel-tree.service.ts"/>
+/// <reference path="camel-navigation.component.ts"/>
+/// <reference path="camel-navigation.service.ts"/>
+/// <reference path="camel.component.ts"/>
 
 namespace Camel {
 
@@ -21,10 +24,18 @@ namespace Camel {
     routesModule,
     treeModule,
     typeConvertersModule
-  ]);
+  ])
+  .component('camel', camelComponent)
+  .component('camelNavigation', camelNavigationComponent)
+  .service('camelTreeService', CamelTreeService)
+  .service('camelNavigationService', CamelNavigationService);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
+            .when('/camel/attributes', {templateUrl: 'plugins/jmx/html/attributes/attributes.html'})
+            .when('/camel/operations', {template: '<operations></operations>'})
+            .when('/camel/charts', {templateUrl: 'plugins/jmx/html/charts.html'})
+            .when('/camel/chartEdit', {templateUrl: 'plugins/jmx/html/chartEdit.html'})
             .when('/camel/contexts', {template: '<contexts></contexts>'})
             .when('/camel/routes', {template: '<routes></routes>'})
             .when('/camel/endpoints', {template: '<endpoints></endpoints>'})
@@ -47,8 +58,6 @@ namespace Camel {
             .when('/camel/propertiesDataFormat', {templateUrl: 'plugins/camel/html/propertiesDataFormat.html'})
             .when('/camel/propertiesEndpoint', {templateUrl: 'plugins/camel/html/propertiesEndpoint.html'});
   }]);
-
-  _module.service('camelTreeService', CamelTreeService);
 
   _module.factory('tracerStatus',function () {
     return {
@@ -74,28 +83,26 @@ namespace Camel {
     return answer;
   }]);
 
-
-  _module.run(["HawtioNav", "workspace", "jolokia", "viewRegistry", "layoutFull", "helpRegistry", "preferencesRegistry", "$templateCache", "$location", "$rootScope", (
-      nav: Nav.Registry,
+  _module.run(["mainNavService", "workspace", "jolokia", "helpRegistry", "preferencesRegistry", "$rootScope", (
+      mainNavService: Nav.MainNavService,
       workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
-      viewRegistry,
-      layoutFull,
       helpRegistry,
       preferencesRegistry: Core.PreferencesRegistry,
-      $templateCache: ng.ITemplateCacheService,
-      $location: ng.ILocationService,
       $rootScope: ng.IRootScopeService) => {
-
-    viewRegistry['camel/endpoint/'] = layoutFull;
-    viewRegistry['camel/route/'] = layoutFull;
-    viewRegistry['{ "main-tab": "camel" }'] = 'plugins/camel/html/layoutCamelTree.html';
 
     helpRegistry.addUserDoc('camel', 'plugins/camel/doc/help.md', () => {
       return workspace.treeContainsDomainAndProperties(jmxDomain);
     });
     preferencesRegistry.addTab('Camel', 'plugins/camel/html/preferences.html', () => {
       return workspace.treeContainsDomainAndProperties(jmxDomain);
+    });
+
+    mainNavService.addItem({
+      title: 'Camel',
+      href: '/camel',
+      template: '<camel></camel>',
+      isValid: () => workspace.treeContainsDomainAndProperties(jmxDomain)
     });
 
     // register default attribute views
@@ -230,19 +237,6 @@ namespace Camel {
       {field: 'RedeliveryDelay', displayName: 'Redelivery Delay'},
       {field: 'MaximumRedeliveryDelay', displayName: 'Max Redeliveries Delay'}
     ];
-
-    const tab = nav.builder().id('camel')
-      .title(() => 'Camel')
-      .defaultPage({
-        rank: 20,
-        isValid: (yes, no) => workspace.treeContainsDomainAndProperties(jmxDomain) ? yes() : no()
-      })
-      .href(() => '/camel/contexts?main-tab=camel')
-      .isValid(() => workspace.treeContainsDomainAndProperties(jmxDomain))
-      .isSelected(() => workspace.isMainTabActive('camel'))
-      .build();
-
-    nav.add(tab);
 
     workspace.addNamedTreePostProcessor('camel', (tree: Jmx.Folder) => {
       const domainName = Camel.jmxDomain;

@@ -21,10 +21,6 @@ namespace ActiveMQ {
       this.populateTree();
     }
 
-    treeFetched(): boolean {
-      return this.workspace.treeFetched;
-    }
-
     private updateSelectionFromURL() {
       Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $(treeElementId), (first: Jmx.Folder) => {
         if (first.children == null) {

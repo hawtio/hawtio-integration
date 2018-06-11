@@ -87,7 +87,6 @@ declare namespace ActiveMQ {
         private $element;
         constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, $element: JQuery);
         $onInit(): void;
-        treeFetched(): boolean;
         private updateSelectionFromURL();
         private populateTree();
         private removeTree();
@@ -114,6 +113,44 @@ declare namespace ActiveMQ {
 declare namespace ActiveMQ {
     const treeModule: string;
     const treeElementId = "#activemqtree";
+}
+declare namespace ActiveMQ {
+    const activeMQComponent: angular.IComponentOptions;
+}
+declare namespace ActiveMQ {
+    class ActiveMQNavigationService {
+        private workspace;
+        private configManager;
+        constructor(workspace: Jmx.Workspace, configManager: Core.ConfigManager);
+        getTabs(): Nav.HawtioTab[];
+        private shouldShowBrowseTab();
+        private shouldShowSendTab();
+        private shouldShowDurableSubscribersTab();
+        private shouldShowJobsTab();
+        private shouldShowCreateTab();
+        private shouldShowDeleteTopicTab();
+        private shouldShowDeleteQueueTab();
+        private shouldShowQueuesTab();
+        private shouldShowTopicsTab();
+        private isQueue();
+        private isTopic();
+        private isQueuesFolder();
+        private isTopicsFolder();
+        private isJobScheduler();
+        private isBroker();
+        private getBroker();
+    }
+}
+declare namespace ActiveMQ {
+    class ActiveMQNavigationController {
+        private $location;
+        private activeMQNavigationService;
+        tabs: Nav.HawtioTab[];
+        constructor($scope: ng.IScope, $location: ng.ILocationService, activeMQNavigationService: ActiveMQNavigationService);
+        $onInit(): void;
+        goto(tab: Nav.HawtioTab): void;
+    }
+    const activeMQNavigationComponent: angular.IComponentOptions;
 }
 declare namespace ActiveMQ {
     const _module: angular.IModule;
@@ -495,7 +532,6 @@ declare namespace Camel {
         private $element;
         constructor($scope: any, $location: ng.ILocationService, workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, $element: JQuery);
         $onInit(): void;
-        treeFetched(): boolean;
         private updateSelectionFromURL();
         private populateTree();
         private removeTree();
@@ -1048,7 +1084,71 @@ declare namespace Camel {
     }
 }
 declare namespace Camel {
+    class CamelNavigationService {
+        private workspace;
+        private jolokia;
+        private hasRestServices;
+        constructor(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia);
+        getTabs(): Nav.HawtioTab[];
+    }
+}
+declare namespace Camel {
+    class CamelNavigationController {
+        private $location;
+        private camelNavigationService;
+        private workspace;
+        tabs: Nav.HawtioTab[];
+        constructor($scope: ng.IScope, $location: ng.ILocationService, camelNavigationService: CamelNavigationService, workspace: Jmx.Workspace);
+        $onInit(): void;
+        goto(tab: Nav.HawtioTab): void;
+    }
+    const camelNavigationComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
+    const camelComponent: angular.IComponentOptions;
+}
+declare namespace Camel {
     const _module: angular.IModule;
+}
+declare namespace Karaf {
+    const pluginName: string;
+    const log: Logging.Logger;
+    function setSelect(selection: any, group: any): any;
+    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function toCollection(values: any): any;
+    function featureLinks(workspace: any, name: any, version: any): string;
+    function extractFeature(attributes: any, name: any, version: any): any;
+    function isPlatformBundle(symbolicName: string): boolean;
+    function isActiveMQBundle(symbolicName: string): boolean;
+    function isCamelBundle(symbolicName: string): boolean;
+    function isCxfBundle(symbolicName: string): boolean;
+    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
+    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
+    function getComponentStateDescription(state: any): "Active" | "Enabled" | "Unsatisfied" | "Activating" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
+    function getAllComponents(workspace: any, jolokia: any): any;
+    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
+    function isComponentActive(workspace: any, jolokia: any, component: any): any;
+    function getComponentState(workspace: any, jolokia: any, component: any): any;
+    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function populateDependencies(attributes: any, dependencies: any, features: any): void;
+    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
+    function getSelectionFeaturesMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
+    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
+    function getSelectionScrMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
+}
+declare namespace Osgi {
+    interface Bundle {
+        id: number;
+        name: string;
+        location: string;
+        symbolicName: string;
+        state: string;
+        version: string;
+    }
 }
 declare namespace Osgi {
     const pluginName: string;
@@ -1118,56 +1218,6 @@ declare namespace Osgi {
     function runWhenTreeReady(fn: () => any, workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<any>;
 }
 declare namespace Osgi {
-    class OsgiDataService {
-        private jolokia;
-        private workspace;
-        constructor(workspace: Jmx.Workspace, jolokia: any);
-        getBundles(): {};
-        getServices(): {};
-        getPackages(): {};
-    }
-}
-declare namespace Karaf {
-    const pluginName: string;
-    const log: Logging.Logger;
-    function setSelect(selection: any, group: any): any;
-    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function toCollection(values: any): any;
-    function featureLinks(workspace: any, name: any, version: any): string;
-    function extractFeature(attributes: any, name: any, version: any): any;
-    function isPlatformBundle(symbolicName: string): boolean;
-    function isActiveMQBundle(symbolicName: string): boolean;
-    function isCamelBundle(symbolicName: string): boolean;
-    function isCxfBundle(symbolicName: string): boolean;
-    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
-    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
-    function getComponentStateDescription(state: any): "Active" | "Enabled" | "Unsatisfied" | "Activating" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
-    function getAllComponents(workspace: any, jolokia: any): any;
-    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
-    function isComponentActive(workspace: any, jolokia: any, component: any): any;
-    function getComponentState(workspace: any, jolokia: any, component: any): any;
-    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function populateDependencies(attributes: any, dependencies: any, features: any): void;
-    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
-    function getSelectionFeaturesMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
-    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
-    function getSelectionScrMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
-}
-declare namespace Osgi {
-    interface Bundle {
-        id: number;
-        name: string;
-        location: string;
-        symbolicName: string;
-        state: string;
-        version: string;
-    }
-}
-declare namespace Osgi {
     class BundlesService {
         private $q;
         private workspace;
@@ -1225,6 +1275,19 @@ declare namespace Osgi {
 }
 declare namespace Osgi {
     const bundlesModule: string;
+}
+declare namespace Osgi {
+    const osgiComponent: angular.IComponentOptions;
+}
+declare namespace Osgi {
+    class OsgiDataService {
+        private jolokia;
+        private workspace;
+        constructor(workspace: Jmx.Workspace, jolokia: any);
+        getBundles(): {};
+        getServices(): {};
+        getPackages(): {};
+    }
 }
 declare namespace Osgi {
     const _module: angular.IModule;
@@ -1367,16 +1430,15 @@ declare namespace SpringBoot {
 }
 declare namespace SpringBoot {
     class SpringBootService {
-        private $q;
-        private treeService;
-        constructor($q: ng.IQService, treeService: Jmx.TreeService);
-        getTabs(): ng.IPromise<Nav.HawtioTab[]>;
+        private workspace;
+        constructor(workspace: Jmx.Workspace);
+        getTabs(): Nav.HawtioTab[];
         private hasEndpoint(name);
     }
 }
 declare namespace SpringBoot {
     function configureRoutes($routeProvider: angular.route.IRouteProvider): void;
-    function configureLayout($templateCache: ng.ITemplateCacheService, viewRegistry: any, HawtioNav: Nav.Registry, workspace: Jmx.Workspace, treeService: Jmx.TreeService, springBootService: SpringBootService): void;
+    function configureLayout(workspace: Jmx.Workspace, springBootService: SpringBootService, mainNavService: Nav.MainNavService): void;
 }
 declare namespace SpringBoot {
     class SpringBootController {
@@ -1397,41 +1459,6 @@ declare namespace Integration {
     const integrationModule: string;
 }
 declare namespace ActiveMQ {
-    class ActiveMQNavigationService {
-        private workspace;
-        private configManager;
-        constructor(workspace: Jmx.Workspace, configManager: Core.ConfigManager);
-        getTabs(): Nav.HawtioTab[];
-        private shouldShowBrowseTab();
-        private shouldShowSendTab();
-        private shouldShowDurableSubscribersTab();
-        private shouldShowJobsTab();
-        private shouldShowCreateTab();
-        private shouldShowDeleteTopicTab();
-        private shouldShowDeleteQueueTab();
-        private shouldShowQueuesTab();
-        private shouldShowTopicsTab();
-        private isQueue();
-        private isTopic();
-        private isQueuesFolder();
-        private isTopicsFolder();
-        private isJobScheduler();
-        private isBroker();
-        private getBroker();
-    }
-}
-declare namespace ActiveMQ {
-    class ActiveMQNavigationController {
-        private $location;
-        private activeMQNavigationService;
-        tabs: Nav.HawtioTab[];
-        constructor($scope: ng.IScope, $location: ng.ILocationService, activeMQNavigationService: ActiveMQNavigationService);
-        $onInit(): void;
-        goto(tab: Nav.HawtioTab): void;
-    }
-    const activeMQNavigationComponent: angular.IComponentOptions;
-}
-declare namespace ActiveMQ {
     var BrowseQueueController: angular.IModule;
 }
 declare namespace ActiveMQ {
@@ -1444,28 +1471,6 @@ declare namespace ActiveMQ {
 }
 declare namespace Camel {
     var BrowseEndpointController: angular.IModule;
-}
-declare namespace Camel {
-    class CamelNavigationService {
-        private workspace;
-        private jolokia;
-        private hasRestServices;
-        constructor(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia);
-        getTabs(): Nav.HawtioTab[];
-    }
-}
-declare namespace Camel {
-    class CamelNavigationController {
-        private $scope;
-        private $location;
-        private camelNavigationService;
-        private workspace;
-        private tabs;
-        constructor($scope: ng.IScope, $location: ng.ILocationService, camelNavigationService: CamelNavigationService, workspace: Jmx.Workspace);
-        $onInit(): void;
-        goto(tab: Nav.HawtioTab): void;
-    }
-    const camelNavigationComponent: angular.IComponentOptions;
 }
 declare namespace Camel {
     var camelHeaderSchema: {

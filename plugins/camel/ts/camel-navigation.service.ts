@@ -1,9 +1,6 @@
-/// <reference path="camelPlugin.ts"/>
-
 namespace Camel {
 
   export class CamelNavigationService {
-
     private hasRestServices: boolean;
 
     constructor(private workspace: Jmx.Workspace, private jolokia: Jolokia.IJolokia) {
@@ -46,7 +43,7 @@ namespace Camel {
       const canSendMesssage = this.workspace.hasInvokeRights(this.workspace.selection, this.workspace.selection && this.workspace.selection.domain === "org.apache.camel" ? "sendBodyAndHeaders" : "sendTextMessage");
 
       if (!isContextsFolder && !isRoutesFolder && !isRouteNode(this.workspace)) {
-        tabs.push(new Nav.HawtioTab('Attributes', '/jmx/attributes'));
+        tabs.push(new Nav.HawtioTab('Attributes', '/camel/attributes'));
       }
 
       if (isContextsFolder) {
@@ -130,18 +127,16 @@ namespace Camel {
       }
 
       if (!isContextsFolder && !isRoutesFolder && !isRouteNode(this.workspace)) {
-        tabs.push(new Nav.HawtioTab('Operations', '/jmx/operations'));
+        tabs.push(new Nav.HawtioTab('Operations', '/camel/operations'));
       }
 
       if (!isContextsFolder && !isRoutesFolder && !isRouteNode(this.workspace)) {
-        tabs.push(new Nav.HawtioTab('Chart', '/jmx/charts'));
+        tabs.push(new Nav.HawtioTab('Chart', '/camel/charts'));
       }
 
       return tabs;
     }
 
   }
-
-  _module.service('camelNavigationService', CamelNavigationService);
 
 }
