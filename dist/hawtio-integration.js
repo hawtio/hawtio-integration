@@ -1,817 +1,3 @@
-/*****************************************************************************
- * Metrics-Watcher
- *
- * Copyright 2012 Ben Bertola and iovation, Inc.
- *
- * To use this library:
- * 1. Call metricsWatcher.addXXX() for each graph you want on your page
- * 2. Call metricsWatcher.initGraphs() once to draw the initial graphs
- * 3. Call metricsWatcher.updateGraphs(jsonData) with JSON data from your
- *    metrics/servlet as often as you'd like your graphs to update
- *
- *****************************************************************************/
-
-(function(metricsWatcher, $) {
-
-	/**
-	 * Add a Gauge type graph to your page.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addGauge = function(divId, className, metricName, title) {
-		var metricInfo = new MetricInfo(divId, className, metricName, null, title, 'gauges', null);
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a Meter type graph to your page.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addMeter = function(divId, className, metricName, max, title, eventType) {
-		if (eventType == undefined) eventType = 'Calls';
-		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'meters', eventType);
-		metricInfo.eventType = eventType;
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a Counter graph
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addCounter = function(divId, className, metricName, max, title) {
-		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'counters', null);
-		graphs.push(metricInfo);
-	};
-
-		/**
-	 * Add a standalone Histogram graph
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addHistogram = function(divId, className, metricName, max, title){
-		var metricInfo = new MetricInfo(divId, className, metricName, (!max ? 1: max), title, 'histograms', null);
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a linked Counter graph. Linked Counters differ from a plain counter graph in that both the numerator and denominator
-	 * of a linked counter graph each come from individual Counter Metrics.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param maxClassName
-	 * @param maxMetricName
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addLinkedCounter = function(divId, className, metricName, maxClassName, maxMetricName, title) {
-		var metricInfo = new MetricInfo(divId, className, metricName, null, title, "counters", null);
-		if(!metricInfo)
-			metricInfo = new MetricInfo(divId, className, metricName, null, title, "timers", null);
-		
-		metricInfo.maxClassName = maxClassName;
-		metricInfo.maxMetricName = maxMetricName;
-
-		metricInfo.getMax = function(json) {
-			var maxNode = this.getMetricNode(this.maxClassName, this.maxMetricName, json);
-			return maxNode["count"];
-		};
-		
-			metricInfo.getMetricNode = function getMetricNode(className, metricName, jsonRoot) {
-				
-				var node=!(jsonRoot["counters"][className+'.'+metricName]) ? null : jsonRoot["counters"][className+'.'+metricName];
-				if(node){
-					return node;
-				}else{
-					return !(jsonRoot["timers"][className+'.'+metricName]) ? null : jsonRoot["timers"][className+'.'+metricName];
-				}
-			};
-
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a Timer graph. This will include a Meter, Timing Info, and a Histogram.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param metricName The metric name of your metrics data, from the metrics servlet
-	 * @param max The max target value for the Meter, showing frequency
-	 * @param title The user-displayed title of this graph
-	 * @param eventType a name for this event type
-	 * @param durationMax The max target value for duration
-	 */
-	metricsWatcher.addTimer = function(divId, className, metricName, max, title, eventType, durationMax) {
-		var timer = addTimerInternal(divId, className, metricName, max, title, eventType, durationMax, false);
-		graphs.push(timer);
-	};
-
-	/**
-	 * Add an ehcache graph.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addCache = function(divId, className, title) {
-		var metricInfo = new MetricInfo(divId, className, null, null, title, "caches", null);
-
-		metricInfo.components = {
-			gauges : [
-				new MetricInfo(null, className, "hits", null, "Hits", "gauges", null),
-				new MetricInfo(null, className, "misses", null, "Misses", "gauges", null),
-				new MetricInfo(null, className, "objects", null, "Objects", "gauges", null),
-				new MetricInfo(null, className, "eviction-count", null, "Eviction Count", "gauges", null),
-				new MetricInfo(null, className, "in-memory-hits", null, "In Memory Hits", "gauges", null),
-				new MetricInfo(null, className, "in-memory-misses", null, "In Memory Misses", "gauges", null),
-				new MetricInfo(null, className, "in-memory-objects", null, "In Memory Objects", "gauges", null),
-				new MetricInfo(null, className, "off-heap-hits", null, "Off Heap Hits", "gauges", null),
-				new MetricInfo(null, className, "off-heap-misses", null, "Off Heap Misses", "gauges", null),
-				new MetricInfo(null, className, "off-heap-objects", null, "Off Heap Objects", "gauges", null),
-				new MetricInfo(null, className, "on-disk-hits", null, "On Disk Hits", "gauges", null),
-				new MetricInfo(null, className, "on-disk-misses", null, "On Disk Misses", "gauges", null),
-				new MetricInfo(null, className, "on-disk-objects", null, "On Disk Objects", "gauges", null),
-				new MetricInfo(null, className, "mean-get-time", null, "Mean Get Time", "gauges", null),
-				new MetricInfo(null, className, "mean-search-time", null, "Mean Search Time", "gauges", null),
-				new MetricInfo(null, className, "searches-per-second", null, "Searches Per Sec", "gauges", null),
-				new MetricInfo(null, className, "writer-queue-size", null, "Writer Queue Size", "gauges", null),
-				new MetricInfo(null, className, "accuracy", null, "Accuracy", "gauges", null)
-			]
-		};
-		metricInfo.getTimer = addTimerInternal(divId + "gettimer", className, "gets", 5, "Get", "get", 1, true);
-		metricInfo.putTimer = addTimerInternal(divId + "puttimer", className, "puts", 5, "Put", "put", 1, true);
-
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a JVM graph.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addJvm = function(divId, className, title) {
-		var metricInfo = new MetricInfo(divId, className, null, null, title, "jvms", null);
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a web server graph.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addWeb = function(divId, className, title) {
-		var metricInfo = new MetricInfo(divId, className, null, null, title, "webs", null);
-
-		metricInfo.components = {
-			meters : [
-				new MetricInfo(divId + " td.responseCodesOkGraph", className, "responseCodes.ok", 10, "OK Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesBadRequestGraph", className, "responseCodes.badRequest", 10, "Bad Requests", "meters", null),
-				new MetricInfo(divId + " td.responseCodesCreatedGraph", className, "responseCodes.created", 10, "Created Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesNoContentGraph", className, "responseCodes.noContent", 10, "No Content Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesNotFoundGraph", className, "responseCodes.notFound", 10, "Not Found Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesOtherGraph", className, "responseCodes.other", 10, "Other Responses", "meters", null),
-				new MetricInfo(divId + " td.responseCodesServerErrorGraph", className, "responseCodes.serverError", 10, "Server Error Responses", "meters", null)
-			],
-			activeRequestsInfo : new MetricInfo(divId + " td.activeRequestsGraph", className, "activeRequests", 10, "Active Requests", "counters", null),
-			requestsInfo : addTimerInternal(divId + " td.requestsGraph", className, "requests", 100, "Requests", "requests", 100, true)
-		};
-
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Add a log4j logged events graph.
-	 *
-	 * @param divId The id of the div to draw the graph in
-	 * @param className The class name of your metrics data, from the metrics servlet
-	 * @param title The user-displayed title of this graph
-	 */
-	metricsWatcher.addLog4j = function(divId, className, title) {
-		var metricInfo = new MetricInfo(divId, className, null, null, title, "log4js", null);
-
-		metricInfo.components = {
-			meters : [
-				new MetricInfo(divId + " td.all", className, "all", 100, "all", "meters", null),
-				new MetricInfo(divId + " td.fatal", className, "fatal", 100, "fatal", "meters", null),
-				new MetricInfo(divId + " td.error", className, "error", 100, "error", "meters", null),
-				new MetricInfo(divId + " td.warn", className, "warn", 100, "warn", "meters", null),
-				new MetricInfo(divId + " td.info", className, "info", 100, "info", "meters", null),
-				new MetricInfo(divId + " td.debug", className, "debug", 100, "debug", "meters", null),
-				new MetricInfo(divId + " td.trace", className, "trace", 100, "trace", "meters", null)
-			]
-		};
-
-		graphs.push(metricInfo);
-	};
-
-	/**
-	 * Initialized each of the graphs that you have added through addXXX() calls,
-	 * and draws them on the screen for the first time
-	 */
-	metricsWatcher.initGraphs = function() {
-		// draw all graphs for the first time
-		for (var i = 0; i < graphs.length; i++) {
-			if (graphs[i].type == "gauges")
-				drawGauge(graphs[i]);
-			else if (graphs[i].type == "meters")
-				drawMeter(graphs[i]);
-			else if (graphs[i].type == "counters" || graphs[i].type == "linkedTimerCounters")
-				drawCounter(graphs[i]);
-			else if (graphs[i].type == "histograms")
-				drawHistogram(graphs[i]);
-			else if (graphs[i].type == "timers")
-				drawTimer(graphs[i]);
-			else if (graphs[i].type == "caches")
-				drawCache(graphs[i]);
-			else if (graphs[i].type == "jvms")
-				drawJvm(graphs[i]);
-			else if (graphs[i].type == "webs")
-				drawWeb(graphs[i]);
-			else if (graphs[i].type == "log4js")
-				drawLog4j(graphs[i]);
-			else
-				alert("Unknown meter info type: " + graphs[i].type);
-		}
-	};
-
-	/**
-	 * Update the existing graphs with new data. You can call this method as frequently as you would
-	 * like to, and all graph info will be updated.
-	 *
-	 * @param json The root of the json node returned from your ajax call to the metrics servlet
-	 */
-	metricsWatcher.updateGraphs = function(json) {
-		for (var i = 0; i < graphs.length; i++) {
-			if (graphs[i].type == "gauges")
-				updateGauge(graphs[i], json);
-			else if (graphs[i].type == "meters")
-				updateMeter(graphs[i], json);
-			else if (graphs[i].type == "counters" || graphs[i].type == "linkedTimerCounters")
-				updateCounter(graphs[i], json);
-			else if (graphs[i].type == "histograms")
-				updateHistogram(graphs[i], json);
-			else if (graphs[i].type == "timers")
-				updateTimer(graphs[i], json);
-			else if (graphs[i].type == "caches")
-				updateCache(graphs[i], json);
-			else if (graphs[i].type == "jvms")
-				updateJvm(graphs[i], json);
-			else if (graphs[i].type == "webs")
-				updateWeb(graphs[i], json);
-			else if (graphs[i].type == "log4js")
-				updateLog4j(graphs[i], json);
-			else
-				alert("Unknown meter info type: " + graphs[i].type);
-		}
-	};
-
-	/*
-	 * Private Methods
-	 */
-	var graphs = [];
-
-  function MetricInfo(divId, className, metricName, max, title, type, subTitle) {
-		this.divId = divId;
-		this.className = className;
-		this.metricName = metricName;
-		this.max = max;
-		this.title = title;
-		this.type = type;
-    this.subTitle = subTitle;
-
-		this.getMax = function(json) {
-			return this.max;
-		};
-		this.getMetricNode = function getMetricNode(className, metricName, jsonRoot) {
-			return !(jsonRoot[type][className+'.'+metricName]) ? null : jsonRoot[type][className+'.'+metricName];
-		};
-
-    this.getSubTitle = function() {
-      if (this.subTitle != null) {
-        return this.subTitle;
-      } else {
-        // fallback and use title
-        return this.title;
-      }
-    }
-	}
-
-	function calculatePercentage(currentVal, maxVal) {
-		var p = (currentVal / maxVal) * 100;
-		return p.toFixed(0);
-	}
-
-	function formatNumber(varNumber, n) {
-		if (isNaN(n)) n = 1;
-
-		return !isNaN(varNumber)?varNumber.toFixed(n):n;
-	}
-
-	function capitalizeFirstLetter(input) {
-		return input.charAt(0).toUpperCase() + input.slice(1);
-	}
-
-	function addTimerInternal(divId, className, metricName, max, title, eventType, durationMax, isNested) {
-		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'timers', eventType);
-
-		metricInfo.getMeterInfo = function() {
-			var myDivId = this.divId + " div.timerGraph div.meterGraph";
-			var retVal = new MetricInfo(myDivId, this.className, this.metricName, this.max, "Frequency", 'timers', null);
-
-			retVal.getMetricNode = function(className, metricName, jsonRoot) {
-				return !jsonRoot['timers'][className+'.'+metricName] ? null : jsonRoot['timers'][className+'.'+metricName];
-			};
-
-			retVal.eventType = eventType;
-			return retVal;
-		};
-
-		metricInfo.getTimerStatsDivId = function() {
-			return "#" + this.divId + " div.timerGraph div.timerStatsGraph";
-		};
-		metricInfo.getTimerHistogramDivId = function() {
-			return "#" + this.divId + " div.timerGraph div.timerHistogram";
-		};
-		metricInfo.durationMax = durationMax;
-		metricInfo.isNested = isNested;
-
-		return metricInfo;
-	}
-
-	/*
-	 * Counter methods
-	 */
-	function drawCounter(counterInfo) {
-		var parentDiv = $("#" + counterInfo.divId);
-		var html = "<div class='counter counterGraph'><h3>" + counterInfo.title
-				+ "</h3><div class='progress'><div class='progress-bar' style='width: 0%;'></div></div></div>";
-		parentDiv.html(html);
-	}
-	
-	function updateCounter(counterInfo, json) {
-		var metricData = counterInfo.getMetricNode(counterInfo.className, counterInfo.metricName, json);
-		var pct = calculatePercentage(metricData.count, counterInfo.getMax(json));
-
-		$("#" + counterInfo.divId + " div.progress div.progress-bar").css("width", pct + "%");
-		$("#" + counterInfo.divId + " div.progress div.progress-bar").html(metricData.count + "/" + counterInfo.getMax(json));
-	}
-
-	/*
-	 * Timer methods
-	 */
-	function drawTimer(timerInfo) {
-		var parentDiv = $("#" + timerInfo.divId);
-
-		var nested = (timerInfo.isNested) ? " nested" : "";
-		var html = 
-          '<div class="metricsWatcher timer timerGraph' + nested + '">'
-        + '  <div class="panel-group" id="accordion-' + timerInfo.divId + '">'
-				+ '    <div class="panel panel-default">'
-				+ '      <div class="panel-heading">'
-				+ '        <h4 class="panel-title">'
-        +            ((timerInfo.isNested)
-                       ? '<a>'
-                       : '<a data-toggle="collapse" data-parent="accordion-' + timerInfo.divId + '" href="#' + timerInfo.divId + 'Collapse">')
-				+            timerInfo.title + '</a>'
-				+ '        </h4>'
-				+ '      </div>'
-				+ '      <div id="' + timerInfo.divId + 'Collapse" class="panel-collapse' + ((timerInfo.isNested) ? '': ' collapse in') + '">'
-				+ '        <div class="panel-body">'
-				+ '          <div class="meterGraph col-md-12 col-lg-4"></div>'
-				+ '          <div class="timerStatsGraph col-md-12 col-lg-4"></div>'
-				+ '          <div class="timerHistogram col-md-12 col-lg-4"></div>'
-				+ '        </div>'
-        + '      </div>'
-        + '    </div>'
-        + '  </div>'
-        + '</div>';
-		parentDiv.html(html);
-
-		drawMeter(timerInfo.getMeterInfo());
-		drawDurationStats(timerInfo);
-		drawDurationHistogram(timerInfo);
-	};
-
-	function drawDurationStats(timerInfo) {
-		var html = "<h3>Duration</h3><div class='timeUnit'></div><div class='metricGraph'><table class='progressTable'>"
-			+ addMeterRow("Min", "min")
-			+ addMeterRow("Mean", "mean")
-			+ addMeterRow("Max", "max")
-			+ addMeterRow("Std&nbsp;Dev", "stddev")
-			+ "</table></div>";
-		var parentDiv = $(timerInfo.getTimerStatsDivId());
-		parentDiv.html(html);
-	}
-
-	function drawDurationHistogram(timerInfo) {
-		var html = "<h3> " +(timerInfo.isNested?  "Histogram" :timerInfo.getSubTitle()) + "</h3><div>Percentiles</div><div class='metricGraph'><table class='progressTable'>"
-			+ addMeterRow("99.9%", "p999")
-			+ addMeterRow("99%", "p99")
-			+ addMeterRow("98%", "p98")
-			+ addMeterRow("95%", "p95")
-			+ addMeterRow("75%", "p75")
-			+ addMeterRow("50%", "p50")
-			+ "</table></div>";
-		var parentDiv = $(timerInfo.getTimerHistogramDivId());
-		parentDiv.html(html);
-	}
-
-	function updateTimer(timerInfo, json) {
-		updateMeter(timerInfo.getMeterInfo(), json);
-		updateDurationStats(timerInfo, json);
-		updateDurationHistogram(timerInfo, json);
-	}
-
-	function updateDurationStats(timerInfo, json) {
-		var metricNode = timerInfo.getMetricNode(timerInfo.className, timerInfo.metricName, json);
-		if (!metricNode) return;
-
-		var timeUnitDiv = $(timerInfo.getTimerStatsDivId() + " div.timeUnit");
-		timeUnitDiv.html(capitalizeFirstLetter(metricNode["duration_units"]));
-
-		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "min", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "mean", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "max", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "stddev", timerInfo.durationMax);
-	}
-
-	function updateDuration(timerStatsDivId, durationData, style, max) {
-		$(timerStatsDivId + " tr." + style + " td.progressValue").html(formatNumber(durationData[style]));
-		$(timerStatsDivId + " tr." + style + " td.progressBar div.progress div.progress-bar")
-			.css("width", calculatePercentage(durationData[style], max) + "%");
-	}
-
-	function updateDurationHistogram(timerInfo, json) {
-		var metricNode = timerInfo.getMetricNode(timerInfo.className, timerInfo.metricName, json);
-		if (!metricNode) return;
-
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p999", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p99", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p98", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p95", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p75", timerInfo.durationMax);
-		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p50", timerInfo.durationMax);
-	}
-
-/*
- * Histogram methods
- */
-
-	function drawHistogram(histogramInfo) {
-		var parentDiv = $("#" + histogramInfo.divId);
-		var html = "<div class='metricsWatcher histogram histogramContainer'>" 
-			+ "<div class='heading1 btn-link col-md-12' data-toggle='collapse' data-target='#" + histogramInfo.divId + "Collapse'> " +(histogramInfo.isNested?  "Histogram" :histogramInfo.title) + "</div>" 
-			+ "<div class='collapse' id='" + histogramInfo.divId + "Collapse'>"
-			+ "<table>" 
-				+ "<tr><td class='col-md-4'>Count</td><td class='col-md-4'>Min</td><td class='col-md-4'>Max<td class='col-md-4'>Mean</td></tr>" 
-				+ "<tr><td class='countVal'></td><td class='minVal'></td><td class='meanVal'></td><td class='maxVal'></td></tr>"
-			+ "</table>"
-			+	"<p>Percentiles</p>"
-			+"<table class='progressTable'>"
-			+ addMeterRow("99.9%", "p999")
-			+ addMeterRow("99%", "p99")
-			+ addMeterRow("98%", "p98")
-			+ addMeterRow("95%", "p95")
-			+ addMeterRow("75%", "p75")
-			+ addMeterRow("50%", "p50")
-			+ "</table></div></div>";
-		parentDiv.html(html);
-	}
-
-	function updateHistogram(histogramInfo, json) {
-		var metricNode = histogramInfo.getMetricNode(histogramInfo.className, histogramInfo.metricName, json);
-		$("#" + histogramInfo.divId +  " td.countVal").html(formatNumber(metricNode['count'],0));
-		$("#" + histogramInfo.divId +  " td.minVal").html(formatNumber(metricNode['min'],0));
-		$("#" + histogramInfo.divId +  " td.maxVal").html(formatNumber(metricNode['max'],0));
-		$("#" + histogramInfo.divId +  " td.meanVal").html(formatNumber(metricNode['mean'],0));
-		
-		setMeterRow(histogramInfo, metricNode, "p999", "p999", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p99", "p99", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p98", "p98", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p95", "p95", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p75", "p75", histogramInfo.max);
-		setMeterRow(histogramInfo, metricNode, "p50", "p50", histogramInfo.max);
-	}
-
-	/*
-	 * Meter methods
-	 */
-	function drawMeter(meterInfo) {
-		var parentDiv = $("#" + meterInfo.divId);
-
-		var html = "<div class='metric metricGraph'><h3>" + meterInfo.title
-			+ "</h3><div class='counterVal'></div><table class='progressTable'>"
-			+ addMeterRow("1&nbsp;min", "onemin")
-			+ addMeterRow("5&nbsp;min", "fivemin")
-			+ addMeterRow("15&nbsp;min", "fifteenmin")
-			+ addMeterRow("Mean", "mean")
-			+ "</table></div>";
-		parentDiv.html(html);
-	}
-
-	function addMeterRow(type, className) {
-		return "<tr class='" + className + "'><td class='progressLabel'>" + type + "</td>"
-			+ "<td class='progressBar'><div class='progress'><div class='progress-bar' style='width: 0%;'></div>"
-			+ "</div></td><td class='progressValue'>0</td></tr>";
-	}
-
-	function updateMeter(meterInfo, json) {
-		var metricData = meterInfo.getMetricNode(meterInfo.className, meterInfo.metricName, json);
-		if (metricData) {
-			updateMeterData(meterInfo, metricData);
-		}
-	}
-
-	function updateMeterData(meterInfo, meterData) {
-		// set the big counter
-		var gaugeDiv = $("#" + meterInfo.divId + " div.counterVal");
-
-		gaugeDiv.html(meterData.rate_units + " (" + meterData.count + " total)");
-
-		var maxRate = Math.max(meterData['mean_rate'],meterData['m1_rate'],meterData['m5_rate'],meterData['m15_rate']);
-
-		// set the mean count
-		setMeterRow(meterInfo, meterData, "mean_rate", "mean", maxRate);
-		setMeterRow(meterInfo, meterData, "m1_rate", "onemin", maxRate);
-		setMeterRow(meterInfo, meterData, "m5_rate", "fivemin", maxRate);
-		setMeterRow(meterInfo, meterData, "m15_rate", "fifteenmin", maxRate);
-	}
-
-	function setMeterRow(meterInfo, meterData, rowType, rowStyle) {
-		setMeterRow(meterInfo, meterData, rowType, rowStyle, meterInfo.max);
-	}
-
-	function setMeterRow(meterInfo, meterData, rowType, rowStyle, max) {
-		$("#" + meterInfo.divId + " tr." + rowStyle + " td.progressValue").html(formatNumber(meterData[rowType]));
-		$("#" + meterInfo.divId + " tr." + rowStyle + " td.progressBar div.progress div.progress-bar")
-			.css("width", calculatePercentage(meterData[rowType], max) + "%");
-	}
-
-	/*
-	 * Gauge methods
-	 */
-	function drawGauge(gaugeInfo) {
-		var parentDiv = $("#" + gaugeInfo.divId);
-		var html = "<div class='metric metricGraph'><h3>" + gaugeInfo.title + "</h3><div class='gaugeDataVal'></div></div>";
-		parentDiv.html(html);
-	}
-	function updateGauge(gaugeInfo, json) {
-		var metricData = gaugeInfo.getMetricNode(gaugeInfo.className, gaugeInfo.metricName, json);
-		if (metricData) {
-			updateGaugeData(gaugeInfo, metricData);
-		}
-	}
-	function updateGaugeData(gaugeInfo, gaugeData) {
-		var gaugeDiv = $("#" + gaugeInfo.divId + " div.gaugeDataVal");
-		gaugeDiv.html(gaugeData.value);
-	}
-
-	/*
-	 * GaugeTable methods
-	 */
-	function drawGaugeTable(divId, title, gauges) {
-		var parentDiv = $("#" + divId);
-		var html = "<div class='metricsWatcher metric metricGraph nested'>"
-				+ "<fieldset><legend><div class='heading1'>" + title + "</div></legend>"
-				+ "<div class='gaugeTableContainer'><table class='gaugeTable'></table></div></fieldset></div>";
-
-		parentDiv.html(html);
-	}
-	function updateGaugeTable(divId, gauges, json) {
-		var div = $("#" + divId + " table");
-
-		var html = "";
-		var length = gauges.length;
-		for (var i = 0; i < length; i++) {
-			var gauge = gauges[i];
-			html += "<tr><td><h5>" + gauge.title + "</h5></td>"
-				+ "<td><h4>" + gauge.getMetricNode(gauge.className, gauge.metricName, json).value
-				+ "</h4></td></tr>";
-		}
-		div.html(html);
-	}
-
-	/*
-	 * Cache methods
-	 */
-	function drawCache(cacheInfo) {
-		var parentDiv = $("#" + cacheInfo.divId);
-
-		var html = "<div class='metricsWatcher cache cacheGraph col-md-12'>"
-				+ "<fieldset><legend><div class='heading1'>" + cacheInfo.title + "</div></legend>"
-				+ "<div class='cacheContainer col-md-12'>"
-				+ "	<div class='row'>"
-				+ "		<div class='col-md-3'><div id='" + cacheInfo.divId + "Statistics'></div></div>"
-				+ "		<div class='col-md-9'>"
-				+ "			<div id='" + cacheInfo.divId + "gettimer'></div>"
-				+ "			<div id='" + cacheInfo.divId + "puttimer'></div>"
-				+ "		</div>"
-				+ "	</div>"
-				+ "</div></fieldset></div>";
-		parentDiv.html(html);
-
-		var length = cacheInfo.components.gauges.length;
-		for (var i = 0; i < length; i++) {
-			drawGauge(cacheInfo.components.gauges[i]);
-		}
-		drawTimer(cacheInfo.getTimer);
-		drawTimer(cacheInfo.putTimer);
-		drawGaugeTable(cacheInfo.divId + "Statistics", "Statistics", cacheInfo.components.gauges);
-	}
-	function updateCache(cacheInfo, json) {
-		var length = cacheInfo.components.gauges.length;
-		for (var i = 0; i < length; i++) {
-			var gauge = cacheInfo.components.gauges[i];
-			var data = gauge.getMetricNode(cacheInfo.className, gauge.metricName, json);
-			if (data) {
-				var gaugeDiv = $("#" + gauge.divId + " div.metricGraph div.gaugeDataVal");
-				gaugeDiv.html(data.value);
-			}
-		}
-		updateTimer(cacheInfo.getTimer, json);
-		updateTimer(cacheInfo.putTimer, json);
-		updateGaugeTable(cacheInfo.divId + "Statistics", cacheInfo.components.gauges, json);
-	}
-
-	/*
-	 * JVM methods
-	 */
-	function drawJvm(jvmInfo) {
-		var parentDiv = $("#" + jvmInfo.divId);
-		var html = "<div class='metricsWatcher jvm metricGraph col-md-12'>"
-				+ "<fieldset><legend><div  class='heading1 btn-link' data-toggle='collapse' data-target='#" + jvmInfo.divId + "Collapse'>" + jvmInfo.title + "</div></legend>"
-				+ "<div class='jvmContainer col-md-12 collapse' id='" + jvmInfo.divId + "Collapse'>"
-				+ "	<div id='" + jvmInfo.divId + "Vm'></div>"
-				+ "</div>"
-				+ "</fieldset></div>";
-		parentDiv.html(html);
-	}
-
-	function updateJvm(jvmInfo, json) {
-		var vmDiv = $("#" + jvmInfo.divId + "Vm");
-		var jvm = json['gauges'];
-		var html = "<div class='row'>"
-				+ "<div class='col-md-3'><table class='jvmTable'><caption>Memory</caption>"
-				+ "<tr><td><h5>Total Init</h5></td><td>" + jvm['jvm.memory.total.init'].value + "</td></tr>"
-				+ "<tr><td><h5>Total Used</h5></td><td>" + jvm['jvm.memory.total.used'].value + "</td></tr>"
-				+ "<tr><td><h5>Total Max</h5></td><td>" + jvm['jvm.memory.total.max'].value + "</td></tr>"
-				+ "<tr><td><h5>Total Committed</h5></td><td>" + jvm['jvm.memory.total.committed'].value + "</td></tr>"
-				+ "<tr><td><h5>Heap Init</h5></td><td>" + jvm['jvm.memory.heap.init'].value + "</td></tr>"
-				+ "<tr><td><h5>Heap Used</h5></td><td>" + jvm['jvm.memory.heap.used'].value + "</td></tr>"
-				+ "<tr><td><h5>Heap Max</h5></td><td>" + jvm['jvm.memory.heap.max'].value + "</td></tr>"
-				+ "<tr><td><h5>Heap Committed</h5></td><td>" + jvm['jvm.memory.heap.committed'].value + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Init</h5></td><td>" + jvm['jvm.memory.non-heap.init'].value + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Used</h5></td><td>" + jvm['jvm.memory.non-heap.used'].value + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Max</h5></td><td>" + jvm['jvm.memory.non-heap.max'].value + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Committed</h5></td><td>" + jvm['jvm.memory.non-heap.committed'].value + "</td></tr>"
-				+ "</table></div>"
-				+ "<div class='col-md-3'><table class='jvmTable'><caption>Memory Usage</caption>"
-				+ "<tr><td><h5>Heap Usage</h5></td><td>" + (jvm['jvm.memory.heap.usage'].value * 100).toFixed(2) + "</td></tr>"
-				+ "<tr><td><h5>Non Heap Usage</h5></td><td>" + (jvm['jvm.memory.non-heap.usage'].value * 100).toFixed(2) + "</td></tr>"
-				+ (!jvm['jvm.memory.pools.JIT-code-cache.usage']?"":("<tr><td><h5>JIT Code Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.JIT-code-cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Code-Cache.usage']?"":("<tr><td><h5>JIT Code Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.Code-Cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.JIT-data-cache.usage']?"":("<tr><td><h5>JIT Data Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.JIT-data-cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Java-heap.usage']?"":("<tr><td><h5>Java Heap Usage</h5></td><td>" + (jvm['jvm.memory.pools.Java-heap.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.class-storage.usage']?"":("<tr><td><h5>Class Storage Usage</h5></td><td>" + (jvm['jvm.memory.pools.class-storage.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Perm-Gen.usage']?"":("<tr><td><h5>Perm Gen Usage</h5></td><td>" + (jvm['jvm.memory.pools.Perm-Gen.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Tenured-Gen.usage']?"":("<tr><td><h5>Tenured Gen Usage</h5></td><td>" + (jvm['jvm.memory.pools.Tenured-Gen.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.miscellaneous-non-heap-storage.usage']?"":("<tr><td><h5>Misc Non Heap Storage Usage</h5></td><td>" + (jvm['jvm.memory.pools.miscellaneous-non-heap-storage.usage'].value * 100).toFixed(2)  + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Survivor-Space.usage']?"":("<tr><td><h5>Survivor Space Usage</h5></td><td>" + (jvm['jvm.memory.pools.Survivor-Space.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+ (!jvm['jvm.memory.pools.Eden-Space.usage']?"":("<tr><td><h5>Eden Space Usage</h5></td><td>" + (jvm['jvm.memory.pools.Eden-Space.usage'].value * 100).toFixed(2) + "</td></tr>"))
-				+"</table></div>"
-				+ "<div class='col-md-3'><table class='jvmTable'><caption>Garbage Collection</caption>"
-				+ "<tr><td><h5>PS Mark Sweep Runs</h5></td><td>" + jvm['jvm.gc.MarkSweepCompact.count'].value + "</td></tr>"
-				+ "<tr><td><h5>PS Mark Sweep Time</h5></td><td>" + jvm['jvm.gc.MarkSweepCompact.time'].value + "</td></tr>"
-				+ "<tr><td><h5>GC Copy Runs</h5></td><td>" + jvm['jvm.gc.Copy.count'].value + "</td></tr>"
-				+ "<tr><td><h5>GC Copy Time</h5></td><td>" + jvm['jvm.gc.Copy.time'].value + "</td></tr>"
-				+ "</table></div>"
-				+ "<div class='col-md-3'><table class='jvmTable'><caption>Threads</caption>"
-//				+ "<tr><td class='rowName'><h5>Name</h5></td><td>" + jvm['jvm.vm.name'].value + "</td></tr>"
-//				+ "<tr><td><h5>Version</h5></td><td>" + jvm['jvm.vm.version'].value + "</td></tr>"
-//				+ "<tr><td><h5>Current Time</h5></td><td>" + jvm['jvm.current_time'].value + "</td></tr>"
-//				+ "<tr><td><h5>Uptime</h5></td><td>" + jvm['jvm.uptime'].value + "</td></tr>"
-				+ "<tr><td><h5>FD Usage</h5></td><td>" + formatNumber(jvm['jvm.fd.usage'].value, 2) + "</td></tr>"
-				+ "<tr><td><h5>Daemon Threads</h5></td><td>" + jvm['jvm.thread-states.daemon.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Threads</h5></td><td>" + jvm['jvm.thread-states.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Deadlocks</h5></td><td>" + jvm['jvm.thread-states.deadlocks'].value + "</td></tr>"
-				+ "</table><table class='jvmTable'><caption>Thread States</caption>"
-				+ "<tr><td><h5>Terminated</h5></td><td>" + jvm['jvm.thread-states.terminated.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Timed Waiting</h5></td><td>" + jvm['jvm.thread-states.timed_waiting.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Blocked</h5></td><td>" + jvm['jvm.thread-states.blocked.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Waiting</h5></td><td>" + jvm['jvm.thread-states.waiting.count'].value + "</td></tr>"
-				+ "<tr><td><h5>Runnable</h5></td><td>" + jvm['jvm.thread-states.runnable.count'].value + "</td></tr>"
-				+ "<tr><td><h5>New</h5></td><td>" + jvm['jvm.thread-states.new.count'].value + "</td></tr>"
-				+ "</table></div></div>";
-
-		vmDiv.html(html);
-	};
-
-	/*
-	 * Web Server methods
-	 */
-	function drawWeb(webInfo) {
-		var parentDiv = $("#" + webInfo.divId);
-		var html = "<div class='metricsWatcher web metricGraph col-md-12'>"
-				+ "<fieldset><legend><div class='heading1 btn-link' data-toggle='collapse' data-target='#"+webInfo.divId+"Collapse'>" + webInfo.title + "</div></legend>"
-				+ "<div class='webContainer col-md-12' id='"+webInfo.divId+"Collapse'>"
-				+ "	<div id='" + webInfo.divId + "Web'></div>"
-				+ "<table><tr>"
-				+ "<td colspan='4' class='requestsGraph col-md-12'></td>"
-				+ "</tr><tr>"
-				+ "<td class='activeRequestsGraph col-md-3'></td>"
-				+ "<td class='responseCodesOkGraph col-md-3'></td>"
-				+ "<td class='responseCodesCreatedGraph col-md-3'></td>"
-				+ "<td class='responseCodesOtherGraph col-md-3'></td>"
-				+ "</tr><tr>"
-				+ "<td class='responseCodesBadRequestGraph col-md-3'></td>"
-				+ "<td class='responseCodesNoContentGraph col-md-3'></td>"
-				+ "<td class='responseCodesNotFoundGraph col-md-3'></td>"
-				+ "<td class='responseCodesServerErrorGraph col-md-3'></td>"
-				+ "</tr></table>"
-				+ "</div>"
-				+ "</fieldset></div>";
-		parentDiv.html(html);
-
-		drawTimer(webInfo.components.requestsInfo);
-		drawCounter(webInfo.components.activeRequestsInfo);
-
-		var length = webInfo.components.meters.length;
-		for (var i = 0; i < length; i++) {
-			drawMeter(webInfo.components.meters[i]);
-		}
-	};
-
-	function updateWeb(webInfo, json) {
-		updateTimer(webInfo.components.requestsInfo, json);
-		updateCounter(webInfo.components.activeRequestsInfo, json);
-
-		var length = webInfo.components.meters.length;
-		for (var i = 0; i < length; i++) {
-			updateMeter(webInfo.components.meters[i], json);
-		}
-	};
-
-	/*
-	 * Log4j events stream  methods
-	 */
-	function drawLog4j(log4jInfo) {
-		var parentDiv = $("#" + log4jInfo.divId);
-		var html = "<div class='metricsWatcher log4j metricGraph col-md-12'>"
-				+ "<fieldset><legend><div class='heading1 btn-link' data-toggle='collapse' data-target='#"+log4jInfo.divId+"Collapse'>" + log4jInfo.title + "</div></legend>"
-				+ "<div class='log4jContainer col-md-12' id='"+log4jInfo.divId+"Collapse'>"
-				+ "	<div id='" + log4jInfo.divId + "Log4j'></div>"
-				+ "<table><tr>"
-				+ "<td colspan='4' class='col-md-12'></td>"
-				+ "</tr><tr>"
-				+ "<td class='all col-md-3'></td>"
-				+ "<td class='fatal col-md-3'></td>"
-				+ "<td class='error col-md-3'></td>"
-				+ "<td class='warn col-md-3'></td>"
-				+ "</tr><tr>"
-				+ "<td class='info col-md-3'></td>"
-				+ "<td class='debug col-md-3'></td>"
-				+ "<td class='trace col-md-3'></td>"
-				+ "</tr></table>"
-				+ "</div>"
-				+ "</fieldset></div>";
-		parentDiv.html(html);
-
-		var length = log4jInfo.components.meters.length;
-		for (var i = 0; i < length; i++) {
-			drawMeter(log4jInfo.components.meters[i]);
-		}
-	};
-
-	function updateLog4j(log4jInfo, json) {
-		var length = log4jInfo.components.meters.length;
-		for (var i = 0; i < length; i++) {
-			updateMeter(log4jInfo.components.meters[i], json);
-		}
-	};
-
-}(window.metricsWatcher = window.metricsWatcher || {}, jQuery));
-
 var _apacheCamelModelVersion = '2.18.1';
 
 var _apacheCamelModel ={
@@ -13778,12 +12964,826 @@ var _apacheCamelModel ={
   }
 };
 
+/*****************************************************************************
+ * Metrics-Watcher
+ *
+ * Copyright 2012 Ben Bertola and iovation, Inc.
+ *
+ * To use this library:
+ * 1. Call metricsWatcher.addXXX() for each graph you want on your page
+ * 2. Call metricsWatcher.initGraphs() once to draw the initial graphs
+ * 3. Call metricsWatcher.updateGraphs(jsonData) with JSON data from your
+ *    metrics/servlet as often as you'd like your graphs to update
+ *
+ *****************************************************************************/
+
+(function(metricsWatcher, $) {
+
+	/**
+	 * Add a Gauge type graph to your page.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addGauge = function(divId, className, metricName, title) {
+		var metricInfo = new MetricInfo(divId, className, metricName, null, title, 'gauges', null);
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a Meter type graph to your page.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addMeter = function(divId, className, metricName, max, title, eventType) {
+		if (eventType == undefined) eventType = 'Calls';
+		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'meters', eventType);
+		metricInfo.eventType = eventType;
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a Counter graph
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addCounter = function(divId, className, metricName, max, title) {
+		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'counters', null);
+		graphs.push(metricInfo);
+	};
+
+		/**
+	 * Add a standalone Histogram graph
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param max What the max value target is, used to determine the % width of progress bars for this graph
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addHistogram = function(divId, className, metricName, max, title){
+		var metricInfo = new MetricInfo(divId, className, metricName, (!max ? 1: max), title, 'histograms', null);
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a linked Counter graph. Linked Counters differ from a plain counter graph in that both the numerator and denominator
+	 * of a linked counter graph each come from individual Counter Metrics.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param maxClassName
+	 * @param maxMetricName
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addLinkedCounter = function(divId, className, metricName, maxClassName, maxMetricName, title) {
+		var metricInfo = new MetricInfo(divId, className, metricName, null, title, "counters", null);
+		if(!metricInfo)
+			metricInfo = new MetricInfo(divId, className, metricName, null, title, "timers", null);
+		
+		metricInfo.maxClassName = maxClassName;
+		metricInfo.maxMetricName = maxMetricName;
+
+		metricInfo.getMax = function(json) {
+			var maxNode = this.getMetricNode(this.maxClassName, this.maxMetricName, json);
+			return maxNode["count"];
+		};
+		
+			metricInfo.getMetricNode = function getMetricNode(className, metricName, jsonRoot) {
+				
+				var node=!(jsonRoot["counters"][className+'.'+metricName]) ? null : jsonRoot["counters"][className+'.'+metricName];
+				if(node){
+					return node;
+				}else{
+					return !(jsonRoot["timers"][className+'.'+metricName]) ? null : jsonRoot["timers"][className+'.'+metricName];
+				}
+			};
+
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a Timer graph. This will include a Meter, Timing Info, and a Histogram.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param metricName The metric name of your metrics data, from the metrics servlet
+	 * @param max The max target value for the Meter, showing frequency
+	 * @param title The user-displayed title of this graph
+	 * @param eventType a name for this event type
+	 * @param durationMax The max target value for duration
+	 */
+	metricsWatcher.addTimer = function(divId, className, metricName, max, title, eventType, durationMax) {
+		var timer = addTimerInternal(divId, className, metricName, max, title, eventType, durationMax, false);
+		graphs.push(timer);
+	};
+
+	/**
+	 * Add an ehcache graph.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addCache = function(divId, className, title) {
+		var metricInfo = new MetricInfo(divId, className, null, null, title, "caches", null);
+
+		metricInfo.components = {
+			gauges : [
+				new MetricInfo(null, className, "hits", null, "Hits", "gauges", null),
+				new MetricInfo(null, className, "misses", null, "Misses", "gauges", null),
+				new MetricInfo(null, className, "objects", null, "Objects", "gauges", null),
+				new MetricInfo(null, className, "eviction-count", null, "Eviction Count", "gauges", null),
+				new MetricInfo(null, className, "in-memory-hits", null, "In Memory Hits", "gauges", null),
+				new MetricInfo(null, className, "in-memory-misses", null, "In Memory Misses", "gauges", null),
+				new MetricInfo(null, className, "in-memory-objects", null, "In Memory Objects", "gauges", null),
+				new MetricInfo(null, className, "off-heap-hits", null, "Off Heap Hits", "gauges", null),
+				new MetricInfo(null, className, "off-heap-misses", null, "Off Heap Misses", "gauges", null),
+				new MetricInfo(null, className, "off-heap-objects", null, "Off Heap Objects", "gauges", null),
+				new MetricInfo(null, className, "on-disk-hits", null, "On Disk Hits", "gauges", null),
+				new MetricInfo(null, className, "on-disk-misses", null, "On Disk Misses", "gauges", null),
+				new MetricInfo(null, className, "on-disk-objects", null, "On Disk Objects", "gauges", null),
+				new MetricInfo(null, className, "mean-get-time", null, "Mean Get Time", "gauges", null),
+				new MetricInfo(null, className, "mean-search-time", null, "Mean Search Time", "gauges", null),
+				new MetricInfo(null, className, "searches-per-second", null, "Searches Per Sec", "gauges", null),
+				new MetricInfo(null, className, "writer-queue-size", null, "Writer Queue Size", "gauges", null),
+				new MetricInfo(null, className, "accuracy", null, "Accuracy", "gauges", null)
+			]
+		};
+		metricInfo.getTimer = addTimerInternal(divId + "gettimer", className, "gets", 5, "Get", "get", 1, true);
+		metricInfo.putTimer = addTimerInternal(divId + "puttimer", className, "puts", 5, "Put", "put", 1, true);
+
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a JVM graph.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addJvm = function(divId, className, title) {
+		var metricInfo = new MetricInfo(divId, className, null, null, title, "jvms", null);
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a web server graph.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addWeb = function(divId, className, title) {
+		var metricInfo = new MetricInfo(divId, className, null, null, title, "webs", null);
+
+		metricInfo.components = {
+			meters : [
+				new MetricInfo(divId + " td.responseCodesOkGraph", className, "responseCodes.ok", 10, "OK Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesBadRequestGraph", className, "responseCodes.badRequest", 10, "Bad Requests", "meters", null),
+				new MetricInfo(divId + " td.responseCodesCreatedGraph", className, "responseCodes.created", 10, "Created Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesNoContentGraph", className, "responseCodes.noContent", 10, "No Content Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesNotFoundGraph", className, "responseCodes.notFound", 10, "Not Found Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesOtherGraph", className, "responseCodes.other", 10, "Other Responses", "meters", null),
+				new MetricInfo(divId + " td.responseCodesServerErrorGraph", className, "responseCodes.serverError", 10, "Server Error Responses", "meters", null)
+			],
+			activeRequestsInfo : new MetricInfo(divId + " td.activeRequestsGraph", className, "activeRequests", 10, "Active Requests", "counters", null),
+			requestsInfo : addTimerInternal(divId + " td.requestsGraph", className, "requests", 100, "Requests", "requests", 100, true)
+		};
+
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Add a log4j logged events graph.
+	 *
+	 * @param divId The id of the div to draw the graph in
+	 * @param className The class name of your metrics data, from the metrics servlet
+	 * @param title The user-displayed title of this graph
+	 */
+	metricsWatcher.addLog4j = function(divId, className, title) {
+		var metricInfo = new MetricInfo(divId, className, null, null, title, "log4js", null);
+
+		metricInfo.components = {
+			meters : [
+				new MetricInfo(divId + " td.all", className, "all", 100, "all", "meters", null),
+				new MetricInfo(divId + " td.fatal", className, "fatal", 100, "fatal", "meters", null),
+				new MetricInfo(divId + " td.error", className, "error", 100, "error", "meters", null),
+				new MetricInfo(divId + " td.warn", className, "warn", 100, "warn", "meters", null),
+				new MetricInfo(divId + " td.info", className, "info", 100, "info", "meters", null),
+				new MetricInfo(divId + " td.debug", className, "debug", 100, "debug", "meters", null),
+				new MetricInfo(divId + " td.trace", className, "trace", 100, "trace", "meters", null)
+			]
+		};
+
+		graphs.push(metricInfo);
+	};
+
+	/**
+	 * Initialized each of the graphs that you have added through addXXX() calls,
+	 * and draws them on the screen for the first time
+	 */
+	metricsWatcher.initGraphs = function() {
+		// draw all graphs for the first time
+		for (var i = 0; i < graphs.length; i++) {
+			if (graphs[i].type == "gauges")
+				drawGauge(graphs[i]);
+			else if (graphs[i].type == "meters")
+				drawMeter(graphs[i]);
+			else if (graphs[i].type == "counters" || graphs[i].type == "linkedTimerCounters")
+				drawCounter(graphs[i]);
+			else if (graphs[i].type == "histograms")
+				drawHistogram(graphs[i]);
+			else if (graphs[i].type == "timers")
+				drawTimer(graphs[i]);
+			else if (graphs[i].type == "caches")
+				drawCache(graphs[i]);
+			else if (graphs[i].type == "jvms")
+				drawJvm(graphs[i]);
+			else if (graphs[i].type == "webs")
+				drawWeb(graphs[i]);
+			else if (graphs[i].type == "log4js")
+				drawLog4j(graphs[i]);
+			else
+				alert("Unknown meter info type: " + graphs[i].type);
+		}
+	};
+
+	/**
+	 * Update the existing graphs with new data. You can call this method as frequently as you would
+	 * like to, and all graph info will be updated.
+	 *
+	 * @param json The root of the json node returned from your ajax call to the metrics servlet
+	 */
+	metricsWatcher.updateGraphs = function(json) {
+		for (var i = 0; i < graphs.length; i++) {
+			if (graphs[i].type == "gauges")
+				updateGauge(graphs[i], json);
+			else if (graphs[i].type == "meters")
+				updateMeter(graphs[i], json);
+			else if (graphs[i].type == "counters" || graphs[i].type == "linkedTimerCounters")
+				updateCounter(graphs[i], json);
+			else if (graphs[i].type == "histograms")
+				updateHistogram(graphs[i], json);
+			else if (graphs[i].type == "timers")
+				updateTimer(graphs[i], json);
+			else if (graphs[i].type == "caches")
+				updateCache(graphs[i], json);
+			else if (graphs[i].type == "jvms")
+				updateJvm(graphs[i], json);
+			else if (graphs[i].type == "webs")
+				updateWeb(graphs[i], json);
+			else if (graphs[i].type == "log4js")
+				updateLog4j(graphs[i], json);
+			else
+				alert("Unknown meter info type: " + graphs[i].type);
+		}
+	};
+
+	/*
+	 * Private Methods
+	 */
+	var graphs = [];
+
+  function MetricInfo(divId, className, metricName, max, title, type, subTitle) {
+		this.divId = divId;
+		this.className = className;
+		this.metricName = metricName;
+		this.max = max;
+		this.title = title;
+		this.type = type;
+    this.subTitle = subTitle;
+
+		this.getMax = function(json) {
+			return this.max;
+		};
+		this.getMetricNode = function getMetricNode(className, metricName, jsonRoot) {
+			return !(jsonRoot[type][className+'.'+metricName]) ? null : jsonRoot[type][className+'.'+metricName];
+		};
+
+    this.getSubTitle = function() {
+      if (this.subTitle != null) {
+        return this.subTitle;
+      } else {
+        // fallback and use title
+        return this.title;
+      }
+    }
+	}
+
+	function calculatePercentage(currentVal, maxVal) {
+		var p = (currentVal / maxVal) * 100;
+		return p.toFixed(0);
+	}
+
+	function formatNumber(varNumber, n) {
+		if (isNaN(n)) n = 1;
+
+		return !isNaN(varNumber)?varNumber.toFixed(n):n;
+	}
+
+	function capitalizeFirstLetter(input) {
+		return input.charAt(0).toUpperCase() + input.slice(1);
+	}
+
+	function addTimerInternal(divId, className, metricName, max, title, eventType, durationMax, isNested) {
+		var metricInfo = new MetricInfo(divId, className, metricName, max, title, 'timers', eventType);
+
+		metricInfo.getMeterInfo = function() {
+			var myDivId = this.divId + " div.timerGraph div.meterGraph";
+			var retVal = new MetricInfo(myDivId, this.className, this.metricName, this.max, "Frequency", 'timers', null);
+
+			retVal.getMetricNode = function(className, metricName, jsonRoot) {
+				return !jsonRoot['timers'][className+'.'+metricName] ? null : jsonRoot['timers'][className+'.'+metricName];
+			};
+
+			retVal.eventType = eventType;
+			return retVal;
+		};
+
+		metricInfo.getTimerStatsDivId = function() {
+			return "#" + this.divId + " div.timerGraph div.timerStatsGraph";
+		};
+		metricInfo.getTimerHistogramDivId = function() {
+			return "#" + this.divId + " div.timerGraph div.timerHistogram";
+		};
+		metricInfo.durationMax = durationMax;
+		metricInfo.isNested = isNested;
+
+		return metricInfo;
+	}
+
+	/*
+	 * Counter methods
+	 */
+	function drawCounter(counterInfo) {
+		var parentDiv = $("#" + counterInfo.divId);
+		var html = "<div class='counter counterGraph'><h3>" + counterInfo.title
+				+ "</h3><div class='progress'><div class='progress-bar' style='width: 0%;'></div></div></div>";
+		parentDiv.html(html);
+	}
+	
+	function updateCounter(counterInfo, json) {
+		var metricData = counterInfo.getMetricNode(counterInfo.className, counterInfo.metricName, json);
+		var pct = calculatePercentage(metricData.count, counterInfo.getMax(json));
+
+		$("#" + counterInfo.divId + " div.progress div.progress-bar").css("width", pct + "%");
+		$("#" + counterInfo.divId + " div.progress div.progress-bar").html(metricData.count + "/" + counterInfo.getMax(json));
+	}
+
+	/*
+	 * Timer methods
+	 */
+	function drawTimer(timerInfo) {
+		var parentDiv = $("#" + timerInfo.divId);
+
+		var nested = (timerInfo.isNested) ? " nested" : "";
+		var html = 
+          '<div class="metricsWatcher timer timerGraph' + nested + '">'
+        + '  <div class="panel-group" id="accordion-' + timerInfo.divId + '">'
+				+ '    <div class="panel panel-default">'
+				+ '      <div class="panel-heading">'
+				+ '        <h4 class="panel-title">'
+        +            ((timerInfo.isNested)
+                       ? '<a>'
+                       : '<a data-toggle="collapse" data-parent="accordion-' + timerInfo.divId + '" href="#' + timerInfo.divId + 'Collapse">')
+				+            timerInfo.title + '</a>'
+				+ '        </h4>'
+				+ '      </div>'
+				+ '      <div id="' + timerInfo.divId + 'Collapse" class="panel-collapse' + ((timerInfo.isNested) ? '': ' collapse in') + '">'
+				+ '        <div class="panel-body">'
+				+ '          <div class="meterGraph col-md-12 col-lg-4"></div>'
+				+ '          <div class="timerStatsGraph col-md-12 col-lg-4"></div>'
+				+ '          <div class="timerHistogram col-md-12 col-lg-4"></div>'
+				+ '        </div>'
+        + '      </div>'
+        + '    </div>'
+        + '  </div>'
+        + '</div>';
+		parentDiv.html(html);
+
+		drawMeter(timerInfo.getMeterInfo());
+		drawDurationStats(timerInfo);
+		drawDurationHistogram(timerInfo);
+	};
+
+	function drawDurationStats(timerInfo) {
+		var html = "<h3>Duration</h3><div class='timeUnit'></div><div class='metricGraph'><table class='progressTable'>"
+			+ addMeterRow("Min", "min")
+			+ addMeterRow("Mean", "mean")
+			+ addMeterRow("Max", "max")
+			+ addMeterRow("Std&nbsp;Dev", "stddev")
+			+ "</table></div>";
+		var parentDiv = $(timerInfo.getTimerStatsDivId());
+		parentDiv.html(html);
+	}
+
+	function drawDurationHistogram(timerInfo) {
+		var html = "<h3> " +(timerInfo.isNested?  "Histogram" :timerInfo.getSubTitle()) + "</h3><div>Percentiles</div><div class='metricGraph'><table class='progressTable'>"
+			+ addMeterRow("99.9%", "p999")
+			+ addMeterRow("99%", "p99")
+			+ addMeterRow("98%", "p98")
+			+ addMeterRow("95%", "p95")
+			+ addMeterRow("75%", "p75")
+			+ addMeterRow("50%", "p50")
+			+ "</table></div>";
+		var parentDiv = $(timerInfo.getTimerHistogramDivId());
+		parentDiv.html(html);
+	}
+
+	function updateTimer(timerInfo, json) {
+		updateMeter(timerInfo.getMeterInfo(), json);
+		updateDurationStats(timerInfo, json);
+		updateDurationHistogram(timerInfo, json);
+	}
+
+	function updateDurationStats(timerInfo, json) {
+		var metricNode = timerInfo.getMetricNode(timerInfo.className, timerInfo.metricName, json);
+		if (!metricNode) return;
+
+		var timeUnitDiv = $(timerInfo.getTimerStatsDivId() + " div.timeUnit");
+		timeUnitDiv.html(capitalizeFirstLetter(metricNode["duration_units"]));
+
+		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "min", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "mean", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "max", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerStatsDivId(), metricNode, "stddev", timerInfo.durationMax);
+	}
+
+	function updateDuration(timerStatsDivId, durationData, style, max) {
+		$(timerStatsDivId + " tr." + style + " td.progressValue").html(formatNumber(durationData[style]));
+		$(timerStatsDivId + " tr." + style + " td.progressBar div.progress div.progress-bar")
+			.css("width", calculatePercentage(durationData[style], max) + "%");
+	}
+
+	function updateDurationHistogram(timerInfo, json) {
+		var metricNode = timerInfo.getMetricNode(timerInfo.className, timerInfo.metricName, json);
+		if (!metricNode) return;
+
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p999", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p99", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p98", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p95", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p75", timerInfo.durationMax);
+		updateDuration(timerInfo.getTimerHistogramDivId(), metricNode, "p50", timerInfo.durationMax);
+	}
+
+/*
+ * Histogram methods
+ */
+
+	function drawHistogram(histogramInfo) {
+		var parentDiv = $("#" + histogramInfo.divId);
+		var html = "<div class='metricsWatcher histogram histogramContainer'>" 
+			+ "<div class='heading1 btn-link col-md-12' data-toggle='collapse' data-target='#" + histogramInfo.divId + "Collapse'> " +(histogramInfo.isNested?  "Histogram" :histogramInfo.title) + "</div>" 
+			+ "<div class='collapse' id='" + histogramInfo.divId + "Collapse'>"
+			+ "<table>" 
+				+ "<tr><td class='col-md-4'>Count</td><td class='col-md-4'>Min</td><td class='col-md-4'>Max<td class='col-md-4'>Mean</td></tr>" 
+				+ "<tr><td class='countVal'></td><td class='minVal'></td><td class='meanVal'></td><td class='maxVal'></td></tr>"
+			+ "</table>"
+			+	"<p>Percentiles</p>"
+			+"<table class='progressTable'>"
+			+ addMeterRow("99.9%", "p999")
+			+ addMeterRow("99%", "p99")
+			+ addMeterRow("98%", "p98")
+			+ addMeterRow("95%", "p95")
+			+ addMeterRow("75%", "p75")
+			+ addMeterRow("50%", "p50")
+			+ "</table></div></div>";
+		parentDiv.html(html);
+	}
+
+	function updateHistogram(histogramInfo, json) {
+		var metricNode = histogramInfo.getMetricNode(histogramInfo.className, histogramInfo.metricName, json);
+		$("#" + histogramInfo.divId +  " td.countVal").html(formatNumber(metricNode['count'],0));
+		$("#" + histogramInfo.divId +  " td.minVal").html(formatNumber(metricNode['min'],0));
+		$("#" + histogramInfo.divId +  " td.maxVal").html(formatNumber(metricNode['max'],0));
+		$("#" + histogramInfo.divId +  " td.meanVal").html(formatNumber(metricNode['mean'],0));
+		
+		setMeterRow(histogramInfo, metricNode, "p999", "p999", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p99", "p99", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p98", "p98", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p95", "p95", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p75", "p75", histogramInfo.max);
+		setMeterRow(histogramInfo, metricNode, "p50", "p50", histogramInfo.max);
+	}
+
+	/*
+	 * Meter methods
+	 */
+	function drawMeter(meterInfo) {
+		var parentDiv = $("#" + meterInfo.divId);
+
+		var html = "<div class='metric metricGraph'><h3>" + meterInfo.title
+			+ "</h3><div class='counterVal'></div><table class='progressTable'>"
+			+ addMeterRow("1&nbsp;min", "onemin")
+			+ addMeterRow("5&nbsp;min", "fivemin")
+			+ addMeterRow("15&nbsp;min", "fifteenmin")
+			+ addMeterRow("Mean", "mean")
+			+ "</table></div>";
+		parentDiv.html(html);
+	}
+
+	function addMeterRow(type, className) {
+		return "<tr class='" + className + "'><td class='progressLabel'>" + type + "</td>"
+			+ "<td class='progressBar'><div class='progress'><div class='progress-bar' style='width: 0%;'></div>"
+			+ "</div></td><td class='progressValue'>0</td></tr>";
+	}
+
+	function updateMeter(meterInfo, json) {
+		var metricData = meterInfo.getMetricNode(meterInfo.className, meterInfo.metricName, json);
+		if (metricData) {
+			updateMeterData(meterInfo, metricData);
+		}
+	}
+
+	function updateMeterData(meterInfo, meterData) {
+		// set the big counter
+		var gaugeDiv = $("#" + meterInfo.divId + " div.counterVal");
+
+		gaugeDiv.html(meterData.rate_units + " (" + meterData.count + " total)");
+
+		var maxRate = Math.max(meterData['mean_rate'],meterData['m1_rate'],meterData['m5_rate'],meterData['m15_rate']);
+
+		// set the mean count
+		setMeterRow(meterInfo, meterData, "mean_rate", "mean", maxRate);
+		setMeterRow(meterInfo, meterData, "m1_rate", "onemin", maxRate);
+		setMeterRow(meterInfo, meterData, "m5_rate", "fivemin", maxRate);
+		setMeterRow(meterInfo, meterData, "m15_rate", "fifteenmin", maxRate);
+	}
+
+	function setMeterRow(meterInfo, meterData, rowType, rowStyle) {
+		setMeterRow(meterInfo, meterData, rowType, rowStyle, meterInfo.max);
+	}
+
+	function setMeterRow(meterInfo, meterData, rowType, rowStyle, max) {
+		$("#" + meterInfo.divId + " tr." + rowStyle + " td.progressValue").html(formatNumber(meterData[rowType]));
+		$("#" + meterInfo.divId + " tr." + rowStyle + " td.progressBar div.progress div.progress-bar")
+			.css("width", calculatePercentage(meterData[rowType], max) + "%");
+	}
+
+	/*
+	 * Gauge methods
+	 */
+	function drawGauge(gaugeInfo) {
+		var parentDiv = $("#" + gaugeInfo.divId);
+		var html = "<div class='metric metricGraph'><h3>" + gaugeInfo.title + "</h3><div class='gaugeDataVal'></div></div>";
+		parentDiv.html(html);
+	}
+	function updateGauge(gaugeInfo, json) {
+		var metricData = gaugeInfo.getMetricNode(gaugeInfo.className, gaugeInfo.metricName, json);
+		if (metricData) {
+			updateGaugeData(gaugeInfo, metricData);
+		}
+	}
+	function updateGaugeData(gaugeInfo, gaugeData) {
+		var gaugeDiv = $("#" + gaugeInfo.divId + " div.gaugeDataVal");
+		gaugeDiv.html(gaugeData.value);
+	}
+
+	/*
+	 * GaugeTable methods
+	 */
+	function drawGaugeTable(divId, title, gauges) {
+		var parentDiv = $("#" + divId);
+		var html = "<div class='metricsWatcher metric metricGraph nested'>"
+				+ "<fieldset><legend><div class='heading1'>" + title + "</div></legend>"
+				+ "<div class='gaugeTableContainer'><table class='gaugeTable'></table></div></fieldset></div>";
+
+		parentDiv.html(html);
+	}
+	function updateGaugeTable(divId, gauges, json) {
+		var div = $("#" + divId + " table");
+
+		var html = "";
+		var length = gauges.length;
+		for (var i = 0; i < length; i++) {
+			var gauge = gauges[i];
+			html += "<tr><td><h5>" + gauge.title + "</h5></td>"
+				+ "<td><h4>" + gauge.getMetricNode(gauge.className, gauge.metricName, json).value
+				+ "</h4></td></tr>";
+		}
+		div.html(html);
+	}
+
+	/*
+	 * Cache methods
+	 */
+	function drawCache(cacheInfo) {
+		var parentDiv = $("#" + cacheInfo.divId);
+
+		var html = "<div class='metricsWatcher cache cacheGraph col-md-12'>"
+				+ "<fieldset><legend><div class='heading1'>" + cacheInfo.title + "</div></legend>"
+				+ "<div class='cacheContainer col-md-12'>"
+				+ "	<div class='row'>"
+				+ "		<div class='col-md-3'><div id='" + cacheInfo.divId + "Statistics'></div></div>"
+				+ "		<div class='col-md-9'>"
+				+ "			<div id='" + cacheInfo.divId + "gettimer'></div>"
+				+ "			<div id='" + cacheInfo.divId + "puttimer'></div>"
+				+ "		</div>"
+				+ "	</div>"
+				+ "</div></fieldset></div>";
+		parentDiv.html(html);
+
+		var length = cacheInfo.components.gauges.length;
+		for (var i = 0; i < length; i++) {
+			drawGauge(cacheInfo.components.gauges[i]);
+		}
+		drawTimer(cacheInfo.getTimer);
+		drawTimer(cacheInfo.putTimer);
+		drawGaugeTable(cacheInfo.divId + "Statistics", "Statistics", cacheInfo.components.gauges);
+	}
+	function updateCache(cacheInfo, json) {
+		var length = cacheInfo.components.gauges.length;
+		for (var i = 0; i < length; i++) {
+			var gauge = cacheInfo.components.gauges[i];
+			var data = gauge.getMetricNode(cacheInfo.className, gauge.metricName, json);
+			if (data) {
+				var gaugeDiv = $("#" + gauge.divId + " div.metricGraph div.gaugeDataVal");
+				gaugeDiv.html(data.value);
+			}
+		}
+		updateTimer(cacheInfo.getTimer, json);
+		updateTimer(cacheInfo.putTimer, json);
+		updateGaugeTable(cacheInfo.divId + "Statistics", cacheInfo.components.gauges, json);
+	}
+
+	/*
+	 * JVM methods
+	 */
+	function drawJvm(jvmInfo) {
+		var parentDiv = $("#" + jvmInfo.divId);
+		var html = "<div class='metricsWatcher jvm metricGraph col-md-12'>"
+				+ "<fieldset><legend><div  class='heading1 btn-link' data-toggle='collapse' data-target='#" + jvmInfo.divId + "Collapse'>" + jvmInfo.title + "</div></legend>"
+				+ "<div class='jvmContainer col-md-12 collapse' id='" + jvmInfo.divId + "Collapse'>"
+				+ "	<div id='" + jvmInfo.divId + "Vm'></div>"
+				+ "</div>"
+				+ "</fieldset></div>";
+		parentDiv.html(html);
+	}
+
+	function updateJvm(jvmInfo, json) {
+		var vmDiv = $("#" + jvmInfo.divId + "Vm");
+		var jvm = json['gauges'];
+		var html = "<div class='row'>"
+				+ "<div class='col-md-3'><table class='jvmTable'><caption>Memory</caption>"
+				+ "<tr><td><h5>Total Init</h5></td><td>" + jvm['jvm.memory.total.init'].value + "</td></tr>"
+				+ "<tr><td><h5>Total Used</h5></td><td>" + jvm['jvm.memory.total.used'].value + "</td></tr>"
+				+ "<tr><td><h5>Total Max</h5></td><td>" + jvm['jvm.memory.total.max'].value + "</td></tr>"
+				+ "<tr><td><h5>Total Committed</h5></td><td>" + jvm['jvm.memory.total.committed'].value + "</td></tr>"
+				+ "<tr><td><h5>Heap Init</h5></td><td>" + jvm['jvm.memory.heap.init'].value + "</td></tr>"
+				+ "<tr><td><h5>Heap Used</h5></td><td>" + jvm['jvm.memory.heap.used'].value + "</td></tr>"
+				+ "<tr><td><h5>Heap Max</h5></td><td>" + jvm['jvm.memory.heap.max'].value + "</td></tr>"
+				+ "<tr><td><h5>Heap Committed</h5></td><td>" + jvm['jvm.memory.heap.committed'].value + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Init</h5></td><td>" + jvm['jvm.memory.non-heap.init'].value + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Used</h5></td><td>" + jvm['jvm.memory.non-heap.used'].value + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Max</h5></td><td>" + jvm['jvm.memory.non-heap.max'].value + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Committed</h5></td><td>" + jvm['jvm.memory.non-heap.committed'].value + "</td></tr>"
+				+ "</table></div>"
+				+ "<div class='col-md-3'><table class='jvmTable'><caption>Memory Usage</caption>"
+				+ "<tr><td><h5>Heap Usage</h5></td><td>" + (jvm['jvm.memory.heap.usage'].value * 100).toFixed(2) + "</td></tr>"
+				+ "<tr><td><h5>Non Heap Usage</h5></td><td>" + (jvm['jvm.memory.non-heap.usage'].value * 100).toFixed(2) + "</td></tr>"
+				+ (!jvm['jvm.memory.pools.JIT-code-cache.usage']?"":("<tr><td><h5>JIT Code Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.JIT-code-cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Code-Cache.usage']?"":("<tr><td><h5>JIT Code Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.Code-Cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.JIT-data-cache.usage']?"":("<tr><td><h5>JIT Data Cache Usage</h5></td><td>" + (jvm['jvm.memory.pools.JIT-data-cache.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Java-heap.usage']?"":("<tr><td><h5>Java Heap Usage</h5></td><td>" + (jvm['jvm.memory.pools.Java-heap.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.class-storage.usage']?"":("<tr><td><h5>Class Storage Usage</h5></td><td>" + (jvm['jvm.memory.pools.class-storage.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Perm-Gen.usage']?"":("<tr><td><h5>Perm Gen Usage</h5></td><td>" + (jvm['jvm.memory.pools.Perm-Gen.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Tenured-Gen.usage']?"":("<tr><td><h5>Tenured Gen Usage</h5></td><td>" + (jvm['jvm.memory.pools.Tenured-Gen.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.miscellaneous-non-heap-storage.usage']?"":("<tr><td><h5>Misc Non Heap Storage Usage</h5></td><td>" + (jvm['jvm.memory.pools.miscellaneous-non-heap-storage.usage'].value * 100).toFixed(2)  + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Survivor-Space.usage']?"":("<tr><td><h5>Survivor Space Usage</h5></td><td>" + (jvm['jvm.memory.pools.Survivor-Space.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+ (!jvm['jvm.memory.pools.Eden-Space.usage']?"":("<tr><td><h5>Eden Space Usage</h5></td><td>" + (jvm['jvm.memory.pools.Eden-Space.usage'].value * 100).toFixed(2) + "</td></tr>"))
+				+"</table></div>"
+				+ "<div class='col-md-3'><table class='jvmTable'><caption>Garbage Collection</caption>"
+				+ "<tr><td><h5>PS Mark Sweep Runs</h5></td><td>" + jvm['jvm.gc.MarkSweepCompact.count'].value + "</td></tr>"
+				+ "<tr><td><h5>PS Mark Sweep Time</h5></td><td>" + jvm['jvm.gc.MarkSweepCompact.time'].value + "</td></tr>"
+				+ "<tr><td><h5>GC Copy Runs</h5></td><td>" + jvm['jvm.gc.Copy.count'].value + "</td></tr>"
+				+ "<tr><td><h5>GC Copy Time</h5></td><td>" + jvm['jvm.gc.Copy.time'].value + "</td></tr>"
+				+ "</table></div>"
+				+ "<div class='col-md-3'><table class='jvmTable'><caption>Threads</caption>"
+//				+ "<tr><td class='rowName'><h5>Name</h5></td><td>" + jvm['jvm.vm.name'].value + "</td></tr>"
+//				+ "<tr><td><h5>Version</h5></td><td>" + jvm['jvm.vm.version'].value + "</td></tr>"
+//				+ "<tr><td><h5>Current Time</h5></td><td>" + jvm['jvm.current_time'].value + "</td></tr>"
+//				+ "<tr><td><h5>Uptime</h5></td><td>" + jvm['jvm.uptime'].value + "</td></tr>"
+				+ "<tr><td><h5>FD Usage</h5></td><td>" + formatNumber(jvm['jvm.fd.usage'].value, 2) + "</td></tr>"
+				+ "<tr><td><h5>Daemon Threads</h5></td><td>" + jvm['jvm.thread-states.daemon.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Threads</h5></td><td>" + jvm['jvm.thread-states.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Deadlocks</h5></td><td>" + jvm['jvm.thread-states.deadlocks'].value + "</td></tr>"
+				+ "</table><table class='jvmTable'><caption>Thread States</caption>"
+				+ "<tr><td><h5>Terminated</h5></td><td>" + jvm['jvm.thread-states.terminated.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Timed Waiting</h5></td><td>" + jvm['jvm.thread-states.timed_waiting.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Blocked</h5></td><td>" + jvm['jvm.thread-states.blocked.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Waiting</h5></td><td>" + jvm['jvm.thread-states.waiting.count'].value + "</td></tr>"
+				+ "<tr><td><h5>Runnable</h5></td><td>" + jvm['jvm.thread-states.runnable.count'].value + "</td></tr>"
+				+ "<tr><td><h5>New</h5></td><td>" + jvm['jvm.thread-states.new.count'].value + "</td></tr>"
+				+ "</table></div></div>";
+
+		vmDiv.html(html);
+	};
+
+	/*
+	 * Web Server methods
+	 */
+	function drawWeb(webInfo) {
+		var parentDiv = $("#" + webInfo.divId);
+		var html = "<div class='metricsWatcher web metricGraph col-md-12'>"
+				+ "<fieldset><legend><div class='heading1 btn-link' data-toggle='collapse' data-target='#"+webInfo.divId+"Collapse'>" + webInfo.title + "</div></legend>"
+				+ "<div class='webContainer col-md-12' id='"+webInfo.divId+"Collapse'>"
+				+ "	<div id='" + webInfo.divId + "Web'></div>"
+				+ "<table><tr>"
+				+ "<td colspan='4' class='requestsGraph col-md-12'></td>"
+				+ "</tr><tr>"
+				+ "<td class='activeRequestsGraph col-md-3'></td>"
+				+ "<td class='responseCodesOkGraph col-md-3'></td>"
+				+ "<td class='responseCodesCreatedGraph col-md-3'></td>"
+				+ "<td class='responseCodesOtherGraph col-md-3'></td>"
+				+ "</tr><tr>"
+				+ "<td class='responseCodesBadRequestGraph col-md-3'></td>"
+				+ "<td class='responseCodesNoContentGraph col-md-3'></td>"
+				+ "<td class='responseCodesNotFoundGraph col-md-3'></td>"
+				+ "<td class='responseCodesServerErrorGraph col-md-3'></td>"
+				+ "</tr></table>"
+				+ "</div>"
+				+ "</fieldset></div>";
+		parentDiv.html(html);
+
+		drawTimer(webInfo.components.requestsInfo);
+		drawCounter(webInfo.components.activeRequestsInfo);
+
+		var length = webInfo.components.meters.length;
+		for (var i = 0; i < length; i++) {
+			drawMeter(webInfo.components.meters[i]);
+		}
+	};
+
+	function updateWeb(webInfo, json) {
+		updateTimer(webInfo.components.requestsInfo, json);
+		updateCounter(webInfo.components.activeRequestsInfo, json);
+
+		var length = webInfo.components.meters.length;
+		for (var i = 0; i < length; i++) {
+			updateMeter(webInfo.components.meters[i], json);
+		}
+	};
+
+	/*
+	 * Log4j events stream  methods
+	 */
+	function drawLog4j(log4jInfo) {
+		var parentDiv = $("#" + log4jInfo.divId);
+		var html = "<div class='metricsWatcher log4j metricGraph col-md-12'>"
+				+ "<fieldset><legend><div class='heading1 btn-link' data-toggle='collapse' data-target='#"+log4jInfo.divId+"Collapse'>" + log4jInfo.title + "</div></legend>"
+				+ "<div class='log4jContainer col-md-12' id='"+log4jInfo.divId+"Collapse'>"
+				+ "	<div id='" + log4jInfo.divId + "Log4j'></div>"
+				+ "<table><tr>"
+				+ "<td colspan='4' class='col-md-12'></td>"
+				+ "</tr><tr>"
+				+ "<td class='all col-md-3'></td>"
+				+ "<td class='fatal col-md-3'></td>"
+				+ "<td class='error col-md-3'></td>"
+				+ "<td class='warn col-md-3'></td>"
+				+ "</tr><tr>"
+				+ "<td class='info col-md-3'></td>"
+				+ "<td class='debug col-md-3'></td>"
+				+ "<td class='trace col-md-3'></td>"
+				+ "</tr></table>"
+				+ "</div>"
+				+ "</fieldset></div>";
+		parentDiv.html(html);
+
+		var length = log4jInfo.components.meters.length;
+		for (var i = 0; i < length; i++) {
+			drawMeter(log4jInfo.components.meters[i]);
+		}
+	};
+
+	function updateLog4j(log4jInfo, json) {
+		var length = log4jInfo.components.meters.length;
+		for (var i = 0; i < length; i++) {
+			updateMeter(log4jInfo.components.meters[i], json);
+		}
+	};
+
+}(window.metricsWatcher = window.metricsWatcher || {}, jQuery));
+
 var Integration;
 (function (Integration) {
     configureAboutPage.$inject = ["aboutService"];
     function configureAboutPage(aboutService) {
         'ngInject';
-        aboutService.addProductInfo('Hawtio Integration', '4.0.0');
+        aboutService.addProductInfo('Hawtio Integration', 'PACKAGE_VERSION_PLACEHOLDER');
     }
     Integration.configureAboutPage = configureAboutPage;
 })(Integration || (Integration = {}));
@@ -19672,8 +19672,34 @@ var Osgi;
 })(Osgi || (Osgi = {}));
 var Osgi;
 (function (Osgi) {
+    var OsgiController = /** @class */ (function () {
+        OsgiController.$inject = ["workspace"];
+        function OsgiController(workspace) {
+            'ngInject';
+            this.workspace = workspace;
+        }
+        OsgiController.prototype.$onInit = function () {
+            this.tabs = [];
+            var bundlesTab = new Nav.HawtioTab('Bundles', '/osgi/bundles');
+            this.tabs.push(bundlesTab);
+            if (Karaf.getSelectionFeaturesMBean(this.workspace)) {
+                this.tabs.push(new Nav.HawtioTab('Features', '/osgi/features'));
+            }
+            this.tabs.push(new Nav.HawtioTab('Packages', '/osgi/packages'));
+            this.tabs.push(new Nav.HawtioTab('Services', '/osgi/services'));
+            if (Karaf.getSelectionScrMBean(this.workspace)) {
+                this.tabs.push(new Nav.HawtioTab('Declarative Services', '/osgi/scr-components'));
+            }
+            this.tabs.push(new Nav.HawtioTab('Server', '/osgi/server'));
+            this.tabs.push(new Nav.HawtioTab('Framework', '/osgi/fwk'));
+            this.tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
+        };
+        return OsgiController;
+    }());
+    Osgi.OsgiController = OsgiController;
     Osgi.osgiComponent = {
-        template: "\n      <div class=\"osgi-nav-main\">\n        <osgi-navigation></osgi-navigation>\n        <div class=\"contents\" ng-view></div>\n      </div>\n    "
+        template: '<hawtio-tabs-layout tabs="$ctrl.tabs"></hawtio-tabs-layout>',
+        controller: OsgiController
     };
 })(Osgi || (Osgi = {}));
 /// <reference path="osgiHelpers.ts"/>
@@ -25501,59 +25527,6 @@ var Osgi;
         }
     };
 })(Osgi || (Osgi = {}));
-/// <reference path="../../karaf/ts/karafHelpers.ts"/>
-/// <reference path="osgiPlugin.ts"/>
-var Osgi;
-(function (Osgi) {
-    var OsgiNavigationController = /** @class */ (function () {
-        OsgiNavigationController.$inject = ["$location", "workspace", "treeService", "$scope"];
-        function OsgiNavigationController($location, workspace, treeService, $scope) {
-            'ngInject';
-            this.$location = $location;
-            this.workspace = workspace;
-            this.treeService = treeService;
-            this.$scope = $scope;
-        }
-        OsgiNavigationController.prototype.$onInit = function () {
-            var _this = this;
-            this.treeService.runWhenTreeReady(function () {
-                var tabs = [];
-                var bundlesTab = new Nav.HawtioTab('Bundles', '/osgi/bundles');
-                tabs.push(bundlesTab);
-                if (Karaf.getSelectionFeaturesMBean(_this.workspace)) {
-                    tabs.push(new Nav.HawtioTab('Features', '/osgi/features'));
-                }
-                tabs.push(new Nav.HawtioTab('Packages', '/osgi/packages'));
-                tabs.push(new Nav.HawtioTab('Services', '/osgi/services'));
-                if (Karaf.getSelectionScrMBean(_this.workspace)) {
-                    tabs.push(new Nav.HawtioTab('Declarative Services', '/osgi/scr-components'));
-                }
-                tabs.push(new Nav.HawtioTab('Server', '/osgi/server'));
-                tabs.push(new Nav.HawtioTab('Framework', '/osgi/fwk'));
-                tabs.push(new Nav.HawtioTab('Configuration', '/osgi/configurations'));
-                _this.tabs = tabs;
-                _this.$scope.$on('$routeChangeSuccess', function (event, current, previous) {
-                    if (_.startsWith(_this.$location.path(), '/osgi/bundle')) {
-                        _this.activeTab = bundlesTab;
-                    }
-                    else {
-                        _this.activeTab = null;
-                    }
-                });
-            });
-        };
-        OsgiNavigationController.prototype.goto = function (tab) {
-            this.$location.path(tab.path);
-        };
-        return OsgiNavigationController;
-    }());
-    Osgi.OsgiNavigationController = OsgiNavigationController;
-    Osgi.osgiNavigationComponent = {
-        template: "\n      <hawtio-tabs tabs=\"$ctrl.tabs\"\n        active-tab=\"$ctrl.activeTab\"\n        on-change=\"$ctrl.goto(tab)\">\n      </hawtio-tabs>",
-        controller: OsgiNavigationController
-    };
-    Osgi._module.component('osgiNavigation', Osgi.osgiNavigationComponent);
-})(Osgi || (Osgi = {}));
 /// <reference path="osgiHelpers.ts"/>
 /// <reference path="osgiPlugin.ts"/>
 var Osgi;
@@ -26339,7 +26312,12 @@ var Osgi;
         }]);
 })(Osgi || (Osgi = {}));
 
-angular.module('hawtio-integration-templates', []).run(['$templateCache', function($templateCache) {$templateCache.put('plugins/camel/html/blocked.html','<div class="table-view" ng-controller="Camel.BlockedExchangesController">\n\n  <h3>Blocked</h3>\n  \n  <p ng-if="!initDone">Loading...</p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No blocked exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n            <div class="form-group">\n              <button type="button" class="btn btn-default" ng-disabled="gridOptions.selectedItems.length === 0"\n                ng-click="unblockDialog = true" data-placement="bottom">Unblock</button>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="unblockDialog" ok-button-text="Unblock" cancel-button-text="Cancel" on-ok="doUnblock()"\n       title="Unblock Exchange">\n    <div class="dialog-body">\n      <p>You are about to unblock the selected thread.</p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n</div>\n');
+angular.module('hawtio-integration-templates', []).run(['$templateCache', function($templateCache) {$templateCache.put('plugins/activemq/html/browseQueue.html','<div ng-controller="ActiveMQ.BrowseQueueController">\n\n  <h1>Browse Queue</h1>\n\n  <div ng-hide="showMessageDetails">\n    <div class="row toolbar-pf table-view-pf-toolbar">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group toolbar-pf-filter has-clear">\n            <div class="search-pf-input-group">\n              <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n              <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n              <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                <span class="pficon pficon-close"></span>\n              </button>\n            </div>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="dlq" ng-click="retryMessages()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="retryMessage" mode="remove"\n                title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">\n                Retry\n              </button>\n              <button class="btn btn-default" ng-disabled="gridOptions.selectedItems.length !== 1" ng-show="showButtons" ng-click="resendMessage()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendTextMessage" mode="remove"\n                title="Edit the message to resend it" data-placement="bottom">\n                Resend\n              </button>\n\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n              <button class="btn btn-default" ng-click="refresh()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="browse" mode="remove"\n                title="Refreshes the list of messages">\n                <i class="fa fa-refresh"></i>\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n    <table class="table table-striped table-bordered table-hover activemq-browse-table" hawtio-simple-table="gridOptions"></table>\n  </div>\n\n  <div ng-show="showMessageDetails">\n    <div class="row toolbar-pf">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions">\n          <div class="form-group">\n            <button class="btn btn-primary" ng-click="showMessageDetails = false">\n              Back\n            </button>\n          </div>\n\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>\n\n    <div class="expandable closed">\n      <div title="Headers" class="title">\n        <h3><i class="expandable-indicator"></i> Headers & Properties</h3>\n      </div>\n      <div class="expandable-body well">\n        <table class="table table-condensed table-striped table-bordered table-hover">\n          <thead>\n            <tr>\n              <th>Header</th>\n              <th>Value</th>\n            </tr>\n          </thead>\n          <tbody compile="row.headerHtml"></tbody>\n        </table>\n      </div>\n    </div>\n\n    <h3>Displaying body as <span ng-bind="row.textMode"></span></h3>\n    <div hawtio-editor="row.bodyText" read-only="true" mode=\'mode\'></div>\n\n  </div>\n\n  <div hawtio-confirm-dialog="deleteDialog" title="Delete messages?"\n       ok-button-text="Delete"\n       cancel-button-text="Cancel"\n       on-ok="deleteMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        This operation cannot be undone so please be careful.\n      </p>\n      <p>You are about to delete\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'a message!\', \'other\': \'{} messages!\'}">\n        </ng-pluralize>\n      </p>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="moveDialog" title="Move messages?"\n       ok-button-text="Move"\n       cancel-button-text="Cancel"\n       on-ok="moveMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        You cannot undo this operation.<br/>\n        Though after the move you can always move the\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'messages\'}"></ng-pluralize>\n        back again.\n      </p>\n      <p>Move\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'{} messages\'}"></ng-pluralize>\n        to: <select ng-model="queueName" ng-options="qn for qn in queueNames" ng-init="queueName=queueNames[0]"></select>\n      </p>\n    </div>\n  </div>\n\n</div>\n\n');
+$templateCache.put('plugins/activemq/html/destinations.html','<div class="table-view" ng-controller="ActiveMQ.QueuesController">\n\n  <h2 class="destination-heading">{{destinationType}}</h2>\n\n  <div>\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n    <pf-table-view config="tableConfig"\n                   page-config="pageConfig"\n                   columns="tableColumns"\n                   items="destinations">\n    </pf-table-view>\n  </div>\n</div>');
+$templateCache.put('plugins/activemq/html/durableSubscribers.html','<div class="table-view" ng-controller="ActiveMQ.DurableSubscriberController">\n    <h2>Durable Subscribers</h2>\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n    <table class="table table-striped table-bordered">\n      <thead>\n        <tr>\n          <th>\n            <input type="checkbox" ng-model="model.allSelected" ng-change="selectAll()">\n          </th>\n          <th>Topic</th>\n          <th>Client ID</th>\n          <th>Consumer ID</th>\n          <th>Status</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="subscriber in durableSubscribers">\n          <td>\n            <input type="checkbox" ng-model="subscriber.selected" ng-click="toggleDeleteActionDisabled()">\n          </td>\n          <td>{{subscriber.destinationName}}</td>\n          <td>{{subscriber.clientId}}</td>\n          <td>\n              <div class="ngCellText">\n                <span ng-hide="subscriber.status != \'Offline\'">{{subscriber.consumerId}}</span>\n                <a href="" ng-show="subscriber.status != \'Offline\'" ng-click="openSubscriberDialog(subscriber)">{{subscriber.consumerId}}</a>\n              </div>\n          </td>\n          <td>{{subscriber.status}}</td>\n        </tr>\n      </tbody>\n    </table>\n\n    <script type="text/ng-template" id="createSubscriberDialog.html">\n      <form name="createSubscriber" class="form-horizontal" ng-submit="doCreateSubscriber(clientId, subscriberName, topicName, subSelector)">\n        <div class="modal-header">\n          <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n            <span class="pficon pficon-close" aria-hidden="true"></span>\n          </button>\n          <h4 class="modal-title">Create durable subscriber</h4>\n        </div>\n        <div class="modal-body">\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="clientId">Client ID</label>\n            <div class="col-sm-9">\n              <input id="clientId" class="form-control" type="text" ng-model="clientId" required>\n            </div>\n          </div>\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="subscriberName">Subscriber name</label>\n            <div class="col-sm-9">\n              <input id="subscriberName" class="form-control" type="text" ng-model="subscriberName" required>\n            </div>\n          </div>\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="topicName">Topic name</label>\n            <div class="col-sm-9">\n              <input id="topicName" class="form-control" type="text" ng-model="topicName" required required uib-typeahead="title for title in topicNames($viewValue) | filter:$viewValue">\n            </div>\n          </div>\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="subSelector">Selector</label>\n            <div class="col-sm-9">\n              <input id="subSelector" class="form-control" type="text" ng-model="subSelector" required>\n            </div>\n          </div>\n        </div>\n        <div class="modal-footer">\n          <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n          <button type="submit" class="btn btn-primary" ng-click="$close()">Create</button>\n        </div>\n      </form>\n    </script>\n\n    <script type="text/ng-template" id="showSubscriberDialog.html">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4 class="modal-title">Durable subscriber</h4>\n      </div>\n      <div class="modal-body">\n        <dl class="dl-horizontal">\n          <dt>Client Id</dt>\n          <dd>{{selectedSubscriber.ClientId}}</dd>\n          <dt>Subscription Name</dt>\n          <dd>{{selectedSubscriber.SubscriptionName}}</dd>\n          <dt>Topic Name</dt>\n          <dd>{{selectedSubscriber.DestinationName}}</dd>\n          <dt ng-if="selectedSubscriber.Selector">Selector</dt>\n          <dd ng-if="selectedSubscriber.Selector">{{selectedSubscriber.Selector}}</dd>\n          <dt>Status</dt>\n          <dd>{{selectedSubscriber.Status}}</dd>\n          <dt>Enqueue Counter</dt>\n          <dd>{{selectedSubscriber.EnqueueCounter}}</dd>\n          <dt>Dequeue Counter</dt>\n          <dd>{{selectedSubscriber.DequeueCounter}}</dd>\n          <dt>Dispatched Counter</dt>\n          <dd>{{selectedSubscriber.DispatchedCounter}}</dd>\n          <dt>Pending Size</dt>\n          <dd>{{selectedSubscriber.PendingQueueSize}}</dd>\n        </dl>\n      </div>\n    </script>\n\n    <div hawtio-confirm-dialog="deleteSubscriberDialog.show"\n         title="Delete durable subscriber"\n         ok-button-text="Yes"\n         cancel-button-text="No"\n         on-ok="deleteSubscribers()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the subscriber(s)?</p>\n      </div>\n    </div>\n\n</div>');
+$templateCache.put('plugins/activemq/html/jobs.html','<div ng-controller="ActiveMQ.JobSchedulerController">\n\n    <div class="row">\n      <div class="col-md-12">\n        <div class="pull-right">\n            <form class="form-inline">\n                <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length"\n                        hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeJob"\n                        ng-click="deleteJobsDialog.open()"\n                        title="Delete the selected jobs">\n                  <i class="fa fa-remove"></i> Delete\n                </button>\n                <button class="btn btn-default" ng-click="refresh()"\n                        title="Refreshes the list of subscribers">\n                    <i class="fa fa-refresh"></i>\n                </button>\n            </form>\n        </div>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="gridStyle" ng-grid="gridOptions"></div>\n    </div>\n\n    <div hawtio-confirm-dialog="deleteJobsDialog.show" ok-button-text="Yes" cancel-button-text="No" on-ok="deleteJobs()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the jobs</p>\n      </div>\n    </div>\n\n</div>');
+$templateCache.put('plugins/activemq/html/preferences.html','<form class="form-horizontal activemq-preferences-form" ng-controller="ActiveMQ.PreferencesController">\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqUserName">\n      ActiveMQ user name\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The user name to be used when connecting to the broker"></span>\n    </label>\n    <div class="col-md-6">\n      <input id="activemqUserName" type="text" class="form-control" ng-model="activemqUserName"/>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqPassword">\n      ActiveMQ password\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The user name to be used when connecting to the broker"></span>\n    </label>\n    <div class="col-md-6">\n      <input id="activemqPassword" type="password" class="form-control" ng-model="activemqPassword"/>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqFilterAdvisoryTopics">\n      Filter advisory topics\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to exclude advisory topics in tree/table"></span>\n    </label>\n    <div class="col-md-6">\n      <input type="checkbox" id="activemqFilterAdvisoryTopics" ng-model="activemqFilterAdvisoryTopics">\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqBrowseBytesMessages">\n      Display message body as\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Browsing byte messages should display the message body as"></span>\n    </label>\n    <div class="col-md-6">\n      <select id="activemqBrowseBytesMessages"\n              ng-model="activemqBrowseBytesMessages"\n              ng-options="key for (key, value) in messageBodyDisplayOptions"\n              ng-selected="activemqBrowseBytesMessages === value">\n      </select>\n    </div>\n  </div>\n\n</form>\n');
+$templateCache.put('plugins/camel/html/blocked.html','<div class="table-view" ng-controller="Camel.BlockedExchangesController">\n\n  <h3>Blocked</h3>\n  \n  <p ng-if="!initDone">Loading...</p>\n  \n  <div ng-if="initDone">\n    <p ng-if="data.length === 0">\n      No blocked exchanges\n    </p>\n    <div ng-if="data.length > 0">\n      <div class="row toolbar-pf table-view-pf-toolbar">\n        <div class="col-sm-12">\n          <form class="toolbar-pf-actions search-pf">\n            <div class="form-group has-clear">\n              <div class="search-pf-input-group">\n                <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n                <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                      class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n                <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                  <span class="pficon pficon-close"></span>\n                </button>\n              </div>\n            </div>\n            <div class="form-group">\n              <button type="button" class="btn btn-default" ng-disabled="gridOptions.selectedItems.length === 0"\n                ng-click="unblockDialog = true" data-placement="bottom">Unblock</button>\n            </div>\n          </form>\n        </div>\n      </div>\n      <table class="table table-striped table-bordered" hawtio-simple-table="gridOptions"></table>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="unblockDialog" ok-button-text="Unblock" cancel-button-text="Cancel" on-ok="doUnblock()"\n       title="Unblock Exchange">\n    <div class="dialog-body">\n      <p>You are about to unblock the selected thread.</p>\n      <p>This operation cannot be undone so please be careful.</p>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/browseEndpoint.html','<div class="table-view" ng-controller="Camel.BrowseEndpointController">\n\n  <div ng-class="{\'wiki-fixed\' : !isJmxTab}">\n\n    <h2>Browse</h2>\n\n    <p ng-if="!messages">Loading...</p>\n    <div ng-if="messages">\n      <pf-toolbar config="toolbarConfig"></pf-toolbar>\n      <table class="table table-striped table-bordered camel-browse-endpoints-table">\n        <thead>\n          <tr>\n            <th>\n              <input type="checkbox" ng-model="model.allSelected" ng-change="selectAll(model.allSelected)">\n            </th>\n            <th>\n              Message ID\n            </th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr ng-repeat="message in messages track by $index">\n            <td>\n              <input type="checkbox" ng-model="message.selected" ng-click="refreshForwardActionDisabledProperty()">\n            </td>\n            <td>\n              <div class="ngCellText">\n                <a href="" ng-click="openMessageDialog(message, $index)">{{message.id}}</a>\n              </div>\n            </td>\n          </tr>\n        </tbody>\n      </table>                    \n    </div>\n\n    <script type="text/ng-template" id="camelBrowseEndpointMessageDetails.html">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <div class="row">\n          <div class="col-md-4">\n            <h4 class="modal-title" id="myModalLabel">Message</h4>\n          </div>\n          <div class="col-md-7">\n            <div class=""\n                hawtio-pager="messages"\n                on-index-change="selectRowIndex"\n                row-index="rowIndex">\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class="modal-body camel-forward-message">\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Forward to endpoint</dt>\n              <dd>\n                <form class="form-horizontal" ng-submit="forwardMessage(row, endpointUri)">\n                  <label class="sr-only" for="endpointUri">URI</label>\n                  <div class="input-group">\n                    <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri" placeholder="URI"\n                            uib-typeahead="title for title in endpointUris() | filter:$viewValue">\n                    <div class="input-group-btn">\n                      <button type="submit" class="btn btn-default" hawtio-show ng-disabled="!endpointUri"\n                              object-name="{{camelContextMBean}}" method-name="sendBodyAndHeaders" mode="remove"\n                              data-placement="bottom" title="Forward the selected messages to another endpoint">\n                        Forward\n                      </button>\n                    </div>\n                  </div>\n                </form>\n              </dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>ID</dt>\n              <dd>{{row.id}}</dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Body</dt>\n              <dd><div hawtio-editor="row.body" read-only="true" mode="mode"></div></dd>\n            </dl>\n          </div>\n        </div>\n        <div class="row">\n          <div class="col-md-12">\n            <dl>\n              <dt>Headers</dt>\n              <dd>\n                <table class="table table-bordered">\n                  <thead>\n                    <tr>\n                      <th>Name</th>\n                      <th>Type</th>\n                      <th>Value</th>\n                    </tr>\n                  </thead>\n                  <tbody compile="row.headerHtml"></tbody>\n                </table>\n              </dd>\n            </dl>\n          </div>\n        </div>\n      </div>\n    </script>\n\n    <script type="text/ng-template" id="camelBrowseEndpointForwardMessage.html">\n      <form class="form-horizontal" ng-submit="forwardMessages(endpointUri); $close();">\n        <div class="modal-header">\n          <button type="button" class="close" aria-label="Close" ng-click="$close()">\n            <span class="pficon pficon-close" aria-hidden="true"></span>\n          </button>\n          <h4 class="modal-title">\n            Forward to endpoint\n          </h4>\n        </div>\n        <div class="modal-body">\n            <div class="form-group">\n              <label class="col-sm-1 control-label" for="endpointUri">URI</label>\n              <div class="col-sm-11">\n                <input type="text" id="endpointUri" class="form-control" ng-model="endpointUri"\n                        uib-typeahead="title for title in endpointUris() | filter:$viewValue">\n              </div>\n            </div>\n        </div>\n        <div class="modal-footer">\n          <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n          <button type="submit" class="btn btn-primary" ng-disabled="!endpointUri">Forward</button>\n        </div>\n      </form>\n    </script>\n\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/browseRoute.html','<ng-include src="\'plugins/camel/html/browseMessageTemplate.html\'"></ng-include>\n\n<div class="row">\n  <table class="table table-striped" hawtio-simple-table="gridOptions"></table>\n  <!--\n      <div class="gridStyle" hawtio-datatable="gridOptions"></div>\n  -->\n</div>\n');
 $templateCache.put('plugins/camel/html/createEndpoint.html','<h1>Add Endpoint</h1>\n<div ng-controller="Camel.EndpointController" ng-switch="hasComponentNames">\n  <div ng-switch-when="true">\n    <div class="radio">\n      <label>\n        <input type="radio" ng-model="inputSource" value="uri">\n        From URI\n      </label>\n    </div>\n    <div ng-show="inputSource === \'uri\'">\n      <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n    </div>\n    <div class="radio">\n      <label>\n        <input type="radio" ng-model="inputSource" value="wizard">\n        From data\n      </label>\n    </div>\n    <div ng-show="inputSource === \'wizard\'">\n      <ng-include src="\'plugins/camel/html/createEndpointWizard.html\'"></ng-include>\n    </div>\n    </tabs>\n  </div>\n  <div ng-switch-default="false">\n    <ng-include src="\'plugins/camel/html/createEndpointURL.html\'"></ng-include>\n  </div>\n</div>\n');
@@ -26364,11 +26342,6 @@ $templateCache.put('plugins/camel/html/routeMetrics.html','<div ng-controller="C
 $templateCache.put('plugins/camel/html/sendMessage.html','<div ng-controller="Camel.SendMessageController">\n\n  <h2>Send Message</h2>\n\n  <div class="alert alert-warning" ng-show="noCredentials">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    <strong>No credentials set for endpoint!</strong>\n    Please set your username and password in the\n    <a href="#" class="alert-link" ng-click="openPrefs()">Preferences</a> page.\n  </div>\n\n  <h3>Headers</h3>\n\n  <div class="row camel-message-headers" ng-if="headers.length > 0">\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Name</label>\n          <input type="text" class="form-control" ng-model="header.name" ng-repeat="header in headers"\n                 uib-typeahead="completion for completion in defaultHeaderNames() | filter:$viewValue"\n                 pf-focused="$last">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-5">\n      <form>\n        <div class="form-group">\n          <label>Value</label>\n          <input type="text" class="form-control" ng-model="header.value" ng-repeat="header in headers">\n        </div>\n      </form>\n    </div>\n    <div class="col-sm-2">\n      <form>\n        <div class="form-group">\n          <label>&nbsp;</label>\n          <button type="button" class="btn btn-default" title="Delete" ng-click="removeHeader(header)"\n                  ng-repeat="header in headers">\n            <span class="pficon pficon-delete"></span>\n          </button>\n        </div>\n      </form>\n    </div>\n  </div>\n\n  <div>\n    <a href="" ng-click="addHeader()">Add header</a>\n  </div>\n\n  <h3>Body</h3>\n\n  <form>\n    <div class="form-group">\n      <div hawtio-editor="message" mode="codeMirrorOptions.mode.name"></div>\n    </div>\n    <div class="form-group">\n      <select class="form-control camel-send-message-format" ng-model="codeMirrorOptions.mode.name">\n        <option value="javascript">JSON</option>\n        <option value="xml">XML</option>\n      </select>\n      <button class="btn btn-default" ng-click="formatMessage()"\n              title="Automatically pretty prints the message so its easier to read">Format\n      </button>\n    </div>\n  </form>\n\n  <p>\n    <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>\n  </p>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/source.html','<div class="table-view" ng-controller="Camel.SourceController">\n  \n  <h2>Source</h2>\n  \n  <form>\n    <div class="form-group">\n      <div hawtio-editor="source" mode="\'xml\'" read-only="!showUpdateButton"></div>\n    </div>\n  </form>\n  \n  <button class="btn btn-primary" hawtio-show object-name="{{camelContextMBean}}"\n          method-name="addOrUpdateRoutesFromXml" ng-click="saveRouteXml()" ng-if="showUpdateButton">\n    Update\n  </button>\n\n</div>\n');
 $templateCache.put('plugins/camel/html/traceRoute.html','<div class="camel-trace-main" ng-controller="Camel.TraceRouteController">\n  \n  <div class="row camel-trace-header">\n    <div class="col-sm-6">\n      <h2>Trace</h2>\n    </div>\n    <div class="col-sm-6">\n      <button type="button" class="btn btn-primary pull-right" ng-if="tracing" ng-click="stopTracing()">\n        Stop tracing\n      </button>\n    </div>\n  </div>\n  \n  <div ng-if="!tracing">\n    <p>Tracing allows you to send messages to a route and then step through and see the messages flow through a route\n      to aid debugging and to help diagnose issues.\n    </p>\n    <p>Once you start tracing, you can send messages to the input endpoints, then come back to this page and see the\n      flow of messages through your route.\n    </p>\n    <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up\n      and down in the message table lets you see the flow of the message through the diagram.\n    </p>\n    <button type="button" class="btn btn-primary" ng-click="startTracing()"\n      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="remove">\n      Start tracing\n    </button>\n    <div class="alert alert-info"\n      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="inverse">\n      <span class="pficon pficon-info"></span>\n      Tracing is not allowed for this user.\n    </div>\n  </div>\n  \n  <div class="camel-trace-diagram-wrapper" ng-include src="graphView" ng-if="tracing"></div>\n\n  <div class="camel-trace-bottom-panel" resizable r-directions="[\'top\']" r-flex="true" ng-if="tracing">\n    <table class="table table-striped table-bordered camel-trace-messages-table-header" ng-show="!message">\n      <thead>\n        <tr>\n          <th>ID</th>\n          <th>To Node</th>\n        </tr>\n      </thead>\n    </table>\n    <div class="camel-trace-messages-table-body-container" ng-show="!message">\n      <table class="table table-striped table-bordered">\n        <tbody>\n          <tr ng-repeat="message in messages">\n            <td>\n              <a href="" title="View message" ng-click="openMessageDialog(message, $index)">\n                {{message.headers.breadcrumbId}}\n              </a>\n            </td>\n            <td>{{message.toNode}}</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n    <div class="camel-trace-message-details" ng-if="message">\n      <button type="button" class="close" aria-hidden="true" ng-click="closeMessageDetails()">\n        <span class="pficon pficon-close"></span>\n      </button>\n      <ul class="pagination">\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="First" ng-disabled="messageIndex === 0" ng-click="changeMessage(0)">\n            <span class="i fa fa-angle-double-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="Previous" ng-disabled="messageIndex === 0" ng-click="changeMessage(messageIndex - 1)">\n            <span class="i fa fa-angle-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Next" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messageIndex + 1)">\n            <span class="i fa fa-angle-right"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Last" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messages.length - 1)">\n            <span class="i fa fa-angle-double-right"></span>\n          </a>\n        </li>\n      </ul>\n      <ul class="nav nav-tabs" ng-init="activeTab = \'headers\'">\n        <li ng-class="{\'active\': activeTab === \'headers\'}">\n          <a href="" ng-click="activeTab = \'headers\'">Headers</a>\n        </li>\n        <li ng-class="{\'active\': activeTab === \'body\'}">\n          <a href="" ng-click="activeTab = \'body\'">Body</a>\n        </li>\n      </ul>\n      <div class="camel-trace-headers-contents" ng-show="activeTab === \'headers\'">\n        <div ng-repeat="(key, value) in message.headers"><label>{{key}}:</label> {{value}}</div>\n      </div>\n      <div class="camel-trace-body-contents" ng-show="activeTab === \'body\'">\n        <em class="camel-trace-no-body-text" ng-show="message.body === \'[Body is null]\'">No Body</em>\n        <pre ng-show="message.body !== \'[Body is null]\'">{{message.body}}</pre>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
-$templateCache.put('plugins/activemq/html/browseQueue.html','<div ng-controller="ActiveMQ.BrowseQueueController">\n\n  <h1>Browse Queue</h1>\n\n  <div ng-hide="showMessageDetails">\n    <div class="row toolbar-pf table-view-pf-toolbar">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions search-pf">\n          <div class="form-group toolbar-pf-filter has-clear">\n            <div class="search-pf-input-group">\n              <label for="filterByKeyword" class="sr-only">Filter by keyword</label>\n              <input id="filterByKeyword" type="search" ng-model="gridOptions.filterOptions.filterText"\n                    class="form-control" placeholder="Filter by keyword..." autocomplete="off">\n              <button type="button" class="clear" aria-hidden="true" ng-click="clearFilter()">\n                <span class="pficon pficon-close"></span>\n              </button>\n            </div>\n          </div>\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="dlq" ng-click="retryMessages()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="retryMessage" mode="remove"\n                title="Moves the dead letter queue message back to its original destination so it can be retried" data-placement="bottom">\n                Retry\n              </button>\n              <button class="btn btn-default" ng-disabled="gridOptions.selectedItems.length !== 1" ng-show="showButtons" ng-click="resendMessage()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="sendTextMessage" mode="remove"\n                title="Edit the message to resend it" data-placement="bottom">\n                Resend\n              </button>\n\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n              <button class="btn btn-default" ng-click="refresh()"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="browse" mode="remove"\n                title="Refreshes the list of messages">\n                <i class="fa fa-refresh"></i>\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n    <table class="table table-striped table-bordered table-hover activemq-browse-table" hawtio-simple-table="gridOptions"></table>\n  </div>\n\n  <div ng-show="showMessageDetails">\n    <div class="row toolbar-pf">\n      <div class="col-sm-12">\n        <form class="toolbar-pf-actions">\n          <div class="form-group">\n            <button class="btn btn-primary" ng-click="showMessageDetails = false">\n              Back\n            </button>\n          </div>\n\n          <div class="toolbar-pf-action-right">\n            <div class="form-group">\n              <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="moveDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="moveMessageTo" mode="remove"\n                title="Move the selected messages to another destination" data-placement="bottom">\n                Move\n              </button>\n              <button class="btn btn-danger" ng-disabled="!gridOptions.selectedItems.length" ng-show="showButtons"\n                ng-click="deleteDialog = true"\n                hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeMessage" mode="remove"\n                title="Delete the selected messages">\n                Delete\n              </button>\n            </div>\n          </div>\n        </form>\n      </div>\n    </div>\n\n    <div hawtio-pager="messages" on-index-change="selectRowIndex" row-index="rowIndex"></div>\n\n    <div class="expandable closed">\n      <div title="Headers" class="title">\n        <h3><i class="expandable-indicator"></i> Headers & Properties</h3>\n      </div>\n      <div class="expandable-body well">\n        <table class="table table-condensed table-striped table-bordered table-hover">\n          <thead>\n            <tr>\n              <th>Header</th>\n              <th>Value</th>\n            </tr>\n          </thead>\n          <tbody compile="row.headerHtml"></tbody>\n        </table>\n      </div>\n    </div>\n\n    <h3>Displaying body as <span ng-bind="row.textMode"></span></h3>\n    <div hawtio-editor="row.bodyText" read-only="true" mode=\'mode\'></div>\n\n  </div>\n\n  <div hawtio-confirm-dialog="deleteDialog" title="Delete messages?"\n       ok-button-text="Delete"\n       cancel-button-text="Cancel"\n       on-ok="deleteMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        This operation cannot be undone so please be careful.\n      </p>\n      <p>You are about to delete\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'a message!\', \'other\': \'{} messages!\'}">\n        </ng-pluralize>\n      </p>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="moveDialog" title="Move messages?"\n       ok-button-text="Move"\n       cancel-button-text="Cancel"\n       on-ok="moveMessages()">\n    <div class="dialog-body">\n      <p class="alert alert-warning">\n        <span class="pficon pficon-warning-triangle-o"></span>\n        You cannot undo this operation.<br/>\n        Though after the move you can always move the\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'messages\'}"></ng-pluralize>\n        back again.\n      </p>\n      <p>Move\n        <ng-pluralize count="gridOptions.selectedItems.length"\n                      when="{\'1\': \'message\', \'other\': \'{} messages\'}"></ng-pluralize>\n        to: <select ng-model="queueName" ng-options="qn for qn in queueNames" ng-init="queueName=queueNames[0]"></select>\n      </p>\n    </div>\n  </div>\n\n</div>\n\n');
-$templateCache.put('plugins/activemq/html/destinations.html','<div class="table-view" ng-controller="ActiveMQ.QueuesController">\n\n  <h2 class="destination-heading">{{destinationType}}</h2>\n\n  <div>\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n    <pf-table-view config="tableConfig"\n                   page-config="pageConfig"\n                   columns="tableColumns"\n                   items="destinations">\n    </pf-table-view>\n  </div>\n</div>');
-$templateCache.put('plugins/activemq/html/durableSubscribers.html','<div class="table-view" ng-controller="ActiveMQ.DurableSubscriberController">\n    <h2>Durable Subscribers</h2>\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n    <table class="table table-striped table-bordered">\n      <thead>\n        <tr>\n          <th>\n            <input type="checkbox" ng-model="model.allSelected" ng-change="selectAll()">\n          </th>\n          <th>Topic</th>\n          <th>Client ID</th>\n          <th>Consumer ID</th>\n          <th>Status</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="subscriber in durableSubscribers">\n          <td>\n            <input type="checkbox" ng-model="subscriber.selected" ng-click="toggleDeleteActionDisabled()">\n          </td>\n          <td>{{subscriber.destinationName}}</td>\n          <td>{{subscriber.clientId}}</td>\n          <td>\n              <div class="ngCellText">\n                <span ng-hide="subscriber.status != \'Offline\'">{{subscriber.consumerId}}</span>\n                <a href="" ng-show="subscriber.status != \'Offline\'" ng-click="openSubscriberDialog(subscriber)">{{subscriber.consumerId}}</a>\n              </div>\n          </td>\n          <td>{{subscriber.status}}</td>\n        </tr>\n      </tbody>\n    </table>\n\n    <script type="text/ng-template" id="createSubscriberDialog.html">\n      <form name="createSubscriber" class="form-horizontal" ng-submit="doCreateSubscriber(clientId, subscriberName, topicName, subSelector)">\n        <div class="modal-header">\n          <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n            <span class="pficon pficon-close" aria-hidden="true"></span>\n          </button>\n          <h4 class="modal-title">Create durable subscriber</h4>\n        </div>\n        <div class="modal-body">\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="clientId">Client ID</label>\n            <div class="col-sm-9">\n              <input id="clientId" class="form-control" type="text" ng-model="clientId" required>\n            </div>\n          </div>\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="subscriberName">Subscriber name</label>\n            <div class="col-sm-9">\n              <input id="subscriberName" class="form-control" type="text" ng-model="subscriberName" required>\n            </div>\n          </div>\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="topicName">Topic name</label>\n            <div class="col-sm-9">\n              <input id="topicName" class="form-control" type="text" ng-model="topicName" required required uib-typeahead="title for title in topicNames($viewValue) | filter:$viewValue">\n            </div>\n          </div>\n          <div class="form-group">\n            <label class="col-sm-3 control-label" for="subSelector">Selector</label>\n            <div class="col-sm-9">\n              <input id="subSelector" class="form-control" type="text" ng-model="subSelector" required>\n            </div>\n          </div>\n        </div>\n        <div class="modal-footer">\n          <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n          <button type="submit" class="btn btn-primary" ng-click="$close()">Create</button>\n        </div>\n      </form>\n    </script>\n\n    <script type="text/ng-template" id="showSubscriberDialog.html">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4 class="modal-title">Durable subscriber</h4>\n      </div>\n      <div class="modal-body">\n        <dl class="dl-horizontal">\n          <dt>Client Id</dt>\n          <dd>{{selectedSubscriber.ClientId}}</dd>\n          <dt>Subscription Name</dt>\n          <dd>{{selectedSubscriber.SubscriptionName}}</dd>\n          <dt>Topic Name</dt>\n          <dd>{{selectedSubscriber.DestinationName}}</dd>\n          <dt ng-if="selectedSubscriber.Selector">Selector</dt>\n          <dd ng-if="selectedSubscriber.Selector">{{selectedSubscriber.Selector}}</dd>\n          <dt>Status</dt>\n          <dd>{{selectedSubscriber.Status}}</dd>\n          <dt>Enqueue Counter</dt>\n          <dd>{{selectedSubscriber.EnqueueCounter}}</dd>\n          <dt>Dequeue Counter</dt>\n          <dd>{{selectedSubscriber.DequeueCounter}}</dd>\n          <dt>Dispatched Counter</dt>\n          <dd>{{selectedSubscriber.DispatchedCounter}}</dd>\n          <dt>Pending Size</dt>\n          <dd>{{selectedSubscriber.PendingQueueSize}}</dd>\n        </dl>\n      </div>\n    </script>\n\n    <div hawtio-confirm-dialog="deleteSubscriberDialog.show"\n         title="Delete durable subscriber"\n         ok-button-text="Yes"\n         cancel-button-text="No"\n         on-ok="deleteSubscribers()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the subscriber(s)?</p>\n      </div>\n    </div>\n\n</div>');
-$templateCache.put('plugins/activemq/html/jobs.html','<div ng-controller="ActiveMQ.JobSchedulerController">\n\n    <div class="row">\n      <div class="col-md-12">\n        <div class="pull-right">\n            <form class="form-inline">\n                <button class="btn btn-default" ng-disabled="!gridOptions.selectedItems.length"\n                        hawtio-show object-name="{{workspace.selection.objectName}}" method-name="removeJob"\n                        ng-click="deleteJobsDialog.open()"\n                        title="Delete the selected jobs">\n                  <i class="fa fa-remove"></i> Delete\n                </button>\n                <button class="btn btn-default" ng-click="refresh()"\n                        title="Refreshes the list of subscribers">\n                    <i class="fa fa-refresh"></i>\n                </button>\n            </form>\n        </div>\n      </div>\n    </div>\n\n    <div class="row">\n      <div class="gridStyle" ng-grid="gridOptions"></div>\n    </div>\n\n    <div hawtio-confirm-dialog="deleteJobsDialog.show" ok-button-text="Yes" cancel-button-text="No" on-ok="deleteJobs()">\n      <div class="dialog-body">\n        <p>Are you sure you want to delete the jobs</p>\n      </div>\n    </div>\n\n</div>');
-$templateCache.put('plugins/activemq/html/preferences.html','<form class="form-horizontal activemq-preferences-form" ng-controller="ActiveMQ.PreferencesController">\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqUserName">\n      ActiveMQ user name\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The user name to be used when connecting to the broker"></span>\n    </label>\n    <div class="col-md-6">\n      <input id="activemqUserName" type="text" class="form-control" ng-model="activemqUserName"/>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqPassword">\n      ActiveMQ password\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The user name to be used when connecting to the broker"></span>\n    </label>\n    <div class="col-md-6">\n      <input id="activemqPassword" type="password" class="form-control" ng-model="activemqPassword"/>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqFilterAdvisoryTopics">\n      Filter advisory topics\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Whether to exclude advisory topics in tree/table"></span>\n    </label>\n    <div class="col-md-6">\n      <input type="checkbox" id="activemqFilterAdvisoryTopics" ng-model="activemqFilterAdvisoryTopics">\n    </div>\n  </div>\n\n  <div class="form-group">\n    <label class="col-md-2 control-label" for="activemqBrowseBytesMessages">\n      Display message body as\n      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Browsing byte messages should display the message body as"></span>\n    </label>\n    <div class="col-md-6">\n      <select id="activemqBrowseBytesMessages"\n              ng-model="activemqBrowseBytesMessages"\n              ng-options="key for (key, value) in messageBodyDisplayOptions"\n              ng-selected="activemqBrowseBytesMessages === value">\n      </select>\n    </div>\n  </div>\n\n</form>\n');
 $templateCache.put('plugins/karaf/html/feature-details.html','<div class="toolbar-pf">\n  <form class="toolbar-pf-actions">\n    <div class="form-group">\n      <button ng-click="install(name,version)"\n              ng-disabled="row.Installed"\n              class="btn btn-default"\n              title="install"\n              hawtio-show\n              object-name="{{featuresMBean}}"\n              method-name="installFeature">Install</button>\n      <button ng-click="uninstall(name,version)"\n              ng-disabled="!row.Installed"\n              class="btn btn-default"\n              title="uninstall"\n              hawtio-show\n              object-name="{{featuresMBean}}"\n              method-name="uninstallFeature">Uninstall</button>\n    </div>\n  </form>\n</div>\n\n<h2>Details</h2>\n<dl class="dl-horizontal">\n  <dt>ID</dt>\n  <dd>{{row.Id}}</dd>\n  <dt>Name</dt>\n  <dd>{{row.Name}}</dd>\n  <dt>State</dt>\n  <dd>{{row.Installed ? \'Installed\' : \'Uninstalled\'}}</dd>\n  <dt>Repository Name</dt>\n  <dd>{{row.RepositoryName}}</dd>\n  <dt>Repository URI</dt>\n  <dd>{{row.RepositoryURI}}</dd>\n  <dt>Version</dt>\n  <dd>{{row.Version}}</dd>\n</dl>\n\n<h2>Dependencies</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="feature in row.Dependencies">\n    <a href=\'osgi/feature/{{feature.Name}}/{{feature.Version}}\'>{{feature.Name}}/{{feature.Version}}</a>\n  </li>\n</ul>\n\n<h2>Bundles</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="bundle in row.BundleDetails">\n    <div ng-switch="bundle.Installed">\n      <a ng-switch-when="true" href=\'osgi/bundle/{{bundle.Identifier}}\'>{{bundle.Location}}</a>\n      <span ng-switch-default>{{bundle.Location}}</span>\n    </div>\n  </li>\n</ul>\n\n<h2>Configurations</h2>\n<table class="table table-striped table-bordered">\n  <thead>\n    <tr>\n      <th>PID</th>\n      <th>Properties</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr ng-repeat="(pid, value) in row.Configurations">\n      <td><a href="osgi/pid/{{value.Pid}}">{{value.Pid}}</a></td>\n      <td>\n        <ul class="list-unstyled">\n          <li ng-repeat="(key, value) in value.Elements">{{key}} = {{value.Value}}</li>\n        </ul>\n    </tr>\n  </tbody>\n</table>\n\n<h2>Configuration Files</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="(key, value) in row[\'Configuration Files\']">{{value.Files}}</li>\n</ul>\n');
 $templateCache.put('plugins/karaf/html/feature.html','<div class="controller-section" ng-controller="Karaf.FeatureController">\n\n  <ol class="breadcrumb">\n    <li>\n      <a ng-href="osgi/features">Features</a>\n    </li>\n    <li class="page-title">\n      {{row.Id}}\n    </li>\n  </ol>\n\n  <div ng-include src="\'plugins/karaf/html/feature-details.html\'"></div>\n\n</div>\n\n');
 $templateCache.put('plugins/karaf/html/features.html','<div class="list-view">\n\n  <h1>Features</h1>\n\n  <p ng-if="$ctrl.loading">Loading...</p>\n\n  <div ng-if="!$ctrl.loading">\n    <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>\n    <pf-list-view items="$ctrl.listItems"\n                  config="$ctrl.listConfig"\n                  action-buttons="$ctrl.listItemActionButtons"\n                  enable-button-for-item-fn="$ctrl.enableButtonForItem">\n      <div class="list-view-pf-description">\n        <div class="list-view-pf-left">\n          <span class="list-view-pf-icon-sm fa"\n                ng-class="{\'list-view-pf-icon-success fa-check\': item.installed}"\n                title="Feature {{item.id}} {{item.getState()}}">\n          </span>\n        </div>\n        <div class="list-group-item-heading"><a ng-href=osgi/feature/{{item.id}}>{{item.id}}</a></div>\n      </div>\n      </pf-list-view>\n  </div>\n</div>\n');
@@ -26378,18 +26351,18 @@ $templateCache.put('plugins/karaf/html/server.html','<h1>Server</h1>\n\n<div cla
 $templateCache.put('plugins/osgi/html/bundle.html','<div class="controller-section" ng-controller="Osgi.BundleController">\n\n  <ol class="breadcrumb">\n    <li>\n        <a ng-href="osgi/bundles">Bundles</a>\n    </li>\n    <li class="page-title">\n        {{row.Headers[\'Bundle-Name\'].Value}}\n    </li>\n  </ol>\n\n  <div class="toolbar-pf">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button ng-click="startBundle(bundleId)"\n                ng-disabled="row.State === \'ACTIVE\'"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="startBundle">Start</button>\n        <button ng-click="stopBundle(bundleId)"\n                ng-disabled="row.State !== \'ACTIVE\'"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="stopBundle">Stop</button>\n        <button ng-click="refreshBundle(bundleId)"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="refreshBundle">Refresh</button>\n        <button ng-click="updateBundle(bundleId)"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="updateBundle">Update</button>\n        <button ng-click="uninstallBundle(bundleId)"\n                class="btn btn-default"\n                hawtio-show\n                object-name="{{frameworkMBean}}"\n                method-name="uninstallBundle">Uninstall</button>\n      </div>\n    </form>\n  </div>\n\n  <h2>Details</h2>\n\n  <dl class="dl-horizontal osgi-bundle-details-dl">\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Fragment&nbsp;ID</span>\n      <span ng-switch-default>Bundle&nbsp;ID</span>\n    </dt>\n    <dd>\n      {{row.Identifier}}\n    </dd>\n    <dt>\n      Bundle&nbsp;Name\n    </dt>\n    <dd>\n      {{row.Headers[\'Bundle-Name\'].Value}}\n    </dd>\n    <dt>\n      Symbolic&nbsp;Name\n    </dt>\n    <dd>\n      {{row.SymbolicName}}\n    </dd>\n    <dt>\n      Version\n    </dt>\n    <dd>\n      {{row.Version}}\n    </dd>\n    <dt>\n      Start&nbsp;Level\n    </dt>\n    <dd>\n      {{row.StartLevel}}\n    </dd>\n    <dt>\n      Location\n    </dt>\n    <dd>\n      {{row.Location}}\n    </dd>\n    <dt>\n      State\n    </dt>\n    <dd>\n      {{row.State.toLowerCase()}}\n    </dd>\n    <dt>\n      Last&nbsp;Modified\n    </dt>\n    <dd>\n      {{row.LastModified | date:\'medium\'}}\n    </dd>\n    <div>\n    <dt ng-switch="row.Fragment">\n      <span ng-switch-when="true">Hosts</span>\n      <span ng-switch-default>Fragments</span>\n    </dt>\n    <dd ng-switch="row.Fragment">\n      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"/>\n      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"/>\n    </dd>\n  </dl>\n\n  <h2>Inspect Classloading</h2>\n\n  <div class="alert alert-dismissable" ng-class="\'alert-\' + classLoadingAlert.type" ng-if="classLoadingAlert">\n    <span class="pficon" ng-class="classLoadingAlert.icon"></span>\n    <button type="button" class="close" aria-hidden="true" ng-click="dismissClassLoadingAlert()">\n      <span class="pficon pficon-close"></span>\n    </button>\n    <span ng-bind-html="classLoadingAlert.message"></span>\n  </div>\n\n  <form class="form-horizontal">\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin" mode="remove">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="classToLoad" class="form-control" ng-model="classToLoad">\n      </div>\n    </div>\n    <div hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin" mode="inverse">\n      <label class="col-sm-2 control-label" for="classToLoad">Class Name</label>\n      <div class="col-sm-10 alert alert-info">\n        <span class="pficon pficon-info"></span>\n        Loading class is not allowed for this user.\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getLoadClassOrigin">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeLoadClass(classToLoad)" ng-disabled="!classToLoad">\n          Load Class\n        </button>\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL" mode="remove">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10">\n        <input type="text" id="resourceToLoad" class="form-control" ng-model="resourceToLoad">\n      </div>\n    </div>\n    <div hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL" mode="inverse">\n      <label class="col-sm-2 control-label" for="resourceToLoad">Resource Name</label>\n      <div class="col-sm-10 alert alert-info">\n        <span class="pficon pficon-info"></span>\n        Getting resource is not allowed for this user.\n      </div>\n    </div>\n    <div class="form-group"\n         hawtio-show object-name="{{osgiToolsMBean}}" operation-name="getResourceURL">\n      <div class="col-sm-offset-2 col-sm-10">\n        <button type="button" class="btn btn-primary" ng-click="executeFindResource(resourceToLoad)" ng-disabled="!resourceToLoad">\n          Get Resource\n        </button>\n      </div>\n    </div>\n  </form>\n\n  <h2>Imported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Imported Version</th>\n        <th>Version</th>\n        <th>Resolution</th>\n        <th>Dynamic Import</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ImportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td>{{data.headers.Aversion}}</td>\n        <td>{{data.headers.Dresolution}}</td>\n        <td>{{data.headers.reason}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <div ng-if="thereAreUnsatisfiedPackages()">\n    <h3>Imports not satisfied</h3>\n    <table class="table table-striped table-bordered">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Version</th>\n          <th>Resolution</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(package, data) in unsatisfiedPackages">\n          <td>{{package}}</td>\n          <td>{{data.Aversion}}</td>\n          <td>{{data.Dresolution}}</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n\n  <h2>Exported Packages</h2>\n\n  <table class="table table-striped table-bordered">\n    <thead>\n      <tr>\n        <th>Name</th>\n        <th>Exported Version</th>\n        <th>Uses</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat="(package, data) in row.ExportData">\n        <td>{{package}}</td>\n        <td>{{data.ReportedVersion}}</td>\n        <td class="osgi-bundle-exported-package-uses">{{data.headers.Duses}}</td>\n      </tr>\n    </tbody>\n  </table>\n\n  <h2>Services</h2>\n\n  <h3>Registered Services</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.RegisteredServices">\n      <span id="registers.service.{{id}}" class="text-success">{{id}}</span>\n    </li>\n  </ul>\n\n  <h3>Services used by this Bundle</h3>\n\n  <ul class="list-group labels">\n    <li class="list-group-item" ng-repeat="id in row.ServicesInUse">\n      <span id="uses.service.{{id}}" class="text-info">{{id}}</span>\n    </li>\n  </ul>\n\n  <div ng-if="row.RequiringBundles.length > 0">\n    <h2>Other Bundles using this Bundle</h2>\n\n    <ul class="list-unstyled">\n      <li ng-repeat="bundle in row.RequiringBundles"><a ng-href="{{bundle.url}}">{{bundle.label}}</a></li>\n    </ul>\n  </div>\n\n  <h2>Headers</h2>\n\n  <dl class="dl-horizontal osgi-bundle-headers-dl">\n    <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>\n    <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>\n  </dl>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/configurations.html','<h1>Configuration</h1>\n\n<div class="controller-section" ng-controller="Osgi.ConfigurationsController">\n\n  <p ng-if="!configurations">Loading...</p>\n  \n  <div ng-if="configurations">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <pf-list-view items="filteredConfigurations" config="listViewConfig" menu-actions="listViewMenuItems">\n      <div class="list-view-pf-left" ng-class="{\'osgi-configuration-factory-instance\': item.isFactoryInstance}">\n        <span class="list-view-pf-icon-sm" ng-class="item.kind.class" title="{{item.kind.title}}"></span>\n      </div>\n      <div class="list-view-pf-body">\n        <div class="list-view-pf-description">\n          <div class="list-group-item-heading" title="{{item.name}}">\n            <a ng-href="{{item.pidLink}}">{{item.name}}</a>\n          </div>\n          <div class="list-group-item-text">\n            {{item.description}}\n          </div>\n        </div>\n      </div>\n    </pf-list-view>\n  </div>\n  \n  <script type="text/ng-template" id="addPidDialog.html">\n    <form class="form-horizontal" ng-submit="$close(newPid)">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4 class="modal-title">Add configuration</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label class="col-sm-3 control-label" for="newPid">Configuration ID</label>\n          <div class="col-sm-9">\n            <input type="text" id="newPid" class="form-control" ng-model="newPid" required/>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-primary" ng-disabled="!(newPid !== \'\' && newPid !== undefined)">Add</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="deletePidDialog.html">\n    <form class="form-horizontal" ng-submit="$close()">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4 class="modal-title">Delete configuration</h4>\n      </div>\n      <div class="modal-body">\n        <p>Delete \'{{item.name}}\' configuration?</p>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$dismiss()">Cancel</button>\n        <button type="submit" class="btn btn-danger">Delete</button>\n      </div>\n    </form>\n  </script>\n  \n</div>\n');
 $templateCache.put('plugins/osgi/html/framework.html','<div class="framework-main" ng-controller="Osgi.FrameworkController">\n\n  <h1>Framework Configuration</h1>\n\n  <form class="form-horizontal framework-form" ng-submit="save()">\n    <div class="form-group">\n      <label class="col-sm-3 control-label" for="startLevel">Current Framework Start Level</label>\n      <div class="col-sm-2">\n        <input id="startLevel" class="form-control" type="number" min="0" max="100" ng-model="config.startLevel">\n      </div>\n    </div>\n    <div class="form-group">\n      <label class="col-sm-3 control-label" for="initialBundleStartLevel">Initial Bundle Start Level</label>\n      <div class="col-sm-2">\n        <input id="initialBundleStartLevel" class="form-control" type="number" min="0" max="100"\n          ng-model="config.initialBundleStartLevel">\n      </div>\n    </div>\n    <div class="form-group">\n      <div class="col-sm-offset-3 col-sm-2">\n        <!--\n          Use the \'setBundleStartLevel\' method here, as the \'setFrameworkStartLevel\' and\n          \'setInitialBundleStartLevel\' methods are not available for hawtio-show directive\n        -->\n        <button type="submit" class="btn btn-primary"\n                hawtio-show object-name="{{frameworkMBean}}" method-name="setBundleStartLevel">\n        Save\n      </button>\n      </div>\n    </div>\n  </form>\n\n</div>\n');
-$templateCache.put('plugins/osgi/html/packages.html','<h1>Packages</h1>\n\n<div class="osgi-packages-main" ng-controller="Osgi.PackagesController">\n\n  <p ng-if="!packages">Loading...</p>\n\n  <div ng-if="packages">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <div class="list-group list-view-pf list-view-pf-view osgi-packages-list" infinite-scroll="appendItems()"\n      infinite-scroll-distance="2" infinite-scroll-container=\'".osgi-nav-main .contents"\'>\n      <div class="list-group-item" ng-repeat="package in scrollablePackages"\n        ng-class="{\'list-view-pf-expand-active\': package.exportsExpanded || package.importsExpanded}">\n        <div class="list-view-pf-main-info">\n          <div class="list-view-pf-body">\n            <div class="list-view-pf-description">\n              <div class="list-group-item-heading" title="{{package.Name}}">\n                {{package.Name}}\n              </div>\n              <div class="list-group-item-text">\n                {{package.Version}}\n              </div>\n            </div>\n            <div class="list-view-pf-additional-info">\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand" ng-class="{\'active\': package.exportsExpanded}"\n                  ng-click="package.exportsExpanded = !package.exportsExpanded; package.importsExpanded = false;">\n                  <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': package.exportsExpanded}"></span>\n                  <span class="pficon pficon-export"></span>\n                  <strong>{{package.ExportingBundles.length}}</strong>\n                  Exporting Bundle{{package.ExportingBundles.length !== 1 ? \'s\' : \'\'}}\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand" ng-class="{\'active\': package.importsExpanded}"\n                  ng-click="package.importsExpanded = !package.importsExpanded; package.exportsExpanded = false;">\n                  <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': package.importsExpanded}"></span>\n                  <span class="pficon pficon-import"></span>\n                  <strong>{{package.ImportingBundles.length}}</strong>\n                  Importing Bundle{{package.ImportingBundles.length !== 1 ? \'s\' : \'\'}}\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand">\n                  <span ng-show="package.RemovalPending">\n                    <span class="pficon pficon-warning-triangle-o"></span>\n                    Removal Pending\n                  </span>\n                </div>\n              </div>\n            </div>              \n          </div>\n        </div>\n        <div class="list-group-item-container" ng-if="package.exportsExpanded">\n          <div class="close" ng-click="package.exportsExpanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <dl>\n            <dt>Exporting Bundles</dt>\n            <dd>\n              <ul class="package-bundles-list">\n                <li ng-repeat="bundle in package.ExportingBundles">\n                  <a title="Exported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n        <div class="list-group-item-container" ng-if="package.importsExpanded">\n          <div class="close" ng-click="package.importsExpanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <dl>\n            <dt>Importing Bundles</dt>\n            <dd>\n              <ul class="package-bundles-list">\n                <li ng-repeat="bundle in package.ImportingBundles">\n                  <a title="Imported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
+$templateCache.put('plugins/osgi/html/packages.html','<h1>Packages</h1>\n\n<div class="osgi-packages-main" ng-controller="Osgi.PackagesController">\n\n  <p ng-if="!packages">Loading...</p>\n\n  <div ng-if="packages">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <div class="list-group list-view-pf list-view-pf-view osgi-packages-list" infinite-scroll="appendItems()"\n      infinite-scroll-distance="2" infinite-scroll-container=\'".nav-tabs-main .contents"\'>\n      <div class="list-group-item" ng-repeat="package in scrollablePackages"\n        ng-class="{\'list-view-pf-expand-active\': package.exportsExpanded || package.importsExpanded}">\n        <div class="list-view-pf-main-info">\n          <div class="list-view-pf-body">\n            <div class="list-view-pf-description">\n              <div class="list-group-item-heading" title="{{package.Name}}">\n                {{package.Name}}\n              </div>\n              <div class="list-group-item-text">\n                {{package.Version}}\n              </div>\n            </div>\n            <div class="list-view-pf-additional-info">\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand" ng-class="{\'active\': package.exportsExpanded}"\n                  ng-click="package.exportsExpanded = !package.exportsExpanded; package.importsExpanded = false;">\n                  <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': package.exportsExpanded}"></span>\n                  <span class="pficon pficon-export"></span>\n                  <strong>{{package.ExportingBundles.length}}</strong>\n                  Exporting Bundle{{package.ExportingBundles.length !== 1 ? \'s\' : \'\'}}\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand" ng-class="{\'active\': package.importsExpanded}"\n                  ng-click="package.importsExpanded = !package.importsExpanded; package.exportsExpanded = false;">\n                  <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': package.importsExpanded}"></span>\n                  <span class="pficon pficon-import"></span>\n                  <strong>{{package.ImportingBundles.length}}</strong>\n                  Importing Bundle{{package.ImportingBundles.length !== 1 ? \'s\' : \'\'}}\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info-item">\n                <div class="list-view-pf-expand">\n                  <span ng-show="package.RemovalPending">\n                    <span class="pficon pficon-warning-triangle-o"></span>\n                    Removal Pending\n                  </span>\n                </div>\n              </div>\n            </div>              \n          </div>\n        </div>\n        <div class="list-group-item-container" ng-if="package.exportsExpanded">\n          <div class="close" ng-click="package.exportsExpanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <dl>\n            <dt>Exporting Bundles</dt>\n            <dd>\n              <ul class="package-bundles-list">\n                <li ng-repeat="bundle in package.ExportingBundles">\n                  <a title="Exported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n        <div class="list-group-item-container" ng-if="package.importsExpanded">\n          <div class="close" ng-click="package.importsExpanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <dl>\n            <dt>Importing Bundles</dt>\n            <dd>\n              <ul class="package-bundles-list">\n                <li ng-repeat="bundle in package.ImportingBundles">\n                  <a title="Imported by bundle {{bundle.Identifier}}" ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                </li>\n              </ul>\n            </dd>\n          </dl>\n        </div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/pid.html','<div class="pid-view" ng-controller="Osgi.PidController">\n\n  <ol class="breadcrumb">\n    <li>\n        <a ng-href="{{configurationUrl}}">Configuration</a>\n    </li>\n    <li class="page-title">\n      {{zkPid || metaType.name || pid}}\n    </li>\n  </ol>  \n  \n  <pf-toolbar config="toolbarConfig"></pf-toolbar>\n  \n  <div ng-hide="editMode">\n    <div class="row config-admin-form view">\n      <div class="col-sm-12">\n        <div simple-form class="pid-form" name="pidEditor" mode=\'view\' entity=\'entity\' data=\'schema\' schema="fullSchema"></div>\n      </div>\n    </div>\n  </div>\n  \n  <div ng-show="editMode">\n    <div class="row config-admin-form edit">\n      <div ng-show="newPid" class="col-sm-12 new-config-name-form">\n        <form class="form-horizontal" action="">\n          <fieldset>\n            <div class="spacer"></div>\n            <div class="form-group">\n              <label class="col-sm-2 control-label" title="The name of the configuration file">\n                Configuration name\n              </label>\n              <div class="col-sm-10">\n                <input type="text" title="The name of the configuration file" ng-required="true"\n                        ng-model="createForm.pidInstanceName" name="path" autofocus>\n              </div>\n            </div>\n          </fieldset>\n        </form>\n      </div>\n      <div class="col-sm-12">\n        <div simple-form name="pidEditor" mode=\'edit\' entity=\'entity\' data=\'schema\' schema="fullSchema" onSubmit="pidSave()"></div>\n      </div>\n    </div>\n    <div class="row">\n      <div class="col-sm-2"></div>\n      <div class="col-sm-10">\n        <button class="btn btn-primary" ng-show="newPid" ng-disabled="!canSave || !createForm.pidInstanceName" ng-click="pidSave()">Create</button>\n        <button class="btn btn-primary" ng-hide="newPid" ng-disabled="!canSave" ng-click="pidSave()">Save</button>\n        <button class="btn btn-default" ng-click="cancelSave()">Cancel</button>\n      </div>\n    </div>\n  </div>\n\n  <script type="text/ng-template" id="deletePropDialog.html">\n    <form name="deleteProperty" class="form-horizontal no-bottom-margin" ng-submit="deletePidPropConfirmed()">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4 class="modal-title">Delete property \'{{deleteKey}}\'</h4>\n      </div>\n      <div class="modal-body">\n        <p class="lead">Are you sure?</p>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n        <button type="submit" class="btn btn-danger">Delete</button>\n      </div>\n    </form>\n  </script>\n\n  <script type="text/ng-template" id="addPropertyDialog.html">\n    <form name="addProperty" class="form-horizontal"\n          ng-submit="addPropertyConfirmed(addPropKey, addPropValue)">\n      <div class="modal-header">\n        <button type="button" class="close" aria-label="Close" ng-click="$close()">\n          <span class="pficon pficon-close" aria-hidden="true"></span>\n        </button>\n        <h4 class="modal-title">Add property</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group" ng-class="{\'has-error\': propertyKeyErrorMsg}">\n          <label class="col-sm-2 control-label" for="propKey">Key</label>\n          <div class="col-sm-10">\n            <input type="text" class="form-control" id="propKey" ng-model="addPropKey">\n            <span class="help-block">{{propertyKeyErrorMsg}}</span>\n          </div>\n        </div>\n        <div class="form-group">\n          <label class="col-sm-2 control-label" for="propValue">Value</label>\n          <div class="col-sm-10">\n            <input type="text" class="form-control" id="propValue" ng-model="addPropValue"/>\n          </div>\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" ng-click="$close()">Cancel</button>\n        <button type="submit" class="btn btn-primary" ng-disabled="!addPropKey">Add</button>\n      </div>\n    </form>\n  </script>\n\n</div>\n');
 $templateCache.put('plugins/osgi/html/services.html','<h1>Services</h1>\n\n<div class="controller-section" ng-controller="Osgi.ServiceController">\n\n  <p ng-if="!services">Loading...</p>\n\n  <div ng-if="services">\n    <pf-toolbar config="toolbarConfig"></pf-toolbar>\n\n    <div class="list-group list-view-pf list-view-pf-view">\n      <div class="list-group-item" ng-class="{\'list-view-pf-expand-active\': service.expanded}"\n          ng-repeat="service in filteredServices">\n        <div class="list-group-item-header" ng-click="service.expanded = !service.expanded">\n          <div class="list-view-pf-expand">\n            <span class="fa fa-angle-right" ng-class="{\'fa-angle-down\': service.expanded}"></span>\n          </div>\n          <div class="list-view-pf-main-info">\n            <div class="list-view-pf-body">\n              <div class="list-view-pf-description">\n                <div class="list-group-item-heading">\n                  ID {{service.Identifier}}\n                </div>\n                <div class="list-group-item-text" ng-bind-html="service.BundleLinks">\n                </div>\n              </div>\n              <div class="list-view-pf-additional-info">\n                <div class="list-view-pf-additional-info-item" title="Object Classes">\n                  {{service.objectClass[0]}}{{service.objectClass.length > 1 ? \'...\' : \'\'}}\n                </div>\n              </div>              \n            </div>\n          </div>\n        </div>\n        <div class="list-group-item-container" ng-if="service.expanded">\n          <div class="close" ng-click="service.expanded = false">\n            <span class="pficon pficon-close"></span>\n          </div>\n          <div class="col-md-5">\n            <dl>\n              <dt>Using Bundles</dt>\n              <dd>\n                <ul class="service-bundles-list">\n                  <li ng-repeat="bundle in service.UsingBundles">\n                    <a ng-href="{{bundle.Url}}">{{bundle.SymbolicName}}</a>\n                  </li>\n                </ul>\n              </dd>\n            </dl>\n          </div>\n          <div class="col-md-5">\n            <dl>\n              <dt>Object Classes</dt>\n              <dd>\n                <ul class="service-object-classes-list">\n                  <li ng-repeat="clazz in service.objectClass">\n                    {{clazz}}\n                  </li>\n                </ul>\n              </dd>\n            </dl>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/spring-boot/trace/trace.html','<div class="spring-boot-trace-main">\n  <div class="spring-boot-trace-flex-container">\n    <div class="spring-boot-trace-fixed-toolbar">\n      <h1>Trace</h1>\n      <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>\n      <div class="blank-slate-pf no-border" ng-if="$ctrl.traces.length === 0">\n        <div class="blank-slate-pf-icon">\n          <span class="pficon pficon pficon-warning-triangle-o"></span>\n        </div>\n        <h1>No Spring Boot Traces</h1>\n        <p>There are no trace details to display for this application.</p>\n        <p>Wait for some trace events to be generated or revise your search filter criteria.</p>\n      </div>\n      <div ng-show="$ctrl.traces.length > 0">\n        <table class="table table-striped spring-boot-trace-header-table">\n          <thead>\n            <tr>\n              <th>Timestamp</th>\n              <th>HTTP Status</th>\n              <th>HTTP Method</th>\n              <th>Path</th>\n              <th>Time Taken</th>\n              <th></th>\n            </tr>\n          </thead>\n        </table>\n      </div>\n    </div>\n    <div class="spring-boot-trace-scrollable-table" ng-show="$ctrl.traces.length > 0">\n      <table class="table table-striped">\n        <tbody>\n          <tr ng-repeat="trace in $ctrl.tableItems">\n            <td>{{trace.timestamp | date: $ctrl.dateFormat}}</td>\n            <td ng-switch="trace.httpStatusCode === undefined">\n              <span ng-switch-when="true">Unknown</span>\n              <div ng-switch-default>\n                <span ng-class="$ctrl.getStatusClass(trace)"></span>\n                <span>{{trace.httpStatusCode}}</span>\n              </div>\n            </td>\n            <td>{{trace.method}}</td>\n            <td>{{trace.path}}</td>\n            <td ng-switch="trace.timeTaken === undefined">\n              <span ng-switch-when="true">Unknown</span>\n              <span ng-switch-default>{{trace.timeTaken}} ms</span>\n            </td>\n            <td>\n              <div class="table-view-pf-btn">\n                <button class="btn btn-default" type="button" ng-click="$ctrl.openTraceModal(trace)">Show Trace Detail</button>\n              </div>\n            </td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <script type="text/ng-template" id="traceDetailsModal.html">\n    <div class="modal-header">\n      <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">\n        <span class="pficon pficon-close" aria-hidden="true"></span>\n      </button>\n      <h4 class="modal-title">Trace</h4>\n    </div>\n    <div class="modal-body">\n      <pre>{{trace.info | json}}</pre>\n    </div>\n  </script>\n</div>');
-$templateCache.put('plugins/camel/html/tree/content.html','<div class="tree-nav-sidebar-content">\n  <div id="cameltree" class="treeview-pf-hover treeview-pf-select"></div>\n</div>\n');
-$templateCache.put('plugins/camel/html/tree/header.html','<div class="tree-nav-sidebar-header">\n  <form role="form" class="search-pf has-button">\n    <div class="form-group has-clear">\n      <div class="search-pf-input-group">\n        <label for="input-search" class="sr-only">Search Tree:</label>\n        <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n          ng-model="$ctrl.filter">\n        <button type="button" class="clear" aria-hidden="true"\n          ng-hide="$ctrl.filter.length === 0"\n          ng-click="$ctrl.filter = \'\'">\n          <span class="pficon pficon-close"></span>\n        </button>\n      </div>\n    </div>\n    <div class="form-group tree-nav-buttons">\n      <span class="badge" ng-class="{positive: $ctrl.result.length > 0}"\n        ng-show="$ctrl.filter.length > 0">\n        {{$ctrl.result.length}}\n      </span>\n      <i class="fa fa-plus-square-o" title="Expand All" ng-click="$ctrl.expandAll()"></i>\n      <i class="fa fa-minus-square-o" title="Collapse All" ng-click="$ctrl.contractAll()"></i>\n    </div>\n  </form>\n</div>\n');
 $templateCache.put('plugins/activemq/html/destination/create.html','<p>\n  <div class="alert alert-info">\n    <span class="pficon pficon-info"></span>The JMS API does not define a standard\n    address syntax. Although a standard address syntax was considered, it was decided\n    that the differences in address semantics between existing message-oriented\n    middleware (MOM) products were too wide to bridge with a single syntax.\n  </div>\n</p>\n\n<form class="form-horizontal">\n\n  <div class="form-group">\n    <label class="col-sm-2 control-label" for="name-markup">{{$ctrl.destinationType}} name</label>\n\n    <div class="col-sm-10">\n      <input id="name-markup" class="form-control" type="text" maxlength="300"\n             name="destinationName" ng-model="$ctrl.destinationName" placeholder="{{$ctrl.destinationType}} name"/>\n    </div>\n  </div>\n  <div class="form-group">\n    <label class="col-sm-2 control-label">Destination type</label>\n\n    <div class="col-sm-10">\n      <label class="checkbox">\n        <input type="radio" ng-model="$ctrl.destinationType" value="Queue"> Queue\n      </label>\n      <label class="checkbox">\n        <input type="radio" ng-model="$ctrl.destinationType" value="Topic"> Topic\n      </label>\n    </div>\n  </div>\n\n  <div class="form-group">\n    <div class="col-sm-offset-2 col-sm-10">\n      <button type="submit" class="btn btn-primary"\n              ng-click="$ctrl.validateAndCreateDestination($ctrl.destinationName, $ctrl.destinationType)"\n              ng-disabled="!$ctrl.destinationName">Create {{$ctrl.destinationType}}\n      </button>\n    </div>\n  </div>\n\n  <div hawtio-confirm-dialog="$ctrl.createDialog"\n        ok-button-text="Create"\n        cancel-button-text="Cancel"\n        on-ok="$ctrl.createDestination($ctrl.destinationName, $ctrl.destinationType)">\n    <div class="dialog-body">\n      <p>{{$ctrl.destinationType}} name <b>{{$ctrl.destinationName}}</b> contains unrecommended characters: <code>:</code></p>\n      <p>This may cause unexpected problems. Are you really sure to create this {{$ctrl.uncapitalisedDestinationType()}}?</p>\n    </div>\n  </div>\n\n</form>\n');
 $templateCache.put('plugins/activemq/html/destination/deleteQueue.html','<p>\n  <div class="alert alert-warning">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    These operations cannot be undone. Please be careful!\n  </div>\n</p>\n\n<h2>Purge queue</h2>\n<p>Purge all the current messages on the queue.</p>\n<button type="submit" class="btn btn-danger" ng-click="$ctrl.purgeDialog = true">\n  Purge queue\n</button>\n\n<hr />\n\n<h2>Delete queue</h2>\n<p>Remove the queue completely.</p>\n<button type="submit" class="btn btn-danger" ng-click="$ctrl.deleteDialog = true">\n  Delete queue\n</button>\n\n<div hawtio-confirm-dialog="$ctrl.deleteDialog"\n     title="Confirm delete queue"\n     ok-button-text="Delete"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.deleteDestination()">\n  <div class="dialog-body">\n    <p>You are about to delete the <b>{{$ctrl.selectedName()}}</b> queue.</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n\n<div hawtio-confirm-dialog="$ctrl.purgeDialog"\n     title="Confirm purge queue"\n     ok-button-text="Purge"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.purgeDestination()">\n  <div class="dialog-body">\n    <p>You are about to purge the <b>{{$ctrl.selectedName()}}</b> queue</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/destination/deleteTopic.html','<p>\n  <div class="alert alert-warning">\n    <span class="pficon pficon-warning-triangle-o"></span>\n    This operation cannot be undone. Please be careful!\n  </div>\n</p>\n\n<h2>Delete topic</h2>\n<p>Remove the topic completely.</p>\n<button type="submit" class="btn btn-danger" ng-click="$ctrl.deleteDialog = true">\n  Delete topic\n</button>\n\n<div hawtio-confirm-dialog="$ctrl.deleteDialog"\n     title="Confirm delete topic"\n     ok-button-text="Delete"\n     cancel-button-text="Cancel"\n     on-ok="$ctrl.deleteDestination()">\n  <div class="dialog-body">\n    <p>You are about to delete the <b>{{$ctrl.selectedName()}}</b> topic.</p>\n    <p>This operation cannot be undone so please be careful.</p>\n  </div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/tree/content.html','<div class="tree-nav-sidebar-content">\n  <div id="activemqtree" class="treeview-pf-hover treeview-pf-select"></div>\n</div>\n');
 $templateCache.put('plugins/activemq/html/tree/header.html','<div class="tree-nav-sidebar-header">\n  <form role="form" class="search-pf has-button">\n    <div class="form-group has-clear">\n      <div class="search-pf-input-group">\n        <label for="input-search" class="sr-only">Search Tree:</label>\n        <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n          ng-model="$ctrl.filter">\n        <button type="button" class="clear" aria-hidden="true"\n          ng-hide="$ctrl.filter.length === 0"\n          ng-click="$ctrl.filter = \'\'">\n          <span class="pficon pficon-close"></span>\n        </button>\n      </div>\n    </div>\n    <div class="form-group tree-nav-buttons">\n      <span class="badge" ng-class="{positive: $ctrl.result.length > 0}"\n        ng-show="$ctrl.filter.length > 0">\n        {{$ctrl.result.length}}\n      </span>\n      <i class="fa fa-plus-square-o" title="Expand All" ng-click="$ctrl.expandAll()"></i>\n      <i class="fa fa-minus-square-o" title="Collapse All" ng-click="$ctrl.contractAll()"></i>\n    </div>\n  </form>\n</div>\n');
-$templateCache.put('plugins/camel/doc/help.md','### Camel\n\nClick [Camel](jmx/attributes?main-tab=camel) in the top navigation bar to view all the running Camel Contexts in the current JVM. (The selection will not appear on the navigation bar if there is no Camel running).\n\nThe Camel plugin allows you to view all the running Camel applications in the current JVM.\nYou can among others see the following details:\n\n* Lists of all running Camel applications\n* Detailed information of each Camel Context such as Camel version number, runtime statics\n* Lists of all routes in each Camel applications and their runtime statistics\n* Manage the lifecycle of all Camel applications and their routes, so you can restart / stop / pause / resume, etc.\n* Graphical representation of the running routes along with real time metrics\n* Live tracing and debugging of running routes\n* Profile the running routes with real time runtime statics; detailed specified per processor\n* Browsing and sending messages to Camel endpoint\n');
+$templateCache.put('plugins/camel/html/tree/content.html','<div class="tree-nav-sidebar-content">\n  <div id="cameltree" class="treeview-pf-hover treeview-pf-select"></div>\n</div>\n');
+$templateCache.put('plugins/camel/html/tree/header.html','<div class="tree-nav-sidebar-header">\n  <form role="form" class="search-pf has-button">\n    <div class="form-group has-clear">\n      <div class="search-pf-input-group">\n        <label for="input-search" class="sr-only">Search Tree:</label>\n        <input id="input-search" type="search" class="form-control" placeholder="Search tree:"\n          ng-model="$ctrl.filter">\n        <button type="button" class="clear" aria-hidden="true"\n          ng-hide="$ctrl.filter.length === 0"\n          ng-click="$ctrl.filter = \'\'">\n          <span class="pficon pficon-close"></span>\n        </button>\n      </div>\n    </div>\n    <div class="form-group tree-nav-buttons">\n      <span class="badge" ng-class="{positive: $ctrl.result.length > 0}"\n        ng-show="$ctrl.filter.length > 0">\n        {{$ctrl.result.length}}\n      </span>\n      <i class="fa fa-plus-square-o" title="Expand All" ng-click="$ctrl.expandAll()"></i>\n      <i class="fa fa-minus-square-o" title="Collapse All" ng-click="$ctrl.contractAll()"></i>\n    </div>\n  </form>\n</div>\n');
 $templateCache.put('plugins/activemq/doc/help.md','### ActiveMQ\n\nClick [ActiveMQ](#/jmx/attributes?tab=activmemq) in the top navigation bar to see the ActiveMQ specific plugin. (The ActiveMQ tab won\'t appear if there is no broker in this JVM).  The ActiveMQ plugin works very much the same as the JMX plugin however with a focus on interacting with an ActiveMQ broker.\n\nThe tree view on the left-hand side shows the top level JMX tree of each broker instance running in the JVM.  Expanding the tree will show the various MBeans registered by ActiveMQ that you can inspect via the **Attributes** tab.\n\nYou can then click on the **Queue** node to see the queues and **Topic** node to see the topics. From either of these nodes you should see **Create Queue** or **Create Topic** tabs to be able to create new destinations.\n\nOnce you have selected a destination you should be able to **Send** to it, **Browse** a queue or view the  **Attributes** or **Charts**\n\nYou can also see a graphical view of all producers, destinations and consumers for all queues (or if you select a Topic folder then topics) using the **Diagram** tab. Selecting a single queue or topic shows just all the producers and consumers on that destination. This diagram makes it easy to spot if producers are sending messages when there are no consumers, or that consumers are on the wrong destination etc.\n');
+$templateCache.put('plugins/camel/doc/help.md','### Camel\n\nClick [Camel](jmx/attributes?main-tab=camel) in the top navigation bar to view all the running Camel Contexts in the current JVM. (The selection will not appear on the navigation bar if there is no Camel running).\n\nThe Camel plugin allows you to view all the running Camel applications in the current JVM.\nYou can among others see the following details:\n\n* Lists of all running Camel applications\n* Detailed information of each Camel Context such as Camel version number, runtime statics\n* Lists of all routes in each Camel applications and their runtime statistics\n* Manage the lifecycle of all Camel applications and their routes, so you can restart / stop / pause / resume, etc.\n* Graphical representation of the running routes along with real time metrics\n* Live tracing and debugging of running routes\n* Profile the running routes with real time runtime statics; detailed specified per processor\n* Browsing and sending messages to Camel endpoint\n');
 $templateCache.put('plugins/karaf/doc/help.md','## Karaf\n\nThis plugin supports the [Apache Karaf](http://karaf.apache.org/) container.');
 $templateCache.put('plugins/osgi/doc/help.md','## OSGi\n\nThis plugin supports the various OSGi standards for working with bundles, Config Admin, services, packages, etc.');}]); hawtioPluginLoader.addModule("hawtio-integration-templates");

@@ -1277,6 +1277,12 @@ declare namespace Osgi {
     const bundlesModule: string;
 }
 declare namespace Osgi {
+    class OsgiController {
+        private workspace;
+        tabs: Nav.HawtioTab[];
+        constructor(workspace: Jmx.Workspace);
+        $onInit(): void;
+    }
     const osgiComponent: angular.IComponentOptions;
 }
 declare namespace Osgi {
@@ -2169,20 +2175,6 @@ declare namespace Osgi {
             };
         };
     };
-}
-declare namespace Osgi {
-    class OsgiNavigationController {
-        private $location;
-        private workspace;
-        private treeService;
-        private $scope;
-        tabs: Nav.HawtioTab[];
-        activeTab: Nav.HawtioTab;
-        constructor($location: ng.ILocationService, workspace: Jmx.Workspace, treeService: Jmx.TreeService, $scope: ng.IScope);
-        $onInit(): void;
-        goto(tab: Nav.HawtioTab): void;
-    }
-    const osgiNavigationComponent: angular.IComponentOptions;
 }
 declare namespace Osgi {
     var TopLevelController: angular.IModule;

@@ -8,7 +8,7 @@
     <pf-toolbar config="toolbarConfig"></pf-toolbar>
 
     <div class="list-group list-view-pf list-view-pf-view osgi-packages-list" infinite-scroll="appendItems()"
-      infinite-scroll-distance="2" infinite-scroll-container='".osgi-nav-main .contents"'>
+      infinite-scroll-distance="2" infinite-scroll-container='".nav-tabs-main .contents"'>
       <div class="list-group-item" ng-repeat="package in scrollablePackages"
         ng-class="{'list-view-pf-expand-active': package.exportsExpanded || package.importsExpanded}">
         <div class="list-view-pf-main-info">
