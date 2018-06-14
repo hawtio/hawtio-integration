@@ -17,26 +17,30 @@ namespace Karaf {
             const repositories: FeatureRepository[] = [];
             angular.forEach(value['Repositories'], (repository) => {
               let featureRepository: FeatureRepository = new FeatureRepository(repository.Name, repository.Uri)
-              featureRepository.dependencies = repository['Repositories'];
+              featureRepository.dependencies = repository.Repositories;
 
-              angular.forEach(repository['Features'], (item) => {
-                angular.forEach(item, (featureInfo, version) => {
-                  let feature: Feature = new Feature(
-                    featureInfo.Name,
-                    featureInfo.Version,
-                    value['Features'][featureInfo.Name][version].Installed,
-                    repository.Name,
-                    repository.Uri
-                  );
-                  featureRepository.features.push(feature);
+              if (!repository.Blacklisted) {
+                angular.forEach(repository.Features, (item) => {
+                  angular.forEach(item, (featureInfo, version) => {
+                    if (!value['Features'][featureInfo.Name][version].Blacklisted) {
+                      let feature: Feature = new Feature(
+                        featureInfo.Name,
+                        featureInfo.Version,
+                        value['Features'][featureInfo.Name][version].Installed,
+                        repository.Name,
+                        repository.Uri
+                      );
+                      featureRepository.features.push(feature);
+                    }
+                  });
                 });
-              });
                 repositories.push(featureRepository);
-              });
+              }
+            });
 
-              return repositories.sort((a,b) => {
-                return this.sortByName(a,b);
-              });
+            return repositories.sort((a,b) => {
+              return this.sortByName(a,b);
+            });
           });
       }
 
