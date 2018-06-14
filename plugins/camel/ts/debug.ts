@@ -141,6 +141,7 @@ namespace Camel {
         } else {
           $scope.graphView = null;
           $scope.tableView = null;
+          $scope.selectedDiagramNodeId = null;
         }
       }
     }
@@ -341,5 +342,7 @@ namespace Camel {
         jolokia.execute(mbean, method, Core.onSuccess(breakpointsChanged));
       }
     }
+
+    reloadData();
   }]);
 }

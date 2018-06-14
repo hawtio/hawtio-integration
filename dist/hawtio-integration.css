@@ -769,6 +769,10 @@ div.camel-properties {
   word-wrap: break-word;
 }
 
+.scr-component-references-table td:nth-child(3) {
+  text-transform: capitalize;
+}
+
 .spring-boot-health-main {
   margin-bottom: 20px;
 }
@@ -835,10 +839,6 @@ div.camel-properties {
 }
 .spring-boot-trace-main .http-status-code-icon {
   margin-right: 5px;
-}
-
-.scr-component-references-table td:nth-child(3) {
-  text-transform: capitalize;
 }
 
 .metricsWatcher .panel-group:first-child {

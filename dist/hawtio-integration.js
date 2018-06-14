@@ -21876,6 +21876,7 @@ var Camel;
                     else {
                         $scope.graphView = null;
                         $scope.tableView = null;
+                        $scope.selectedDiagramNodeId = null;
                     }
                 }
             }
@@ -22059,6 +22060,7 @@ var Camel;
                     jolokia.execute(mbean, method, Core.onSuccess(breakpointsChanged));
                 }
             }
+            reloadData();
         }]);
 })(Camel || (Camel = {}));
 /// <reference path="camelPlugin.ts"/>
