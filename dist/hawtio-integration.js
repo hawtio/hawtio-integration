@@ -23690,14 +23690,18 @@ var Karaf;
                 var repositories = [];
                 angular.forEach(value['Repositories'], function (repository) {
                     var featureRepository = new Karaf.FeatureRepository(repository.Name, repository.Uri);
-                    featureRepository.dependencies = repository['Repositories'];
-                    angular.forEach(repository['Features'], function (item) {
-                        angular.forEach(item, function (featureInfo, version) {
-                            var feature = new Karaf.Feature(featureInfo.Name, featureInfo.Version, value['Features'][featureInfo.Name][version].Installed, repository.Name, repository.Uri);
-                            featureRepository.features.push(feature);
+                    featureRepository.dependencies = repository.Repositories;
+                    if (!repository.Blacklisted) {
+                        angular.forEach(repository.Features, function (item) {
+                            angular.forEach(item, function (featureInfo, version) {
+                                if (!value['Features'][featureInfo.Name][version].Blacklisted) {
+                                    var feature = new Karaf.Feature(featureInfo.Name, featureInfo.Version, value['Features'][featureInfo.Name][version].Installed, repository.Name, repository.Uri);
+                                    featureRepository.features.push(feature);
+                                }
+                            });
                         });
-                    });
-                    repositories.push(featureRepository);
+                        repositories.push(featureRepository);
+                    }
                 });
                 return repositories.sort(function (a, b) {
                     return _this.sortByName(a, b);
