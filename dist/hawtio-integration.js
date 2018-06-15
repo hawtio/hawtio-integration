@@ -18244,7 +18244,6 @@ var Camel;
         }]);
     Camel._module.factory('tracerStatus', function () {
         return {
-            jhandle: null,
             messages: []
         };
     });
@@ -23472,6 +23471,7 @@ var Camel;
             $scope.messageIndex = -1;
             $scope.graphView = "plugins/camel/html/routeDiagram.html";
             $scope.camelTraceMBean = Camel.getSelectionCamelTraceMBean(workspace);
+            $scope.jolokiaHandle = null;
             $scope.gridOptions = Camel.createBrowseGridOptions();
             $scope.gridOptions.selectWithCheckboxOnly = false;
             $scope.gridOptions.showSelectionCheckbox = false;
@@ -23524,10 +23524,10 @@ var Camel;
             function reloadTracingFlag() {
                 $scope.tracing = false;
                 // clear any previous polls
-                if (tracerStatus.jhandle != null) {
+                if ($scope.jolokiaHandle != null) {
                     log.debug("Unregistering jolokia handle");
-                    jolokia.unregister(tracerStatus.jhandle);
-                    tracerStatus.jhandle = null;
+                    jolokia.unregister($scope.jolokiaHandle);
+                    $scope.jolokiaHandle = null;
                 }
                 var mbean = Camel.getSelectionCamelTraceMBean(workspace);
                 if (mbean) {
@@ -23536,14 +23536,14 @@ var Camel;
                         var traceMBean = mbean;
                         if (traceMBean) {
                             // register callback for doing live update of tracing
-                            if (tracerStatus.jhandle === null) {
+                            if ($scope.jolokiaHandle === null) {
                                 log.debug("Registering jolokia handle");
-                                tracerStatus.jhandle = jolokia.register(populateRouteMessages, {
+                                Core.scopeStoreJolokiaHandle($scope, jolokia, jolokia.register(populateRouteMessages, {
                                     type: 'exec', mbean: traceMBean,
                                     operation: 'dumpAllTracedMessagesAsXml()',
                                     ignoreErrors: true,
                                     arguments: []
-                                });
+                                }));
                             }
                         }
                     }
@@ -23637,7 +23637,7 @@ var Camel;
             }
             log.info("Re-activating tracer with", tracerStatus.messages.length, "existing messages");
             $scope.messages = tracerStatus.messages;
-            $scope.tracing = tracerStatus.jhandle != null;
+            $scope.tracing = $scope.jolokiaHandle != null;
         }]);
 })(Camel || (Camel = {}));
 var Karaf;

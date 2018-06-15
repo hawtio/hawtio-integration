@@ -61,7 +61,6 @@ namespace Camel {
 
   _module.factory('tracerStatus',function () {
     return {
-      jhandle: null,
       messages: []
     };
   });
