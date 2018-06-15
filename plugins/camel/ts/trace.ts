@@ -217,6 +217,7 @@ namespace Camel {
     log.info("Re-activating tracer with", tracerStatus.messages.length, "existing messages");
     $scope.messages = tracerStatus.messages;
     $scope.tracing = $scope.jolokiaHandle != null;
+    reloadTracingFlag();
   }]);
 
 }
