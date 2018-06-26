@@ -62,8 +62,10 @@ namespace Camel {
     ];
 
     contexts: Context[];
+    showTable = true;
 
-    constructor(private $uibModal, private workspace: Jmx.Workspace, private contextsService: ContextsService) {
+    constructor(private $timeout: ng.ITimeoutService, private $uibModal, private workspace: Jmx.Workspace,
+      private contextsService: ContextsService) {
       'ngInject';
     }
 
@@ -92,13 +94,20 @@ namespace Camel {
             }
           }
           this.enableDisableActions();
+          this.repaintTable();
         });
     }
-
+    
     private removeSelectedContexts() {
       _.remove(this.contexts, context => context.selected);
       this.workspace.loadTree();
       this.enableDisableActions();
+    }
+    
+    // This is a hack to keep the 'select all' checkbox working after starting/suspending contexts
+    private repaintTable() {
+      this.showTable = false;
+      this.$timeout(() => this.showTable = true);
     }
   }
 
@@ -108,7 +117,9 @@ namespace Camel {
       <p ng-if="!$ctrl.contexts">Loading...</p>
       <div ng-if="$ctrl.contexts">
         <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
-        <pf-table-view config="$ctrl.tableConfig" columns="$ctrl.tableColumns" items="$ctrl.contexts"></pf-table-view>
+        <div ng-if="$ctrl.showTable">
+          <pf-table-view config="$ctrl.tableConfig" columns="$ctrl.tableColumns" items="$ctrl.contexts"></pf-table-view>
+        </div>
       </div>
     `,
     controller: ContextsController

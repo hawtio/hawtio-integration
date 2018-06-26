@@ -62,9 +62,10 @@ namespace Camel {
     ];
 
     routes: Route[];
+    showTable = true;
 
-    constructor(private $uibModal, private workspace: Jmx.Workspace, private treeService: Jmx.TreeService,
-      private routesService: RoutesService) {
+    constructor(private $timeout: ng.ITimeoutService, private $uibModal, private workspace: Jmx.Workspace,
+      private treeService: Jmx.TreeService, private routesService: RoutesService) {
       'ngInject';
     }
 
@@ -105,6 +106,7 @@ namespace Camel {
             }
           }
           this.enableDisableActions();
+          this.repaintTable();
         });
     }
 
@@ -114,6 +116,11 @@ namespace Camel {
       this.enableDisableActions();
     }
 
+    // This is a hack to keep the 'select all' checkbox working after starting/stopping routes
+    private repaintTable() {
+      this.showTable = false;
+      this.$timeout(() => this.showTable = true);
+    }
   }
 
   export const routesComponent: angular.IComponentOptions = {
@@ -122,7 +129,9 @@ namespace Camel {
       <p ng-if="!$ctrl.routes">Loading...</p>
       <div ng-if="$ctrl.routes">
         <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
-        <pf-table-view config="$ctrl.tableConfig" columns="$ctrl.tableColumns" items="$ctrl.routes"></pf-table-view>
+        <div ng-if="$ctrl.showTable">
+          <pf-table-view config="$ctrl.tableConfig" columns="$ctrl.tableColumns" items="$ctrl.routes"></pf-table-view>
+        </div>
       </div>
     `,
     controller: RoutesController
