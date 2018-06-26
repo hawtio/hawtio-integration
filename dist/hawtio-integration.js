@@ -14755,10 +14755,11 @@ var Camel;
 var Camel;
 (function (Camel) {
     var ContextsController = /** @class */ (function () {
-        ContextsController.$inject = ["$uibModal", "workspace", "contextsService"];
-        function ContextsController($uibModal, workspace, contextsService) {
+        ContextsController.$inject = ["$timeout", "$uibModal", "workspace", "contextsService"];
+        function ContextsController($timeout, $uibModal, workspace, contextsService) {
             'ngInject';
             var _this = this;
+            this.$timeout = $timeout;
             this.$uibModal = $uibModal;
             this.workspace = workspace;
             this.contextsService = contextsService;
@@ -14832,6 +14833,7 @@ var Camel;
                 { header: "Name", itemField: "name" },
                 { header: "State", itemField: "state" }
             ];
+            this.showTable = true;
         }
         ContextsController.prototype.$onInit = function () {
             var _this = this;
@@ -14857,6 +14859,7 @@ var Camel;
                     }
                 }
                 _this.enableDisableActions();
+                _this.repaintTable();
             });
         };
         ContextsController.prototype.removeSelectedContexts = function () {
@@ -14864,11 +14867,17 @@ var Camel;
             this.workspace.loadTree();
             this.enableDisableActions();
         };
+        // This is a hack to keep the 'select all' checkbox working after starting/suspending contexts
+        ContextsController.prototype.repaintTable = function () {
+            var _this = this;
+            this.showTable = false;
+            this.$timeout(function () { return _this.showTable = true; });
+        };
         return ContextsController;
     }());
     Camel.ContextsController = ContextsController;
     Camel.contextsComponent = {
-        template: "\n      <h2>Contexts</h2>\n      <p ng-if=\"!$ctrl.contexts\">Loading...</p>\n      <div ng-if=\"$ctrl.contexts\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <pf-table-view config=\"$ctrl.tableConfig\" columns=\"$ctrl.tableColumns\" items=\"$ctrl.contexts\"></pf-table-view>\n      </div>\n    ",
+        template: "\n      <h2>Contexts</h2>\n      <p ng-if=\"!$ctrl.contexts\">Loading...</p>\n      <div ng-if=\"$ctrl.contexts\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <div ng-if=\"$ctrl.showTable\">\n          <pf-table-view config=\"$ctrl.tableConfig\" columns=\"$ctrl.tableColumns\" items=\"$ctrl.contexts\"></pf-table-view>\n        </div>\n      </div>\n    ",
         controller: ContextsController
     };
 })(Camel || (Camel = {}));
@@ -15723,10 +15732,11 @@ var Camel;
 var Camel;
 (function (Camel) {
     var RoutesController = /** @class */ (function () {
-        RoutesController.$inject = ["$uibModal", "workspace", "treeService", "routesService"];
-        function RoutesController($uibModal, workspace, treeService, routesService) {
+        RoutesController.$inject = ["$timeout", "$uibModal", "workspace", "treeService", "routesService"];
+        function RoutesController($timeout, $uibModal, workspace, treeService, routesService) {
             'ngInject';
             var _this = this;
+            this.$timeout = $timeout;
             this.$uibModal = $uibModal;
             this.workspace = workspace;
             this.treeService = treeService;
@@ -15804,6 +15814,7 @@ var Camel;
                 { header: "Name", itemField: "name" },
                 { header: "State", itemField: "state" }
             ];
+            this.showTable = true;
         }
         RoutesController.prototype.$onInit = function () {
             this.loadRoutes();
@@ -15840,6 +15851,7 @@ var Camel;
                     }
                 }
                 _this.enableDisableActions();
+                _this.repaintTable();
             });
         };
         RoutesController.prototype.removeSelectedRoutes = function () {
@@ -15847,11 +15859,17 @@ var Camel;
             this.workspace.loadTree();
             this.enableDisableActions();
         };
+        // This is a hack to keep the 'select all' checkbox working after starting/stopping routes
+        RoutesController.prototype.repaintTable = function () {
+            var _this = this;
+            this.showTable = false;
+            this.$timeout(function () { return _this.showTable = true; });
+        };
         return RoutesController;
     }());
     Camel.RoutesController = RoutesController;
     Camel.routesComponent = {
-        template: "\n      <h2>Routes</h2>\n      <p ng-if=\"!$ctrl.routes\">Loading...</p>\n      <div ng-if=\"$ctrl.routes\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <pf-table-view config=\"$ctrl.tableConfig\" columns=\"$ctrl.tableColumns\" items=\"$ctrl.routes\"></pf-table-view>\n      </div>\n    ",
+        template: "\n      <h2>Routes</h2>\n      <p ng-if=\"!$ctrl.routes\">Loading...</p>\n      <div ng-if=\"$ctrl.routes\">\n        <pf-toolbar config=\"$ctrl.toolbarConfig\"></pf-toolbar>\n        <div ng-if=\"$ctrl.showTable\">\n          <pf-table-view config=\"$ctrl.tableConfig\" columns=\"$ctrl.tableColumns\" items=\"$ctrl.routes\"></pf-table-view>\n        </div>\n      </div>\n    ",
         controller: RoutesController
     };
 })(Camel || (Camel = {}));

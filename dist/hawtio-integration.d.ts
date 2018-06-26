@@ -185,6 +185,7 @@ declare namespace Camel {
 }
 declare namespace Camel {
     class ContextsController {
+        private $timeout;
         private $uibModal;
         private workspace;
         private contextsService;
@@ -215,12 +216,14 @@ declare namespace Camel {
             itemField: string;
         }[];
         contexts: Context[];
-        constructor($uibModal: any, workspace: Jmx.Workspace, contextsService: ContextsService);
+        showTable: boolean;
+        constructor($timeout: ng.ITimeoutService, $uibModal: any, workspace: Jmx.Workspace, contextsService: ContextsService);
         $onInit(): void;
         private getSelectedContexts();
         private enableDisableActions();
         private updateContexts();
         private removeSelectedContexts();
+        private repaintTable();
     }
     const contextsComponent: angular.IComponentOptions;
 }
@@ -463,6 +466,7 @@ declare namespace Camel {
 }
 declare namespace Camel {
     class RoutesController {
+        private $timeout;
         private $uibModal;
         private workspace;
         private treeService;
@@ -494,13 +498,15 @@ declare namespace Camel {
             itemField: string;
         }[];
         routes: Route[];
-        constructor($uibModal: any, workspace: Jmx.Workspace, treeService: Jmx.TreeService, routesService: RoutesService);
+        showTable: boolean;
+        constructor($timeout: ng.ITimeoutService, $uibModal: any, workspace: Jmx.Workspace, treeService: Jmx.TreeService, routesService: RoutesService);
         $onInit(): void;
         private getSelectedRoutes();
         private enableDisableActions();
         private loadRoutes();
         private updateRoutes();
         private removeSelectedRoutes();
+        private repaintTable();
     }
     const routesComponent: angular.IComponentOptions;
 }
