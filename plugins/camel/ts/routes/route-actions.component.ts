@@ -27,16 +27,24 @@ namespace Camel {
     start(): void {
       this.routesService.startRoute(this.route)
         .then(response => {
+          Core.notification('success', 'Route started successfully');
           this.routesService.getRoute(this.route.mbean)
             .then(route => this.route = route);
+        })
+        .catch(error => {
+          Core.notification('danger', error);
         });
     }
 
     stop(): void {
       this.routesService.stopRoute(this.route)
         .then(response => {
+          Core.notification('success', 'Route stopped successfully');
           this.routesService.getRoute(this.route.mbean)
             .then(route => this.route = route);
+        })
+        .catch(error => {
+          Core.notification('danger', error);
         });
     }
 
@@ -44,12 +52,16 @@ namespace Camel {
       this.$uibModal.open({
         templateUrl: 'plugins/camel/html/deleteRouteWarningModal.html'
       })
-        .result.then(() => {
-          this.routesService.removeRoute(this.route)
-            .then(response => {
-              this.route = null;
-              this.workspace.loadTree();
-            });
+      .result.then(() => {
+        this.routesService.removeRoute(this.route)
+          .then(response => {
+            Core.notification('success', 'Route deleted successfully');
+            this.route = null;
+            this.workspace.loadTree();
+          })
+          .catch(error => {
+            Core.notification('danger', error);
+          });
         });
     }
   }

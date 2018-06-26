@@ -11,7 +11,7 @@ namespace Camel {
       private workspace: Jmx.Workspace, private contextsService: ContextsService) {
       'ngInject';
     }
-    
+
     $onInit() {
       this.unsubscribe = this.$scope.$on(Jmx.TreeEvent.NodeSelected, (event, selectedNode: Jmx.NodeSelection) => {
         if (selectedNode.typeName === 'context' && selectedNode.objectName) {
@@ -34,16 +34,24 @@ namespace Camel {
     start(): void {
       this.contextsService.startContext(this.context)
         .then(response => {
+          Core.notification('success', 'Camel context started successfully');
           this.contextsService.getContext(this.context.mbeanName)
             .then(context => this.context = context);
+        })
+        .catch(error => {
+          Core.notification('danger', error);
         });
     }
 
     suspend(): void {
       this.contextsService.suspendContext(this.context)
         .then(response => {
+          Core.notification('success', 'Camel context suspended successfully');
           this.contextsService.getContext(this.context.mbeanName)
             .then(context => this.context = context);
+        })
+        .catch(error => {
+          Core.notification('danger', error);
         });
     }
 
@@ -51,13 +59,17 @@ namespace Camel {
       this.$uibModal.open({
         templateUrl: 'plugins/camel/html/deleteContextWarningModal.html'
       })
-        .result.then(() => {
-          this.contextsService.stopContext(this.context)
-            .then(response => {
-              this.context = null;
-              this.workspace.removeAndSelectParentNode();
-            });
-        });
+      .result.then(() => {
+        this.contextsService.stopContext(this.context)
+          .then(response => {
+            Core.notification('success', 'Camel context deleted successfully');
+            this.context = null;
+            this.workspace.removeAndSelectParentNode();
+          });
+      })
+      .catch(error => {
+        Core.notification('danger', error);
+      });
     }
   }
 

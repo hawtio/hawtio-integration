@@ -10,7 +10,13 @@ namespace Camel {
       actionFn: action => {
         let selectedContexts = this.getSelectedContexts();
         this.contextsService.startContexts(selectedContexts)
-          .then(response => this.updateContexts());
+          .then(response => {
+            Core.notification('success', `Started ${Core.maybePlural(selectedContexts.length, 'Camel context')} successfully`);
+            this.updateContexts();
+          })
+          .catch(error => {
+            Core.notification('danger', error);
+          });
       },
       isDisabled: true
     };
@@ -19,7 +25,13 @@ namespace Camel {
       actionFn: action => {
         let selectedContexts = this.getSelectedContexts();
         this.contextsService.suspendContexts(selectedContexts)
-          .then(response => this.updateContexts());
+        .then(response => {
+          Core.notification('success', `Suspended ${Core.maybePlural(selectedContexts.length, 'Camel context')} successfully`);
+          this.updateContexts();
+        })
+        .catch(error => {
+          Core.notification('danger', error);
+        });
       },
       isDisabled: true
     }
@@ -32,7 +44,13 @@ namespace Camel {
         .result.then(() => {
           let selectedContexts = this.getSelectedContexts();
           this.contextsService.stopContexts(selectedContexts)
-            .then(response => this.removeSelectedContexts());
+          .then(response => {
+            Core.notification('success', `Deleted ${Core.maybePlural(selectedContexts.length, 'Camel context')} successfully`);
+            this.removeSelectedContexts();
+          })
+          .catch(error => {
+            Core.notification('danger', error);
+          });
         });
       },
       isDisabled: true

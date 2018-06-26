@@ -14552,7 +14552,13 @@ var Camel;
                 actionFn: function (action) {
                     var selectedContexts = _this.getSelectedContexts();
                     _this.contextsService.startContexts(selectedContexts)
-                        .then(function (response) { return _this.updateContexts(); });
+                        .then(function (response) {
+                        Core.notification('success', "Started " + Core.maybePlural(selectedContexts.length, 'Camel context') + " successfully");
+                        _this.updateContexts();
+                    })
+                        .catch(function (error) {
+                        Core.notification('danger', error);
+                    });
                 },
                 isDisabled: true
             };
@@ -14561,7 +14567,13 @@ var Camel;
                 actionFn: function (action) {
                     var selectedContexts = _this.getSelectedContexts();
                     _this.contextsService.suspendContexts(selectedContexts)
-                        .then(function (response) { return _this.updateContexts(); });
+                        .then(function (response) {
+                        Core.notification('success', "Suspended " + Core.maybePlural(selectedContexts.length, 'Camel context') + " successfully");
+                        _this.updateContexts();
+                    })
+                        .catch(function (error) {
+                        Core.notification('danger', error);
+                    });
                 },
                 isDisabled: true
             };
@@ -14574,7 +14586,13 @@ var Camel;
                         .result.then(function () {
                         var selectedContexts = _this.getSelectedContexts();
                         _this.contextsService.stopContexts(selectedContexts)
-                            .then(function (response) { return _this.removeSelectedContexts(); });
+                            .then(function (response) {
+                            Core.notification('success', "Deleted " + Core.maybePlural(selectedContexts.length, 'Camel context') + " successfully");
+                            _this.removeSelectedContexts();
+                        })
+                            .catch(function (error) {
+                            Core.notification('danger', error);
+                        });
                     });
                 },
                 isDisabled: true
@@ -14684,16 +14702,24 @@ var Camel;
             var _this = this;
             this.contextsService.startContext(this.context)
                 .then(function (response) {
+                Core.notification('success', 'Camel context started successfully');
                 _this.contextsService.getContext(_this.context.mbeanName)
                     .then(function (context) { return _this.context = context; });
+            })
+                .catch(function (error) {
+                Core.notification('danger', error);
             });
         };
         ContextActionsController.prototype.suspend = function () {
             var _this = this;
             this.contextsService.suspendContext(this.context)
                 .then(function (response) {
+                Core.notification('success', 'Camel context suspended successfully');
                 _this.contextsService.getContext(_this.context.mbeanName)
                     .then(function (context) { return _this.context = context; });
+            })
+                .catch(function (error) {
+                Core.notification('danger', error);
             });
         };
         ContextActionsController.prototype.delete = function () {
@@ -14704,9 +14730,13 @@ var Camel;
                 .result.then(function () {
                 _this.contextsService.stopContext(_this.context)
                     .then(function (response) {
+                    Core.notification('success', 'Camel context deleted successfully');
                     _this.context = null;
                     _this.workspace.removeAndSelectParentNode();
                 });
+            })
+                .catch(function (error) {
+                Core.notification('danger', error);
             });
         };
         return ContextActionsController;
@@ -15500,7 +15530,14 @@ var Camel;
                 actionFn: function (action) {
                     var selectedRoutes = _this.getSelectedRoutes();
                     _this.routesService.startRoutes(selectedRoutes)
-                        .then(function (response) { return _this.updateRoutes(); });
+                        .then(function (response) {
+                        Core.notification('success', "Started " + Core.maybePlural(selectedRoutes.length, 'route') + " successfully");
+                        _this.updateRoutes();
+                    })
+                        .catch(function (error) {
+                        Core.notification('danger', error);
+                        _this.updateRoutes();
+                    });
                 },
                 isDisabled: true
             };
@@ -15509,7 +15546,14 @@ var Camel;
                 actionFn: function (action) {
                     var selectedRoutes = _this.getSelectedRoutes();
                     _this.routesService.stopRoutes(selectedRoutes)
-                        .then(function (response) { return _this.updateRoutes(); });
+                        .then(function (response) {
+                        Core.notification('success', "Stopped " + Core.maybePlural(selectedRoutes.length, 'route') + " successfully");
+                        _this.updateRoutes();
+                    })
+                        .catch(function (error) {
+                        Core.notification('danger', error);
+                        _this.updateRoutes();
+                    });
                 },
                 isDisabled: true
             };
@@ -15522,7 +15566,14 @@ var Camel;
                     })
                         .result.then(function () {
                         _this.routesService.removeRoutes(selectedRoutes)
-                            .then(function (response) { return _this.removeSelectedRoutes(); });
+                            .then(function (response) {
+                            Core.notification('success', "Deleted " + Core.maybePlural(selectedRoutes.length, 'route') + " successfully");
+                            _this.removeSelectedRoutes();
+                        })
+                            .catch(function (error) {
+                            Core.notification('danger', error);
+                            _this.updateRoutes();
+                        });
                     });
                 },
                 isDisabled: true
@@ -15638,16 +15689,24 @@ var Camel;
             var _this = this;
             this.routesService.startRoute(this.route)
                 .then(function (response) {
+                Core.notification('success', 'Route started successfully');
                 _this.routesService.getRoute(_this.route.mbean)
                     .then(function (route) { return _this.route = route; });
+            })
+                .catch(function (error) {
+                Core.notification('danger', error);
             });
         };
         RouteActionsController.prototype.stop = function () {
             var _this = this;
             this.routesService.stopRoute(this.route)
                 .then(function (response) {
+                Core.notification('success', 'Route stopped successfully');
                 _this.routesService.getRoute(_this.route.mbean)
                     .then(function (route) { return _this.route = route; });
+            })
+                .catch(function (error) {
+                Core.notification('danger', error);
             });
         };
         RouteActionsController.prototype.delete = function () {
@@ -15658,8 +15717,12 @@ var Camel;
                 .result.then(function () {
                 _this.routesService.removeRoute(_this.route)
                     .then(function (response) {
+                    Core.notification('success', 'Route deleted successfully');
                     _this.route = null;
                     _this.workspace.loadTree();
+                })
+                    .catch(function (error) {
+                    Core.notification('danger', error);
                 });
             });
         };

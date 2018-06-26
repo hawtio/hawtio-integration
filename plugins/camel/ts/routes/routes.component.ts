@@ -10,7 +10,14 @@ namespace Camel {
       actionFn: action => {
         let selectedRoutes = this.getSelectedRoutes();
         this.routesService.startRoutes(selectedRoutes)
-          .then(response => this.updateRoutes());
+          .then(response => {
+            Core.notification('success', `Started ${Core.maybePlural(selectedRoutes.length, 'route')} successfully`);
+            this.updateRoutes()
+          })
+          .catch(error => {
+            Core.notification('danger', error);
+            this.updateRoutes();
+          });
       },
       isDisabled: true
     };
@@ -19,7 +26,14 @@ namespace Camel {
       actionFn: action => {
         let selectedRoutes = this.getSelectedRoutes();
         this.routesService.stopRoutes(selectedRoutes)
-          .then(response => this.updateRoutes());
+        .then(response => {
+          Core.notification('success', `Stopped ${Core.maybePlural(selectedRoutes.length, 'route')} successfully`);
+          this.updateRoutes()
+        })
+        .catch(error => {
+          Core.notification('danger', error);
+          this.updateRoutes();
+        });
       },
       isDisabled: true
     };
@@ -32,7 +46,14 @@ namespace Camel {
         })
         .result.then(() => {
           this.routesService.removeRoutes(selectedRoutes)
-            .then(response => this.removeSelectedRoutes());
+          .then(response => {
+            Core.notification('success', `Deleted ${Core.maybePlural(selectedRoutes.length, 'route')} successfully`);
+            this.removeSelectedRoutes()
+          })
+          .catch(error => {
+            Core.notification('danger', error);
+            this.updateRoutes();
+          });
         });
       },
       isDisabled: true
