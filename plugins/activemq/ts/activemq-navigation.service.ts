@@ -5,15 +5,15 @@ namespace ActiveMQ {
   const TAB_CONFIG: any = {
     attributes: {
       title: 'Attributes',
-      route: '/jmx/attributes'
+      route: '/activemq/attributes'
     },
     operations: {
       title: 'Operations',
-      route: '/jmx/operations'
+      route: '/activemq/operations'
     },
     chart: {
       title: 'Chart',
-      route: '/jmx/charts'
+      route: '/activemq/charts'
     },
     browse: {
       title: 'Browse',

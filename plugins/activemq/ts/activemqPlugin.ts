@@ -28,6 +28,10 @@ namespace ActiveMQ {
   function defineRoutes(configManager: Core.ConfigManager): void {
     'ngInject';
     configManager.
+      addRoute('/activemq/attributes',         {templateUrl: 'plugins/jmx/html/attributes/attributes.html'}).
+      addRoute('/activemq/operations',         {template:    '<operations></operations>'}).
+      addRoute('/activemq/charts',             {templateUrl: 'plugins/jmx/html/charts.html'}).
+      addRoute('/activemq/chartEdit',          {templateUrl: 'plugins/jmx/html/chartEdit.html'}).
       addRoute('/activemq/browseQueue',        {templateUrl: 'plugins/activemq/html/browseQueue.html'}).
       addRoute('/activemq/createDestination',  {template:    '<create-destination></create-destination>'}).
       addRoute('/activemq/deleteQueue',        {template:    '<delete-queue></delete-queue>'}).
@@ -61,7 +65,7 @@ namespace ActiveMQ {
 
     mainNavService.addItem({
       title: 'ActiveMQ',
-      href: '/jmx/attributes',
+      href: '/activemq',
       template: '<activemq></activemq>',
       isValid: () => workspace.treeContainsDomainAndProperties(jmxDomain) && activeMQNavigationService.getTabs().length > 0
     });
