@@ -18,7 +18,8 @@ namespace Osgi {
             location: item.Location,
             symbolicName: item.SymbolicName,
             state: item.State.toLowerCase(),
-            version: item.Version
+            version: item.Version,
+            startLevel: item.StartLevel
           })));
     }
 

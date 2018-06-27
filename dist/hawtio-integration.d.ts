@@ -1154,6 +1154,7 @@ declare namespace Osgi {
         symbolicName: string;
         state: string;
         version: string;
+        startLevel: number;
     }
 }
 declare namespace Osgi {
@@ -1281,6 +1282,40 @@ declare namespace Osgi {
 }
 declare namespace Osgi {
     const bundlesModule: string;
+}
+declare namespace Osgi {
+    interface Framework {
+        startLevel: number;
+        initialBundleStartLevel: number;
+    }
+}
+declare namespace Osgi {
+    class FrameworkService {
+        private $q;
+        private workspace;
+        private jolokiaService;
+        private static FRAMEWORK_MBEAN_ATTRIBUTES;
+        constructor($q: ng.IQService, workspace: Jmx.Workspace, jolokiaService: JVM.JolokiaService);
+        getFramework(): ng.IPromise<Framework>;
+        updateConfiguration(framework: Framework): angular.IPromise<any[]>;
+    }
+}
+declare namespace Osgi {
+    class FrameworkController {
+        frameworkService: FrameworkService;
+        bundlesService: BundlesService;
+        private framework;
+        private maxBundleStartLevel;
+        private loading;
+        constructor(frameworkService: FrameworkService, bundlesService: BundlesService);
+        $onInit(): void;
+        updateFrameworkConfiguration(): void;
+        saveDisabled(): boolean;
+    }
+    const frameworkComponent: angular.IComponentOptions;
+}
+declare namespace Osgi {
+    const frameworkModule: string;
 }
 declare namespace Osgi {
     class OsgiController {
@@ -2087,8 +2122,6 @@ declare namespace Karaf {
 }
 declare namespace Osgi {
     function formatServiceName(objClass: any): string;
-}
-declare namespace Osgi {
 }
 declare namespace Osgi {
 }

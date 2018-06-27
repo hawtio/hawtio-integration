@@ -1,5 +1,6 @@
 /// <reference path="../../karaf/ts/karafHelpers.ts"/>
 /// <reference path="bundles/bundles.module.ts"/>
+/// <reference path="framework/framework.module.ts"/>
 /// <reference path="osgi.component.ts"/>
 /// <reference path="osgiData.ts"/>
 /// <reference path="osgiHelpers.ts"/>
@@ -8,7 +9,8 @@ namespace Osgi {
 
   export const _module = angular.module(pluginName, [
     'infinite-scroll',
-    bundlesModule
+    bundlesModule,
+    frameworkModule
   ])
   .component('osgi', osgiComponent);
 
@@ -21,7 +23,7 @@ namespace Osgi {
             .when('/osgi/configurations', {templateUrl: 'plugins/osgi/html/configurations.html'})
             .when('/osgi/pid/:pid/:factoryPid', {templateUrl: 'plugins/osgi/html/pid.html'})
             .when('/osgi/pid/:pid', {templateUrl: 'plugins/osgi/html/pid.html'})
-            .when('/osgi/fwk', {templateUrl: 'plugins/osgi/html/framework.html'});
+            .when('/osgi/fwk', {template: '<framework></framework>'});
   }]);
 
   _module.run(["mainNavService", "workspace", "helpRegistry", (
