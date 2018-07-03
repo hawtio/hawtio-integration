@@ -1950,18 +1950,17 @@ declare namespace Karaf {
 }
 declare namespace Karaf {
     class FeaturesService {
-        private $q;
-        private jolokia;
+        private jolokiaService;
         private workspace;
-        constructor($q: ng.IQService, jolokia: Jolokia.IJolokia, workspace: Jmx.Workspace);
+        static MBEAN: string;
+        constructor(jolokiaService: JVM.JolokiaService, workspace: Jmx.Workspace);
         getFeatureRepositories(): ng.IPromise<FeatureRepository[]>;
         installFeature(feature: Feature): ng.IPromise<string>;
         uninstallFeature(feature: Feature): ng.IPromise<string>;
         addFeatureRepository(repositoryUri: string): ng.IPromise<string>;
         removeFeatureRepository(repository: FeatureRepository): ng.IPromise<string>;
-        private execute(mbean, operation, args?, type?);
-        private handleResponse(response);
-        sortByName(a: any, b: any): 0 | 1 | -1;
+        hasInvokeRightsForName(name: string): boolean;
+        sortByName(a: any, b: any): number;
     }
 }
 declare namespace Karaf {
@@ -1969,6 +1968,7 @@ declare namespace Karaf {
         private featuresService;
         private $uibModal;
         private workspace;
+        private $timeout;
         private static FILTER_FUNCTIONS;
         private features;
         private repositories;
@@ -1985,6 +1985,7 @@ declare namespace Karaf {
         listItemActionButtons: any[];
         private readonly addRepositoryAction;
         private readonly removeRepositoryAction;
+        toolbarActions: any[];
         toolbarConfig: {
             filterConfig: {
                 fields: ({
@@ -2009,13 +2010,18 @@ declare namespace Karaf {
             };
             isTableView: boolean;
         };
-        constructor(featuresService: FeaturesService, $uibModal: angular.ui.bootstrap.IModalService, workspace: Jmx.Workspace);
+        pageConfig: {
+            pageSize: number;
+        };
+        constructor(featuresService: FeaturesService, $uibModal: angular.ui.bootstrap.IModalService, workspace: Jmx.Workspace, $timeout: ng.ITimeoutService);
         $onInit(): void;
         private itemActionButtons();
-        private toolbarActions();
-        private loadFeatureRepositories();
+        private toolbarActionButtons();
+        private loadFeatureRepositories(loadCompleteFn?);
         private applyFilters(filters);
         enableButtonForItem(action: any, item: any): boolean;
+        private setUpdateInProgress(updateInProgress);
+        private runWithDelay(fn);
     }
     const featuresComponent: angular.IComponentOptions;
 }
