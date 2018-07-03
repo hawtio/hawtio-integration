@@ -25,7 +25,7 @@ namespace Karaf {
     listConfig = {
       showSelectBox: false,
       useExpandingRows: false,
-      updateInProgress: false
+      updateInProgress: false,
     };
 
     loading = true;
@@ -34,19 +34,25 @@ namespace Karaf {
 
     private readonly installButton = {
       name: 'Install',
-      actionFn: (action, item) => {
-        Core.notification('info', `Installing feature ${item.name}`);
+      actionFn: (action, feature: Feature) => {
+        if (this.listConfig.updateInProgress === true) {
+          return;
+        }
 
-        this.listConfig.updateInProgress = true;
-        this.featuresService.installFeature(item)
+        Core.notification('info', `Installing feature ${feature.name}`);
+        this.setUpdateInProgress(true);
+        this.featuresService.installFeature(feature)
           .then(() => {
-            Core.notification('success', `Installed feature ${item.name}`);
-            this.loadFeatureRepositories();
-            this.listConfig.updateInProgress = false;
+            this.runWithDelay(() => {
+              this.loadFeatureRepositories(() => {
+                Core.notification('success', `Installed feature ${feature.name}`);
+                this.setUpdateInProgress(false);
+              });
+            });
           })
           .catch(error => {
             Core.notification('danger', error)
-            this.listConfig.updateInProgress = true;
+            this.setUpdateInProgress(false);
           });
       },
       selectedId: null
@@ -54,19 +60,25 @@ namespace Karaf {
 
     private readonly uninstallButton = {
       name: 'Uninstall',
-      actionFn: (action, item) => {
-        Core.notification('info', `Uninstalling feature ${item.name}`);
+      actionFn: (action, feature: Feature) => {
+        if (this.listConfig.updateInProgress === true) {
+          return;
+        }
 
-        this.listConfig.updateInProgress = true;
-        this.featuresService.uninstallFeature(item)
+        Core.notification('info', `Uninstalling feature ${feature.name}`);
+        this.setUpdateInProgress(true);
+        this.featuresService.uninstallFeature(feature)
           .then(() => {
-            Core.notification('success', `Uninstalled feature ${item.name}`);
-            this.loadFeatureRepositories();
-            this.listConfig.updateInProgress = false;
+            this.runWithDelay(() => {
+              this.loadFeatureRepositories(() => {
+                Core.notification('success', `Uninstalled feature ${feature.name}`);
+                this.setUpdateInProgress(false);
+              });
+            });
           })
           .catch(error => {
             Core.notification('danger', error)
-            this.listConfig.updateInProgress = false;
+            this.setUpdateInProgress(false);
           });
       },
       selectedId: null
@@ -82,17 +94,23 @@ namespace Karaf {
         })
           .result.then((repository: any) => {
             if (repository.uri && repository.uri.trim().length > 0) {
-              let repositoryMatch:FeatureRepository = this.repositories.filter(match => match.uri === repository.uri.trim())[0]
+              const repositoryMatch:FeatureRepository = this.repositories.filter(match => match.uri === repository.uri.trim())[0]
               if (repositoryMatch) {
                 Core.notification('warning',`Feature repository ${repositoryMatch.uri} is already installed`);
               } else {
                 Core.notification('info', `Adding feature repository ${repository.uri}`);
+                this.setUpdateInProgress(true);
                 this.featuresService.addFeatureRepository(repository.uri)
                 .then(() => {
-                  Core.notification('success', `Added feature repository ${repository.uri}`);
-                  this.loadFeatureRepositories();
+                  this.loadFeatureRepositories(() => {
+                    Core.notification('success', `Added feature repository ${repository.uri}`);
+                    this.setUpdateInProgress(false);
+                  });
                 })
-                .catch(error => Core.notification('danger', error));
+                .catch(error => {
+                  Core.notification('danger', error)
+                  this.setUpdateInProgress(false);
+                });
               }
             }
           });
@@ -108,7 +126,7 @@ namespace Karaf {
         })
           .result.then((selectedRepository: FeatureRepository) => {
             if (selectedRepository) {
-              let dependentRepositories = [];
+              const dependentRepositories = [];
 
               angular.forEach(this.repositories, repository => {
                 if (repository.name !== selectedRepository.name) {
@@ -128,16 +146,24 @@ namespace Karaf {
               }
 
               Core.notification('info', `Removing feature repository ${selectedRepository.uri}`);
+              this.setUpdateInProgress(true);
               this.featuresService.removeFeatureRepository(selectedRepository)
                 .then(() => {
-                  Core.notification('success', `Removed feature repository ${selectedRepository.uri}`);
-                  this.loadFeatureRepositories();
+                  this.loadFeatureRepositories(() => {
+                    Core.notification('success', `Removed feature repository ${selectedRepository.uri}`);
+                    this.setUpdateInProgress(false);
+                  });
                 })
-                .catch(error => Core.notification('danger', error));
-            }
+                .catch(error => {
+                  Core.notification('danger', error)
+                  this.setUpdateInProgress(false);
+                });
+              }
           });
       }
     };
+
+    toolbarActions = this.toolbarActionButtons();
 
     toolbarConfig = {
       filterConfig: {
@@ -172,46 +198,49 @@ namespace Karaf {
         resultsCount: 0
       },
       actionsConfig: {
-        primaryActions: this.toolbarActions()
+        primaryActions: this.toolbarActions
       },
       isTableView: false
     };
 
-    constructor(private featuresService: FeaturesService, private $uibModal: angular.ui.bootstrap.IModalService, private workspace: Jmx.Workspace) {
+    pageConfig = {
+      pageSize: 10
+    };
+
+    constructor(private featuresService: FeaturesService, private $uibModal: angular.ui.bootstrap.IModalService,
+      private workspace: Jmx.Workspace, private $timeout: ng.ITimeoutService) {
       'ngInject';
     }
 
-    $onInit() {
+    $onInit(): void {
       this.loadFeatureRepositories();
     }
 
     private itemActionButtons(): any[] {
       let buttons = [];
-      let featuresMBean = getSelectionFeaturesMBean(this.workspace);
-      if (this.workspace.hasInvokeRightsForName(featuresMBean, 'installFeature')) {
+      if (this.featuresService.hasInvokeRightsForName('installFeature')) {
         buttons.push(this.installButton);
       }
-      if (this.workspace.hasInvokeRightsForName(featuresMBean, 'uninstallFeature')) {
+      if (this.featuresService.hasInvokeRightsForName('uninstallFeature')) {
         buttons.push(this.uninstallButton);
       }
       log.debug("RBAC - Rendered features buttons:", buttons);
       return buttons;
     }
 
-    private toolbarActions(): any[] {
+    private toolbarActionButtons(): any[] {
       let actions = [];
-      let featuresMBean = getSelectionFeaturesMBean(this.workspace);
-      if (this.workspace.hasInvokeRightsForName(featuresMBean, 'addRepository')) {
+      if (this.featuresService.hasInvokeRightsForName('addRepository')) {
         actions.push(this.addRepositoryAction);
       }
-      if (this.workspace.hasInvokeRightsForName(featuresMBean, 'removeRepository')) {
+      if (this.featuresService.hasInvokeRightsForName('removeRepository')) {
         actions.push(this.removeRepositoryAction);
       }
       log.debug("RBAC - Rendered features actions:", actions);
       return actions;
     }
 
-    private loadFeatureRepositories() {
+    private loadFeatureRepositories(loadCompleteFn?: Function): void {
       this.featuresService.getFeatureRepositories()
         .then(featureRepositories => {
           this.features = [];
@@ -235,10 +264,19 @@ namespace Karaf {
             this.toolbarConfig.filterConfig.resultsCount = this.features.length;
           }
           this.loading = false;
+        })
+        .catch(error => {
+          Core.notification('danger', error);
+          this.setUpdateInProgress(false);
+        })
+        .then(() => {
+          if (loadCompleteFn) {
+            loadCompleteFn()
+          }
         });
     }
 
-    private applyFilters(filters: any[]) {
+    private applyFilters(filters: any[]): void {
       let filteredFeatures = this.features;
       filters.forEach(filter => {
         filteredFeatures = FeaturesController.FILTER_FUNCTIONS[filter.id](filteredFeatures, filter.value);
@@ -247,7 +285,7 @@ namespace Karaf {
       this.toolbarConfig.filterConfig.resultsCount = filteredFeatures.length;
     }
 
-    enableButtonForItem(action, item) {
+    enableButtonForItem(action, item): boolean {
       if (this['config']['updateInProgress'] === true) {
         return false;
       }
@@ -259,6 +297,18 @@ namespace Karaf {
       if (action.name === 'Uninstall') {
         return item.installed === true;
       }
+    }
+
+    private setUpdateInProgress(updateInProgress: boolean): void {
+      this.listConfig.updateInProgress = updateInProgress;
+      this.toolbarActions.forEach(action => action.isDisabled = (this.listConfig.updateInProgress === true));
+    }
+
+    private runWithDelay(fn: Function): void {
+      const timeoutPromise = this.$timeout(() => {
+        this.$timeout.cancel(timeoutPromise);
+        fn();
+      }, 1000);
     }
   }
 

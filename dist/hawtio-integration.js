@@ -23848,21 +23848,18 @@ var Karaf;
 })(Karaf || (Karaf = {}));
 /// <reference path="feature.ts"/>
 /// <reference path="feature-repository.ts"/>
-/// <reference path="../karafHelpers.ts"/>
 var Karaf;
 (function (Karaf) {
     var FeaturesService = /** @class */ (function () {
-        FeaturesService.$inject = ["$q", "jolokia", "workspace"];
-        function FeaturesService($q, jolokia, workspace) {
+        FeaturesService.$inject = ["jolokiaService", "workspace"];
+        function FeaturesService(jolokiaService, workspace) {
             'ngInject';
-            this.$q = $q;
-            this.jolokia = jolokia;
+            this.jolokiaService = jolokiaService;
             this.workspace = workspace;
         }
         FeaturesService.prototype.getFeatureRepositories = function () {
             var _this = this;
-            return Karaf.getSelectionFeaturesMBeanAsync(this.workspace, this.$q)
-                .then(function (mbean) { return _this.execute(mbean, undefined, undefined, 'read'); })
+            return this.jolokiaService.getMBean(FeaturesService.MBEAN)
                 .then(function (value) {
                 var repositories = [];
                 angular.forEach(value['Repositories'], function (repository) {
@@ -23886,60 +23883,19 @@ var Karaf;
             });
         };
         FeaturesService.prototype.installFeature = function (feature) {
-            var mbean = Karaf.getSelectionFeaturesMBean(this.workspace);
-            var args = [feature.name, feature.version];
-            return this.execute(mbean, 'installFeature(java.lang.String, java.lang.String)', args)
-                .then(this.handleResponse);
+            return this.jolokiaService.execute(FeaturesService.MBEAN, 'installFeature(java.lang.String, java.lang.String)', feature.name, feature.version);
         };
         FeaturesService.prototype.uninstallFeature = function (feature) {
-            var mbean = Karaf.getSelectionFeaturesMBean(this.workspace);
-            var args = [feature.name, feature.version];
-            return this.execute(mbean, 'uninstallFeature(java.lang.String, java.lang.String)', args)
-                .then(this.handleResponse);
+            return this.jolokiaService.execute(FeaturesService.MBEAN, 'uninstallFeature(java.lang.String, java.lang.String)', feature.name, feature.version);
         };
         FeaturesService.prototype.addFeatureRepository = function (repositoryUri) {
-            var mbean = Karaf.getSelectionFeaturesMBean(this.workspace);
-            var args = [repositoryUri];
-            return this.execute(mbean, 'addRepository(java.lang.String)', args)
-                .then(this.handleResponse);
+            return this.jolokiaService.execute(FeaturesService.MBEAN, 'addRepository(java.lang.String)', repositoryUri);
         };
         FeaturesService.prototype.removeFeatureRepository = function (repository) {
-            var mbean = Karaf.getSelectionFeaturesMBean(this.workspace);
-            var args = [repository.uri];
-            return this.execute(mbean, 'removeRepository(java.lang.String)', args)
-                .then(this.handleResponse);
+            return this.jolokiaService.execute(FeaturesService.MBEAN, 'removeRepository(java.lang.String)', repository.uri);
         };
-        FeaturesService.prototype.execute = function (mbean, operation, args, type) {
-            var _this = this;
-            if (args === void 0) { args = []; }
-            if (type === void 0) { type = "exec"; }
-            var request = {
-                type: type,
-                mbean: mbean,
-            };
-            if (operation) {
-                request['operation'] = operation;
-            }
-            if (args) {
-                request['arguments'] = args;
-            }
-            return this.$q(function (resolve, reject) {
-                _this.jolokia.request(request, {
-                    method: "post",
-                    success: function (response) { return resolve(response.value); },
-                    error: function (response) {
-                        reject(response.error);
-                    }
-                });
-            });
-        };
-        FeaturesService.prototype.handleResponse = function (response) {
-            if (response && response['Error']) {
-                throw response['Error'];
-            }
-            else {
-                return "The operation completed successfully";
-            }
+        FeaturesService.prototype.hasInvokeRightsForName = function (name) {
+            return this.workspace.hasInvokeRightsForName(FeaturesService.MBEAN, name);
         };
         FeaturesService.prototype.sortByName = function (a, b) {
             if (a.name < b.name)
@@ -23948,6 +23904,7 @@ var Karaf;
                 return 1;
             return 0;
         };
+        FeaturesService.MBEAN = 'org.apache.karaf:type=feature,name=root';
         return FeaturesService;
     }());
     Karaf.FeaturesService = FeaturesService;
@@ -23957,54 +23914,67 @@ var Karaf;
 var Karaf;
 (function (Karaf) {
     var FeaturesController = /** @class */ (function () {
-        FeaturesController.$inject = ["featuresService", "$uibModal", "workspace"];
-        function FeaturesController(featuresService, $uibModal, workspace) {
+        FeaturesController.$inject = ["featuresService", "$uibModal", "workspace", "$timeout"];
+        function FeaturesController(featuresService, $uibModal, workspace, $timeout) {
             'ngInject';
             var _this = this;
             this.featuresService = featuresService;
             this.$uibModal = $uibModal;
             this.workspace = workspace;
+            this.$timeout = $timeout;
             this.features = [];
             this.repositoryFilterValues = [];
             this.listConfig = {
                 showSelectBox: false,
                 useExpandingRows: false,
-                updateInProgress: false
+                updateInProgress: false,
             };
             this.loading = true;
             this.listItems = null;
             this.installButton = {
                 name: 'Install',
-                actionFn: function (action, item) {
-                    Core.notification('info', "Installing feature " + item.name);
-                    _this.listConfig.updateInProgress = true;
-                    _this.featuresService.installFeature(item)
+                actionFn: function (action, feature) {
+                    if (_this.listConfig.updateInProgress === true) {
+                        return;
+                    }
+                    Core.notification('info', "Installing feature " + feature.name);
+                    _this.setUpdateInProgress(true);
+                    _this.featuresService.installFeature(feature)
                         .then(function () {
-                        Core.notification('success', "Installed feature " + item.name);
-                        _this.loadFeatureRepositories();
-                        _this.listConfig.updateInProgress = false;
+                        _this.runWithDelay(function () {
+                            _this.loadFeatureRepositories(function () {
+                                Core.notification('success', "Installed feature " + feature.name);
+                                _this.setUpdateInProgress(false);
+                            });
+                        });
                     })
                         .catch(function (error) {
                         Core.notification('danger', error);
-                        _this.listConfig.updateInProgress = true;
+                        _this.setUpdateInProgress(false);
                     });
                 },
                 selectedId: null
             };
             this.uninstallButton = {
                 name: 'Uninstall',
-                actionFn: function (action, item) {
-                    Core.notification('info', "Uninstalling feature " + item.name);
-                    _this.listConfig.updateInProgress = true;
-                    _this.featuresService.uninstallFeature(item)
+                actionFn: function (action, feature) {
+                    if (_this.listConfig.updateInProgress === true) {
+                        return;
+                    }
+                    Core.notification('info', "Uninstalling feature " + feature.name);
+                    _this.setUpdateInProgress(true);
+                    _this.featuresService.uninstallFeature(feature)
                         .then(function () {
-                        Core.notification('success', "Uninstalled feature " + item.name);
-                        _this.loadFeatureRepositories();
-                        _this.listConfig.updateInProgress = false;
+                        _this.runWithDelay(function () {
+                            _this.loadFeatureRepositories(function () {
+                                Core.notification('success', "Uninstalled feature " + feature.name);
+                                _this.setUpdateInProgress(false);
+                            });
+                        });
                     })
                         .catch(function (error) {
                         Core.notification('danger', error);
-                        _this.listConfig.updateInProgress = false;
+                        _this.setUpdateInProgress(false);
                     });
                 },
                 selectedId: null
@@ -24024,12 +23994,18 @@ var Karaf;
                             }
                             else {
                                 Core.notification('info', "Adding feature repository " + repository.uri);
+                                _this.setUpdateInProgress(true);
                                 _this.featuresService.addFeatureRepository(repository.uri)
                                     .then(function () {
-                                    Core.notification('success', "Added feature repository " + repository.uri);
-                                    _this.loadFeatureRepositories();
+                                    _this.loadFeatureRepositories(function () {
+                                        Core.notification('success', "Added feature repository " + repository.uri);
+                                        _this.setUpdateInProgress(false);
+                                    });
                                 })
-                                    .catch(function (error) { return Core.notification('danger', error); });
+                                    .catch(function (error) {
+                                    Core.notification('danger', error);
+                                    _this.setUpdateInProgress(false);
+                                });
                             }
                         }
                     });
@@ -24060,16 +24036,23 @@ var Karaf;
                                 return;
                             }
                             Core.notification('info', "Removing feature repository " + selectedRepository.uri);
+                            _this.setUpdateInProgress(true);
                             _this.featuresService.removeFeatureRepository(selectedRepository)
                                 .then(function () {
-                                Core.notification('success', "Removed feature repository " + selectedRepository.uri);
-                                _this.loadFeatureRepositories();
+                                _this.loadFeatureRepositories(function () {
+                                    Core.notification('success', "Removed feature repository " + selectedRepository.uri);
+                                    _this.setUpdateInProgress(false);
+                                });
                             })
-                                .catch(function (error) { return Core.notification('danger', error); });
+                                .catch(function (error) {
+                                Core.notification('danger', error);
+                                _this.setUpdateInProgress(false);
+                            });
                         }
                     });
                 }
             };
+            this.toolbarActions = this.toolbarActionButtons();
             this.toolbarConfig = {
                 filterConfig: {
                     fields: [
@@ -24103,9 +24086,12 @@ var Karaf;
                     resultsCount: 0
                 },
                 actionsConfig: {
-                    primaryActions: this.toolbarActions()
+                    primaryActions: this.toolbarActions
                 },
                 isTableView: false
+            };
+            this.pageConfig = {
+                pageSize: 10
             };
         }
         FeaturesController.prototype.$onInit = function () {
@@ -24113,29 +24099,27 @@ var Karaf;
         };
         FeaturesController.prototype.itemActionButtons = function () {
             var buttons = [];
-            var featuresMBean = Karaf.getSelectionFeaturesMBean(this.workspace);
-            if (this.workspace.hasInvokeRightsForName(featuresMBean, 'installFeature')) {
+            if (this.featuresService.hasInvokeRightsForName('installFeature')) {
                 buttons.push(this.installButton);
             }
-            if (this.workspace.hasInvokeRightsForName(featuresMBean, 'uninstallFeature')) {
+            if (this.featuresService.hasInvokeRightsForName('uninstallFeature')) {
                 buttons.push(this.uninstallButton);
             }
             Karaf.log.debug("RBAC - Rendered features buttons:", buttons);
             return buttons;
         };
-        FeaturesController.prototype.toolbarActions = function () {
+        FeaturesController.prototype.toolbarActionButtons = function () {
             var actions = [];
-            var featuresMBean = Karaf.getSelectionFeaturesMBean(this.workspace);
-            if (this.workspace.hasInvokeRightsForName(featuresMBean, 'addRepository')) {
+            if (this.featuresService.hasInvokeRightsForName('addRepository')) {
                 actions.push(this.addRepositoryAction);
             }
-            if (this.workspace.hasInvokeRightsForName(featuresMBean, 'removeRepository')) {
+            if (this.featuresService.hasInvokeRightsForName('removeRepository')) {
                 actions.push(this.removeRepositoryAction);
             }
             Karaf.log.debug("RBAC - Rendered features actions:", actions);
             return actions;
         };
-        FeaturesController.prototype.loadFeatureRepositories = function () {
+        FeaturesController.prototype.loadFeatureRepositories = function (loadCompleteFn) {
             var _this = this;
             this.featuresService.getFeatureRepositories()
                 .then(function (featureRepositories) {
@@ -24156,6 +24140,15 @@ var Karaf;
                     _this.toolbarConfig.filterConfig.resultsCount = _this.features.length;
                 }
                 _this.loading = false;
+            })
+                .catch(function (error) {
+                Core.notification('danger', error);
+                _this.setUpdateInProgress(false);
+            })
+                .then(function () {
+                if (loadCompleteFn) {
+                    loadCompleteFn();
+                }
             });
         };
         FeaturesController.prototype.applyFilters = function (filters) {
@@ -24176,6 +24169,18 @@ var Karaf;
             if (action.name === 'Uninstall') {
                 return item.installed === true;
             }
+        };
+        FeaturesController.prototype.setUpdateInProgress = function (updateInProgress) {
+            var _this = this;
+            this.listConfig.updateInProgress = updateInProgress;
+            this.toolbarActions.forEach(function (action) { return action.isDisabled = (_this.listConfig.updateInProgress === true); });
+        };
+        FeaturesController.prototype.runWithDelay = function (fn) {
+            var _this = this;
+            var timeoutPromise = this.$timeout(function () {
+                _this.$timeout.cancel(timeoutPromise);
+                fn();
+            }, 1000);
         };
         FeaturesController.FILTER_FUNCTIONS = {
             state: function (features, state) { return features.filter(function (feature) { return feature.installed === (state === 'Installed' ? true : false); }); },
@@ -26525,7 +26530,7 @@ $templateCache.put('plugins/camel/html/source.html','<div class="table-view" ng-
 $templateCache.put('plugins/camel/html/traceRoute.html','<div class="camel-trace-main" ng-controller="Camel.TraceRouteController">\n  \n  <div class="row camel-trace-header">\n    <div class="col-sm-6">\n      <h2>Trace</h2>\n    </div>\n    <div class="col-sm-6">\n      <button type="button" class="btn btn-primary pull-right" ng-if="tracing" ng-click="stopTracing()">\n        Stop tracing\n      </button>\n    </div>\n  </div>\n  \n  <div ng-if="!tracing">\n    <p>Tracing allows you to send messages to a route and then step through and see the messages flow through a route\n      to aid debugging and to help diagnose issues.\n    </p>\n    <p>Once you start tracing, you can send messages to the input endpoints, then come back to this page and see the\n      flow of messages through your route.\n    </p>\n    <p>As you click on the message table, you can see which node in the flow it came through; moving the selection up\n      and down in the message table lets you see the flow of the message through the diagram.\n    </p>\n    <button type="button" class="btn btn-primary" ng-click="startTracing()"\n      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="remove">\n      Start tracing\n    </button>\n    <div class="alert alert-info"\n      hawtio-show object-name="{{camelTraceMBean}}" method-name="setEnabled" mode="inverse">\n      <span class="pficon pficon-info"></span>\n      Tracing is not allowed for this user.\n    </div>\n  </div>\n  \n  <div class="camel-trace-diagram-wrapper" ng-include src="graphView" ng-if="tracing"></div>\n\n  <div class="camel-trace-bottom-panel" resizable r-directions="[\'top\']" r-flex="true" ng-if="tracing">\n    <table class="table table-striped table-bordered camel-trace-messages-table-header" ng-show="!message">\n      <thead>\n        <tr>\n          <th>ID</th>\n          <th>To Node</th>\n        </tr>\n      </thead>\n    </table>\n    <div class="camel-trace-messages-table-body-container" ng-show="!message">\n      <table class="table table-striped table-bordered">\n        <tbody>\n          <tr ng-repeat="message in messages">\n            <td>\n              <a href="" title="View message" ng-click="openMessageDialog(message, $index)">\n                {{message.headers.breadcrumbId}}\n              </a>\n            </td>\n            <td>{{message.toNode}}</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n    <div class="camel-trace-message-details" ng-if="message">\n      <button type="button" class="close" aria-hidden="true" ng-click="closeMessageDetails()">\n        <span class="pficon pficon-close"></span>\n      </button>\n      <ul class="pagination">\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="First" ng-disabled="messageIndex === 0" ng-click="changeMessage(0)">\n            <span class="i fa fa-angle-double-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === 0}">\n          <a href="#" title="Previous" ng-disabled="messageIndex === 0" ng-click="changeMessage(messageIndex - 1)">\n            <span class="i fa fa-angle-left"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Next" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messageIndex + 1)">\n            <span class="i fa fa-angle-right"></span>\n          </a>\n        </li>\n        <li ng-class="{disabled: messageIndex === messages.length - 1}">\n          <a href="#" title="Last" ng-disabled="messageIndex === messages.length - 1" ng-click="changeMessage(messages.length - 1)">\n            <span class="i fa fa-angle-double-right"></span>\n          </a>\n        </li>\n      </ul>\n      <ul class="nav nav-tabs" ng-init="activeTab = \'headers\'">\n        <li ng-class="{\'active\': activeTab === \'headers\'}">\n          <a href="" ng-click="activeTab = \'headers\'">Headers</a>\n        </li>\n        <li ng-class="{\'active\': activeTab === \'body\'}">\n          <a href="" ng-click="activeTab = \'body\'">Body</a>\n        </li>\n      </ul>\n      <div class="camel-trace-headers-contents" ng-show="activeTab === \'headers\'">\n        <div ng-repeat="(key, value) in message.headers"><label>{{key}}:</label> {{value}}</div>\n      </div>\n      <div class="camel-trace-body-contents" ng-show="activeTab === \'body\'">\n        <em class="camel-trace-no-body-text" ng-show="message.body === \'[Body is null]\'">No Body</em>\n        <pre ng-show="message.body !== \'[Body is null]\'">{{message.body}}</pre>\n      </div>\n    </div>\n  </div>\n\n</div>\n');
 $templateCache.put('plugins/karaf/html/feature-details.html','<div class="toolbar-pf">\n  <form class="toolbar-pf-actions">\n    <div class="form-group">\n      <button ng-click="install(name,version)"\n              ng-disabled="row.Installed"\n              class="btn btn-default"\n              title="install"\n              hawtio-show\n              object-name="{{featuresMBean}}"\n              method-name="installFeature">Install</button>\n      <button ng-click="uninstall(name,version)"\n              ng-disabled="!row.Installed"\n              class="btn btn-default"\n              title="uninstall"\n              hawtio-show\n              object-name="{{featuresMBean}}"\n              method-name="uninstallFeature">Uninstall</button>\n    </div>\n  </form>\n</div>\n\n<h2>Details</h2>\n<dl class="dl-horizontal">\n  <dt>ID</dt>\n  <dd>{{row.Id}}</dd>\n  <dt>Name</dt>\n  <dd>{{row.Name}}</dd>\n  <dt>State</dt>\n  <dd>{{row.Installed ? \'Installed\' : \'Uninstalled\'}}</dd>\n  <dt>Repository Name</dt>\n  <dd>{{row.RepositoryName}}</dd>\n  <dt>Repository URI</dt>\n  <dd>{{row.RepositoryURI}}</dd>\n  <dt>Version</dt>\n  <dd>{{row.Version}}</dd>\n</dl>\n\n<h2>Dependencies</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="feature in row.Dependencies">\n    <a href=\'osgi/feature/{{feature.Name}}/{{feature.Version}}\'>{{feature.Name}}/{{feature.Version}}</a>\n  </li>\n</ul>\n\n<h2>Bundles</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="bundle in row.BundleDetails">\n    <div ng-switch="bundle.Installed">\n      <a ng-switch-when="true" href=\'osgi/bundle/{{bundle.Identifier}}\'>{{bundle.Location}}</a>\n      <span ng-switch-default>{{bundle.Location}}</span>\n    </div>\n  </li>\n</ul>\n\n<h2>Configurations</h2>\n<table class="table table-striped table-bordered">\n  <thead>\n    <tr>\n      <th>PID</th>\n      <th>Properties</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr ng-repeat="(pid, value) in row.Configurations">\n      <td><a href="osgi/pid/{{value.Pid}}">{{value.Pid}}</a></td>\n      <td>\n        <ul class="list-unstyled">\n          <li ng-repeat="(key, value) in value.Elements">{{key}} = {{value.Value}}</li>\n        </ul>\n    </tr>\n  </tbody>\n</table>\n\n<h2>Configuration Files</h2>\n<ul class="list-unstyled">\n  <li ng-repeat="(key, value) in row[\'Configuration Files\']">{{value.Files}}</li>\n</ul>\n');
 $templateCache.put('plugins/karaf/html/feature.html','<div class="controller-section" ng-controller="Karaf.FeatureController">\n\n  <ol class="breadcrumb">\n    <li>\n      <a ng-href="osgi/features">Features</a>\n    </li>\n    <li class="page-title">\n      {{row.Id}}\n    </li>\n  </ol>\n\n  <div ng-include src="\'plugins/karaf/html/feature-details.html\'"></div>\n\n</div>\n\n');
-$templateCache.put('plugins/karaf/html/features.html','<div class="list-view">\n\n  <h1>Features</h1>\n\n  <p ng-if="$ctrl.loading">Loading...</p>\n\n  <div ng-if="!$ctrl.loading">\n    <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>\n    <pf-list-view items="$ctrl.listItems"\n                  config="$ctrl.listConfig"\n                  action-buttons="$ctrl.listItemActionButtons"\n                  enable-button-for-item-fn="$ctrl.enableButtonForItem">\n      <div class="list-view-pf-description">\n        <div class="list-view-pf-left">\n          <span class="list-view-pf-icon-sm fa"\n                ng-class="{\'list-view-pf-icon-success fa-check\': item.installed}"\n                title="Feature {{item.id}} {{item.getState()}}">\n          </span>\n        </div>\n        <div class="list-group-item-heading"><a ng-href=osgi/feature/{{item.id}}>{{item.id}}</a></div>\n      </div>\n      </pf-list-view>\n  </div>\n</div>\n');
+$templateCache.put('plugins/karaf/html/features.html','<div class="list-view">\n\n  <h1>Features</h1>\n\n  <p ng-if="$ctrl.loading">Loading...</p>\n\n  <div ng-if="!$ctrl.loading">\n    <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>\n    <pf-list-view items="$ctrl.listItems"\n                  config="$ctrl.listConfig"\n                  page-config="$ctrl.pageConfig"\n                  action-buttons="$ctrl.listItemActionButtons"\n                  enable-button-for-item-fn="$ctrl.enableButtonForItem">\n      <div class="list-view-pf-description">\n        <div class="list-view-pf-left">\n          <span class="list-view-pf-icon-sm fa"\n                ng-class="{\'list-view-pf-icon-success fa-check\': item.installed}"\n                title="Feature {{item.id}} {{item.getState()}}">\n          </span>\n        </div>\n        <div class="list-group-item-heading"><a ng-href=osgi/feature/{{item.id}}>{{item.id}}</a></div>\n      </div>\n      </pf-list-view>\n  </div>\n</div>\n');
 $templateCache.put('plugins/karaf/html/scr-component-details.html','<div class="row toolbar-pf">\n  <div class="col-sm-12">\n    <form class="toolbar-pf-actions">\n      <div class="form-group">\n        <button class="btn btn-default" \n                ng-click="$ctrl.enableComponent()"\n                ng-disabled="$ctrl.disableComponentEnable()"\n                hawtio-show\n                object-name="{{$ctrl.scrMBean}}"\n                method-name="enableComponent">\n          Enable\n        </button>\n        <button class="btn btn-default" \n                ng-click="$ctrl.disableComponent()"\n                ng-disabled="$ctrl.disableComponentDisable()"\n                hawtio-show\n                object-name="{{$ctrl.scrMBean}}"\n                method-name="disableComponent">\n          Disable\n        </button>\n      </div>\n    </form>\n  </div>\n</div>\n\n<h2>Details</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt ng-if="$ctrl.component.id >= 0">ID</dt>\n      <dd ng-if="$ctrl.component.id >= 0">{{$ctrl.component.id}}</dd>\n      <dt>Bundle ID</dt>\n      <dd><a ng-href="osgi/bundle/{{$ctrl.component.bundleId}}">{{$ctrl.component.bundleId}}</a></dd>\n      <dt>Name</dt>\n      <dd>{{$ctrl.component.name}}</dd>\n      <dt>State</dt>\n      <dd>{{$ctrl.component.state}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>Properties</h2>\n<div class="row">\n  <div class="col-md-12">\n    <dl class="dl-horizontal">\n      <dt ng-repeat-start="(key, value) in $ctrl.component.properties">{{key}}</dt>\n      <dd ng-repeat-end>{{value.Value}}</dd>\n    </dl>\n  </div>\n</div>\n\n<h2>References</h2>\n\n<div class="row">\n  <div class="col-md-12">\n    <table class="scr-component-references-table table">\n      <thead>\n        <tr>\n          <th>Name</th>\n          <th>Cardinality</th>\n          <th>Policy</th>\n          <th>Bound Services</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr ng-repeat="(key, value) in $ctrl.component.references">\n          <td>{{value.Name}}</td>\n          <td>{{value.Cardinality}}</td>\n          <td>{{value.Policy}}</td>\n          <td>\n            <ul class="list-unstyled">\n              <li ng-repeat="id in value[\'BoundServices\']">\n                <i class="fa fa-cog text-info" id="bound.service.{{id}}"> {{id}}</i>\n              </li>\n            </ul>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n</div>\n');
 $templateCache.put('plugins/karaf/html/scr-component.html','<p ng-if="$ctrl.loading">Loading...</p>\n\n<div class="controller-section" ng-if="!$ctrl.loading">\n  <ol class="breadcrumb">\n    <li>\n      <a ng-href="{{$ctrl.srcComponentsUrl}}">Declarative Services</a>\n    </li>\n    <li class="page-title">\n      {{$ctrl.component.name}}\n    </li>\n  </ol>\n  <div ng-include src="\'plugins/karaf/html/scr-component-details.html\'"></div>\n</div>\n');
 $templateCache.put('plugins/karaf/html/server.html','<h1>Server</h1>\n\n<div class="controller-section" ng-controller="Karaf.ServerController">\n\n  <div class="row">\n    <div class="col-md-12">\n      <dl class="dl-horizontal">\n        <dt>Name</dt>\n        <dd>{{data.name}}</dd>\n        <dt>Version</dt>\n        <dd>{{data.version}}</dd>\n        <dt>State</dt>\n        <dd>{{data.state}}</dd>\n        <dt>Is root</dt>\n        <dd>{{data.root}}</dd>\n        <dt>Start Level</dt>\n        <dd>{{data.startLevel}}</dd>\n        <dt>Framework</dt>\n        <dd>{{data.framework}}</dd>\n        <dt>Framework Version</dt>\n        <dd>{{data.frameworkVersion}}</dd>\n        <dt>Location</dt>\n        <dd>{{data.location}}</dd>\n        <dt>SSH Port</dt>\n        <dd>{{data.sshPort}}</dd>\n        <dt>RMI Registry Port</dt>\n        <dd>{{data.rmiRegistryPort}}</dd>\n        <dt>RMI Server Port</dt>\n        <dd>{{data.rmiServerPort}}</dd>\n        <dt>PID</dt>\n        <dd>{{data.pid}}</dd>\n      </dl>\n    </div>\n  </div>\n\n</div>\n');
