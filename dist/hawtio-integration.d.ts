@@ -1056,6 +1056,47 @@ declare namespace Camel {
 declare namespace Camel {
     const _module: angular.IModule;
 }
+declare namespace Karaf {
+    const pluginName: string;
+    const log: Logging.Logger;
+    function setSelect(selection: any, group: any): any;
+    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
+    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
+    function toCollection(values: any): any;
+    function featureLinks(workspace: any, name: any, version: any): string;
+    function extractFeature(attributes: any, name: any, version: any): any;
+    function isPlatformBundle(symbolicName: string): boolean;
+    function isActiveMQBundle(symbolicName: string): boolean;
+    function isCamelBundle(symbolicName: string): boolean;
+    function isCxfBundle(symbolicName: string): boolean;
+    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
+    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
+    function getComponentStateDescription(state: any): "Active" | "Enabled" | "Unsatisfied" | "Activating" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
+    function getAllComponents(workspace: any, jolokia: any): any;
+    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
+    function isComponentActive(workspace: any, jolokia: any, component: any): any;
+    function getComponentState(workspace: any, jolokia: any, component: any): any;
+    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
+    function populateDependencies(attributes: any, dependencies: any, features: any): void;
+    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
+    function getSelectionFeaturesMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
+    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
+    function getSelectionScrMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
+}
+declare namespace Osgi {
+    interface Bundle {
+        id: number;
+        name: string;
+        location: string;
+        symbolicName: string;
+        state: string;
+        version: string;
+        startLevel: number;
+    }
+}
 declare namespace Osgi {
     const pluginName: string;
     const log: Logging.Logger;
@@ -1124,56 +1165,6 @@ declare namespace Osgi {
     function runWhenTreeReady(fn: () => any, workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<any>;
 }
 declare namespace Osgi {
-    class OsgiDataService {
-        private jolokia;
-        private workspace;
-        constructor(workspace: Jmx.Workspace, jolokia: any);
-        getBundles(): {};
-        getServices(): {};
-        getPackages(): {};
-    }
-}
-declare namespace Karaf {
-    const pluginName: string;
-    const log: Logging.Logger;
-    function setSelect(selection: any, group: any): any;
-    function installRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function uninstallRepository(workspace: any, jolokia: any, uri: any, success: any, error: any): void;
-    function installFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function uninstallFeature(workspace: any, jolokia: any, feature: any, version: any, success: any, error: any): void;
-    function toCollection(values: any): any;
-    function featureLinks(workspace: any, name: any, version: any): string;
-    function extractFeature(attributes: any, name: any, version: any): any;
-    function isPlatformBundle(symbolicName: string): boolean;
-    function isActiveMQBundle(symbolicName: string): boolean;
-    function isCamelBundle(symbolicName: string): boolean;
-    function isCxfBundle(symbolicName: string): boolean;
-    function populateFeaturesAndRepos(attributes: any, features: any, repositories: any): void;
-    function createScrComponentsView(workspace: any, jolokia: any, components: any): any[];
-    function getComponentStateDescription(state: any): "Active" | "Enabled" | "Unsatisfied" | "Activating" | "Registered" | "Factory" | "Deactivating" | "Destroying" | "Disabling" | "Disposing" | "Unknown";
-    function getAllComponents(workspace: any, jolokia: any): any;
-    function getComponentByName(workspace: any, jolokia: any, componentName: any): any;
-    function isComponentActive(workspace: any, jolokia: any, component: any): any;
-    function getComponentState(workspace: any, jolokia: any, component: any): any;
-    function activateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function deactivateComponent(workspace: any, jolokia: any, component: any, success: any, error: any): void;
-    function populateDependencies(attributes: any, dependencies: any, features: any): void;
-    function getSelectionFeaturesMBean(workspace: Jmx.Workspace): string;
-    function getSelectionFeaturesMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
-    function getSelectionScrMBean(workspace: Jmx.Workspace): string;
-    function getSelectionScrMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
-}
-declare namespace Osgi {
-    interface Bundle {
-        id: number;
-        name: string;
-        location: string;
-        symbolicName: string;
-        state: string;
-        version: string;
-    }
-}
-declare namespace Osgi {
     class BundlesService {
         private $q;
         private workspace;
@@ -1231,6 +1222,50 @@ declare namespace Osgi {
 }
 declare namespace Osgi {
     const bundlesModule: string;
+}
+declare namespace Osgi {
+    interface Framework {
+        startLevel: number;
+        initialBundleStartLevel: number;
+    }
+}
+declare namespace Osgi {
+    class FrameworkService {
+        private $q;
+        private workspace;
+        private jolokiaService;
+        private static FRAMEWORK_MBEAN_ATTRIBUTES;
+        constructor($q: ng.IQService, workspace: Jmx.Workspace, jolokiaService: JVM.JolokiaService);
+        getFramework(): ng.IPromise<Framework>;
+        updateConfiguration(framework: Framework): angular.IPromise<any[]>;
+    }
+}
+declare namespace Osgi {
+    class FrameworkController {
+        frameworkService: FrameworkService;
+        bundlesService: BundlesService;
+        private framework;
+        private maxBundleStartLevel;
+        private loading;
+        constructor(frameworkService: FrameworkService, bundlesService: BundlesService);
+        $onInit(): void;
+        updateFrameworkConfiguration(): void;
+        saveDisabled(): boolean;
+    }
+    const frameworkComponent: angular.IComponentOptions;
+}
+declare namespace Osgi {
+    const frameworkModule: string;
+}
+declare namespace Osgi {
+    class OsgiDataService {
+        private jolokia;
+        private workspace;
+        constructor(workspace: Jmx.Workspace, jolokia: any);
+        getBundles(): {};
+        getServices(): {};
+        getPackages(): {};
+    }
 }
 declare namespace Osgi {
     const _module: angular.IModule;
@@ -2076,8 +2111,6 @@ declare namespace Karaf {
 }
 declare namespace Osgi {
     function formatServiceName(objClass: any): string;
-}
-declare namespace Osgi {
 }
 declare namespace Osgi {
 }

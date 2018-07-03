@@ -6,7 +6,8 @@ namespace Osgi {
       location: string,
       symbolicName: string,
       state: string,
-      version: string
+      version: string,
+      startLevel: number
     }
 
   }
