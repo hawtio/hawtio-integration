@@ -1247,6 +1247,7 @@ declare namespace Osgi {
         private framework;
         private maxBundleStartLevel;
         private loading;
+        private saveInProgress;
         constructor(frameworkService: FrameworkService, bundlesService: BundlesService);
         $onInit(): void;
         updateFrameworkConfiguration(): void;

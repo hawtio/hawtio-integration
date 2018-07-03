@@ -19412,6 +19412,7 @@ var Osgi;
             this.framework = null;
             this.maxBundleStartLevel = null;
             this.loading = false;
+            this.saveInProgress = false;
         }
         FrameworkController.prototype.$onInit = function () {
             var _this = this;
@@ -19439,14 +19440,14 @@ var Osgi;
                 Core.notification('danger', "Cannot set framework start level to " + this.framework.startLevel + ".\n\nSome installed bundles require a start level of " + this.maxBundleStartLevel + ".");
             }
             else {
-                this.loading = true;
+                this.saveInProgress = true;
                 this.frameworkService.updateConfiguration(this.framework)
                     .then(function (response) {
-                    _this.loading = false;
+                    _this.saveInProgress = false;
                     Core.notification('success', 'Configuration updated');
                 })
                     .catch(function (error) {
-                    _this.loading = false;
+                    _this.saveInProgress = false;
                     Core.notification('danger', error);
                 });
             }
@@ -19455,13 +19456,13 @@ var Osgi;
             return this.framework === null ||
                 this.framework.initialBundleStartLevel === null ||
                 this.framework.startLevel === null ||
-                this.loading === true;
+                this.saveInProgress === true;
         };
         return FrameworkController;
     }());
     Osgi.FrameworkController = FrameworkController;
     Osgi.frameworkComponent = {
-        template: "\n      <div class=\"framework-main\">\n        <h1>Framework Configuration</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <form class=\"form-horizontal framework-form\">\n            <div class=\"form-group\">\n              <label class=\"col-sm-3 control-label\" for=\"startLevel\">Current Framework Start Level</label>\n              <div class=\"col-sm-2\">\n                <input id=\"startLevel\" class=\"form-control\" type=\"number\" min=\"0\" max=\"100\" ng-model=\"$ctrl.framework.startLevel\">\n              </div>\n            </div>\n            <div class=\"form-group\">\n              <label class=\"col-sm-3 control-label\" for=\"initialBundleStartLevel\">Initial Bundle Start Level</label>\n              <div class=\"col-sm-2\">\n                <input id=\"initialBundleStartLevel\" class=\"form-control\" type=\"number\" min=\"0\" max=\"100\" ng-model=\"$ctrl.framework.initialBundleStartLevel\">\n              </div>\n            </div>\n            <div class=\"form-group\">\n              <div class=\"col-sm-offset-3 col-sm-2\">\n                <button type=\"button\" class=\"btn btn-primary\" ng-click=\"$ctrl.updateFrameworkConfiguration()\" ng-disabled=\"$ctrl.saveDisabled()\">\n                  Save\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n    ",
+        template: "\n      <div class=\"framework-main\">\n        <h1>Framework Configuration</h1>\n        <p ng-if=\"$ctrl.loading\">Loading...</p>\n        <div ng-if=\"!$ctrl.loading\">\n          <form class=\"form-horizontal framework-form\" ng-submit=\"$ctrl.updateFrameworkConfiguration()\">\n            <div class=\"form-group\">\n              <label class=\"col-sm-3 control-label\" for=\"startLevel\">Current Framework Start Level</label>\n              <div class=\"col-sm-2\">\n                <input id=\"startLevel\" class=\"form-control\" type=\"number\" min=\"0\" max=\"100\" ng-model=\"$ctrl.framework.startLevel\">\n              </div>\n            </div>\n            <div class=\"form-group\">\n              <label class=\"col-sm-3 control-label\" for=\"initialBundleStartLevel\">Initial Bundle Start Level</label>\n              <div class=\"col-sm-2\">\n                <input id=\"initialBundleStartLevel\" class=\"form-control\" type=\"number\" min=\"0\" max=\"100\" ng-model=\"$ctrl.framework.initialBundleStartLevel\">\n              </div>\n            </div>\n            <div class=\"form-group\">\n              <div class=\"col-sm-offset-3 col-sm-2\">\n                <button type=\"submit\" class=\"btn btn-primary\" ng-disabled=\"$ctrl.saveDisabled()\">\n                  Save\n                </button>\n              </div>\n            </div>\n          </form>\n        </div>\n      </div>\n    ",
         controller: FrameworkController
     };
 })(Osgi || (Osgi = {}));

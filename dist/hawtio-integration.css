@@ -664,10 +664,6 @@ div.camel-properties {
   margin: 15px 0;
 }
 
-.scr-component-references-table td:nth-child(3) {
-  text-transform: capitalize;
-}
-
 .install-bundle {
   margin-bottom: 10px;
 }
@@ -863,6 +859,10 @@ spring-boot-trace,
 }
 .spring-boot-trace-main .http-status-code-icon {
   margin-right: 5px;
+}
+
+.scr-component-references-table td:nth-child(3) {
+  text-transform: capitalize;
 }
 
 .metricsWatcher .panel-group:first-child {
