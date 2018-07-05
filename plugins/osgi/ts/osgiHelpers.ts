@@ -264,10 +264,6 @@ namespace Osgi {
     return null;
   }
 
-  export function getSelectionBundleMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
-    return runWhenTreeReady(() => getSelectionBundleMBean(workspace), workspace, $q);
-  }
-
   /**
    * Walks the tree looking in the first child all the way down until we find an objectName
    * @method findFirstObjectName

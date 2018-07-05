@@ -5,13 +5,13 @@ namespace Osgi {
 
   export class BundlesService {
 
-    constructor(private $q: ng.IQService, private workspace: Jmx.Workspace, private jolokiaService: JVM.JolokiaService) {
+    constructor(private workspace: Jmx.Workspace, private jolokiaService: JVM.JolokiaService) {
       'ngInject';
     }
 
     getBundles(): ng.IPromise<Bundle[]> {
-      return getSelectionBundleMBeanAsync(this.workspace, this.$q)
-        .then(objectName => this.jolokiaService.execute(objectName, 'listBundles()'))
+      const objectName = getSelectionBundleMBean(this.workspace);
+      return this.jolokiaService.execute(objectName, 'listBundles()')
         .then(result => _.values(result).map(item => ({
             id: item.Identifier,
             name: item.Headers['Bundle-Name'] ? item.Headers['Bundle-Name']['Value'] : '',
@@ -19,7 +19,8 @@ namespace Osgi {
             symbolicName: item.SymbolicName,
             state: item.State.toLowerCase(),
             version: item.Version,
-            startLevel: item.StartLevel
+            startLevel: item.StartLevel,
+            fragment: item.Fragment
           })));
     }
 

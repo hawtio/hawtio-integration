@@ -7,7 +7,8 @@ namespace Osgi {
       symbolicName: string,
       state: string,
       version: string,
-      startLevel: number
+      startLevel: number,
+      fragment: boolean
     }
 
   }
