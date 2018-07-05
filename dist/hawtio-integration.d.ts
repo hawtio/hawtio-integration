@@ -1095,6 +1095,7 @@ declare namespace Osgi {
         state: string;
         version: string;
         startLevel: number;
+        fragment: boolean;
     }
 }
 declare namespace Osgi {
@@ -1127,7 +1128,6 @@ declare namespace Osgi {
      */
     function findBundle(bundleId: any, values: any): string;
     function getSelectionBundleMBean(workspace: Jmx.Workspace): string;
-    function getSelectionBundleMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string>;
     /**
      * Walks the tree looking in the first child all the way down until we find an objectName
      * @method findFirstObjectName
@@ -1166,10 +1166,9 @@ declare namespace Osgi {
 }
 declare namespace Osgi {
     class BundlesService {
-        private $q;
         private workspace;
         private jolokiaService;
-        constructor($q: ng.IQService, workspace: Jmx.Workspace, jolokiaService: JVM.JolokiaService);
+        constructor(workspace: Jmx.Workspace, jolokiaService: JVM.JolokiaService);
         getBundles(): ng.IPromise<Bundle[]>;
         startBundles(bundles: Bundle[]): ng.IPromise<string>;
         stopBundles(bundles: Bundle[]): ng.IPromise<string>;

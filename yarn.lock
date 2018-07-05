@@ -447,7 +447,7 @@ amqplib@^0.5.2:
     readable-stream "1.x >=1.1.9"
     safe-buffer "^5.0.1"
 
-angular-animate@1.5.*, angular-animate@1.6.10, angular-animate@~1.6.0:
+angular-animate@1.5.*, angular-animate@1.6.10:
   version "1.6.10"
   resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.6.10.tgz#c520f6d341370e34e0a62060c99bcf47b7d7db8c"
 

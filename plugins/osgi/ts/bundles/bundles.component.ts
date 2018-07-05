@@ -24,13 +24,18 @@ namespace Osgi {
     private readonly startAction = {
       name: 'Start',
       actionFn: action => {
-        let selectedBundles = this.getSelectedBundles();
-        this.bundlesService.startBundles(selectedBundles)
-          .then(response => {
-            Core.notification('success', response);
-            this.loadBundles();
-          })
-          .catch(error => Core.notification('danger', error));
+        const selectedBundles = this.getSelectedBundles();
+        const fragmentBundles = selectedBundles.filter(bundle => bundle.fragment);
+        if (fragmentBundles.length > 0) {
+          Core.notification('warning', 'Fragment bundles cannot be started');
+        } else {
+          this.bundlesService.startBundles(selectedBundles)
+            .then(response => {
+              Core.notification('success', response);
+              this.loadBundles();
+            })
+            .catch(error => Core.notification('danger', error));
+        }
       },
       isDisabled: true
     }
