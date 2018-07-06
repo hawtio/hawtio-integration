@@ -65,13 +65,28 @@ namespace Karaf {
           return;
         }
 
+        // Only uninstall required features. Else assume the feature is a dependency of some other feature.
+        // See https://issues.jboss.org/browse/ENTESB-9135.
+        if (feature.required === false) {
+          Core.notification('warning', `Feature ${feature.name} cannot be uninstalled as other features depend on it`);
+          return;
+        }
+
         Core.notification('info', `Uninstalling feature ${feature.name}`);
         this.setUpdateInProgress(true);
         this.featuresService.uninstallFeature(feature)
           .then(() => {
             this.runWithDelay(() => {
               this.loadFeatureRepositories(() => {
-                Core.notification('success', `Uninstalled feature ${feature.name}`);
+                const updatedFeature = this.features.filter((match: Feature) => match.name === feature.name && match.version === feature.version)[0];
+
+                // Handle scenario where Karaf has not modified the installed state after uninstall
+                if (updatedFeature && updatedFeature.installed === true && updatedFeature.required === false) {
+                  Core.notification('warning', `Feature ${feature.name} cannot be uninstalled as other features depend on it`);
+                } else {
+                  Core.notification('success', `Uninstalled feature ${feature.name}`);
+                }
+
                 this.setUpdateInProgress(false);
               });
             });
@@ -92,28 +107,28 @@ namespace Karaf {
         this.$uibModal.open({
           component: 'featureRepositoryAddModal'
         })
-          .result.then((repository: any) => {
-            if (repository.uri && repository.uri.trim().length > 0) {
-              const repositoryMatch:FeatureRepository = this.repositories.filter(match => match.uri === repository.uri.trim())[0]
-              if (repositoryMatch) {
-                Core.notification('warning',`Feature repository ${repositoryMatch.uri} is already installed`);
-              } else {
-                Core.notification('info', `Adding feature repository ${repository.uri}`);
-                this.setUpdateInProgress(true);
-                this.featuresService.addFeatureRepository(repository.uri)
-                .then(() => {
-                  this.loadFeatureRepositories(() => {
-                    Core.notification('success', `Added feature repository ${repository.uri}`);
-                    this.setUpdateInProgress(false);
-                  });
-                })
-                .catch(error => {
-                  Core.notification('danger', error)
+        .result.then((repository: any) => {
+          if (repository.uri && repository.uri.trim().length > 0) {
+            const repositoryMatch:FeatureRepository = this.repositories.filter(match => match.uri === repository.uri.trim())[0]
+            if (repositoryMatch) {
+              Core.notification('warning',`Feature repository ${repositoryMatch.uri} is already installed`);
+            } else {
+              Core.notification('info', `Adding feature repository ${repository.uri}`);
+              this.setUpdateInProgress(true);
+              this.featuresService.addFeatureRepository(repository.uri)
+              .then(() => {
+                this.loadFeatureRepositories(() => {
+                  Core.notification('success', `Added feature repository ${repository.uri}`);
                   this.setUpdateInProgress(false);
                 });
-              }
+              })
+              .catch(error => {
+                Core.notification('danger', error)
+                this.setUpdateInProgress(false);
+              });
             }
-          });
+          }
+        });
       }
     };
 
@@ -124,42 +139,42 @@ namespace Karaf {
           component: 'featureRepositoryRemoveModal',
           resolve: {repositories: () => {return this.repositories}}
         })
-          .result.then((selectedRepository: FeatureRepository) => {
-            if (selectedRepository) {
-              const dependentRepositories = [];
+        .result.then((selectedRepository: FeatureRepository) => {
+          if (selectedRepository) {
+            const dependentRepositories = [];
 
-              angular.forEach(this.repositories, repository => {
-                if (repository.name !== selectedRepository.name) {
-                  angular.forEach(repository.dependencies, dependency => {
-                    if (dependency === selectedRepository.uri) {
-                      dependentRepositories.push(repository.name);
-                    }
-                  });
-                }
-              });
-
-              if (dependentRepositories.length > 0) {
-                let message = dependentRepositories.length === 1 ? dependentRepositories[0] : dependentRepositories.length + ' other features';
-                Core.notification('danger',
-                  `Unable to remove repository ${selectedRepository.name}. It is required by ${message}.`)
-                return;
-              }
-
-              Core.notification('info', `Removing feature repository ${selectedRepository.uri}`);
-              this.setUpdateInProgress(true);
-              this.featuresService.removeFeatureRepository(selectedRepository)
-                .then(() => {
-                  this.loadFeatureRepositories(() => {
-                    Core.notification('success', `Removed feature repository ${selectedRepository.uri}`);
-                    this.setUpdateInProgress(false);
-                  });
-                })
-                .catch(error => {
-                  Core.notification('danger', error)
-                  this.setUpdateInProgress(false);
+            angular.forEach(this.repositories, repository => {
+              if (repository.name !== selectedRepository.name) {
+                angular.forEach(repository.dependencies, dependency => {
+                  if (dependency === selectedRepository.uri) {
+                    dependentRepositories.push(repository.name);
+                  }
                 });
               }
-          });
+            });
+
+            if (dependentRepositories.length > 0) {
+              let message = dependentRepositories.length === 1 ? dependentRepositories[0] : dependentRepositories.length + ' other features';
+              Core.notification('danger',
+                `Unable to remove repository ${selectedRepository.name}. It is required by ${message}.`)
+              return;
+            }
+
+            Core.notification('info', `Removing feature repository ${selectedRepository.uri}`);
+            this.setUpdateInProgress(true);
+            this.featuresService.removeFeatureRepository(selectedRepository)
+              .then(() => {
+                this.loadFeatureRepositories(() => {
+                  Core.notification('success', `Removed feature repository ${selectedRepository.uri}`);
+                  this.setUpdateInProgress(false);
+                });
+              })
+              .catch(error => {
+                Core.notification('danger', error)
+                this.setUpdateInProgress(false);
+              });
+            }
+        });
       }
     };
 

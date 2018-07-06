@@ -1921,9 +1921,10 @@ declare namespace Karaf {
         name: string;
         version: string;
         installed: boolean;
+        required: boolean;
         repositoryName: string;
         repositoryUri: string;
-        constructor(name: string, version: string, installed: boolean, repositoryName: string, repositoryUri: string);
+        constructor(name: string, version: string, installed: boolean, required: boolean, repositoryName: string, repositoryUri: string);
         getState(): string;
     }
 }

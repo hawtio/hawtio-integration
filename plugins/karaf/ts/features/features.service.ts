@@ -27,6 +27,7 @@ namespace Karaf {
                       featureInfo.Name,
                       featureInfo.Version,
                       value['Features'][featureInfo.Name][version].Installed,
+                      value['Features'][featureInfo.Name][version].Required,
                       repository.Name,
                       repository.Uri
                     );

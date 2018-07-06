@@ -23819,11 +23819,12 @@ var Camel;
 var Karaf;
 (function (Karaf) {
     var Feature = /** @class */ (function () {
-        function Feature(name, version, installed, repositoryName, repositoryUri) {
+        function Feature(name, version, installed, required, repositoryName, repositoryUri) {
             this.id = name + "/" + version;
             this.name = name;
             this.version = version;
             this.installed = installed;
+            this.required = required;
             this.repositoryName = repositoryName;
             this.repositoryUri = repositoryUri;
         }
@@ -23870,7 +23871,7 @@ var Karaf;
                         angular.forEach(repository.Features, function (item) {
                             angular.forEach(item, function (featureInfo, version) {
                                 if (!value['Features'][featureInfo.Name][version].Blacklisted) {
-                                    var feature = new Karaf.Feature(featureInfo.Name, featureInfo.Version, value['Features'][featureInfo.Name][version].Installed, repository.Name, repository.Uri);
+                                    var feature = new Karaf.Feature(featureInfo.Name, featureInfo.Version, value['Features'][featureInfo.Name][version].Installed, value['Features'][featureInfo.Name][version].Required, repository.Name, repository.Uri);
                                     featureRepository.features.push(feature);
                                 }
                             });
@@ -23962,13 +23963,26 @@ var Karaf;
                     if (_this.listConfig.updateInProgress === true) {
                         return;
                     }
+                    // Only uninstall required features. Else assume the feature is a dependency of some other feature.
+                    // See https://issues.jboss.org/browse/ENTESB-9135.
+                    if (feature.required === false) {
+                        Core.notification('warning', "Feature " + feature.name + " cannot be uninstalled as other features depend on it");
+                        return;
+                    }
                     Core.notification('info', "Uninstalling feature " + feature.name);
                     _this.setUpdateInProgress(true);
                     _this.featuresService.uninstallFeature(feature)
                         .then(function () {
                         _this.runWithDelay(function () {
                             _this.loadFeatureRepositories(function () {
-                                Core.notification('success', "Uninstalled feature " + feature.name);
+                                var updatedFeature = _this.features.filter(function (match) { return match.name === feature.name && match.version === feature.version; })[0];
+                                // Handle scenario where Karaf has not modified the installed state after uninstall
+                                if (updatedFeature && updatedFeature.installed === true && updatedFeature.required === false) {
+                                    Core.notification('warning', "Feature " + feature.name + " cannot be uninstalled as other features depend on it");
+                                }
+                                else {
+                                    Core.notification('success', "Uninstalled feature " + feature.name);
+                                }
                                 _this.setUpdateInProgress(false);
                             });
                         });
