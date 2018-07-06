@@ -19283,12 +19283,10 @@ var Osgi;
                 return bundles.filter(function (bundle) { return regExp.test(bundle.name); });
             },
             symbolicName: function (bundles, symbolicName) {
-                var regExp = new RegExp(symbolicName, 'i');
-                return bundles.filter(function (bundle) { return regExp.test(bundle.symbolicName); });
+                return bundles.filter(function (bundle) { return bundle.symbolicName.indexOf(symbolicName) !== -1; });
             },
             version: function (bundles, version) {
-                var regExp = new RegExp(version, 'i');
-                return bundles.filter(function (bundle) { return regExp.test(bundle.version); });
+                return bundles.filter(function (bundle) { return bundle.version.indexOf(version) !== -1; });
             }
         };
         return BundlesController;
