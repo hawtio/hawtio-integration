@@ -12,12 +12,10 @@ namespace Osgi {
         return bundles.filter(bundle => regExp.test(bundle.name));
       },
       symbolicName: (bundles, symbolicName) => {
-        var regExp = new RegExp(symbolicName, 'i');
-        return bundles.filter(bundle => regExp.test(bundle.symbolicName));
+        return bundles.filter(bundle => bundle.symbolicName.indexOf(symbolicName) !== -1);
       },
       version: (bundles, version) => {
-        var regExp = new RegExp(version, 'i');
-        return bundles.filter(bundle => regExp.test(bundle.version));
+        return bundles.filter(bundle => bundle.version.indexOf(version) !== -1);
       }
     };
 
