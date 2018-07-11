@@ -19,6 +19,8 @@ namespace Karaf {
     $scope.install = () => {
       installFeature(workspace, jolokia, $scope.name, $scope.version, function () {
         Core.notification('success', 'Installed feature ' + $scope.name);
+        $scope.row.Installed = true;
+        Core.$apply($scope);
       }, function (response) {
         Core.notification('danger', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
       });
@@ -27,6 +29,8 @@ namespace Karaf {
     $scope.uninstall = () => {
       uninstallFeature(workspace, jolokia, $scope.name, $scope.version, function () {
         Core.notification('success', 'Uninstalled feature ' + $scope.name);
+        $scope.row.Installed = false;
+        Core.$apply($scope);
       }, function (response) {
         Core.notification('danger', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
       });
