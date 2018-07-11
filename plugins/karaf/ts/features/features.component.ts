@@ -323,7 +323,7 @@ namespace Karaf {
       const timeoutPromise = this.$timeout(() => {
         this.$timeout.cancel(timeoutPromise);
         fn();
-      }, 1000);
+      }, 2000);
     }
   }
 
