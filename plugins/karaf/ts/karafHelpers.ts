@@ -41,7 +41,7 @@ namespace Karaf {
               operation: 'installFeature(java.lang.String, java.lang.String)',
               arguments: [feature, version]
             },
-            Core.onSuccess(success, { error: error }));
+            Core.onSuccess(success, { error: error, ajaxError: success }));
   }
 
   export function uninstallFeature(workspace, jolokia, feature, version, success, error) {
@@ -51,7 +51,7 @@ namespace Karaf {
               operation: 'uninstallFeature(java.lang.String, java.lang.String)',
               arguments: [feature, version]
             },
-            Core.onSuccess(success, { error: error }));
+            Core.onSuccess(success, { error: error, ajaxError: success }));
   }
 
   // TODO move to core?

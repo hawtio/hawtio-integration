@@ -18235,7 +18235,7 @@ var Karaf;
             type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
             operation: 'installFeature(java.lang.String, java.lang.String)',
             arguments: [feature, version]
-        }, Core.onSuccess(success, { error: error }));
+        }, Core.onSuccess(success, { error: error, ajaxError: success }));
     }
     Karaf.installFeature = installFeature;
     function uninstallFeature(workspace, jolokia, feature, version, success, error) {
@@ -18243,7 +18243,7 @@ var Karaf;
             type: 'exec', mbean: getSelectionFeaturesMBean(workspace),
             operation: 'uninstallFeature(java.lang.String, java.lang.String)',
             arguments: [feature, version]
-        }, Core.onSuccess(success, { error: error }));
+        }, Core.onSuccess(success, { error: error, ajaxError: success }));
     }
     Karaf.uninstallFeature = uninstallFeature;
     // TODO move to core?
@@ -24653,6 +24653,8 @@ var Karaf;
             $scope.install = function () {
                 Karaf.installFeature(workspace, jolokia, $scope.name, $scope.version, function () {
                     Core.notification('success', 'Installed feature ' + $scope.name);
+                    $scope.row.Installed = true;
+                    Core.$apply($scope);
                 }, function (response) {
                     Core.notification('danger', 'Failed to install feature ' + $scope.name + ' due to ' + response.error);
                 });
@@ -24660,6 +24662,8 @@ var Karaf;
             $scope.uninstall = function () {
                 Karaf.uninstallFeature(workspace, jolokia, $scope.name, $scope.version, function () {
                     Core.notification('success', 'Uninstalled feature ' + $scope.name);
+                    $scope.row.Installed = false;
+                    Core.$apply($scope);
                 }, function (response) {
                     Core.notification('danger', 'Failed to uninstall feature ' + $scope.name + ' due to ' + response.error);
                 });
