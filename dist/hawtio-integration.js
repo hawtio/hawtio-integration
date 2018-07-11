@@ -23883,10 +23883,22 @@ var Karaf;
             });
         };
         FeaturesService.prototype.installFeature = function (feature) {
-            return this.jolokiaService.execute(FeaturesService.MBEAN, 'installFeature(java.lang.String, java.lang.String)', feature.name, feature.version);
+            return this.jolokiaService.execute(FeaturesService.MBEAN, 'installFeature(java.lang.String, java.lang.String)', feature.name, feature.version)
+                .catch(function (error) {
+                // Ignore server error caused by pax-web restarting
+                if (error.indexOf('socket hang up') === -1) {
+                    throw error;
+                }
+            });
         };
         FeaturesService.prototype.uninstallFeature = function (feature) {
-            return this.jolokiaService.execute(FeaturesService.MBEAN, 'uninstallFeature(java.lang.String, java.lang.String)', feature.name, feature.version);
+            return this.jolokiaService.execute(FeaturesService.MBEAN, 'uninstallFeature(java.lang.String, java.lang.String)', feature.name, feature.version)
+                .catch(function (error) {
+                // Ignore server error caused by pax-web restarting
+                if (error.indexOf('socket hang up') === -1) {
+                    throw error;
+                }
+            });
         };
         FeaturesService.prototype.addFeatureRepository = function (repositoryUri) {
             return this.jolokiaService.execute(FeaturesService.MBEAN, 'addRepository(java.lang.String)', repositoryUri);
@@ -24193,7 +24205,7 @@ var Karaf;
             var timeoutPromise = this.$timeout(function () {
                 _this.$timeout.cancel(timeoutPromise);
                 fn();
-            }, 1000);
+            }, 2000);
         };
         FeaturesController.FILTER_FUNCTIONS = {
             state: function (features, state) { return features.filter(function (feature) { return feature.installed === (state === 'Installed' ? true : false); }); },

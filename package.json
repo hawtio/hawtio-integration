@@ -10,8 +10,7 @@
     "start": "gulp",
     "build": "gulp build",
     "test": "gulp test",
-    "prepublishOnly": "gulp test",
-    "version": "gulp version"
+    "version": "gulp version && git add -A dist"
   },
   "dependencies": {
     "@hawtio/core-dts": "3.1.0",
@@ -249,8 +248,6 @@
     "core-js": "2.5.3",
     "@types/jqueryui": "1.12.2",
     "@types/jasmine": "2.8.6",
-    "@hawtio/core-dts": "3.1.0",
-    "@hawtio/core": "3.2.25",
     "typescript": "2.8.1",
     "angular-animate": "1.6.10",
     "http-proxy": "1.17.0",
@@ -258,6 +255,7 @@
     "aws4": "1.7.0",
     "stringstream": "0.0.6",
     "yallist": "3.0.2",
-    "follow-redirects": "1.5.0"
+    "follow-redirects": "1.5.0",
+    "@hawtio/core-dts": "3.1.0"
   }
 }
