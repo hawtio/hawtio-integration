@@ -46,12 +46,24 @@ namespace Karaf {
       }
 
       installFeature(feature: Feature): ng.IPromise<string> {
-        return this.jolokiaService.execute(FeaturesService.MBEAN, 'installFeature(java.lang.String, java.lang.String)', feature.name, feature.version);
+        return this.jolokiaService.execute(FeaturesService.MBEAN, 'installFeature(java.lang.String, java.lang.String)', feature.name, feature.version)
+          .catch((error: string) => {
+            // Ignore server error caused by pax-web restarting
+            if (error.indexOf('socket hang up') === -1) {
+              throw error;
+            }
+          });
       }
 
       uninstallFeature(feature: Feature): ng.IPromise<string> {
-        return this.jolokiaService.execute(FeaturesService.MBEAN, 'uninstallFeature(java.lang.String, java.lang.String)', feature.name, feature.version);
-      }
+        return this.jolokiaService.execute(FeaturesService.MBEAN, 'uninstallFeature(java.lang.String, java.lang.String)', feature.name, feature.version)
+          .catch((error: string) => {
+            // Ignore server error caused by pax-web restarting
+            if (error.indexOf('socket hang up') === -1) {
+              throw error;
+            }
+          });
+    }
 
       addFeatureRepository(repositoryUri: string): ng.IPromise<string> {
         return this.jolokiaService.execute(FeaturesService.MBEAN, 'addRepository(java.lang.String)', repositoryUri);
