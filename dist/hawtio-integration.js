@@ -13783,7 +13783,7 @@ var Integration;
     configureAboutPage.$inject = ["aboutService"];
     function configureAboutPage(aboutService) {
         'ngInject';
-        aboutService.addProductInfo('Hawtio Integration', 'PACKAGE_VERSION_PLACEHOLDER');
+        aboutService.addProductInfo('Hawtio Integration', '3.3.0');
     }
     Integration.configureAboutPage = configureAboutPage;
 })(Integration || (Integration = {}));
