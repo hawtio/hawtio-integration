@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@hawtio/core-dts": "3.1.0",
-    "@hawtio/jmx": "~3.2.0",
+    "@hawtio/jmx": "~3.3.0",
     "@types/angular-mocks": "~1.5.11",
     "@types/angular-ui-bootstrap": "~0.13.46",
     "@types/jqueryui": "1.12.0",

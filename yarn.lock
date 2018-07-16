@@ -25,9 +25,9 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@^3.0.0", "@hawtio/core@~3.2.0":
-  version "3.2.26"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.26.tgz#0efc45bec40f21bfc37e045c556e5dbea70b4e6d"
+"@hawtio/core@^3.3.0", "@hawtio/core@~3.3.0":
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.3.1.tgz#6474fcf6b64a6e8f413d0dc1ad0b750827176e23"
   dependencies:
     "@hawtio/core-dts" "3.0.18"
     "@types/angular" "~1.6.0"
@@ -48,21 +48,21 @@
     marked "0.3.9"
     urijs "1.19.0"
 
-"@hawtio/forms@~3.2.0":
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/@hawtio/forms/-/forms-3.2.1.tgz#5486e4c5685b7705ef40aeac89914567cd7f937c"
+"@hawtio/forms@~3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/forms/-/forms-3.3.0.tgz#c0ad3b8fbc57c3f129004353fa125c394ba1848d"
   dependencies:
-    "@hawtio/core" "~3.2.0"
+    "@hawtio/core" "~3.3.0"
     "@hawtio/core-dts" "~3.0.0"
-    "@hawtio/ui" "~3.2.0"
+    "@hawtio/ui" "~3.3.0"
 
-"@hawtio/jmx@~3.2.0":
-  version "3.2.34"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.2.34.tgz#110e8e94debd23298cce0b6e52efa6d9b7740b21"
+"@hawtio/jmx@~3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-3.3.0.tgz#3d93a0bc280ee601a2d7d9a53e808ff373f19afc"
   dependencies:
-    "@hawtio/core" "~3.2.0"
-    "@hawtio/forms" "~3.2.0"
-    "@hawtio/ui" "~3.2.0"
+    "@hawtio/core" "~3.3.0"
+    "@hawtio/forms" "~3.3.0"
+    "@hawtio/ui" "~3.3.0"
     "@types/angular-ui-bootstrap" "~0.13.46"
     angular-resizable "1.2.0"
     patternfly-bootstrap-treeview "2.1.5"
@@ -85,11 +85,11 @@
     underscore.string "^3.3.4"
     urijs "^1.18.10"
 
-"@hawtio/ui@~3.2.0":
-  version "3.2.7"
-  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-3.2.7.tgz#9625556409d28adb021373575f6e0d7401c3ae19"
+"@hawtio/ui@~3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-3.3.0.tgz#5de27626a1276a91b2a876e0f862952570a46114"
   dependencies:
-    "@hawtio/core" "^3.0.0"
+    "@hawtio/core" "^3.3.0"
     "@hawtio/core-dts" "^3.0.0"
     "@types/bootstrap" "3.3.36"
     "@types/clipboard" "1.5.35"
