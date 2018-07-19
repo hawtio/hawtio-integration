@@ -100,9 +100,13 @@ namespace Osgi {
           var newPath = createConfigPidPath($scope, pid);
           $location.path(newPath);
         } else {
-          $scope.editMode = false;
-          $scope.canSave = false;
-          $scope.saved = true;
+          Osgi.getConfigurationProperties(workspace, jolokia, $scope.pid, (response) => {
+            $scope.modelLoaded = false;
+            populateTable(response);
+            $scope.editMode = false;
+            $scope.canSave = false;
+            $scope.saved = true;
+          });
         }
       };
       var callback = Core.onSuccess(completeFn, errorHandler("Failed to update: " + pid));
