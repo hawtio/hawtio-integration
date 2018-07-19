@@ -137,19 +137,19 @@ namespace Camel {
           total += +message.getAttribute("exchangesCompleted");
           total += +message.getAttribute("exchangesFailed");
           messageData.count = total;
-          messageData.last = message.getAttribute("lastProcessingTime");
+          messageData.last = parseInt(message.getAttribute("lastProcessingTime"));
           // delta is only avail from Camel 2.11 onwards
           var delta = message.getAttribute("deltaProcessingTime");
           if (delta) {
-            messageData.delta = delta;
+            messageData.delta = parseInt(delta);
           } else {
             messageData.delta = 0;
           }
-          messageData.mean = message.getAttribute("meanProcessingTime");
-          messageData.min = message.getAttribute("minProcessingTime");
-          messageData.max = message.getAttribute("maxProcessingTime");
-          messageData.total = message.getAttribute("totalProcessingTime");
-          messageData.self = message.getAttribute("selfProcessingTime");
+          messageData.mean = parseInt(message.getAttribute("meanProcessingTime"));
+          messageData.min = parseInt(message.getAttribute("minProcessingTime"));
+          messageData.max = parseInt(message.getAttribute("maxProcessingTime"));
+          messageData.total = parseInt(message.getAttribute("totalProcessingTime"));
+          messageData.self = parseInt(message.getAttribute("selfProcessingTime"));
           updatedData.push(messageData);
         });
 
@@ -173,26 +173,26 @@ namespace Camel {
           total += +message.getAttribute("exchangesCompleted");
           total += +message.getAttribute("exchangesFailed");
           messageData.count = total;
-          messageData.last = message.getAttribute("lastProcessingTime");
+          messageData.last = parseInt(message.getAttribute("lastProcessingTime"));
           // delta is only avail from Camel 2.11 onwards
           var delta = message.getAttribute("deltaProcessingTime");
           if (delta) {
-            messageData.delta = delta;
+            messageData.delta = parseInt(delta);
           } else {
             messageData.delta = 0;
           }
-          messageData.mean = message.getAttribute("meanProcessingTime");
-          messageData.min = message.getAttribute("minProcessingTime");
-          messageData.max = message.getAttribute("maxProcessingTime");
+          messageData.mean = parseInt(message.getAttribute("meanProcessingTime"));
+          messageData.min = parseInt(message.getAttribute("minProcessingTime"));
+          messageData.max = parseInt(message.getAttribute("maxProcessingTime"));
           // total time for processors is pre calculated as accumulated from Camel 2.11 onwards
           var apt = message.getAttribute("accumulatedProcessingTime");
           if (apt) {
-            messageData.total = apt;
+            messageData.total = parseInt(apt);
           } else {
-            messageData.total = "0"
+            messageData.total = 0;
           }
           // self time for processors is their total time
-          messageData.self = message.getAttribute("totalProcessingTime");
+          messageData.self = parseInt(message.getAttribute("totalProcessingTime"));
 
           updatedData.push(messageData);
         });
@@ -214,7 +214,7 @@ namespace Camel {
       camelTreeService.getSelectedRouteId()
         .then(selectedRouteId => {
           var routeMBean = getSelectionRouteMBean(workspace, selectedRouteId);
-    
+
           // schedule update the profile data, based on the configured interval
           if (routeMBean) {
             var query = {
