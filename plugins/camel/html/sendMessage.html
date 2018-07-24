@@ -55,8 +55,7 @@
     </div>
     <div class="form-group">
       <select class="form-control camel-send-message-format" ng-model="codeMirrorOptions.mode.name">
-        <option value="javascript">JSON</option>
-        <option value="xml">XML</option>
+        <option ng-repeat="(key, value) in messageFormats" value="{{key}}">{{value}}</option>
       </select>
       <button class="btn btn-default" ng-click="formatMessage()"
               title="Automatically pretty prints the message so its easier to read">Format
@@ -65,7 +64,8 @@
   </form>
 
   <p>
-    <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()">Send message</button>
+    <button type="button" class="btn btn-primary camel-send-message-button" ng-click="sendMessage()"
+            ng-disabled="messageFieldDisabled">Send message</button>
   </p>
 
 </div>

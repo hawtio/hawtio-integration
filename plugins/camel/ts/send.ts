@@ -6,11 +6,9 @@ namespace Camel {
 
    var DELIVERY_PERSISTENT = "2";
 
-  _module.controller("Camel.SendMessageController", ["$route", "$scope", "$element", "$timeout", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", (
+  _module.controller("Camel.SendMessageController", ["$route", "$scope", "workspace", "jolokia", "localStorage", "$location", "activeMQMessage", (
       $route: angular.route.IRouteService,
       $scope,
-      $element,
-      $timeout: ng.ITimeoutService,
       workspace: Jmx.Workspace,
       jolokia: Jolokia.IJolokia,
       localStorage: Storage,
@@ -21,6 +19,11 @@ namespace Camel {
     $scope.container = {};
     $scope.message = "";
     $scope.headers = [];
+    $scope.messageFormats = {
+      javascript: 'JSON',
+      xml: 'XML'
+    }
+    $scope.messageFieldDisabled = true;
 
     // bind model values to search params...
     Core.bindModelToSearchParam($scope, $location, "tab", "subtab", "compose");
@@ -65,6 +68,9 @@ namespace Camel {
     });
 
     $scope.$on('hawtioEditor_default_instance', (event, codeMirror) => {
+      codeMirror.on("change", (codeMirror) => {
+        $scope.messageFieldDisabled = Core.isBlank(codeMirror.getValue());
+      });
       $scope.codeMirror = codeMirror;
     });
 
@@ -103,7 +109,6 @@ namespace Camel {
     });
 
     var sendWorked = () => {
-      $scope.message = "";
       Core.notification("success", "Message sent!");
     };
 
@@ -115,7 +120,6 @@ namespace Camel {
       var body = $scope.message;
       doSendMessage(body, sendWorked);
     };
-
 
     function doSendMessage(body, onSendCompleteFn) {
       var selection = workspace.selection;
