@@ -10,8 +10,8 @@
     "start": "gulp",
     "build": "gulp build",
     "test": "gulp test",
-    "prepack": "gulp version",
-    "prepublishOnly": "gulp test"
+    "preversion": "gulp test",
+    "prepack": "gulp version"
   },
   "dependencies": {
     "@hawtio/core-dts": "3.1.0",
