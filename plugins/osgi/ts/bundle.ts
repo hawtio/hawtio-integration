@@ -160,7 +160,8 @@ namespace Osgi {
       jolokiaService.execute(getSelectionFrameworkMBean(workspace), 'refreshBundle', bundleId)
         .then((response) => {
           Core.notification('success', notificationMsg);
-          updateTableContents();
+          // delay reloading because some bundles change their state for a moment after a refresh
+          setTimeout(() => updateTableContents(), 2000);
         })
         .catch((error) => {
           Core.notification('danger', error);
