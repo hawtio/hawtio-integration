@@ -59,7 +59,8 @@ namespace Osgi {
         this.bundlesService.refreshBundles(selectedBundles)
           .then(response => {
             Core.notification('success', response);
-            this.loadBundles();
+            // delay reloading because some bundles change their state for a moment after a refresh
+            setTimeout(() => this.loadBundles(), 2000);
           })
           .catch(error => Core.notification('danger', error));
       },
