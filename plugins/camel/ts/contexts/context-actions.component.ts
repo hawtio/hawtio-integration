@@ -7,8 +7,8 @@ namespace Camel {
     context: Context = null;
     unsubscribe;
 
-    constructor(private $scope, private $uibModal, private $timeout: ng.ITimeoutService,
-      private workspace: Jmx.Workspace, private contextsService: ContextsService) {
+    constructor(private $scope, private $uibModal, private workspace: Jmx.Workspace,
+      private contextsService: ContextsService) {
       'ngInject';
     }
 
@@ -25,10 +25,6 @@ namespace Camel {
 
     $onDestroy() {
       this.unsubscribe();
-    }
-
-    isVisible(): boolean {
-      return this.context !== null;
     }
 
     start(): void {
@@ -75,8 +71,8 @@ namespace Camel {
 
   export const contextActionsComponent = <angular.IComponentOptions>{
     template: `
-      <div class="dropdown camel-main-actions" ng-show="$ctrl.isVisible()"
-        hawtio-show object-name-model="$ctrl.context.mbean" method-name="stop" mode="remove">
+      <div class="dropdown camel-main-actions" ng-show="$ctrl.context"
+        hawtio-show object-name-model="$ctrl.context.mbeanName" method-name="stop" mode="remove">
         <button type="button" id="dropdownMenu1" class="btn btn-default dropdown-toggle"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
           <span class="fa" ng-class="{'fa-play': $ctrl.context.isStarted(), 'fa-pause': $ctrl.context.isSuspended()}"></span>

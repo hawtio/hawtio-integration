@@ -4,7 +4,13 @@ namespace Camel {
 
   export class RoutesService {
 
-    constructor(private jolokiaService: JVM.JolokiaService) {
+    private Operation = {
+      START: 'start()',
+      STOP: 'stop()',
+      DELETE: 'remove()'
+    };
+
+    constructor(private jolokiaService: JVM.JolokiaService, private workspace: Jmx.Workspace) {
       'ngInject';
     }
 
@@ -23,7 +29,7 @@ namespace Camel {
     }
 
     startRoutes(routes: Route[]): ng.IPromise<any> {
-      return this.executeOperationOnRoutes('start()', routes);
+      return this.executeOperationOnRoutes(this.Operation.START, routes);
     }
 
     stopRoute(route: Route): ng.IPromise<any> {
@@ -31,7 +37,7 @@ namespace Camel {
     }
 
     stopRoutes(routes: Route[]): ng.IPromise<any> {
-      return this.executeOperationOnRoutes('stop()', routes);
+      return this.executeOperationOnRoutes(this.Operation.STOP, routes);
     }
 
     removeRoute(route: Route): ng.IPromise<any> {
@@ -39,12 +45,28 @@ namespace Camel {
     }
 
     removeRoutes(routes: Route[]): ng.IPromise<any> {
-      return this.executeOperationOnRoutes('remove()', routes);
+      return this.executeOperationOnRoutes(this.Operation.DELETE, routes);
     }
 
-    executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<any> {
+    private executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<any> {
       const objectNames = routes.map(route => route.mbean);
       return this.jolokiaService.executeMany(objectNames, operation);
+    }
+
+    canStartRoutes(routes: Route[]): boolean {
+      return this.canExecuteOperationOnRoutes(this.Operation.START, routes);
+    }
+
+    canStopRoutes(routes: Route[]): boolean {
+      return this.canExecuteOperationOnRoutes(this.Operation.STOP, routes);
+    }
+
+    canDeleteRoutes(routes: Route[]): boolean {
+      return this.canExecuteOperationOnRoutes(this.Operation.DELETE, routes);
+    }
+
+    private canExecuteOperationOnRoutes(operation: string, routes: Route[]): boolean {
+      return _.every(routes, route => this.workspace.hasInvokeRightsForName(route.mbean, operation));
     }
   }
 
