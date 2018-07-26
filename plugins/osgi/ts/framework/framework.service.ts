@@ -5,7 +5,7 @@ namespace Osgi {
 
   export class FrameworkService {
 
-    private static FRAMEWORK_MBEAN_ATTRIBUTES: string[] = [
+    static FRAMEWORK_MBEAN_ATTRIBUTES: string[] = [
       'FrameworkStartLevel',
       'InitialBundleStartLevel'
     ]

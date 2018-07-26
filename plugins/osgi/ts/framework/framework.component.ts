@@ -10,29 +10,45 @@ namespace Osgi {
     private maxBundleStartLevel: number = null;
     private loading: boolean = false;
     private saveInProgress: boolean = false;
+    private canSave: boolean = false;
 
-    constructor(public frameworkService: FrameworkService, public bundlesService: BundlesService) {
+    constructor(
+      public frameworkService: FrameworkService,
+      public bundlesService: BundlesService,
+      private attributesService: Jmx.AttributesService,
+      private workspace: Jmx.Workspace,
+      private $q: ng.IQService,
+    ) {
       'ngInject';
     }
 
     $onInit() {
       this.loading = true;
-
       this.frameworkService.getFramework()
         .then(framework => this.framework = framework)
         .catch(error => Core.notification('danger', error));
 
       this.bundlesService.getBundles()
         .then(bundles => {
-          this.loading = false;
-
           const bundleStartLevels = bundles.filter(bundle => bundle.state === 'active').map(bundle => bundle.startLevel)
           this.maxBundleStartLevel = Math.max.apply(Math, bundleStartLevels);
+        })
+        .then(_ => this.fetchPermissions())
+        .then(permissions => {
+          this.canSave = _.every(permissions);
+          this.loading = false;
         })
         .catch(error => {
           this.loading = false;
           log.error(error);
         });
+    }
+
+    private fetchPermissions(): ng.IPromise<boolean[]> {
+      console.log('fetchPermissions')
+      const mbean = getSelectionFrameworkMBean(this.workspace);
+      return this.$q.all(FrameworkService.FRAMEWORK_MBEAN_ATTRIBUTES
+        .map(attribute => this.attributesService.canInvoke(mbean, attribute, 'Int')))
     }
 
     updateFrameworkConfiguration() {
@@ -58,7 +74,9 @@ namespace Osgi {
       return this.framework === null ||
              this.framework.initialBundleStartLevel === null ||
              this.framework.startLevel === null ||
-             this.saveInProgress === true;
+             this.saveInProgress === true ||
+             // RBAC
+             this.canSave === false;
     }
   }
 

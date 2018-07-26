@@ -1233,7 +1233,7 @@ declare namespace Osgi {
         private $q;
         private workspace;
         private jolokiaService;
-        private static FRAMEWORK_MBEAN_ATTRIBUTES;
+        static FRAMEWORK_MBEAN_ATTRIBUTES: string[];
         constructor($q: ng.IQService, workspace: Jmx.Workspace, jolokiaService: JVM.JolokiaService);
         getFramework(): ng.IPromise<Framework>;
         updateConfiguration(framework: Framework): angular.IPromise<any[]>;
@@ -1243,12 +1243,17 @@ declare namespace Osgi {
     class FrameworkController {
         frameworkService: FrameworkService;
         bundlesService: BundlesService;
+        private attributesService;
+        private workspace;
+        private $q;
         private framework;
         private maxBundleStartLevel;
         private loading;
         private saveInProgress;
-        constructor(frameworkService: FrameworkService, bundlesService: BundlesService);
+        private canSave;
+        constructor(frameworkService: FrameworkService, bundlesService: BundlesService, attributesService: Jmx.AttributesService, workspace: Jmx.Workspace, $q: ng.IQService);
         $onInit(): void;
+        private fetchPermissions();
         updateFrameworkConfiguration(): void;
         saveDisabled(): boolean;
     }
