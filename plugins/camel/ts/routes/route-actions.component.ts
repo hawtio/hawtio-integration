@@ -4,15 +4,18 @@
 namespace Camel {
 
   export class RouteActionsController {
-
     route: Route = null;
+    unsubscribe;
 
-    constructor(private $scope, private $uibModal, private $timeout: ng.ITimeoutService,
-      private workspace: Jmx.Workspace, private routesService: RoutesService) {
+    constructor(private $scope, private $uibModal, private workspace: Jmx.Workspace,
+      private routesService: RoutesService) {
       'ngInject';
-      $scope.$on('jmxTreeClicked', (event, selectedNode) => {
-        if (workspace.isRoute()) {
-          routesService.getRoute(selectedNode.objectName)
+    }
+    
+    $onInit() {
+      this.unsubscribe = this.$scope.$on(Jmx.TreeEvent.NodeSelected, (event, selectedNode: Jmx.NodeSelection) => {
+        if (this.workspace.isRoute()) {
+          this.routesService.getRoute(selectedNode.objectName)
             .then(route => this.route = route);
         } else {
           this.route = null;
@@ -20,8 +23,8 @@ namespace Camel {
       });
     }
 
-    isVisible(): boolean {
-      return this.route !== null;
+    $onDestroy() {
+      this.unsubscribe();
     }
 
     start(): void {
@@ -68,7 +71,7 @@ namespace Camel {
 
   export const routeActionsComponent = <angular.IComponentOptions>{
     template: `
-      <div class="dropdown camel-main-actions" ng-show="$ctrl.isVisible()"
+      <div class="dropdown camel-main-actions" ng-show="$ctrl.route"
         hawtio-show object-name-model="$ctrl.route.mbean" method-name="stop" mode="remove">
         <button type="button" id="dropdownMenu1" class="btn btn-default dropdown-toggle"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

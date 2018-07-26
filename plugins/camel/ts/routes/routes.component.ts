@@ -59,18 +59,7 @@ namespace Camel {
       isDisabled: true
     }
 
-    toolbarConfig = {
-      actionsConfig: {
-        primaryActions: [
-          this.startAction,
-          this.stopAction
-        ],
-        moreActions: [
-          this.deleteAction
-        ]
-      },
-      isTableView: true
-    };
+    toolbarConfig = null;
 
     tableConfig = {
       selectionMatchProp: "name",
@@ -91,7 +80,32 @@ namespace Camel {
     }
 
     $onInit() {
-      this.loadRoutes();
+      this.loadRoutes()
+        .then(() => this.configureToolbar());
+    }
+
+    private configureToolbar(): void {
+      const primaryActions = [];
+      const moreActions = [];
+      if (this.routesService.canStartRoutes(this.routes)) {
+        primaryActions.push(this.startAction);
+      }
+      if (this.routesService.canStopRoutes(this.routes)) {
+        primaryActions.push(this.stopAction);
+      }
+      if (this.routesService.canDeleteRoutes(this.routes)) {
+        moreActions.push(this.deleteAction);
+      }
+      log.debug("RBAC - Rendered routes actions:", primaryActions.concat(moreActions));
+      if (primaryActions.length > 0 || moreActions.length > 0) {
+        this.toolbarConfig = {
+          actionsConfig: {
+            primaryActions: primaryActions,
+            moreActions: moreActions
+          },
+          isTableView: true
+        };
+      }
     }
 
     private getSelectedRoutes() {
@@ -105,13 +119,13 @@ namespace Camel {
       this.deleteAction.isDisabled = !selectedRoutes.every((route: Route) => route.state === 'Stopped');
     }
 
-    private loadRoutes() {
-      this.treeService.getSelectedMBean()
+    private loadRoutes(): ng.IPromise<Route[]> {
+      return this.treeService.getSelectedMBean()
         .then(mbean => {
           if (mbean.children) {
             let children = mbean.children.filter(node => {return node.objectName != null})
             let mbeanNames = _.map(children, node => node.objectName);
-            this.routesService.getRoutes(mbeanNames)
+            return this.routesService.getRoutes(mbeanNames)
               .then(routes => this.routes = routes);
           }
         });
@@ -149,7 +163,9 @@ namespace Camel {
       <h2>Routes</h2>
       <p ng-if="!$ctrl.routes">Loading...</p>
       <div ng-if="$ctrl.routes">
-        <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+        <div ng-if="$ctrl.toolbarConfig">
+          <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+        </div>
         <div ng-if="$ctrl.showTable">
           <pf-table-view config="$ctrl.tableConfig" columns="$ctrl.tableColumns" items="$ctrl.routes"></pf-table-view>
         </div>
