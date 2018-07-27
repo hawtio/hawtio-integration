@@ -194,15 +194,13 @@ declare namespace Camel {
     class ContextActionsController {
         private $scope;
         private $uibModal;
-        private $timeout;
         private workspace;
         private contextsService;
         context: Context;
         unsubscribe: any;
-        constructor($scope: any, $uibModal: any, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, contextsService: ContextsService);
+        constructor($scope: any, $uibModal: any, workspace: Jmx.Workspace, contextsService: ContextsService);
         $onInit(): void;
         $onDestroy(): void;
-        isVisible(): boolean;
         start(): void;
         suspend(): void;
         delete(): void;
@@ -415,7 +413,9 @@ declare namespace Camel {
 declare namespace Camel {
     class RoutesService {
         private jolokiaService;
-        constructor(jolokiaService: JVM.JolokiaService);
+        private workspace;
+        private Operation;
+        constructor(jolokiaService: JVM.JolokiaService, workspace: Jmx.Workspace);
         getRoute(objectName: string): ng.IPromise<Route>;
         getRoutes(objectNames: string[]): ng.IPromise<Route[]>;
         startRoute(route: Route): ng.IPromise<any>;
@@ -424,7 +424,11 @@ declare namespace Camel {
         stopRoutes(routes: Route[]): ng.IPromise<any>;
         removeRoute(route: Route): ng.IPromise<any>;
         removeRoutes(routes: Route[]): ng.IPromise<any>;
-        executeOperationOnRoutes(operation: string, routes: Route[]): ng.IPromise<any>;
+        private executeOperationOnRoutes(operation, routes);
+        canStartRoutes(routes: Route[]): boolean;
+        canStopRoutes(routes: Route[]): boolean;
+        canDeleteRoutes(routes: Route[]): boolean;
+        private canExecuteOperationOnRoutes(operation, routes);
     }
 }
 declare namespace Camel {
@@ -437,21 +441,7 @@ declare namespace Camel {
         private startAction;
         private stopAction;
         private deleteAction;
-        toolbarConfig: {
-            actionsConfig: {
-                primaryActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                    isDisabled: boolean;
-                }[];
-                moreActions: {
-                    name: string;
-                    actionFn: (action: any) => void;
-                    isDisabled: boolean;
-                }[];
-            };
-            isTableView: boolean;
-        };
+        toolbarConfig: any;
         tableConfig: {
             selectionMatchProp: string;
             onCheckBoxChange: (item: any) => void;
@@ -464,6 +454,7 @@ declare namespace Camel {
         showTable: boolean;
         constructor($timeout: ng.ITimeoutService, $uibModal: any, workspace: Jmx.Workspace, treeService: Jmx.TreeService, routesService: RoutesService);
         $onInit(): void;
+        private configureToolbar();
         private getSelectedRoutes();
         private enableDisableActions();
         private loadRoutes();
@@ -477,12 +468,13 @@ declare namespace Camel {
     class RouteActionsController {
         private $scope;
         private $uibModal;
-        private $timeout;
         private workspace;
         private routesService;
         route: Route;
-        constructor($scope: any, $uibModal: any, $timeout: ng.ITimeoutService, workspace: Jmx.Workspace, routesService: RoutesService);
-        isVisible(): boolean;
+        unsubscribe: any;
+        constructor($scope: any, $uibModal: any, workspace: Jmx.Workspace, routesService: RoutesService);
+        $onInit(): void;
+        $onDestroy(): void;
         start(): void;
         stop(): void;
         delete(): void;

@@ -21,11 +21,11 @@ namespace Camel {
       this.$scope.$on('jmxTreeUpdated', () => this.populateTree());
       this.populateTree();
     }
-    
+
     treeFetched(): boolean {
       return this.workspace.treeFetched;
     }
-    
+
     private updateSelectionFromURL(): void {
       Jmx.updateTreeSelectionFromURLAndAutoSelect(this.$location, $(treeElementId), (first: Jmx.Folder) => {
         // use function to auto select first Camel context routes if there is only one Camel context
@@ -53,6 +53,12 @@ namespace Camel {
           this.removeTree();
           Jmx.enableTree(this.$scope, this.$location, this.workspace, $(treeElementId), [rootFolder]);
           this.updateSelectionFromURL();
+        } else {
+          // No camel contexts so redirect to the JMX view and select the first tree node
+          if (tree.children && tree.children.length > 0) {
+            const firstNode = tree.children[0];
+            this.$location.path('/jmx/attributes').search({'nid': firstNode['id']});
+          }
         }
       }
     }

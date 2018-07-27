@@ -60,7 +60,7 @@ namespace Camel {
           .then(response => {
             Core.notification('success', 'Camel context deleted successfully');
             this.context = null;
-            this.workspace.removeAndSelectParentNode();
+            this.workspace.loadTree();
           });
       })
       .catch(error => {
