@@ -115,13 +115,13 @@ namespace Camel {
           this.repaintTable();
         });
     }
-    
+
     private removeSelectedContexts() {
       _.remove(this.contexts, context => context.selected);
       this.workspace.loadTree();
       this.enableDisableActions();
     }
-    
+
     // This is a hack to keep the 'select all' checkbox working after starting/suspending contexts
     private repaintTable() {
       this.showTable = false;
