@@ -65,7 +65,7 @@ namespace ActiveMQ {
 
     mainNavService.addItem({
       title: 'ActiveMQ',
-      href: '/activemq',
+      basePath: '/activemq',
       template: '<activemq></activemq>',
       isValid: () => workspace.treeContainsDomainAndProperties(jmxDomain) && activeMQNavigationService.getTabs().length > 0
     });

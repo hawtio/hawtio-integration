@@ -26,8 +26,8 @@
     "@types/jquery" "~2.0.46"
 
 "@hawtio/core@^4.0.0":
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.0.4.tgz#03083bf002026e26fba33d4d5003e9d19618ff33"
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.0.9.tgz#ed97736c7c6720d9ded7968e2d8e856b73bd8f4a"
   dependencies:
     "@hawtio/core-dts" "3.0.18"
     "@types/angular" "*"
@@ -56,8 +56,8 @@
     "@hawtio/ui" "^4.0.0"
 
 "@hawtio/jmx@~4.0.0":
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.0.5.tgz#7bfd9a6eda3a10474c4793b1aca804a3fd899a63"
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.0.7.tgz#8c669d21168282f725380d8b1a7f6fec819a7f63"
   dependencies:
     "@hawtio/core" "^4.0.0"
     "@hawtio/forms" "^4.0.0"
@@ -113,14 +113,14 @@
     "@types/angular" "*"
 
 "@types/angular-ui-bootstrap@~0.13.46":
-  version "0.13.46"
-  resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-0.13.46.tgz#67b2bc2801cdaec515567840c9d82cc649c34656"
+  version "0.13.47"
+  resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-0.13.47.tgz#e9fd4baf09dd98ff2b868ed00474310b2a66fa37"
   dependencies:
     "@types/angular" "*"
 
 "@types/angular@*":
-  version "1.6.48"
-  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.48.tgz#e8f77bf41d00d3293421cbaaed2bafb4d5f399f9"
+  version "1.6.49"
+  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.49.tgz#8a5dd666100155d27cda9801f961360eb24b8d96"
 
 "@types/bootstrap@3.3.36":
   version "3.3.36"
@@ -203,8 +203,8 @@
     "@types/geojson" "*"
 
 "@types/d3-hierarchy@*":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@types/d3-hierarchy/-/d3-hierarchy-1.1.2.tgz#63a4e433f321ffc4dbd9aa05ff95962072b51993"
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@types/d3-hierarchy/-/d3-hierarchy-1.1.3.tgz#c5364aac0ff4491fc78f73b7c0d546b57b561230"
 
 "@types/d3-interpolate@*":
   version "1.2.0"
@@ -221,8 +221,8 @@
   resolved "https://registry.yarnpkg.com/@types/d3-polygon/-/d3-polygon-1.0.6.tgz#db25c630a2afb9191fe51ba61dd37baee9dd44c7"
 
 "@types/d3-quadtree@*":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@types/d3-quadtree/-/d3-quadtree-1.0.5.tgz#1ce1e659eae4530df0cb127f297f1741a367a82e"
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@types/d3-quadtree/-/d3-quadtree-1.0.6.tgz#45da9e603688ba90eedd3d40f6e504764e06e493"
 
 "@types/d3-queue@*":
   version "3.0.6"
@@ -460,8 +460,8 @@ angular-mocks@~1.7.1:
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.7.2.tgz#8a2bc7a7ce355697a48ab00e548b88e78f71fa52"
 
 angular-patternfly@^4.0.0:
-  version "4.18.3"
-  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.18.3.tgz#9b070203df7a066f0958d7c922a543e776ff789e"
+  version "4.18.4"
+  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.18.4.tgz#91c33ac364bafb09923d307eaf23adecacc0bf8f"
   dependencies:
     angular "1.5.*"
     angular-animate "1.5.*"
@@ -3906,8 +3906,8 @@ patternfly-bootstrap-treeview@2.1.5, patternfly-bootstrap-treeview@~2.1.0:
     jquery ">= 2.1.x"
 
 patternfly@^3.37.1:
-  version "3.52.2"
-  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.52.2.tgz#09d0db457fef15dc8987897feb299dbad0397443"
+  version "3.54.1"
+  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.54.1.tgz#a0f8b52076aa405486e77ecb504460b1ff35fe92"
   dependencies:
     bootstrap "~3.3.7"
     font-awesome "^4.7.0"

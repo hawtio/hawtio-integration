@@ -37,7 +37,7 @@ namespace Osgi {
 
     mainNavService.addItem({
       title: 'OSGi',
-      href: '/osgi',
+      basePath: '/osgi',
       template: '<osgi></osgi>',
       isValid: () => workspace.treeContainsDomainAndProperties("osgi.core")
     });

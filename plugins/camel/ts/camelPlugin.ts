@@ -99,7 +99,7 @@ namespace Camel {
 
     mainNavService.addItem({
       title: 'Camel',
-      href: '/camel',
+      basePath: '/camel',
       template: '<camel></camel>',
       isValid: () => workspace.treeContainsDomainAndProperties(jmxDomain)
     });
