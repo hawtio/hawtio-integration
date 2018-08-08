@@ -222,8 +222,7 @@ namespace Osgi {
         } else {
           let reason = $scope.row.Headers["DynamicImport-Package"];
           if (reason !== undefined) {
-            reason = reason.Value;
-            $scope.row.ImportData[pkg].headers = { reason: 'Imported due to ' + reason.Value };
+            $scope.row.ImportData[pkg].headers = { reason: 'Imported due to DynamicImport-Package=' + reason.Value };
           }
         }
         // Delete data so we can see whether there are any unbound optional imports left...
