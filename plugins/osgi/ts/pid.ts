@@ -4,9 +4,8 @@
 
 namespace Osgi {
 
-  _module.controller("Osgi.PidController", ["$scope", "$timeout", "$routeParams", "$location", "workspace", "jolokia", "$uibModal", (
+  _module.controller("Osgi.PidController", ["$scope", "$routeParams", "$location", "workspace", "jolokia", "$uibModal", (
     $scope,
-    $timeout: ng.ITimeoutService,
     $routeParams: angular.route.IRouteParamsService,
     $location: ng.ILocationService,
     workspace: Jmx.Workspace,
@@ -125,7 +124,7 @@ namespace Osgi {
           text = value.toString();
         }
         if (angular.isDefined(text)) {
-          data[decodeKey(key, $scope.pid)] = text;
+          data[decodeKey(key)] = text;
         }
       });
 
@@ -303,7 +302,7 @@ namespace Osgi {
         angular.forEach(metaType.attributes, (attribute) => {
           var id = attribute.id;
           if (isValidProperty(id)) {
-            var key = encodeKey(id, pid);
+            var key = encodeKey(id);
             var typeName = asJsonSchemaType(attribute.typeName, attribute.id);
             var attributeProperties = {
               title: attribute.name,
@@ -378,7 +377,7 @@ namespace Osgi {
       var entity = {};
       angular.forEach($scope.configValues, (value, rawKey: string) => {
         if (isValidProperty(rawKey)) {
-          var key = encodeKey(rawKey, pid);
+          var key = encodeKey(rawKey);
           //comply with Forms.safeIdentifier in 'forms/js/formHelpers.ts'
           key = convertToSafeFormsIdentifier(key);
           var attrValue = value;
@@ -473,12 +472,16 @@ namespace Osgi {
       return id && ignorePropertyIds.indexOf(id) < 0;
     }
 
-    function encodeKey(key, pid) {
-      return key.replace(/\./g, "__");
+    function encodeKey(key) {
+      return key
+        .replace(/\./g, "__")
+        .replace(/^(\d)/, '_$1');
     }
 
-    function decodeKey(key, pid) {
-      return key.replace(/__/g, ".");
+    function decodeKey(key) {
+      return key
+        .replace(/__/g, ".")
+        .replace(/^_(\d)/, '$1');
     }
 
     function asJsonSchemaType(typeName, id) {
