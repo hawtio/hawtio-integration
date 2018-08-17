@@ -5,11 +5,6 @@
 version: 2
 jobs:
   build:
-    branches:
-      only:
-        - master
-        - 3.x-redhat
-
     docker:
       # specify the version you desire here
       - image: circleci/node:8-browsers
