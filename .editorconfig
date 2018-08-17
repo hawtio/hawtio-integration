@@ -1,8 +1,7 @@
-# http://EditorConfig.org
-
-# top-most EditorConfig file
 root = true
 
-[*.{html,ts,js,json,css,less}]
+[*]
+end_of_line = lf
+insert_final_newline = true
 indent_style = space
 indent_size = 2
