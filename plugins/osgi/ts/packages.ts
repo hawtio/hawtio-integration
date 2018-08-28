@@ -74,7 +74,7 @@ namespace Osgi {
             Version: value.Version,
             LastModified: value.LastModified,
             Location: value.Location,
-            Url: Core.url("/osgi/bundle/" + value.Identifier + workspace.hash())
+            Url: Core.url("/osgi/bundles/" + value.Identifier + workspace.hash())
           };
           if (value.Headers['Bundle-Name']) {
             obj.Name = value.Headers['Bundle-Name']['Value'];

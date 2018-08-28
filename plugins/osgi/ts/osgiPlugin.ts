@@ -7,29 +7,28 @@
 
 namespace Osgi {
 
-  export const _module = angular.module(pluginName, [
-    'infinite-scroll',
-    bundlesModule,
-    frameworkModule
-  ])
-  .component('osgi', osgiComponent);
+  export const _module = angular
+    .module(pluginName, [
+      'infinite-scroll',
+      bundlesModule,
+      frameworkModule
+    ])
+    .component('osgi', osgiComponent);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
-            .when('/osgi/bundles', {template: '<bundles></bundles>'})
-            .when('/osgi/bundle/:bundleId', {templateUrl: 'plugins/osgi/html/bundle.html'})
-            .when('/osgi/services', {templateUrl: 'plugins/osgi/html/services.html'})
-            .when('/osgi/packages', {templateUrl: 'plugins/osgi/html/packages.html'})
-            .when('/osgi/configurations', {templateUrl: 'plugins/osgi/html/configurations.html'})
-            .when('/osgi/pid/:pid/:factoryPid', {templateUrl: 'plugins/osgi/html/pid.html'})
-            .when('/osgi/pid/:pid', {templateUrl: 'plugins/osgi/html/pid.html'})
-            .when('/osgi/fwk', {template: '<framework></framework>'});
+      .when('/osgi/bundles', { template: '<bundles></bundles>' })
+      .when('/osgi/bundles/:bundleId', { templateUrl: 'plugins/osgi/html/bundle.html' })
+      .when('/osgi/services', { templateUrl: 'plugins/osgi/html/services.html' })
+      .when('/osgi/packages', { templateUrl: 'plugins/osgi/html/packages.html' })
+      .when('/osgi/configurations', { templateUrl: 'plugins/osgi/html/configurations.html' })
+      .when('/osgi/configurations/pid/:pid/:factoryPid', { templateUrl: 'plugins/osgi/html/pid.html' })
+      .when('/osgi/configurations/pid/:pid', { templateUrl: 'plugins/osgi/html/pid.html' })
+      .when('/osgi/fwk', { template: '<framework></framework>' });
   }]);
 
-  _module.run(["mainNavService", "workspace", "helpRegistry", (
-      mainNavService: Nav.MainNavService,
-      workspace: Jmx.Workspace,
-      helpRegistry) => {
+  _module.run(["mainNavService", "workspace", "helpRegistry", (mainNavService: Nav.MainNavService,
+    workspace: Jmx.Workspace, helpRegistry) => {
 
     helpRegistry.addUserDoc('osgi', 'plugins/osgi/doc/help.md', () => {
       return workspace.treeContainsDomainAndProperties("osgi.core");

@@ -38,7 +38,7 @@
 <h2>Dependencies</h2>
 <ul class="list-unstyled">
   <li ng-repeat="feature in row.Dependencies">
-    <a href='osgi/feature/{{feature.Name}}/{{feature.Version}}'>{{feature.Name}}/{{feature.Version}}</a>
+    <a href='osgi/features/{{feature.Name}}/{{feature.Version}}'>{{feature.Name}}/{{feature.Version}}</a>
   </li>
 </ul>
 
@@ -46,7 +46,7 @@
 <ul class="list-unstyled">
   <li ng-repeat="bundle in row.BundleDetails">
     <div ng-switch="bundle.Installed">
-      <a ng-switch-when="true" href='osgi/bundle/{{bundle.Identifier}}'>{{bundle.Location}}</a>
+      <a ng-switch-when="true" href='osgi/bundles/{{bundle.Identifier}}'>{{bundle.Location}}</a>
       <span ng-switch-default>{{bundle.Location}}</span>
     </div>
   </li>
@@ -62,7 +62,7 @@
   </thead>
   <tbody>
     <tr ng-repeat="(pid, value) in row.Configurations">
-      <td><a href="osgi/pid/{{value.Pid}}">{{value.Pid}}</a></td>
+      <td><a href="osgi/configurations/pid/{{value.Pid}}">{{value.Pid}}</a></td>
       <td>
         <ul class="list-unstyled">
           <li ng-repeat="(key, value) in value.Elements">{{key}} = {{value.Value}}</li>

@@ -9,7 +9,7 @@ namespace Osgi {
 
     $scope.services = null;
     $scope.filteredServices = [];
-    
+
     $scope.toolbarConfig = {
       filterConfig: {
         fields: [
@@ -60,7 +60,7 @@ namespace Osgi {
     function updateResultCount() {
       $scope.toolbarConfig.filterConfig.resultsCount = $scope.filteredServices.length;
     }
-    
+
     var populateTable = function (response) {
       var services = Osgi.defaultServiceValues(workspace, $scope, response.value);
       augmentServicesInfo(services);
@@ -78,17 +78,17 @@ namespace Osgi {
             Version: value.Version,
             LastModified: value.LastModified,
             Location: value.Location,
-            Url: Core.url("/osgi/bundle/" + value.Identifier + workspace.hash())
+            Url: Core.url("/osgi/bundles/" + value.Identifier + workspace.hash())
           };
           if (value.Headers['Bundle-Name']) {
             obj.Name = value.Headers['Bundle-Name']['Value'];
           }
           bundleMap[obj.Identifier] = obj;
         });
-        
+
         var servicesArray = [];
         angular.forEach(services, function (s, key) {
-          s.Url = Core.url("/osgi/bundle/" + s.Identifier + workspace.hash())
+          s.Url = Core.url("/osgi/bundles/" + s.Identifier + workspace.hash())
           angular.forEach(s["UsingBundles"], function (b, key) {
             s["UsingBundles"][key] = bundleMap[b];
           });
@@ -96,9 +96,9 @@ namespace Osgi {
         });
         $scope.services = servicesArray;
         $scope.toolbarConfig.filterConfig.totalCount = servicesArray.length;
-        
+
         applyFilters($scope.toolbarConfig.filterConfig.appliedFilters);
-        updateResultCount(); 
+        updateResultCount();
 
         Core.$apply($scope);
       };

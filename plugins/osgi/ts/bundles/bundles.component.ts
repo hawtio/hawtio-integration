@@ -155,7 +155,7 @@ namespace Osgi {
     };
 
     private readonly tableColumns = [
-      { header: 'ID', itemField: 'id', templateFn: value => `<a href="osgi/bundle/${value}">${value}</a>` },
+      { header: 'ID', itemField: 'id', templateFn: value => `<a href="osgi/bundles/${value}">${value}</a>` },
       { header: 'State', itemField: 'state' },
       { header: 'Name', itemField: 'name' },
       { header: 'Symbolic Name', itemField: 'symbolicName' },

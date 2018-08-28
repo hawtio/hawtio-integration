@@ -64,7 +64,7 @@ namespace Karaf {
   }
 
   export function featureLinks(workspace, name, version) {
-    return  "<a href='" + Core.url("#/karaf/feature/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
+    return  "<a href='" + Core.url("#/karaf/features/" + name + "/" + version + workspace.hash()) + "'>" + version + "</a>";
   }
 
   export function extractFeature(attributes, name, version) {
@@ -320,7 +320,7 @@ namespace Karaf {
             if (!folder) {
               folder = child.navigate("features");
             }
-          });        
+          });
         }
       }
       if (folder) {
@@ -381,5 +381,5 @@ namespace Karaf {
   export function getSelectionScrMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
     return Osgi.runWhenTreeReady(() => getSelectionScrMBean(workspace), workspace, $q);
   }
-  
+
 }

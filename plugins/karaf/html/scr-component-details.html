@@ -2,7 +2,7 @@
   <div class="col-sm-12">
     <form class="toolbar-pf-actions">
       <div class="form-group">
-        <button class="btn btn-default" 
+        <button class="btn btn-default"
                 ng-click="$ctrl.enableComponent()"
                 ng-disabled="$ctrl.disableComponentEnable()"
                 hawtio-show
@@ -10,7 +10,7 @@
                 method-name="enableComponent">
           Enable
         </button>
-        <button class="btn btn-default" 
+        <button class="btn btn-default"
                 ng-click="$ctrl.disableComponent()"
                 ng-disabled="$ctrl.disableComponentDisable()"
                 hawtio-show
@@ -31,7 +31,7 @@
       <dt ng-if="$ctrl.component.id >= 0">ID</dt>
       <dd ng-if="$ctrl.component.id >= 0">{{$ctrl.component.id}}</dd>
       <dt>Bundle ID</dt>
-      <dd><a ng-href="osgi/bundle/{{$ctrl.component.bundleId}}">{{$ctrl.component.bundleId}}</a></dd>
+      <dd><a ng-href="osgi/bundles/{{$ctrl.component.bundleId}}">{{$ctrl.component.bundleId}}</a></dd>
       <dt>Name</dt>
       <dd>{{$ctrl.component.name}}</dd>
       <dt>State</dt>

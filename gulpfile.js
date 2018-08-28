@@ -3,23 +3,17 @@ let argv = require('yargs').argv;
 let concat = require('gulp-concat');
 let del = require('del');
 let eventStream = require('event-stream');
-let fs = require('fs');
 let gulp = require('gulp');
-let gulpif = require('gulp-if');
-let gulpLoadPlugins = require('gulp-load-plugins');
 let hawtio = require('@hawtio/node-backend');
 let less = require('gulp-less');
 let logger = require('js-logger');
 let ngAnnotate = require('gulp-ng-annotate');
 let path = require('path');
 let rename = require("gulp-rename");
-let sequence = require('run-sequence');
-let sourcemaps = require('gulp-sourcemaps');
+let replace = require("gulp-replace");
 let typescript = require('gulp-typescript');
 let Server = require('karma').Server;
 let packageJson = require('./package.json');
-
-const plugins  = gulpLoadPlugins({});
 
 const config = {
   proxyPort: argv.port || 8181,
@@ -41,22 +35,20 @@ const config = {
 
 const tsProject = typescript.createProject('tsconfig.json');
 
-gulp.task('tsc', function() {
+gulp.task('tsc', function () {
   var tsResult = tsProject.src()
-    .pipe(gulpif(config.sourceMap, sourcemaps.init()))
     .pipe(tsProject());
 
   return eventStream.merge(
     tsResult.js
       .pipe(ngAnnotate())
-      .pipe(gulpif(config.sourceMap, sourcemaps.write()))
       .pipe(gulp.dest('.')),
     tsResult.dts
       .pipe(rename(config.dts))
       .pipe(gulp.dest(config.dist)));
 });
 
-gulp.task('template', ['tsc'], function() {
+gulp.task('template', ['tsc'], function () {
   return gulp.src(config.templates)
     .pipe(angularTemplatecache({
       filename: 'templates.js',
@@ -68,13 +60,13 @@ gulp.task('template', ['tsc'], function() {
     .pipe(gulp.dest('.'));
 });
 
-gulp.task('concat', ['template'], function() {
+gulp.task('concat', ['template'], function () {
   return gulp.src([config.vendorJs, 'compiled.js', 'templates.js'])
     .pipe(concat(config.js))
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('clean', ['concat'], function() {
+gulp.task('clean', ['concat'], function () {
   del(['templates.js', 'compiled.js']);
 });
 
@@ -92,16 +84,16 @@ gulp.task('less', function () {
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('copy-images', function() {
+gulp.task('copy-images', function () {
   return gulp.src(config.srcImg)
     .pipe(gulp.dest(config.distImg));
 });
 
-gulp.task('watch-less', function() {
+gulp.task('watch-less', function () {
   gulp.watch(config.less, ['less']);
 });
 
-gulp.task('watch', ['build', 'watch-less'], function() {
+gulp.task('watch', ['build', 'watch-less'], function () {
   gulp.watch(['index.html', config.dist + '*'], ['reload']);
 
   const tsconfig = require('./tsconfig.json');
@@ -109,7 +101,7 @@ gulp.task('watch', ['build', 'watch-less'], function() {
     ['tsc', 'template', 'concat', 'clean']);
 });
 
-gulp.task('connect', ['watch'], function() {
+gulp.task('connect', ['watch'], function () {
   hawtio.setConfig({
     logLevel: config.logLevel,
     port: 2772,
@@ -128,7 +120,7 @@ gulp.task('connect', ['watch'], function() {
       enabled: true
     }
   });
-  hawtio.use('/', function(req, res, next) {
+  hawtio.use('/', function (req, res, next) {
     var path = req.originalUrl;
     if (path === '/') {
       res.redirect('/integration');
@@ -146,14 +138,14 @@ gulp.task('connect', ['watch'], function() {
       next();
     }
   });
-  hawtio.listen(function(server) {
+  hawtio.listen(function (server) {
     var host = server.address().address;
     var port = server.address().port;
     console.log("started from gulp file at ", host, ":", port);
   });
 });
 
-gulp.task('reload', function() {
+gulp.task('reload', function () {
   gulp.src('.')
     .pipe(hawtio.reload());
 });
@@ -164,9 +156,9 @@ gulp.task('test', ['build'], function (done) {
   }, done).start();
 });
 
-gulp.task('version', function() {
+gulp.task('version', function () {
   gulp.src(config.dist + config.js)
-    .pipe(plugins.replace('PACKAGE_VERSION_PLACEHOLDER', packageJson.version))
+    .pipe(replace('PACKAGE_VERSION_PLACEHOLDER', packageJson.version))
     .pipe(gulp.dest(config.dist));
 });
 

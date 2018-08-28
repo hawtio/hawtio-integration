@@ -81,7 +81,7 @@ namespace Osgi {
     angular.forEach(values, (row) => {
       var map = {};
       map["Pid"] = row[0];
-      map["PidLink"] = "<a href='" + Core.url("/osgi/pid/" + row[0] + workspace.hash()) + "'>" + row[0] + "</a>";
+      map["PidLink"] = "<a href='" + Core.url("/osgi/configurations/pid/" + row[0] + workspace.hash()) + "'>" + row[0] + "</a>";
       map["Bundle"] = row[1];
       array.push(map);
     });
@@ -196,7 +196,7 @@ namespace Osgi {
       .filter(value => allValues.hasOwnProperty(value))
       .map(value => ({
         label: allValues[value].SymbolicName,
-        url: Core.url("/osgi/bundle/" + value + workspace.hash())
+        url: Core.url("/osgi/bundles/" + value + workspace.hash())
       }));
   }
 
@@ -208,7 +208,7 @@ namespace Osgi {
       if (answer.length > 0) {
         prefix = " ";
       }
-      answer += prefix + "<a href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>Bundle " + value + "</a>";
+      answer += prefix + "<a href='" + Core.url("/osgi/bundles/" + value + workspace.hash()) + "'>Bundle " + value + "</a>";
     });
     return answer;
   }
@@ -216,7 +216,7 @@ namespace Osgi {
   export function bundleUrls(workspace, values) {
     var answer = [];
     angular.forEach(values, function (value, key) {
-      answer.push(Core.url("/osgi/bundle/" + value + workspace.hash()));
+      answer.push(Core.url("/osgi/bundles/" + value + workspace.hash()));
     });
     return answer;
   }
@@ -228,7 +228,7 @@ namespace Osgi {
       if (answer.length > 0) {
         prefix = " ";
       }
-      answer += prefix + "<a href='" + Core.url("/osgi/bundle/" + value + workspace.hash()) + "'>" + value + "</a>";
+      answer += prefix + "<a href='" + Core.url("/osgi/bundles/" + value + workspace.hash()) + "'>" + value + "</a>";
     });
     return answer;
   }
@@ -299,7 +299,7 @@ namespace Osgi {
   export function getSelectionFrameworkMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
     return runWhenTreeReady(() => getSelectionFrameworkMBean(workspace), workspace, $q);
   }
-  
+
   export function getSelectionServiceMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       // lets navigate to the tree item based on paths
@@ -338,7 +338,7 @@ namespace Osgi {
   export function getSelectionConfigAdminMBeanAsync(workspace: Jmx.Workspace, $q: ng.IQService): ng.IPromise<string> {
     return runWhenTreeReady(() => getSelectionConfigAdminMBean(workspace), workspace, $q);
   }
-  
+
   export function getMetaTypeMBean(workspace: Jmx.Workspace):string {
     if (workspace) {
       var mbeanTypesToDomain = workspace.mbeanTypesToDomain;
@@ -397,7 +397,7 @@ namespace Osgi {
       var configPage = isFactory ? "/newConfiguration/" : "/configuration/";
       return "/wiki/branch/" + versionId + configPage + link + "/" + $scope.pageId;
     } else {
-      return "osgi/pid/" + link;
+      return "osgi/configurations/pid/" + link;
     }
   }
 
