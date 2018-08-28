@@ -7,10 +7,10 @@
     <li class="page-title">
       {{zkPid || metaType.name || pid}}
     </li>
-  </ol>  
-  
+  </ol>
+
   <pf-toolbar config="toolbarConfig"></pf-toolbar>
-  
+
   <div ng-hide="editMode">
     <div class="row config-admin-form view">
       <div class="col-sm-12">
@@ -18,7 +18,7 @@
       </div>
     </div>
   </div>
-  
+
   <div ng-show="editMode">
     <div class="row config-admin-form edit">
       <div ng-show="newPid" class="col-sm-12 new-config-name-form">
@@ -38,7 +38,7 @@
         </form>
       </div>
       <div class="col-sm-12">
-        <div simple-form name="pidEditor" mode='edit' entity='entity' data='schema' schema="fullSchema" onSubmit="pidSave()"></div>
+        <div simple-form class="pid-form" name="pidEditor" mode='edit' entity='entity' data='schema' schema="fullSchema" onSubmit="pidSave()"></div>
       </div>
     </div>
     <div class="row">
