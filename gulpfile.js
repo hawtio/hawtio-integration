@@ -16,7 +16,6 @@ let Server = require('karma').Server;
 let packageJson = require('./package.json');
 
 const config = {
-  proxyPort: argv.port || 8181,
   targetPath: argv.path || '/hawtio/jolokia',
   logLevel: argv.debug ? logger.DEBUG : logger.INFO,
   templates: ['plugins/**/*.html', 'plugins/**/*.md'],
@@ -107,7 +106,6 @@ gulp.task('connect', ['watch'], function () {
     port: 2772,
     proxy: '/integration/proxy',
     staticProxies: [{
-      port: config.proxyPort,
       path: '/integration/jolokia',
       targetPath: config.targetPath
     }],

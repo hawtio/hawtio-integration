@@ -56,8 +56,8 @@
     "@hawtio/ui" "^4.0.0"
 
 "@hawtio/jmx@~4.0.0":
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.0.8.tgz#f0141aac5528588c94a09020edfd3abd2e8fdc95"
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.0.9.tgz#12c1864a4e972f227d49e439ed5addfe4a526d46"
   dependencies:
     "@hawtio/core" "^4.0.0"
     "@hawtio/forms" "^4.0.0"
@@ -107,8 +107,8 @@
     "@types/angular" "*"
 
 "@types/angular-route@*":
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/@types/angular-route/-/angular-route-1.3.5.tgz#78b8e0b069d5efe55ec7072461f4e2f6ae20767b"
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@types/angular-route/-/angular-route-1.7.0.tgz#ba12d09df1aac3c88e3684500001daedfc97fb69"
   dependencies:
     "@types/angular" "*"
 
@@ -488,8 +488,8 @@ angular-resizable@1.2.0:
   resolved "https://registry.yarnpkg.com/angular-resizable/-/angular-resizable-1.2.0.tgz#9dd29af008f8b54abfc051bd269a8f0b4fe43f1a"
 
 angular-route@~1.7.0:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.7.1.tgz#8e2c1ce1d01b0d9b944692de7eba900b9a3ec451"
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.7.3.tgz#245c7ea7d18514c1d08201588092db7df210e7c6"
 
 angular-sanitize@1.5.*, angular-sanitize@1.7.3, angular-sanitize@~1.7.0:
   version "1.7.3"
