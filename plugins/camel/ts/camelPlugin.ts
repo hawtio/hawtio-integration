@@ -25,41 +25,42 @@ namespace Camel {
     treeModule,
     typeConvertersModule
   ])
-  .component('camel', camelComponent)
-  .component('camelNavigation', camelNavigationComponent)
-  .service('camelTreeService', CamelTreeService)
-  .service('camelNavigationService', CamelNavigationService);
+    .component('camel', camelComponent)
+    .component('camelNavigation', camelNavigationComponent)
+    .service('camelTreeService', CamelTreeService)
+    .service('camelNavigationService', CamelNavigationService);
 
   _module.config(["$routeProvider", ($routeProvider) => {
     $routeProvider
-            .when('/camel/attributes', {templateUrl: 'plugins/jmx/html/attributes/attributes.html'})
-            .when('/camel/operations', {template: '<operations></operations>'})
-            .when('/camel/charts', {templateUrl: 'plugins/jmx/html/charts.html'})
-            .when('/camel/chartEdit', {templateUrl: 'plugins/jmx/html/chartEdit.html'})
-            .when('/camel/contexts', {template: '<contexts></contexts>'})
-            .when('/camel/routes', {template: '<routes></routes>'})
-            .when('/camel/endpoints', {template: '<endpoints></endpoints>'})
-            .when('/camel/browseEndpoint', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
-            .when('/camel/endpoint/browse/:contextId/*endpointPath', {templateUrl: 'plugins/camel/html/browseEndpoint.html'})
-            .when('/camel/createEndpoint', {templateUrl: 'plugins/camel/html/createEndpoint.html'})
-            .when('/camel/route/diagram/:contextId/:routeId', {templateUrl: 'plugins/camel/html/routeDiagram.html'})
-            .when('/camel/routeDiagram', {templateUrl: 'plugins/camel/html/routeDiagram.html'})
-            .when('/camel/typeConverter', {template: '<type-converters></type-converters>'})
-            .when('/camel/restServices', {templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false})
-            .when('/camel/endpoints-statistics', {template: '<endpoints-statistics></endpoints-statistics>'})
-            .when('/camel/routeMetrics', {templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false})
-            .when('/camel/exchanges', {template: '<exchanges></exchanges>'})
-            .when('/camel/sendMessage', {templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false})
-            .when('/camel/traceRoute', {templateUrl: 'plugins/camel/html/traceRoute.html'})
-            .when('/camel/debugRoute', {templateUrl: 'plugins/camel/html/debug.html'})
-            .when('/camel/profileRoute', {templateUrl: 'plugins/camel/html/profileRoute.html'})
-            .when('/camel/propertiesRoute', {templateUrl: 'plugins/camel/html/propertiesRoute.html'})
-            .when('/camel/propertiesComponent', {templateUrl: 'plugins/camel/html/propertiesComponent.html'})
-            .when('/camel/propertiesDataFormat', {templateUrl: 'plugins/camel/html/propertiesDataFormat.html'})
-            .when('/camel/propertiesEndpoint', {templateUrl: 'plugins/camel/html/propertiesEndpoint.html'});
+      .when('/camel/attributes', { templateUrl: 'plugins/jmx/html/attributes/attributes.html' })
+      .when('/camel/operations', { template: '<operations></operations>' })
+      .when('/camel/charts', { templateUrl: 'plugins/jmx/html/charts.html' })
+      .when('/camel/chartEdit', { templateUrl: 'plugins/jmx/html/chartEdit.html' })
+      .when('/camel/contexts', { template: '<contexts></contexts>' })
+      .when('/camel/routes', { template: '<routes></routes>' })
+      .when('/camel/endpoints', { template: '<endpoints></endpoints>' })
+      .when('/camel/browseEndpoint', { templateUrl: 'plugins/camel/html/browseEndpoint.html' })
+      .when('/camel/endpoint/browse/:contextId/*endpointPath', { templateUrl: 'plugins/camel/html/browseEndpoint.html' })
+      .when('/camel/createEndpoint', { templateUrl: 'plugins/camel/html/createEndpoint.html' })
+      .when('/camel/route/diagram/:contextId/:routeId', { templateUrl: 'plugins/camel/html/routeDiagram.html' })
+      .when('/camel/routeDiagram', { templateUrl: 'plugins/camel/html/routeDiagram.html' })
+      .when('/camel/source', { templateUrl: 'plugins/camel/html/source.html' })
+      .when('/camel/typeConverter', { template: '<type-converters></type-converters>' })
+      .when('/camel/restServices', { templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false })
+      .when('/camel/endpoints-statistics', { template: '<endpoints-statistics></endpoints-statistics>' })
+      .when('/camel/routeMetrics', { templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false })
+      .when('/camel/exchanges', { template: '<exchanges></exchanges>' })
+      .when('/camel/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false })
+      .when('/camel/traceRoute', { templateUrl: 'plugins/camel/html/traceRoute.html' })
+      .when('/camel/debugRoute', { templateUrl: 'plugins/camel/html/debug.html' })
+      .when('/camel/profileRoute', { templateUrl: 'plugins/camel/html/profileRoute.html' })
+      .when('/camel/propertiesRoute', { templateUrl: 'plugins/camel/html/propertiesRoute.html' })
+      .when('/camel/propertiesComponent', { templateUrl: 'plugins/camel/html/propertiesComponent.html' })
+      .when('/camel/propertiesDataFormat', { templateUrl: 'plugins/camel/html/propertiesDataFormat.html' })
+      .when('/camel/propertiesEndpoint', { templateUrl: 'plugins/camel/html/propertiesEndpoint.html' });
   }]);
 
-  _module.factory('tracerStatus',function () {
+  _module.factory('tracerStatus', function () {
     return {
       messages: []
     };
@@ -68,7 +69,7 @@ namespace Camel {
   _module.filter('camelIconClass', () => iconClass);
 
   _module.factory('activeMQMessage', () => {
-      return { 'message' : null}
+    return { 'message': null }
   });
 
   // service for the codehale metrics
@@ -83,12 +84,12 @@ namespace Camel {
   }]);
 
   _module.run(["mainNavService", "workspace", "jolokia", "helpRegistry", "preferencesRegistry", "$rootScope", (
-      mainNavService: Nav.MainNavService,
-      workspace: Jmx.Workspace,
-      jolokia: Jolokia.IJolokia,
-      helpRegistry,
-      preferencesRegistry: Core.PreferencesRegistry,
-      $rootScope: ng.IRootScopeService) => {
+    mainNavService: Nav.MainNavService,
+    workspace: Jmx.Workspace,
+    jolokia: Jolokia.IJolokia,
+    helpRegistry,
+    preferencesRegistry: Core.PreferencesRegistry,
+    $rootScope: ng.IRootScopeService) => {
 
     helpRegistry.addUserDoc('camel', 'plugins/camel/doc/help.md', () => {
       return workspace.treeContainsDomainAndProperties(jmxDomain);
@@ -107,7 +108,8 @@ namespace Camel {
     // register default attribute views
     var stateField = 'State';
     var stateTemplate = '<div class="ngCellText pagination-centered" title="{{row.getProperty(col.field)}}"><i class="{{row.getProperty(\'' + stateField + '\') | camelIconClass}}"></i></div>';
-    var stateColumn = {field: stateField, displayName: stateField,
+    var stateColumn = {
+      field: stateField, displayName: stateField,
       cellTemplate: stateTemplate,
       width: 56,
       minWidth: 56,
@@ -120,121 +122,121 @@ namespace Camel {
     var attributes = workspace.attributeColumnDefs;
     attributes[jmxDomain + "/context/folder"] = [
       stateColumn,
-      {field: 'CamelId', displayName: 'Context'},
-      {field: 'Uptime', displayName: 'Uptime', visible: false},
-      {field: 'CamelVersion', displayName: 'Version', visible: false},
-      {field: 'ExchangesCompleted', displayName: 'Completed'},
-      {field: 'ExchangesFailed', displayName: 'Failed'},
-      {field: 'FailuresHandled', displayName: 'Failed Handled', visible: false},
-      {field: 'ExchangesTotal', displayName: 'Total', visible: false},
-      {field: 'Redeliveries', displayName: 'Redelivery', visible: false},
-      {field: 'ExchangesInflight', displayName: 'Inflight'},
-      {field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false},
-      {field: 'MeanProcessingTime', displayName: 'Mean Time'},
-      {field: 'MinProcessingTime', displayName: 'Min Time'},
-      {field: 'MaxProcessingTime', displayName: 'Max Time'},
-      {field: 'TotalProcessingTime', displayName: 'Total Time', visible: false},
-      {field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false},
-      {field: 'LastProcessingTime', displayName: 'Last Time', visible: false},
-      {field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false},
-      {field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false},
-      {field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false},
-      {field: 'StartedRoutes', displayName: 'Started Routes'},
-      {field: 'TotalRoutes', displayName: 'Total Routes'}
+      { field: 'CamelId', displayName: 'Context' },
+      { field: 'Uptime', displayName: 'Uptime', visible: false },
+      { field: 'CamelVersion', displayName: 'Version', visible: false },
+      { field: 'ExchangesCompleted', displayName: 'Completed' },
+      { field: 'ExchangesFailed', displayName: 'Failed' },
+      { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
+      { field: 'ExchangesTotal', displayName: 'Total', visible: false },
+      { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+      { field: 'ExchangesInflight', displayName: 'Inflight' },
+      { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
+      { field: 'MeanProcessingTime', displayName: 'Mean Time' },
+      { field: 'MinProcessingTime', displayName: 'Min Time' },
+      { field: 'MaxProcessingTime', displayName: 'Max Time' },
+      { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
+      { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
+      { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
+      { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
+      { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
+      { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false },
+      { field: 'StartedRoutes', displayName: 'Started Routes' },
+      { field: 'TotalRoutes', displayName: 'Total Routes' }
     ];
     attributes[jmxDomain + "/routes/folder"] = [
       stateColumn,
-      {field: 'CamelId', displayName: 'Context'},
-      {field: 'RouteId', displayName: 'Route'},
-      {field: 'ExchangesCompleted', displayName: 'Completed'},
-      {field: 'ExchangesFailed', displayName: 'Failed'},
-      {field: 'FailuresHandled', displayName: 'Failed Handled', visible: false},
-      {field: 'Redeliveries', displayName: 'Redelivery', visible: false},
-      {field: 'ExchangesTotal', displayName: 'Total', visible: false},
-      {field: 'ExchangesInflight', displayName: 'Inflight'},
-      {field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false},
-      {field: 'MeanProcessingTime', displayName: 'Mean Time'},
-      {field: 'MinProcessingTime', displayName: 'Min Time'},
-      {field: 'MaxProcessingTime', displayName: 'Max Time'},
-      {field: 'TotalProcessingTime', displayName: 'Total Time', visible: false},
-      {field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false},
-      {field: 'LastProcessingTime', displayName: 'Last Time', visible: false},
-      {field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false},
-      {field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false},
-      {field: 'Redeliveries', displayName: 'Redelivery', visible: false},
-      {field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false}
+      { field: 'CamelId', displayName: 'Context' },
+      { field: 'RouteId', displayName: 'Route' },
+      { field: 'ExchangesCompleted', displayName: 'Completed' },
+      { field: 'ExchangesFailed', displayName: 'Failed' },
+      { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
+      { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+      { field: 'ExchangesTotal', displayName: 'Total', visible: false },
+      { field: 'ExchangesInflight', displayName: 'Inflight' },
+      { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
+      { field: 'MeanProcessingTime', displayName: 'Mean Time' },
+      { field: 'MinProcessingTime', displayName: 'Min Time' },
+      { field: 'MaxProcessingTime', displayName: 'Max Time' },
+      { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
+      { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
+      { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
+      { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
+      { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
+      { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+      { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false }
     ];
     attributes[jmxDomain + "/processors/folder"] = [
       stateColumn,
-      {field: 'CamelId', displayName: 'Context'},
-      {field: 'RouteId', displayName: 'Route'},
-      {field: 'ProcessorId', displayName: 'Processor'},
-      {field: 'ExchangesCompleted', displayName: 'Completed'},
-      {field: 'ExchangesFailed', displayName: 'Failed'},
-      {field: 'FailuresHandled', displayName: 'Failed Handled', visible: false},
-      {field: 'Redeliveries', displayName: 'Redelivery', visible: false},
-      {field: 'ExchangesTotal', displayName: 'Total', visible: false},
-      {field: 'ExchangesInflight', displayName: 'Inflight'},
-      {field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false},
-      {field: 'MeanProcessingTime', displayName: 'Mean Time'},
-      {field: 'MinProcessingTime', displayName: 'Min Time'},
-      {field: 'MaxProcessingTime', displayName: 'Max Time'},
-      {field: 'TotalProcessingTime', displayName: 'Total Time', visible: false},
-      {field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false},
-      {field: 'LastProcessingTime', displayName: 'Last Time', visible: false},
-      {field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false},
-      {field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false},
-      {field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false}
+      { field: 'CamelId', displayName: 'Context' },
+      { field: 'RouteId', displayName: 'Route' },
+      { field: 'ProcessorId', displayName: 'Processor' },
+      { field: 'ExchangesCompleted', displayName: 'Completed' },
+      { field: 'ExchangesFailed', displayName: 'Failed' },
+      { field: 'FailuresHandled', displayName: 'Failed Handled', visible: false },
+      { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
+      { field: 'ExchangesTotal', displayName: 'Total', visible: false },
+      { field: 'ExchangesInflight', displayName: 'Inflight' },
+      { field: 'OldestInflightDuration', displayName: 'Oldest Inflight Time', visible: false },
+      { field: 'MeanProcessingTime', displayName: 'Mean Time' },
+      { field: 'MinProcessingTime', displayName: 'Min Time' },
+      { field: 'MaxProcessingTime', displayName: 'Max Time' },
+      { field: 'TotalProcessingTime', displayName: 'Total Time', visible: false },
+      { field: 'DeltaProcessingTime', displayName: 'Delta Time', visible: false },
+      { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
+      { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
+      { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
+      { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false }
     ];
     attributes[jmxDomain + "/components/folder"] = [
       stateColumn,
-      {field: 'CamelId', displayName: 'Context'},
-      {field: 'ComponentName', displayName: 'Name'}
+      { field: 'CamelId', displayName: 'Context' },
+      { field: 'ComponentName', displayName: 'Name' }
     ];
     attributes[jmxDomain + "/consumers/folder"] = [
       stateColumn,
-      {field: 'CamelId', displayName: 'Context'},
-      {field: 'RouteId', displayName: 'Route'},
-      {field: 'EndpointUri', displayName: 'Endpoint URI', width: "**"},
-      {field: 'Suspended', displayName: 'Suspended', resizable: false},
-      {field: 'InflightExchanges', displayName: 'Inflight'}
+      { field: 'CamelId', displayName: 'Context' },
+      { field: 'RouteId', displayName: 'Route' },
+      { field: 'EndpointUri', displayName: 'Endpoint URI', width: "**" },
+      { field: 'Suspended', displayName: 'Suspended', resizable: false },
+      { field: 'InflightExchanges', displayName: 'Inflight' }
     ];
     attributes[jmxDomain + "/producers/folder"] = [
       stateColumn,
-      {field: 'CamelId', displayName: 'Context'},
-      {field: 'RouteId', displayName: 'Route'},
-      {field: 'EndpointUri', displayName: 'Endpoint URI', width: "**"},
-      {field: 'Suspended', displayName: 'Suspended', resizable: false}
+      { field: 'CamelId', displayName: 'Context' },
+      { field: 'RouteId', displayName: 'Route' },
+      { field: 'EndpointUri', displayName: 'Endpoint URI', width: "**" },
+      { field: 'Suspended', displayName: 'Suspended', resizable: false }
     ];
     attributes[jmxDomain + "/services/folder"] = [
       stateColumn,
-      {field: 'CamelId', displayName: 'Context'},
-      {field: 'RouteId', displayName: 'Route'},
-      {field: 'Suspended', displayName: 'Suspended', resizable: false},
-      {field: 'SupportsSuspended', displayName: 'Can Suspend', resizable: false}
+      { field: 'CamelId', displayName: 'Context' },
+      { field: 'RouteId', displayName: 'Route' },
+      { field: 'Suspended', displayName: 'Suspended', resizable: false },
+      { field: 'SupportsSuspended', displayName: 'Can Suspend', resizable: false }
     ];
     attributes[jmxDomain + "/endpoints/folder"] = [
       stateColumn,
-      {field: 'CamelId', displayName: 'Context'},
-      {field: 'EndpointUri', displayName: 'Endpoint URI', width: "***"},
-      {field: 'Singleton', displayName: 'Singleton', resizable: false }
+      { field: 'CamelId', displayName: 'Context' },
+      { field: 'EndpointUri', displayName: 'Endpoint URI', width: "***" },
+      { field: 'Singleton', displayName: 'Singleton', resizable: false }
     ];
     attributes[jmxDomain + "/threadpools/folder"] = [
-      {field: 'Id', displayName: 'Id', width: "**"},
-      {field: 'ActiveCount', displayName: 'Active'},
-      {field: 'PoolSize', displayName: 'Pool Size'},
-      {field: 'CorePoolSize', displayName: 'Core Pool Size'},
-      {field: 'TaskQueueSize', displayName: 'Task Queue Size'},
-      {field: 'TaskCount', displayName: 'Task'},
-      {field: 'CompletedTaskCount', displayName: 'Completed Task'}
+      { field: 'Id', displayName: 'Id', width: "**" },
+      { field: 'ActiveCount', displayName: 'Active' },
+      { field: 'PoolSize', displayName: 'Pool Size' },
+      { field: 'CorePoolSize', displayName: 'Core Pool Size' },
+      { field: 'TaskQueueSize', displayName: 'Task Queue Size' },
+      { field: 'TaskCount', displayName: 'Task' },
+      { field: 'CompletedTaskCount', displayName: 'Completed Task' }
     ];
     attributes[jmxDomain + "/errorhandlers/folder"] = [
-      {field: 'CamelId', displayName: 'Context'},
-      {field: 'DeadLetterChannel', displayName: 'Dead Letter'},
-      {field: 'DeadLetterChannelEndpointUri', displayName: 'Endpoint URI', width: "**", resizable: true},
-      {field: 'MaximumRedeliveries', displayName: 'Max Redeliveries'},
-      {field: 'RedeliveryDelay', displayName: 'Redelivery Delay'},
-      {field: 'MaximumRedeliveryDelay', displayName: 'Max Redeliveries Delay'}
+      { field: 'CamelId', displayName: 'Context' },
+      { field: 'DeadLetterChannel', displayName: 'Dead Letter' },
+      { field: 'DeadLetterChannelEndpointUri', displayName: 'Endpoint URI', width: "**", resizable: true },
+      { field: 'MaximumRedeliveries', displayName: 'Max Redeliveries' },
+      { field: 'RedeliveryDelay', displayName: 'Redelivery Delay' },
+      { field: 'MaximumRedeliveryDelay', displayName: 'Max Redeliveries Delay' }
     ];
 
     workspace.addNamedTreePostProcessor('camel', (tree: Jmx.Folder) => {

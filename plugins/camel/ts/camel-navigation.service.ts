@@ -3,7 +3,8 @@ namespace Camel {
   export class CamelNavigationService {
     private hasRestServices: boolean;
 
-    constructor(private workspace: Jmx.Workspace, private jolokia: Jolokia.IJolokia) {
+    constructor(private workspace: Jmx.Workspace, private jolokia: Jolokia.IJolokia,
+      private configManager: Core.ConfigManager) {
       'ngInject';
       this.hasRestServices = Camel.hasRestServices(workspace, jolokia);
     }
@@ -56,6 +57,11 @@ namespace Camel {
 
       if ((isRoute || isRoutesFolder) && canDumpRoutesAsXml) {
         tabs.push(new Nav.HawtioTab('Route Diagram', '/camel/routeDiagram'));
+      }
+
+      if (!isEndpoint && !isEndpointsFolder && (isRoute || isRoutesFolder) && canDumpRoutesAsXml &&
+        this.configManager.isRouteEnabled('/camel/source')) {
+        tabs.push(new Nav.HawtioTab('Source', '/camel/source'));
       }
 
       if (isRoute || isRouteNode(this.workspace)) {
