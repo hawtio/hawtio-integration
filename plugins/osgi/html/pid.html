@@ -9,7 +9,14 @@
     </li>
   </ol>
 
-  <pf-toolbar config="toolbarConfig"></pf-toolbar>
+  <hawtio-action-bar>
+    <button type="button" class="btn btn-default" ng-click="addProperty()" ng-if="hasRightsToAddProperty">
+      Add property
+    </button>
+    <button type="button" class="btn btn-default" ng-click="editProperties()" ng-if="hasRightsToEditProperties" ng-disabled="isEditPropertiesDisabled">
+      Edit properties
+    </button>
+  </hawtio-action-bar>
 
   <div ng-hide="editMode">
     <div class="row config-admin-form view">

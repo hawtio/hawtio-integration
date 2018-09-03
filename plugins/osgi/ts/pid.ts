@@ -37,47 +37,25 @@ namespace Osgi {
     $scope.modelLoaded = false;
     $scope.canSave = false;
 
-    const addPropertyAction = {
-      name: 'Add property',
-      actionFn: action => {
-        $scope.propertyKeyErrorMsg = null;
-        uibModalInstance = $uibModal.open({
-          templateUrl: 'addPropertyDialog.html',
-          scope: $scope
-        });
+    $scope.addProperty = action => {
+      $scope.propertyKeyErrorMsg = null;
+      uibModalInstance = $uibModal.open({
+        templateUrl: 'addPropertyDialog.html',
+        scope: $scope
+      });
+    }
+
+    $scope.editProperties = action => {
+      if (Object.keys($scope.entity).length > 0) {
+        $scope.editMode = true;
       }
     }
 
-    const editPropertiesAction = {
-      name: 'Edit properties',
-      actionFn: action => {
-        if (Object.keys($scope.entity).length > 0) {
-          $scope.editMode = true;
-        }
-      },
-      isDisabled: true
-    }
-
-    $scope.toolbarConfig = {
-      actionsConfig: {
-        primaryActions: toolbarActions()
-      }
-    }
-
-    function toolbarActions(): any[] {
-      let actions = [];
-      let hawtioConfigAdminMBean = getHawtioConfigAdminMBean(workspace);
-      let configAdminMBean = getSelectionConfigAdminMBean(workspace);
-      if (workspace.hasInvokeRightsForName(configAdminMBean, 'createFactoryConfiguration')
-        && workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
-        actions.push(addPropertyAction);
-      }
-      if (workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
-        actions.push(editPropertiesAction);
-      }
-      log.debug("RBAC - Rendered pid actions:", actions);
-      return actions;
-    }
+    let hawtioConfigAdminMBean = getHawtioConfigAdminMBean(workspace);
+    let configAdminMBean = getSelectionConfigAdminMBean(workspace);
+    $scope.hasRightsToAddProperty = workspace.hasInvokeRightsForName(configAdminMBean, 'createFactoryConfiguration')
+      && workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate');
+    $scope.hasRightsToEditProperties = workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate');
 
     var startInEditMode = $scope.factoryPid && !$routeParams['pid'];
     $scope.editMode = startInEditMode;
@@ -424,7 +402,7 @@ namespace Osgi {
         }
       });
 
-      editPropertiesAction.isDisabled = Object.keys(entity).length === 0;
+      $scope.isEditPropertiesDisabled = Object.keys(entity).length === 0;
 
       //log.info("default values: " + angular.toJson($scope.defaultValues));
       $scope.entity = entity;

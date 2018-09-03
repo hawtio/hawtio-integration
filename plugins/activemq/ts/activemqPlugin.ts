@@ -25,22 +25,22 @@ namespace ActiveMQ {
     .service('activeMQNavigationService', ActiveMQNavigationService)
     .run(configurePlugin);
 
-  function defineRoutes(configManager: Core.ConfigManager): void {
+  function defineRoutes($routeProvider: angular.route.IRouteProvider): void {
     'ngInject';
-    configManager.
-      addRoute('/activemq/attributes',         {templateUrl: 'plugins/jmx/html/attributes/attributes.html'}).
-      addRoute('/activemq/operations',         {template:    '<operations></operations>'}).
-      addRoute('/activemq/charts',             {templateUrl: 'plugins/jmx/html/charts.html'}).
-      addRoute('/activemq/chartEdit',          {templateUrl: 'plugins/jmx/html/chartEdit.html'}).
-      addRoute('/activemq/browseQueue',        {templateUrl: 'plugins/activemq/html/browseQueue.html'}).
-      addRoute('/activemq/createDestination',  {template:    '<create-destination></create-destination>'}).
-      addRoute('/activemq/deleteQueue',        {template:    '<delete-queue></delete-queue>'}).
-      addRoute('/activemq/deleteTopic',        {template:    '<delete-topic></delete-topic>'}).
-      addRoute('/activemq/sendMessage',        {templateUrl: 'plugins/camel/html/sendMessage.html'}).
-      addRoute('/activemq/durableSubscribers', {templateUrl: 'plugins/activemq/html/durableSubscribers.html'}).
-      addRoute('/activemq/jobs',               {templateUrl: 'plugins/activemq/html/jobs.html'}).
-      addRoute('/activemq/queues',             {templateUrl: 'plugins/activemq/html/destinations.html', controller: 'queuesController'}).
-      addRoute('/activemq/topics',             {templateUrl: 'plugins/activemq/html/destinations.html', controller: 'topicsController'});
+    $routeProvider.
+      when('/activemq/attributes',         {templateUrl: 'plugins/jmx/html/attributes/attributes.html'}).
+      when('/activemq/operations',         {template:    '<operations></operations>'}).
+      when('/activemq/charts',             {templateUrl: 'plugins/jmx/html/charts.html'}).
+      when('/activemq/chartEdit',          {templateUrl: 'plugins/jmx/html/chartEdit.html'}).
+      when('/activemq/browseQueue',        {templateUrl: 'plugins/activemq/html/browseQueue.html'}).
+      when('/activemq/createDestination',  {template:    '<create-destination></create-destination>'}).
+      when('/activemq/deleteQueue',        {template:    '<delete-queue></delete-queue>'}).
+      when('/activemq/deleteTopic',        {template:    '<delete-topic></delete-topic>'}).
+      when('/activemq/sendMessage',        {templateUrl: 'plugins/camel/html/sendMessage.html'}).
+      when('/activemq/durableSubscribers', {templateUrl: 'plugins/activemq/html/durableSubscribers.html'}).
+      when('/activemq/jobs',               {templateUrl: 'plugins/activemq/html/jobs.html'}).
+      when('/activemq/queues',             {templateUrl: 'plugins/activemq/html/destinations.html', controller: 'queuesController'}).
+      when('/activemq/topics',             {templateUrl: 'plugins/activemq/html/destinations.html', controller: 'topicsController'});
   }
 
   function configurePlugin(
