@@ -5,12 +5,14 @@ let del = require('del');
 let eventStream = require('event-stream');
 let gulp = require('gulp');
 let hawtio = require('@hawtio/node-backend');
+let If = require('gulp-if');
 let less = require('gulp-less');
 let logger = require('js-logger');
 let ngAnnotate = require('gulp-ng-annotate');
 let path = require('path');
 let rename = require("gulp-rename");
 let replace = require("gulp-replace");
+let sourcemaps = require('gulp-sourcemaps');
 let typescript = require('gulp-typescript');
 let Server = require('karma').Server;
 let packageJson = require('./package.json');
@@ -28,6 +30,7 @@ const config = {
   sourceMap: argv.sourcemap,
   vendorJs: './vendor/**/*.js',
   vendorCss: './vendor/**/*.css',
+  sourceMap: argv.sourcemap,
   srcImg: './img/**/*',
   distImg: './dist/img',
 };
@@ -36,11 +39,13 @@ const tsProject = typescript.createProject('tsconfig.json');
 
 gulp.task('tsc', function () {
   var tsResult = tsProject.src()
+    .pipe(If(config.sourceMap, sourcemaps.init()))
     .pipe(tsProject());
 
   return eventStream.merge(
     tsResult.js
       .pipe(ngAnnotate())
+      .pipe(If(config.sourceMap, sourcemaps.write()))
       .pipe(gulp.dest('.')),
     tsResult.dts
       .pipe(rename(config.dts))
