@@ -55,7 +55,7 @@ namespace ActiveMQ {
 
   export class ActiveMQNavigationService {
 
-    constructor(private workspace: Jmx.Workspace, private configManager: Core.ConfigManager) {
+    constructor(private workspace: Jmx.Workspace) {
       'ngInject';
     }
 
@@ -63,8 +63,8 @@ namespace ActiveMQ {
       const tabs = [];
 
       let enabledRoutes = Object.keys(TAB_CONFIG)
-        .map(config => {return TAB_CONFIG[config].route})
-        .filter(route => {return _.startsWith(route, '/activemq') && this.configManager.isRouteEnabled(route)});
+        .map(config => TAB_CONFIG[config].route)
+        .filter(route => _.startsWith(route, '/activemq'));
 
       if (enabledRoutes.length > 0) {
         tabs.push(new Nav.HawtioTab(TAB_CONFIG.attributes.title, TAB_CONFIG.attributes.route));
@@ -112,53 +112,49 @@ namespace ActiveMQ {
     }
 
     private shouldShowBrowseTab() {
-      return this.configManager.isRouteEnabled(TAB_CONFIG.browse.route) && this.isQueue() &&
-        this.workspace.hasInvokeRights(this.workspace.selection, 'browse()');
+      return this.isQueue() && this.workspace.hasInvokeRights(this.workspace.selection, 'browse()');
     }
 
     private shouldShowSendTab() {
-      return this.configManager.isRouteEnabled(TAB_CONFIG.sendMessage.route) && (this.isQueue() || this.isTopic()) &&
-      this.workspace.hasInvokeRights(this.workspace.selection, 'sendTextMessage(java.util.Map,java.lang.String,java.lang.String,java.lang.String)');
+      return (this.isQueue() || this.isTopic()) &&
+        this.workspace.hasInvokeRights(this.workspace.selection, 'sendTextMessage(java.util.Map,java.lang.String,java.lang.String,java.lang.String)');
     }
 
     private shouldShowDurableSubscribersTab() {
-      return this.configManager.isRouteEnabled(TAB_CONFIG.durableSubscribers.route) && this.isBroker();
+      return this.isBroker();
     }
 
     private shouldShowJobsTab() {
-      return this.configManager.isRouteEnabled(TAB_CONFIG.jobs.route) && this.isJobScheduler();
+      return this.isJobScheduler();
     }
 
     private shouldShowCreateTab() {
-      return this.configManager.isRouteEnabled(TAB_CONFIG.createDestination.route) && this.isBroker() &&
-        this.workspace.hasInvokeRights(this.getBroker(), 'addQueue', 'addTopic');
+      return this.isBroker() && this.workspace.hasInvokeRights(this.getBroker(), 'addQueue', 'addTopic');
     }
 
     private shouldShowDeleteTopicTab() {
-      return this.configManager.isRouteEnabled(TAB_CONFIG.deleteTopic.route) && this.isTopic() &&
-        this.workspace.hasInvokeRights(this.getBroker(), 'removeTopic');
+      return this.isTopic() && this.workspace.hasInvokeRights(this.getBroker(), 'removeTopic');
     }
 
     private shouldShowDeleteQueueTab() {
-      return this.configManager.isRouteEnabled(TAB_CONFIG.deleteQueue.route) && this.isQueue() &&
-        this.workspace.hasInvokeRights(this.getBroker(), 'removeQueue');
+      return this.isQueue() && this.workspace.hasInvokeRights(this.getBroker(), 'removeQueue');
     }
 
     private shouldShowQueuesTab() {
-      return this.configManager.isRouteEnabled(TAB_CONFIG.queues.route) && this.isBroker();
+      return this.isBroker();
     }
 
     private shouldShowTopicsTab() {
-      return this.configManager.isRouteEnabled(TAB_CONFIG.topics.route) && this.isBroker();
+      return this.isBroker();
     }
 
     private isQueue() {
-      return this.workspace.hasDomainAndProperties(jmxDomain, {'destinationType': 'Queue'}, 4) ||
+      return this.workspace.hasDomainAndProperties(jmxDomain, { 'destinationType': 'Queue' }, 4) ||
         this.workspace.selectionHasDomainAndType(jmxDomain, 'Queue');
     }
 
     private isTopic() {
-      return this.workspace.hasDomainAndProperties(jmxDomain, {'destinationType': 'Topic'}, 4) || this.workspace.selectionHasDomainAndType(jmxDomain, 'Topic');
+      return this.workspace.hasDomainAndProperties(jmxDomain, { 'destinationType': 'Topic' }, 4) || this.workspace.selectionHasDomainAndType(jmxDomain, 'Topic');
     }
 
     private isQueuesFolder() {
@@ -170,7 +166,7 @@ namespace ActiveMQ {
     }
 
     private isJobScheduler() {
-        return this.workspace.hasDomainAndProperties(jmxDomain, {'service': 'JobScheduler'}, 4);
+      return this.workspace.hasDomainAndProperties(jmxDomain, { 'service': 'JobScheduler' }, 4);
     }
 
     private isBroker() {
@@ -186,8 +182,8 @@ namespace ActiveMQ {
       var answer: Jmx.Folder = null;
       var selection = this.workspace.selection;
       if (selection) {
-        answer = <Jmx.Folder> selection.findAncestor((current: Jmx.Folder) => {
-          var entries = <any> current.entries;
+        answer = <Jmx.Folder>selection.findAncestor((current: Jmx.Folder) => {
+          var entries = <any>current.entries;
           if (entries) {
             return (('type' in entries && entries.type === 'Broker') && 'brokerName' in entries && !('destinationName' in entries) && !('destinationType' in entries))
           } else {
