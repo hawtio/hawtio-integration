@@ -9,7 +9,8 @@
     ]
   },
   "include": [
-    "plugins/**/*.ts"
+    "plugins/**/*.ts",
+    "node_modules/jolokia.js/index.d.ts"
   ],
   "exclude": [
     "plugins/**/*.spec.ts"
