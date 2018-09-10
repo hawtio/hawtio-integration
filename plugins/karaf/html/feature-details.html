@@ -37,13 +37,20 @@
 
 <h2>Dependencies</h2>
 <ul class="list-unstyled">
-  <li ng-repeat="feature in row.Dependencies">
-    <a href='osgi/features/{{feature.Name}}/{{feature.Version}}'>{{feature.Name}}/{{feature.Version}}</a>
+  <li ng-if="!row.Dependencies.length">none</li>
+  <li ng-repeat="feature in row.Dependencies" ng-switch on="isVersionRange(feature.Version)">
+    <span ng-switch-when="true">
+      {{feature.Name}}/{{feature.Version}}
+    </span>
+    <a ng-switch-when="false" href='osgi/features/{{feature.Name}}/{{feature.Version}}'>
+      {{feature.Name}}/{{feature.Version}}
+    </a>
   </li>
 </ul>
 
 <h2>Bundles</h2>
 <ul class="list-unstyled">
+  <li ng-if="!row.BundleDetails.length">none</li>
   <li ng-repeat="bundle in row.BundleDetails">
     <div ng-switch="bundle.Installed">
       <a ng-switch-when="true" href='osgi/bundles/{{bundle.Identifier}}'>{{bundle.Location}}</a>
@@ -53,7 +60,8 @@
 </ul>
 
 <h2>Configurations</h2>
-<table class="table table-striped table-bordered">
+<p ng-if="!row.Configurations.length">none</p>
+<table class="table table-striped table-bordered" ng-if="row.Configurations.length">
   <thead>
     <tr>
       <th>PID</th>
@@ -73,5 +81,6 @@
 
 <h2>Configuration Files</h2>
 <ul class="list-unstyled">
+  <li ng-if="!Object.keys(row['Configuration Files']).length">none</li>
   <li ng-repeat="(key, value) in row['Configuration Files']">{{value.Files}}</li>
 </ul>

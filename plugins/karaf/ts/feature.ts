@@ -64,6 +64,11 @@ namespace Karaf {
       Core.$apply($scope);
     }
 
+    $scope.isVersionRange = (version: string): boolean => {
+      const firstChar = version[0];
+      return firstChar === '[' || firstChar === '(';
+    }
+
     function setBundles(response) {
       var bundleMap = {};
       Osgi.defaultBundleValues(workspace, $scope, response.values);
