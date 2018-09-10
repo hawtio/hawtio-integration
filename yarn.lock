@@ -19,7 +19,7 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@hawtio/core-dts@3.0.18", "@hawtio/core-dts@3.2.0":
+"@hawtio/core-dts@3.2.0":
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.2.0.tgz#9a685349dcfb9733234f6de71da5005d69b613fb"
   dependencies:
@@ -87,11 +87,10 @@
     urijs "^1.18.10"
 
 "@hawtio/ui@^4.0.0":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.0.2.tgz#8231c23af9a594acc99fbf041ff1004fa3ceccab"
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.0.3.tgz#2568974045be62643105e003e2d0f58793fe337d"
   dependencies:
     "@hawtio/core" "^4.0.0"
-    "@hawtio/core-dts" "3.0.18"
     "@types/bootstrap" "3.3.36"
     "@types/clipboard" "1.5.35"
     "@types/codemirror" "0.0.40"

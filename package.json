@@ -256,7 +256,6 @@
     "angular-animate": "1.7.3",
     "angular-sanitize": "1.7.3",
     "lodash.template": "4.4.0",
-    "lodash.templatesettings": "4.1.0",
-    "@hawtio/core-dts": "3.2.0"
+    "lodash.templatesettings": "4.1.0"
   }
 }
