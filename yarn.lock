@@ -19,17 +19,17 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@hawtio/core-dts@3.0.18", "@hawtio/core-dts@3.1.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.1.0.tgz#23b73d0f7f884fb1e1e8d9537d36d42bbdee18df"
+"@hawtio/core-dts@3.0.18", "@hawtio/core-dts@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.2.0.tgz#9a685349dcfb9733234f6de71da5005d69b613fb"
   dependencies:
     "@types/jquery" "~2.0.46"
 
 "@hawtio/core@^4.0.0":
-  version "4.0.13"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.0.13.tgz#7382c003e433fde0bf5b1c627ce9f9c62234f2dd"
+  version "4.0.14"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.0.14.tgz#9e5c8c379ae208a62e9b998aea98b00036b6940e"
   dependencies:
-    "@hawtio/core-dts" "3.0.18"
+    "@hawtio/core-dts" "3.2.0"
     "@types/angular" "*"
     "@types/angular-route" "*"
     "@types/jasmine" "2.8.2"
@@ -392,7 +392,7 @@ accord@^0.27.3:
     uglify-js "^2.8.22"
     when "^3.7.8"
 
-acorn@4.0.13, acorn@4.X, acorn@5.X, acorn@^5.0.3, acorn@~2.6.4:
+acorn@4.0.13, acorn@4.X, acorn@^5.0.3, acorn@~2.6.4:
   version "4.0.13"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-4.0.13.tgz#105495ae5361d697bd195c825192e1ad7f253787"
 
@@ -1283,7 +1283,7 @@ dateformat@1.0.12, dateformat@^1.0.11:
     get-stdin "^4.0.1"
     meow "^3.3.0"
 
-debug-fabulous@0.1.2, debug-fabulous@0.1.X, debug-fabulous@1.X:
+debug-fabulous@0.1.2, debug-fabulous@0.1.X:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/debug-fabulous/-/debug-fabulous-0.1.2.tgz#c63ac4df92a13690b8b79d511401d653b0a31767"
   dependencies:
@@ -1291,7 +1291,7 @@ debug-fabulous@0.1.2, debug-fabulous@0.1.X, debug-fabulous@1.X:
     memoizee "0.4.X"
     object-assign "4.X"
 
-debug@2, debug@2.6.7, debug@2.6.8, debug@2.6.9, debug@3.1.0, debug@3.X, debug@^2.1.2, debug@^2.2.0, debug@^2.3.3, debug@^2.6.8, debug@^2.6.9, debug@^3.1.0, debug@~2.6.4, debug@~2.6.6, debug@~2.6.7, debug@~3.1.0:
+debug@2, debug@2.6.7, debug@2.6.8, debug@2.6.9, debug@3.1.0, debug@^2.1.2, debug@^2.2.0, debug@^2.3.3, debug@^2.6.8, debug@^2.6.9, debug@^3.1.0, debug@~2.6.4, debug@~2.6.6, debug@~2.6.7, debug@~3.1.0:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.7.tgz#92bad1f6d05bbb6bba22cca88bcd0ec894c2861e"
   dependencies:
@@ -2219,7 +2219,7 @@ gulp-replace@~0.5.0:
     readable-stream "^2.0.1"
     replacestream "^4.0.0"
 
-gulp-sourcemaps@2.6.0, gulp-sourcemaps@~2.6.4:
+gulp-sourcemaps@2.6.0, gulp-sourcemaps@~2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/gulp-sourcemaps/-/gulp-sourcemaps-2.6.0.tgz#7ccce899a8a3bfca1593a3348d0fbf41dd3f51e5"
   dependencies:
@@ -4498,7 +4498,7 @@ source-map-url@0.4.0, source-map-url@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/source-map-url/-/source-map-url-0.4.0.tgz#3e935d7ddd73631b97659956d55128e87b5084a3"
 
-source-map@0.5.6, source-map@0.X, source-map@^0.1.38, source-map@^0.5.1, source-map@^0.5.3, source-map@^0.5.6, source-map@^0.6.0, source-map@^0.6.1, source-map@~0.5.1, source-map@~0.5.3, source-map@~0.6.0, source-map@~0.6.1:
+source-map@0.5.6, source-map@0.X, source-map@^0.1.38, source-map@^0.5.1, source-map@^0.5.3, source-map@^0.5.6, source-map@^0.6.0, source-map@^0.6.1, source-map@~0.5.1, source-map@~0.5.3, source-map@~0.6.1:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.6.tgz#75ce38f52bf0733c5a7f0c118d81334a2bb5f412"
 
