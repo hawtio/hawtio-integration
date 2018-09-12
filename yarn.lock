@@ -56,8 +56,8 @@
     "@hawtio/ui" "^4.0.0"
 
 "@hawtio/jmx@~4.0.0":
-  version "4.0.13"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.0.13.tgz#6015accc858016f8df19516386857574a10b2007"
+  version "4.0.14"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.0.14.tgz#d9dfb0e0b1ad1fec97bb0a1617e4e031e561df3a"
   dependencies:
     "@hawtio/core" "^4.0.0"
     "@hawtio/forms" "^4.0.0"
@@ -226,16 +226,16 @@
   resolved "https://registry.yarnpkg.com/@types/d3-quadtree/-/d3-quadtree-1.0.6.tgz#45da9e603688ba90eedd3d40f6e504764e06e493"
 
 "@types/d3-queue@*":
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/@types/d3-queue/-/d3-queue-3.0.6.tgz#2f5aa7eca3b153bb49687eaa570c10ab713439d3"
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/@types/d3-queue/-/d3-queue-3.0.7.tgz#94dc7af693281ab78ccdf381a8c1f71ef16659c1"
 
 "@types/d3-random@*":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@types/d3-random/-/d3-random-1.1.1.tgz#38647ce2ff4ce7d0d56974334c1c4092513c8b9f"
 
 "@types/d3-request@*":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@types/d3-request/-/d3-request-1.0.2.tgz#db9db8154f47816584706c6e6f702be66f22f4be"
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@types/d3-request/-/d3-request-1.0.3.tgz#f528d12efdc83dbc3df486746c939fc5519dc79c"
   dependencies:
     "@types/d3-dsv" "*"
 
@@ -274,8 +274,8 @@
     "@types/d3-selection" "*"
 
 "@types/d3-voronoi@*":
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/@types/d3-voronoi/-/d3-voronoi-1.1.7.tgz#c0a145cf04395927e01706ff6c4ff835c97a8ece"
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@types/d3-voronoi/-/d3-voronoi-1.1.8.tgz#a039cb8368bce4efc1a70aebe744d210851cf1a7"
 
 "@types/d3-zoom@*":
   version "1.7.1"
@@ -489,8 +489,8 @@ angular-resizable@1.2.0:
   resolved "https://registry.yarnpkg.com/angular-resizable/-/angular-resizable-1.2.0.tgz#9dd29af008f8b54abfc051bd269a8f0b4fe43f1a"
 
 angular-route@~1.7.0:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.7.3.tgz#245c7ea7d18514c1d08201588092db7df210e7c6"
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.7.4.tgz#2af79395b7bc0d92d2a394efea255a912255fea9"
 
 angular-sanitize@1.5.*, angular-sanitize@1.7.3, angular-sanitize@~1.7.0:
   version "1.7.3"
@@ -3344,7 +3344,7 @@ moment@2.18.1, "moment@>= 2.6.0", moment@^2.10, moment@^2.19.1, moment@~2.19.3:
   version "2.18.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
 
-ms@2.0.0:
+ms@2.0.0, ms@^2.1.1:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
