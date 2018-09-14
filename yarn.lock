@@ -26,8 +26,8 @@
     "@types/jquery" "~2.0.46"
 
 "@hawtio/core@^4.0.0":
-  version "4.0.14"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.0.14.tgz#9e5c8c379ae208a62e9b998aea98b00036b6940e"
+  version "4.0.16"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.0.16.tgz#09a0abcfed6b27310868e759751060f411afa854"
   dependencies:
     "@hawtio/core-dts" "3.2.0"
     "@types/angular" "*"
@@ -56,8 +56,8 @@
     "@hawtio/ui" "^4.0.0"
 
 "@hawtio/jmx@~4.0.0":
-  version "4.0.14"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.0.14.tgz#d9dfb0e0b1ad1fec97bb0a1617e4e031e561df3a"
+  version "4.0.15"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.0.15.tgz#78c2742dc21d2cc67dff6c25fd68ac7d65f6b9ad"
   dependencies:
     "@hawtio/core" "^4.0.0"
     "@hawtio/forms" "^4.0.0"
