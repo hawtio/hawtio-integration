@@ -11,7 +11,8 @@
     "build": "gulp build",
     "test": "gulp test",
     "preversion": "gulp test",
-    "prepack": "gulp version"
+    "prepack": "gulp version",
+    "postpublish": "git push --tags"
   },
   "dependencies": {
     "@hawtio/jmx": "~4.0.0",
