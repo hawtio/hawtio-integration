@@ -60,7 +60,6 @@
   "flat": true,
   "resolutions": {
     "gulp-concat": "2.6.1",
-    "gulp-sourcemaps": "2.6.0",
     "underscore.string": "3.3.4",
     "yargs": "8.0.2",
     "bootstrap-select": "1.12.4",
