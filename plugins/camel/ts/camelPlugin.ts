@@ -35,7 +35,7 @@ namespace Camel {
       .when('/camel/attributes', { templateUrl: 'plugins/jmx/html/attributes/attributes.html' })
       .when('/camel/operations', { template: '<operations></operations>' })
       .when('/camel/charts', { templateUrl: 'plugins/jmx/html/charts.html' })
-      .when('/camel/chartEdit', { templateUrl: 'plugins/jmx/html/chartEdit.html' })
+      .when('/camel/charts/edit', { templateUrl: 'plugins/jmx/html/chartEdit.html' })
       .when('/camel/contexts', { template: '<contexts></contexts>' })
       .when('/camel/routes', { template: '<routes></routes>' })
       .when('/camel/endpoints', { template: '<endpoints></endpoints>' })

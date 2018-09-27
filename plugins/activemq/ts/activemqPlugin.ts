@@ -31,7 +31,7 @@ namespace ActiveMQ {
       when('/activemq/attributes',         {templateUrl: 'plugins/jmx/html/attributes/attributes.html'}).
       when('/activemq/operations',         {template:    '<operations></operations>'}).
       when('/activemq/charts',             {templateUrl: 'plugins/jmx/html/charts.html'}).
-      when('/activemq/chartEdit',          {templateUrl: 'plugins/jmx/html/chartEdit.html'}).
+      when('/activemq/charts/edit',        {templateUrl: 'plugins/jmx/html/chartEdit.html'}).
       when('/activemq/browseQueue',        {templateUrl: 'plugins/activemq/html/browseQueue.html'}).
       when('/activemq/createDestination',  {template:    '<create-destination></create-destination>'}).
       when('/activemq/deleteQueue',        {template:    '<delete-queue></delete-queue>'}).
