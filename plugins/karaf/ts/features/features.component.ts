@@ -22,6 +22,8 @@ namespace Karaf {
 
     private repositoryFilterValues: string[] = [];
 
+    private mbean: string;
+
     listConfig = {
       showSelectBox: false,
       useExpandingRows: false,
@@ -41,7 +43,7 @@ namespace Karaf {
 
         Core.notification('info', `Installing feature ${feature.name}`);
         this.setUpdateInProgress(true);
-        this.featuresService.installFeature(feature)
+        this.featuresService.installFeature(this.mbean, feature)
           .then(() => {
             this.runWithDelay(() => {
               this.loadFeatureRepositories(() => {
@@ -74,7 +76,7 @@ namespace Karaf {
 
         Core.notification('info', `Uninstalling feature ${feature.name}`);
         this.setUpdateInProgress(true);
-        this.featuresService.uninstallFeature(feature)
+        this.featuresService.uninstallFeature(this.mbean, feature)
           .then(() => {
             this.runWithDelay(() => {
               this.loadFeatureRepositories(() => {
@@ -99,7 +101,7 @@ namespace Karaf {
       selectedId: null
     };
 
-    listItemActionButtons = this.itemActionButtons();
+    listItemActionButtons = [];
 
     private readonly addRepositoryAction = {
       name: 'Add repository',
@@ -115,7 +117,7 @@ namespace Karaf {
             } else {
               Core.notification('info', `Adding feature repository ${repository.uri}`);
               this.setUpdateInProgress(true);
-              this.featuresService.addFeatureRepository(repository.uri)
+              this.featuresService.addFeatureRepository(this.mbean, repository.uri)
               .then(() => {
                 this.loadFeatureRepositories(() => {
                   Core.notification('success', `Added feature repository ${repository.uri}`);
@@ -162,7 +164,7 @@ namespace Karaf {
 
             Core.notification('info', `Removing feature repository ${selectedRepository.uri}`);
             this.setUpdateInProgress(true);
-            this.featuresService.removeFeatureRepository(selectedRepository)
+            this.featuresService.removeFeatureRepository(this.mbean, selectedRepository)
               .then(() => {
                 this.loadFeatureRepositories(() => {
                   Core.notification('success', `Removed feature repository ${selectedRepository.uri}`);
@@ -178,7 +180,7 @@ namespace Karaf {
       }
     };
 
-    toolbarActions = this.toolbarActionButtons();
+    toolbarActions = [];
 
     toolbarConfig = {
       filterConfig: {
@@ -223,20 +225,26 @@ namespace Karaf {
     };
 
     constructor(private featuresService: FeaturesService, private $uibModal: angular.ui.bootstrap.IModalService,
-      private workspace: Jmx.Workspace, private $timeout: ng.ITimeoutService) {
+      private workspace: Jmx.Workspace, private $timeout: ng.ITimeoutService, private $q: ng.IQService) {
       'ngInject';
     }
 
     $onInit(): void {
-      this.loadFeatureRepositories();
+      Osgi.runWhenTreeReady(() => getSelectionFeaturesMBean(this.workspace), this.workspace, this.$q)
+        .then(mbean => {
+          this.mbean = mbean;
+          this.listItemActionButtons = this.itemActionButtons();
+          this.toolbarActions = this.toolbarActionButtons();
+          this.loadFeatureRepositories();
+        });
     }
 
     private itemActionButtons(): any[] {
       let buttons = [];
-      if (this.featuresService.hasInvokeRightsForName('installFeature')) {
+      if (this.featuresService.hasInvokeRightsForName(this.mbean, 'installFeature')) {
         buttons.push(this.installButton);
       }
-      if (this.featuresService.hasInvokeRightsForName('uninstallFeature')) {
+      if (this.featuresService.hasInvokeRightsForName(this.mbean, 'uninstallFeature')) {
         buttons.push(this.uninstallButton);
       }
       log.debug("RBAC - Rendered features buttons:", buttons);
@@ -245,10 +253,10 @@ namespace Karaf {
 
     private toolbarActionButtons(): any[] {
       let actions = [];
-      if (this.featuresService.hasInvokeRightsForName('addRepository')) {
+      if (this.featuresService.hasInvokeRightsForName(this.mbean, 'addRepository')) {
         actions.push(this.addRepositoryAction);
       }
-      if (this.featuresService.hasInvokeRightsForName('removeRepository')) {
+      if (this.featuresService.hasInvokeRightsForName(this.mbean, 'removeRepository')) {
         actions.push(this.removeRepositoryAction);
       }
       log.debug("RBAC - Rendered features actions:", actions);
@@ -256,7 +264,7 @@ namespace Karaf {
     }
 
     private loadFeatureRepositories(loadCompleteFn?: Function): void {
-      this.featuresService.getFeatureRepositories()
+      this.featuresService.getFeatureRepositories(this.mbean)
         .then(featureRepositories => {
           this.features = [];
 

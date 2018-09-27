@@ -5,14 +5,12 @@ namespace Karaf {
 
     export class FeaturesService {
 
-      public static MBEAN: string = 'org.apache.karaf:type=feature,name=root';
-
       constructor(private jolokiaService: JVM.JolokiaService, private workspace: Jmx.Workspace) {
         'ngInject';
       }
 
-      getFeatureRepositories(): ng.IPromise<FeatureRepository[]> {
-        return this.jolokiaService.getMBean(FeaturesService.MBEAN)
+      getFeatureRepositories(mbean: string): ng.IPromise<FeatureRepository[]> {
+        return this.jolokiaService.getMBean(mbean)
         .then(value => {
           const repositories: FeatureRepository[] = [];
           angular.forEach(value['Repositories'], (repository) => {
@@ -45,8 +43,8 @@ namespace Karaf {
         })
       }
 
-      installFeature(feature: Feature): ng.IPromise<string> {
-        return this.jolokiaService.execute(FeaturesService.MBEAN, 'installFeature(java.lang.String, java.lang.String)', feature.name, feature.version)
+      installFeature(mbean:string, feature: Feature): ng.IPromise<string> {
+        return this.jolokiaService.execute(mbean, 'installFeature(java.lang.String, java.lang.String)', feature.name, feature.version)
           .catch((error: string) => {
             // Ignore server error caused by pax-web restarting
             if (error.indexOf('socket hang up') === -1) {
@@ -55,8 +53,8 @@ namespace Karaf {
           });
       }
 
-      uninstallFeature(feature: Feature): ng.IPromise<string> {
-        return this.jolokiaService.execute(FeaturesService.MBEAN, 'uninstallFeature(java.lang.String, java.lang.String)', feature.name, feature.version)
+      uninstallFeature(mbean:string, feature: Feature): ng.IPromise<string> {
+        return this.jolokiaService.execute(mbean, 'uninstallFeature(java.lang.String, java.lang.String)', feature.name, feature.version)
           .catch((error: string) => {
             // Ignore server error caused by pax-web restarting
             if (error.indexOf('socket hang up') === -1) {
@@ -65,16 +63,16 @@ namespace Karaf {
           });
     }
 
-      addFeatureRepository(repositoryUri: string): ng.IPromise<string> {
-        return this.jolokiaService.execute(FeaturesService.MBEAN, 'addRepository(java.lang.String)', repositoryUri);
+      addFeatureRepository(mbean:string, repositoryUri: string): ng.IPromise<string> {
+        return this.jolokiaService.execute(mbean, 'addRepository(java.lang.String)', repositoryUri);
       }
 
-      removeFeatureRepository(repository: FeatureRepository): ng.IPromise<string> {
-        return this.jolokiaService.execute(FeaturesService.MBEAN, 'removeRepository(java.lang.String)', repository.uri);
+      removeFeatureRepository(mbean:string, repository: FeatureRepository): ng.IPromise<string> {
+        return this.jolokiaService.execute(mbean, 'removeRepository(java.lang.String)', repository.uri);
       }
 
-      hasInvokeRightsForName(name: string) {
-        return this.workspace.hasInvokeRightsForName(FeaturesService.MBEAN, name);
+      hasInvokeRightsForName(mbean:string, name: string) {
+        return this.workspace.hasInvokeRightsForName(mbean, name);
       }
 
       sortByName(a,b): number {
