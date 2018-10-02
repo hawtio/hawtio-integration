@@ -1,5 +1,6 @@
 /// <reference path="../../karaf/ts/karafHelpers.ts"/>
 /// <reference path="bundles/bundles.module.ts"/>
+/// <reference path="configuration/configuration.module.ts"/>
 /// <reference path="framework/framework.module.ts"/>
 /// <reference path="osgi.component.ts"/>
 /// <reference path="osgiData.ts"/>
@@ -11,6 +12,7 @@ namespace Osgi {
     .module(pluginName, [
       'infinite-scroll',
       bundlesModule,
+      configurationModule,
       frameworkModule
     ])
     .component('osgi', osgiComponent);
@@ -22,8 +24,7 @@ namespace Osgi {
       .when('/osgi/services', { templateUrl: 'plugins/osgi/html/services.html' })
       .when('/osgi/packages', { templateUrl: 'plugins/osgi/html/packages.html' })
       .when('/osgi/configurations', { templateUrl: 'plugins/osgi/html/configurations.html' })
-      .when('/osgi/configurations/pid/:pid/:factoryPid', { templateUrl: 'plugins/osgi/html/pid.html' })
-      .when('/osgi/configurations/pid/:pid', { templateUrl: 'plugins/osgi/html/pid.html' })
+      .when('/osgi/configurations/:id', { template: '<osgi-configuration></osgi-configuration>' })
       .when('/osgi/fwk', { template: '<framework></framework>' });
   }]);
 

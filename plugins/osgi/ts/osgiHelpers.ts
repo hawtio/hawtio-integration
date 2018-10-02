@@ -76,18 +76,6 @@ namespace Osgi {
     return packages;
   }
 
-  export function defaultConfigurationValues(workspace: Jmx.Workspace, $scope, values) {
-    var array = [];
-    angular.forEach(values, (row) => {
-      var map = {};
-      map["Pid"] = row[0];
-      map["PidLink"] = "<a href='" + Core.url("/osgi/configurations/pid/" + row[0] + workspace.hash()) + "'>" + row[0] + "</a>";
-      map["Bundle"] = row[1];
-      array.push(map);
-    });
-    return array;
-  }
-
   export function parseActualPackages(packages : string[]) : {} {
     var result = {};
     for (var i = 0; i < packages.length; i++) {

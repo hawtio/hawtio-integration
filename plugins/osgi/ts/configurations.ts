@@ -15,7 +15,7 @@ namespace Osgi {
 
       $scope.configurations = null;
       $scope.filteredConfigurations = [];
-            
+
       /** the kinds of config */
       const configKinds = {
         factory: {
@@ -135,12 +135,12 @@ namespace Osgi {
         });
         $scope.filteredConfigurations = filteredConfigurations;
       }
-  
+
       function updateResultCount() {
         $scope.toolbarConfig.filterConfig.totalCount = $scope.configurations.length;
         $scope.toolbarConfig.filterConfig.resultsCount = $scope.filteredConfigurations.length;
       }
-        
+
       function openAddPidDialog() {
         $uibModal.open({
           templateUrl: 'addPidDialog.html',
@@ -241,7 +241,7 @@ namespace Osgi {
             configurations.push(config);
           }
         });
-        // sort configurations by name        
+        // sort configurations by name
         configurations = _.sortBy(configurations, configuration => configuration.name.toLowerCase());
         // add children under their parents in array
         for (let i = configurations.length - 1; i > -1; i--) {
@@ -427,7 +427,7 @@ namespace Osgi {
         //config["pidLink"] = createPidLink(pid, factoryPid);
         var children = factoryConfig.children;
         if (factoryPid) {
-          factoryConfig.pidLink = createPidLink(factoryPid, true);
+          factoryConfig.pidLink = createPidLink(factoryPid);
         }
         if (!children) {
           children = {};
@@ -454,8 +454,8 @@ namespace Osgi {
         factoryConfig["pidLink"] = createPidLink(factoryPid);
       }
 
-      function createPidLink(pid, isFactory = false) {
-        return createConfigPidLink($scope, workspace, pid, isFactory);
+      function createPidLink(pid) {
+        return `osgi/configurations/${pid}`;
       }
 
       function errorHandler(message) {
