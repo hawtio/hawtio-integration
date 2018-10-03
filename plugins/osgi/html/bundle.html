@@ -102,8 +102,8 @@
       <span ng-switch-default>Fragments</span>
     </dt>
     <dd ng-switch="row.Fragment">
-      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"/>
-      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"/>
+      <span ng-switch-when="true" ng-bind-html-unsafe="row.Hosts"></span>
+      <span ng-switch-default ng-bind-html-unsafe="row.Fragments"></span>
     </dd>
   </dl>
 
@@ -166,7 +166,8 @@
 
   <h2>Imported Packages</h2>
 
-  <table class="table table-striped table-bordered">
+  <p ng-if="isEmpty(row.ImportData)">none</p>
+  <table class="table table-striped table-bordered" ng-if="!isEmpty(row.ImportData)">
     <thead>
       <tr>
         <th>Name</th>
@@ -187,7 +188,7 @@
     </tbody>
   </table>
 
-  <div ng-if="thereAreUnsatisfiedPackages()">
+  <div ng-if="!isEmpty(unsatisfiedPackages)">
     <h3>Imports not satisfied</h3>
     <table class="table table-striped table-bordered">
       <thead>
@@ -209,7 +210,8 @@
 
   <h2>Exported Packages</h2>
 
-  <table class="table table-striped table-bordered">
+  <p ng-if="isEmpty(row.ExportData)">none</p>
+  <table class="table table-striped table-bordered" ng-if="!isEmpty(row.ExportData)">
     <thead>
       <tr>
         <th>Name</th>
@@ -226,34 +228,34 @@
     </tbody>
   </table>
 
-  <h2>Services</h2>
+  <h2 ng-if="row.RegisteredServices.length > 0 || row.ServicesInUse.length > 0">Services</h2>
 
-  <h3>Registered Services</h3>
+  <div ng-if="row.RegisteredServices.length > 0">
+    <h3>Registered Services</h3>
+    <ul class="list-group labels">
+      <li class="list-group-item" ng-repeat="id in row.RegisteredServices">
+        <span id="registers.service.{{id}}" class="text-success">{{id}}</span>
+      </li>
+    </ul>
+  </div>
 
-  <ul class="list-group labels">
-    <li class="list-group-item" ng-repeat="id in row.RegisteredServices">
-      <span id="registers.service.{{id}}" class="text-success">{{id}}</span>
-    </li>
-  </ul>
-
-  <h3>Services used by this Bundle</h3>
-
-  <ul class="list-group labels">
-    <li class="list-group-item" ng-repeat="id in row.ServicesInUse">
-      <span id="uses.service.{{id}}" class="text-info">{{id}}</span>
-    </li>
-  </ul>
+  <div ng-if="row.ServicesInUse.length > 0">
+    <h3>Services used by this Bundle</h3>
+    <ul class="list-group labels">
+      <li class="list-group-item" ng-repeat="id in row.ServicesInUse">
+        <span id="uses.service.{{id}}" class="text-info">{{id}}</span>
+      </li>
+    </ul>
+  </div>
 
   <div ng-if="row.RequiringBundles.length > 0">
     <h2>Other Bundles using this Bundle</h2>
-
     <ul class="list-unstyled">
       <li ng-repeat="bundle in row.RequiringBundles"><a ng-href="{{bundle.url}}">{{bundle.label}}</a></li>
     </ul>
   </div>
 
   <h2>Headers</h2>
-
   <dl class="dl-horizontal osgi-bundle-headers-dl">
     <dt ng-repeat-start="(key, value) in row.Headers" ng-show="showValue(key)">{{key}}</dt>
     <dd ng-repeat-end ng-show="showValue(key)">{{value.Value}}</dd>

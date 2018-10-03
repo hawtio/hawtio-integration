@@ -59,7 +59,7 @@ namespace Osgi {
 
     $scope.unsatisfiedPackages = {};
 
-    $scope.thereAreUnsatisfiedPackages = () => Object.keys($scope.unsatisfiedPackages).length > 0;
+    $scope.isEmpty = obj => _.isEmpty(obj);
 
     $scope.dismissClassLoadingAlert = () => $scope.classLoadingAlert = null;
 
