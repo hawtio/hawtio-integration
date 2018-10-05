@@ -361,7 +361,7 @@ namespace Camel {
     nodes.forEach((node) => {
       var idx = node.id;
       if (idx === undefined) {
-        console.log("No node found for node " + JSON.stringify(node));
+        log.debug("No node found for node " + JSON.stringify(node));
       } else {
         if (node.edges === undefined) node.edges = [];
         if (!node.label) node.label = "node " + idx;
@@ -373,7 +373,7 @@ namespace Camel {
       var source = stateKeys[d.source];
       var target = stateKeys[d.target];
       if (source === undefined || target === undefined) {
-        console.log("Bad link!  " + source + " target " + target + " for " + d);
+        log.debug("Bad link!  " + source + " target " + target + " for " + d);
       } else {
         var edge = {source: source, target: target};
         transitions.push(edge);

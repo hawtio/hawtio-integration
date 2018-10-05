@@ -45,7 +45,6 @@ namespace Osgi {
     }
 
     private fetchPermissions(): ng.IPromise<boolean[]> {
-      console.log('fetchPermissions')
       const mbean = getSelectionFrameworkMBean(this.workspace);
       return this.$q.all(FrameworkService.FRAMEWORK_MBEAN_ATTRIBUTES
         .map(attribute => this.attributesService.canInvoke(mbean, attribute, 'Int')))

@@ -33,7 +33,6 @@ namespace Karaf {
     }
 
     function loadData() {
-      console.log("Loading Karaf data...");
       jolokia.search("org.apache.karaf:type=instance,*", Core.onSuccess(render));
     }
 

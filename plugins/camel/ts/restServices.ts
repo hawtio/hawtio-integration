@@ -128,7 +128,6 @@ namespace Camel {
     }
 
     function loadRestRegistry() {
-      console.log("Loading RestRegistry data...");
       var mbean = getSelectionCamelRestRegistry(workspace);
       if (mbean) {
         jolokia.request({type: 'exec', mbean: mbean, operation: 'listRestServices'}, Core.onSuccess(onRestRegistry));

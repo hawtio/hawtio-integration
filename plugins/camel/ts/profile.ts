@@ -209,8 +209,6 @@ namespace Camel {
     };
 
     function loadData() {
-      console.log("Loading Camel route profile data...");
-
       camelTreeService.getSelectedRouteId()
         .then(selectedRouteId => {
           var routeMBean = getSelectionRouteMBean(workspace, selectedRouteId);

@@ -236,7 +236,7 @@ namespace Camel {
       if (mbean) {
         $scope.jolokia.execute(mbean, 'findComponentNames', Core.onSuccess(onComponents, silentOptions));
       } else {
-        console.log('WARNING: No camel context mbean so cannot load component names');
+        log.warn('WARNING: No camel context mbean so cannot load component names');
       }
     };
 
@@ -266,8 +266,8 @@ namespace Camel {
           $scope.loadedEndpointSchema = endpointName;
           Core.$apply($scope);
         } catch (e) {
-          console.log("Failed to parse JSON " + e);
-          console.log("JSON: " + response);
+          log.error("Failed to parse JSON " + e);
+          log.error("JSON: " + response);
         }
       }
     }
@@ -301,12 +301,12 @@ namespace Camel {
       // disable reload notifications
       let jmxTreeLazyLoadRegistry = Core.lazyLoaders;
       let profileWorkspace = new Jmx.Workspace(remoteJolokia, jolokiaStatus, jmxTreeLazyLoadRegistry, $location, $compile, $templateCache, localStorage, $rootScope);
-  
+
       log.info("Loading the profile using jolokia: " + remoteJolokia);
       profileWorkspace.loadTree();
       return profileWorkspace;
     }
-    
+
     function findCamelContextMBean() {
       let profileWorkspace = $scope.profileWorkspace;
       if (!profileWorkspace) {

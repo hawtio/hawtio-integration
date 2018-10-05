@@ -43,7 +43,6 @@ namespace Karaf {
     }
 
     disableComponentDisable(): boolean {
-      console.log(this.component.state)
       return this.component == undefined || this.component.state !== 'Enabled';
     }
 

@@ -2,16 +2,15 @@ namespace SpringBoot {
 
   export class Health {
 
-    constructor(public status: HealthStatus, public items: HealthItem[]) {
+    constructor(public global: HealthCard, public details: HealthCard[]) {
     }
 
   }
 
-  export type HealthStatus = 'FATAL' | 'DOWN' | 'OUT OF SERVICE' | 'UNKNOWN' | 'UP';
-
-  export interface HealthItem {
+  export interface HealthCard {
     title: string;
-    info: string[];
+    iconClass: string;
+    info?: string[];
   }
- 
+
 }

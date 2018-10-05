@@ -99,7 +99,6 @@ namespace Camel {
       var mbean = getSelectionCamelContextMBean(workspace);
       var selectedMessages = $scope.messages.filter(message => message.selected);
       if (mbean && uri && selectedMessages && selectedMessages.length) {
-        //console.log("Creating a new endpoint called: " + uri + " just in case!");
         jolokia.execute(mbean, "createEndpoint(java.lang.String)", uri, Core.onSuccess(intermediateResult));
 
         $scope.message = "Forwarded " + Core.maybePlural(selectedMessages.length, "message" + " to " + uri);
@@ -107,7 +106,6 @@ namespace Camel {
           var callback = (idx + 1 < selectedMessages.length) ? intermediateResult : operationSuccess;
           var body = item.body;
           var headers = item.headers;
-          //console.log("sending to uri " + uri + " headers: " + JSON.stringify(headers) + " body: " + body);
           jolokia.execute(mbean, "sendBodyAndHeaders(java.lang.String, java.lang.Object, java.util.Map)", uri, body, headers, Core.onSuccess(callback));
         });
       }

@@ -35,7 +35,7 @@ namespace Camel {
     $scope.createEndpointFromData = () => {
       if ($scope.selectedComponentName && $scope.endpointPath) {
         var name = $scope.selectedComponentName + "://" + $scope.endpointPath;
-        console.log("Have endpoint data " + JSON.stringify($scope.endpointParameters));
+        log.debug("Have endpoint data " + JSON.stringify($scope.endpointParameters));
 
         var params = "";
         angular.forEach($scope.endpointParameters, (value, key) => {

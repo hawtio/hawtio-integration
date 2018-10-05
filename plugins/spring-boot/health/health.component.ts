@@ -25,33 +25,10 @@ namespace SpringBoot {
         .then(health => this.health = health)
         .then(() => this.promise = this.$timeout(() => this.loadDataPeriodically(), this.reloadDelay));
     }
-    
+
     cancelTimer() {
       this.$timeout.cancel(this.promise);
     }
-
-    getStatusIcon() {
-      switch (this.health.status) {
-        case 'UP':
-          return 'pficon-ok'
-        case 'FATAL':
-          return 'pficon-error-circle-o'
-        default:
-          return 'pficon-info';
-      }
-    }
-
-    getStatusClass() {
-      switch (this.health.status) {
-        case 'UP':
-          return 'alert-success'
-        case 'FATAL':
-          return 'alert-danger'
-        default:
-          return 'alert-info';
-      }
-    }
-    
   }
 
   export const healthComponent: angular.IComponentOptions = {
@@ -62,13 +39,10 @@ namespace SpringBoot {
           <div class="container-fluid container-cards-pf">
             <div class="row row-cards-pf">
               <div class="col-lg-12">
-                <div class="toast-pf alert" ng-class="$ctrl.getStatusClass()">
-                  <span class="pficon" ng-class="$ctrl.getStatusIcon()"></span>
-                  <strong>{{$ctrl.health.status}}</strong>
-                </div>
+                <pf-info-status-card status="$ctrl.health.global" show-top-border="true"></pf-info-status-card>
               </div>
-              <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="item in $ctrl.health.items">
-                <pf-info-status-card status="item"></pf-info-status-card>
+              <div class="col-lg-12" ng-repeat="item in $ctrl.health.details">
+                <pf-info-status-card status="item" html-content="true"></pf-info-status-card>
               </div>
             </div>
           </div>
