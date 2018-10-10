@@ -52,15 +52,14 @@ namespace Camel {
    * @param {Function} onRoute
    */
   export function processRouteXml(workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, folder: Jmx.Folder, onRoute: (route: Element) => void) {
-    var selectedRouteId = getSelectedRouteId(workspace, folder);
-    var mbean = getExpandingFolderCamelContextMBean(workspace, folder) || getSelectionCamelContextMBean(workspace);
+    const selectedRouteId = getSelectedRouteId(workspace, folder);
+    const mbean = getExpandingFolderCamelContextMBean(workspace, folder) || getSelectionCamelContextMBean(workspace);
 
-    var onRouteXml = response => {
-      var route = null;
-      var data = response ? response.value : null;
-      if (data) {
-        var doc = $.parseXML(data);
-        var routes = $(doc).find("route[id='" + selectedRouteId + "']");
+    const onRouteXml = (xml: string) => {
+      let route = null;
+      if (xml) {
+        const doc: XMLDocument = $.parseXML(xml);
+        const routes = $(doc).find("route[id='" + selectedRouteId + "']");
         if (routes && routes.length) {
           route = routes[0];
         }
@@ -69,9 +68,15 @@ namespace Camel {
     }
 
     if (mbean && selectedRouteId) {
-      jolokia.request(
-              {type: 'exec', mbean: mbean, operation: 'dumpRoutesAsXml()'},
-              Core.onSuccess(onRouteXml, {error: onRouteXml}));
+      // Run synchronously as we want the treeview lazy function to fully complete
+      const response = jolokia.request({type: 'exec', mbean: mbean, operation: 'dumpRoutesAsXml()'}, Core.onSuccess(null));
+      let xml = null;
+      if (response && response.value) {
+        xml = response.value;
+      } else if (response && response.error) {
+        log.error('Jolokia request dumpRoutesAsXml failed:', response.error);
+      }
+      onRouteXml(xml);
     } else {
       if (!selectedRouteId) {
         log.warn("No selectedRouteId when trying to lazy load the route!")
