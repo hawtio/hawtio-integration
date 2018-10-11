@@ -73,9 +73,11 @@ namespace Osgi {
       return this.framework === null ||
              this.framework.initialBundleStartLevel === null ||
              this.framework.startLevel === null ||
-             this.saveInProgress === true ||
-             // RBAC
-             this.canSave === false;
+             this.saveInProgress === true;
+    }
+
+    hasEditPermission(): boolean {
+      return this.canSave;
     }
   }
 
@@ -98,7 +100,7 @@ namespace Osgi {
                 <input id="initialBundleStartLevel" class="form-control" type="number" min="0" max="100" ng-model="$ctrl.framework.initialBundleStartLevel">
               </div>
             </div>
-            <div class="form-group">
+            <div ng-if="$ctrl.hasEditPermission()" class="form-group">
               <div class="col-sm-offset-3 col-sm-2">
                 <button type="submit" class="btn btn-primary" ng-disabled="$ctrl.saveDisabled()">
                   Save
