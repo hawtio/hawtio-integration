@@ -3,6 +3,7 @@
 /// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="exchanges/exchanges.module.ts"/>
 /// <reference path="properties/properties.module.ts"/>
+/// <reference path="rest-services/rest-services.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
 /// <reference path="tree/tree.module.ts"/>
 /// <reference path="type-converters/type-converters.module.ts"/>
@@ -21,6 +22,7 @@ namespace Camel {
     endpointsModule,
     exchangesModule,
     propertiesModule,
+    restServicesModule,
     routesModule,
     treeModule,
     typeConvertersModule
@@ -46,7 +48,7 @@ namespace Camel {
       .when('/camel/routeDiagram', { templateUrl: 'plugins/camel/html/routeDiagram.html' })
       .when('/camel/source', { templateUrl: 'plugins/camel/html/source.html' })
       .when('/camel/typeConverter', { template: '<type-converters></type-converters>' })
-      .when('/camel/restServices', { templateUrl: 'plugins/camel/html/restServices.html', reloadOnSearch: false })
+      .when('/camel/restServices', { template: '<rest-services></rest-services>' })
       .when('/camel/endpoints-statistics', { template: '<endpoints-statistics></endpoints-statistics>' })
       .when('/camel/routeMetrics', { templateUrl: 'plugins/camel/html/routeMetrics.html', reloadOnSearch: false })
       .when('/camel/exchanges', { template: '<exchanges></exchanges>' })
