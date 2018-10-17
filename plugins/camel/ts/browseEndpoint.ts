@@ -106,7 +106,7 @@ namespace Camel {
           var callback = (idx + 1 < selectedMessages.length) ? intermediateResult : operationSuccess;
           var body = item.body;
           var headers = item.headers;
-          jolokia.execute(mbean, "sendBodyAndHeaders(java.lang.String, java.lang.Object, java.util.Map)", uri, body, headers, Core.onSuccess(callback));
+          jolokia.execute(mbean, "sendBodyAndHeaders(java.lang.String, java.lang.Object, java.util.Map)", uri, body, headers, Core.onSuccess(callback, {error: onError}));
         });
       }
       $scope.endpointUri = null;
@@ -136,6 +136,11 @@ namespace Camel {
     function operationSuccess() {
       Core.notification("success", $scope.message);
       setTimeout(loadData, 50);
+    }
+
+    function onError(response) {
+      Core.notification("danger", "Error forwarding messages to endpoint");
+      log.error(response.error);
     }
 
     function loadData() {

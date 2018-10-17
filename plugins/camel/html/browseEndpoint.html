@@ -21,7 +21,7 @@
         <tbody>
           <tr ng-repeat="message in messages track by $index">
             <td>
-              <input type="checkbox" ng-model="message.selected" ng-click="refreshForwardActionDisabledProperty()">
+              <input type="checkbox" ng-model="message.selected" ng-change="refreshForwardActionDisabledProperty()">
             </td>
             <td>
               <div class="ngCellText">
@@ -30,7 +30,7 @@
             </td>
           </tr>
         </tbody>
-      </table>                    
+      </table>
     </div>
 
     <script type="text/ng-template" id="camelBrowseEndpointMessageDetails.html">
@@ -43,10 +43,9 @@
             <h4 class="modal-title" id="myModalLabel">Message</h4>
           </div>
           <div class="col-md-7">
-            <div class=""
-                hawtio-pager="messages"
-                on-index-change="selectRowIndex"
-                row-index="rowIndex">
+            <div hawtio-pager="messages"
+                 on-index-change="selectRowIndex"
+                 row-index="rowIndex">
             </div>
           </div>
         </div>
