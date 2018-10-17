@@ -1,6 +1,6 @@
 namespace Pf {
 
-  export function filter(items: object[], filterConfig) {
+  export function filter<T>(items: T[], filterConfig: any): T[] {
     let filteredItems = items;
     if (filterConfig.appliedFilters) {
       filterConfig.appliedFilters.forEach(filter => {

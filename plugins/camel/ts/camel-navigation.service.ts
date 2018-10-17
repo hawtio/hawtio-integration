@@ -1,11 +1,8 @@
 namespace Camel {
 
   export class CamelNavigationService {
-    private hasRestServices: boolean;
-
     constructor(private workspace: Jmx.Workspace, private jolokia: Jolokia.IJolokia) {
       'ngInject';
-      this.hasRestServices = Camel.hasRestServices(workspace, jolokia);
     }
 
     getTabs(): Nav.HawtioTab[] {
@@ -79,30 +76,30 @@ namespace Camel {
       }
 
       if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder &&
-          !isComponent && (isCamelContext || isRoutesFolder || isRoute) &&
-          isCamelVersionEQGT_2_15 && canBrowse) {
+        !isComponent && (isCamelContext || isRoutesFolder || isRoute) &&
+        isCamelVersionEQGT_2_15 && canBrowse) {
         tabs.push(new Nav.HawtioTab('Exchanges', '/camel/exchanges'));
       }
 
       if (!isEndpointsFolder && !isEndpoint && (isCamelContext || isRoutesFolder) &&
-          isCamelVersionEQGT_2_14 && isRouteMetrics && canDumpStatisticsAsJson) {
+        isCamelVersionEQGT_2_14 && isRouteMetrics && canDumpStatisticsAsJson) {
         tabs.push(new Nav.HawtioTab('Route Metrics', '/camel/routeMetrics'));
       }
 
       if (!isRoute && !isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
-          (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_14 && isRestRegistry &&
-          this.hasRestServices && canListRestServices) {
+        (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_14 && isRestRegistry &&
+        hasRestServices(this.workspace, this.jolokia) && canListRestServices) {
         tabs.push(new Nav.HawtioTab('REST Services', '/camel/restServices'));
       }
 
       if (!isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
-          (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_16 && inEndpointRuntimeRegistry &&
-          canSeeEndpointStatistics) {
+        (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_16 && inEndpointRuntimeRegistry &&
+        canSeeEndpointStatistics) {
         tabs.push(new Nav.HawtioTab('Endpoints (in/out)', '/camel/endpoints-statistics'));
       }
 
       if (!isRoute && !isRouteNode(this.workspace) && !isEndpointsFolder && !isEndpoint && !isComponentsFolder && !isComponent &&
-          (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_13 && canListTypeConverters) {
+        (isCamelContext || isRoutesFolder) && isCamelVersionEQGT_2_13 && canListTypeConverters) {
         tabs.push(new Nav.HawtioTab('Type Converters', '/camel/typeConverter'));
       }
 
