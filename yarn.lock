@@ -29,9 +29,9 @@
     "@types/jquery" "~2.0.46"
 
 "@hawtio/core@~4.1.0":
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.1.1.tgz#730ecb97a7007d71db4e325d013039d33f925442"
-  integrity sha512-bq28sfe7zLsprl35/FZczMZs7EcDcUXjjYFXB0cHE+rR2hoSrbxvuibBR1Pdze5qF6GoI00j02fFU6tw8AgHOw==
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.1.2.tgz#9551fdfc46f99cc58f8331bd645a2f9b5d4eb28d"
+  integrity sha512-U6gZyULJbEwtQvdHHKLdYOGaiSkskDs3/kizP8juEqIk1Wwks22Djdem9tim2icu3/JT7g/QKALmZmmmFIFsGw==
   dependencies:
     "@hawtio/core-dts" "3.2.0"
     "@types/angular" "*"
@@ -61,9 +61,9 @@
     "@hawtio/ui" "~4.1.0"
 
 "@hawtio/jmx@~4.1.0":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.1.2.tgz#1b9b9886f2d80112f505c15da1349e7a2d24c396"
-  integrity sha512-hFbT+EiqHNd4CqBMQhx0++2VuZLI7R4rmfaggfhTn6pNeJBDm+IedROJl0yK0Xxd8fsZ0jlZK68bcuUPrNRZ6Q==
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.1.3.tgz#63ad0be897771eb46557eb6189cd94b2470b9d1a"
+  integrity sha512-Cm5nYhXz2ugSmxay0YARVkNptimsrM/7mO9FxzxGI5z229HJXoT7C/yF/RfuJ5GGeTPnkH/rO5usl90ZL0uXsQ==
   dependencies:
     "@hawtio/core" "~4.1.0"
     "@hawtio/forms" "~4.1.0"
