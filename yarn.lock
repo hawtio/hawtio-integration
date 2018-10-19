@@ -29,9 +29,9 @@
     "@types/jquery" "~2.0.46"
 
 "@hawtio/core@~4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.1.0.tgz#3940a86954991303f03793144281399032364702"
-  integrity sha512-11cI41ltbbuHVJq5MYqAN7cheI1/4/jmdTUp52zrklDwKKmlUbKjRZ2iMB34xM73nIk2lUqh06uykiy6M9t8gA==
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.1.1.tgz#730ecb97a7007d71db4e325d013039d33f925442"
+  integrity sha512-bq28sfe7zLsprl35/FZczMZs7EcDcUXjjYFXB0cHE+rR2hoSrbxvuibBR1Pdze5qF6GoI00j02fFU6tw8AgHOw==
   dependencies:
     "@hawtio/core-dts" "3.2.0"
     "@types/angular" "*"
@@ -61,9 +61,9 @@
     "@hawtio/ui" "~4.1.0"
 
 "@hawtio/jmx@~4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.1.0.tgz#1f85d64825c74efa311e88213a54e628476290ee"
-  integrity sha512-BkUZixdHgDDCiRy2Ruu8Kec63SVIwrykJl731MuECOWhDytNsknboZ8LTC8gCPbmrFIgUMcGr7GP72W6uUOdgg==
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.1.2.tgz#1b9b9886f2d80112f505c15da1349e7a2d24c396"
+  integrity sha512-hFbT+EiqHNd4CqBMQhx0++2VuZLI7R4rmfaggfhTn6pNeJBDm+IedROJl0yK0Xxd8fsZ0jlZK68bcuUPrNRZ6Q==
   dependencies:
     "@hawtio/core" "~4.1.0"
     "@hawtio/forms" "~4.1.0"
@@ -160,9 +160,9 @@
   integrity sha1-CGjtm6W/PvgHLegOJF7PSo8Lvf0=
 
 "@types/d3-array@*":
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/@types/d3-array/-/d3-array-1.2.3.tgz#dd141e3ba311485fffbf0792a1b01a7f2ec12dc1"
-  integrity sha512-yTO4ws1jnWC7iSKK8j7sUAGKIcJ628ioiGTdyXmPd36cNnuY9fDcjgEW2r19yXWuQFLu61/JhHVZ8RYYTEzFSg==
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/@types/d3-array/-/d3-array-1.2.4.tgz#7088445c8717ba1fba416a1df7bbd11cc72a3763"
+  integrity sha512-3r1fOAAb+SGfcOGXty/LGvoP0ovMec4UtGNUyHOSzYyvSGpmt+eNMxLowol/3HryusevznSfcHZebEShXMwsZA==
 
 "@types/d3-axis@*":
   version "1.0.11"
@@ -331,9 +331,9 @@
     "@types/d3-selection" "*"
 
 "@types/d3@^4":
-  version "4.13.0"
-  resolved "https://registry.yarnpkg.com/@types/d3/-/d3-4.13.0.tgz#aae092b368266409cfbf19c611203145ec0d5f65"
-  integrity sha512-L7C+aOIl+z/e7pPBvRXxA9EZ8a5RIZSq4UnTgdjCnypYV3bPI1wpx81snC8pE1zB4SZQC/WK4noZUHzWAABfBA==
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/@types/d3/-/d3-4.13.1.tgz#6d12ecab1ceb704fb41e4ac43e1c45f7fef016c8"
+  integrity sha512-aJDD18fjLurxior2/3aZ+Trvu5kcCEwoujGGt6LrLXsdxv9KR1gCeJQOve7tUwvSQhrIUsXNfTHhXNnfRxnyaA==
   dependencies:
     "@types/d3-array" "*"
     "@types/d3-axis" "*"
@@ -412,6 +412,11 @@
   version "7.0.70"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.70.tgz#688aaeb6e6d374ed016c4dc2c46de695859d6887"
   integrity sha512-bAcW/1aM8/s5iFKhRpu/YJiQf/b1ZwnMRqqsWRCmAqEDQF2zY8Ez3Iu9AcZKFKc3vCJc8KJVpJ6Pn54sJ1BvXQ==
+
+"@types/sizzle@*":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
+  integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
 
 "@types/urijs@1.15.34":
   version "1.15.34"
@@ -523,14 +528,14 @@ angular-drag-and-drop-lists@2.0.0:
   integrity sha1-oB1EuUzyM8nC1FoxhCyzWp0Igso=
 
 angular-mocks@~1.7.0:
-  version "1.7.4"
-  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.7.4.tgz#106d9c96eae0117ad9962ee688da5e514edae645"
-  integrity sha512-VSgHxObks7g5KeKVZ/g8awQosCY75SLm/R90WL/bqu8MxOvr9upYcNYCQuWS8z+OlLz+A8UuNPrzAc/LsGZ65Q==
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.7.5.tgz#c8baba5a06ed60b934697026b492169626af384b"
+  integrity sha512-I+Ue2Bkx6R9W5178DYrNvzjIdGh4wKKoCWsgz8dc7ysH4mA70Q3M9v5xRF0RUu7r+2CZj+nDeUecvh2paxcYvg==
 
 angular-patternfly@^4.0.0:
-  version "4.18.5"
-  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.18.5.tgz#9a1fe340b222a3befd2f4f5b814b8ee6a321c5e4"
-  integrity sha512-lSrMF724ErWwRaibL0nmtyEFZC74BdoQgHCNZwvrG7/m8bbNqwl/R+5I4E0/S4moEcbxoGSGcNaw4VF4tGY96w==
+  version "4.18.6"
+  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.18.6.tgz#4f62fc235d93aecd1c03f7ed70e08ec1ea2e5fdb"
+  integrity sha512-QWEwBniEQoengjMJMLh/qUCRfEPuDaZ2eH6kmOd74O9sImcOQjYTz4CFGoIS6PkVD2ZpvG0QL/or6Nnhf3SbUw==
   dependencies:
     angular "1.5.*"
     angular-animate "1.5.*"
@@ -961,7 +966,7 @@ bootstrap-touchspin@~3.1.1:
 
 bootstrap@3.3.x, bootstrap@^3.3, bootstrap@~3.3.7:
   version "3.3.7"
-  resolved "http://registry.npmjs.org/bootstrap/-/bootstrap-3.3.7.tgz#5a389394549f23330875a3b150656574f8a9eb71"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.3.7.tgz#5a389394549f23330875a3b150656574f8a9eb71"
   integrity sha1-WjiTlFSfIzMIdaOxUGVldPip63E=
 
 brace-expansion@^1.0.0, brace-expansion@^1.1.7:
@@ -1288,10 +1293,10 @@ concat-stream@1.5.2, concat-stream@1.6.0:
     readable-stream "~2.0.0"
     typedarray "~0.0.5"
 
-concat-with-sourcemaps@*, concat-with-sourcemaps@^1.0.0:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/concat-with-sourcemaps/-/concat-with-sourcemaps-1.0.5.tgz#8964bc2347d05819b63798104d87d6e001bed8d0"
-  integrity sha512-YtnS0VEY+e2Khzsey/6mra9EoM6h/5gxaC0e3mcHpA5yfDxafhygytNmcJWodvUgyXzSiL5MSkPO6bQGgfliHw==
+concat-with-sourcemaps@*, concat-with-sourcemaps@1.1.0, concat-with-sourcemaps@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/concat-with-sourcemaps/-/concat-with-sourcemaps-1.1.0.tgz#d4ea93f05ae25790951b99e7b3b09e3908a4082e"
+  integrity sha512-4gEjHJFT9e+2W/77h/DS5SGUgwDaOwprX8L/gl5+3ixnzkVJJsZWDSelmN3Oilw3LNDZjZV0yqH1hLG3k6nghg==
   dependencies:
     source-map "^0.6.1"
 
@@ -1666,7 +1671,7 @@ duplexer2@0.0.2:
 
 duplexer@^0.1.1, duplexer@~0.1.1:
   version "0.1.1"
-  resolved "http://registry.npmjs.org/duplexer/-/duplexer-0.1.1.tgz#ace6ff808c1ce66b57d1ebf97977acb02334cfc1"
+  resolved "https://registry.yarnpkg.com/duplexer/-/duplexer-0.1.1.tgz#ace6ff808c1ce66b57d1ebf97977acb02334cfc1"
   integrity sha1-rOb/gIwc5mtX0ev5eXessCM0z8E=
 
 duplexify@3.6.0, duplexify@^3.5.0, duplexify@^3.6.0:
@@ -2160,9 +2165,9 @@ flagged-respawn@^1.0.0:
   integrity sha1-Tnmumy6zi/hrO7Vr8+ClaqX8q9c=
 
 flatmap-stream@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/flatmap-stream/-/flatmap-stream-0.1.0.tgz#ed54e01422cd29281800914fcb968d58b685d5f1"
-  integrity sha512-Nlic4ZRYxikqnK5rj3YoxDVKGGtUjcNDUtvQ7XsdGLZmMwdUYnXf10o1zcXtzEZTBgc6GxeRpQxV/Wu3WPIIHA==
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/flatmap-stream/-/flatmap-stream-0.1.1.tgz#d34f39ef3b9aa5a2fc225016bd3adf28ac5ae6ea"
+  integrity sha512-lAq4tLbm3sidmdCN8G3ExaxH7cUCtP5mgDvrYowsx84dcYkJJ4I28N7gkxA6+YlSXzaGLJYIDEi9WGfXzMiXdw==
 
 flush-write-stream@^1.0.2:
   version "1.0.3"
@@ -2493,9 +2498,9 @@ graphlib@^2.1.1:
     lodash "^4.11.1"
 
 gulp-angular-templatecache@~2.2.0:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/gulp-angular-templatecache/-/gulp-angular-templatecache-2.2.1.tgz#f08088fd4b1a80733d627c4ba24728d4e9cca8a9"
-  integrity sha512-MAsOPoefYUaZ9a19+inieP+1r+/dD+QNy0QqYQD4WKn7nYiHob4cjJLIfZGl3M3wRGBxPM+la0zqUDSfUJWozQ==
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/gulp-angular-templatecache/-/gulp-angular-templatecache-2.2.2.tgz#dde1e5d1abe9df610d3498824fdc23e64d693548"
+  integrity sha512-esi4BPecJbvBOfXqKANl7NBsYHrfpee07bSL0QAOzjiG9kyGEVyOJoRCwOCRq1VF40a0G6x4V//Lv0FFJ25eKw==
   dependencies:
     event-stream "3.3.4"
     gulp-concat "2.6.1"
@@ -3210,7 +3215,7 @@ js-beautify@1.7.5:
     mkdirp "~0.5.0"
     nopt "~3.0.1"
 
-js-logger@1.4.1, js-logger@^1.3.0, js-logger@~1.3.0:
+js-logger@1.4.1, js-logger@^1.3.0, js-logger@~1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/js-logger/-/js-logger-1.4.1.tgz#f0230dc5e84e120f213d6e5a6b767a913d290335"
   integrity sha1-8CMNxehOEg8hPW5aa3Z6kT0pAzU=
@@ -3882,7 +3887,7 @@ mkdirp@0.5.0, mkdirp@0.5.1, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0:
 
 moment-timezone@^0.4.0, moment-timezone@^0.4.1:
   version "0.4.1"
-  resolved "http://registry.npmjs.org/moment-timezone/-/moment-timezone-0.4.1.tgz#81f598c3ad5e22cdad796b67ecd8d88d0f5baa06"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.4.1.tgz#81f598c3ad5e22cdad796b67ecd8d88d0f5baa06"
   integrity sha1-gfWYw61eIs2teWtn7NjYjQ9bqgY=
   dependencies:
     moment ">= 2.6.0"
@@ -4478,9 +4483,9 @@ patternfly-bootstrap-treeview@~2.1.0:
     jquery ">= 2.1.x"
 
 patternfly@^3.37.1:
-  version "3.54.8"
-  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.54.8.tgz#fd6c69714dc460575d2534c9f29017a58b442a83"
-  integrity sha512-6pGy2tBZRM7Cnxi3ziLPB4kbYO9mMzT8ZSU8bVZSux2d+j/o08XB50NU2l8djL0sEmsr8s4J06mwB3vTlAuUrg==
+  version "3.55.0"
+  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.55.0.tgz#ee8a711d42713738176aed51eb60722d7f324ad8"
+  integrity sha512-YG35hzE8To4BIZBM3gwi3SvIxLpefFmq46hwojlWS9gWLer4voyeQlS0O6daVzYZ7v5vecp6U3fwDiWcl3j4Iw==
   dependencies:
     bootstrap "~3.3.7"
     font-awesome "^4.7.0"
@@ -4511,7 +4516,7 @@ patternfly@^3.37.1:
 
 pause-stream@0.0.11, pause-stream@^0.0.11:
   version "0.0.11"
-  resolved "http://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz#fe5a34b0cbce12b5aa6a2b403ee2e73b602f1445"
+  resolved "https://registry.yarnpkg.com/pause-stream/-/pause-stream-0.0.11.tgz#fe5a34b0cbce12b5aa6a2b403ee2e73b602f1445"
   integrity sha1-/lo0sMvOErWqaitAPuLnO2AvFEU=
   dependencies:
     through "~2.3"
@@ -5481,7 +5486,7 @@ through2@2.0.3, through2@2.X, through2@^0.6.1, through2@^2.0.0, through2@^2.0.1,
 
 through@2, through@^2.3.8, through@~2.3, through@~2.3.1, through@~2.3.4:
   version "2.3.8"
-  resolved "http://registry.npmjs.org/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
+  resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=
 
 thunkify@^2.1.2:
@@ -5638,10 +5643,10 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@3.0.3, typescript@^3.0.0, typescript@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.3.tgz#4853b3e275ecdaa27f78fda46dc273a7eb7fc1c8"
-  integrity sha512-kk80vLW9iGtjMnIv11qyxLqZm20UklzuR2tL0QAnDIygIUIemcZMxlMWudl9OOt76H3ntVzcTiddQ1/pAAJMYg==
+typescript@3.1.3, typescript@^3.0.0, typescript@^3.0.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.3.tgz#01b70247a6d3c2467f70c45795ef5ea18ce191d5"
+  integrity sha512-+81MUSyX+BaSo+u2RbozuQk/UWx6hfG0a5gHu4ANEM4sU96XbuIyAB+rWBW1u70c6a5QuZfuYICn3s2UjuHUpA==
 
 uglify-js@^2.8.22:
   version "2.8.29"
