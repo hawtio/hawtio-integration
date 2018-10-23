@@ -259,6 +259,8 @@
     "stream-combiner": "0.2.2",
     "combined-stream": "1.0.7",
     "typescript": "3.0.3",
-    "event-stream": "3.3.6"
+    "event-stream": "3.3.6",
+    "@hawtio/core": "4.0.18",
+    "@hawtio/ui": "4.0.3"
   }
 }
