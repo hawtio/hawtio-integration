@@ -1,19 +1,22 @@
 /// <reference path="health.ts"/>
+/// <reference path="../common/endpoint-mbean.ts"/>
 
 namespace SpringBoot {
 
   export class HealthService {
 
-    constructor(private jolokiaService: JVM.JolokiaService, private humanizeService: Core.HumanizeService) {
+    constructor(private jolokiaService: JVM.JolokiaService, private humanizeService: Core.HumanizeService, private springBootService: SpringBootService) {
       'ngInject';
     }
 
     getHealth(): ng.IPromise<Health> {
       log.debug('Fetch health data');
-      return this.jolokiaService.getAttribute('org.springframework.boot:type=Endpoint,name=healthEndpoint', 'Data')
-        .then(data => {
-          const globalItem = this.getGlobalCard(data);
-          const items = this.getDetailCards(data);
+      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['healthEndpoint', 'Health'], ['getData', 'health'])
+      return this.jolokiaService.execute(mbean.objectName, mbean.operation)
+        .then(response => {
+          const details = response.details ? response.details : response;
+          const globalItem = this.getGlobalCard(response);
+          const items = this.getDetailCards(details);
           return new Health(globalItem, items);
         });
     }

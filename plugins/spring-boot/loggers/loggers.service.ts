@@ -1,15 +1,17 @@
 /// <reference path="logger.ts"/>
+/// <reference path="../common/endpoint-mbean.ts"/>
 
 namespace SpringBoot {
 
   export class LoggersService {
 
-    constructor(private jolokiaService: JVM.JolokiaService) {
+    constructor(private jolokiaService: JVM.JolokiaService, private springBootService: SpringBootService) {
       'ngInject';
     }
 
     getLoggerConfiguration(): ng.IPromise<LoggerConfiguration> {
-      return this.jolokiaService.getAttribute(loggersJmxDomain, 'Loggers')
+      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['loggersEndpoint', 'Loggers'], ['getLoggers', 'loggers'])
+      return this.jolokiaService.execute(mbean.objectName, mbean.operation)
         .then(data => {
           let loggers: Logger[] = [];
 
@@ -32,7 +34,8 @@ namespace SpringBoot {
     }
 
     setLoggerLevel(logger: Logger): ng.IPromise<void> {
-      return this.jolokiaService.execute(loggersJmxDomain, 'setLogLevel', logger.name, logger.configuredLevel);
+      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['loggersEndpoint', 'Loggers'], ['setLogLevel', 'configureLogLevel'])
+      return this.jolokiaService.execute(mbean.objectName, mbean.operation, logger.name, logger.configuredLevel);
     }
   }
 }

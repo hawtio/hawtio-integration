@@ -4,13 +4,15 @@
 describe("LoggersService", function() {
 
   let jolokiaService: jasmine.SpyObj<JVM.JolokiaService>;
+  let springBootService: jasmine.SpyObj<SpringBoot.SpringBootService>;
   let loggersService: SpringBoot.LoggersService;
   let $q: ng.IQService;
   let $rootScope: ng.IRootScopeService;
 
   beforeEach(inject(function(_$q_, _$rootScope_) {
-    jolokiaService = jasmine.createSpyObj('jolokiaService', ['getAttribute', 'execute']);
-    loggersService = new SpringBoot.LoggersService(jolokiaService);
+    jolokiaService = jasmine.createSpyObj('jolokiaService', ['execute']);
+    springBootService = jasmine.createSpyObj('springBootService', ['getEndpointMBean']);
+    loggersService = new SpringBoot.LoggersService(jolokiaService, springBootService);
     $q = _$q_;
     $rootScope = _$rootScope_;
   }));
@@ -19,8 +21,10 @@ describe("LoggersService", function() {
 
     it("should return logger configuration", function(done) {
       // given
+      springBootService.getEndpointMBean.and.returnValue({objectName: 'Loggers', operation: 'getLoggers'});
+
       let levels = [ "INFO", "ERROR", "WARN", "DEBUG", "TRACE", "OFF" ];
-      jolokiaService.getAttribute.and.returnValue($q.resolve({
+      jolokiaService.execute.and.returnValue($q.resolve({
         levels: levels,
         loggers: {
           "org": {
@@ -65,6 +69,8 @@ describe("LoggersService", function() {
 
     it("should set the configured logger level", function(done) {
       // given
+      springBootService.getEndpointMBean.and.returnValue({objectName: 'Loggers', operation: 'setLogLevel'});
+
       let logger = {
         name: "org.foo",
         effectiveLevel: "INFO",
@@ -75,7 +81,7 @@ describe("LoggersService", function() {
       loggersService.setLoggerLevel(logger);
 
       // then
-      expect(jolokiaService.execute).toHaveBeenCalledWith(SpringBoot.loggersJmxDomain, 'setLogLevel', 'org.foo', 'TRACE');
+      expect(jolokiaService.execute).toHaveBeenCalledWith('Loggers', 'setLogLevel', 'org.foo', 'TRACE');
       done();
     });
   });
