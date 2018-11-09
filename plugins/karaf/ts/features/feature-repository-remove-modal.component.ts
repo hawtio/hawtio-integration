@@ -41,13 +41,14 @@ namespace Karaf {
           <div class="form-group">
             <label class="col-sm-3 control-label" for="repository">Repository</label>
             <div class="col-sm-9">
-              <select ng-model="repository" ng-options="repository.name for repository in $ctrl.repositories"></select>
+              <select id="repository" class="form-control" ng-model="repository"
+                      ng-options="repository.name for repository in $ctrl.repositories"></select>
             </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" ng-click="$ctrl.dismiss()">Cancel</button>
-          <button type="submit" class="btn btn-primary" ng-disabled="!(repository !== '' && repository !== undefined)">Remove</button>
+          <button type="submit" class="btn btn-primary" ng-disabled="!repository">Remove</button>
         </div>
       </form>
     `,
