@@ -180,8 +180,6 @@ namespace Karaf {
       }
     };
 
-    toolbarActions = [];
-
     toolbarConfig = {
       filterConfig: {
         fields: [
@@ -215,7 +213,7 @@ namespace Karaf {
         resultsCount: 0
       },
       actionsConfig: {
-        primaryActions: this.toolbarActions
+        primaryActions: []
       },
       isTableView: false
     };
@@ -234,7 +232,7 @@ namespace Karaf {
         .then(mbean => {
           this.mbean = mbean;
           this.listItemActionButtons = this.itemActionButtons();
-          this.toolbarActions = this.toolbarActionButtons();
+          this.toolbarConfig.actionsConfig.primaryActions = this.toolbarActionButtons();
           this.loadFeatureRepositories();
         });
     }
@@ -324,7 +322,7 @@ namespace Karaf {
 
     private setUpdateInProgress(updateInProgress: boolean): void {
       this.listConfig.updateInProgress = updateInProgress;
-      this.toolbarActions.forEach(action => action.isDisabled = (this.listConfig.updateInProgress === true));
+      this.toolbarConfig.actionsConfig.primaryActions.forEach(action => action.isDisabled = (this.listConfig.updateInProgress === true));
     }
 
     private runWithDelay(fn: Function): void {
