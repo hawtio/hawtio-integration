@@ -1,4 +1,4 @@
-var _apacheCamelModelVersion = '2.21.1';
+var _apacheCamelModelVersion = '2.21.2';
 
 var _apacheCamelModel ={
   "definitions": {
@@ -4485,8 +4485,8 @@ var _apacheCamelModel ={
       "icon": "generic24.png",
       "description": "Defines a policy the route will use",
       "acceptInput": "true",
-      "acceptOutput": "true",
-      "nextSiblingAddedAsChild": "false",
+      "acceptOutput": "false",
+      "nextSiblingAddedAsChild": "true",
       "properties": {
         "ref": {
           "kind": "attribute",
@@ -5245,6 +5245,14 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "retryAttemptedLogInterval": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the interval to use for logging retry attempts",
+          "title": "Retry Attempted Log Interval",
+          "required": false,
+          "deprecated": false
+        },
         "logRetryAttempted": {
           "kind": "attribute",
           "type": "string",
@@ -5449,6 +5457,15 @@ var _apacheCamelModel ={
           "enum": [ "DEBUG", "ERROR", "INFO", "OFF", "TRACE", "WARN" ],
           "description": "Sets the logging level to use for log messages when retries are attempted.",
           "title": "Retry Attempted Log Level",
+          "required": false,
+          "deprecated": false
+        },
+        "retryAttemptedLogInterval": {
+          "kind": "attribute",
+          "type": "string",
+          "defaultValue": "0",
+          "description": "Sets the interval for log messages when retries are attempted.",
+          "title": "Retry Attempted Log Interval",
           "required": false,
           "deprecated": false
         },
@@ -8119,8 +8136,8 @@ var _apacheCamelModel ={
       "icon": "transactionalClient24.png",
       "description": "Enables transaction on the route",
       "acceptInput": "true",
-      "acceptOutput": "true",
-      "nextSiblingAddedAsChild": "false",
+      "acceptOutput": "false",
+      "nextSiblingAddedAsChild": "true",
       "properties": {
         "ref": {
           "kind": "attribute",
@@ -15080,4 +15097,4 @@ var _apacheCamelModel ={
       }
     }
   }
-};
+}
