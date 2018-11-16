@@ -14,6 +14,7 @@ namespace SpringBoot {
       traceModule
     ])
     .config(configureRoutes)
+    .run(configureHelp)
     .run(configureLayout)
     .component('springBoot', springBootComponent)
     .service('springBootService', SpringBootService)

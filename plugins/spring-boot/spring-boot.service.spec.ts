@@ -96,4 +96,25 @@ describe("SpringBootService", () => {
       expect(endpointMBean).toBeNull();
     });
   });
+
+  describe("isValid()", () => {
+
+    it("should return true when spring boot endpoints enabled", () => {
+      // given
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, true, true);
+      // when
+      const isValid = springBootService.isValid();
+      // then
+      expect(isValid).toEqual(true);
+    });
+
+    it("should return false when spring boot endpoints disabled", () => {
+      // given
+      workspace.treeContainsDomainAndProperties.and.returnValue(null);
+      // when
+      const isValid = springBootService.isValid();
+      // then
+      expect(isValid).toEqual(false);
+    });
+  });
 });

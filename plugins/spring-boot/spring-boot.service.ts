@@ -37,6 +37,10 @@ namespace SpringBoot {
       return null;
     }
 
+    isValid(): boolean {
+      return this.getTabs().length > 0;
+    }
+
     private hasEndpoint(name: string): boolean {
       return this.workspace.treeContainsDomainAndProperties('org.springframework.boot',
         {type: 'Endpoint', name: name});

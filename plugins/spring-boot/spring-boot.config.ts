@@ -17,8 +17,12 @@ namespace SpringBoot {
       title: 'Spring Boot',
       href: '/spring-boot',
       template: '<spring-boot></spring-boot>',
-      isValid: () => springBootService.getTabs().length > 0
+      isValid: () => springBootService.isValid()
     });
   }
 
+  export function configureHelp(helpRegistry: Help.HelpRegistry, springBootService: SpringBootService) {
+    'ngInject';
+    helpRegistry.addUserDoc('spring boot', 'plugins/spring-boot/doc/help.md', () => springBootService.isValid());
+  }
 }
