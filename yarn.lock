@@ -60,10 +60,10 @@
   dependencies:
     "@hawtio/ui" "~4.1.0"
 
-"@hawtio/jmx@~4.1.0":
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.1.4.tgz#40af0dd6c54c3f2b93953d02ca9610cdd519d29f"
-  integrity sha512-BPsERUeWAsTdObIMoX9o8eEDQcyk7I1gL68QqP7Wp4nrZhlSlpBiPb/tIhrXsOnil5FVoGaN1hH/kx73L1qoqA==
+"@hawtio/jmx@~4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.2.0.tgz#96c6dc0c8bc144e57b8238a5d5f9eeb013098b4a"
+  integrity sha512-JohrOn1XZLVXlFCPBD+uXZRkD6hdfxyqQadcj1+e3kKBK1cVRQzPyodFgkY++cbqAIn2BDMOhzCicyX/zUNvOQ==
   dependencies:
     "@hawtio/core" "~4.1.0"
     "@hawtio/forms" "~4.1.0"
@@ -412,11 +412,6 @@
   version "7.0.70"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.70.tgz#688aaeb6e6d374ed016c4dc2c46de695859d6887"
   integrity sha512-bAcW/1aM8/s5iFKhRpu/YJiQf/b1ZwnMRqqsWRCmAqEDQF2zY8Ez3Iu9AcZKFKc3vCJc8KJVpJ6Pn54sJ1BvXQ==
-
-"@types/sizzle@*":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
-  integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
 
 "@types/urijs@1.15.34":
   version "1.15.34"
