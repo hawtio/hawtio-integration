@@ -5,10 +5,10 @@ namespace SpringBoot {
 
   export class HealthController {
     readonly reloadDelay = 20000;
+    reloadTask: ng.IPromise<any>;
     health: Health;
-    promise: ng.IPromise<any>;
 
-    constructor(private $timeout: ng.ITimeoutService, private healthService: HealthService) {
+    constructor(private $interval: ng.IIntervalService, private healthService: HealthService) {
       'ngInject';
     }
 
@@ -17,17 +17,24 @@ namespace SpringBoot {
     }
 
     $onDestroy() {
-      this.cancelTimer();
+      this.cancelReloadTask();
     }
 
     loadDataPeriodically() {
-      this.healthService.getHealth()
-        .then(health => this.health = health)
-        .then(() => this.promise = this.$timeout(() => this.loadDataPeriodically(), this.reloadDelay));
+      this.loadData();
+      this.reloadTask = this.$interval(() => this.loadData(), this.reloadDelay);
     }
 
-    cancelTimer() {
-      this.$timeout.cancel(this.promise);
+    loadData() {
+      this.healthService.getHealth()
+        .then(health => this.health = health);
+    }
+
+    cancelReloadTask() {
+      const successfullyCancelled = this.$interval.cancel(this.reloadTask);
+      if (!successfullyCancelled) {
+        log.error('Failed to cancel Health data reload task');
+      }
     }
   }
 
