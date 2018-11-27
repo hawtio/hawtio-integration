@@ -20,7 +20,7 @@ namespace Camel {
         var name:string = reply.value["ComponentName"];
         if (name) {
           $scope.componentName = name;
-          log.info("Calling explainComponentJson for name:", name);
+          log.debug("Calling explainComponentJson for name:", name);
           var query = {
             type: 'exec',
             mbean: contextMBean,

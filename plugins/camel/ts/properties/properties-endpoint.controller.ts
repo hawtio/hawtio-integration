@@ -30,7 +30,7 @@ namespace Camel {
         var url:string = reply.value["EndpointUri"];
         if (url) {
           $scope.endpointUrl = url;
-          log.info("Calling explainEndpointJson for url:", url);
+          log.debug("Calling explainEndpointJson for url:", url);
           var query = {
             type: 'exec',
             mbean: contextMBean,
