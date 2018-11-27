@@ -26,7 +26,7 @@
     "@types/dagre-layout": "0.8.0",
     "angular-mocks": "~1.7.0",
     "del": "~3.0.0",
-    "event-stream": "~3.3.0",
+    "event-stream": "3.3.4",
     "gulp": "~3.9.0",
     "gulp-angular-templatecache": "~2.2.0",
     "gulp-concat": "~2.6.0",
@@ -258,7 +258,7 @@
     "split": "1.0.1",
     "stream-combiner": "0.2.2",
     "combined-stream": "1.0.7",
-    "event-stream": "3.3.6",
+    "event-stream": "3.3.4",
     "concat-with-sourcemaps": "1.1.0",
     "typescript": "3.1.3"
   }
