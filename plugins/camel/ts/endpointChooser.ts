@@ -250,7 +250,7 @@ namespace Camel {
 
     function onComponents(response) {
       $scope.componentNames = response;
-      log.info("onComponents: " + response);
+      log.debug("onComponents: " + response);
       $scope.hasComponentNames = $scope.componentNames ? true : false;
       Core.$apply($scope);
     }
