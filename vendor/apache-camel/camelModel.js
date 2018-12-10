@@ -1,4 +1,4 @@
-var _apacheCamelModelVersion = '2.22.2';
+var _apacheCamelModelVersion = '2.23.0';
 
 var _apacheCamelModel ={
   "definitions": {
@@ -180,7 +180,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "false",
-          "description": "Enables the batch completion mode where we aggregate from a org.apache.camel.BatchConsumer and aggregate the total number of exchanges the org.apache.camel.BatchConsumer has reported as total by checking the exchange property link org.apache.camel.ExchangeBATCH_COMPLETE when its complete.",
+          "description": "Enables the batch completion mode where we aggregate from a org.apache.camel.BatchConsumer and aggregate the total number of exchanges the org.apache.camel.BatchConsumer has reported as total by checking the exchange property org.apache.camel.Exchange#BATCH_COMPLETE when its complete.",
           "title": "Completion From Batch Consumer",
           "required": false,
           "deprecated": false
@@ -652,7 +652,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "string",
           "defaultValue": "true",
-          "description": "Sets whether the object should automatically start when Camel starts. Important: Currently only routes can be disabled, as CamelContexts are always started. Note: When setting auto startup false on CamelContext then that takes precedence and no routes is started. You would need to start CamelContext explicit using the link org.apache.camel.CamelContextstart() method, to start the context, and then you would need to start the routes manually using link CamelContextstartRoute(String).",
+          "description": "Sets whether the object should automatically start when Camel starts. Important: Currently only routes can be disabled, as CamelContexts are always started. Note: When setting auto startup false on CamelContext then that takes precedence and no routes is started. You would need to start CamelContext explicit using the org.apache.camel.CamelContext#start() method, to start the context, and then you would need to start the routes manually using CamelContext#startRoute(String).",
           "title": "Auto Startup",
           "required": false,
           "deprecated": false
@@ -703,7 +703,7 @@ var _apacheCamelModel ={
         "allowUseOriginalMessage": {
           "kind": "attribute",
           "type": "string",
-          "description": "Sets whether to allow access to the original message from Camel's error handler, or from link org.apache.camel.spi.UnitOfWorkgetOriginalInMessage(). Turning this off can optimize performance, as defensive copy of the original message is not needed.",
+          "description": "Sets whether to allow access to the original message from Camel's error handler, or from org.apache.camel.spi.UnitOfWork#getOriginalInMessage(). Turning this off can optimize performance, as defensive copy of the original message is not needed.",
           "title": "Allow Use Original Message",
           "required": false,
           "deprecated": false
@@ -729,7 +729,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "string",
           "defaultValue": "Camel (#camelId#) thread ##counter# - #name#",
-          "description": "Sets the thread name pattern used for creating the full thread name. The default pattern is: Camel (camelId) thread counter - name Where camelId is the name of the org.apache.camel.CamelContext and counter is a unique incrementing counter. and name is the regular thread name. You can also use longName is the long thread name which can includes endpoint parameters etc.",
+          "description": "Sets the thread name pattern used for creating the full thread name. The default pattern is: Camel (#camelId#) thread ##counter# - #name# Where #camelId# is the name of the org.apache.camel.CamelContext and #counter# is a unique incrementing counter. and #name# is the regular thread name. You can also use #longName# is the long thread name which can includes endpoint parameters etc.",
           "title": "Thread Name Pattern",
           "required": false,
           "deprecated": false
@@ -776,7 +776,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "false",
-          "description": "Sets whether or not type converter statistics is enabled. By default the type converter utilization statistics is disabled. Notice: If enabled then there is a slight performance impact under very heavy load. You can enable/disable the statistics at runtime using the link org.apache.camel.spi.TypeConverterRegistrygetStatistics()setTypeConverterStatisticsEnabled(Boolean) method, or from JMX on the org.apache.camel.api.management.mbean.ManagedTypeConverterRegistryMBean mbean.",
+          "description": "Sets whether or not type converter statistics is enabled. By default the type converter utilization statistics is disabled. Notice: If enabled then there is a slight performance impact under very heavy load. You can enable/disable the statistics at runtime using the org.apache.camel.spi.TypeConverterRegistry#getStatistics()#setTypeConverterStatisticsEnabled(Boolean) method, or from JMX on the org.apache.camel.api.management.mbean.ManagedTypeConverterRegistryMBean mbean.",
           "title": "Type Converter Statistics Enabled",
           "required": false,
           "deprecated": false
@@ -828,7 +828,7 @@ var _apacheCamelModel ={
         "package": {
           "kind": "element",
           "type": "array",
-          "description": "Sets the package names to be recursively searched for Java classes which extend org.apache.camel.builder.RouteBuilder to be auto-wired up to the CamelContext as a route. Note that classes are excluded if they are specifically configured in the spring.xml A more advanced configuration can be done using link setPackageScan(org.apache.camel.model.PackageScanDefinition)",
+          "description": "Sets the package names to be recursively searched for Java classes which extend org.apache.camel.builder.RouteBuilder to be auto-wired up to the CamelContext as a route. Note that classes are excluded if they are specifically configured in the spring.xml A more advanced configuration can be done using setPackageScan(org.apache.camel.model.PackageScanDefinition)",
           "title": "Package",
           "required": false,
           "deprecated": false
@@ -1185,7 +1185,7 @@ var _apacheCamelModel ={
         "filter": {
           "kind": "attribute",
           "type": "string",
-          "description": "Specified a filter to control what data gets merging data back from the claim check repository. The following syntax is supported: body - to aggregate the message body attachments - to aggregate all the message attachments headers - to aggregate all the message headers header:pattern - to aggregate all the message headers that matches the pattern. The pattern syntax is documented by: link EndpointHelpermatchPattern(String, String). You can specify multiple rules separated by comma. For example to include the message body and all headers starting with foo body,header:foo. The syntax supports the following prefixes which can be used to specify include,exclude, or remove - to include (which is the default mode) - - to exclude (exclude takes precedence over include) -- - to remove (remove takes precedence) For example to exclude a header name foo, and remove all headers starting with bar -header:foo,--headers:bar Note you cannot have both include and exclude header:pattern at the same time.",
+          "description": "Specified a filter to control what data gets merging data back from the claim check repository. The following syntax is supported: body - to aggregate the message body attachments - to aggregate all the message attachments headers - to aggregate all the message headers header:pattern - to aggregate all the message headers that matches the pattern. The pattern syntax is documented by: link EndpointHelper#matchPattern(String, String). You can specify multiple rules separated by comma. For example to include the message body and all headers starting with foo body,header:foo. The syntax supports the following prefixes which can be used to specify include,exclude, or remove - to include (which is the default mode) - - to exclude (exclude takes precedence over include) -- - to remove (remove takes precedence) For example to exclude a header name foo, and remove all headers starting with bar -header:foo,--headers:bar Note you cannot have both include and exclude header:pattern at the same time.",
           "title": "Filter",
           "required": false,
           "deprecated": false
@@ -2736,7 +2736,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "false",
-          "description": "If true the HystrixCircuitBreakerallowRequest() will always return true to allow requests regardless of the error percentage from HystrixCommandMetrics.getHealthCounts(). The circuitBreakerForceOpen() property takes precedence so if it set to true this property does nothing.",
+          "description": "If true the HystrixCircuitBreaker#allowRequest() will always return true to allow requests regardless of the error percentage from HystrixCommandMetrics.getHealthCounts(). The circuitBreakerForceOpen() property takes precedence so if it set to true this property does nothing.",
           "title": "Circuit Breaker Force Closed",
           "required": false,
           "deprecated": false
@@ -2791,7 +2791,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "true",
-          "description": "Whether the execution thread should attempt an interrupt (using link Futurecancel) when a thread times out. Applicable only when executionIsolationStrategy() == THREAD.",
+          "description": "Whether the execution thread should attempt an interrupt (using Future#cancel) when a thread times out. Applicable only when executionIsolationStrategy() == THREAD.",
           "title": "Execution Isolation Thread Interrupt On Timeout",
           "required": false,
           "deprecated": false
@@ -2800,7 +2800,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "integer",
           "defaultValue": "1000",
-          "description": "Time in milliseconds at which point the command will timeout and halt execution. If link executionIsolationThreadInterruptOnTimeout == true and the command is thread-isolated, the executing thread will be interrupted. If the command is semaphore-isolated and a HystrixObservableCommand, that command will get unsubscribed.",
+          "description": "Time in milliseconds at which point the command will timeout and halt execution. If executionIsolationThreadInterruptOnTimeout == true and the command is thread-isolated, the executing thread will be interrupted. If the command is semaphore-isolated and a HystrixObservableCommand, that command will get unsubscribed.",
           "title": "Execution Timeout In Milliseconds",
           "required": false,
           "deprecated": false
@@ -2908,7 +2908,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "integer",
           "defaultValue": "10",
-          "description": "Core thread-pool size that gets passed to link java.util.concurrent.ThreadPoolExecutorsetCorePoolSize(int)",
+          "description": "Core thread-pool size that gets passed to java.util.concurrent.ThreadPoolExecutor#setCorePoolSize(int)",
           "title": "Core Pool Size",
           "required": false,
           "deprecated": false
@@ -2917,7 +2917,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "integer",
           "defaultValue": "10",
-          "description": "Maximum thread-pool size that gets passed to link ThreadPoolExecutorsetMaximumPoolSize(int). This is the maximum amount of concurrency that can be supported without starting to reject HystrixCommands. Please note that this setting only takes effect if you also set allowMaximumSizeToDivergeFromCoreSize",
+          "description": "Maximum thread-pool size that gets passed to ThreadPoolExecutor#setMaximumPoolSize(int). This is the maximum amount of concurrency that can be supported without starting to reject HystrixCommands. Please note that this setting only takes effect if you also set allowMaximumSizeToDivergeFromCoreSize",
           "title": "Maximum Size",
           "required": false,
           "deprecated": false
@@ -2926,7 +2926,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "integer",
           "defaultValue": "1",
-          "description": "Keep-alive time in minutes that gets passed to link ThreadPoolExecutorsetKeepAliveTime(long, TimeUnit)",
+          "description": "Keep-alive time in minutes that gets passed to link ThreadPoolExecutor#setKeepAliveTime(long, TimeUnit)",
           "title": "Keep Alive Time",
           "required": false,
           "deprecated": false
@@ -2944,7 +2944,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "integer",
           "defaultValue": "5",
-          "description": "Queue size rejection threshold is an artificial max size at which rejections will occur even if link maxQueueSize has not been reached. This is done because the link maxQueueSize of a BlockingQueue can not be dynamically changed and we want to support dynamically changing the queue size that affects rejections. This is used by HystrixCommand when queuing a thread for execution.",
+          "description": "Queue size rejection threshold is an artificial max size at which rejections will occur even if maxQueueSize has not been reached. This is done because the maxQueueSize of a BlockingQueue can not be dynamically changed and we want to support dynamically changing the queue size that affects rejections. This is used by HystrixCommand when queuing a thread for execution.",
           "title": "Queue Size Rejection Threshold",
           "required": false,
           "deprecated": false
@@ -3034,7 +3034,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "true",
-          "description": "Sets whether to skip duplicates or not. The default behavior is to skip duplicates. A duplicate message would have the Exchange property link org.apache.camel.ExchangeDUPLICATE_MESSAGE set to a link BooleanTRUE value. A none duplicate message will not have this property set.",
+          "description": "Sets whether to skip duplicates or not. The default behavior is to skip duplicates. A duplicate message would have the Exchange property org.apache.camel.Exchange#DUPLICATE_MESSAGE set to a Boolean#TRUE value. A none duplicate message will not have this property set.",
           "title": "Skip Duplicate",
           "required": false,
           "deprecated": false
@@ -4877,7 +4877,7 @@ var _apacheCamelModel ={
         "encoding": {
           "kind": "attribute",
           "type": "string",
-          "description": "Encoding to use when loading properties file from the file system or classpath. If no encoding has been set, then the properties files is loaded using ISO-8859-1 encoding (latin-1) as documented by link java.util.Propertiesload(java.io.InputStream)",
+          "description": "Encoding to use when loading properties file from the file system or classpath. If no encoding has been set, then the properties files is loaded using ISO-8859-1 encoding (latin-1) as documented by java.util.Properties#load(java.io.InputStream)",
           "title": "Encoding",
           "required": false,
           "deprecated": false
@@ -7249,7 +7249,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "false",
-          "description": "When in streaming mode, then the splitter splits the original message on-demand, and each splitted message is processed one by one. This reduces memory usage as the splitter do not split all the messages first, but then we do not know the total size, and therefore the link org.apache.camel.ExchangeSPLIT_SIZE is empty. In non-streaming mode (default) the splitter will split each message first, to know the total size, and then process each message one by one. This requires to keep all the splitted messages in memory and therefore requires more memory. The total size is provided in the link org.apache.camel.ExchangeSPLIT_SIZE header. The streaming mode also affects the aggregation behavior. If enabled then Camel will process replies out-of-order, eg in the order they come back. If disabled, Camel will process replies in the same order as the messages was splitted.",
+          "description": "When in streaming mode, then the splitter splits the original message on-demand, and each splitted message is processed one by one. This reduces memory usage as the splitter do not split all the messages first, but then we do not know the total size, and therefore the org.apache.camel.Exchange#SPLIT_SIZE is empty. In non-streaming mode (default) the splitter will split each message first, to know the total size, and then process each message one by one. This requires to keep all the splitted messages in memory and therefore requires more memory. The total size is provided in the org.apache.camel.Exchange#SPLIT_SIZE header. The streaming mode also affects the aggregation behavior. If enabled then Camel will process replies out-of-order, eg in the order they come back. If disabled, Camel will process replies in the same order as the messages was splitted.",
           "title": "Streaming",
           "required": false,
           "deprecated": false
@@ -7520,7 +7520,7 @@ var _apacheCamelModel ={
         "spoolThreshold": {
           "kind": "attribute",
           "type": "string",
-          "description": "Threshold in bytes when overflow to disk is activated. The default threshold is link org.apache.camel.StreamCacheDEFAULT_SPOOL_THRESHOLD bytes (eg 128kb). Use -1 to disable overflow to disk.",
+          "description": "Threshold in bytes when overflow to disk is activated. The default threshold is org.apache.camel.StreamCache#DEFAULT_SPOOL_THRESHOLD bytes (eg 128kb). Use -1 to disable overflow to disk.",
           "title": "Spool Threshold",
           "required": false,
           "deprecated": false
@@ -7552,7 +7552,7 @@ var _apacheCamelModel ={
         "bufferSize": {
           "kind": "attribute",
           "type": "string",
-          "description": "Sets the buffer size to use when allocating in-memory buffers used for in-memory stream caches. The default size is link org.apache.camel.util.IOHelperDEFAULT_BUFFER_SIZE",
+          "description": "Sets the buffer size to use when allocating in-memory buffers used for in-memory stream caches. The default size is org.apache.camel.util.IOHelper#DEFAULT_BUFFER_SIZE",
           "title": "Buffer Size",
           "required": false,
           "deprecated": false
@@ -7966,6 +7966,14 @@ var _apacheCamelModel ={
           "description": "Expression to configure the maximum number of messages to throttle per request",
           "title": "Expression",
           "required": true,
+          "deprecated": false
+        },
+        "correlationExpression": {
+          "kind": "expression",
+          "type": "object",
+          "description": "The expression used to calculate the correlation key to use for throttle grouping. The Exchange which has the same correlation key is throttled together.",
+          "title": "Correlation Expression",
+          "required": false,
           "deprecated": false
         },
         "executorServiceRef": {
@@ -10437,7 +10445,7 @@ var _apacheCamelModel ={
         "apiContextIdPattern": {
           "kind": "attribute",
           "type": "string",
-          "description": "Sets an CamelContext id pattern to only allow Rest APIs from rest services within CamelContext's which name matches the pattern. The pattern name refers to the CamelContext name, to match on the current CamelContext only. For any other value, the pattern uses the rules from link org.apache.camel.util.EndpointHelpermatchPattern(String, String)",
+          "description": "Sets an CamelContext id pattern to only allow Rest APIs from rest services within CamelContext's which name matches the pattern. The pattern #name# refers to the CamelContext name, to match on the current CamelContext only. For any other value, the pattern uses the rules from link org.apache.camel.util.EndpointHelper#matchPattern(String, String)",
           "title": "Api Context Id Pattern",
           "required": false,
           "deprecated": false
@@ -11283,7 +11291,7 @@ var _apacheCamelModel ={
         "allowedUnmarshallObjects": {
           "kind": "attribute",
           "type": "string",
-          "description": "Define the allowed objects to be unmarshalled. You can specify the FQN class name of allowed objects, and you can use comma to separate multiple entries. It is also possible to use wildcards and regular expression which is based on the pattern defined by link org.apache.camel.util.EndpointHelpermatchPattern(String, String). Denied objects takes precedence over allowed objects.",
+          "description": "Define the allowed objects to be unmarshalled. You can specify the FQN class name of allowed objects, and you can use comma to separate multiple entries. It is also possible to use wildcards and regular expression which is based on the pattern defined by link org.apache.camel.util.EndpointHelper#matchPattern(String, String). Denied objects takes precedence over allowed objects.",
           "title": "Allowed Unmarshall Objects",
           "required": false,
           "deprecated": false
@@ -11291,7 +11299,7 @@ var _apacheCamelModel ={
         "deniedUnmarshallObjects": {
           "kind": "attribute",
           "type": "string",
-          "description": "Define the denied objects to be unmarshalled. You can specify the FQN class name of deined objects, and you can use comma to separate multiple entries. It is also possible to use wildcards and regular expression which is based on the pattern defined by link org.apache.camel.util.EndpointHelpermatchPattern(String, String). Denied objects takes precedence over allowed objects.",
+          "description": "Define the denied objects to be unmarshalled. You can specify the FQN class name of deined objects, and you can use comma to separate multiple entries. It is also possible to use wildcards and regular expression which is based on the pattern defined by link org.apache.camel.util.EndpointHelper#matchPattern(String, String). Denied objects takes precedence over allowed objects.",
           "title": "Denied Unmarshall Objects",
           "required": false,
           "deprecated": false
@@ -11763,7 +11771,7 @@ var _apacheCamelModel ={
     "fhirJson": {
       "type": "object",
       "title": "FHIR JSon",
-      "group": "dataformat,transformation,hl7",
+      "group": "dataformat,transformation,hl7,json",
       "icon": "generic24.png",
       "description": "The FHIR JSon data format is used to marshall/unmarshall to/from FHIR objects to/from JSON.",
       "properties": {
@@ -11774,6 +11782,109 @@ var _apacheCamelModel ={
           "enum": [ "DSTU2", "DSTU2_1", "DSTU2_HL7ORG", "DSTU3", "R4" ],
           "description": "The version of FHIR to use. Possible values are: DSTU2,DSTU2_HL7ORG,DSTU2_1,DSTU3,R4",
           "title": "Fhir Version",
+          "required": false,
+          "deprecated": false
+        },
+        "prettyPrint": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "Sets the pretty print flag, meaning that the parser will encode resources with human-readable spacing and newlines between elements instead of condensing output as much as possible.",
+          "title": "Pretty Print",
+          "required": false,
+          "deprecated": false
+        },
+        "serverBaseUrl": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the server's base URL used by this parser. If a value is set, resource references will be turned into relative references if they are provided as absolute URLs but have a base matching the given base.",
+          "title": "Server Base Url",
+          "required": false,
+          "deprecated": false
+        },
+        "omitResourceId": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (default is false) the ID of any resources being encoded will not be included in the output. Note that this does not apply to contained resources, only to root resources. In other words, if this is set to true, contained resources will still have local IDs but the outer/containing ID will not have an ID.",
+          "title": "Omit Resource Id",
+          "required": false,
+          "deprecated": false
+        },
+        "encodeElementsAppliesToResourceTypes": {
+          "kind": "attribute",
+          "type": "object",
+          "description": "If provided, tells the parse which resource types to apply link #setEncodeElements(Set) encode elements to. Any resource types not specified here will be encoded completely, with no elements excluded.",
+          "title": "Encode Elements Applies To Resource Types",
+          "required": false,
+          "deprecated": false
+        },
+        "encodeElementsAppliesToChildResourcesOnly": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (default is false), the values supplied to setEncodeElements(Set) will not be applied to the root resource (typically a Bundle), but will be applied to any sub-resources contained within it (i.e. search result resources in that bundle)",
+          "title": "Encode Elements Applies To Child Resources Only",
+          "required": false,
+          "deprecated": false
+        },
+        "encodeElements": {
+          "kind": "attribute",
+          "type": "object",
+          "description": "If provided, specifies the elements which should be encoded, to the exclusion of all others. Valid values for this field would include: Patient - Encode patient and all its children Patient.name - Encode only the patient's name Patient.name.family - Encode only the patient's family name .text - Encode the text element on any resource (only the very first position may contain a wildcard) .(mandatory) - This is a special case which causes any mandatory fields (min 0) to be encoded",
+          "title": "Encode Elements",
+          "required": false,
+          "deprecated": false
+        },
+        "dontEncodeElements": {
+          "kind": "attribute",
+          "type": "object",
+          "description": "If provided, specifies the elements which should NOT be encoded. Valid values for this field would include: Patient - Don't encode patient and all its children Patient.name - Don't encode the patient's name Patient.name.family - Don't encode the patient's family name .text - Don't encode the text element on any resource (only the very first position may contain a wildcard) DSTU2 note: Note that values including meta, such as Patient.meta will work for DSTU2 parsers, but values with subelements on meta such as Patient.meta.lastUpdated will only work in DSTU3 mode.",
+          "title": "Dont Encode Elements",
+          "required": false,
+          "deprecated": false
+        },
+        "stripVersionsFromReferences": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (which is the default), resource references containing a version will have the version removed when the resource is encoded. This is generally good behaviour because in most situations, references from one resource to another should be to the resource by ID, not by ID and version. In some cases though, it may be desirable to preserve the version in resource links. In that case, this value should be set to false. This method provides the ability to globally disable reference encoding. If finer-grained control is needed, use setDontStripVersionsFromReferencesAtPaths(List)",
+          "title": "Strip Versions From References",
+          "required": false,
+          "deprecated": false
+        },
+        "overrideResourceIdWithBundleEntryFullUrl": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (which is the default), the Bundle.entry.fullUrl will override the Bundle.entry.resource's resource id if the fullUrl is defined. This behavior happens when parsing the source data into a Bundle object. Set this to false if this is not the desired behavior (e.g. the client code wishes to perform additional validation checks between the fullUrl and the resource id).",
+          "title": "Override Resource Id With Bundle Entry Full Url",
+          "required": false,
+          "deprecated": false
+        },
+        "summaryMode": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (default is false) only elements marked by the FHIR specification as being summary elements will be included.",
+          "title": "Summary Mode",
+          "required": false,
+          "deprecated": false
+        },
+        "suppressNarratives": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (default is false), narratives will not be included in the encoded values.",
+          "title": "Suppress Narratives",
+          "required": false,
+          "deprecated": false
+        },
+        "dontStripVersionsFromReferencesAtPaths": {
+          "kind": "attribute",
+          "type": "array",
+          "description": "If supplied value(s), any resource references at the specified paths will have their resource versions encoded instead of being automatically stripped during the encoding process. This setting has no effect on the parsing process. This method provides a finer-grained level of control than setStripVersionsFromReferences(Boolean) and any paths specified by this method will be encoded even if setStripVersionsFromReferences(Boolean) has been set to true (which is the default)",
+          "title": "Dont Strip Versions From References At Paths",
           "required": false,
           "deprecated": false
         },
@@ -11799,7 +11910,7 @@ var _apacheCamelModel ={
     "fhirXml": {
       "type": "object",
       "title": "FHIR XML",
-      "group": "dataformat,transformation,hl7",
+      "group": "dataformat,transformation,hl7,xml",
       "icon": "generic24.png",
       "description": "The FHIR XML data format is used to marshall/unmarshall from/to FHIR objects to/from XML.",
       "properties": {
@@ -11810,6 +11921,109 @@ var _apacheCamelModel ={
           "enum": [ "DSTU2", "DSTU2_1", "DSTU2_HL7ORG", "DSTU3", "R4" ],
           "description": "The version of FHIR to use. Possible values are: DSTU2,DSTU2_HL7ORG,DSTU2_1,DSTU3,R4",
           "title": "Fhir Version",
+          "required": false,
+          "deprecated": false
+        },
+        "prettyPrint": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "Sets the pretty print flag, meaning that the parser will encode resources with human-readable spacing and newlines between elements instead of condensing output as much as possible.",
+          "title": "Pretty Print",
+          "required": false,
+          "deprecated": false
+        },
+        "serverBaseUrl": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the server's base URL used by this parser. If a value is set, resource references will be turned into relative references if they are provided as absolute URLs but have a base matching the given base.",
+          "title": "Server Base Url",
+          "required": false,
+          "deprecated": false
+        },
+        "omitResourceId": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (default is false) the ID of any resources being encoded will not be included in the output. Note that this does not apply to contained resources, only to root resources. In other words, if this is set to true, contained resources will still have local IDs but the outer/containing ID will not have an ID.",
+          "title": "Omit Resource Id",
+          "required": false,
+          "deprecated": false
+        },
+        "encodeElementsAppliesToResourceTypes": {
+          "kind": "attribute",
+          "type": "object",
+          "description": "If provided, tells the parse which resource types to apply link #setEncodeElements(Set) encode elements to. Any resource types not specified here will be encoded completely, with no elements excluded.",
+          "title": "Encode Elements Applies To Resource Types",
+          "required": false,
+          "deprecated": false
+        },
+        "encodeElementsAppliesToChildResourcesOnly": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (default is false), the values supplied to setEncodeElements(Set) will not be applied to the root resource (typically a Bundle), but will be applied to any sub-resources contained within it (i.e. search result resources in that bundle)",
+          "title": "Encode Elements Applies To Child Resources Only",
+          "required": false,
+          "deprecated": false
+        },
+        "encodeElements": {
+          "kind": "attribute",
+          "type": "object",
+          "description": "If provided, specifies the elements which should be encoded, to the exclusion of all others. Valid values for this field would include: Patient - Encode patient and all its children Patient.name - Encode only the patient's name Patient.name.family - Encode only the patient's family name .text - Encode the text element on any resource (only the very first position may contain a wildcard) .(mandatory) - This is a special case which causes any mandatory fields (min 0) to be encoded",
+          "title": "Encode Elements",
+          "required": false,
+          "deprecated": false
+        },
+        "dontEncodeElements": {
+          "kind": "attribute",
+          "type": "object",
+          "description": "If provided, specifies the elements which should NOT be encoded. Valid values for this field would include: Patient - Don't encode patient and all its children Patient.name - Don't encode the patient's name Patient.name.family - Don't encode the patient's family name .text - Don't encode the text element on any resource (only the very first position may contain a wildcard) DSTU2 note: Note that values including meta, such as Patient.meta will work for DSTU2 parsers, but values with subelements on meta such as Patient.meta.lastUpdated will only work in DSTU3 mode.",
+          "title": "Dont Encode Elements",
+          "required": false,
+          "deprecated": false
+        },
+        "stripVersionsFromReferences": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (which is the default), resource references containing a version will have the version removed when the resource is encoded. This is generally good behaviour because in most situations, references from one resource to another should be to the resource by ID, not by ID and version. In some cases though, it may be desirable to preserve the version in resource links. In that case, this value should be set to false. This method provides the ability to globally disable reference encoding. If finer-grained control is needed, use setDontStripVersionsFromReferencesAtPaths(List)",
+          "title": "Strip Versions From References",
+          "required": false,
+          "deprecated": false
+        },
+        "overrideResourceIdWithBundleEntryFullUrl": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (which is the default), the Bundle.entry.fullUrl will override the Bundle.entry.resource's resource id if the fullUrl is defined. This behavior happens when parsing the source data into a Bundle object. Set this to false if this is not the desired behavior (e.g. the client code wishes to perform additional validation checks between the fullUrl and the resource id).",
+          "title": "Override Resource Id With Bundle Entry Full Url",
+          "required": false,
+          "deprecated": false
+        },
+        "summaryMode": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (default is false) only elements marked by the FHIR specification as being summary elements will be included.",
+          "title": "Summary Mode",
+          "required": false,
+          "deprecated": false
+        },
+        "suppressNarratives": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "If set to true (default is false), narratives will not be included in the encoded values.",
+          "title": "Suppress Narratives",
+          "required": false,
+          "deprecated": false
+        },
+        "dontStripVersionsFromReferencesAtPaths": {
+          "kind": "attribute",
+          "type": "array",
+          "description": "If supplied value(s), any resource references at the specified paths will have their resource versions encoded instead of being automatically stripped during the encoding process. This setting has no effect on the parsing process. This method provides a finer-grained level of control than setStripVersionsFromReferences(Boolean) and any paths specified by this method will be encoded even if setStripVersionsFromReferences(Boolean) has been set to true (which is the default)",
+          "title": "Dont Strip Versions From References At Paths",
           "required": false,
           "deprecated": false
         },
@@ -12117,7 +12331,7 @@ var _apacheCamelModel ={
         "include": {
           "kind": "attribute",
           "type": "string",
-          "description": "If you want to marshal a pojo to JSON, and the pojo has some fields with null values. And you want to skip these null values, you can set this option to NOT_NULL",
+          "description": "If you want to marshal a pojo to JSON, and the pojo has some fields with null values. And you want to skip these null values, you can set this option to NON_NULL",
           "title": "Include",
           "required": false,
           "deprecated": false
@@ -12491,7 +12705,7 @@ var _apacheCamelModel ={
         "include": {
           "kind": "attribute",
           "type": "string",
-          "description": "If you want to marshal a pojo to JSON, and the pojo has some fields with null values. And you want to skip these null values, you can set this option to NOT_NULL",
+          "description": "If you want to marshal a pojo to JSON, and the pojo has some fields with null values. And you want to skip these null values, you can set this option to NON_NULL",
           "title": "Include",
           "required": false,
           "deprecated": false
@@ -12943,6 +13157,14 @@ var _apacheCamelModel ={
           "type": "string",
           "description": "A String used as passPhrase to encrypt/decrypt content. The passPhrase has to be provided. If no passPhrase is specified, a default passPhrase is used. The passPhrase needs to be put together in conjunction with the appropriate encryption algorithm. For example using TRIPLEDES the passPhase can be a Only another 24 Byte key",
           "title": "Pass Phrase",
+          "required": false,
+          "deprecated": false
+        },
+        "passPhraseByte": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "A byte used as passPhrase to encrypt/decrypt content. The passPhrase has to be provided. If no passPhrase is specified, a default passPhrase is used. The passPhrase needs to be put together in conjunction with the appropriate encryption algorithm. For example using TRIPLEDES the passPhase can be a Only another 24 Byte key",
+          "title": "Pass Phrase Byte",
           "required": false,
           "deprecated": false
         },
@@ -13503,7 +13725,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "string",
           "defaultValue": "#",
-          "description": "The comment symbol. The default value is",
+          "description": "The comment symbol. The default value is #",
           "title": "Comment",
           "required": false,
           "deprecated": false
@@ -13668,7 +13890,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "string",
           "defaultValue": "#",
-          "description": "The comment symbol. The default value is",
+          "description": "The comment symbol. The default value is #",
           "title": "Comment",
           "required": false,
           "deprecated": false
@@ -13841,7 +14063,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "string",
           "defaultValue": "#",
-          "description": "The comment symbol. The default value is",
+          "description": "The comment symbol. The default value is #",
           "title": "Comment",
           "required": false,
           "deprecated": false
