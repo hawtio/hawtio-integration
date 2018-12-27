@@ -26,14 +26,14 @@ namespace Camel {
       actionFn: action => {
         let selectedRoutes = this.getSelectedRoutes();
         this.routesService.stopRoutes(selectedRoutes)
-        .then(response => {
-          Core.notification('success', `Stopped ${Core.maybePlural(selectedRoutes.length, 'route')} successfully`);
-          this.updateRoutes()
-        })
-        .catch(error => {
-          Core.notification('danger', error);
-          this.updateRoutes();
-        });
+          .then(response => {
+            Core.notification('success', `Stopped ${Core.maybePlural(selectedRoutes.length, 'route')} successfully`);
+            this.updateRoutes()
+          })
+          .catch(error => {
+            Core.notification('danger', error);
+            this.updateRoutes();
+          });
       },
       isDisabled: true
     };
@@ -44,17 +44,17 @@ namespace Camel {
         this.$uibModal.open({
           templateUrl: 'plugins/camel/html/deleteRouteWarningModal.html'
         })
-        .result.then(() => {
-          this.routesService.removeRoutes(selectedRoutes)
-          .then(response => {
-            Core.notification('success', `Deleted ${Core.maybePlural(selectedRoutes.length, 'route')} successfully`);
-            this.removeSelectedRoutes()
-          })
-          .catch(error => {
-            Core.notification('danger', error);
-            this.updateRoutes();
+          .result.then(() => {
+            this.routesService.removeRoutes(selectedRoutes)
+              .then(response => {
+                Core.notification('success', `Deleted ${Core.maybePlural(selectedRoutes.length, 'route')} successfully`);
+                this.removeSelectedRoutes()
+              })
+              .catch(error => {
+                Core.notification('danger', error);
+                this.updateRoutes();
+              });
           });
-        });
       },
       isDisabled: true
     }
@@ -62,13 +62,20 @@ namespace Camel {
     toolbarConfig = null;
 
     tableConfig = {
-      selectionMatchProp: "name",
+      selectionMatchProp: 'name',
       onCheckBoxChange: item => this.enableDisableActions()
     };
 
     tableColumns = [
-      { header: "Name", itemField: "name" },
-      { header: "State", itemField: "state" }
+      { header: 'Name', itemField: 'name' },
+      { header: 'State', itemField: 'state' },
+      { header: 'Uptime', itemField: 'uptime' },
+      { header: 'Completed', itemField: 'exchangesCompleted' },
+      { header: 'Failed', itemField: 'exchangesFailed' },
+      { header: 'Handled', itemField: 'failuresHandled' },
+      { header: 'Total', itemField: 'exchangesTotal' },
+      { header: 'Inflight', itemField: 'exchangesInflight' },
+      { header: 'Mean time', itemField: 'meanProcessingTime' },
     ];
 
     routes: Route[];
@@ -96,7 +103,7 @@ namespace Camel {
       if (this.routesService.canDeleteRoutes(this.routes)) {
         moreActions.push(this.deleteAction);
       }
-      log.debug("RBAC - Rendered routes actions:", primaryActions.concat(moreActions));
+      log.debug('RBAC - Rendered routes actions:', primaryActions.concat(moreActions));
       if (primaryActions.length > 0 || moreActions.length > 0) {
         this.toolbarConfig = {
           actionsConfig: {
@@ -123,7 +130,7 @@ namespace Camel {
       return this.treeService.getSelectedMBean()
         .then(mbean => {
           if (mbean.children) {
-            let children = mbean.children.filter(node => {return node.objectName != null})
+            let children = mbean.children.filter(node => { return node.objectName != null })
             let mbeanNames = _.map(children, node => node.objectName);
             return this.routesService.getRoutes(mbeanNames)
               .then(routes => this.routes = routes);
@@ -137,7 +144,7 @@ namespace Camel {
         .then(routes => {
           for (let i = 0; i < routes.length; i++) {
             if (this.routes[i].state !== routes[i].state) {
-              this.routes[i] = angular.extend({}, this.routes[i], {state: routes[i].state});
+              this.routes[i] = angular.extend({}, this.routes[i], { state: routes[i].state });
             }
           }
           this.enableDisableActions();
@@ -167,7 +174,8 @@ namespace Camel {
           <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
         </div>
         <div ng-if="$ctrl.showTable">
-          <pf-table-view config="$ctrl.tableConfig" columns="$ctrl.tableColumns" items="$ctrl.routes"></pf-table-view>
+          <pf-table-view class="camel-routes-table" config="$ctrl.tableConfig" columns="$ctrl.tableColumns"
+                         items="$ctrl.routes"></pf-table-view>
         </div>
       </div>
     `,

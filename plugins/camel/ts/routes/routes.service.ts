@@ -16,12 +16,18 @@ namespace Camel {
 
     getRoute(objectName: string): ng.IPromise<Route> {
       return this.jolokiaService.getMBean(objectName)
-        .then(mbean => new Route(mbean.RouteId, mbean.State, objectName));
+        .then(mbean => this.buildRoute(mbean, objectName));
     }
 
     getRoutes(objectNames: string[]): ng.IPromise<Route[]> {
       return this.jolokiaService.getMBeans(objectNames)
-        .then(mbeans => mbeans.map((mbean, i) => new Route(mbean.RouteId, mbean.State, objectNames[i])));
+        .then(mbeans => mbeans.map((mbean, i) => this.buildRoute(mbean, objectNames[i])));
+    }
+
+    private buildRoute(mbean, objectName): Route {
+      return new Route(mbean.RouteId, mbean.State, objectName, mbean.Uptime, mbean.ExchangesCompleted,
+        mbean.ExchangesFailed, mbean.FailuresHandled, mbean.ExchangesTotal, mbean.ExchangesInflight,
+        mbean.MeanProcessingTime);
     }
 
     startRoute(route: Route): ng.IPromise<any> {
