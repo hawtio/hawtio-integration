@@ -28,27 +28,31 @@ namespace Camel {
     }
 
     start(): void {
-      this.contextsService.startContext(this.context)
-        .then(response => {
-          Core.notification('success', 'Camel context started successfully');
-          this.contextsService.getContext(this.context.mbeanName)
-            .then(context => this.context = context);
-        })
-        .catch(error => {
-          Core.notification('danger', error);
-        });
+      if (!this.context.isStarted()) {
+        this.contextsService.startContext(this.context)
+          .then(response => {
+            Core.notification('success', 'Camel context started successfully');
+            this.contextsService.getContext(this.context.mbeanName)
+              .then(context => this.context = context);
+          })
+          .catch(error => {
+            Core.notification('danger', error);
+          });
+      }
     }
 
     suspend(): void {
-      this.contextsService.suspendContext(this.context)
-        .then(response => {
-          Core.notification('success', 'Camel context suspended successfully');
-          this.contextsService.getContext(this.context.mbeanName)
-            .then(context => this.context = context);
-        })
-        .catch(error => {
-          Core.notification('danger', error);
-        });
+      if (!this.context.isSuspended()) {
+        this.contextsService.suspendContext(this.context)
+          .then(response => {
+            Core.notification('success', 'Camel context suspended successfully');
+            this.contextsService.getContext(this.context.mbeanName)
+              .then(context => this.context = context);
+          })
+          .catch(error => {
+            Core.notification('danger', error);
+          });
+      }
     }
 
     delete(): void {
@@ -82,10 +86,10 @@ namespace Camel {
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-          <li ng-class="{disabled: $ctrl.context.state === 'Started'}">
+          <li ng-class="{disabled: $ctrl.context.isStarted()}">
             <a href="#" ng-click="$ctrl.start()">Start</a>
           </li>
-          <li ng-class="{disabled: $ctrl.context.state === 'Suspended'}">
+          <li ng-class="{disabled: $ctrl.context.isSuspended()}">
             <a href="#" ng-click="$ctrl.suspend()">Suspend</a>
           </li>
           <li>
