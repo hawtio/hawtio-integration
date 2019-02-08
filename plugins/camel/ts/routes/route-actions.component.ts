@@ -11,7 +11,7 @@ namespace Camel {
       private routesService: RoutesService) {
       'ngInject';
     }
-    
+
     $onInit() {
       this.unsubscribe = this.$scope.$on(Jmx.TreeEvent.NodeSelected, (event, selectedNode: Jmx.NodeSelection) => {
         if (this.workspace.isRoute()) {
@@ -28,44 +28,50 @@ namespace Camel {
     }
 
     start(): void {
-      this.routesService.startRoute(this.route)
-        .then(response => {
-          Core.notification('success', 'Route started successfully');
-          this.routesService.getRoute(this.route.mbean)
-            .then(route => this.route = route);
-        })
-        .catch(error => {
-          Core.notification('danger', error);
-        });
-    }
-
-    stop(): void {
-      this.routesService.stopRoute(this.route)
-        .then(response => {
-          Core.notification('success', 'Route stopped successfully');
-          this.routesService.getRoute(this.route.mbean)
-            .then(route => this.route = route);
-        })
-        .catch(error => {
-          Core.notification('danger', error);
-        });
-    }
-
-    delete(): void {
-      this.$uibModal.open({
-        templateUrl: 'plugins/camel/html/deleteRouteWarningModal.html'
-      })
-      .result.then(() => {
-        this.routesService.removeRoute(this.route)
+      if (!this.route.isStarted()) {
+        this.routesService.startRoute(this.route)
           .then(response => {
-            Core.notification('success', 'Route deleted successfully');
-            this.route = null;
-            this.workspace.loadTree();
+            Core.notification('success', 'Route started successfully');
+            this.routesService.getRoute(this.route.mbean)
+              .then(route => this.route = route);
           })
           .catch(error => {
             Core.notification('danger', error);
           });
-        });
+      }
+    }
+
+    stop(): void {
+      if (!this.route.isStopped()) {
+        this.routesService.stopRoute(this.route)
+          .then(response => {
+            Core.notification('success', 'Route stopped successfully');
+            this.routesService.getRoute(this.route.mbean)
+              .then(route => this.route = route);
+          })
+          .catch(error => {
+            Core.notification('danger', error);
+          });
+      }
+    }
+
+    delete(): void {
+      if (!this.route.isStarted()) {
+        this.$uibModal.open({
+          templateUrl: 'plugins/camel/html/deleteRouteWarningModal.html'
+        })
+        .result.then(() => {
+          this.routesService.removeRoute(this.route)
+            .then(response => {
+              Core.notification('success', 'Route deleted successfully');
+              this.route = null;
+              this.workspace.loadTree();
+            })
+            .catch(error => {
+              Core.notification('danger', error);
+            });
+          });
+      }
     }
   }
 
