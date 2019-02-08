@@ -14,9 +14,10 @@
     "prepack": "gulp version"
   },
   "dependencies": {
-    "@hawtio/jmx": "~4.2.0",
+    "@hawtio/jmx": "~4.3.0",
     "@types/angular-mocks": "~1.7.0",
     "@types/angular-ui-bootstrap": "~0.13.46",
+    "@types/jquery": "2.0.53",
     "@types/jqueryui": "1.12.2",
     "dagre-layout": "0.8.0",
     "ng-infinite-scroll": "1.3.0"
@@ -199,7 +200,6 @@
     "colors": "1.1.2",
     "commander": "2.12.2",
     "bufferstreams": "1.1.3",
-    "@types/jquery": "2.0.49",
     "process-nextick-args": "1.0.7",
     "detect-file": "1.0.0",
     "micromatch": "3.1.9",
@@ -249,9 +249,6 @@
     "tough-cookie": "2.4.3",
     "socks-proxy-agent": "4.0.1",
     "smart-buffer": "4.0.1",
-    "angular": "1.7.3",
-    "angular-animate": "1.7.3",
-    "angular-sanitize": "1.7.3",
     "lodash.template": "4.4.0",
     "lodash.templatesettings": "4.1.0",
     "map-stream": "0.1.0",
@@ -260,9 +257,13 @@
     "combined-stream": "1.0.7",
     "event-stream": "3.3.4",
     "concat-with-sourcemaps": "1.1.0",
-    "typescript": "3.1.3",
     "bootstrap": "3.3.7",
     "fast-deep-equal": "2.0.1",
-    "json-schema-traverse": "0.4.1"
+    "json-schema-traverse": "0.4.1",
+    "angular": "1.7.7",
+    "angular-animate": "1.7.7",
+    "angular-sanitize": "1.7.7",
+    "typescript": "3.3.3",
+    "@types/jquery": "2.0.53"
   }
 }

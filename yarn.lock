@@ -21,54 +21,55 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@hawtio/core-dts@3.2.0":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.2.0.tgz#9a685349dcfb9733234f6de71da5005d69b613fb"
-  integrity sha512-PXS8fF0DCRAjBK5yxl6oXIR0T7rCNslW3+yRoyg5Xrx+9vjnouXnYAeejAtc7f+/8MgnN96LA00uncrzTjxiow==
+"@hawtio/core-dts@~3.3.0":
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/@hawtio/core-dts/-/core-dts-3.3.2.tgz#816c61ff16fd7ae3126a34be965cb2f13c132cdc"
+  integrity sha512-BIbNKMx3JSbE4wbcDT406Ps7NhdFU8zuZy0+ic40mlttGx+3zQhGYu4RxEnCSKvr7BQBnOUBq3o42ruMUPSG/A==
   dependencies:
-    "@types/jquery" "~2.0.46"
+    "@types/jquery" "2.0.53"
 
-"@hawtio/core@~4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.2.0.tgz#336f59110f244489c89e6bc5520b5f0cc19cfebc"
-  integrity sha512-KTqkLjlmQzTkWg2yf/xOxyWXYmX+KO+8qJi3QYdQ892YrZPK9wnXiyayslg3dLTHFvOpKlWRe/GkZWO2e89tYA==
+"@hawtio/core@~4.3.0":
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.3.3.tgz#6ceae993c9023372655e1d1a1e2933f3b6e02079"
+  integrity sha512-J1Y3XFJcXrlIomnw3kj1sGpX+sUWw8B7s4/J4bfJykAOOnvcFFJ0QPbB/rH4I1csbUceRT3wq73kzfp4xSnt9Q==
   dependencies:
-    "@hawtio/core-dts" "3.2.0"
+    "@hawtio/core-dts" "~3.3.0"
     "@types/angular" "*"
     "@types/angular-route" "*"
-    "@types/jasmine" "2.8.2"
-    "@types/jquery" "~2.0.0"
+    "@types/jasmine" "~2.8.0"
+    "@types/jquery" "2.0.53"
     "@types/lodash" "^4.0.0"
-    "@types/marked" "0.3.0"
-    "@types/urijs" "1.15.34"
-    angular "~1.7.0"
-    angular-animate "~1.7.0"
-    angular-patternfly "^4.0.0"
-    angular-route "~1.7.0"
-    angular-sanitize "~1.7.0"
-    gulp-rename "~1.2.3"
+    "@types/marked" "0.6.0"
+    "@types/urijs" "~1.15.38"
+    angular "1.7.7"
+    angular-animate "1.7.7"
+    angular-patternfly "4.18.6"
+    angular-route "1.7.7"
+    angular-sanitize "1.7.7"
     jquery "2.2.4"
     js-logger "1.4.1"
-    lodash "~4.17.0"
-    marked "0.3.9"
+    lodash "4.17.11"
+    marked "0.6.0"
+    typescript "^3.0.3"
     urijs "1.19.0"
 
-"@hawtio/forms@~4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/forms/-/forms-4.2.0.tgz#072c28d8bb525cb6dc08d808232f17a0abc5a9ce"
-  integrity sha512-LyMfsr/okGG6xoLAeyO/7zfSKQzJIixikVvOttG2sA7x2SycAnLSfXHEljxB60I/AbMhkNGd3y7PGa8GissC1g==
+"@hawtio/forms@~4.3.0":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@hawtio/forms/-/forms-4.3.2.tgz#4fe007f5bb7b9adde242a179d5b904b4028c677d"
+  integrity sha512-wplrxr6YaR2M4oxJjeImtoxNmGl6w+6P+wJV+DdBijWR0cwSxn+KyiWi0zkihSv+p075llRHdMdnpUqjbBAzSw==
   dependencies:
-    "@hawtio/ui" "~4.2.0"
+    "@hawtio/ui" "~4.3.0"
 
-"@hawtio/jmx@~4.2.0":
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.2.2.tgz#54768618c806361d512ce7f5a3c77046fa031385"
-  integrity sha512-//IYtQi9Ofsfu+Hnheq/eNMjNlZK9iKcLjITzk16uceTnRuxjXrk480mjM3Mis1wZuhO9ZMSEKVwZz+tvV7YeA==
+"@hawtio/jmx@~4.3.0":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.3.1.tgz#fd3d1caaf0484751be4c4592d73c32b1ff8ed7ba"
+  integrity sha512-kOU4b7nIlvUmrpQzmHvxDROuyKePB8z2dbgDRKlE4B+NnD8S3+QLhDRXuE7hNZS9hk/IpI8Tb9WXknkj+pwUtQ==
   dependencies:
-    "@hawtio/core" "~4.2.0"
-    "@hawtio/forms" "~4.2.0"
-    "@hawtio/ui" "~4.2.0"
+    "@hawtio/core" "~4.3.0"
+    "@hawtio/forms" "~4.3.0"
+    "@hawtio/ui" "~4.3.0"
     "@types/angular-ui-bootstrap" "~0.13.46"
+    "@types/jquery" "2.0.53"
     angular-resizable "1.2.0"
     cubism "^1.6.0"
     jolokia.js "^1.6.0-1"
@@ -93,17 +94,15 @@
     underscore.string "^3.3.4"
     urijs "^1.18.10"
 
-"@hawtio/ui@~4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.2.0.tgz#f60b55f79b5b54310251d88f33439966ef171fe9"
-  integrity sha512-77Y3zXEMXtqFK4YMtg6IiBgr6Amdat10Q6bYDw6GKnfyuZYHsNjdFjAHlHiZu1V2IK3j/kjVCssAfP5Qo4mzhA==
+"@hawtio/ui@~4.3.0":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.3.2.tgz#c9a545d8c4c5263e1506612357fcaf8e90036a2d"
+  integrity sha512-9hhSegqbtCUQwJVifiNJ2xlefjMfKu0CHngqzpC/fMD6MKTW7DSyHjc2vGT+Tlz5lA/UG0+EPISHGPoARIpyRA==
   dependencies:
-    "@hawtio/core" "~4.2.0"
+    "@hawtio/core" "~4.3.0"
     "@types/bootstrap" "3.3.36"
     "@types/clipboard" "1.5.35"
-    "@types/codemirror" "0.0.40"
     "@types/js-beautify" "0.0.30"
-    "@types/marked" "0.0.28"
     angular-ui-bootstrap "2.5.6"
     clipboard "1.7.1"
     codemirror "5.33.0"
@@ -153,11 +152,6 @@
   version "1.5.35"
   resolved "https://registry.yarnpkg.com/@types/clipboard/-/clipboard-1.5.35.tgz#bceb67a7e0aad3070468929b95a2d626405db464"
   integrity sha512-hNy/1wiFDjSkmqZMQh+JbK7ekVqaYcCcToMVcnUIKk786sizDbAANeyqQm27hZXyYgJMS7TlMv24cPma2LANLQ==
-
-"@types/codemirror@0.0.40":
-  version "0.0.40"
-  resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.40.tgz#0868ed9ba5bf3ef8072de80e245ecf4a8f0bbdfd"
-  integrity sha1-CGjtm6W/PvgHLegOJF7PSo8Lvf0=
 
 "@types/d3-array@*":
   version "1.2.5"
@@ -376,15 +370,15 @@
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.5.tgz#9aea839ea5af4b1bc079f1d9fa977d48665e02b0"
   integrity sha512-rLlMXpd3rdlrp0+xsrda/hFfOpIxgqFcRpk005UKbHtcdFK+QXAjhBAPnvO58qF4O1LdDXrcaiJxMgstCIlcaw==
 
-"@types/jasmine@2.8.2", "@types/jasmine@2.8.6":
+"@types/jasmine@2.8.6", "@types/jasmine@~2.8.0":
   version "2.8.6"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.8.6.tgz#14445b6a1613cf4e05dd61c3c3256d0e95c0421e"
   integrity sha512-clg9raJTY0EOo5pVZKX3ZlMjlYzVU73L71q5OV1jhE2Uezb7oF94jh4CvwrW6wInquQAdhOxJz5VDF2TLUGmmA==
 
-"@types/jquery@*", "@types/jquery@2.0.49", "@types/jquery@~2.0.0", "@types/jquery@~2.0.46":
-  version "2.0.49"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-2.0.49.tgz#95bd7064caebf65bde10429dff491a1aea05b67d"
-  integrity sha512-/9xLnYmohN/vD2gDnLS4cym8TUmrJu7DvZa/LELKzZjdPsvWVJiedsdu2SXNtb/DA7FGimqL2g0IoyhbNKLl8g==
+"@types/jquery@*", "@types/jquery@2.0.53", "@types/jquery@~2.0.46":
+  version "2.0.53"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-2.0.53.tgz#89c53bc83d820e50c3b667ae2fdf4276df8b3aba"
+  integrity sha512-MZKPWUhp5TKkoJ/58NSq6io+CSUCOHm2b3Z6U4+r9v70kktB0JM+eRjdp6YmDHtw0kK2XB7L2K7/FMIoziHjUA==
 
 "@types/jqueryui@1.12.2":
   version "1.12.2"
@@ -403,7 +397,7 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.91.tgz#794611b28056d16b5436059c6d800b39d573cd3a"
   integrity sha512-k+nc3moSlAaXacyvz4/c6D9lnUeI6AKsLvkXFuNzUEEqMw7sjDnLW2GqlJ4nyFgMX/p+QzvVG6zRoDo4lJIV5g==
 
-"@types/marked@0.0.28", "@types/marked@0.3.0":
+"@types/marked@0.3.0", "@types/marked@0.6.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@types/marked/-/marked-0.3.0.tgz#583c223dd33385a1dda01aaf77b0cd0411c4b524"
   integrity sha512-CSf9YWJdX1DkTNu9zcNtdCcn6hkRtB5ILjbhRId4ZOQqx30fXmdecuaXhugQL6eyrhuXtaHJ7PHI+Vm7k9ZJjg==
@@ -413,10 +407,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.10.2.tgz#a98845168012d7a63a84d50e738829da43bdb0de"
   integrity sha512-RO4ig5taKmcrU4Rex8ojG1gpwFkjddzug9iPQSDvbewHN9vDpcFewevkaOK+KT+w1LeZnxbgOyfXwV4pxsQ4GQ==
 
-"@types/urijs@1.15.34":
-  version "1.15.34"
-  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.15.34.tgz#b9d5954e9beaabb6fc48c2127d8df15ac6393256"
-  integrity sha512-hhYTPl+5vDeyrMM0WXwS5GVYq/OoKPhXfIoZskSP48aiYjjWQTGJOgoaJczXKlawp70xZYpLU/8B31YqQRLG9g==
+"@types/urijs@~1.15.38":
+  version "1.15.38"
+  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.15.38.tgz#733ff7f18d42de60d0cdba40d8e92673b27cd5a4"
+  integrity sha512-5VWXqu6V2IxXsPuSXYwCZHbh25U7pE+UJTFtKnNQRJLZA7o0D7fOQRJdgwBTMLNY0uc5F9GsFSang1VwNcPguA==
   dependencies:
     "@types/jquery" "*"
 
@@ -512,10 +506,10 @@ amqplib@^0.5.2:
     readable-stream "1.x >=1.1.9"
     safe-buffer "^5.0.1"
 
-angular-animate@1.5.*, angular-animate@1.7.3, angular-animate@~1.7.0:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.7.3.tgz#99aa794d3417aa6a794f603c9c27ec0ee4c4b3b4"
-  integrity sha512-RIYQhql+jUU13jwTrXemSMYTfbGuLBr7jh67R3UbR2yCQ8IOxcXHn2tx+hm8PwXX8agsFAQjWSPP5wam5ecuSg==
+angular-animate@1.5.*, angular-animate@1.7.7:
+  version "1.7.7"
+  resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.7.7.tgz#5422909094a41cd7404937d8a8a960f30c4d9364"
+  integrity sha512-KLbU9gtgCyNSaMZKnNe9Yi6UTlDMN2EWyokQ06TG5fbDWOePm+kv2xqeUg1S2h+ZLjK0NnoVDIvwDhVQ+AWAag==
 
 angular-drag-and-drop-lists@2.0.0:
   version "2.0.0"
@@ -527,7 +521,7 @@ angular-mocks@~1.7.0:
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.7.7.tgz#227feca8a7e9cc61c4680366db024d6563d4c6eb"
   integrity sha512-EIUUAigjCgyk4Lqspf1iM0RItOPtlKoHlqDyrYsgVmMqj5xS41BDXIqedcMAFn6Lln5Qe9YDsGQ3ZHAAoX1SgA==
 
-angular-patternfly@^4.0.0:
+angular-patternfly@4.18.6:
   version "4.18.6"
   resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.18.6.tgz#4f62fc235d93aecd1c03f7ed70e08ec1ea2e5fdb"
   integrity sha512-QWEwBniEQoengjMJMLh/qUCRfEPuDaZ2eH6kmOd74O9sImcOQjYTz4CFGoIS6PkVD2ZpvG0QL/or6Nnhf3SbUw==
@@ -557,15 +551,15 @@ angular-resizable@1.2.0:
   resolved "https://registry.yarnpkg.com/angular-resizable/-/angular-resizable-1.2.0.tgz#9dd29af008f8b54abfc051bd269a8f0b4fe43f1a"
   integrity sha1-ndKa8Aj4tUq/wFG9JpqPC0/kPxo=
 
-angular-route@~1.7.0:
+angular-route@1.7.7:
   version "1.7.7"
   resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.7.7.tgz#0573c8efa87e735bcd4f64f6551a176faca3b6d1"
   integrity sha512-nshsCti751h8GfvYQ2nlTbQnaY/q5zvxLctj78sS5SjB8iRDqNbT1NVNz8B/nDQUudjc7etE7xYaTdM8idzq6g==
 
-angular-sanitize@1.5.*, angular-sanitize@1.7.3, angular-sanitize@~1.7.0:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.7.3.tgz#e1ddaa7337724f9554066fd9e9123486b8881c4a"
-  integrity sha512-2t5BXXx0/4qGdGp54eCvT+1fM+yFP2ub5TnNFIpJDeSrPwlQD8ThesOWxEsBnr+3UVKTE/TzX2Q4g8qjQXhDzw==
+angular-sanitize@1.5.*, angular-sanitize@1.7.7:
+  version "1.7.7"
+  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.7.7.tgz#5852592ea885d48db1f2718a3ec7b6e3330950d6"
+  integrity sha512-DZ0kidLOOrq/mbqwKbeT2aSlT2Kdy25tZh5KcWOrRXx26imbhQfwbuncMYMFh7uPqfWySAI534+XhjnmhJ626Q==
 
 angular-svg-base-fix@2.0.0:
   version "2.0.0"
@@ -577,10 +571,10 @@ angular-ui-bootstrap@2.3.x, angular-ui-bootstrap@2.5.6:
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.6.tgz#23937322ec641a6fbee16498cc32452aa199e7c5"
   integrity sha512-yzcHpPMLQl0232nDzm5P4iAFTFQ9dMw0QgFLuKYbDj9M0xJ62z0oudYD/Lvh1pWfRsukiytP4Xj6BHOSrSXP8A==
 
-angular@1.5.*, angular@1.7.3, angular@>=1.3.0, angular@~1.7.0:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.3.tgz#0f25a661d079fc84d5ccc877a2ef9d7178575ddb"
-  integrity sha512-hQRhU56shs72y88cS0Uy9g+UAMHoztJ3V+r+iF8o1AK/Bpu8ewmjFDk9j2LjSuN05a9mhxW1rOHnYKOwyTS/Zg==
+angular@1.5.*, angular@1.7.7, angular@>=1.3.0:
+  version "1.7.7"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.7.tgz#26bd87693deadcbd5944610a7a0463fc79a18803"
+  integrity sha512-MH3JEGd8y/EkNCKJ8EV6Ch0j9X0rZTta/QVIDpBWaIdfh85/e5KO8+ZKgvWIb02MQuiS20pDFmMFlv4ZaLcLWg==
 
 angularjs-datatables@^0.5.9:
   version "0.5.9"
@@ -2569,7 +2563,7 @@ gulp-ng-annotate@~2.0.0:
     through2 "^2.0.1"
     vinyl-sourcemaps-apply "^0.2.1"
 
-gulp-rename@~1.2.0, gulp-rename@~1.2.3:
+gulp-rename@~1.2.0:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/gulp-rename/-/gulp-rename-1.2.3.tgz#37b75298e9d3e6c0fe9ac4eac13ce3be5434646b"
   integrity sha512-CmdPM0BjJ105QCX1fk+j7NGhiN/1rCl9HLGss+KllBS/tdYadpjTxqdKyh/5fNV+M3yjT1MFz5z93bXdrTyzAw==
@@ -3602,7 +3596,7 @@ lodash.uniq@^4.3.0:
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
   integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
 
-lodash@4.17.4, lodash@4.x, lodash@^4.0.0, lodash@^4.11.1, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.4, lodash@^4.5.0, lodash@~1.0.1, lodash@~4.17.0:
+lodash@4.17.11, lodash@4.17.4, lodash@4.x, lodash@^4.0.0, lodash@^4.11.1, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.4, lodash@^4.5.0, lodash@~1.0.1:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
   integrity sha1-eCA6TRwyiuHYbcpkYONptX9AVa4=
@@ -3723,7 +3717,7 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-marked@0.3.9:
+marked@0.3.9, marked@0.6.0:
   version "0.3.9"
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.9.tgz#54ce6a57e720c3ac6098374ec625fcbcc97ff290"
   integrity sha512-nW5u0dxpXxHfkHzzrveY45gCbi+R4PaO4WRZYqZNl+vB0hVGeqlFn0aOg1c8AKL63TrNFn9Bm2UP4AdiZ9TPLw==
@@ -5637,10 +5631,10 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@3.1.3, typescript@^3.0.0, typescript@^3.0.3:
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.3.tgz#01b70247a6d3c2467f70c45795ef5ea18ce191d5"
-  integrity sha512-+81MUSyX+BaSo+u2RbozuQk/UWx6hfG0a5gHu4ANEM4sU96XbuIyAB+rWBW1u70c6a5QuZfuYICn3s2UjuHUpA==
+typescript@3.3.3, typescript@^3.0.0, typescript@^3.0.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.3.tgz#f1657fc7daa27e1a8930758ace9ae8da31403221"
+  integrity sha512-Y21Xqe54TBVp+VDSNbuDYdGw0BpoR/Q6wo/+35M8PAU0vipahnyduJWirxxdxjsAkS7hue53x2zp8gz7F05u0A==
 
 uglify-js@^2.8.22:
   version "2.8.29"
