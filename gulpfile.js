@@ -31,8 +31,9 @@ const config = {
   vendorJs: './vendor/**/*.js',
   vendorCss: './vendor/**/*.css',
   sourceMap: argv.sourcemap,
-  srcImg: './img/**/*',
+  srcImg: './plugins/img/**/*',
   distImg: './dist/img',
+  tempImg: './img'
 };
 
 const tsProject = typescript.createProject('tsconfig.json');
@@ -89,8 +90,11 @@ gulp.task('less', function () {
 });
 
 gulp.task('copy-images', function () {
-  return gulp.src(config.srcImg)
-    .pipe(gulp.dest(config.distImg));
+  gulp.src(config.srcImg)
+    .pipe(gulp.dest(config.distImg))
+    .pipe(gulp.dest(config.tempImg));
+  return gulp.src('node_modules/@hawtio/core/dist/img/*')
+    .pipe(gulp.dest(config.tempImg));
 });
 
 gulp.task('watch-less', function () {

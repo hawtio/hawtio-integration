@@ -399,7 +399,7 @@ namespace Camel {
     }
 
     // Now start laying things out
-    var svg = svgElement ? d3.select(svgElement) : d3.select("svg");
+    var svg = svgElement ? d3.select(svgElement) : d3.select("svg.camel-diagram");
 
     // lets remove all the old g elements
     if (svgElement) {
@@ -575,7 +575,7 @@ namespace Camel {
   }
 
   function dagreUpdateGraphData() {
-    var svg = d3.select("svg");
+    var svg = d3.select("svg.camel-diagram");
     svg.selectAll("text.counter").text(_counterFunction);
     svg.selectAll("text.inflight").text(_inflightFunction);
 

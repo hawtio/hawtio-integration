@@ -45,7 +45,6 @@ module.exports = function(config) {
       'node_modules/ng-infinite-scroll/build/ng-infinite-scroll.min.js',
       'node_modules/@hawtio/core/dist/hawtio-core.js',
       'node_modules/@hawtio/ui/dist/hawtio-ui.js',
-      'node_modules/@hawtio/forms/dist/hawtio-forms.js',
       'node_modules/@hawtio/jmx/dist/hawtio-jmx.js',
       'dist/hawtio-integration.js',
       'node_modules/angular-mocks/angular-mocks.js',
@@ -53,7 +52,7 @@ module.exports = function(config) {
       {pattern: 'hawtconfig.json', watched: false, included: false, served: true}
     ],
 
-    
+
     proxies: {
       "/hawtconfig.json": "/base/hawtconfig.json"
     },

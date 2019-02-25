@@ -67,7 +67,7 @@ namespace Camel {
     };
 
     function highlightToNode(toNode) {
-      var nodes = d3.select("svg").selectAll("g .node");
+      var nodes = d3.select("svg.camel-diagram").selectAll("g .node");
       Camel.highlightSelectedNode(nodes, toNode);
     }
 
@@ -185,7 +185,7 @@ namespace Camel {
           var toNode = selected["toNode"];
           if (toNode) {
             // lets highlight the node in the diagram
-            var nodes = d3.select("svg").selectAll("g .node");
+            var nodes = d3.select("svg.camel-diagram").selectAll("g .node");
             Camel.highlightSelectedNode(nodes, toNode);
           }
         }

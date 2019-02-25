@@ -5,6 +5,9 @@
 # Output directory
 /dist/
 
+# Temporary images directory
+/img/
+
 # Dependency directories
 /node_modules/
 

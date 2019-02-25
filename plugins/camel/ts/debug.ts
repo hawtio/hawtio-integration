@@ -114,7 +114,7 @@ namespace Camel {
 
       let nodes = getDiagramNodes();
       if (!nodes || nodes.length == 0) {
-        return true
+        return true;
       }
 
       return nodes[0][0].getAttribute("data-cid") === $scope.selectedDiagramNodeId;
@@ -290,8 +290,8 @@ namespace Camel {
     }
 
     function getDiagramNodes() {
-      var svg = d3.select("svg");
-      return svg.selectAll("g .node");
+      var svg = d3.select("svg.camel-diagram");
+      return svg.selectAll("g.node");
     }
 
     function updateBreakpointNodes(nodes = getDiagramNodes()) {

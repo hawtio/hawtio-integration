@@ -28,12 +28,13 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@~4.3.0":
-  version "4.3.3"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.3.3.tgz#6ceae993c9023372655e1d1a1e2933f3b6e02079"
-  integrity sha512-J1Y3XFJcXrlIomnw3kj1sGpX+sUWw8B7s4/J4bfJykAOOnvcFFJ0QPbB/rH4I1csbUceRT3wq73kzfp4xSnt9Q==
+"@hawtio/core@~4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.4.0.tgz#fadfb43e554d60f4777bd62401800df4155d9e89"
+  integrity sha512-gRNlUNdSa9GEdSTg0I5pRTThIWLDBBCwHyN/zjyBNNRetoW7vNz1GAsO36bkbfvBsLX5xzJ0aalc8sqEPnTRPA==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
+    "@patternfly/patternfly" "~1.0.192"
     "@types/angular" "*"
     "@types/angular-route" "*"
     "@types/jasmine" "~2.8.0"
@@ -53,21 +54,12 @@
     typescript "^3.0.3"
     urijs "1.19.0"
 
-"@hawtio/forms@~4.3.0":
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/@hawtio/forms/-/forms-4.3.2.tgz#4fe007f5bb7b9adde242a179d5b904b4028c677d"
-  integrity sha512-wplrxr6YaR2M4oxJjeImtoxNmGl6w+6P+wJV+DdBijWR0cwSxn+KyiWi0zkihSv+p075llRHdMdnpUqjbBAzSw==
+"@hawtio/jmx@~4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.4.0.tgz#41b12c71512968d05c276f7f8fd3227b42158aa9"
+  integrity sha512-iiLPfq0q6mIDzVM/NTzxRjSHLrOg/yH50cMTcmsHcyBhDi87ucnpPwp0elM5z7TZgZw8uYKOghTI1g4Esbv5VQ==
   dependencies:
-    "@hawtio/ui" "~4.3.0"
-
-"@hawtio/jmx@~4.3.0":
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.3.1.tgz#fd3d1caaf0484751be4c4592d73c32b1ff8ed7ba"
-  integrity sha512-kOU4b7nIlvUmrpQzmHvxDROuyKePB8z2dbgDRKlE4B+NnD8S3+QLhDRXuE7hNZS9hk/IpI8Tb9WXknkj+pwUtQ==
-  dependencies:
-    "@hawtio/core" "~4.3.0"
-    "@hawtio/forms" "~4.3.0"
-    "@hawtio/ui" "~4.3.0"
+    "@hawtio/ui" "~4.4.0"
     "@types/angular-ui-bootstrap" "~0.13.46"
     "@types/jquery" "2.0.53"
     angular-resizable "1.2.0"
@@ -94,12 +86,12 @@
     underscore.string "^3.3.4"
     urijs "^1.18.10"
 
-"@hawtio/ui@~4.3.0":
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.3.2.tgz#c9a545d8c4c5263e1506612357fcaf8e90036a2d"
-  integrity sha512-9hhSegqbtCUQwJVifiNJ2xlefjMfKu0CHngqzpC/fMD6MKTW7DSyHjc2vGT+Tlz5lA/UG0+EPISHGPoARIpyRA==
+"@hawtio/ui@~4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.4.0.tgz#09a6ccdaf5d02c546d4d070b05d42ab5ff243644"
+  integrity sha512-zL65wNc9jzYm3k81n6ohYbPmxu6gGxKl6tVfY/JhuezI6kcxzqihh68zZaK2DFL/Hq53kETtvaAIDp2aWP8lSg==
   dependencies:
-    "@hawtio/core" "~4.3.0"
+    "@hawtio/core" "~4.4.0"
     "@types/bootstrap" "3.3.36"
     "@types/clipboard" "1.5.35"
     "@types/js-beautify" "0.0.30"
@@ -107,6 +99,11 @@
     clipboard "1.7.1"
     codemirror "5.33.0"
     js-beautify "1.7.5"
+
+"@patternfly/patternfly@~1.0.192":
+  version "1.0.205"
+  resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-1.0.205.tgz#acd10f3765790f2f2907892c9472190d5a111d3a"
+  integrity sha512-MGlOTE9qr29R794g1Sz2GZR0sOf5NGkQEIQ/OBy7ZzknFIT+lmZWCLqRKFOhTEhNQq48ynR35KIcrY8uegehhQ==
 
 "@types/angular-mocks@~1.7.0":
   version "1.7.0"
@@ -1788,10 +1785,10 @@ error@^7.0.0:
     string-template "~0.2.1"
     xtend "~4.0.0"
 
-es5-ext@^0.10.14, es5-ext@^0.10.35, es5-ext@^0.10.45, es5-ext@^0.10.9, es5-ext@~0.10.14, es5-ext@~0.10.2:
-  version "0.10.46"
-  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.46.tgz#efd99f67c5a7ec789baa3daa7f79870388f7f572"
-  integrity sha512-24XxRvJXNFwEMpJb3nOkiRJKRoupmjYmOPVlI65Qy2SrtxwOTB+g6ODjBKOtwEHbYrhWRty9xxOWLNdClT2djw==
+es5-ext@^0.10.14, es5-ext@^0.10.35, es5-ext@^0.10.45, es5-ext@^0.10.9, es5-ext@~0.10.14, es5-ext@~0.10.2, es5-ext@~0.10.46:
+  version "0.10.48"
+  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.10.48.tgz#9a0b31eeded39e64453bcedf6f9d50bbbfb43850"
+  integrity sha512-CdRvPlX/24Mj5L4NVxTs4804sxiS2CjVprgCmrgoDkdmjdY4D+ySHa7K3jJf8R40dFg0tIm3z/dk326LrnuSGw==
   dependencies:
     es6-iterator "~2.0.3"
     es6-symbol "~3.1.1"
@@ -2578,9 +2575,9 @@ gulp-replace@~0.5.0:
     replacestream "^4.0.0"
 
 gulp-sourcemaps@~2.6.0:
-  version "2.6.4"
-  resolved "https://registry.yarnpkg.com/gulp-sourcemaps/-/gulp-sourcemaps-2.6.4.tgz#cbb2008450b1bcce6cd23bf98337be751bf6e30a"
-  integrity sha1-y7IAhFCxvM5s0jv5gze+dRv24wo=
+  version "2.6.5"
+  resolved "https://registry.yarnpkg.com/gulp-sourcemaps/-/gulp-sourcemaps-2.6.5.tgz#a3f002d87346d2c0f3aec36af7eb873f23de8ae6"
+  integrity sha512-SYLBRzPTew8T5Suh2U8jCSDKY+4NARua4aqjj8HOysBh2tSgT9u4jc1FYirAdPx1akUxxDeK++fqw6Jg0LkQRg==
   dependencies:
     "@gulp-sourcemaps/identity-map" "1.X"
     "@gulp-sourcemaps/map-sources" "1.X"
@@ -5495,11 +5492,11 @@ time-stamp@^1.0.0:
   integrity sha1-dkpaEa9QVhkhsTPztE5hhofg9cM=
 
 timers-ext@^0.1.5:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/timers-ext/-/timers-ext-0.1.5.tgz#77147dd4e76b660c2abb8785db96574cbbd12922"
-  integrity sha512-tsEStd7kmACHENhsUPaxb8Jf8/+GZZxyNFQbZD07HQOyooOa6At1rQqjffgvg7n+dxscQa9cjjMdWhJtsP2sxg==
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/timers-ext/-/timers-ext-0.1.7.tgz#6f57ad8578e07a3fb9f91d9387d65647555e25c6"
+  integrity sha512-b85NUNzTSdodShTIbky6ZF02e8STtVVfD+fu4aXXShEELpozH+bCpJLYMPZbsABN2wDH7fJpqIoXxJpzbf0NqQ==
   dependencies:
-    es5-ext "~0.10.14"
+    es5-ext "~0.10.46"
     next-tick "1"
 
 timespan@2.3.x:

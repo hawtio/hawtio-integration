@@ -14,7 +14,7 @@
     "prepack": "gulp version"
   },
   "dependencies": {
-    "@hawtio/jmx": "~4.3.0",
+    "@hawtio/jmx": "~4.4.0",
     "@types/angular-mocks": "~1.7.0",
     "@types/angular-ui-bootstrap": "~0.13.46",
     "@types/jquery": "2.0.53",
