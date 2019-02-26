@@ -29,9 +29,9 @@
     "@types/jquery" "2.0.53"
 
 "@hawtio/core@~4.4.0":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.4.1.tgz#5e7031e5091aef5e2a7bf7267fc5d9dd8a2b9adb"
-  integrity sha512-es/hCd4OsHZny+nT5a+FE+uMdiB979dIdIrdcmuc0UXNrigAe20YEpzl3dB6r3mopjWB5Dq5P+ro4fpOBNjwyg==
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.4.3.tgz#d7f076e98a0518fad7e0469ad7d0b082f22072c5"
+  integrity sha512-5+WjnVzqrN9r1kYAruvyg9PErdBeVOxMT9eApnU/r8UrCbwpvUyG//LP0EWejVzIKFwg6bet9RV2vuZtnCyd1Q==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "~1.0.192"
@@ -55,9 +55,9 @@
     urijs "1.19.0"
 
 "@hawtio/jmx@~4.4.0":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.4.1.tgz#bb478ea88b35c104ad8232d6e34ee5d891c2ad27"
-  integrity sha512-jPAuXVH0Z1sqxVk0/d9TOdLMff8svBAmFXlzi+WNae0LIuF+t7i0Q4aLgICbwaXIwrfJ9YygrJhuuN9a6eeKAQ==
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.4.3.tgz#e05700bac9ad77fa3d0cd59b236363494ff5115e"
+  integrity sha512-vJOdPh1jUB78x6Od7dWHIO6PoJuzFkpqI+uGBeVehwWaSkjfMoW19b8Oyi27TwMvf7evFZR0fd2W05n/T77Esw==
   dependencies:
     "@hawtio/ui" "~4.4.0"
     "@types/angular-ui-bootstrap" "~0.13.46"
@@ -87,9 +87,9 @@
     urijs "^1.18.10"
 
 "@hawtio/ui@~4.4.0":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.4.1.tgz#c7d8d3746bcd11d365877ccb8b2abe7c634489e2"
-  integrity sha512-TcxzwF4m7JaPFBh76qlkM8xyWkltxCBexLOW1NVFsjsUwLbfVTnqbKJglWXn7bgJWUigLli4AjEoUdSOYXvwzA==
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.4.3.tgz#4d307138da79a66672fca3d1bb422b84210fd300"
+  integrity sha512-+NEyNI+dZ0USjkiWVWrxX/wXP1MkXIFCnTiJr2xFOz8aDtdcEpVkQyCMipTvex25pDKvLVNRCvR++nVCOctKJw==
   dependencies:
     "@hawtio/core" "~4.4.0"
     "@types/bootstrap" "3.3.36"
