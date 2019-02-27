@@ -29,9 +29,9 @@
     "@types/jquery" "2.0.53"
 
 "@hawtio/core@~4.4.0":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.4.3.tgz#d7f076e98a0518fad7e0469ad7d0b082f22072c5"
-  integrity sha512-5+WjnVzqrN9r1kYAruvyg9PErdBeVOxMT9eApnU/r8UrCbwpvUyG//LP0EWejVzIKFwg6bet9RV2vuZtnCyd1Q==
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.4.4.tgz#078d35341e3a950c958ba595c62bfd8349918bde"
+  integrity sha512-HWL/s4y6ZNdpGijrhcycTLMxU56lp8IcYgjYGx7EH4JEl/Fb91s2agb5TaFA4jbht2zBLzDQpmQ1uPjh90EKiQ==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "~1.0.192"
@@ -55,9 +55,9 @@
     urijs "1.19.0"
 
 "@hawtio/jmx@~4.4.0":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.4.3.tgz#e05700bac9ad77fa3d0cd59b236363494ff5115e"
-  integrity sha512-vJOdPh1jUB78x6Od7dWHIO6PoJuzFkpqI+uGBeVehwWaSkjfMoW19b8Oyi27TwMvf7evFZR0fd2W05n/T77Esw==
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.4.4.tgz#c4cf48cce6f1a39433ea667b72f8c6ce4548e3a5"
+  integrity sha512-A5sn77zIawdXjGIRL52MLfa+MSxQsvnuE7e0sFtfiwiFsJTZ+Z08fU5/MCA07jvnes/Ps5YpK5dmiPkiCYWdSg==
   dependencies:
     "@hawtio/ui" "~4.4.0"
     "@types/angular-ui-bootstrap" "~0.13.46"
@@ -87,9 +87,9 @@
     urijs "^1.18.10"
 
 "@hawtio/ui@~4.4.0":
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.4.3.tgz#4d307138da79a66672fca3d1bb422b84210fd300"
-  integrity sha512-+NEyNI+dZ0USjkiWVWrxX/wXP1MkXIFCnTiJr2xFOz8aDtdcEpVkQyCMipTvex25pDKvLVNRCvR++nVCOctKJw==
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.4.4.tgz#f2107456041d9d9b8a8ba8f0f2f8afe1f74e04fa"
+  integrity sha512-gBowpSQKE1MbgSVLPUWoeIba0f2rchLV6/Ui/Q5hwVY9GKxso4xrcgwJxvcSLfuhqmxjsHsGjlNL8MG1fAEVkA==
   dependencies:
     "@hawtio/core" "~4.4.0"
     "@types/bootstrap" "3.3.36"
@@ -101,9 +101,9 @@
     js-beautify "1.7.5"
 
 "@patternfly/patternfly@~1.0.192":
-  version "1.0.209"
-  resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-1.0.209.tgz#6fa7af6cbbbcca3928fb619eb1c82e1031cf4a0a"
-  integrity sha512-i16e6M/Il9PS7UKNxsbFA9ch22cHEvSomhXn0dxAwQGvq8FXAOdHqZiUCRaw+tlKHpTva9CCi4IGUXTHBZiNAg==
+  version "1.0.212"
+  resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-1.0.212.tgz#fefa4ff58a1398ab586c4dbee285fda6774c293d"
+  integrity sha512-HSK+aMNj7eZz7Gf2uW+jqwl3/aCdpEGZ+CaM0BFViTiJ2dtEC7SidQfjwngOiCeXjN1WsEswUJ6vuTaH27ORTA==
 
 "@types/angular-mocks@~1.7.0":
   version "1.7.0"

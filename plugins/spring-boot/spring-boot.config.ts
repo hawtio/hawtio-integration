@@ -15,7 +15,7 @@ namespace SpringBoot {
     'ngInject';
     mainNavService.addItem({
       title: 'Spring Boot',
-      href: '/spring-boot',
+      basePath: '/spring-boot',
       template: '<spring-boot></spring-boot>',
       isValid: () => springBootService.isValid()
     });
