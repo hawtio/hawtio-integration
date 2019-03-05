@@ -55,9 +55,9 @@
     urijs "1.19.0"
 
 "@hawtio/jmx@~4.4.0":
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.4.4.tgz#c4cf48cce6f1a39433ea667b72f8c6ce4548e3a5"
-  integrity sha512-A5sn77zIawdXjGIRL52MLfa+MSxQsvnuE7e0sFtfiwiFsJTZ+Z08fU5/MCA07jvnes/Ps5YpK5dmiPkiCYWdSg==
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.4.5.tgz#a908f441a9b07b58e1802363304951f5b82e7ea5"
+  integrity sha512-Lnb6rn29p2Gf0Ey53OFUm8dzKmdq991wUkkiC44yknLqIwmSV6aVcpSyE7up4ozwUr2qktJrcCAB53v01mDVfA==
   dependencies:
     "@hawtio/ui" "~4.4.0"
     "@types/angular-ui-bootstrap" "~0.13.46"
@@ -101,9 +101,9 @@
     js-beautify "1.7.5"
 
 "@patternfly/patternfly@~1.0.192":
-  version "1.0.212"
-  resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-1.0.212.tgz#fefa4ff58a1398ab586c4dbee285fda6774c293d"
-  integrity sha512-HSK+aMNj7eZz7Gf2uW+jqwl3/aCdpEGZ+CaM0BFViTiJ2dtEC7SidQfjwngOiCeXjN1WsEswUJ6vuTaH27ORTA==
+  version "1.0.218"
+  resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-1.0.218.tgz#90a7d13c736c9d7fce73c4d51337f1d521ddc184"
+  integrity sha512-+/2IGyVfALAL7ktnBYH2s8vbcEzUd1HVB2Vt9rNAW7H3OnQqeUS/Z1qSZXRt7p+PJYaz0IuKxreAZEaGC/k1UA==
 
 "@types/angular-mocks@~1.7.0":
   version "1.7.0"
