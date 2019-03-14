@@ -28,10 +28,10 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@~4.4.0":
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.4.4.tgz#078d35341e3a950c958ba595c62bfd8349918bde"
-  integrity sha512-HWL/s4y6ZNdpGijrhcycTLMxU56lp8IcYgjYGx7EH4JEl/Fb91s2agb5TaFA4jbht2zBLzDQpmQ1uPjh90EKiQ==
+"@hawtio/core@~4.5.0":
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.5.1.tgz#7076fcc18fcbd911eaf7481d7a0a839d5d3ed105"
+  integrity sha512-6bc9K7COc3vAHBtTMXPq2M6CiD+EpNKgTc51aLhlnYoipVVagxAfGtgdqWV3S7674RPl1viPzNICNUrgqWMYzg==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "~1.0.192"
@@ -54,12 +54,12 @@
     typescript "^3.0.3"
     urijs "1.19.0"
 
-"@hawtio/jmx@~4.4.0":
-  version "4.4.5"
-  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.4.5.tgz#a908f441a9b07b58e1802363304951f5b82e7ea5"
-  integrity sha512-Lnb6rn29p2Gf0Ey53OFUm8dzKmdq991wUkkiC44yknLqIwmSV6aVcpSyE7up4ozwUr2qktJrcCAB53v01mDVfA==
+"@hawtio/jmx@~4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/jmx/-/jmx-4.5.0.tgz#d22996a208b8e92d9019b6d0aa2b16ba0534b8ec"
+  integrity sha512-AN0TtDdl67jKm5jyKvczydPO4SHIEMhUQm5S+Gkp7lXi8rzmjZF71o8NRRWEG6zvDV0ug3jkYuyN/b4lhwBAQg==
   dependencies:
-    "@hawtio/ui" "~4.4.0"
+    "@hawtio/ui" "~4.5.0"
     "@types/angular-ui-bootstrap" "~0.13.46"
     "@types/jquery" "2.0.53"
     angular-resizable "1.2.0"
@@ -86,12 +86,12 @@
     underscore.string "^3.3.4"
     urijs "^1.18.10"
 
-"@hawtio/ui@~4.4.0":
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.4.4.tgz#f2107456041d9d9b8a8ba8f0f2f8afe1f74e04fa"
-  integrity sha512-gBowpSQKE1MbgSVLPUWoeIba0f2rchLV6/Ui/Q5hwVY9GKxso4xrcgwJxvcSLfuhqmxjsHsGjlNL8MG1fAEVkA==
+"@hawtio/ui@~4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/ui/-/ui-4.5.0.tgz#6c11994e550e50eccaf5194329918e2d07eef9f6"
+  integrity sha512-QHaOs+ngW28/UtTbHR3Rt5Snok+FZINNGN5Hbb/A8BdhK6ZEOZ2cVIO2eh2EQ0W0+LxI+s8GPHz3dN4roI5mHg==
   dependencies:
-    "@hawtio/core" "~4.4.0"
+    "@hawtio/core" "~4.5.0"
     "@types/bootstrap" "3.3.36"
     "@types/clipboard" "1.5.35"
     "@types/js-beautify" "0.0.30"
@@ -403,11 +403,6 @@
   version "7.10.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.10.2.tgz#a98845168012d7a63a84d50e738829da43bdb0de"
   integrity sha512-RO4ig5taKmcrU4Rex8ojG1gpwFkjddzug9iPQSDvbewHN9vDpcFewevkaOK+KT+w1LeZnxbgOyfXwV4pxsQ4GQ==
-
-"@types/sizzle@*":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
-  integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
 
 "@types/urijs@~1.15.38":
   version "1.15.38"
