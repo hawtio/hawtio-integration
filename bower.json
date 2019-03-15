@@ -30,6 +30,7 @@
     "hawtio-extension-service": "~2.0.0"
   },
   "resolutions": {
-    "jquery": "~2.1.0"
+    "jquery": "~2.1.0",
+    "bootstrap": "~3.3.7"
   }
 }
