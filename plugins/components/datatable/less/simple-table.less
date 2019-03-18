@@ -1,0 +1,82 @@
+.hawtio-simple-table {
+  table-layout: fixed;
+  border-collapse: collapse !important;
+
+  .simple-table-checkbox { 
+    padding: 0 !important;
+    width: 36px;
+    input {
+      min-width: 16px;
+      margin-top: 3px;
+      margin-bottom: 3px;
+      margin-right: 10px;
+      margin-left: 10px;
+    }
+  }
+
+  thead .sorting {
+    background-image: none;
+  }
+
+  th {
+    vertical-align: middle;
+  }
+
+  td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+
+  table.dataTable td div {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.scroll-header-table {
+  border: none;
+  margin-bottom: 0;
+
+  th:first-child {
+    border-left: none;
+  }
+
+  th:nth-last-child(2) {
+    border-right: none;
+  }
+
+  th:last-child {
+    padding: 0;
+    border-left: none;
+    border-top: none;
+    border-right: none;
+  }
+}
+
+.scroll-body-table {
+  border: none;
+  margin-bottom: 0;
+
+  td:first-child {
+    border-left: none;
+  }
+
+  td:last-child {
+    border-right: none;
+  }
+
+  tr:first-child td {
+    border-top: none;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+div.scroll-body-table-wrapper {
+  overflow-y: scroll;
+}

@@ -1,0 +1,11 @@
+<div class="modal-header">
+  <h3 class="modal-title">{{header}}</h3>
+</div>
+<div class="modal-body">
+  <div ng-show="description" ng-bind-html="description"></div>
+  <div hawtio-form-2="schema" entity="newEntity"></div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" ng-click="ok()">OK</button>
+  <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

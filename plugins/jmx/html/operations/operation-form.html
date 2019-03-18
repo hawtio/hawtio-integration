@@ -1,0 +1,36 @@
+<p ng-hide="$ctrl.operation.args.length">
+  This JMX operation requires no arguments. Click the 'Execute' button to invoke the operation.
+</p>
+<p ng-show="$ctrl.operation.args.length">
+  This JMX operation requires some parameters. Fill in the fields below and click the 'Execute' button
+  to invoke the operation.
+</p>
+
+<form class="form-horizontal" ng-submit="$ctrl.execute()">
+  <div class="form-group" ng-repeat="formField in $ctrl.formFields">
+    <label class="col-sm-2 control-label" for="{{formField.label}}">{{formField.label}}</label>
+    <div class="col-sm-10">
+      <input type="{{formField.type}}" id="{{formField.label}}" ng-class="{'form-control': formField.type !== 'checkbox'}"
+        ng-model="formField.value" ng-disabled="!$ctrl.operation.canInvoke">
+      <span class="help-block">{{formField.helpText}}</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <div ng-class="{'col-sm-offset-2 col-sm-10': $ctrl.operation.args.length, 'col-sm-12': !$ctrl.operation.args.length}">
+      <button type="submit" class="btn btn-primary" ng-disabled="!$ctrl.operation.canInvoke || $ctrl.isExecuting">Execute</button>
+    </div>
+  </div>
+</form>
+
+<form ng-show="$ctrl.operationResult">
+  <div class="form-group">
+    <label>Result</label>
+    <div class="hawtio-clipboard-container">
+      <button hawtio-clipboard="#operation-result" class="btn btn-default btn-lg">
+        <i class="fa fa-clipboard" aria-hidden="true"></i>
+      </button>
+      <pre ng-class="{'jmx-operation-error': $ctrl.operationFailed}">{{$ctrl.operationResult}}</pre>
+    </div>
+    <textarea id="operation-result" class="hawtio-clipboard-hidden-target">{{$ctrl.operationResult}}</textarea>
+  </div>
+</form>

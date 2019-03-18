@@ -1,0 +1,286 @@
+
+#log-panel {
+  position: fixed;
+  top: -5px;
+  left: 30px;
+  right: 30px;
+  bottom: 50%;
+  z-index: 10000;
+  background: inherit;
+  transition: bottom 1s ease-in-out;
+}
+
+#log-panel > div {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#log-panel #log-panel-statements {
+  margin-left: 0;
+  margin-bottom: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  overflow-y: auto;
+}
+
+#log-panel-statements li {
+  margin-left: 3px;
+  margin-right: 3px;
+  transition: background .25s ease-in-out;
+}
+
+#log-panel-statements li pre {
+  border-radius: 0;
+  font-size: 11px;
+}
+
+#log-panel-statements li:hover {
+  background: #111111;
+}
+
+#log-panel-statements li.DEBUG {
+  color: dodgerblue;
+}
+
+#log-panel-statements li.INFO {
+  color: white;
+}
+
+#log-panel-statements li.WARN {
+  color: yellow;
+}
+
+#log-panel-statements li.ERROR {
+  color: red;
+}
+
+#log-panel #close {
+  text-align: center;
+  position: absolute;
+  height: 20px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 1px 13px rgba(0, 0, 0, 0.1) inset;
+  opacity: 1;
+}
+
+#log-panel #copy {
+  position: absolute;
+  right: 23px;
+  bottom: 26px;
+  background: inherit;
+  transition: opacity 1s ease-in-out;
+  opacity: 0.4;
+  cursor: pointer;
+}
+
+#log-panel #copy:hover {
+  opacity: 1;
+}
+
+div.log-stack-trace p {
+  line-height: 14px;
+  margin-bottom: 2px;
+}
+
+.logbar {
+  z-index: 40;
+  position: fixed;
+  width: 87%;
+  top: 70px;
+  left: 5%;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.logbar-container {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.logbar-container .control-group {
+  margin-bottom: 5px;
+}
+
+.log-main {
+  margin-top: 55px;
+}
+
+.log-filter {
+  margin-right: 30px;
+}
+
+/* log page */
+.log-table > li {
+  position: relative;
+  list-style-type: none;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 0;
+}
+
+.log-table .table-head div div {
+  font-weight: bold;
+  text-align: center !important;
+  direction: ltr !important;
+}
+
+.log-table .table-head div div:nth-child(4) {
+  font-weight: bold;
+  left: 247px;
+  width: 326px;
+  text-align: center !important;
+  direction: ltr !important;
+}
+
+.log-table > li > div > div {
+  position: absolute;
+  display: inline-block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  min-height: 28px;
+  overflow-x: hidden;
+  padding: 3px;
+  padding-top: 6px;
+  width: auto;
+}
+
+.log-table {
+  margin: 0;
+}
+
+.log-table > .table-row {
+  cursor: pointer;
+}
+
+.log-table > .table-row.selected:before {
+  z-index: 39;
+  position: absolute;
+  top: 6px;
+  font-family: FontAwesome;
+  content: "\f054";
+  font-size: 20px;
+  color: green;
+}
+
+.log-table > li > div > div:nth-child(1):not(.stack-line) {
+  left: 0;
+  width: 11px;
+  z-index: 5;
+}
+
+.log-table > li > div > div:nth-child(2) {
+  left: 18px;
+  width: 180px;
+  z-index: 5;
+}
+
+.log-table > li > div > div:nth-child(3) {
+  left: 190px;
+  width: 60px;
+  z-index: 5;
+  text-align: center;
+}
+
+.log-table > li > div > div:nth-child(4) {
+  padding-right: 5px;
+  text-align: right;
+  direction: rtl;
+  z-index: 3;
+  left: 0;
+  width: 573px;
+}
+
+.log-table > li > div > div:nth-child(5) {
+  left: 580px;
+  right: 0;
+  padding-left: 5px;
+}
+
+.log-table > li > div > div:nth-child(6) {
+  position: static;
+  margin-top: 43px;
+  white-space: normal;
+  display: block;
+}
+
+.log-info-panel {
+  z-index: 60;
+  position: fixed;
+  right: 7em;
+  top: 150px;
+  bottom: 5em;
+  padding: 0;
+  overflow: hidden;
+  min-height: 500px;
+  min-width: 800px;
+}
+
+@media(max-width: 1085px) {
+  .log-info-panel {
+    left: 5px;
+    right: 5px;
+    max-width: inherit;
+    min-width: 500px;
+  }
+}
+
+.log-info-panel >.log-info-panel-frame {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  margin: 10px;
+}
+
+.log-info-panel > .log-info-panel-frame > .log-info-panel-header {
+  position: absolute;
+  top: 0;
+  height: 80px;
+  left: 5px;
+  right: 50px;
+  white-space: nowrap;
+}
+
+.log-info-panel-header > span {
+  margin-left: 7px;
+  position: relative;
+  top: 2px;
+  overflow: hidden;
+}
+
+.log-info-panel-frame > .log-info-panel-body {
+  position: absolute;
+  overflow: auto;
+  left: 5px;
+  right: 27px;
+  top: 80px;
+  bottom: 15px;
+  padding-top: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.log-info-panel-body > .row-fluid {
+  margin-bottom: 10px;
+}
+
+.log-info-panel > .log-info-panel-frame > .log-info-panel-body > .row-fluid > span {
+  margin-right: 7px;
+  white-space: nowrap;
+}
+
+.log-table-dashboard {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+/* end log page */
+
+

@@ -1,0 +1,33 @@
+<div>
+  <script type="text/ng-template" id="wizardParent.html">
+    <div>
+      <div class="wizardParent" ng-switch="getCurrentPageId()">
+      </div>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="wizardButtons.html">
+    <div class="wizardButtons align-right">
+      <span>{{currentPageIndex + 1}} / {{pageIds.length}}</span>
+      <button class="btn btn-default back" ng-click="back()" ng-hide="atFront()">{{buttons.back}}</button>
+      <button class="btn btn-primary next" ng-click="next()" ng-hide="atBack()">{{buttons.next}}</button>
+      <button class="btn btn-primary finish" ng-click="onFinish()" ng-show="atBack()">{{buttons.finish}}</button>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="wizardPage.html">
+    <div class="wizardPage">
+      <h3></h3>
+      <div class="wizardPageBody">
+      </div>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="tabElement.html">
+    <div class="tabbable hawtio-form-tabs"></div>
+  </script>
+
+  <script type="text/ng-template" id="tabPage.html">
+    <div class="tab-pane"></div>
+  </script>
+</div>

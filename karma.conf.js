@@ -44,8 +44,6 @@ module.exports = function(config) {
       'node_modules/dagre-layout/dist/dagre-layout.js',
       'node_modules/ng-infinite-scroll/build/ng-infinite-scroll.min.js',
       'node_modules/@hawtio/core/dist/hawtio-core.js',
-      'node_modules/@hawtio/ui/dist/hawtio-ui.js',
-      'node_modules/@hawtio/jmx/dist/hawtio-jmx.js',
       'dist/hawtio-integration.js',
       'node_modules/angular-mocks/angular-mocks.js',
       'plugins/**/*.spec.ts',

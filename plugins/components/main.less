@@ -1,0 +1,134 @@
+//@import "site-base";
+//@import "default";
+//@import "grid-xl";
+
+.well.editor-autoresize {
+  padding: 0px;
+}
+
+.well.editor-autoresize .CodeMirror {
+  margin-bottom: 0px;
+  border: none;
+}
+
+.editor-autoresize .CodeMirror .CodeMirror-scroll {
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+
+.mouse-pointer,
+.pointer {
+  cursor: pointer;
+}
+
+.directive-example {
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.clickable {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity .5s;
+  text-decoration: none;
+}
+
+.clickable,
+.clickable:before {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+}
+
+.clickable.no-fade {
+  transition: none;
+  opacity: 1;
+}
+
+.clickable:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.widget-title > .row {
+  position: relative;
+}
+
+.widget-title > .row > .pull-left {
+  position: absolute;
+  right: 16px;
+  left: 0;
+}
+
+.widget-title > .row > .pull-left > .ep > div {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+ul.zebra-list {
+  margin-left: 0;
+}
+
+.zebra-list li {
+  padding: 7px;
+}
+
+ul.zebra-list > li {
+  list-style-type: none;
+}
+
+ol.zebra-list {
+  counter-reset:li;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+ol.zebra-list > li {
+  position: relative;
+  list-style-type: none;
+}
+
+ol.zebra-list > li:before {
+  content: counter(li);
+  counter-increment: li;
+  padding: 7px;
+  font-weight: bold;
+}
+
+.toast.toast-warning * {
+  color: black;
+}
+
+.search-query {
+  min-width: 20em;
+  padding: 5px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  &.has-text {
+    background: #55ddff;
+    color: #333333;
+  }
+}
+
+/* Main nav tweaks */
+
+.navbar-fixed-top [hawtio-main-nav] {
+  display: block;
+  float: none;
+}
+
+.navbar-fixed-top [hawtio-sub-tabs] {
+  float: none;
+  display: block;
+  /* border-top: 1px solid #d4d4d4; */
+}
+
+.navbar-fixed-top [hawtio-sub-tabs] li a {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.toolbar-pf .form-group:first-child {
+  padding-left: 0;
+}

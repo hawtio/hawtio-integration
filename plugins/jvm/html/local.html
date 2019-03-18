@@ -1,0 +1,49 @@
+<div ng-controller="JVM.JVMsController">
+  <h1>Local</h1>
+  <p ng-if="!initDone">
+    Please wait, discovering local JVM processes...
+  </p>
+  <div ng-if="initDone">
+    <p ng-if='status'>
+      {{status}}
+    </p>
+    <div ng-if='data.length > 0'>
+      <div class="row toolbar-pf">
+        <div class="col-sm-12">
+          <form class="toolbar-pf-actions">
+            <div class="form-group">
+              <input type="text" class="form-control" ng-model="filter" placeholder="Filter..." autocomplete="off">
+            </div>  
+            <div class="form-group">
+              <button class="btn btn-default" ng-click="fetch()" title="Refresh"><i class="fa fa-refresh"></i> Refresh</button>
+            </div>  
+          </form>  
+        </div>  
+      </div>  
+      <table class='centered table table-bordered table-condensed table-striped'>
+        <thead>
+        <tr>
+          <th style="width: 70px">PID</th>
+          <th>Name</th>
+          <th style="width: 300px">Agent URL</th>
+          <th style="width: 50px"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="jvm in data track by $index" ng-show="filterMatches(jvm)">
+          <td>{{jvm.id}}</td>
+          <td title="{{jvm.displayName}}">{{jvm.alias}}</td>
+          <td><a href='' title="Connect to this agent"
+                 ng-click="connectTo(jvm.url, jvm.scheme, jvm.hostname, jvm.port, jvm.path)">{{jvm.agentUrl}}</a></td>
+          <td>
+            <a class='btn control-button' href="" title="Stop agent" ng-show="jvm.agentUrl"
+             ng-click="stopAgent(jvm.id)"><i class="pficon-close"></i></a>
+            <a class='btn control-button' href="" title="Start agent" ng-hide="jvm.agentUrl"
+             ng-click="startAgent(jvm.id)"><i class="pficon-running"></i></a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

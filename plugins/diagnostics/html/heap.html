@@ -1,0 +1,25 @@
+<div ng-controller="DiagnosticsHeapController" class="table-view">
+  <h1>Class Histogram</h1>
+  <p>
+    <strong>Please note:</strong> Loading class histogram may be very expensive, depending on the size and
+    layout of the heap. Alternatively, use the <samp>jcmd</samp> utility:<br>
+    <samp>jcmd &lt;process id/main class&gt; GC.class_histogram<samp>
+  </p>
+  <p>
+    <button type="button" class="btn btn-primary" ng-click="loadClassStats()" ng-disabled="loading">
+      Load class histogram
+    </button>
+  </p>
+  <p ng-show="loading">
+    Loading...
+  </p>
+  <div ng-show="!loading && items.length > 0">
+    <pf-toolbar config="toolbarConfig">
+      <span ng-show="lastLoaded">
+        Last loaded: {{lastLoaded | date: 'yyyy-MM-dd hh:mm:ss'}}
+      </span>
+    </pf-toolbar>
+    <pf-table-view class="diagnostics-class-histogram-table" config="tableConfig" dt-options="tableDtOptions"
+                   page-config="pageConfig" columns="tableColumns" items="items"></pf-table-view>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<div ng-controller="Jmx.ChartController">
+  <h2>Chart</h2>
+  <div ng-switch="errorMessage()">
+    <div ng-switch-when="metrics">No valid metrics to show for this mbean.</div>
+    <div ng-switch-when="updateRate">Charts aren't available when the update rate is set to "No refreshes", go to the <a ng-href="#/preferences{{hash}}">Preferences</a> panel and set a refresh rate to enable charts</div>
+    <div ng-switch-default>
+      <hawtio-action-bar>
+        <button type="button" class="btn btn-default" ng-click="edit()">Edit</button>
+      </hawtio-action-bar>
+    </div>
+    <div id="charts"></div>
+  </div>
+</div>

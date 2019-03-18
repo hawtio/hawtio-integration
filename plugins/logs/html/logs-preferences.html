@@ -1,0 +1,43 @@
+<form class="form-horizontal logs-preferences-form" ng-controller="LogsPreferencesController">
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="logSortAsc">
+      Sort ascending
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Sort log entries by timestamp ascending"></span>
+    </label>
+    <div class="col-md-6">
+      <input type="checkbox" id="logSortAsc" ng-model="logSortAsc">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="logAutoScroll">
+      Auto scroll
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="Automatically scroll when new log entries are added"></span>
+    </label>
+    <div class="col-md-6">
+      <input type="checkbox" id="logAutoScroll" ng-model="logAutoScroll">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="logCacheSize">
+      Log cache size
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The number of log messages to keep in the browser"></span>
+    </label>
+    <div class="col-md-6">
+      <input id="logCacheSize" type="number" class="form-control" ng-model="logCacheSize" min="0"/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-2 control-label" for="logBatchSize">
+      Log batch size
+      <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum number of log messages to retrieve when loading new log lines"></span>
+    </label>
+    <div class="col-md-6">
+      <input id="logBatchSize" type="number" class="form-control" ng-model="logBatchSize" min="1" max="1000"/>
+    </div>
+  </div>
+
+</form>

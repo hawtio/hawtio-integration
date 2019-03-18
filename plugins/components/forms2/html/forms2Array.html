@@ -1,0 +1,32 @@
+<div>
+  <script type="text/ng-template" id="header.html">
+    <th>{{control.label || name}}</th>
+  </script>
+  <script type="text/ng-template" id="emptyHeader.html">
+    <th></th>
+  </script>
+  <script type="text/ng-template" id="newItemHeader.html">
+    <th class="align-right">
+      <button ng-hide="config.mode == 0" class="button button-success" ng-click="createNewRow()">
+        <i class="fa fa-plus green" ></i>
+      </button>
+    </th>
+  </script>
+  <script type="text/ng-template" id="arrayRowTemplate.html">
+    <tr></tr>
+  </script>
+  <script type="text/ng-template" id="deleteRow.html">
+    <td class="align-right">
+      <button ng-hide="config.mode == 0" class='editRow'><i class="fa fa-pencil yellow"></i></button>
+      <button ng-hide="config.mode == 0" class='deleteRow'><i class="fa fa-minus red"></i></button>
+    </td>
+  </script>
+  <script type="text/ng-template" id="table.html">
+    <table class="table table-striped">
+      <thead>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </script>
+</div> 

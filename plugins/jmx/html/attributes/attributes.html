@@ -1,0 +1,30 @@
+<div class="table-view" ng-controller="Jmx.AttributesController">
+  <h2>Attributes</h2>
+  <div ng-if="gridData.length > 0">
+    <div compile="attributes"></div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="gridTemplate">
+  <table class="table table-striped table-bordered table-hover jmx-attributes-table"
+    ng-class="{'ht-table-extra-columns': hasExtraColumns}"
+    hawtio-simple-table="gridOptions">
+  </table>
+</script>
+
+<script type="text/ng-template" id="attributeModal.html">
+  <div class="modal-header">
+    <button type="button" class="close" aria-label="Close" ng-click="$dismiss()">
+      <span class="pficon pficon-close" aria-hidden="true"></span>
+    </button>
+    <h4 class="modal-title">Attribute: {{entity.key}}</h4>
+  </div>
+  <div class="modal-body">
+    <div simple-form ng-hide="!entity.rw" name="attributeEditor" mode="edit" entity='entity' data='attributeSchemaEdit'></div>
+    <div simple-form ng-hide="entity.rw" name="attributeViewer" mode="view" entity='entity' data='attributeSchemaView'></div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
+    <button type="button" class="btn btn-primary" ng-show="entity.rw" ng-click="$close()">Update</button>
+  </div>
+</script>

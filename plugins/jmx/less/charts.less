@@ -1,0 +1,76 @@
+#charts {
+  display: block;
+  overflow: hidden;
+  margin: 5px auto;
+  position: relative;
+  padding-bottom: 35px;
+}
+
+.group {
+  margin-bottom: 1em;
+}
+
+.axis {
+  font: 10px sans-serif;
+  pointer-events: none;
+  z-index: 2;
+
+  &.text {
+    -webkit-transition: fill-opacity 250ms linear;
+  }
+  &.top {
+    position: relative;
+    top: 0;
+    padding: 0;
+  }
+  &.bottom {
+    position: absolute;
+    bottom: 0px;
+    padding: 0;
+  }
+  path {
+    display: none;
+  }
+  line {
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+}
+
+.horizon {
+  overflow: hidden;
+  position: relative;
+  border-top: solid 1px #d4d4d4;
+  .title,
+  .value {
+    bottom: 0;
+    line-height: 40px;
+    margin: 0 6px;
+    position: absolute;
+    white-space: nowrap;
+    font-weight: 600;
+    text-shadow: 0 0 5px white;
+  }
+  .title {
+    left: 0;
+  }
+  .value {
+    right: 0;
+  }
+  canvas {
+    display: block;
+  }
+}
+
+.horizon:last-of-type {
+  border-bottom: solid 1px #d4d4d4;
+}
+
+.line {
+  opacity: .2;
+  z-index: 2;
+}
+
+.jmx-charts-edit-view {
+  margin-top: 20px;
+}

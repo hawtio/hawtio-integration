@@ -1,0 +1,25 @@
+<ul class="pagination">
+  <li ng-class="{disabled: isEmptyOrFirst()}">
+    <a href="#" ng-disabled="isEmptyOrFirst()" ng-click="first()">
+      <span class="i fa fa-angle-double-left"></span>
+    </a>
+  </li>
+  <li ng-class="{disabled: isEmptyOrFirst()}">
+    <a href="#" ng-disabled="isEmptyOrFirst()" ng-click="previous()">
+      <span class="i fa fa-angle-left"></span>
+    </a>
+  </li>
+  <li class="active">
+    <span>{{rowIndex() + 1}} / {{tableLength()}}</span>
+  </li>
+  <li ng-class="{disabled: isEmptyOrLast()}">
+    <a href="#" ng-disabled="isEmptyOrLast()" ng-click="next()">
+      <span class="i fa fa-angle-right"></span>
+    </a>
+  </li>
+  <li ng-class="{disabled: isEmptyOrLast()}">
+    <a href="#" ng-disabled="isEmptyOrLast()" ng-click="last()">
+      <span class="i fa fa-angle-double-right"></span>
+    </a>
+  </li>
+</ul>

@@ -1,0 +1,5 @@
+<div class="form-group">
+  <label ng-hide="{{control.noLabel}}" class="control-label">{{control.label || maybeHumanize(name)}}</label>
+  <input ng-disabled="config.mode == 0" type="" class="form-control" placeholder="{{control.placeholder}}" ng-model="{{model}}" name="{{name}}">
+  <p class="help-block">{{control.description}}</p>
+</div>

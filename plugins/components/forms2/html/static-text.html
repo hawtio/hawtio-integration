@@ -1,0 +1,5 @@
+<div class="form-group">
+  <label class="control-label">{{control.label}}</label>
+  <p ng-hide="{{model}}" class="form-control-static">{{control.description}}</p>
+  <p ng-show="{{model}}" class="form-control-static" ng-bind="{{model}}"></p>
+</div>

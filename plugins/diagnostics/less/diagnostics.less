@@ -1,0 +1,135 @@
+.casette {
+  background: #000000;
+  width: 400px;
+  height: 250px;
+  border-radius: 20px;
+  margin: 15px;
+}
+
+.cassetteLabelCutCorners {
+  top: 0;
+  left: 25px;
+  width: 350px;
+  height: 0;
+  border-bottom: 25px solid white;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  position: relative;
+
+}
+
+.casetteLabel {
+  background: #ffffff;
+  top: 0;
+  left: 25px;
+  width: 350px;
+  height: 125px;
+  position: relative;
+  padding-left: 25px;
+  font-family: fantasy;
+}
+
+.cogSpacer {
+  width: 100px;
+  height: 50px;
+}
+
+.notLabel {
+  background: #000000;
+  border-radius: 30px;
+  width: 200px;
+  height: 50px;
+  left: 75px;
+  top: 50px;
+  position: absolute;
+}
+
+.spinning {
+  animation-name: spin;
+  animation-duration: 3000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.wrapCog {
+  width: 50px;
+  height: 50px;
+}
+
+#rightCogWrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#recordingIndicator {
+  margin-top: 5px;
+  margin-left: 5px;
+}
+
+.recorderButton {
+  padding: 10px;
+}
+
+.raisedButton {
+  box-shadow: 10px 10px;
+}
+
+.casettePlayer {
+  background: #555555;
+  border-radius: 10px;
+  width: 430px;
+  margin-bottom: 15px;
+  float: left;
+  overflow: hidden;
+  margin-right: 15px;
+}
+
+#casetteButtons {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  margin-left: 5px;
+}
+
+.recordingSymbol {
+  height: 50px;
+  width: 50px;
+  margin: 5px 3px;
+}
+
+#rec {
+  border-radius: 50%;
+  background-color: red;
+}
+
+.recordingSymbol#stop {
+  border-radius: 1px;
+  background-color: black;
+}
+
+//override patternfly disabled button
+#casetteButtons .disabledJfrButton {
+  background-color: rgb(90, 90, 90) !important;
+}
+
+.settingsWrapper {
+  margin-left: 430px;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rightAlignedNumber {
+  text-align: right;
+}
+
+.diagnostics-class-histogram-table {
+  tr {
+    td:nth-child(1) {
+      word-break: break-all;
+    }
+  }
+}

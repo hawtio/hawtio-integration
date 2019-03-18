@@ -1,0 +1,13 @@
+<div ng-controller="JVM.ResetController">
+  <div class="alert alert-success jvm-reset-connections-alert" ng-if="showAlert">
+    <span class="pficon pficon-ok"></span>
+    Connections cleared successfully!
+  </div>
+  <h3>Clear saved connections</h3>
+  <p>
+    Clear all saved connection settings stored in your browser's local storage.
+  </p>
+  <p>
+    <button class="btn btn-danger" ng-click="doClearConnectSettings()">Clear saved connections</button>
+  </p>
+</div>

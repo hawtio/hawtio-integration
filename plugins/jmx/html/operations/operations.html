@@ -1,0 +1,24 @@
+<h2>Operations</h2>
+<p ng-if="$ctrl.operations.length === 0">
+  This MBean has no JMX operations.
+</p>
+<div ng-if="$ctrl.operations.length > 0">
+  <p>
+    This MBean supports the following JMX operations. Expand an item in the list to invoke that operation.
+  </p>
+  <pf-list-view class="jmx-operations-list-view" items="$ctrl.operations" config="$ctrl.config"
+    menu-actions="$ctrl.menuActions">
+    <div class="list-view-pf-stacked">
+      <div class="list-group-item-heading">
+        <span class="pficon pficon-locked" ng-if="!item.canInvoke"></span>
+        {{item.readableName}}
+      </div>
+      <div class="list-group-item-text">
+        {{item.description}}
+      </div>
+    </div>
+    <list-expanded-content>
+      <operation-form operation="$parent.item"></operation-form>
+    </list-expanded-content>
+  </pf-list-view>
+</div>

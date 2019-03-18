@@ -1,0 +1,8 @@
+<div class="form-group">
+  <div class="checkbox">
+    <label>
+      <input ng-disabled="config.mode == 0" type="checkbox" ng-model="{{model}}" name="{{name}}"> {{control.label || maybeHumanize(name)}}
+    </label>
+    <p class="help-block">{{control.description}}</p>
+  </div>
+</div>

@@ -30,3 +30,42 @@
   line-height: 1.1;
   display: inline-block;
 }
+
+.main-content {
+  margin-top: @pf-padding;
+}
+
+.modal-header .pagination-container {
+  line-height: 0.8;
+}
+
+.modal-header .pagination {
+  margin: 0;
+}
+
+.table-view {
+  margin-bottom: @pf-padding;
+}
+
+.modal dd {
+  overflow-wrap: break-word;
+}
+
+.table-cell-truncated {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  width: 100%;
+}
+
+td > span {
+  display: inline-block;
+  width: 100%;
+}
+
+pf-toolbar > .container-fluid, pf-table-view > .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}

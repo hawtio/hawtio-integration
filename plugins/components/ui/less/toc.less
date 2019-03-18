@@ -1,0 +1,99 @@
+/*
+ * jquery.tocify.css 1.8.0
+ * Author: @gregfranko
+ */
+/* The Table of Contents container element */
+.tocify {
+  /* top works for the wiki, may need customization
+     elsewhere */
+  top: 56px;
+  width: 232px;
+  padding-left: 1em;
+  padding-right: 1em;
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: fixed;
+  bottom: 5px;
+  z-index: 20;
+}
+
+.tocify h2,
+.tocify h3 {
+  white-space: normal;
+}
+
+.toc-container {
+  position: relative;
+  width: 100%;
+}
+
+.toc-content {
+  position: absolute;
+  left: 280px;
+  right: 0;
+}
+
+.tocify ul {
+  margin-left: 0px;
+}
+
+.tocify li {
+  list-style-type: none;
+  display: block;
+}
+
+.tocify li a {
+  display: block;
+  padding: 3px;
+  transition: background,border .25s ease-in-out;
+}
+
+.tocify li a:hover {
+  text-decoration: none;
+}
+
+.tocify li a.active {
+  font-weight: bolder;
+}
+
+/* Makes the font smaller for all subheader elements. */
+.tocify-subheader li {
+  font-size: 12px;
+}
+
+/* Further indents second level subheader elements. */
+.tocify-subheader .tocify-subheader {
+  text-indent: 30px;
+}
+
+/* Further indents third level subheader elements. You can continue this pattern if you have more nested elements. */
+.tocify-subheader .tocify-subheader .tocify-subheader {
+  text-indent: 40px;
+}
+
+@media(max-width: 700px) {
+  .tocify {
+    position: static;
+    width: auto;
+    margin-bottom: 1em;
+  }
+
+  .toc-content {
+    position: static;
+    left: auto;
+  }
+}
+
+.hawtio-toc .panel-title {
+  padding: 0;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.hawtio-toc .panel-title a {
+  display: block;
+  text-align: center;
+  padding: 10px;
+}

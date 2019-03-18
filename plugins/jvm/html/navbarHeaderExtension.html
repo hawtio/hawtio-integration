@@ -1,0 +1,22 @@
+<style>
+  .navbar-header-hawtio-jvm {
+    float: left;
+    margin: 0;
+  }
+
+  .navbar-header-hawtio-jvm h4 {
+    color: white;
+    margin: 0px;
+  }
+
+  .navbar-header-hawtio-jvm li {
+    list-style-type: none;
+    display: inline-block;
+    margin-right: 10px;
+    margin-top: 4px;
+  }
+</style>
+<ul class="navbar-header-hawtio-jvm" ng-controller="JVM.HeaderController">
+  <li ng-show="containerName"><h4 ng-bind="containerName"></h4></li>
+  <li ng-show="goBack"><strong><a href="" ng-click="goBack()">Back</a></strong></li>
+</ul>

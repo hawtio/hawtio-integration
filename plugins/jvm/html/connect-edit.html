@@ -1,0 +1,63 @@
+<div class="modal-header">
+  <button type="button" class="close" aria-label="Close" ng-click="$ctrl.cancel()">
+    <span class="pficon pficon-close" aria-hidden="true"></span>
+  </button>
+  <h4 class="modal-title" ng-show="$ctrl.operation === 'add'">Add Connection</h4>
+  <h4 class="modal-title" ng-show="$ctrl.operation === 'edit'">Edit Connection</h4>
+</div>
+<form name="connectForm" class="form-horizontal jvm-connection-form" ng-submit="$ctrl.saveConnection($ctrl.connection)">
+  <div class="modal-body">
+    <div class="form-group" ng-class="{'has-error': $ctrl.errors.name}">
+      <label class="col-sm-3 control-label" for="connection-name">Name</label>
+      <div class="col-sm-8">
+        <input type="text" id="connection-name" class="form-control" name="name" ng-model="$ctrl.connection.name" pf-focused="!$ctrl.connection.name">
+        <span class="help-block" ng-show="$ctrl.errors.name">{{$ctrl.errors.name}}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-3 control-label" for="connection-scheme">Scheme</label>
+      <div class="col-sm-8">
+        <select id="connection-scheme" class="form-control" name="scheme" ng-model="$ctrl.connection.scheme">
+          <option>http</option>
+          <option>https</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" ng-class="{'has-error': $ctrl.errors.host}">
+      <label class="col-sm-3 control-label" for="connection-host">Host</label>
+      <div class="col-sm-8">
+        <input type="text" id="connection-host" class="form-control" name="host" ng-model="$ctrl.connection.host" ng-change="">
+        <span class="help-block" ng-show="$ctrl.errors.host">{{$ctrl.errors.host}}</span>
+      </div>
+    </div>
+    <div class="form-group" ng-class="{'has-error': $ctrl.errors.port}">
+      <label class="col-sm-3 control-label" for="connection-port">Port</label>
+      <div class="col-sm-8">
+        <input type="number" id="connection-port" class="form-control" name="port" ng-model="$ctrl.connection.port" ng-change="resetTestConnection()">
+        <span class="help-block" ng-show="$ctrl.errors.port">{{$ctrl.errors.port}}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-3 control-label" for="connection-path">Path</label>
+      <div class="col-sm-8">
+        <input type="text" id="connection-path" class="form-control" name="path" ng-model="$ctrl.connection.path" ng-change="resetTestConnection()">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-8">
+        <button type="button" class="btn btn-default" ng-click="$ctrl.testConnection($ctrl.connection)">
+          Test Connection
+        </button>
+        <span class="jvm-connection-test-msg" ng-show="$ctrl.connectionTestResult.message">
+          <span class="pficon" ng-class="{'pficon-ok': $ctrl.connectionTestResult.ok, 'pficon-warning-triangle-o': !$ctrl.connectionTestResult.ok}"></span>
+          {{$ctrl.connectionTestResult.message}}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+    <button type="submit" class="btn btn-primary" ng-show="$ctrl.operation === 'add'">Add</button>
+    <button type="submit" class="btn btn-primary" ng-show="$ctrl.operation === 'edit'">Save</button>
+  </div>
+</form>

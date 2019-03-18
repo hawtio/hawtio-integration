@@ -1,0 +1,5 @@
+<div class="form-group">
+  <label class="control-label">{{control.label || maybeHumanize(name)}}</label>
+  <select ng-disabled="config.mode == 0" hawtio-combobox class="form-control" ng-model="{{model}}" name="{{name}}"></select>
+  <p class="help-block">{{control.description}}</p>
+</div>

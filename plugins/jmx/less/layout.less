@@ -1,0 +1,125 @@
+@import (reference) 'global.less';
+
+.tree-nav-layout {
+  height: 100%;
+  display: flex;
+
+  .sidebar-pf {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 100%;
+
+    .rg-right {
+      @grabber-width: 7px;
+      @grabber-height: 30px;
+
+      div& {
+        width: 2 * @grabber-width;
+        margin-right: -@grabber-width;
+      }
+
+      span {
+        border-width: 1px;
+        background-color: white;
+        top: 50%;
+        margin: -@grabber-height / 2 0 0 @grabber-width / 2;
+        height: @grabber-height;
+        width: @grabber-width;
+      }
+    }
+  }
+
+  .tree-nav-sidebar-header {
+    flex: 0 0 auto;
+    padding: 5px 10px;
+
+    .form-froup,
+    .tree-nav-buttons {
+      display: inline-flex;
+      margin-left: 8px;
+      vertical-align: middle;
+
+      .badge {
+        font-size: 10px;
+        margin-left: 0px;
+        margin-right: 8px;
+        margin-bottom: 4px;
+
+        &.positive {
+          color: #b58100;
+          background-color: #fbeabc;
+          text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+        }
+      }
+    }
+
+    .fa {
+      font-size: 1.2em;
+      cursor: pointer;
+      margin-top: 4px;
+      margin-bottom: 4px;
+
+      &:not(:last-of-type) {
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .tree-nav-sidebar-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+
+    .spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 9999999999;
+      margin-left: -1.25 * @font-size-base;
+      margin-top: -1.25 * @font-size-base;
+    }
+
+    ul {
+      margin-bottom: 5px;
+    }
+
+    .treeview {
+      margin-left: 0;
+      margin-right: 0;
+
+      .icon {
+        width: unset;
+        font-size: 11px;
+      }
+    }
+  }
+}
+
+.tree-nav-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  .jmx-header {
+    overflow-wrap: break-word;
+    margin-left: @pf-padding;
+    margin-right: @pf-padding;
+  }
+
+  .nav-tabs {
+    flex: 0 0 auto;
+    margin-left: @pf-padding;
+    margin-right: @pf-padding;
+  }
+
+  .contents {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    position: relative;
+    padding-left: @pf-padding !important;
+    padding-right: @pf-padding;
+    height: 100%;
+  }
+}

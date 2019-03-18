@@ -1,0 +1,39 @@
+<div class="jmx-charts-edit-view" ng-controller="Jmx.ChartEditController">
+  <h2>Chart</h2>
+  <div ng-show="canEditChart()">
+    <p ng-if="showElements() && showAttributes()">
+      Please select the elements and attributes you want to see in the chart.
+    </p>
+    <p ng-if="!showElements() && showAttributes()">
+      Please select the attributes you want to see in the chart.
+    </p>
+    <p ng-if="!showElements() && !showAttributes()">
+      This chart cannot be edited.
+    </p>
+    <form>
+      <div class="row">
+        <div class="form-group col-md-6" ng-show="showElements()">
+          <label for="mbeans">Elements</label>
+          <select id="mbeans" class="form-control" size="20" multiple ng-model="selectedMBeans"
+                  ng-options="name for (name, value) in mbeans"
+                  ng-change="onSelectedMBeansChange()"></select>
+        </div>
+        <div class="form-group col-md-6" ng-show="showAttributes()">
+          <label for="attributes">Attributes</label>
+          <select id="attributes" class="form-control" size="20" multiple ng-model="selectedAttributes"
+                  ng-options="name | humanize for (name, value) in metrics"
+                  ng-change="onSelectedAttributesChange()"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary" ng-click="viewChart()"
+                ng-disabled="!selectedAttributes.length && !selectedMBeans.length">
+          View Chart
+        </button>
+      </div>
+    </form>
+  </div>
+  <p ng-show="!canEditChart()">
+    No numeric metrics available. Please select another item to chart on.
+  </p>
+</div>

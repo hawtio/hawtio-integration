@@ -1,0 +1,46 @@
+
+editable-property {
+  position: relative;
+}
+
+.ep {
+  & form fieldset i {
+    cursor: pointer;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  & form.no-bottom-margin {
+    margin: 0;
+  }
+
+  & > i:hover {
+    opacity: 1;
+  }
+  & > i {
+    cursor: pointer;
+    opacity: .25;
+    transition: opacity 0.25s ease-in-out;
+    -moz-transition: opacity 0.25s ease-in-out;
+    -webkit-transition: opacity 0.25s ease-in-out;
+  }
+  & > form > fieldset input {
+    border: none;
+  }
+  &.editing {
+    position: absolute;
+    top: -28px;
+    padding: 6px;
+    z-index: 10000;
+    border: 1px solid #cecdcd;
+    white-space: nowrap;
+    background: white;
+
+    & > form > fieldset > i {
+      position: relative;
+      top: 2px;
+
+    }
+  }
+}
+
