@@ -216,9 +216,7 @@ namespace Jmx {
         // if we've children and none of the query arguments matched any metrics
         // lets redirect back to the edit view
         if (node.children.length && !$scope.metrics.length) {
-          // lets forward to the chart selection UI if we have some children; they may have
-          // chartable attributes
-          $location.path($location.path().replace('/charts', '/charts/edit'));
+          addSubtreeMetrics(node);
         }
       }
 
@@ -283,7 +281,34 @@ namespace Jmx {
 
       Core.$apply($scope);
 
-    };
+    }
+
+    function addSubtreeMetrics(node) {
+      getChildNodes(node).forEach(child => {
+        var showChildText = node.domain !== "org.apache.camel";
+        angular.forEach(child.mbean.attr, (attribute, key) => {
+          if (Core.isNumberTypeName(attribute.type)) {
+            var title = (showChildText ? child.text + ": " : "") + Core.humanizeValue(key);
+            var metric = $scope.jolokiaContext.metric({
+              type: 'read',
+              mbean: child.objectName,
+              attribute: key
+            }, title);
+            if (metric) {
+              $scope.metrics.push(metric);
+            }
+          }
+        });
+      });
+    }
+
+    function getChildNodes(node) {
+      if (node.objectName) {
+        return [node];
+      } else {
+        return node.children.flatMap(child => getChildNodes(child));
+      }
+    }
 
   }]);
 }

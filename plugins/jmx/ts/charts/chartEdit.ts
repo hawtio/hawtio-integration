@@ -2,7 +2,7 @@
 
 namespace Jmx {
 
-  jmxModule.controller("Jmx.ChartEditController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace:Workspace, jolokia) => {
+  jmxModule.controller("Jmx.ChartEditController", ["$scope", "$location", "workspace", "jolokia", ($scope, $location, workspace: Workspace, jolokia) => {
     $scope.selectedAttributes = [];
     $scope.selectedAttributesBackup = [];
     $scope.selectedMBeans = [];
@@ -21,7 +21,7 @@ namespace Jmx {
 
     $scope.canViewChart = () => {
       return $scope.selectedAttributes.length && $scope.selectedMBeans.length &&
-              $scope.size($scope.mbeans) > 0 && $scope.size($scope.metrics) > 0;
+        $scope.size($scope.mbeans) > 0 && $scope.size($scope.metrics) > 0;
     };
 
     $scope.canEditChart = () => {
@@ -108,8 +108,6 @@ namespace Jmx {
           var mbean = mbeanNode.objectName;
           var name = mbeanNode.text;
           if (name && mbean) {
-            mbeanCounter++;
-            $scope.mbeans[name] = name;
             // use same logic as the JMX attributes page which works better than jolokia.list which has problems with
             // mbeans with special characters such as ? and query parameters such as Camel endpoint mbeans
             var asQuery = (node) => {
@@ -127,17 +125,23 @@ namespace Jmx {
             jolokia.request(infoQuery, Core.onSuccess((meta) => {
               var attributes = meta.value.attr;
               if (attributes) {
+                let hasNumericAttribute = false;
                 for (var key in attributes) {
                   var value = attributes[key];
                   if (value) {
                     var typeName = value['type'];
                     if (Core.isNumberTypeName(typeName)) {
+                      hasNumericAttribute = true;
                       if (!$scope.metrics[key]) {
                         //console.log("Number attribute " + key + " for " + mbean);
                         $scope.metrics[key] = key;
                       }
                     }
                   }
+                }
+                if (hasNumericAttribute) {
+                  mbeanCounter++;
+                  $scope.mbeans[name] = name;
                 }
                 if (++resultCounter >= mbeanCounter) {
                   // TODO do we need to sort just in case?
@@ -187,10 +191,11 @@ namespace Jmx {
 
               // update the website
               Core.$apply($scope);
-            }, {method: "post"}));
+            }, { method: "post" }));
           }
         });
       }
     }
+
   }]);
 }

@@ -53,13 +53,14 @@ namespace Core {
    * @param response the response from a jolokia request
    */
   export function defaultJolokiaErrorHandler(response: Jolokia.IErrorResponse, options: Jolokia.IParams = {}): void {
-    let operation = Core.pathGet(response, ['request', 'operation']) || "unknown";
-    let silent = options['silent'];
-    let stacktrace = response.stacktrace;
-    if (silent || isIgnorableException(response)) {
-      log.debug("Operation", operation, "failed due to:", response['error']);
-    } else {
-      log.warn("Operation", operation, "failed due to:", response['error']);
+    if (response.error) {
+      let operation = Core.pathGet(response, ['request', 'operation']) || "unknown";
+      let silent = options['silent'];
+      if (silent || isIgnorableException(response)) {
+        log.debug("Operation", operation, "failed due to:", response.error);
+      } else {
+        log.warn("Operation", operation, "failed due to:", response.error);
+      }
     }
   }
 
