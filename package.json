@@ -275,6 +275,14 @@
     "angular-animate": "1.7.7",
     "angular-sanitize": "1.7.7",
     "typescript": "3.3.3",
-    "@types/jquery": "2.0.53"
+    "@types/jquery": "2.0.53",
+    "gaze": "1.1.3",
+    "globule": "1.2.1",
+    "nan": "2.13.1",
+    "tar": "4.4.6",
+    "os-locale": "2.1.0",
+    "which-module": "2.0.0",
+    "yargs-parser": "7.0.0",
+    "cross-spawn": "5.1.0"
   }
 }
