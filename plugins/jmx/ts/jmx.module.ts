@@ -17,7 +17,6 @@ namespace Jmx {
     treeModule
   ])
   .config(configureRoutes)
-  .run(configureAbout)
   .run(configureHelp)
   .run(configureMainNav)
   .run(configurePageTitle)

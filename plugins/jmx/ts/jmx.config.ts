@@ -13,11 +13,6 @@ namespace Jmx {
       .when('/jmx/charts/edit', {templateUrl: 'plugins/jmx/html/chartEdit.html'});
   }
 
-  export function configureAbout(aboutService: About.AboutService) {
-    'ngInject';
-    aboutService.addProductInfo('Hawtio JMX', 'PACKAGE_VERSION_PLACEHOLDER');
-  }
-
   export function configureHelp(helpRegistry) {
     'ngInject';
     helpRegistry.addUserDoc('jmx', 'plugins/jmx/doc/help.md');
