@@ -1,4 +1,5 @@
 table.jmx-attributes-table {
+  table-layout: fixed;
 
   &.ht-table-extra-columns {
     table-layout: auto;
@@ -7,7 +8,14 @@ table.jmx-attributes-table {
   th:nth-child(1) {
     width: 40%;
   }
+
   th:nth-child(2) {
     width: 60%;
+  }
+
+  td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }

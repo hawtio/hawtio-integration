@@ -3,35 +3,18 @@ namespace Jmx {
   const PROPERTIES_COLUMN_DEFS = [
     {
       field: 'name',
-      displayName: 'Attribute',
-      cellTemplate: `
-        <div class="ngCellText" title="{{row.entity.attrDesc}}" data-placement="bottom">
-          <a href="" ng-click="row.entity.onViewAttribute()">{{row.entity.name}}</a>
-        </div>
-      `
+      displayName: 'Attribute'
     },
     {
       field: 'value',
-      displayName: 'Value',
-      cellTemplate: `
-        <div class="ngCellText mouse-pointer"
-             ng-click="row.entity.onViewAttribute()"
-             title="{{row.entity.tooltip}}"
-             ng-bind-html="row.entity.summary"></div>
-      `
+      displayName: 'Value'
     }
   ];
 
   const FOLDERS_COLUMN_DEFS = [
     {
-      displayName: 'Name',
-      cellTemplate: `
-        <div class="ngCellText">
-          <a href="" ng-click="row.entity.gotoFolder(row)">
-            <i class="{{row.entity.folderIconClass(row)}}"></i> {{row.getProperty("title")}}
-          </a>
-        </div>
-      `
+      field: 'title',
+      displayName: 'Name'
     }
   ];
 
@@ -39,7 +22,6 @@ namespace Jmx {
     $scope,
     $location: ng.ILocationService,
     workspace: Workspace,
-    $templateCache: ng.ITemplateCacheService,
     localStorage: Storage,
     $uibModal: angular.ui.bootstrap.IModalService,
     attributesService: AttributesService) {
@@ -47,7 +29,6 @@ namespace Jmx {
 
     let gridData = [];
 
-    $scope.searchText = '';
     $scope.nid = 'empty';
     $scope.selectedItems = [];
     $scope.lastKey = null;
@@ -55,17 +36,7 @@ namespace Jmx {
     $scope.entity = {};
     $scope.attributeSchema = {};
     $scope.gridData = [];
-    $scope.attributes = "";
-
-    $scope.$watch('gridData.length', (newValue, oldValue) => {
-      if (newValue !== oldValue) {
-        if (newValue > 0) {
-          $scope.attributes = $templateCache.get('gridTemplate');
-        } else {
-          $scope.attributes = "";
-        }
-      }
-    });
+    $scope.columnDefs = [];
 
     const ATTRIBUTE_SCHEMA_BASIC = {
       properties: {
@@ -97,34 +68,6 @@ namespace Jmx {
       }
     };
 
-    $scope.gridOptions = {
-      scope: $scope,
-      selectedItems: [],
-      showFilter: false,
-      canSelectRows: false,
-      enableRowSelection: false,
-      enableRowClickSelection: false,
-      keepLastSelected: false,
-      multiSelect: false,
-      showColumnMenu: true,
-      displaySelectionCheckbox: false,
-      filterOptions: {
-        filterText: ''
-      },
-      data: 'gridData',
-      columnDefs: PROPERTIES_COLUMN_DEFS
-    };
-
-    $scope.$watch(
-      (scope) => scope.gridOptions.selectedItems.map((item) => item.key || item),
-      (newValue, oldValue) => {
-        if (newValue !== oldValue) {
-          log.debug("Selected items:", newValue);
-          $scope.selectedItems = newValue;
-        }
-      },
-      true);
-
     // clear selection if we clicked the jmx nav bar button
     // otherwise we may show data from Camel/ActiveMQ or other plugins that
     // reuse the JMX plugin for showing tables (#884)
@@ -142,6 +85,14 @@ namespace Jmx {
     $scope.$on(TreeEvent.Updated, updateTable);
 
     updateTable();
+
+    $scope.onClick = item => {
+      if ($scope.columnDefs === FOLDERS_COLUMN_DEFS) {
+        gotoFolder(item);
+      } else if ($scope.columnDefs === PROPERTIES_COLUMN_DEFS) {
+        onViewAttribute(item);
+      }
+    };
 
     function onViewAttribute(
       row: { summary: string, key: string, attrDesc: string, type: string, rw: boolean }): void {
@@ -288,17 +239,17 @@ namespace Jmx {
       if (mbean) {
         request = { type: 'read', mbean: mbean };
         if (_.isNil(node) || node.key !== $scope.lastKey) {
-          $scope.gridOptions.columnDefs = PROPERTIES_COLUMN_DEFS;
+          $scope.columnDefs = PROPERTIES_COLUMN_DEFS;
         }
       } else if (node) {
         if (node.key !== $scope.lastKey) {
-          $scope.gridOptions.columnDefs = [];
+          $scope.columnDefs = [];
         }
         // lets query each child's details
         let children = node.children;
         if (children) {
           let childNodes = children.map((child) => child.objectName);
-          let mbeans = childNodes.filter((mbean) => FilterHelpers.search(mbean, $scope.gridOptions.filterOptions.filterText));
+          let mbeans = childNodes.filter((mbean) => FilterHelpers.search(mbean, ''));
           let maxFolderSize = localStorage["jmxMaxFolderSize"];
           mbeans = mbeans.slice(0, maxFolderSize);
           if (mbeans) {
@@ -326,10 +277,9 @@ namespace Jmx {
         attributesService.registerJolokia($scope, request, Core.onSuccess(render));
       } else if (node) {
         if (node.key !== $scope.lastKey) {
-          $scope.gridOptions.columnDefs = FOLDERS_COLUMN_DEFS;
+          $scope.columnDefs = FOLDERS_COLUMN_DEFS;
         }
         $scope.gridData = node.children;
-        addHandlerFunctions($scope.gridData);
       }
       if (node) {
         $scope.lastKey = node.key;
@@ -361,12 +311,10 @@ namespace Jmx {
             $scope.selectedIndices = $scope.selectedItems.map((item) => $scope.gridData.indexOf(item));
             gridData = [];
 
-            if (!$scope.gridOptions.columnDefs.length) {
+            if (!$scope.columnDefs.length) {
               // lets update the column definitions based on any configured defaults
 
               let key = workspace.selectionConfigKey();
-              $scope.gridOptions.gridKey = key;
-              $scope.gridOptions.onClickRowHandlers = workspace.onClickRowHandlers;
               let defaultDefs = _.clone(workspace.attributeColumnDefs[key]) || [];
               let defaultSize = defaultDefs.length;
               let map = {};
@@ -407,7 +355,7 @@ namespace Jmx {
                 $scope.hasExtraColumns = true;
               }
 
-              $scope.gridOptions.columnDefs = defaultDefs;
+              $scope.columnDefs = defaultDefs;
             }
           }
           // mask attribute read error
@@ -418,7 +366,6 @@ namespace Jmx {
           });
           // assume 1 row of data per mbean
           gridData[idx] = data;
-          addHandlerFunctions(gridData);
 
           let count = $scope.mbeanCount;
           if (!count || idx + 1 >= count) {
@@ -434,8 +381,7 @@ namespace Jmx {
           log.info("No mbean name in request", JSON.stringify(response.request));
         }
       } else {
-        $scope.gridOptions.columnDefs = PROPERTIES_COLUMN_DEFS;
-        $scope.gridOptions.enableRowClickSelection = false;
+        $scope.columnDefs = PROPERTIES_COLUMN_DEFS;
         let showAllAttributes = true;
         if (_.isObject(data)) {
           let properties = [];
@@ -481,7 +427,6 @@ namespace Jmx {
           data = properties;
         }
         $scope.gridData = data;
-        addHandlerFunctions($scope.gridData);
         Core.$apply($scope);
       }
     }
@@ -501,34 +446,21 @@ namespace Jmx {
       }
     }
 
-    function addHandlerFunctions(data: any[]): void {
-      if (!data) {
-        return;
-      }
-      data.forEach((item) => {
-        item['onViewAttribute'] = () => onViewAttribute(item);
-        item['folderIconClass'] = (row) => folderIconClass(row);
-        item['gotoFolder'] = (row) => gotoFolder(row);
-      });
-    }
-
-    function folderIconClass(row: any): string {
-      if (!row.getProperty) {
+    $scope.folderIconClass = (item: any): string => {
+      if ($scope.columnDefs === FOLDERS_COLUMN_DEFS) {
+        if (!item.objectName) {
+          return 'pficon pficon-folder-close';
+        }
+        let mbean = item.mbean;
+        return _.isNil(mbean) || _.isNil(mbean.canInvoke) || mbean.canInvoke ? 'fa fa-cog' : 'fa fa-lock';
+      } else {
         return '';
       }
-      if (!row.getProperty('objectName')) {
-        return 'pficon pficon-folder-close';
-      }
-      let mbean = row.getProperty('mbean');
-      return _.isNil(mbean) || _.isNil(mbean.canInvoke) || mbean.canInvoke ? 'fa fa-cog' : 'fa fa-lock';
     }
 
-    function gotoFolder(row: any): void {
-      if (row.getProperty) {
-        let key = row.getProperty('key');
-        if (key) {
-          $location.search('nid', key);
-        }
+    function gotoFolder(item: any): void {
+      if (item.key) {
+        $location.search('nid', item.key);
       }
     }
 

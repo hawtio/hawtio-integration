@@ -1,16 +1,26 @@
 <div class="table-view" ng-controller="Jmx.AttributesController">
   <h2>Attributes</h2>
   <div ng-if="gridData.length > 0">
-    <div compile="attributes"></div>
+    <table class="table table-striped table-bordered jmx-attributes-table"
+           ng-class="{'ht-table-extra-columns': hasExtraColumns, 'table-hover mouse-pointer': columnDefs.length <= 2}">
+      <thead>
+        <tr>
+          <th ng-repeat="columnDef in columnDefs track by columnDef.displayName">
+            {{ columnDef.displayName }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="item in gridData track by $index" ng-click="onClick(item)">
+          <td ng-repeat="columnDef in columnDefs track by columnDef.displayName" title="{{item[columnDef.field]}}">
+            <i ng-class="folderIconClass(item)"></i>
+            {{ item[columnDef.field] }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
-
-<script type="text/ng-template" id="gridTemplate">
-  <table class="table table-striped table-bordered table-hover jmx-attributes-table"
-    ng-class="{'ht-table-extra-columns': hasExtraColumns}"
-    hawtio-simple-table="gridOptions">
-  </table>
-</script>
 
 <script type="text/ng-template" id="attributeModal.html">
   <div class="modal-header">
