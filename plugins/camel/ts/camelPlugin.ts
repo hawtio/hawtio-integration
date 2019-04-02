@@ -2,6 +2,7 @@
 /// <reference path="endpoints-statistics/endpoints-statistics.module.ts"/>
 /// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="exchanges/exchanges.module.ts"/>
+/// <reference path="profile/profile.module.ts"/>
 /// <reference path="properties/properties.module.ts"/>
 /// <reference path="rest-services/rest-services.module.ts"/>
 /// <reference path="routes/routes.module.ts"/>
@@ -21,6 +22,7 @@ namespace Camel {
     endpointsStatisticsModule,
     endpointsModule,
     exchangesModule,
+    profileModule,
     propertiesModule,
     restServicesModule,
     routesModule,
@@ -55,7 +57,7 @@ namespace Camel {
       .when('/camel/sendMessage', { templateUrl: 'plugins/camel/html/sendMessage.html', reloadOnSearch: false })
       .when('/camel/traceRoute', { templateUrl: 'plugins/camel/html/traceRoute.html' })
       .when('/camel/debugRoute', { templateUrl: 'plugins/camel/html/debug.html' })
-      .when('/camel/profileRoute', { templateUrl: 'plugins/camel/html/profileRoute.html' })
+      .when('/camel/profile', { template: '<profile></profile>' })
       .when('/camel/propertiesRoute', { templateUrl: 'plugins/camel/html/propertiesRoute.html' })
       .when('/camel/propertiesComponent', { templateUrl: 'plugins/camel/html/propertiesComponent.html' })
       .when('/camel/propertiesDataFormat', { templateUrl: 'plugins/camel/html/propertiesDataFormat.html' })

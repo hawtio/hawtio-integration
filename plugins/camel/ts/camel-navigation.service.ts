@@ -104,7 +104,7 @@ namespace Camel {
       }
 
       if (isRoute && isTraceMBean && canDumpAllTracedMessagesAsXml) {
-        tabs.push(new Nav.HawtioTab('Profile', '/camel/profileRoute'));
+        tabs.push(new Nav.HawtioTab('Profile', '/camel/profile'));
       }
 
       if (isRoute && isDebugMbean && canGetBreakpoints) {
