@@ -167,7 +167,6 @@ namespace Camel {
       { field: 'LastProcessingTime', displayName: 'Last Time', visible: false },
       { field: 'LastExchangeCompletedTimestamp', displayName: 'Last completed', visible: false },
       { field: 'LastExchangeFailedTimestamp', displayName: 'Last failed', visible: false },
-      { field: 'Redeliveries', displayName: 'Redelivery', visible: false },
       { field: 'ExternalRedeliveries', displayName: 'External Redelivery', visible: false }
     ];
     attributes[jmxDomain + "/processors/folder"] = [
