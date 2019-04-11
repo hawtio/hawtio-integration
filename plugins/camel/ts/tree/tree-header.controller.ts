@@ -1,3 +1,5 @@
+/// <reference path="../../../tree-utils.ts"/>
+
 namespace Camel {
   export class TreeHeaderController {
 
@@ -42,7 +44,7 @@ namespace Camel {
 
     expandAll(): any {
       return this.tree()
-        .expandNode(this.tree().getNodes(), { levels: 1, silent: true });
+        .expandNode(this.tree().getNodes(), { levels: HawtioTree.getMaxTreeLevel(this.tree()), silent: true });
     }
 
     contractAll(): any {

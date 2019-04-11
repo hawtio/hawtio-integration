@@ -1,3 +1,5 @@
+/// <reference path="../../../tree-utils.ts"/>
+
 namespace ActiveMQ {
 
   export class TreeHeaderController {
@@ -43,7 +45,7 @@ namespace ActiveMQ {
 
     expandAll(): any {
       return this.tree()
-        .expandNode(this.tree().getNodes(), { levels: 1, silent: true });
+        .expandNode(this.tree().getNodes(), { levels: HawtioTree.getMaxTreeLevel(this.tree()), silent: true });
     }
 
     contractAll(): any {

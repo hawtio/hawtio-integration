@@ -1,4 +1,5 @@
 /// <reference path="tree.module.ts"/>
+/// <reference path="../../../tree-utils.ts"/>
 
 namespace Jmx {
 
@@ -44,11 +45,13 @@ namespace Jmx {
     }
 
     expandAll(): any {
-      return this.tree().expandAll({ silent: true });
+      return this.tree()
+        .expandNode(this.tree().getNodes(), { levels: HawtioTree.getMaxTreeLevel(this.tree()), silent: true });
     }
 
     contractAll(): any {
-      return this.tree().collapseAll({ silent: true });
+      return this.tree()
+        .collapseNode(this.tree().getNodes(), { ignoreChildren: true, silent: true });
     }
   }
 }
