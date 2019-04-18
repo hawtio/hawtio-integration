@@ -130,7 +130,8 @@ namespace ActiveMQ {
           var id = item.JMSMessageID;
           if (id) {
             var callback = (idx + 1 < selectedItems.length) ? intermediateResult : moveSuccess;
-            jolokia.execute(mbean, operation, id, $scope.queueName, Core.onSuccess(callback));
+            var queueName = Core.unescapeHTML($scope.queueName);
+            jolokia.execute(mbean, operation, id, queueName, Core.onSuccess(callback));
           }
         });
     };
