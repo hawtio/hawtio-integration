@@ -1,5 +1,5 @@
 <div class="camel-debug-main" ng-controller="Camel.DebugRouteController">
-  
+
   <div class="row camel-debug-header">
     <div class="col-sm-6">
       <h2>Debug</h2>
@@ -10,7 +10,7 @@
       </button>
     </div>
   </div>
-  
+
   <div ng-if="!debugging">
     <p>Debugging allows you to step through camel routes to diagnose issues.</p>
     <button type="button" class="btn btn-primary" ng-click="startDebugging()"
@@ -23,7 +23,7 @@
       Debugging is not allowed for this user.
     </div>
   </div>
-  
+
   <div class="toolbar-pf camel-debug-toolbar" ng-if="debugging">
     <form class="toolbar-pf-actions">
       <div class="form-group">
@@ -35,6 +35,10 @@
           <button type="button" ng-switch-default="false" class="btn btn-default" ng-disabled="shouldDisableAddBreakpoint()"
                   ng-click="addBreakpoint()" title="Add a breakpoint on the selected node">
             Add breakpoint
+          </button>
+          <button type="button" ng-switch-default="false" class="btn btn-default" ng-disabled="shouldDisableAddBreakpoint()"
+            ng-click="addConditionalBreakpoint()" title="Add a conditional breakpoint on the selected node">
+            Add conditional breakpoint
           </button>
         </div>
       </div>

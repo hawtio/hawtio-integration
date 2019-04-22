@@ -1,16 +1,16 @@
-/// <reference path="camelPlugin.ts"/>
-
 namespace Camel {
 
   const log: Logging.Logger = Logger.get("hawtio-integration-camel-debugger");
 
-  _module.controller("Camel.DebugRouteController", ["$scope", "$element", "workspace", "jolokia", "localStorage", "documentBase", (
+  export function DebugController(
     $scope,
     $element,
     workspace: Jmx.Workspace,
     jolokia: Jolokia.IJolokia,
     localStorage: Storage,
-    documentBase: string) => {
+    documentBase: string,
+    $uibModal) {
+    'ngInject';
 
     const breakpointImageUrl = UrlHelpers.join(documentBase, "/img/icons/camel/breakpoint.png");
 
@@ -65,6 +65,16 @@ namespace Camel {
         jolokia.execute(mbean, "addBreakpoint", $scope.selectedDiagramNodeId, Core.onSuccess(breakpointsChanged));
       }
     };
+
+    $scope.addConditionalBreakpoint = () => {
+      $uibModal.open({
+        component: 'addConditionalBreakpointModal',
+        resolve: {
+          nodeId: () => $scope.selectedDiagramNodeId
+        }
+      })
+      .result.then(breakpointsChanged);
+    }
 
     $scope.removeBreakpoint = () => {
       log.info("Remove breakpoint");
@@ -324,7 +334,7 @@ namespace Camel {
       });
     }
 
-    function breakpointsChanged(response: Jolokia.IResponse): void {
+    function breakpointsChanged(): void {
       reloadData();
       Core.$apply($scope);
     }
@@ -344,5 +354,6 @@ namespace Camel {
     }
 
     reloadData();
-  }]);
+  }
+
 }

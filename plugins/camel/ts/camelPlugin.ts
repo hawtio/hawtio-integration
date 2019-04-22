@@ -1,4 +1,5 @@
 /// <reference path="contexts/contexts.module.ts"/>
+/// <reference path="debug/debug.module.ts"/>
 /// <reference path="endpoints-statistics/endpoints-statistics.module.ts"/>
 /// <reference path="endpoints/endpoints.module.ts"/>
 /// <reference path="exchanges/exchanges.module.ts"/>
@@ -19,6 +20,7 @@ namespace Camel {
   export const _module = angular.module(pluginName, [
     'angularResizable',
     contextsModule,
+    debugModule,
     endpointsStatisticsModule,
     endpointsModule,
     exchangesModule,
