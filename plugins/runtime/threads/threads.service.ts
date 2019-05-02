@@ -12,13 +12,13 @@ namespace Runtime {
       TIMED_WAITING: 'Timed waiting',
       WAITING: 'Waiting'
     };
-    
+
     constructor(private jolokiaService: JVM.JolokiaService) {
       'ngInject';
     }
 
     getThreads(): angular.IPromise<Thread[]> {
-      return this.jolokiaService.execute('java.lang:type=Threading', 'dumpAllThreads', false, false)
+      return this.jolokiaService.execute('java.lang:type=Threading', 'dumpAllThreads(boolean,boolean)', false, false)
         .then(threads => {
           threads.forEach(thread => {
             thread.threadState = ThreadsService.STATE_LABELS[thread.threadState];
