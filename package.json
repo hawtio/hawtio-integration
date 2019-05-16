@@ -283,6 +283,7 @@
     "os-locale": "2.1.0",
     "which-module": "2.0.0",
     "yargs-parser": "7.0.0",
-    "cross-spawn": "5.1.0"
+    "cross-spawn": "5.1.0",
+    "fstream": "1.0.11"
   }
 }
