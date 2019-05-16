@@ -619,7 +619,7 @@ namespace Camel {
     if (folder.entries && folder.entries['type'] === 'routes') {
       const context = workspace.tree.findDescendant(node => node.typeName === 'context'
         && node.domain === 'org.apache.camel'
-        && node.text === folder.entries['context']);
+        && node.entries['context'] === folder.entries['context']);
       if (context) {
         return context.objectName;
       }
