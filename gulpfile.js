@@ -8,6 +8,7 @@ let hawtio = require('@hawtio/node-backend');
 let If = require('gulp-if');
 let less = require('gulp-less');
 let logger = require('js-logger');
+let maven = require('maven');
 let ngAnnotate = require('gulp-ng-annotate');
 let path = require('path');
 let rename = require("gulp-rename");
@@ -37,6 +38,13 @@ const config = {
 };
 
 const tsProject = typescript.createProject('tsconfig.json');
+
+gulp.task('camel-model', function () {
+  let mvn = maven.create({
+     cwd: 'vendor/apache-camel'
+  });
+  mvn.execute('compile');
+});
 
 gulp.task('tsc', function () {
   var tsResult = tsProject.src()
