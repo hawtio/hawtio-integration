@@ -2255,7 +2255,7 @@ fsevents@^1.2.2:
     nan "^2.9.2"
     node-pre-gyp "^0.10.0"
 
-fstream@^1.0.0, fstream@^1.0.12:
+fstream@1.0.11, fstream@^1.0.0, fstream@^1.0.12:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/fstream/-/fstream-1.0.11.tgz#5c1fb1f117477114f0632a0eb4b71b3cb0fd3171"
   integrity sha1-XB+x8RdHcRTwYyoOtLcbPLD9MXE=
@@ -3746,6 +3746,11 @@ math-random@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/math-random/-/math-random-1.0.1.tgz#8b3aac588b8a66e4975e3cdea67f7bb329601fac"
   integrity sha1-izqsWIuKZuSXXjzepn97sylgH6w=
+
+maven@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/maven/-/maven-4.5.0.tgz#b6ac99f1f293b4d71a4c96fecf8f1a7116d7c7c4"
+  integrity sha512-K9Jz3sjZuEZm9iDpU/LemXpD6lZna6CUYl3wNEHSBgDOwjwNKWw5f31CmWCmbaQUwNN7YcAbOyOpffUazvLgug==
 
 media-typer@0.3.0:
   version "0.3.0"
