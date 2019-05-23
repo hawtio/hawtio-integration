@@ -31,6 +31,8 @@ cd hawtio-integration
 yarn install
 ```
 
+## Developing
+
 ### Run the web application
 
 ```
@@ -62,3 +64,15 @@ gulp --sourcemap
 ```
 
 Do not use this flag when you are committing the compiled `.js` file, as it embeds source maps to the output file. Use this flag only during development.
+
+### Upgrade Apache Camel
+
+In order to support the latest Camel meta model in Camel plugin, you need to update the [camelModel.js](vendor/apache-camel/camelModel.js) with the latest `camel-catalog`. To do so, first update the Camel version in the `camel-model-generator` [pom.xml](vendor/apache-camel/pom.xml):
+
+```
+    <version.org.apache.camel>2.23.0</version.org.apache.camel>
+```
+then run the following yarn script:
+```
+yarn update-camel-model
+```

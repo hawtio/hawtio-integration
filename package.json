@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "start": "gulp",
-    "build": "gulp camel-model && gulp build",
+    "build": "gulp build",
+    "update-camel-model": "gulp camel-model",
     "test": "gulp test",
     "preversion": "gulp test",
     "prepack": "gulp version"
