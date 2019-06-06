@@ -181,10 +181,7 @@
     "lodash": "4.17.4",
     "urijs": "1.19.0",
     "@types/lodash": "4.14.91",
-    "@types/marked": "0.3.0",
-    "marked": "0.3.9",
     "mkdirp": "0.5.1",
-    "ws": "2.3.1",
     "caseless": "0.12.0",
     "tunnel-agent": "0.6.0",
     "co": "4.6.0",
@@ -241,7 +238,6 @@
     "combine-source-map": "0.8.0",
     "readable-stream": "2.3.3",
     "agent-base": "4.2.0",
-    "https-proxy-agent": "2.1.1",
     "core-js": "2.5.3",
     "@types/jqueryui": "1.12.2",
     "@types/jasmine": "2.8.6",
@@ -286,6 +282,8 @@
     "which-module": "2.0.0",
     "yargs-parser": "7.0.0",
     "cross-spawn": "5.1.0",
-    "fstream": "1.0.11"
+    "ws": "3.3.3",
+    "https-proxy-agent": "2.2.1",
+    "fstream": "1.0.12"
   }
 }
