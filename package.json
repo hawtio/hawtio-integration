@@ -51,12 +51,12 @@
     "gulp-replace": "~0.5.0",
     "gulp-sourcemaps": "~2.6.0",
     "gulp-typescript": "^4.0.0",
-    "jasmine-core": "~3.1.0",
+    "jasmine-core": "^3.0.0",
     "js-logger": "~1.4.1",
-    "karma": "~2.0.0",
-    "karma-chrome-launcher": "~2.2.0",
-    "karma-jasmine": "~1.1.1",
-    "karma-mocha-reporter": "~2.2.5",
+    "karma": "^2.0.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^2.0.0",
+    "karma-mocha-reporter": "^2.0.0",
     "karma-typescript-preprocessor": "~0.4.0",
     "puppeteer": "~1.1.1",
     "run-sequence": "^1.2.2",
@@ -191,7 +191,6 @@
     "supports-color": "2.0.0",
     "duplexer2": "0.0.2",
     "resolve": "1.5.0",
-    "braces": "1.8.5",
     "expand-range": "1.8.2",
     "repeat-string": "1.6.1",
     "array-slice": "1.1.0",
@@ -284,6 +283,7 @@
     "cross-spawn": "5.1.0",
     "ws": "3.3.3",
     "https-proxy-agent": "2.2.1",
-    "fstream": "1.0.12"
+    "fstream": "1.0.12",
+    "braces": "2.3.2"
   }
 }
