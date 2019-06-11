@@ -6,20 +6,22 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10-browsers
     working_directory: ~/hawtio
     steps:
       - checkout
       - restore_cache:
+          name: Restore Yarn Package Cache
           keys:
-          - dependency-cache-{{ checksum "package.json" }}
+            - yarn-packages-{{ checksum "yarn.lock" }}
       - run:
           name: Install dependencies
-          command: yarn install
+          command: yarn install --frozen-lockfile
       - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
           paths:
-            - node_modules
-          key: dependency-cache-{{ checksum "package.json" }}
+            - ~/.cache/yarn
       - run:
           name: Run tests
           command: yarn test
