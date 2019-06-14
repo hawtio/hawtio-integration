@@ -46,7 +46,7 @@ namespace JVM {
       if (connection.name === null || connection.name.trim().length === 0) {
         errors['name'] = 'Please fill out this field';
       }
-      if(this.connectionNames.indexOf(connection.name.trim()) >= 0) {
+      if (connection.name !== null && this.connectionNames.indexOf(connection.name.trim()) >= 0) {
         errors['name'] = `Connection name '${connection.name.trim()}' is already in use`;
       }
       if (connection.host === null || connection.host.trim().length === 0) {
