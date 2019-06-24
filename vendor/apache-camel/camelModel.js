@@ -1,4 +1,4 @@
-var _apacheCamelModelVersion = '2.23.0';
+var _apacheCamelModelVersion = '2.24.1';
 
 var _apacheCamelModel ={
   "definitions": {
@@ -1802,10 +1802,10 @@ var _apacheCamelModel ={
         "handled": {
           "kind": "expression",
           "type": "object",
-          "description": "Sets whether the exchange should be marked as handled or not.",
+          "description": "Expression to be used for evaluate whether the doCatch should catch the exception or not.",
           "title": "Handled",
           "required": false,
-          "deprecated": false
+          "deprecated": true
         },
         "id": {
           "kind": "attribute",
@@ -4236,7 +4236,7 @@ var _apacheCamelModel ={
         "redeliveryPolicy": {
           "kind": "element",
           "type": "object",
-          "description": "Set the RedeliveryPolicy to be used.",
+          "description": "Used for configuring redelivery options",
           "title": "Redelivery Policy",
           "required": false,
           "deprecated": false
@@ -7515,6 +7515,14 @@ var _apacheCamelModel ={
           "description": "Sets a chiper name to use when spooling to disk to write with encryption. By default the data is not encrypted.",
           "title": "Spool Chiper",
           "required": false,
+          "deprecated": true
+        },
+        "spoolCipher": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets a cipher name to use when spooling to disk to write with encryption. By default the data is not encrypted.",
+          "title": "Spool Cipher",
+          "required": false,
           "deprecated": false
         },
         "spoolThreshold": {
@@ -10399,6 +10407,15 @@ var _apacheCamelModel ={
           "type": "string",
           "description": "To use an specific hostname for the API documentation (eg swagger) This can be used to override the generated host with this configured hostname",
           "title": "Api Host",
+          "required": false,
+          "deprecated": false
+        },
+        "useXForwardHeaders": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "true",
+          "description": "Whether to use X-Forward headers for Host and related setting. The default value is true.",
+          "title": "Use X Forward Headers",
           "required": false,
           "deprecated": false
         },
