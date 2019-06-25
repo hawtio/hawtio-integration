@@ -284,6 +284,7 @@
     "ws": "3.3.3",
     "https-proxy-agent": "2.2.1",
     "fstream": "1.0.12",
-    "braces": "2.3.2"
+    "braces": "2.3.2",
+    "path-parse": "1.0.6"
   }
 }
