@@ -11,6 +11,7 @@
     "build": "gulp build",
     "update-camel-model": "gulp camel-model",
     "test": "gulp test",
+    "preversion": "gulp test",
     "prepack": "gulp version"
   },
   "dependencies": {
