@@ -125,7 +125,7 @@ namespace Jmx {
         ajaxError: (response) => {
           workspace.setTreeFetched();
           log.debug("Error fetching JMX tree:", response);
-        }        
+        }
       };
       log.debug("Jolokia:", this.jolokia);
       this.jolokiaList((response) => {
@@ -280,7 +280,7 @@ namespace Jmx {
         rootScope.$broadcast(TreeEvent.Fetched);
       }
     }
-    
+
     jmxTreeUpdated() {
       let rootScope = this.$rootScope;
       if (rootScope) {
@@ -344,31 +344,34 @@ namespace Jmx {
         // Core.escapeHtml() and _.escape() cannot be used, as escaping '"' breaks Camel tree...
         let propValue = this.escapeTagOnly(kv[1] || propKey);
         entries[propKey] = propValue;
-        let moveToFront = false;
+        let index = -1;
         let lowerKey = propKey.toLowerCase();
-        if (lowerKey === "type") {
+        if (lowerKey === 'type') {
           typeName = propValue;
-          // if the type name value already exists in the root node
-          // of the domain then lets move this property around too
           if (domainFolder.get(propValue)) {
-            moveToFront = true;
+            // if the type name value already exists in the root node
+            // of the domain then lets move this property around too
+            index = 0;
+          } else if (entries['name']) {
+            // else if the name key already exists, insert the type key before it
+            index = _.findIndex(paths, _.matchesProperty('key', 'name'));
           }
         }
-        if (lowerKey === "service") {
+        if (lowerKey === 'service') {
           serviceName = propValue;
         }
-        if (moveToFront) {
-          paths.unshift(propValue);
+        if (index >= 0) {
+          paths.splice(index, 0, { key: lowerKey, value: propValue });
         } else {
-          paths.push(propValue);
+          paths.push({ key: lowerKey, value: propValue });
         }
       });
 
       let folder = domainFolder;
       let domainName = domainFolder.domain;
       let folderNames = _.clone(domainFolder.folderNames);
-      let lastPath = paths.pop();
-      paths.forEach((path) => {
+      let lastPath = paths.pop().value;
+      paths.map(p => p.value).forEach((path) => {
         folder = this.folderGetOrElse(folder, path);
         if (folder) {
           folderNames.push(path);
