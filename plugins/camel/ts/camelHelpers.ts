@@ -1118,7 +1118,9 @@ namespace Camel {
       if (parenNodeName === "choice") {
         siblingNodes = siblingNodes.concat(siblings);
         x += delta;
-      } else if (nodeId === "choice") {
+      } else if (nodeId === "aggregate" || nodeId === "choice" || nodeId === "filter" || 
+                 nodeId === "loadBalance" || nodeId === "loop" || nodeId === "multicast"||
+                 nodeId === "resequence" || nodeId === "split") { 
         siblingNodes = siblings;
         y += delta;
       } else {
