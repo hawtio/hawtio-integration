@@ -9,7 +9,9 @@
 
   <properties>
     <version.org.apache.camel>2.24.1</version.org.apache.camel>
+
     <version.io.hawt.plugin>1.5.11</version.io.hawt.plugin>
+    <version.org.codehaus.gmaven.plugin>2.1</version.org.codehaus.gmaven.plugin>
 
     <schema-outdir>.</schema-outdir>
 
@@ -38,6 +40,30 @@
             </goals>
             <configuration>
               <buildDir>.</buildDir>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>groovy-maven-plugin</artifactId>
+        <version>${version.org.codehaus.gmaven.plugin}</version>
+        <executions>
+          <execution>
+            <id>modify-camel-model</id>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <phase>compile</phase>
+            <configuration>
+              <source>
+                // Ensure camel model is terminated with a semicolon
+                def file = new File("camelModel.js")
+                if (!file.exists()) {
+                  fail("camelModel.js does not exist!")
+                }
+                file.write(file.text.trim() + ";")
+              </source>
             </configuration>
           </execution>
         </executions>
