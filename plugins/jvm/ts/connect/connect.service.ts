@@ -52,8 +52,7 @@ namespace JVM {
               ajaxError: (response: JQueryXHR) => {
                 let result: ConnectionTestResult;
                 if (response.status === 403) {
-                  const forbiddenReason = response.responseJSON && response.responseJSON['reason'];
-                  if (forbiddenReason === 'HOST_NOT_ALLOWED') {
+                  if (this.forbiddenReasonMatches(response, 'HOST_NOT_ALLOWED')) {
                     result = { ok: false, message: 'Host not whitelisted' }
                   } else {
                     result = { ok: true, message: 'Connection successful' }
@@ -130,6 +129,13 @@ namespace JVM {
       return contextPath;
     }
 
+    private forbiddenReasonMatches(response: JQueryXHR, reason: string): boolean {
+      // Preserve compatibility with versions of Hawtio 2.x that return JSON on 403 responses
+      if (response.responseJSON && response.responseJSON['reason']) {
+        return response.responseJSON['reason'] === reason;
+      }
+      // Otherwise expect a response header containing a forbidden reason
+      return response.getResponseHeader("Hawtio-Forbidden-Reason") === reason;
+    }
   }
-
 }
