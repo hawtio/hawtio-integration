@@ -180,3 +180,10 @@ gulp.task('version', function () {
 gulp.task('build', ['tsc', 'less', 'template', 'concat', 'clean', 'copy-images']);
 
 gulp.task('default', ['connect']);
+
+gulp.task('camel-test', ['default'], function () {
+  let mvn = maven.create({
+     cwd: 'test'
+  });
+  mvn.execute('hawtio:spring');
+});

@@ -25,46 +25,46 @@
                 <choice>
                     <when>
                         <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 2" />
+                        <log message="When 1" />
                     </when>
                     <when>
                         <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 3" />
+                        <log message="When 2" />
                     </when>
                     <otherwise>
-                        <log message="When 4" />
+                        <log message="When 3" />
                     </otherwise>
                 </choice>
             </aggregate>
             <delay>
                 <constant>1000</constant>
-                <choice>
+                <!--<choice>
                     <when>
                         <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 2" />
+                        <log message="When 1" />
                     </when>
                     <when>
                         <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 3" />
+                        <log message="When 2" />
                     </when>
                     <otherwise>
-                        <log message="When 4" />
+                        <log message="When 3" />
                     </otherwise>
-                </choice>
+                </choice>-->
             </delay>
             <filter>
                 <xpath>$foo = 'bar'</xpath>
                 <choice>
                     <when>
                         <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 2" />
+                        <log message="When 1" />
                     </when>
                     <when>
                         <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 3" />
+                        <log message="When 2" />
                     </when>
                     <otherwise>
-                        <log message="When 4" />
+                        <log message="When 3" />
                     </otherwise>
                 </choice>
             </filter>
@@ -73,14 +73,14 @@
                 <choice>
                     <when>
                         <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 2" />
+                        <log message="When 1" />
                     </when>
                     <when>
                         <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 3" />
+                        <log message="When 2" />
                     </when>
                     <otherwise>
-                        <log message="When 4" />
+                        <log message="When 3" />
                     </otherwise>
                 </choice>
             </loadBalance>
@@ -89,14 +89,14 @@
                 <choice>
                     <when>
                         <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 2" />
+                        <log message="When 1" />
                     </when>
                     <when>
                         <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 3" />
+                        <log message="When 2" />
                     </when>
                     <otherwise>
-                        <log message="When 4" />
+                        <log message="When 3" />
                     </otherwise>
                 </choice>
             </loop>
@@ -104,14 +104,14 @@
                 <choice>
                     <when>
                         <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 2" />
+                        <log message="When 1" />
                     </when>
                     <when>
                         <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 3" />
+                        <log message="When 2" />
                     </when>
                     <otherwise>
-                        <log message="When 4" />
+                        <log message="When 3" />
                     </otherwise>
                 </choice>
             </multicast>
@@ -120,14 +120,14 @@
                 <choice>
                     <when>
                         <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 2" />
+                        <log message="When 1" />
                     </when>
                     <when>
                         <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 3" />
+                        <log message="When 2" />
                     </when>
                     <otherwise>
-                        <log message="When 4" />
+                        <log message="When 3" />
                     </otherwise>
                 </choice>
             </resequence>
@@ -136,14 +136,14 @@
                 <choice>
                     <when>
                         <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 2" />
+                        <log message="When 1" />
                     </when>
                     <when>
                         <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 3" />
+                        <log message="When 2" />
                     </when>
                     <otherwise>
-                        <log message="When 4" />
+                        <log message="When 3" />
                     </otherwise>
                 </choice>
             </split>
