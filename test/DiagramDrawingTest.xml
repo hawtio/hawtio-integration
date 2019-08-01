@@ -13,32 +13,47 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd     ">
-    <camelContext xmlns="http://camel.apache.org/schema/spring">
-        <!-- START SNIPPET: ex1 -->
-        <route>
-            <from uri="direct:simple" />
-            <aggregate completionSize="2" completionTimeout="5000" strategyRef="useLatest">
-                <correlationExpression>
-                    <constant>true</constant>
-                </correlationExpression>
-                <choice>
-                    <when>
-                        <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 1" />
-                    </when>
-                    <when>
-                        <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 2" />
-                    </when>
-                    <otherwise>
-                        <log message="When 3" />
-                    </otherwise>
-                </choice>
-            </aggregate>
-            <delay>
-                <constant>1000</constant>
-                <!--<choice>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+   <camelContext xmlns="http://camel.apache.org/schema/spring">
+      <!-- START SNIPPET: ex1 -->
+      <route>
+         <from uri="direct:simple" />
+         <onCompletion>
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </onCompletion>
+         <aggregate completionSize="2" completionTimeout="5000" strategyRef="useLatest">
+            <correlationExpression>
+               <constant>true</constant>
+            </correlationExpression>
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </aggregate>
+         <delay>
+            <constant>1000</constant>
+            <!--<choice>
                     <when>
                         <simple>${body.length} &lt;= 1</simple>
                         <log message="When 1" />
@@ -51,104 +66,171 @@
                         <log message="When 3" />
                     </otherwise>
                 </choice>-->
-            </delay>
-            <filter>
-                <xpath>$foo = 'bar'</xpath>
-                <choice>
-                    <when>
-                        <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 1" />
-                    </when>
-                    <when>
-                        <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 2" />
-                    </when>
-                    <otherwise>
-                        <log message="When 3" />
-                    </otherwise>
-                </choice>
-            </filter>
-            <loadBalance>
-                <roundRobin />
-                <choice>
-                    <when>
-                        <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 1" />
-                    </when>
-                    <when>
-                        <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 2" />
-                    </when>
-                    <otherwise>
-                        <log message="When 3" />
-                    </otherwise>
-                </choice>
-            </loadBalance>
-            <loop>
-                <simple>${body.length} &lt;= 3</simple>
-                <choice>
-                    <when>
-                        <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 1" />
-                    </when>
-                    <when>
-                        <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 2" />
-                    </when>
-                    <otherwise>
-                        <log message="When 3" />
-                    </otherwise>
-                </choice>
-            </loop>
-            <multicast>
-                <choice>
-                    <when>
-                        <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 1" />
-                    </when>
-                    <when>
-                        <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 2" />
-                    </when>
-                    <otherwise>
-                        <log message="When 3" />
-                    </otherwise>
-                </choice>
-            </multicast>
-            <resequence>
-                <header>id</header>
-                <choice>
-                    <when>
-                        <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 1" />
-                    </when>
-                    <when>
-                        <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 2" />
-                    </when>
-                    <otherwise>
-                        <log message="When 3" />
-                    </otherwise>
-                </choice>
-            </resequence>
-            <split>
-                <simple>${body}</simple>
-                <choice>
-                    <when>
-                        <simple>${body.length} &lt;= 1</simple>
-                        <log message="When 1" />
-                    </when>
-                    <when>
-                        <simple>${body.length} &lt;= 2</simple>
-                        <log message="When 2" />
-                    </when>
-                    <otherwise>
-                        <log message="When 3" />
-                    </otherwise>
-                </choice>
-            </split>
-            <to uri="mock:result" />
-        </route>
-    </camelContext>
-    <bean id="useLatest" class="org.apache.camel.processor.aggregate.UseLatestAggregationStrategy" />
+         </delay>
+         <filter>
+            <xpath>$foo = 'bar'</xpath>
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </filter>
+         <loadBalance>
+            <roundRobin />
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </loadBalance>
+         <loop>
+            <simple>${body.length} &lt;= 3</simple>
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </loop>
+         <multicast>
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </multicast>
+         <resequence>
+            <header>id</header>
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </resequence>
+         <split>
+            <simple>${body}</simple>
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </split>
+         <doTry>
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </doTry>
+         <doTry>
+            <log message="doTry" />
+            <doCatch>
+               <exception>java.io.IOException</exception>
+               <choice>
+                  <when>
+                     <simple>${body.length} &lt;= 1</simple>
+                     <log message="When 1" />
+                  </when>
+                  <when>
+                     <simple>${body.length} &lt;= 2</simple>
+                     <log message="When 2" />
+                  </when>
+                  <otherwise>
+                     <log message="When 3" />
+                  </otherwise>
+               </choice>
+            </doCatch>
+            <doFinally>
+               <choice>
+                  <when>
+                     <simple>${body.length} &lt;= 1</simple>
+                     <log message="When 1" />
+                  </when>
+                  <when>
+                     <simple>${body.length} &lt;= 2</simple>
+                     <log message="When 2" />
+                  </when>
+                  <otherwise>
+                     <log message="When 3" />
+                  </otherwise>
+               </choice>
+            </doFinally>
+         </doTry>
+         <idempotentConsumer messageIdRepositoryRef="myRepo">
+            <header>messageId</header>
+            <choice>
+               <when>
+                  <simple>${body.length} &lt;= 1</simple>
+                  <log message="When 1" />
+               </when>
+               <when>
+                  <simple>${body.length} &lt;= 2</simple>
+                  <log message="When 2" />
+               </when>
+               <otherwise>
+                  <log message="When 3" />
+               </otherwise>
+            </choice>
+         </idempotentConsumer>
+         <to uri="mock:result" />
+      </route>
+   </camelContext>
+   <bean id="myRepo" class="org.apache.camel.processor.idempotent.MemoryIdempotentRepository" />
+   <bean id="useLatest" class="org.apache.camel.processor.aggregate.UseLatestAggregationStrategy" />
 </beans>
+

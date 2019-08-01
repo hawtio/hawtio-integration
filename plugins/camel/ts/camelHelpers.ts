@@ -1120,7 +1120,9 @@ namespace Camel {
         x += delta;
       } else if (nodeId === "aggregate" || nodeId === "choice" || nodeId === "delay" || 
                  nodeId === "filter" || nodeId === "loadBalance" || nodeId === "loop" || 
-                 nodeId === "multicast"|| nodeId === "resequence" || nodeId === "split") {
+                 nodeId === "multicast"|| nodeId === "resequence" || nodeId === "split" ||
+                 nodeId === "doTry" || nodeId === "doCatch" || nodeId === "doFinally" ||
+                 nodeId === "idempotentConsumer" || nodeId ==="onCompletion") {
         siblingNodes = siblings;
         y += delta;
       } else {

@@ -17,80 +17,76 @@
     limitations under the License.
 
 -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-	<groupId>org.apache.camel.example</groupId>
-	<version>3.0.0-SNAPSHOT</version>
-    <artifactId>camel-example-spring</artifactId>
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.apache.camel.example</groupId>
+   <version>3.0.0-SNAPSHOT</version>
+   <artifactId>camel-example-spring</artifactId>
 
-	<properties>
-		<camel.version>3.0.0-M4</camel.version>
-		<log4j.version>2.12.0</log4j.version>
-		<junit.version>4.12</junit.version>
-		<hawtio.version>2.7.0</hawtio.version>
-	</properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-spring</artifactId>
-			<version>${camel.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-management-impl</artifactId>
-            <version>${camel.version}</version>
-        </dependency>
-
-        <dependency>
+   <properties>
+      <camel.version>2.24.1</camel.version>
+      <log4j.version>2.12.0</log4j.version>
+      <junit.version>4.12</junit.version>
+      <hawtio.version>2.7.0</hawtio.version>
+   </properties>
+   <dependencies>
+      <!-- https://mvnrepository.com/artifact/org.apache.camel/camel-core -->
+      <dependency>
+         <groupId>org.apache.camel</groupId>
+         <artifactId>camel-core</artifactId>
+         <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.camel</groupId>
+         <artifactId>camel-spring</artifactId>
+         <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>io.hawt</groupId>
+         <artifactId>hawtio-core</artifactId>
+         <version>${hawtio.version}</version>
+      </dependency>
+      <!-- logging -->
+      <dependency>
+         <groupId>org.apache.logging.log4j</groupId>
+         <artifactId>log4j-api</artifactId>
+         <version>${log4j.version}</version>
+         <scope>runtime</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.logging.log4j</groupId>
+         <artifactId>log4j-core</artifactId>
+         <version>${log4j.version}</version>
+         <scope>runtime</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.logging.log4j</groupId>
+         <artifactId>log4j-slf4j-impl</artifactId>
+         <version>${log4j.version}</version>
+         <scope>runtime</scope>
+      </dependency>
+      <!-- for testing -->
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>${junit.version}</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+   <build>
+      <plugins>
+         <plugin>
             <groupId>io.hawt</groupId>
-            <artifactId>hawtio-core</artifactId>
+            <artifactId>hawtio-maven-plugin</artifactId>
             <version>${hawtio.version}</version>
-        </dependency>
-        
-		<!-- logging -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-			<version>${log4j.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-			<version>${log4j.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-			<version>${log4j.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!-- for testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-	
-    <build>
-        <plugins>
-			<plugin>
-			  <groupId>io.hawt</groupId>
-			  <artifactId>hawtio-maven-plugin</artifactId>
-			  <version>${hawtio.version}</version>
-			  <configuration>
-				<!-- configuration options goes here -->
-				<fileApplicationContextUri>DiagramDrawingTest.xml</fileApplicationContextUri>
-				<openWebConsole>false</openWebConsole>
-			  </configuration>
-			</plugin>
-        </plugins>
-    </build>
+            <configuration>
+               <!-- configuration options goes here -->
+               <fileApplicationContextUri>DiagramDrawingTest.xml</fileApplicationContextUri>
+               <openWebConsole>false</openWebConsole>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
 </project>
+
