@@ -28,13 +28,13 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@~4.6.0":
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.6.0.tgz#1e06e2ac734910464ca6ce416ef35cd31bff7801"
-  integrity sha512-ch9b/S6jfbryWOFr7E+vZVxOPUXcD4n45Ve8datPuyUfz53vwwI7kgprxma0ZcAha/1sR3oqC49eFtVR8fPTNw==
+"@hawtio/core@~4.7.0":
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.7.0.tgz#c74657275939899abcd3011bea11efda99f74509"
+  integrity sha512-rW2IXhqGWWS/WXYrq9jFdYV8+DVtYNffNVYGxmVE4NC3HPIWyoooOkea/w6juYLjwECkioiQ7kh9sycJuMXNMw==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
-    "@patternfly/patternfly" "~1.0.192"
+    "@patternfly/patternfly" "^2.0.0"
     "@types/angular" "*"
     "@types/angular-route" "*"
     "@types/jasmine" "~2.8.0"
@@ -70,10 +70,10 @@
     underscore.string "^3.3.4"
     urijs "^1.18.10"
 
-"@patternfly/patternfly@~1.0.192":
-  version "1.0.250"
-  resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-1.0.250.tgz#02952d55039891ab4796b6e78e677ecd01c25855"
-  integrity sha512-Ew9m5sRTjb68ewzD1gk/QMgJYZl/0jyXtSSYaSdXyzpzB+0Yj+46qhcKDCGql6MzXxO7kZ8vjt4gmBRqfV+OnA==
+"@patternfly/patternfly@^2.0.0":
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-2.24.0.tgz#dec25e8bf1593b6a4acdb18d167cb5c9f3e71378"
+  integrity sha512-/hcfFEy85E/l7XScFiHjUc6qdYQHCWo7mny5gSnEg3y6ShUg1/JJksqAVeYDkgGGKQHGZ+Bfgaw3upU5Wl0jEw==
 
 "@types/angular-mocks@~1.7.0":
   version "1.7.0"
