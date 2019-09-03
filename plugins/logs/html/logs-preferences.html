@@ -20,23 +20,25 @@
     </div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" ng-class="{'has-error': logCacheSize === null || logCacheSize === undefined}">
     <label class="col-md-2 control-label" for="logCacheSize">
       Log cache size
       <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The number of log messages to keep in the browser"></span>
     </label>
     <div class="col-md-6">
       <input id="logCacheSize" type="number" class="form-control" ng-model="logCacheSize" min="0"/>
+      <span class="help-block" ng-show="logCacheSize === null || logCacheSize === undefined">Invalid value</span>
     </div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" ng-class="{'has-error': logBatchSize === null || logBatchSize === undefined}">
     <label class="col-md-2 control-label" for="logBatchSize">
       Log batch size
       <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum number of log messages to retrieve when loading new log lines"></span>
     </label>
     <div class="col-md-6">
       <input id="logBatchSize" type="number" class="form-control" ng-model="logBatchSize" min="1" max="1000"/>
+      <span class="help-block" ng-show="logBatchSize === null || logBatchSize === undefined">Invalid value</span>
     </div>
   </div>
 

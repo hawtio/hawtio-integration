@@ -285,6 +285,7 @@
     "https-proxy-agent": "2.2.1",
     "fstream": "1.0.12",
     "braces": "2.3.2",
-    "path-parse": "1.0.6"
+    "path-parse": "1.0.6",
+    "uuid": "3.3.3"
   }
 }

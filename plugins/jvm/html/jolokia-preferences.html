@@ -19,22 +19,24 @@
         </select>
       </div>
     </div>
-    <div class="form-group">
+    <div class="form-group" ng-class="{'has-error': maxDepth === null || maxDepth === undefined}">
       <label class="col-md-2 control-label" for="maxDepth">
         Max depth
         <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The number of levels jolokia will marshal an object to json on the server side before returning"></span>
       </label>
       <div class="col-sm-6">
-        <input type="number" id="maxDepth" class="form-control" ng-model="maxDepth">
+        <input type="number" id="maxDepth" class="form-control" min="1" ng-model="maxDepth">
+        <span class="help-block" ng-show="maxDepth === null || maxDepth === undefined">Invalid value</span>
       </div>
     </div>
-    <div class="form-group">
+    <div class="form-group" ng-class="{'has-error': maxCollectionSize === null || maxCollectionSize === undefined}">
       <label class="col-md-2 control-label" for="maxCollectionSize">
         Max collection size
         <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum number of elements in an array that jolokia will marshal in a response"></span>
       </label>
       <div class="col-sm-6">
-        <input type="number" id="maxCollectionSize" class="form-control" ng-model="maxCollectionSize">
+        <input type="number" id="maxCollectionSize" class="form-control" min="1" ng-model="maxCollectionSize">
+        <span class="help-block" ng-show="maxCollectionSize === null || maxCollectionSize === undefined">Invalid value</span>
       </div>
     </div>
     <div class="form-group">
