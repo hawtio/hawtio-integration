@@ -30,9 +30,9 @@ namespace SpringBoot {
 
     private getDetailCards(data): HealthCard[] {
       return _.toPairs(data)
-        .filter(pair => _.isObject(pair[1]))
+        .filter((pair: [string, unknown]) => _.isObject(pair[1]))
         .sort(this.sortByFirstValue)
-        .map(pair => ({
+        .map((pair: [string, object]) => ({
           title: this.humanizeService.toSentenceCase(pair[0]),
           iconClass: this.getIconClass(pair[1]['status']),
           info: this.buildInfo(pair[1])

@@ -17,8 +17,8 @@ namespace UI {
         let copied = false;
         $element.attr('data-clipboard-target', $scope.hawtioClipboard);
         $element.tooltip({placement: 'bottom', title: 'Copy to clipboard'});
-    
-        new Clipboard($element.get(0)).on('success', () => {
+
+        new ClipboardJS($element.get(0)).on('success', () => {
           $element.tooltip('destroy');
           $timeout(() => {
             $element.tooltip({placement: 'bottom', title: 'Copied!'});
@@ -26,7 +26,7 @@ namespace UI {
             copied = true;
           }, 200);
         });
-    
+
         $element.on('mouseleave', () => {
           if (copied) {
             $element.tooltip('destroy');

@@ -16,7 +16,7 @@ namespace Jmx {
       {
         name: 'Copy method name',
         actionFn: (action, item: Operation) => {
-          let clipboard = new Clipboard('.jmx-operations-list-view .dropdown-menu a', {
+          let clipboard = new ClipboardJS('.jmx-operations-list-view .dropdown-menu a', {
             text: (trigger) => item.readableName
           });
           setTimeout(() => clipboard.destroy(), 1000);
@@ -26,7 +26,7 @@ namespace Jmx {
       {
         name: 'Copy Jolokia URL',
         actionFn: (action, item: Operation) => {
-          let clipboard = new Clipboard('.jmx-operations-list-view .dropdown-menu a', {
+          let clipboard = new ClipboardJS('.jmx-operations-list-view .dropdown-menu a', {
             text: (trigger) => this.operationsService.buildJolokiaUrl(item)
           });
           setTimeout(() => clipboard.destroy(), 1000);
