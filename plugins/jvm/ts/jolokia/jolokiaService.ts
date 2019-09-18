@@ -234,7 +234,7 @@ namespace JVM {
         const errorThreshold = 2;
         let errorCount = 0;
         jolokiaParams.ajaxError = (xhr: JQueryXHR, textStatus: string, error: any) => {
-          if (xhr.status === 403) {
+          if (xhr.status === 401 || xhr.status === 403) {
             // If window was opened to connect to remote Jolokia endpoint
             if (isRemoteConnection()) {
               // ... and not showing the login modal

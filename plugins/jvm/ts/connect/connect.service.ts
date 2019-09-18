@@ -51,7 +51,9 @@ namespace JVM {
               },
               ajaxError: (response: JQueryXHR) => {
                 let result: ConnectionTestResult;
-                if (response.status === 403) {
+                if (response.status === 401) {
+                  result = { ok: true, message: 'Connection successful' };
+                } else if (response.status === 403) {
                   if (this.forbiddenReasonMatches(response, 'HOST_NOT_ALLOWED')) {
                     result = { ok: false, message: 'Host not whitelisted' }
                   } else {
