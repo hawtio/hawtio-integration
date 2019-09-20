@@ -36,6 +36,12 @@ namespace JVM {
       this.$window.localStorage.setItem(connectionSettingsKey, JSON.stringify(connections));
     }
 
+    importConnections(connections: ConnectOptions[]) {
+      const existingConnections = this.getConnections();
+      _.pullAllBy(connections, existingConnections, 'name');
+      this.saveConnections(existingConnections.concat(connections));
+    }
+
     testConnection(connection: ConnectOptions): ng.IPromise<ConnectionTestResult> {
       return this.$q((resolve, reject) => {
         try {

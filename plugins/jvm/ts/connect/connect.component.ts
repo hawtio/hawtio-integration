@@ -6,6 +6,18 @@ namespace JVM {
     connections: ConnectOptions[] = [];
     promise: ng.IPromise<any>;
 
+    toolbarConfig = {
+      actionsConfig: {
+        primaryActions: [
+          { name: 'Add connection', actionFn: () => this.addConnection() }
+        ],
+        moreActions: [
+          { name: 'Import connections', actionFn: () => this.importConnections() },
+          { name: 'Export connections', actionFn: () => this.exportConnections() }
+        ]
+      }
+    }
+
     listConfig = {
       selectionMatchProp: 'name',
       selectItems: false,
@@ -96,6 +108,29 @@ namespace JVM {
           component: 'connectUnreachableModal'
         });
       }
+    }
+
+    private exportConnections() {
+      let content = JSON.stringify(this.connections, null, '  ');
+      let blob = new Blob([content], {type: 'application/json'});
+      let url = URL.createObjectURL(blob);
+			let downloadLink = angular.element('<a></a>');
+      downloadLink.attr('href', url);
+      downloadLink.attr('download', `hawtio-connnections-${Date.now()}.json`);
+      downloadLink.appendTo('body');
+			downloadLink[0].click();
+      downloadLink.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    private importConnections() {
+      this.$uibModal.open({
+        component: 'connectImportModal'
+      })
+      .result.then(() => {
+        this.connections = this.connectService.getConnections();
+        this.connectService.updateReachableFlags(this.connections);
+      });
     }
   }
 
