@@ -45,12 +45,13 @@ namespace JVM {
       let errors = {};
       if (connection.name === null || connection.name.trim().length === 0) {
         errors['name'] = 'Please fill out this field';
-      }
-      if (connection.name !== null && this.connectionNames.indexOf(connection.name.trim()) >= 0) {
+      } else if (this.connectionNames.indexOf(connection.name.trim()) >= 0) {
         errors['name'] = `Connection name '${connection.name.trim()}' is already in use`;
       }
       if (connection.host === null || connection.host.trim().length === 0) {
         errors['host'] = 'Please fill out this field';
+      } else if (connection.host.indexOf(':') !== -1) {
+        errors['host'] = "Invalid character ':'";
       }
       if (connection.port !== null && connection.port < 0 || connection.port > 65535) {
         errors['port'] = 'Please enter a number from 0 to 65535';

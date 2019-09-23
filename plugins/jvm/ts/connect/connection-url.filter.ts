@@ -7,7 +7,8 @@ namespace JVM {
         url += `:${connection.port}`;
       }
       if (connection.path) {
-        url += `/${connection.path}`;
+        url += connection.path[0] !== '/' ? '/' : '';
+        url += connection.path;
       }
       return url;
     }
