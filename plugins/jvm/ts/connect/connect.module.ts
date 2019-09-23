@@ -1,6 +1,7 @@
 /// <reference path="connect.component.ts"/>
 /// <reference path="connect-edit-modal.component.ts"/>
 /// <reference path="connect-delete-modal.component.ts"/>
+/// <reference path="connect-import-modal.component.ts"/>
 /// <reference path="connect-login.component.ts"/>
 /// <reference path="connect-login-modal.component.ts"/>
 /// <reference path="connect-unreachable-modal.component.ts"/>
@@ -14,6 +15,7 @@ namespace JVM {
     .component('connect', connectComponent)
     .component('connectEditModal', connectEditModalComponent)
     .component('connectDeleteModal', connectDeleteModalComponent)
+    .component('connectImportModal', connectImportModalComponent)
     .component('connectLogin', connectLoginComponent)
     .component('connectLoginModal', connectLoginModalComponent)
     .component('connectUnreachableModal', connectUnreachableModalComponent)

@@ -6,9 +6,7 @@
     <span class="pficon pficon-help"></span>
   </button>
 </h1>
-<hawtio-action-bar>
-  <button type="button" class="btn btn-default" ng-click="$ctrl.addConnection()">Add connection</button>
-</hawtio-action-bar>
+<pf-toolbar class="jvm-connect-toolbar" config="$ctrl.toolbarConfig"></pf-toolbar>
 <pf-list-view class="jvm-connection-list" items="$ctrl.connections" config="$ctrl.listConfig"
               action-buttons="$ctrl.listActionButtons" menu-actions="$ctrl.listActionDropDown">
   <div class="list-view-pf-left">
