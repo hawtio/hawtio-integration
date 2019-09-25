@@ -15,7 +15,6 @@ namespace Camel {
     $scope.loadEndpointNames();
 
     $scope.workspace = workspace;
-    $scope.message = "";
 
     $scope.cancel = () => $location.path('/camel/endpoints');
 
@@ -24,10 +23,9 @@ namespace Camel {
       if (jolokia) {
         var mbean = getSelectionCamelContextMBean(workspace);
         if (mbean) {
-          $scope.message = name;
           var operation = "createEndpoint(java.lang.String)";
           jolokiaService.execute(mbean, operation, name)
-            .then(Core.onSuccess(operationSuccess))
+            .then(() => operationSuccess())
             .catch((error: string) => {
               error = error.replace("org.apache.camel.ResolveEndpointFailedException : ", "")
               Core.notification("danger", error);
@@ -64,26 +62,19 @@ namespace Camel {
         var domain = selection.domain;
         var brokerName = entries["BrokerName"];
         var name = entries["Destination"];
-        var isQueue = "Topic" !== entries["Type"];
         if (domain && brokerName) {
           var mbean = "" + domain + ":BrokerName=" + brokerName + ",Type=Broker";
-          $scope.message = "Deleting " + (isQueue ? "queue" : "topic") + " " + name;
           var operation = "removeEndpoint(java.lang.String)";
           jolokia.execute(mbean, operation, name, Core.onSuccess(deleteSuccess));
         }
       }
     };
 
-    function operationSuccess(endpointCreated): void {
+    function operationSuccess() {
       $scope.endpointName = "";
       $scope.workspace.operationCounter += 1;
       Core.$apply($scope);
-
-      if (endpointCreated && endpointCreated === true) {
-        Core.notification('success', "Creating endpoint " + $scope.message);
-      } else {
-        Core.notification('danger', "Failed to create endpoint " + $scope.message);
-      }
+      Core.notification('success', "Creating endpoint", 3000);
     }
 
     function deleteSuccess(): void {
@@ -96,7 +87,7 @@ namespace Camel {
       }
       $scope.workspace.operationCounter += 1;
       Core.$apply($scope);
-      Core.notification("success", $scope.message);
+      Core.notification("success", "Endpoint deleted");
     }
   }]);
 }
