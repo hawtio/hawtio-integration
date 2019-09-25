@@ -3,12 +3,13 @@
 
 namespace Camel {
 
-  _module.controller("Camel.EndpointController", ["$scope", "$location", "localStorage", "workspace", "jolokia", (
+  _module.controller("Camel.EndpointController", ["$scope", "$location", "localStorage", "workspace", "jolokia", "jolokiaService", (
       $scope,
       $location: ng.ILocationService,
       localStorage: Storage,
       workspace: Jmx.Workspace,
-      jolokia: Jolokia.IJolokia) => {
+      jolokia: Jolokia.IJolokia,
+      jolokiaService: JVM.JolokiaService) => {
 
     Camel.initEndpointChooserScope($scope, $location, localStorage, workspace, jolokia);
     $scope.loadEndpointNames();
@@ -25,7 +26,12 @@ namespace Camel {
         if (mbean) {
           $scope.message = name;
           var operation = "createEndpoint(java.lang.String)";
-          jolokia.execute(mbean, operation, name, Core.onSuccess(operationSuccess));
+          jolokiaService.execute(mbean, operation, name)
+            .then(Core.onSuccess(operationSuccess))
+            .catch((error: string) => {
+              error = error.replace("org.apache.camel.ResolveEndpointFailedException : ", "")
+              Core.notification("danger", error);
+            });
         } else {
           Core.notification("danger", "Could not find the CamelContext MBean!");
         }
