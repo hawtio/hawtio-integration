@@ -106,7 +106,7 @@ namespace Osgi {
       function toolbarActions(): any[] {
         let actions = [];
         let hawtioConfigAdminMBean = getHawtioConfigAdminMBean(workspace);
-        if (workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
+        if (hawtioConfigAdminMBean && workspace.hasInvokeRightsForName(hawtioConfigAdminMBean, 'configAdminUpdate')) {
           actions.push(addConfigurationAction);
         }
         log.debug("RBAC - Rendered configuration actions:", actions);
@@ -115,8 +115,9 @@ namespace Osgi {
 
       function itemMenuActions(): any[] {
         let actions = [];
+        let hawtioConfigAdminMBean = getHawtioConfigAdminMBean(workspace);
         let configAdminMBean = Osgi.getSelectionConfigAdminMBean(workspace);
-        if (workspace.hasInvokeRightsForName(configAdminMBean, 'delete')) {
+        if (hawtioConfigAdminMBean && configAdminMBean && workspace.hasInvokeRightsForName(configAdminMBean, 'delete')) {
           actions.push(deleteItemAction);
         }
         log.debug("RBAC - Rendered configuration item actions:", actions);

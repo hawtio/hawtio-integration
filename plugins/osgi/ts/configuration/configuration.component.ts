@@ -41,7 +41,7 @@ namespace Osgi {
 
     getToolbarActions(): any[] {
       let actions = [];
-      if (this.configurationService.hasRightsToAddProperty()) {
+      if (this.configurationService.isReadWrite() && this.configurationService.hasRightsToAddProperty()) {
         actions.push({ name: 'Add property', actionFn: this.addAction });
       }
       return actions;
@@ -49,10 +49,10 @@ namespace Osgi {
 
     getTableMenuActions(): any[] {
       let actions = [];
-      if (this.configurationService.hasRightsToEditProperties()) {
+      if (this.configurationService.isReadWrite() && this.configurationService.hasRightsToEditProperties()) {
         actions.push({ name: 'Edit', actionFn: this.editAction });
       }
-      if (this.configurationService.hasRightsToDeleteProperties()) {
+      if (this.configurationService.isReadWrite() && this.configurationService.hasRightsToDeleteProperties()) {
         actions.push({ name: 'Delete', actionFn: this.deleteAction });
       }
       return actions;

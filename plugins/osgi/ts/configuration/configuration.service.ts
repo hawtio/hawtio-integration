@@ -13,6 +13,10 @@ namespace Osgi {
       this.configAdminMBean = getSelectionConfigAdminMBean(workspace);
     }
 
+    isReadWrite(): boolean {
+      return !!this.hawtioConfigAdminMBean && !!this.configAdminMBean;
+    }
+
     getConfiguration(id: string): ng.IPromise<Configuration> {
       return this.jolokiaService.execute(this.configAdminMBean, 'getProperties', id)
         .then(result => {
