@@ -2,6 +2,12 @@
 .idea
 .vscode
 
+# VS Code Java extension
+.classpath
+.factorypath
+.project
+org.eclipse.*
+
 # Output directory
 /dist/
 
