@@ -54,12 +54,15 @@ namespace Jmx {
       }
     };
 
-    var doRender:()=>any = _.debounce(render, 200, { trailing: true} );
+    const doRender = _.debounce(render, 200, { trailing: true} );
 
     $scope.deregRouteChange = $scope.$on("$routeChangeSuccess", function (event, current, previous) {
       // lets do this asynchronously to avoid Error: $digest already in progress
       doRender();
     });
+
+    window.addEventListener('resize', doRender);
+    $scope.$on('$destroy', () => window.removeEventListener('resize', doRender));
 
     doRender();
 
