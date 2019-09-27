@@ -9,6 +9,7 @@ namespace Logs {
     logs = [];
     filteredLogs = [];
     messageSearchText = [];
+    loading = true;
     toolbarConfig = {
       filterConfig: {
         fields: [
@@ -41,10 +42,10 @@ namespace Logs {
         totalCount: this.logs.length,
         resultsCount: this.filteredLogs.length,
         appliedFilters: [],
-        onFilterChange: filters => this.applyFilters(filters)
+        onFilterChange: (filters: any[]) => this.applyFilters(filters)
       },
       isTableView: true
-    }
+    };
     scrollableTable = null;
 
     constructor(private $timeout, private $uibModal, private logsService: LogsService) {
@@ -54,10 +55,13 @@ namespace Logs {
     $onInit() {
       this.scrollableTable = document.querySelector('.log-jmx-scrollable-table');
       this.logsService.getInitialLogs()
-        .then(response => this.processLogEntries(response));
+        .then(response => {
+          this.loading = false;
+          this.processLogEntries(response);
+        });
     }
 
-    applyFilters(filters) {
+    applyFilters(filters: any[]) {
       let tableScrolled = this.isTableScrolled();
 
       this.removePreviousLevelFilter(filters);
@@ -132,22 +136,27 @@ namespace Logs {
         <div class="log-jmx-flex-container">
           <div class="log-jmx-fixed-toolbar">
             <h1>Logs</h1>
-            <p ng-show="$ctrl.logs.length === 0">Loading...</p>
-            <div ng-show="$ctrl.logs.length > 0">
+            <p ng-show="$ctrl.loading">Loading...</p>
+            <div ng-show="!$ctrl.loading">
               <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
-              <table class="table table-striped log-jmx-header-table">
-                <thead>
-                  <tr>
-                    <th>Timestamp</th>
-                    <th>Level</th>
-                    <th>Logger</th>
-                    <th>Message</th>
-                  </tr>
-                </thead>
-              </table>
+              <div ng-show="$ctrl.filteredLogs.length === 0">
+                <pf-empty-state></pf-empty-state>
+              </div>
+              <div ng-show="$ctrl.filteredLogs.length > 0">
+                <table class="table table-striped log-jmx-header-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Level</th>
+                      <th>Logger</th>
+                      <th>Message</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
             </div>
           </div>
-          <div class="log-jmx-scrollable-table" ng-show="$ctrl.logs.length > 0">
+          <div class="log-jmx-scrollable-table" ng-show="$ctrl.filteredLogs.length > 0">
             <table class="table table-striped">
               <tbody>
                 <tr ng-repeat="logEntry in $ctrl.filteredLogs">
