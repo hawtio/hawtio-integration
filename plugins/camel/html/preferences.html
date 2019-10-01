@@ -40,23 +40,25 @@
     </div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" ng-class="{'has-error': camelMaximumTraceOrDebugBodyLength === null || camelMaximumTraceOrDebugBodyLength === undefined}">
     <label class="col-md-4 control-label" for="camelMaximumTraceOrDebugBodyLength">
       Maximum trace / debug body length
       <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum length of the body before its clipped when using the tracer and debugger"></span>
     </label>
     <div class="col-md-4">
       <input id="camelMaximumTraceOrDebugBodyLength" type="number" class="form-control" ng-model="camelMaximumTraceOrDebugBodyLength" min="0"/>
+      <span class="help-block" ng-show="camelMaximumTraceOrDebugBodyLength === null || camelMaximumTraceOrDebugBodyLength === undefined">Invalid value</span>
     </div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" ng-class="{'has-error': camelMaximumLabelWidth === null || camelMaximumLabelWidth === undefined}">
     <label class="col-md-4 control-label" for="camelMaximumLabelWidth">
       Maximum label width
       <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum length of a label in Camel diagrams before it is clipped"></span>
     </label>
     <div class="col-md-4">
       <input id="camelMaximumLabelWidth" type="number" class="form-control" ng-model="camelMaximumLabelWidth" min="0"/>
+      <span class="help-block" ng-show="camelMaximumLabelWidth === null || camelMaximumLabelWidth === undefined">Invalid value</span>
     </div>
   </div>
 
@@ -80,13 +82,14 @@
     </div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" ng-class="{'has-error': camelRouteMetricMaxSeconds === null || camelRouteMetricMaxSeconds === undefined}">
     <label class="col-md-4 control-label" for="camelRouteMetricMaxSeconds">
       Route metric maximum seconds
       <span class="pficon pficon-info" data-toggle="tooltip" data-placement="top" title="The maximum value in seconds used by the route metrics duration and histogram charts"></span>
     </label>
     <div class="col-md-4">
       <input id="camelRouteMetricMaxSeconds" type="number" class="form-control" ng-model="camelRouteMetricMaxSeconds" min="0" max="100"/>
+      <span class="help-block" ng-show="camelRouteMetricMaxSeconds === null || camelRouteMetricMaxSeconds === undefined">Invalid value</span>
     </div>
   </div>
 
