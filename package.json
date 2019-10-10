@@ -15,7 +15,7 @@
     "prepack": "gulp version"
   },
   "dependencies": {
-    "@hawtio/core": "~4.7.0",
+    "@hawtio/core": "~4.8.0",
     "@types/angular-mocks": "~1.7.0",
     "@types/angular-ui-bootstrap": "~0.13.46",
     "@types/bootstrap": "3.3.36",
