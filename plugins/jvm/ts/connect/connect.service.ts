@@ -6,6 +6,15 @@ namespace JVM {
 
     constructor(private $q: ng.IQService, private $window: ng.IWindowService, private $location: ng.ILocationService) {
       'ngInject';
+      this.convertOldConnections();
+    }
+
+    private convertOldConnections() {
+      let connections = this.getConnections();
+      if (connections && !angular.isArray(connections)) {
+        connections = Object.values(connections);
+        this.saveConnections(connections);
+      }
     }
 
     getConnections(): ConnectOptions[] {
