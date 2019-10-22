@@ -10,7 +10,8 @@ namespace JVM {
 
     getConnections(): ConnectOptions[] {
       const connectionsJson = this.$window.localStorage.getItem(connectionSettingsKey);
-      return connectionsJson ? JSON.parse(connectionsJson) : [];
+      const connections = connectionsJson ? JSON.parse(connectionsJson) : [];
+      return angular.isArray(connections) ? connections : Object.values(connections);
     }
 
     updateReachableFlags(connections: ConnectOptions[]): ng.IPromise<ConnectOptions[]> {
