@@ -110,7 +110,7 @@ gulp.task('watch-less', function () {
 });
 
 gulp.task('watch', ['build', 'watch-less'], function () {
-  gulp.watch(['index.html', config.dist + '*'], ['reload']);
+  gulp.watch(['index.html', config.dist + config.js], ['reload']);
 
   const tsconfig = require('./tsconfig.json');
   gulp.watch([...tsconfig.include, ...(tsconfig.exclude || []).map(e => `!${e}`), config.templates],
