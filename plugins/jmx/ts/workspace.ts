@@ -344,24 +344,18 @@ namespace Jmx {
         // Core.escapeHtml() and _.escape() cannot be used, as escaping '"' breaks Camel tree...
         let propValue = this.escapeTagOnly(kv[1] || propKey);
         entries[propKey] = propValue;
-        let index = -1;
+        let addtoFront = false;
         let lowerKey = propKey.toLowerCase();
         if (lowerKey === 'type') {
+          addtoFront = true;
           typeName = propValue;
-          if (domainFolder.get(propValue)) {
-            // if the type name value already exists in the root node
-            // of the domain then lets move this property around too
-            index = 0;
-          } else if (entries['name']) {
-            // else if the name key already exists, insert the type key before it
-            index = _.findIndex(paths, _.matchesProperty('key', 'name'));
-          }
         }
         if (lowerKey === 'service') {
+          addtoFront = true;
           serviceName = propValue;
         }
-        if (index >= 0) {
-          paths.splice(index, 0, { key: lowerKey, value: propValue });
+        if (addtoFront) {
+          paths.unshift({ key: lowerKey, value: propValue });
         } else {
           paths.push({ key: lowerKey, value: propValue });
         }
