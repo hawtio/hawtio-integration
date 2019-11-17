@@ -425,4 +425,37 @@ namespace Core {
       delete scope.$jhandle;
     }
   }
+
+  /**
+   * Hack to fix the paths ordering. It's required for Karaf on OpenShift.
+   * @param domainText
+   * @param paths
+   */
+  export function fixOsgiPathsOrdering(domainText: string, paths: any[]) {
+    switch (domainText) {
+      case 'osgi.compendium':
+        moveObjectsToFront(paths, 'key', ['service', 'version', 'framework']);
+        break;
+      case 'osgi.core':
+        moveObjectsToFront(paths, 'key', ['type', 'version', 'framework']);
+        break;
+    }
+  }
+
+  /**
+   * Move objects to the front of array according to object property values.
+   * @param arr
+   * @param key
+   * @param values
+   */
+  function moveObjectsToFront(arr: object[], key: string, values: string[]) {
+    values.reverse().forEach(value => {
+      const index = _.findIndex(arr, [key, value]);
+      if (index !== -1) {
+        const obj = arr.splice(index, 1)[0];
+        arr.unshift(obj);
+      }
+    });
+  }
+
 }
