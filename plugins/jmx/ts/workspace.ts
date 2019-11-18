@@ -1,5 +1,6 @@
 /// <reference path="../../jvm/ts/jolokia/jolokiaService.ts"/>
 /// <reference path="tree/tree-event.ts"/>
+/// <reference path="helpers.ts"/>
 
 namespace Jmx {
 
@@ -366,6 +367,8 @@ namespace Jmx {
           paths.push({ key: lowerKey, value: propValue });
         }
       });
+
+      Core.reorderPathsIfRequired(domainFolder.text, paths);
 
       let folder = domainFolder;
       let domainName = domainFolder.domain;
