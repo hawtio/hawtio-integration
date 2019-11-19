@@ -425,4 +425,58 @@ namespace Core {
       delete scope.$jhandle;
     }
   }
+
+  /**
+   * Reorder paths when they aren't in the correct order.
+   * @param {object[]} paths
+   * @param {string} domainText
+   */
+  export function reorderPathsIfRequired(domainText: string, paths: object[]) {
+    switch (domainText) {
+      case 'osgi.compendium':
+        reorderObjectsByKeyAndValuesOrder(paths, 'key', ['service', 'version', 'framework']);
+        break;
+      case 'osgi.core':
+        reorderObjectsByKeyAndValuesOrder(paths, 'key', ['type', 'version', 'framework']);
+        break;
+    }
+  }
+
+  /**
+   * Reorder objects by key according to provided order of values.
+   * @param {object[]} arr
+   * @param {string} key
+   * @param {string[]} valuesOrder
+   */
+  function reorderObjectsByKeyAndValuesOrder(arr: object[], key: string, valuesOrder: string[]) {
+    if (needToReorderObjects(arr, key, valuesOrder)) {
+      valuesOrder.reverse().forEach(value => {
+        const index = _.findIndex(arr, [key, value]);
+        if (index !== -1) {
+          const obj = arr.splice(index, 1)[0];
+          arr.unshift(obj);
+        }
+      });
+    }
+  }
+
+  /**
+   * Check whether the objects need to be reordered.
+   * @param {object[]} arr
+   * @param {string} key
+   * @param {string[]} valuesOrder
+   * @returns {boolean}
+   */
+  function needToReorderObjects(arr: object[], key: string, valuesOrder: string[]): boolean {
+    if (arr.length < valuesOrder.length) {
+      return true;
+    }
+    for (let i = 0; i < valuesOrder.length; i++) {
+      if (arr[i][key] !== valuesOrder[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }
