@@ -26,7 +26,7 @@ namespace Core {
           <span class="pficon pficon-close"></span>
         </button>
         <span class="pficon pficon-${resolveToastIcon(type)}"></span>
-        ${message}
+        ${Core.escapeHtml(message)}
       </div>
     `;
     let toastFrag = document.createRange().createContextualFragment(toastHtml);
