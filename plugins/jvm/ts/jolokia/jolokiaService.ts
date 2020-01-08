@@ -214,7 +214,8 @@ namespace JVM {
     jolokiaUrl: string,
     userDetails: Core.AuthService,
     postLoginTasks: Core.Tasks,
-    $timeout: ng.ITimeoutService): Jolokia.IJolokia {
+    $timeout: ng.ITimeoutService,
+    $cookies: ng.cookies.ICookiesService): Jolokia.IJolokia {
     'ngInject';
 
     let jolokia: Jolokia.IJolokia = null;
@@ -223,7 +224,7 @@ namespace JVM {
       // hawtio-oauth may have already set up jQuery beforeSend
       if (!$.ajaxSettings.beforeSend) {
         log.debug("Setting up jQuery beforeSend");
-        $.ajaxSetup({ beforeSend: getBeforeSend(userDetails) });
+        $.ajaxSetup({ beforeSend: getBeforeSend(userDetails, $cookies) });
       }
 
       // execute post-login tasks in case they are not yet executed
@@ -275,7 +276,7 @@ namespace JVM {
     return jolokia;
   }
 
-  function getBeforeSend(userDetails: Core.AuthService): (xhr: JQueryXHR) => any {
+  function getBeforeSend(userDetails: Core.AuthService, $cookies: ng.cookies.ICookiesService): (xhr: JQueryXHR) => any {
     // Just set Authorization for now...
     let header = 'Authorization';
     if (userDetails.loggedIn && userDetails.token) {
@@ -286,13 +287,19 @@ namespace JVM {
         }
       }
     } else if (connectOptions && connectOptions['token']) {
-      return (xhr: JQueryXHR) => xhr.setRequestHeader(header, 'Bearer ' + connectOptions['token']);
+      return (xhr: JQueryXHR) =>
+        xhr.setRequestHeader(header, 'Bearer ' + connectOptions['token']);
     } else if (connectOptions && connectOptions.userName && connectOptions.password) {
       log.debug("Setting authorization header to username/password");
       return (xhr: JQueryXHR) =>
         xhr.setRequestHeader(
           header,
           Core.getBasicAuthHeader(connectOptions.userName, connectOptions.password));
+    } else if ($cookies.get('XSRF-TOKEN')) {
+      // For CSRF protection with Spring Security
+      log.debug("Setting XSRF token header from cookies");
+      return (xhr: JQueryXHR) =>
+        xhr.setRequestHeader('X-XSRF-TOKEN', $cookies.get('XSRF-TOKEN'));
     } else {
       log.debug("Not setting any authorization header");
       return (xhr: JQueryXHR) => { };

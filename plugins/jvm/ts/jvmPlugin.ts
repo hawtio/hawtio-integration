@@ -6,6 +6,7 @@ namespace JVM {
 
   export const _module = angular
     .module(pluginName, [
+      'ngCookies',
       connectModule,
       jolokiaModule
     ])

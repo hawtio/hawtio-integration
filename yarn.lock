@@ -75,6 +75,13 @@
   resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-2.40.3.tgz#49e7a4164ccf956d5ba1d39a6f3e6d0dc0c41032"
   integrity sha512-9hA9fIAD0ebJbJmWrykophBv0oORoyInTPekgMplbvOxXMRFFz2T2z+P0rzCku5ecBTT8zzrIkiF9B+YucFSkA==
 
+"@types/angular-cookies@^1.4.5":
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/@types/angular-cookies/-/angular-cookies-1.4.5.tgz#f5ccf5f42a7b9f4d13e77afb8722034ea9f40bd3"
+  integrity sha512-WJJX4Z0JDte/0KSKGm4JGJbnv3wz8fnK6Li3aKdXUGu+mvjTvmJF7h0acFV9ODGhgwpFXzH9dLw3IjR6WbgG3w==
+  dependencies:
+    "@types/angular" "*"
+
 "@types/angular-mocks@~1.7.0":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@types/angular-mocks/-/angular-mocks-1.7.0.tgz#310d999a3c47c10ecd8eef466b5861df84799429"
@@ -483,6 +490,11 @@ angular-animate@1.7.7, angular-animate@^1.7.7:
   resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.7.7.tgz#5422909094a41cd7404937d8a8a960f30c4d9364"
   integrity sha512-KLbU9gtgCyNSaMZKnNe9Yi6UTlDMN2EWyokQ06TG5fbDWOePm+kv2xqeUg1S2h+ZLjK0NnoVDIvwDhVQ+AWAag==
 
+angular-cookies@^1.7.9:
+  version "1.7.9"
+  resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.7.9.tgz#0f0cd2a9d1c81e5b8d6c6711d41f0909f9d0b8e0"
+  integrity sha512-3eRq/aPrtCZKDWQnc3nW3sFoMbLiHkCkyDF2O9u7VXnqvVsUPaipk5R1ZqahgcSQHQrN/F5IU4T4nrz52qAZmA==
+
 angular-drag-and-drop-lists@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/angular-drag-and-drop-lists/-/angular-drag-and-drop-lists-2.0.0.tgz#a01d44b94cf233c9c2d45a31842cb35a9d0882ca"
@@ -751,7 +763,7 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
 
-atob@2.0.3, atob@^2.0.0, atob@^2.1.1:
+atob@2.0.3, atob@^2.0.0, atob@^2.1.2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.0.3.tgz#19c7a760473774468f20b2d2d03372ad7d4cbf5d"
   integrity sha1-GcenYEc3dEaPILLS0DNyrX1Mv10=
@@ -3819,7 +3831,7 @@ micromatch@3.1.9, micromatch@^2.3.7, micromatch@^3.0.4, micromatch@^3.1.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-mime-db@1.36.0, mime-db@1.42.0, mime-db@~1.36.0:
+mime-db@1.36.0, mime-db@1.43.0, mime-db@~1.36.0:
   version "1.36.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.36.0.tgz#5020478db3c7fe93aad7bbcc4dcf869c43363397"
   integrity sha512-L+xvyD9MkoYMXb1jAmzI/lWYAxAMCPvIBSWur0PZ5nOf5euahRLVqH//FKW9mWp2lkqUgYiXPgkzfMUFi4zVDw==
