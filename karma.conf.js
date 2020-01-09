@@ -32,6 +32,7 @@ module.exports = function(config) {
       'node_modules/angular-drag-and-drop-lists/angular-drag-and-drop-lists.min.js',
       'node_modules/angularjs-datatables/dist/angular-datatables.min.js',
       'node_modules/angularjs-datatables/dist/plugins/select/angular-datatables.select.min.js',
+      'node_modules/angular-cookies/angular-cookies.min.js',
       'node_modules/angular-patternfly/dist/angular-patternfly.js',
       'node_modules/c3/c3.min.js',
       'node_modules/d3/d3.min.js',
