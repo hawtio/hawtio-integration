@@ -25,7 +25,13 @@ namespace Camel {
         if (mbean) {
           var operation = "createEndpoint(java.lang.String)";
           jolokiaService.execute(mbean, operation, name)
-            .then(() => operationSuccess())
+            .then((success: boolean) => {
+              if (success) {
+                operationSuccess();
+              } else {
+                Core.notification('danger', 'Invalid URI');
+              }
+            })
             .catch((error: string) => {
               error = error.replace("org.apache.camel.ResolveEndpointFailedException : ", "")
               Core.notification("danger", error);
