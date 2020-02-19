@@ -11,5 +11,6 @@ namespace JVM {
     'tomcat': logoPath + 'tomcat-logo.gif',
     'generic': logoPath + 'java-logo.svg'
   };
+  export const proxyEnabledPath = 'proxy/enabled';
 
 }

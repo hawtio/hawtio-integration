@@ -38,7 +38,8 @@ namespace JVM {
     HawtioDashboard,
     HawtioExtension: Core.HawtioExtension,
     $templateCache: ng.ITemplateCacheService,
-    $compile: ng.ICompileService): void {
+    $compile: ng.ICompileService,
+    $http: ng.IHttpService): void {
     'ngInject';
 
     viewRegistry['jvm'] = "plugins/jvm/html/layoutConnect.html";
@@ -81,12 +82,28 @@ namespace JVM {
     preferencesRegistry.addTab("Connect", 'plugins/jvm/html/reset.html');
     preferencesRegistry.addTab("Jolokia", "plugins/jvm/html/jolokia-preferences.html");
 
-    mainNavService.addItem({
-      title: 'Connect',
-      basePath: '/jvm',
-      template: '<jvm></jvm>',
-      isValid: () => ConnectOptions == null || ConnectOptions.name == null
-    });
+    $http.get<string>(proxyEnabledPath)
+      .then(
+        // success
+        (response: ng.IHttpResponse<string>) => {
+          let enabled = response.data !== 'false';
+          log.debug('Proxy is', enabled ? 'enabled' : 'disabled');
+          return enabled;
+        },
+        // error
+        (response: ng.IHttpResponse<any>) => {
+          // Silently ignore and enable it when the path is not available
+          log.debug('Failed to fetch', proxyEnabledPath, ':', response.data);
+          return true;
+        })
+      .then((enabled: boolean) => {
+        mainNavService.addItem({
+          title: 'Connect',
+          basePath: '/jvm',
+          template: '<jvm></jvm>',
+          isValid: () => enabled && (ConnectOptions == null || ConnectOptions.name == null)
+        });
+      });
   }
 
   function startJolokia($q: ng.IQService, initService: Init.InitService, jolokia: Jolokia.IJolokia, localStorage: Storage) {
