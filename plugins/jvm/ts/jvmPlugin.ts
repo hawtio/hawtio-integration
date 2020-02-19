@@ -86,7 +86,7 @@ namespace JVM {
       .then(
         // success
         (response: ng.IHttpResponse<string>) => {
-          let enabled = response.data !== 'false';
+          let enabled = !response.data || response.data.trim() !== 'false';
           log.debug('Proxy is', enabled ? 'enabled' : 'disabled');
           return enabled;
         },
