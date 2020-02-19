@@ -147,6 +147,7 @@ gulp.task('connect', ['watch'], function () {
       res.statusCode = 404;
       res.end();
     } else if (path === '/integration/proxy/enabled') {
+      res.set('Content-Type', 'application/json');
       res.send('true\n');
     } else {
       if (argv.debug) {

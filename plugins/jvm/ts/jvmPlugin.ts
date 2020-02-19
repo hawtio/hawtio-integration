@@ -85,8 +85,8 @@ namespace JVM {
     $http.get<string>(proxyEnabledPath)
       .then(
         // success
-        (response: ng.IHttpResponse<string>) => {
-          let enabled = !response.data || response.data.trim() !== 'false';
+        (response: ng.IHttpResponse<any>) => {
+          let enabled = response.data as boolean;
           log.debug('Proxy is', enabled ? 'enabled' : 'disabled');
           return enabled;
         },
