@@ -13,4 +13,6 @@ namespace JVM {
   };
   export const proxyEnabledPath = 'proxy/enabled';
 
+  export let proxyEnabled: boolean = true;
+
 }

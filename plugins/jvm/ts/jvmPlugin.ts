@@ -38,8 +38,7 @@ namespace JVM {
     HawtioDashboard,
     HawtioExtension: Core.HawtioExtension,
     $templateCache: ng.ITemplateCacheService,
-    $compile: ng.ICompileService,
-    $http: ng.IHttpService): void {
+    $compile: ng.ICompileService): void {
     'ngInject';
 
     viewRegistry['jvm'] = "plugins/jvm/html/layoutConnect.html";
@@ -82,28 +81,12 @@ namespace JVM {
     preferencesRegistry.addTab("Connect", 'plugins/jvm/html/reset.html');
     preferencesRegistry.addTab("Jolokia", "plugins/jvm/html/jolokia-preferences.html");
 
-    $http.get<string>(proxyEnabledPath)
-      .then(
-        // success
-        (response: ng.IHttpResponse<any>) => {
-          let enabled = response.data as boolean;
-          log.debug('Proxy is', enabled ? 'enabled' : 'disabled');
-          return enabled;
-        },
-        // error
-        (response: ng.IHttpResponse<any>) => {
-          // Silently ignore and enable it when the path is not available
-          log.debug('Failed to fetch', proxyEnabledPath, ':', response.data);
-          return true;
-        })
-      .then((enabled: boolean) => {
-        mainNavService.addItem({
-          title: 'Connect',
-          basePath: '/jvm',
-          template: '<jvm></jvm>',
-          isValid: () => enabled && (ConnectOptions == null || ConnectOptions.name == null)
-        });
-      });
+    mainNavService.addItem({
+      title: 'Connect',
+      basePath: '/jvm',
+      template: '<jvm></jvm>',
+      isValid: () => proxyEnabled && (ConnectOptions == null || ConnectOptions.name == null)
+    });
   }
 
   function startJolokia($q: ng.IQService, initService: Init.InitService, jolokia: Jolokia.IJolokia, localStorage: Storage) {
@@ -120,5 +103,28 @@ namespace JVM {
     });
   }
 
-  hawtioPluginLoader.addModule(pluginName);
+  hawtioPluginLoader
+    .addModule(pluginName)
+    .registerPreBootstrapTask({
+      name: 'InitProxyEnabled',
+      task: (next) => initProxyEnabled(next)
+    });
+
+  function initProxyEnabled(callback: () => void): void {
+    $.ajax(proxyEnabledPath, {
+      type: 'GET',
+      success: (data: any, status: string, xhr: JQueryXHR) => {
+        let enabled = data !== false;
+        log.debug('Proxy enabled:', enabled);
+        proxyEnabled = enabled;
+        callback();
+      },
+      error: (xhr: JQueryXHR, status: string, error: string) => {
+        // Silently ignore and enable it when the path is not available
+        log.debug('Failed to fetch', proxyEnabledPath, ':', error);
+        proxyEnabled = true;
+        callback();
+      }
+    });
+  }
 }
