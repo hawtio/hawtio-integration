@@ -70,7 +70,7 @@ namespace ActiveMQ {
       isValid: () => workspace.treeContainsDomainAndProperties(jmxDomain) && activeMQNavigationService.getTabs().length > 0
     });
 
-    workspace.addTreePostProcessor(postProcessTree);
+    workspace.addNamedTreePostProcessor('activemq', postProcessTree);
 
     // clean up local storage upon logout
     preLogoutTasks.addTask('CleanupActiveMQCredentials', () => {

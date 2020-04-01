@@ -139,15 +139,7 @@ namespace Jmx {
     /**
      * Adds a post processor of the tree to swizzle the tree metadata after loading
      * such as correcting any typeName values or CSS styles by hand
-     * @method addTreePostProcessor
-     * @param {Function} processor
      */
-    public addTreePostProcessor(processor: (tree: Folder) => void) {
-      let numKeys = _.keys(this.treePostProcessors).length;
-      let nextKey = numKeys + 1;
-      return this.addNamedTreePostProcessor(nextKey + '', processor);
-    }
-
     public addNamedTreePostProcessor(name: string, processor: (tree: Folder) => void) {
       this.treePostProcessors[name] = processor;
       let tree = this.tree;

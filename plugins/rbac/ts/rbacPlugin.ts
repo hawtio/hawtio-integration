@@ -21,7 +21,7 @@ namespace RBAC {
     .service('rbacACLMBean', RBACACLMBeanFactory.create)
     .run(addTreePostProcessor);
 
-  const TREE_POSTPROCESSOR_NAME = "rbacTreePostprocessor";
+  const TREE_POSTPROCESSOR_NAME = "rbac";
 
   function addTreePostProcessor(
     jolokia: Jolokia.IJolokia,
