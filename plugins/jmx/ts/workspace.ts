@@ -300,7 +300,7 @@ namespace Jmx {
     }
 
     private populateDomainFolder(tree: Folder, domainName: string, domain: Core.JMXDomain): void {
-      logTree.debug("JMX tree domain: " + domainName);
+      logTree.debug("JMX tree domain:", domainName);
       let domainClass = Core.escapeDots(domainName);
       let folder = this.folderGetOrElse(tree, domainName);
       this.initFolder(folder, domainName, [domainName]);
@@ -331,7 +331,7 @@ namespace Jmx {
     }
 
     private populateMBeanFolder(domainFolder: Folder, domainClass: string, mbeanName: string, mbean: Core.JMXMBean): void {
-      logTree.debug("  JMX tree mbean: " + mbeanName);
+      logTree.debug("  JMX tree mbean:", mbeanName);
 
       let entries = {};
       let paths = [];
@@ -402,7 +402,7 @@ namespace Jmx {
           }
         }
       } else {
-        log.info("No folder found for last path: " + lastPath);
+        log.info("No folder found for last path:", lastPath);
       }
     }
 
