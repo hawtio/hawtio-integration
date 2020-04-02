@@ -45,9 +45,6 @@ namespace Jmx {
     // mapData allows to store arbitrary data on the workspace
     public mapData = {};
 
-    private rootId: string = 'root';
-    private separator: string = '-';
-
     constructor(
       public jolokia: Jolokia.IJolokia,
       public jolokiaStatus: JVM.JolokiaStatus,
@@ -239,8 +236,7 @@ namespace Jmx {
       this.mbeanServicesToDomain = {};
       this.keyToNodeMap = {};
 
-      let newTree = new Folder('MBeans');
-      newTree.key = this.rootId;
+      let newTree = new Folder('MBeans', true);
       let domains = response.value;
       _.forEach(domains, (domain, domainName) => {
         // domain name is displayed in the tree, so let's escape it here
@@ -259,6 +255,8 @@ namespace Jmx {
         log.debug("Running tree post processor:", key);
         processor(newTree);
       });
+
+      logTree.debug('Populated JMX tree:', this.tree);
 
       this.maybeMonitorPlugins();
 
@@ -282,19 +280,10 @@ namespace Jmx {
       }
     }
 
-    private initFolder(folder: Folder, domain: string, folderNames: string[]): void {
-      folder.domain = domain;
-      if (!folder.key) {
-        folder.key = this.rootId + this.separator + folderNames.join(this.separator);
-      }
-      folder.folderNames = folderNames;
-      logTree.debug("    folder: domain=" + folder.domain + ", key=" + folder.key);
-    }
-
     private populateDomainFolder(tree: Folder, domainName: string, domain: Core.JMXDomain): void {
       logTree.debug("JMX tree domain:", domainName);
       let domainClass = Core.escapeDots(domainName);
-      let folder = this.folderGetOrElse(tree, domainName);
+      let folder = tree.getOrElse(domainName);
       this.initFolder(folder, domainName, [domainName]);
       _.forEach(domain, (mbean, mbeanName) => {
         this.populateMBeanFolder(folder, domainClass, mbeanName, mbean);
@@ -327,8 +316,8 @@ namespace Jmx {
 
       let entries = {};
       let paths = [];
-      let typeName = null;
-      let serviceName = null;
+      let typeName: string = null;
+      let serviceName: string = null;
       mbeanName.split(',').forEach((prop) => {
         // do not use split('=') as it splits wrong when there is a space in the mbean name
         let kv = this.splitMBeanProperty(prop);
@@ -366,40 +355,26 @@ namespace Jmx {
       let domainName = domainFolder.domain;
       let folderNames = _.clone(domainFolder.folderNames);
       let lastPath = paths.pop().value;
-      paths.map(p => p.value).forEach((path) => {
-        folder = this.folderGetOrElse(folder, path);
-        if (folder) {
-          folderNames.push(path);
-          this.configureFolder(folder, domainName, domainClass, folderNames, path);
-        }
+      paths.map(p => p.value).forEach((path: string) => {
+        folder = folder.getOrElse(path);
+        folderNames.push(path);
+        this.configureFolder(folder, domainName, domainClass, folderNames, path);
       });
 
-      if (folder) {
-        folder = this.folderGetOrElse(folder, lastPath);
-        if (folder) {
-          // lets add the various data into the folder
-          folder.entries = entries;
-          folderNames.push(lastPath);
-          this.configureFolder(folder, domainName, domainClass, folderNames, lastPath);
-          folder.text = Core.trimQuotes(lastPath);
-          folder.objectName = domainName + ":" + mbeanName;
-          folder.mbean = mbean;
-          folder.typeName = typeName;
+      folder = folder.getOrElse(lastPath);
+      folderNames.push(lastPath);
+      this.configureFolder(folder, domainName, domainClass, folderNames, lastPath);
+      // lets add the various data into the folder
+      let text = Core.trimQuotes(lastPath);
+      let objectName = domainName + ":" + mbeanName;
+      folder.configureMBean(entries, text, objectName, mbean, typeName);
 
-          if (serviceName) {
-            this.addFolderByDomain(folder, domainName, serviceName, this.mbeanServicesToDomain);
-          }
-          if (typeName) {
-            this.addFolderByDomain(folder, domainName, typeName, this.mbeanTypesToDomain);
-          }
-        }
-      } else {
-        log.info("No folder found for last path:", lastPath);
+      if (serviceName) {
+        this.addFolderByDomain(folder, domainName, serviceName, this.mbeanServicesToDomain);
       }
-    }
-
-    private folderGetOrElse(folder: Folder, name: string): Folder {
-      return folder ? folder.getOrElse(name) : null;
+      if (typeName) {
+        this.addFolderByDomain(folder, domainName, typeName, this.mbeanTypesToDomain);
+      }
     }
 
     private splitMBeanProperty(property: string): [string, string] {
@@ -411,31 +386,15 @@ namespace Jmx {
       }
     }
 
-    public configureFolder(folder: Folder, domainName: string, domainClass: string, folderNames: string[], path: string): Folder {
+    private initFolder(folder: Folder, domain: string, folderNames: string[]): void {
+      folder.init(domain, folderNames);
+      logTree.debug("    folder: domain=" + folder.domain + ", key=" + folder.key);
+    }
+
+    public configureFolder(folder: Folder, domainName: string, domainClass: string, folderNames: string[], path: string): void {
       this.initFolder(folder, domainName, _.clone(folderNames));
       this.keyToNodeMap[folder.key] = folder;
-      let classes = "";
-      let typeKey = _.filter(_.keys(folder.entries), key => key.toLowerCase().indexOf("type") >= 0);
-      if (typeKey.length) {
-        // last path
-        _.forEach(typeKey, key => {
-          let typeName = folder.entries[key];
-          if (!folder.ancestorHasEntry(key, typeName)) {
-            classes += " " + domainClass + this.separator + typeName;
-          }
-        });
-      } else {
-        // folder
-        let kindName = _.last(folderNames);
-        if (kindName === path) {
-          kindName += "-folder";
-        }
-        if (kindName) {
-          classes += " " + domainClass + this.separator + kindName;
-        }
-      }
-      folder.class = Core.escapeTreeCssStyles(classes);
-      return folder;
+      folder.configureClass(domainClass, folderNames, path);
     }
 
     private addFolderByDomain(folder: Folder, domainName: string, typeName: string, owner: any): void {

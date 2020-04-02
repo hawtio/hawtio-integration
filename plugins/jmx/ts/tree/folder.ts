@@ -20,7 +20,7 @@ namespace Jmx {
      * @type string
      * @optional
      */
-    key?:string;
+    key?: string;
     /**
      * @property typeName
      * @type string
@@ -56,7 +56,7 @@ namespace Jmx {
      * @type NodeSelection
      * @optional
      */
-    children?:Array<NodeSelection>;
+    children?: Array<NodeSelection>;
     /**
      * @property parent
      * @type NodeSelection
@@ -86,7 +86,7 @@ namespace Jmx {
      * @param {String} key
      * @return {NodeSelection}
      */
-    get(key:string): NodeSelection;
+    get(key: string): NodeSelection;
     /**
      * @method isFolder
      * @return {boolean}
@@ -97,14 +97,14 @@ namespace Jmx {
      * @param {String} typeName
      * @return {Boolean}
      */
-    ancestorHasType(typeName:string): boolean;
+    ancestorHasType(typeName: string): boolean;
     /**
      * @method ancestorHasEntry
      * @param key
      * @param value
      * @return {Boolean}
      */
-    ancestorHasEntry(key:string, value): boolean;
+    ancestorHasEntry(key: string, value): boolean;
 
     /**
      * @method findDescendant
@@ -132,57 +132,103 @@ namespace Jmx {
    */
   export class Folder implements NodeSelection {
 
-    constructor(public text:string) {
+    private readonly rootId: string = 'root';
+    private readonly separator: string = '-';
+
+    constructor(public text: string, root: boolean = false) {
       this.class = Core.escapeTreeCssStyles(text);
+      if (root) {
+        this.id = this.rootId;
+      }
     }
 
-    id:string = null;
+    id: string = null;
 
-    get key():string {
+    get key(): string {
       return this.id;
     }
-    set key(key:string) {
+    set key(key: string) {
       this.id = key;
     }
 
-    get title():string {
+    get title(): string {
       return this.text;
     }
     set title(title: string) {
       this.text = title;
     }
 
-    typeName:string = null;
+    typeName: string = null;
     nodes = <Array<NodeSelection>>[];
 
-    get children():Array<NodeSelection> {
+    get children(): Array<NodeSelection> {
       return this.nodes;
     }
-    set children(items:Array<NodeSelection>) {
+    set children(items: Array<NodeSelection>) {
       this.nodes = items;
     }
 
-    folderNames:string[] = [];
-    domain:string = null;
-    objectName:string = null;
+    folderNames: string[] = [];
+    domain: string = null;
+    objectName: string = null;
     entries = {};
     class: string = null;
-    parent:Folder = null;
-    isLazy:boolean = false;
+    parent: Folder = null;
+    isLazy: boolean = false;
 
-    get lazyLoad():boolean {
+    get lazyLoad(): boolean {
       return this.isLazy;
     }
-    set lazyLoad(isLazy:boolean) {
+    set lazyLoad(isLazy: boolean) {
       this.isLazy = isLazy;
     }
 
-    icon:string = null;
-    image:string = null;
-    tooltip:string = null;
-    entity:any = null;
-    version:string = null;
+    icon: string = null;
+    image: string = null;
+    tooltip: string = null;
+    entity: any = null;
+    version: string = null;
     mbean: Core.JMXMBean & { opByString?: { [name: string]: any } } = null;
+
+    init(domain: string, folderNames: string[]): void {
+      if (!this.id) {
+        this.id = this.rootId + this.separator + folderNames.join(this.separator);
+      }
+      this.domain = domain;
+      this.folderNames = folderNames;
+    }
+
+    configureClass(domainClass: string, folderNames: string[], path: string): void {
+      let classes = "";
+      let typeKey = _.filter(_.keys(this.entries), key => key.toLowerCase().indexOf("type") >= 0);
+      if (typeKey.length) {
+        // last path (mbean)
+        _.forEach(typeKey, key => {
+          let typeName = this.entries[key];
+          if (!this.ancestorHasEntry(key, typeName)) {
+            classes += " " + domainClass + this.separator + typeName;
+          }
+        });
+      } else {
+        // folder
+        let kindName = _.last(folderNames);
+        if (kindName === path) {
+          kindName += "-folder";
+        }
+        if (kindName) {
+          classes += " " + domainClass + this.separator + kindName;
+        }
+      }
+      this.class = Core.escapeTreeCssStyles(classes);
+    }
+
+    configureMBean(entries: {}, text: string, objectName: string, mbean: Core.JMXMBean, typeName: string): void {
+      this.entries = entries;
+      this.text = text;
+      this.objectName = objectName;
+      this.mbean = mbean;
+      this.typeName = typeName;
+    }
 
     get(key: string): NodeSelection {
       return _.find(this.children, child => child.text === key);
