@@ -323,8 +323,7 @@ namespace Jmx {
         let kv = this.splitMBeanProperty(prop);
         let propKey = kv[0];
         // mbean property value is displayed in the tree, so let's escape it here
-        // Core.escapeHtml() and _.escape() cannot be used, as escaping '"' breaks Camel tree...
-        let propValue = this.escapeTagOnly(kv[1] || propKey);
+        let propValue = this.escapeTagOnly(Core.trimQuotes(kv[1] || propKey));
         entries[propKey] = propValue;
         let index = -1;
         let lowerKey = propKey.toLowerCase();
@@ -365,9 +364,8 @@ namespace Jmx {
       folderNames.push(lastPath);
       this.configureFolder(folder, domainName, domainClass, folderNames, lastPath);
       // lets add the various data into the folder
-      let text = Core.trimQuotes(lastPath);
       let objectName = domainName + ":" + mbeanName;
-      folder.configureMBean(entries, text, objectName, mbean, typeName);
+      folder.configureMBean(entries, objectName, mbean, typeName);
 
       if (serviceName) {
         this.addFolderByDomain(folder, domainName, serviceName, this.mbeanServicesToDomain);

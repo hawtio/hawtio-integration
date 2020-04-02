@@ -222,9 +222,8 @@ namespace Jmx {
       this.class = Core.escapeTreeCssStyles(classes);
     }
 
-    configureMBean(entries: {}, text: string, objectName: string, mbean: Core.JMXMBean, typeName: string): void {
+    configureMBean(entries: {}, objectName: string, mbean: Core.JMXMBean, typeName: string): void {
       this.entries = entries;
-      this.text = text;
       this.objectName = objectName;
       this.mbean = mbean;
       this.typeName = typeName;
