@@ -11,7 +11,7 @@ namespace Diagnostics {
 
     getTabs(): Nav.HawtioTab[] {
       const tabs = [];
-      if (this.hasDiagnosticFunction('jfrCheck')) {
+      if (this.hasDiagnosticFunction('jfrCheck') || this.flightRecorderMBean()) {
         tabs.push(new Nav.HawtioTab('Flight Recorder', '/diagnostics/jfr'));
       }
       if (this.hasDiagnosticFunction('gcClassHistogram')) {
@@ -32,15 +32,16 @@ namespace Diagnostics {
       return diagnostics && diagnostics.mbean && diagnostics.mbean.op && !!diagnostics.mbean.op[operation];
     }
 
-    findMyPid(title) {
-      //snatch PID from window title
-      const regex = /pid:(\d+)/g;
-      const pid = regex.exec(title);
-      if (pid && pid[1]) {
-        return pid[1];
+    public flightRecorderMBean() : string {
+      //varying names over different JVM versions, could potentially support jrockit as well, but not prioritizing
+      if(this.workspace.findMBeanWithProperties('jdk.management.jfr', {type: 'FlightRecorder'})) {
+        return 'jdk.management.jfr:type=FlightRecorder';
+      } else if (this.workspace.findMBeanWithProperties('jdk.jfr.management', {type: 'FlightRecorder'})) {
+        return 'jdk.jfr.management:type=FlightRecorder';
       } else {
         return null;
       }
+      
     }
 
   }
