@@ -262,6 +262,7 @@ namespace Diagnostics {
           while(true) {
             let value=jolokia.execute(jfrMBean, "readStream", streamId);
             if(Array.isArray(value)) {
+              //reuse buffer accross calls if possible 
               if(value.length != buffer.length) {
                 buffer=new Uint8Array(value.length);
               }
@@ -271,6 +272,7 @@ namespace Diagnostics {
             } else {
               break;
             }
+            //TODO: figure out how to get data over to the client.
           }
 
         }
