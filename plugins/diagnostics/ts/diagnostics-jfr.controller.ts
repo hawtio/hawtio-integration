@@ -241,11 +241,37 @@ namespace Diagnostics {
     
         };
         scope.dumpRecording = () => {
-          scope.downloadRecording(currentRecordingNumber);
+          const existingRecordings: RecordingFromJfrBean[] = getExistingRecordings(jolokia, jfrMBean, scope);
+          var lastRecording=null;
+          for (let index = 0; index < existingRecordings.length; index++) {
+            const recording = existingRecordings[index];
+            if (recording.state === "STOPPED" ) {
+              lastRecording=recording;
+            }
+          }
+          if(lastRecording) {
+            scope.downloadRecording(lastRecording.number);
+          }
+
         };
 
         scope.downloadRecording = (recordingNumber: number) => {
-          jolokia.execute(jfrMBean, "openStream", recordingNumber);
+          const streamId = jolokia.execute(jfrMBean, "openStream", recordingNumber, null);
+          log.info("Downloading recording", recordingNumber, ".jfr using stream " , streamId);
+          var buffer=new Uint8Array(0);
+          while(true) {
+            let value=jolokia.execute(jfrMBean, "readStream", streamId);
+            if(Array.isArray(value)) {
+              if(value.length != buffer.length) {
+                buffer=new Uint8Array(value.length);
+              }
+              for (let index = 0; index < value.length; index++) {
+                buffer[index]=value[index] & 0xff;
+              }
+            } else {
+              break;
+            }
+          }
 
         }
         Core.$apply(scope);
@@ -300,7 +326,6 @@ namespace Diagnostics {
   
         executeDiagnosticFunction('jfrDump([Ljava.lang.String;)', 'JFR.dump',
           [buildDumpParams(scope.jfrSettings)], (response) => {
-  
             const matches = splitResponse(response);
             Diagnostics.log.debug("response: " + response
               + " split: " + matches + "split2: "
@@ -364,8 +389,8 @@ namespace Diagnostics {
 
     function executeDiagnosticFunction(operation: string, jcmd: string, arguments, callback) {
       Diagnostics.log.debug(Date.now() + " Invoking operation "
-        + operation + " with arguments" + arguments + " settings: " + JSON.stringify(scope.jfrSettings));
-      scope.jcmd = 'jcmd ' + scope.pid + ' ' + jcmd + ' ' + showArguments(arguments);
+        + operation + " with arguments" + arguments + " settings: " + JSON.stringify($scope.jfrSettings));
+      $scope.jcmd = 'jcmd ' + $scope.pid + ' ' + jcmd + ' ' + showArguments(arguments);
       jolokia.request([{
         type: "exec",
         operation: operation,
@@ -385,7 +410,7 @@ namespace Diagnostics {
           if (callback) {
             callback(response.value);
           }
-          Core.$apply(scope);
+          Core.$apply($scope);
         }
       }, {
         error: function (response) {
