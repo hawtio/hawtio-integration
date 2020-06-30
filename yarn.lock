@@ -75,6 +75,11 @@
   resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-2.71.3.tgz#22deedc5e2610d7b2710a1efe827c25fac7726b2"
   integrity sha512-uTb9zAtPjTKB8aHmWdavEOrSMs+NL9XovMvWYL9R74zXbGnEMHEpibn7cNSu469u2JrxY6VsH7x44aOfdZpqpg==
 
+"@tadayosi/artemis-plugin-npm@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@tadayosi/artemis-plugin-npm/-/artemis-plugin-npm-0.1.0.tgz#fcf088857dba8b8b138e5e5104f0c93ba6c68078"
+  integrity sha512-tEzU7SSdVSpZoDSG6YFiCmL1dIuGxVegwpfFFAwUGcv1ALA6WXA3IZcGB9TbqsxMYdsLO0qhEq3TS/WvUcPGfg==
+
 "@types/angular-cookies@^1.4.5":
   version "1.4.5"
   resolved "https://registry.yarnpkg.com/@types/angular-cookies/-/angular-cookies-1.4.5.tgz#f5ccf5f42a7b9f4d13e77afb8722034ea9f40bd3"
@@ -3826,7 +3831,7 @@ micromatch@3.1.9, micromatch@^2.3.7, micromatch@^3.0.4, micromatch@^3.1.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-mime-db@1.36.0, mime-db@1.43.0, mime-db@~1.36.0:
+mime-db@1.36.0, mime-db@1.44.0, mime-db@~1.36.0:
   version "1.36.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.36.0.tgz#5020478db3c7fe93aad7bbcc4dcf869c43363397"
   integrity sha512-L+xvyD9MkoYMXb1jAmzI/lWYAxAMCPvIBSWur0PZ5nOf5euahRLVqH//FKW9mWp2lkqUgYiXPgkzfMUFi4zVDw==
@@ -4208,7 +4213,7 @@ object-visit@^1.0.0:
   dependencies:
     isobject "^3.0.0"
 
-object.assign@^4.0.4:
+object.assign@^4.0.4, object.assign@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/object.assign/-/object.assign-4.1.0.tgz#968bf1100d7956bb3ca086f006f846b3bc4008da"
   integrity sha512-exHJeq6kBKj58mqGyTQ9DFvrZC/eR6OwxzoM9YRoGBqrXYonaFyGiFMuc9VZrXf7DarreEwMpurG3dd+CNyW5w==
@@ -6043,7 +6048,7 @@ yallist@3.0.2, yallist@^2.1.2, yallist@^3.0.0, yallist@^3.0.2:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.0.2.tgz#8452b4bb7e83c7c188d8041c1a837c773d6d8bb9"
   integrity sha1-hFK0u36Dx8GI2AQcGoN8dz1ti7k=
 
-yargs-parser@7.0.0, yargs-parser@^5.0.0, yargs-parser@^7.0.0:
+yargs-parser@5.0.0-security.0, yargs-parser@7.0.0, yargs-parser@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-7.0.0.tgz#8d0ac42f16ea55debd332caf4c4038b3e3f5dfd9"
   integrity sha1-jQrELxbqVd69MyyvTEA4s+P139k=
