@@ -75,11 +75,6 @@
   resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-2.71.3.tgz#22deedc5e2610d7b2710a1efe827c25fac7726b2"
   integrity sha512-uTb9zAtPjTKB8aHmWdavEOrSMs+NL9XovMvWYL9R74zXbGnEMHEpibn7cNSu469u2JrxY6VsH7x44aOfdZpqpg==
 
-"@tadayosi/artemis-plugin-npm@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@tadayosi/artemis-plugin-npm/-/artemis-plugin-npm-0.1.0.tgz#fcf088857dba8b8b138e5e5104f0c93ba6c68078"
-  integrity sha512-tEzU7SSdVSpZoDSG6YFiCmL1dIuGxVegwpfFFAwUGcv1ALA6WXA3IZcGB9TbqsxMYdsLO0qhEq3TS/WvUcPGfg==
-
 "@types/angular-cookies@^1.4.5":
   version "1.4.5"
   resolved "https://registry.yarnpkg.com/@types/angular-cookies/-/angular-cookies-1.4.5.tgz#f5ccf5f42a7b9f4d13e77afb8722034ea9f40bd3"
@@ -713,6 +708,11 @@ arraybuffer.slice@~0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/arraybuffer.slice/-/arraybuffer.slice-0.0.7.tgz#3bbc4275dd584cc1b10809b89d4e8b63a69e7675"
   integrity sha512-wGUIVQXuehL5TCqQun8OW81jGzAWycqzFF8lFp+GOM5BXLYj3bKNsYC4daB7n6XjCqxQA/qgTJ+8ANR3acjrog==
+
+artemis-plugin-npm@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/artemis-plugin-npm/-/artemis-plugin-npm-0.1.1.tgz#f0a4e380e0f070248838411e668eb7b4c7a37157"
+  integrity sha512-nUn1yyfDu2ifggAqyyhMvuAy45BmGR21BzY5DT3ERxhMTQLj9aCra8onFQ9Vu2aDsOCwQuR5MWVfrRpqBBHGdQ==
 
 asap@~2.0.3:
   version "2.0.6"
