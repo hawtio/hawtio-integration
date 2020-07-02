@@ -709,10 +709,10 @@ arraybuffer.slice@~0.0.7:
   resolved "https://registry.yarnpkg.com/arraybuffer.slice/-/arraybuffer.slice-0.0.7.tgz#3bbc4275dd584cc1b10809b89d4e8b63a69e7675"
   integrity sha512-wGUIVQXuehL5TCqQun8OW81jGzAWycqzFF8lFp+GOM5BXLYj3bKNsYC4daB7n6XjCqxQA/qgTJ+8ANR3acjrog==
 
-artemis-plugin-npm@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/artemis-plugin-npm/-/artemis-plugin-npm-0.1.1.tgz#f0a4e380e0f070248838411e668eb7b4c7a37157"
-  integrity sha512-nUn1yyfDu2ifggAqyyhMvuAy45BmGR21BzY5DT3ERxhMTQLj9aCra8onFQ9Vu2aDsOCwQuR5MWVfrRpqBBHGdQ==
+artemis-plugin-npm@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/artemis-plugin-npm/-/artemis-plugin-npm-0.1.2.tgz#f5891e3101a1ddbb2e7e34e06d48987b674a6ec0"
+  integrity sha512-PZd+S72rq21sxw6bgO0/5tcCffNdLnvSvjRiiFBSFhnbnRM7nABNwYGRZEUbF604obNJewdbAz/F5F0YQOwNmw==
 
 asap@~2.0.3:
   version "2.0.6"
