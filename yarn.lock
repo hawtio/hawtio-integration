@@ -28,10 +28,10 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@^4.12.0":
-  version "4.13.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.13.0.tgz#f130ccd985cd0b3f4d0fe78a9e120938c7eea4e5"
-  integrity sha512-Rt+oOtIETFR5tl82wwDp0ENPWxzrSsWEB+i3P5bQIvk8O4Rif3Kvn3M39PG4aCZdy6zACkn9Dii95oszAONkpg==
+"@hawtio/core@^4.13.0":
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.13.1.tgz#787a10757c23d6bf0a5e7756b5cfe8f4cebb7518"
+  integrity sha512-nLUNgzdGuYkNKtdbzg7F6wFzSCngkF3zjn/XY5G+BKfm82XhTwHCPuggnKHWcdtnoLQOkIuzIa7KPHBN5/qI3g==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "^2.0.0"
@@ -42,6 +42,7 @@
     "@types/lodash" "^4.0.0"
     "@types/marked" "0.6.0"
     "@types/urijs" "~1.15.38"
+    angular "^1.8.0"
     angular-patternfly "^5.0.0"
     angular-route "^1.7.7"
     jquery "2.2.4"
@@ -443,7 +444,7 @@ agent-base@4, agent-base@4.2.0, agent-base@^4.1.0, agent-base@^4.2.0, agent-base
   dependencies:
     es6-promisify "^5.0.0"
 
-ajv@5.5.1, ajv@^4.9.1, ajv@^5.1.0, ajv@^6.5.5:
+ajv@5.5.1, ajv@^4.9.1, ajv@^5.1.0, ajv@^6.12.3:
   version "5.5.1"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.5.1.tgz#b38bb8876d9e86bee994956a04e721e88b248eb2"
   integrity sha1-s4u4h22ehr7plJVqBOch6IskjrI=
@@ -556,10 +557,10 @@ angular-ui-bootstrap@2.3.x, angular-ui-bootstrap@2.5.6:
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.6.tgz#23937322ec641a6fbee16498cc32452aa199e7c5"
   integrity sha512-yzcHpPMLQl0232nDzm5P4iAFTFQ9dMw0QgFLuKYbDj9M0xJ62z0oudYD/Lvh1pWfRsukiytP4Xj6BHOSrSXP8A==
 
-angular@1.7.7, angular@>=1.3.0, angular@^1.7.7:
-  version "1.7.7"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.7.tgz#26bd87693deadcbd5944610a7a0463fc79a18803"
-  integrity sha512-MH3JEGd8y/EkNCKJ8EV6Ch0j9X0rZTta/QVIDpBWaIdfh85/e5KO8+ZKgvWIb02MQuiS20pDFmMFlv4ZaLcLWg==
+angular@1.8.0, angular@>=1.3.0, angular@^1.7.7, angular@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.0.tgz#b1ec179887869215cab6dfd0df2e42caa65b1b51"
+  integrity sha512-VdaMx+Qk0Skla7B5gw77a8hzlcOakwF8mjlW13DpIWIDlfqwAbSSLfd8N/qZnzEmQF4jC4iofInd3gE7vL8ZZg==
 
 angularjs-datatables@^0.5.9:
   version "0.5.9"
@@ -3826,7 +3827,7 @@ micromatch@3.1.9, micromatch@^2.3.7, micromatch@^3.0.4, micromatch@^3.1.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-mime-db@1.36.0, mime-db@1.43.0, mime-db@~1.36.0:
+mime-db@1.36.0, mime-db@1.44.0, mime-db@~1.36.0:
   version "1.36.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.36.0.tgz#5020478db3c7fe93aad7bbcc4dcf869c43363397"
   integrity sha512-L+xvyD9MkoYMXb1jAmzI/lWYAxAMCPvIBSWur0PZ5nOf5euahRLVqH//FKW9mWp2lkqUgYiXPgkzfMUFi4zVDw==
@@ -4208,7 +4209,7 @@ object-visit@^1.0.0:
   dependencies:
     isobject "^3.0.0"
 
-object.assign@^4.0.4:
+object.assign@^4.0.4, object.assign@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/object.assign/-/object.assign-4.1.0.tgz#968bf1100d7956bb3ca086f006f846b3bc4008da"
   integrity sha512-exHJeq6kBKj58mqGyTQ9DFvrZC/eR6OwxzoM9YRoGBqrXYonaFyGiFMuc9VZrXf7DarreEwMpurG3dd+CNyW5w==
@@ -6043,7 +6044,7 @@ yallist@3.0.2, yallist@^2.1.2, yallist@^3.0.0, yallist@^3.0.2:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.0.2.tgz#8452b4bb7e83c7c188d8041c1a837c773d6d8bb9"
   integrity sha1-hFK0u36Dx8GI2AQcGoN8dz1ti7k=
 
-yargs-parser@7.0.0, yargs-parser@^5.0.0, yargs-parser@^7.0.0:
+yargs-parser@5.0.0-security.0, yargs-parser@7.0.0, yargs-parser@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-7.0.0.tgz#8d0ac42f16ea55debd332caf4c4038b3e3f5dfd9"
   integrity sha1-jQrELxbqVd69MyyvTEA4s+P139k=
