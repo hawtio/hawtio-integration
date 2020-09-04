@@ -2,10 +2,38 @@
 
 namespace JVM {
 
+  export type JolokiaFactory = (options: ConnectOptions, checkCredentials?: boolean) => Jolokia.IJolokia;
+
   export class ConnectService {
 
     constructor(private $q: ng.IQService, private $window: ng.IWindowService, private $location: ng.ILocationService) {
       'ngInject';
+    }
+
+    private _createJolokia: JolokiaFactory = (options: ConnectOptions, checkCredentials = false) => {
+      if (checkCredentials) {
+        return new Jolokia({
+          url: createServerConnectionUrl(options),
+          method: 'post',
+          mimeType: 'application/json',
+          username: options.userName,
+          password: options.password
+        });
+      } else {
+        return new Jolokia({
+          url: createServerConnectionUrl(options),
+          method: 'post',
+          mimeType: 'application/json'
+        });
+      }
+    };
+
+    get createJolokia(): JolokiaFactory {
+      return this._createJolokia;
+    }
+
+    set createJolokia(factory: JolokiaFactory) {
+      this._createJolokia = factory;
     }
 
     getConnections(): ConnectOptions[] {
@@ -44,34 +72,30 @@ namespace JVM {
     }
 
     testConnection(connection: ConnectOptions): ng.IPromise<ConnectionTestResult> {
-      return this.$q((resolve, reject) => {
+      return this.$q((resolve, _reject) => {
         try {
-          new Jolokia({
-            url: createServerConnectionUrl(connection),
-            method: 'post',
-            mimeType: 'application/json'
-          }).request({
+          this.createJolokia(connection).request({
             type: 'version'
           }, {
-              success: () => {
-                resolve({ ok: true, message: 'Connection successful' });
-              },
-              ajaxError: (response: JQueryXHR) => {
-                let result: ConnectionTestResult;
-                if (response.status === 401) {
-                  result = { ok: true, message: 'Connection successful' };
-                } else if (response.status === 403) {
-                  if (this.forbiddenReasonMatches(response, 'HOST_NOT_ALLOWED')) {
-                    result = { ok: false, message: 'Host not whitelisted' }
-                  } else {
-                    result = { ok: true, message: 'Connection successful' }
-                  }
+            success: () => {
+              resolve({ ok: true, message: 'Connection successful' });
+            },
+            ajaxError: (response: JQueryXHR) => {
+              let result: ConnectionTestResult;
+              if (response.status === 401) {
+                result = { ok: true, message: 'Connection successful' };
+              } else if (response.status === 403) {
+                if (this.forbiddenReasonMatches(response, 'HOST_NOT_ALLOWED')) {
+                  result = { ok: false, message: 'Host not whitelisted' }
                 } else {
-                  result = { ok: false, message: 'Connection failed' }
+                  result = { ok: true, message: 'Connection successful' }
                 }
-                resolve(result);
+              } else {
+                result = { ok: false, message: 'Connection failed' }
               }
-            });
+              resolve(result);
+            }
+          });
         } catch (error) {
           log.error(error);
         }
@@ -79,28 +103,24 @@ namespace JVM {
     };
 
     checkCredentials(connection: ConnectOptions, username: string, password: string): ng.IPromise<boolean> {
-      return this.$q((resolve, reject) => {
-        new Jolokia({
-          url: createServerConnectionUrl(connection),
-          method: 'post',
-          mimeType: 'application/json',
-          username: username,
-          password: password
-        }).request({
+      return this.$q((resolve, _reject) => {
+        connection.userName = username;
+        connection.password = password;
+        this.createJolokia(connection, true).request({
           type: 'version'
         }, {
-            success: () => {
-              resolve(true);
-            },
-            ajaxError: () => {
-              resolve(false);
-            }
-          });
+          success: () => {
+            resolve(true);
+          },
+          ajaxError: () => {
+            resolve(false);
+          }
+        });
       });
     };
 
     connect(connection: ConnectOptions) {
-      log.debug("Connecting with options: ", StringHelpers.toString(connection));
+      log.debug("Connecting with options:", StringHelpers.toString(connection));
       const url = URI('').search({ con: connection.name }).toString();
       this.$window.open(url);
     }

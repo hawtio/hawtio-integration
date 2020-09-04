@@ -180,7 +180,7 @@ namespace JVM {
       }
     }
     answer = jolokiaURI.toString();
-    log.debug("Complete jolokia URL: ", answer);
+    log.debug("Complete jolokia URL:", answer);
     return answer;
   }
 
