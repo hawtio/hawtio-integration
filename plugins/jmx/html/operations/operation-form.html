@@ -29,8 +29,8 @@
       <button hawtio-clipboard="#operation-result" class="btn btn-default btn-lg">
         <i class="fa fa-clipboard" aria-hidden="true"></i>
       </button>
-      <pre ng-class="{'jmx-operation-error': $ctrl.operationFailed}">{{$ctrl.operationResult}}</pre>
+      <pre ng-class="{'jmx-operation-error': $ctrl.operationFailed}" ng-bind-html="$ctrl.operationResult | trustHtml"></pre>
     </div>
-    <textarea id="operation-result" class="hawtio-clipboard-hidden-target">{{$ctrl.operationResult}}</textarea>
+    <textarea id="operation-result" class="hawtio-clipboard-hidden-target" ng-bind-html="$ctrl.operationResult | trustHtml"></textarea>
   </div>
 </form>
