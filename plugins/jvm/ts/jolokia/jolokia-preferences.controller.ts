@@ -2,14 +2,15 @@
 
 namespace JVM {
 
+  import parseBooleanValue = Core.parseBooleanValue;
   const SHOW_ALERT = 'showJolokiaPreferencesAlert';
-  
+
   export function JolokiaPreferences($scope, localStorage, jolokiaParams, $window) {
     'ngInject';
 
     // Initialize tooltips
     (<any>$('[data-toggle="tooltip"]')).tooltip();
-    
+
     Core.initPreferenceScope($scope, localStorage, {
       'updateRate': {
         'value': 5000,
@@ -34,12 +35,30 @@ namespace JVM {
           jolokiaParams.maxCollectionSize = newValue;
           localStorage['jolokiaParams'] = angular.toJson(jolokiaParams);
         }
+      },
+      'showResultAsHtml': {
+        'value': false,
+        'converter': parseBooleanValue,
+        'formatter': parseBooleanValue,
+        'post': (newValue) => {
+          jolokiaParams.showResultAsHtml = newValue;
+          localStorage['jolokiaParams'] = angular.toJson(jolokiaParams);
+        }
+      },
+      'trustHtmlSource': {
+        'value': false,
+        'converter': parseBooleanValue,
+        'formatter': parseBooleanValue,
+        'post': (newValue) => {
+          jolokiaParams.trustHtmlSource = newValue;
+          localStorage['jolokiaParams'] = angular.toJson(jolokiaParams);
+        }
       }
     });
 
     $scope.showAlert = !!$window.sessionStorage.getItem(SHOW_ALERT);
     $window.sessionStorage.removeItem(SHOW_ALERT);
-    
+
     $scope.reboot = () => {
       $window.sessionStorage.setItem(SHOW_ALERT, 'true');
       $window.location.reload();
