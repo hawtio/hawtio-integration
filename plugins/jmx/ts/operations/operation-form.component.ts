@@ -12,10 +12,8 @@ namespace Jmx {
     operationFailed: boolean;
     operationResult: string;
     isExecuting: boolean = false;
-    isShowResultAsHtml: boolean = false;
-    isTrustHtmlSource: boolean = false;
 
-    constructor(private workspace: Workspace, private operationsService: OperationsService, private localStorage: Storage) {
+    constructor(private workspace: Workspace, private operationsService: OperationsService) {
       'ngInject';
     }
 
@@ -26,15 +24,10 @@ namespace Jmx {
         helpText: OperationFormController.buildHelpText(arg),
         value: OperationFormController.getDefaultValue(arg.type)
       }));
+    }
 
-      let jolokiaParams = angular.fromJson(localStorage['jolokiaParams']);
-      if (jolokiaParams.showResultAsHtml) {
-        this.isShowResultAsHtml = jolokiaParams.showResultAsHtml;
-      }
-
-      if (jolokiaParams.trustHtmlSource) {
-        this.isTrustHtmlSource = jolokiaParams.trustHtmlSource;
-      }
+    public isResultHtml(): boolean {
+      return this.operationResult.startsWith('<!DOCTYPE html>');
     }
 
     private static buildHelpText(arg: OperationArgument) {

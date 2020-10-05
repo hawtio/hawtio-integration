@@ -2,7 +2,6 @@
 
 namespace JVM {
 
-  import parseBooleanValue = Core.parseBooleanValue;
   const SHOW_ALERT = 'showJolokiaPreferencesAlert';
 
   export function JolokiaPreferences($scope, localStorage, jolokiaParams, $window) {
@@ -33,24 +32,6 @@ namespace JVM {
         'formatter': parseInt,
         'post': (newValue) => {
           jolokiaParams.maxCollectionSize = newValue;
-          localStorage['jolokiaParams'] = angular.toJson(jolokiaParams);
-        }
-      },
-      'showResultAsHtml': {
-        'value': false,
-        'converter': parseBooleanValue,
-        'formatter': parseBooleanValue,
-        'post': (newValue) => {
-          jolokiaParams.showResultAsHtml = newValue;
-          localStorage['jolokiaParams'] = angular.toJson(jolokiaParams);
-        }
-      },
-      'trustHtmlSource': {
-        'value': false,
-        'converter': parseBooleanValue,
-        'formatter': parseBooleanValue,
-        'post': (newValue) => {
-          jolokiaParams.trustHtmlSource = newValue;
           localStorage['jolokiaParams'] = angular.toJson(jolokiaParams);
         }
       }

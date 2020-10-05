@@ -9,15 +9,6 @@ namespace Jmx {
     .component('operations', operationsComponent)
     .component('operationForm', operationFormComponent)
     .service('operationsService', OperationsService)
-    .filter('trustHtml', ($sce) => {
-      return function(html, isTrustHtmlSource) {
-        if (isTrustHtmlSource) {
-          return $sce.trustAsHtml(html);
-        } else {
-          return html;
-        }
-      };
-    })
     .name;
 
 }
