@@ -3,13 +3,13 @@
 namespace JVM {
 
   const SHOW_ALERT = 'showJolokiaPreferencesAlert';
-  
+
   export function JolokiaPreferences($scope, localStorage, jolokiaParams, $window) {
     'ngInject';
 
     // Initialize tooltips
     (<any>$('[data-toggle="tooltip"]')).tooltip();
-    
+
     Core.initPreferenceScope($scope, localStorage, {
       'updateRate': {
         'value': 5000,
@@ -39,7 +39,7 @@ namespace JVM {
 
     $scope.showAlert = !!$window.sessionStorage.getItem(SHOW_ALERT);
     $window.sessionStorage.removeItem(SHOW_ALERT);
-    
+
     $scope.reboot = () => {
       $window.sessionStorage.setItem(SHOW_ALERT, 'true');
       $window.location.reload();

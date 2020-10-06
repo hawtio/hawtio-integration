@@ -26,6 +26,10 @@ namespace Jmx {
       }));
     }
 
+    public isResultHtml(): boolean {
+      return this.operationResult.startsWith('<!DOCTYPE html>');
+    }
+
     private static buildHelpText(arg: OperationArgument) {
       if (arg.desc && arg.desc !== arg.name) {
         if (arg.desc.charAt(arg.desc.length - 1) !== '.') {
