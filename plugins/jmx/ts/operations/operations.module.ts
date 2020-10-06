@@ -5,7 +5,7 @@
 namespace Jmx {
 
   export const operationsModule = angular
-    .module('hawtio-jmx-operations', [])
+    .module('hawtio-jmx-operations', ['ngSanitize'])
     .component('operations', operationsComponent)
     .component('operationForm', operationFormComponent)
     .service('operationsService', OperationsService)

@@ -27,7 +27,12 @@ namespace Jmx {
     }
 
     public isResultHtml(): boolean {
-      return this.operationResult.startsWith('<!DOCTYPE html>');
+      if (!this.operationResult) {
+        return false;
+      }
+      return this.operationResult.startsWith('<!DOCTYPE html>')
+        || /^<table[^>]*>/.test(this.operationResult)
+        || /^<ul[^>]*>/.test(this.operationResult);
     }
 
     private static buildHelpText(arg: OperationArgument) {

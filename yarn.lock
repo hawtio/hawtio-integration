@@ -486,7 +486,7 @@ amqplib@^0.5.2:
     readable-stream "1.x >=1.1.9"
     safe-buffer "^5.0.1"
 
-angular-animate@1.7.7, angular-animate@^1.7.7:
+angular-animate@^1.7.7:
   version "1.7.7"
   resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.7.7.tgz#5422909094a41cd7404937d8a8a960f30c4d9364"
   integrity sha512-KLbU9gtgCyNSaMZKnNe9Yi6UTlDMN2EWyokQ06TG5fbDWOePm+kv2xqeUg1S2h+ZLjK0NnoVDIvwDhVQ+AWAag==
@@ -542,10 +542,10 @@ angular-route@^1.7.7:
   resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.7.9.tgz#f9910a2af0ba3ad7a969c5dd369b8360d0d5e4ef"
   integrity sha512-vRoj5hzdQtWbODhWJqDzD1iNOEfCKshO6GFBuPVV7RHlPjzIc4R2dHCc7Qiv/8F3LDxJDohc6vSnTDMLHuaqeA==
 
-angular-sanitize@1.7.7, angular-sanitize@^1.7.7:
-  version "1.7.7"
-  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.7.7.tgz#5852592ea885d48db1f2718a3ec7b6e3330950d6"
-  integrity sha512-DZ0kidLOOrq/mbqwKbeT2aSlT2Kdy25tZh5KcWOrRXx26imbhQfwbuncMYMFh7uPqfWySAI534+XhjnmhJ626Q==
+angular-sanitize@1.8.1, angular-sanitize@^1.7.7, angular-sanitize@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.8.1.tgz#80e24614669cf3d252d199e199680f4c9dee5505"
+  integrity sha512-kDtbAQkN+biyvBMJ8mgFIDZureng5yl6qegFCQ+bUw50n3KOx4FCsZ9S5tNAQ/rjYYTC5tP4hREv7+2ha+8M2w==
 
 angular-svg-base-fix@2.0.0:
   version "2.0.0"
