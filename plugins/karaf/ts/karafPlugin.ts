@@ -11,20 +11,17 @@ namespace Karaf {
     scrComponentsModule
   ]);
 
-  _module.config(["$routeProvider", ($routeProvider) => {
+  _module.config(["$routeProvider", ($routeProvider: angular.route.IRouteProvider) => {
     $routeProvider.
-            when('/osgi/server', {templateUrl: 'plugins/karaf/html/server.html'}).
-            when('/osgi/features', {template: '<features></features>'}).
-            when('/osgi/scr-components', {template: '<scr-list-components></scr-list-components>'}).
-            when('/osgi/scr-components/:name', {template: '<scr-component-detail></scr-component-detail>'}).
-            when('/osgi/features/:name/:version', {templateUrl: 'plugins/karaf/html/feature.html'})
+      when('/osgi/server', { templateUrl: 'plugins/karaf/html/server.html' }).
+      when('/osgi/features', { template: '<features></features>' }).
+      when('/osgi/scr-components', { template: '<scr-list-components></scr-list-components>' }).
+      when('/osgi/scr-components/:name', { template: '<scr-component-detail></scr-component-detail>' }).
+      when('/osgi/features/:name/:version', { templateUrl: 'plugins/karaf/html/feature.html' })
   }]);
 
 
-  _module.run(["workspace", "viewRegistry", "helpRegistry", (
-      workspace: Jmx.Workspace,
-      viewRegistry,
-      helpRegistry) => {
+  _module.run(["workspace", "helpRegistry", (workspace: Jmx.Workspace, helpRegistry: Help.HelpRegistry) => {
 
     helpRegistry.addUserDoc('karaf', 'plugins/karaf/doc/help.md', () => {
       return workspace.treeContainsDomainAndProperties('org.apache.karaf');

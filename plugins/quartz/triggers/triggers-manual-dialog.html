@@ -1,0 +1,12 @@
+<ng-form name="quartz-manual-trigger-form" class="form-horizontal">
+  <pf-form-group pf-label="Name" pf-label-class="col-sm-4" pf-input-class="col-sm-8">
+    <input id="name" name="name" ng-model="$ctrl.modalBodyScope.name" type="text" required />
+  </pf-form-group>
+  <pf-form-group pf-label="Group" pf-label-class="col-sm-4" pf-input-class="col-sm-8">
+    <input id="group" name="group" ng-model="$ctrl.modalBodyScope.group" type="text" required />
+  </pf-form-group>
+  <pf-form-group pf-label="Parameters" pf-label-class="col-sm-4" pf-input-class="col-sm-8">
+    <input id="parameters" name="parameters" ng-model="$ctrl.modalBodyScope.parameters" type="text" required />
+    <small class="form-text text-muted">Parameters if any (<tt>java.util.Map</tt> in JSON syntax).</small>
+  </pf-form-group>
+</ng-form>

@@ -103,7 +103,7 @@ namespace Camel {
       if (this.routesService.canDeleteRoutes(this.routes)) {
         moreActions.push(this.deleteAction);
       }
-      log.debug('RBAC - Rendered routes actions:', primaryActions.concat(moreActions));
+      log.debug('RBAC - Rendered routes actions:', primaryActions.concat(moreActions).map(a => a.name));
       if (primaryActions.length > 0 || moreActions.length > 0) {
         this.toolbarConfig = {
           actionsConfig: {

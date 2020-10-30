@@ -29,7 +29,6 @@ namespace JVM {
   function configurePlugin(
     mainNavService: Nav.MainNavService,
     $location: ng.ILocationService,
-    viewRegistry,
     helpRegistry: Help.HelpRegistry,
     preferencesRegistry: Core.PreferencesRegistry,
     ConnectOptions: ConnectOptions,
@@ -40,8 +39,6 @@ namespace JVM {
     $templateCache: ng.ITemplateCacheService,
     $compile: ng.ICompileService): void {
     'ngInject';
-
-    viewRegistry['jvm'] = "plugins/jvm/html/layoutConnect.html";
 
     HawtioExtension.add('hawtio-header', ($scope) => {
       let template = $templateCache.get<string>(UrlHelpers.join(templatePath, 'navbarHeaderExtension.html'));

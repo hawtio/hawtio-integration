@@ -1,0 +1,34 @@
+<div class="quartz-triggers-main">
+  <h2>Triggers</h2>
+
+  <div class="blank-slate-pf" ng-hide="$ctrl.selectedScheduler">
+    <h2>No scheduler selected</h2>
+    <p>
+      The Quartz plugin allows you to see details about running Quartz Schedulers,
+      and their associated triggers and jobs.
+    </p>
+    <p>
+      Select a Quartz Scheduler in the tree to continue.
+    </p>
+  </div>
+
+  <div ng-show="$ctrl.selectedScheduler">
+    <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+    <pf-table-view class="quartz-triggers-table" config="$ctrl.tableConfig" columns="$ctrl.tableColumns"
+      action-buttons="$ctrl.actionButtons" menu-actions="$ctrl.menuActions" items="$ctrl.filteredTriggers">
+    </pf-table-view>
+
+    <pf-modal-overlay show-modal="$ctrl.showUpdateTriggerDialog" on-close="$ctrl.onClose()"
+      modal-id="quartz-update-trigger-dialog" modal-title="$ctrl.updateTriggerTitle" is-form="true"
+      modal-body-template="$ctrl.updateTriggerTemplate" modal-body-scope="$ctrl.updateTriggerForm"
+      action-buttons="$ctrl.updateTriggerButtons">
+    </pf-modal-overlay>
+
+    <pf-modal-overlay show-modal="$ctrl.showManualTriggerDialog" on-close="$ctrl.onClose()"
+      modal-id="quartz-manual-trigger-dialog" modal-title="$ctrl.manualTriggerTitle" is-form="true"
+      modal-body-template="$ctrl.manualTriggerTemplate" modal-body-scope="$ctrl.manualTriggerForm"
+      action-buttons="$ctrl.manualTriggerButtons">
+    </pf-modal-overlay>
+  </div>
+
+</div>

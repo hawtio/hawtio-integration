@@ -38,7 +38,8 @@ namespace Jmx {
     updateTreeSelectionFromURLAndAutoSelect($location, treeElement, null, activateIfNoneSelected);
   }
 
-  export function updateTreeSelectionFromURLAndAutoSelect($location, treeElement, autoSelect: (Folder) => NodeSelection, activateIfNoneSelected = false) {
+  export function updateTreeSelectionFromURLAndAutoSelect($location: ng.ILocationService, treeElement,
+    autoSelect: (Folder) => NodeSelection, activateIfNoneSelected = false) {
     const tree = treeElement.treeview(true);
     let node: NodeSelection;
 
@@ -86,7 +87,7 @@ namespace Jmx {
     return Object.keys(typeNameMap);
   }
 
-  export function enableTree($scope, $location: ng.ILocationService, workspace: Workspace, treeElement, children: Array<NodeSelection>) {
+  export function enableTree($scope: ng.IScope, $location: ng.ILocationService, workspace: Workspace, treeElement, children: Array<NodeSelection>) {
     treeElement.treeview({
       lazyLoad: function (node: Folder, addNodes: (nodes: NodeSelection[]) => void) {
         const plugin = Jmx.findLazyLoadingFunction(workspace, node) as (workspace: Workspace, folder: Folder, onComplete: (children: NodeSelection[]) => void) => void;

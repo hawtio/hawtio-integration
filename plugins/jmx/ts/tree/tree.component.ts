@@ -3,7 +3,7 @@ namespace Jmx {
   export class TreeController {
 
     constructor(
-      private $scope,
+      private $scope: ng.IScope,
       private $location: ng.ILocationService,
       private workspace: Workspace,
       private $element: JQuery,

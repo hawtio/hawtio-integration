@@ -1,0 +1,40 @@
+<div class="quartz-jobs-main">
+  <h2>Jobs</h2>
+
+  <div class="blank-slate-pf" ng-hide="$ctrl.selectedScheduler">
+    <h2>No scheduler selected</h2>
+    <p>
+      The Quartz plugin allows you to see details about running Quartz Schedulers,
+      and their associated triggers and jobs.
+    </p>
+    <p>
+      Select a Quartz Scheduler in the tree to continue.
+    </p>
+  </div>
+
+  <div ng-show="$ctrl.selectedScheduler">
+    <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
+    <table class="quartz-jobs-table table table-striped table-bordered table-hover mouse-pointer">
+      <thead>
+        <tr>
+          <th ng-repeat="col in $ctrl.tableColumns">
+            {{ col.header }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="job in $ctrl.filteredJobs track by $index" ng-click="$ctrl.onClick(job)">
+          <td ng-repeat="col in $ctrl.tableColumns">
+            {{ job[col.itemField] }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <pf-modal-overlay show-modal="$ctrl.showJobDetails" on-close="$ctrl.onClose()" modal-id="quartz-job-details-dialog"
+      modal-title="$ctrl.jobDetailsTitle" is-form="true" modal-body-template="$ctrl.jobDetailsTemplate"
+      modal-body-scope="$ctrl.jobDetailsScope" action-buttons="$ctrl.jobDetailsButtons">
+    </pf-modal-overlay>
+  </div>
+
+</div>

@@ -1,0 +1,89 @@
+<div class="quartz-scheduler-main">
+  <h2>Scheduler</h2>
+
+  <div class="blank-slate-pf" ng-hide="$ctrl.selectedSchedulerMBean">
+    <h2>No scheduler selected</h2>
+    <p>
+      The Quartz plugin allows you to see details about running Quartz Schedulers,
+      and their associated triggers and jobs.
+    </p>
+    <p>
+      Select a Quartz Scheduler in the tree to continue.
+    </p>
+  </div>
+
+  <div class="cards-pf" ng-show="$ctrl.selectedSchedulerMBean">
+    <div class="container-fluid container-cards-pf">
+      <div class="row row-cards-pf">
+        <div class="card-pf card-pf-info-status card-pf-accented">
+          <div class="card-pf-info-image">
+            <span class="info-icon {{$ctrl.selectedScheduler.Started | quartzIconClass}}"></span>
+          </div>
+          <div class="card-pf-info-content card-pf-body">
+            <h3 class="card-pf-title">
+              {{$ctrl.selectedScheduler.SchedulerName}}
+            </h3>
+            <dl class="dl-horizontal">
+              <dt>Instance</dt>
+              <dd>{{$ctrl.selectedScheduler.SchedulerInstanceId}}</dd>
+              <dt>Version</dt>
+              <dd>{{$ctrl.selectedScheduler.Version}}</dd>
+            </dl>
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary" ng-disabled="$ctrl.selectedScheduler.Started"
+                ng-click="$ctrl.startScheduler()">
+                Start
+              </button>
+              <button type="button" class="btn btn-danger" ng-disabled="!$ctrl.selectedScheduler.Started"
+                ng-click="$ctrl.pauseScheduler()">
+                Pause
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-pf card-pf-info-status">
+          <div class="card-pf-info-image">
+            <span class="info-icon {{$ctrl.selectedScheduler.SampledStatisticsEnabled | quartzIconClass}}"></span>
+          </div>
+          <div class="card-pf-info-content card-pf-body">
+            <h3 class="card-pf-title">Sampled Statistics</h3>
+            <p class="card-pf-subtitle">Most recent samples:</p>
+            <dl class="dl-horizontal">
+              <dt>Jobs Completed</dt>
+              <dd>{{$ctrl.selectedScheduler.JobsCompletedMostRecentSample}}</dd>
+              <dt>Jobs Executed</dt>
+              <dd>{{$ctrl.selectedScheduler.JobsExecutedMostRecentSample}}</dd>
+              <dt>Jobs Scheduled</dt>
+              <dd>{{$ctrl.selectedScheduler.JobsScheduledMostRecentSample}}</dd>
+            </dl>
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary"
+                ng-disabled="$ctrl.selectedScheduler.SampledStatisticsEnabled"
+                ng-click="$ctrl.enableSampleStatistics()">
+                Start
+              </button>
+              <button type="button" class="btn btn-danger"
+                ng-disabled="!$ctrl.selectedScheduler.SampledStatisticsEnabled"
+                ng-click="$ctrl.disableSampleStatistics()">
+                Pause
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-pf card-pf-info-status">
+          <div class="card-pf-info-content card-pf-body">
+            <dl class="dl-horizontal">
+              <dt>JobStore ClassName</dt>
+              <dd>{{$ctrl.selectedScheduler.JobStoreClassName}}</dd>
+              <dt>Thread Pool ClassName</dt>
+              <dd>{{$ctrl.selectedScheduler.ThreadPoolClassName}}</dd>
+              <dt>Thread Pool Size</dt>
+              <dd>{{$ctrl.selectedScheduler.ThreadPoolSize}}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

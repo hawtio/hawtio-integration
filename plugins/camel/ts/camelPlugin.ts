@@ -93,7 +93,7 @@ namespace Camel {
     mainNavService: Nav.MainNavService,
     workspace: Jmx.Workspace,
     jolokia: Jolokia.IJolokia,
-    helpRegistry,
+    helpRegistry: Help.HelpRegistry,
     preferencesRegistry: Core.PreferencesRegistry,
     $rootScope: ng.IRootScopeService) => {
 

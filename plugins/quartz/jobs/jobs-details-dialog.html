@@ -1,0 +1,12 @@
+<table class="quartz-job-details-table table table-striped table-bordered">
+  <thead>
+    <th>Key</th>
+    <th>Value</th>
+  </thead>
+  <tbody>
+    <tr ng-repeat="key in $ctrl.modalBodyScope.keys">
+      <td>{{ key }}</td>
+      <td>{{ $ctrl.modalBodyScope.dataMap[key] }}</td>
+    </tr>
+  </tbody>
+</table>

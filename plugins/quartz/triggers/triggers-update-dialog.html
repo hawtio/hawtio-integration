@@ -1,0 +1,25 @@
+<ng-form name="quartz-update-trigger-form" class="form-horizontal">
+  <pf-form-group ng-show="$ctrl.modalBodyScope.showCron" pf-label="Cron expression" pf-label-class="col-sm-4"
+    pf-input-class="col-sm-8">
+    <input id="cron" name="cron" ng-model="$ctrl.modalBodyScope.cron" type="text"
+      ng-required="$ctrl.modalBodyScope.showCron" />
+    <small class="form-text text-muted">Specify a cron expression for the trigger.</small>
+  </pf-form-group>
+  <pf-form-group ng-show="$ctrl.modalBodyScope.showRepeatCount" pf-label="Repeat count" pf-label-class="col-sm-4"
+    pf-input-class="col-sm-8">
+    <input id="repeatCount" name="repeatCount" ng-model="$ctrl.modalBodyScope.repeatCount" type="text"
+      ng-required="$ctrl.modalBodyScope.showRepeatCount" />
+    <small class="form-text text-muted">Number of times to repeat. Use -1 for forever.</small>
+  </pf-form-group>
+  <pf-form-group ng-show="$ctrl.modalBodyScope.showRepeatInterval" pf-label="Repeat interval" pf-label-class="col-sm-4"
+    pf-input-class="col-sm-8">
+    <input id="repeatInterval" name="repeatInterval" ng-model="$ctrl.modalBodyScope.repeatInterval" type="text"
+      ng-required="$ctrl.modalBodyScope.showRepeatInterval" />
+    <small class="form-text text-muted">Elapsed time in millis between triggering.</small>
+  </pf-form-group>
+  <pf-form-group pf-label="Misfire instruction" required pf-label-class="col-sm-4" pf-input-class="col-sm-8">
+    <select id="misfireInstruction" name="misfireInstruction" ng-model="$ctrl.modalBodyScope.misfireInstruction"
+      ng-options="m.id as m.title for m in $ctrl.modalBodyScope.misfireInstructions" ng-required="true" />
+    <small class="form-text text-muted">What to do when misfiring happens.</small>
+  </pf-form-group>
+</ng-form>

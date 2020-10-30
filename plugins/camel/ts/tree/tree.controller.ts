@@ -5,20 +5,20 @@ namespace Camel {
   export class TreeController {
 
     constructor(
-      private $scope,
+      private $scope: ng.IScope,
       private $location: ng.ILocationService,
       private workspace: Jmx.Workspace,
       private jolokia: Jolokia.IJolokia,
       private $element: JQuery) {
-        'ngInject';
-        // it's not possible to declare classes to the component host tag in AngularJS
-        $element.addClass('tree-nav-sidebar-content');
+      'ngInject';
+      // it's not possible to declare classes to the component host tag in AngularJS
+      $element.addClass('tree-nav-sidebar-content');
     }
 
     $onInit(): void {
       this.$scope.$on('$destroy', () => this.removeTree());
       this.$scope.$on('$routeChangeStart', () => Jmx.updateTreeSelectionFromURL(this.$location, $(treeElementId)));
-      this.$scope.$on('jmxTreeUpdated', () => this.populateTree());
+      this.$scope.$on(Jmx.TreeEvent.Updated, () => this.populateTree());
       this.populateTree();
     }
 
@@ -53,7 +53,7 @@ namespace Camel {
           // No camel contexts so redirect to the JMX view and select the first tree node
           if (tree.children && tree.children.length > 0) {
             const firstNode = tree.children[0];
-            this.$location.path('/jmx/attributes').search({'nid': firstNode['id']});
+            this.$location.path('/jmx/attributes').search({ 'nid': firstNode['id'] });
           }
         }
       }
