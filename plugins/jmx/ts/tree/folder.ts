@@ -188,7 +188,7 @@ namespace Jmx {
     tooltip: string = null;
     entity: any = null;
     version: string = null;
-    mbean: Core.JMXMBean & { opByString?: { [name: string]: any } } = null;
+    mbean: MBean = null;
 
     init(domain: string, folderNames: string[]): void {
       if (!this.id) {
@@ -389,6 +389,10 @@ namespace Jmx {
         return null;
       }
     }
+  }
+
+  export interface MBean extends Core.JMXMBean {
+    opByString?: { [name: string]: any }
   }
 }
 

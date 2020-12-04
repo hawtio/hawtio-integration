@@ -6,12 +6,16 @@ namespace JVM {
     // constant meaning that general LIST+EXEC Jolokia operations should be used
     LIST_GENERAL = "list",
     // constant meaning that optimized hawtio:type=security,name=RBACRegistry may be used
-    LIST_WITH_RBAC = "list_rbac",
+    LIST_OPTIMISED = "list_optimised",
     // when we get this status, we have to try checking again after logging in
     LIST_CANT_DETERMINE = "cant_determine"
   }
 
-  const JOLOKIA_RBAC_LIST_MBEAN = "hawtio:type=security,name=RBACRegistry";
+  /**
+   * This is really a MBean that provides an optimised Jolokia list operation,
+   * with optionally decorated RBAC info on the result.
+   */
+  const OPTIMISED_JOLOKIA_LIST_MBEAN = "hawtio:type=security,name=RBACRegistry";
 
   export const DEFAULT_MAX_DEPTH = 7;
   export const DEFAULT_MAX_COLLECTION_SIZE = 50000;
@@ -202,7 +206,7 @@ namespace JVM {
     return {
       xhr: null,
       listMethod: JolokiaListMethod.LIST_GENERAL,
-      listMBean: JOLOKIA_RBAC_LIST_MBEAN
+      listMBean: OPTIMISED_JOLOKIA_LIST_MBEAN
     };
   }
 
@@ -316,7 +320,7 @@ namespace JVM {
     // NOTE: Sync XHR call to Jolokia is required here to resolve the available list method immediately
     let response = jolokia.list(Core.escapeMBeanPath(jolokiaStatus.listMBean), Core.onSuccess(null));
     if (response && _.isObject(response['op'])) {
-      jolokiaStatus.listMethod = JolokiaListMethod.LIST_WITH_RBAC;
+      jolokiaStatus.listMethod = JolokiaListMethod.LIST_OPTIMISED;
     } else {
       // we could get 403 error, mark the method as special case, equal in practice with LIST_GENERAL
       jolokiaStatus.listMethod = JolokiaListMethod.LIST_CANT_DETERMINE;

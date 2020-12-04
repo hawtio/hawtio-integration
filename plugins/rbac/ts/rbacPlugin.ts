@@ -38,7 +38,7 @@ namespace RBAC {
     });
 
     // add info to the JMX tree if we have access to invoke on mbeans or not
-    let processor = new JmxTreeProcessor(jolokia, jolokiaStatus, rbacTasks, workspace);
+    let processor = new JmxTreeProcessor(jolokia, jolokiaStatus, rbacTasks);
     rbacTasks.addTask("JMXTreePostProcess",
       () => workspace.addNamedTreePostProcessor(TREE_POSTPROCESSOR_NAME,
         (tree: Jmx.Folder) => processor.process(tree)));

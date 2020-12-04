@@ -1,26 +1,33 @@
 namespace RBAC {
 
   type MBeans = { [name: string]: Jmx.Folder };
+  type BulkRequest = { [name: string]: string[] };
+  type BulkResponse = { [name: string]: Operations };
+  type Operations = { [name: string]: Operation };
+  type Operation = { ObjectName: string, Method: string, CanInvoke: boolean };
 
   export class JmxTreeProcessor {
 
     constructor(
       private jolokia: Jolokia.IJolokia,
       private jolokiaStatus: JVM.JolokiaStatus,
-      private rbacTasks: RBACTasks,
-      private workspace: Jmx.Workspace) {
+      private rbacTasks: RBACTasks) {
     }
 
     process(tree: Jmx.Folder): void {
       log.debug("Processing tree", tree);
       this.rbacTasks.getACLMBean().then((aclMBean) => {
-        let mbeans: MBeans = {};
-        this.flattenMBeanTree(mbeans, tree);
-        let listMethod = this.jolokiaStatus.listMethod;
-        switch (listMethod) {
-          case JVM.JolokiaListMethod.LIST_WITH_RBAC:
-            log.debug("Process JMX tree: list with RBAC mode");
-            this.processWithRBAC(mbeans);
+        const mbeans = this.flatten(tree);
+        switch (this.jolokiaStatus.listMethod) {
+          case JVM.JolokiaListMethod.LIST_OPTIMISED:
+            log.debug("Process JMX tree: optimised list mode");
+            if (this.hasDecoratedRBAC(mbeans)) {
+              log.debug("JMX tree already decorated with RBAC");
+              this.processWithRBAC(mbeans);
+            } else {
+              log.debug("JMX tree not decorated with RBAC, fetching RBAC info now");
+              this.processGeneral(aclMBean, mbeans);
+            }
             log.debug("Processed tree mbeans with RBAC", mbeans);
             break;
           case JVM.JolokiaListMethod.LIST_GENERAL:
@@ -34,86 +41,121 @@ namespace RBAC {
       });
     }
 
-    private flattenMBeanTree(mbeans: MBeans, tree: Jmx.Folder): void {
-      if (!Core.isBlank(tree.objectName)) {
-        mbeans[tree.objectName] = tree;
+    private flatten(tree: Jmx.Folder): MBeans {
+      const mbeans: MBeans = {};
+      this.flattenFolder(mbeans, tree);
+      return mbeans;
+    }
+
+    /**
+     * Recursive method to flatten MBeans folder
+     */
+    private flattenFolder(mbeans: MBeans, folder: Jmx.Folder): void {
+      if (!Core.isBlank(folder.objectName)) {
+        mbeans[folder.objectName] = folder;
       }
-      if (tree.isFolder()) {
-        tree.children.forEach((child) => this.flattenMBeanTree(mbeans, child as Jmx.Folder));
+      if (folder.isFolder()) {
+        folder.children.forEach(child => this.flattenFolder(mbeans, child as Jmx.Folder));
       }
+    }
+
+    /**
+     * Check if RBACDecorator has been applied to the MBean tree at server side.
+     */
+    private hasDecoratedRBAC(mbeans: MBeans): boolean {
+      const node = _.find(mbeans,
+        folder => !_.isEmpty(folder.mbean.op) && _.isEmpty(folder.mbean.opByString));
+      return _.isNil(node);
     }
 
     private processWithRBAC(mbeans: MBeans): void {
       // we already have everything related to RBAC in place, except 'class' property
       _.forEach(mbeans, (node: Jmx.Folder, mbeanName: string) => {
-        let mbean = node.mbean;
-        let canInvoke = mbean && (_.isNil(mbean.canInvoke) || mbean.canInvoke);
+        const mbean = node.mbean;
+        const canInvoke = mbean && (_.isNil(mbean.canInvoke) || mbean.canInvoke);
         this.addCanInvokeToClass(node, canInvoke);
       });
     }
 
     private processGeneral(aclMBean: string, mbeans: MBeans): void {
-      let requests = [];
-      let bulkRequest = {};
-      _.forEach(mbeans, (mbean, mbeanName) => {
-        if (!('canInvoke' in mbean)) {
-          requests.push({
-            type: 'exec',
-            mbean: aclMBean,
-            operation: 'canInvoke(java.lang.String)',
-            arguments: [mbeanName]
-          });
-          if (mbean.mbean && mbean.mbean.op) {
-            let ops = mbean.mbean.op;
-            mbean.mbean.opByString = {};
-            let opList: string[] = [];
-            _.forEach(ops, (op: Core.JMXOperation, opName: string) => {
-              if (_.isArray(op)) {
-                _.forEach(op, (op) => this.addOperation(mbean, opList, opName, op));
-              } else {
-                this.addOperation(mbean, opList, opName, op);
-              }
-            });
-            bulkRequest[mbeanName] = opList;
-          }
-        }
+      const requests: Jolokia.IRequest[] = [];
+      const bulkRequest: BulkRequest = {};
+      // register canInvoke requests for each MBean and accumulate bulkRequest for all ops
+      _.forEach(mbeans, (folder, mbeanName) => {
+        this.addCanInvokeRequests(aclMBean, mbeanName, folder, requests, bulkRequest);
       });
+      // register the bulk request finally based on the accumulated bulkRequest
       requests.push({
         type: 'exec',
         mbean: aclMBean,
         operation: 'canInvoke(java.util.Map)',
         arguments: [bulkRequest]
       });
+      // send batch request
+      log.debug('Batch canInvoke request:', requests);
       this.jolokia.request(requests, Core.onSuccess(
-        (response) => {
-          let mbean = response.request.arguments[0];
-          if (mbean && _.isString(mbean)) {
-            let canInvoke = response.value;
-            mbeans[mbean]['canInvoke'] = response.value;
-            this.addCanInvokeToClass(mbeans[mbean], canInvoke);
-          } else {
-            let responseMap = response.value;
-            _.forEach(responseMap, (operations, mbeanName) => {
-              _.forEach(operations, (data, operationName) => {
-                mbeans[mbeanName].mbean.opByString[operationName]['canInvoke'] = data['CanInvoke'];
-              });
-            });
-          }
-        },
+        (response) => this.applyCanInvoke(mbeans, response),
         { error: (response) => { /* silently ignore */ } }));
     }
 
-    private addOperation(mbean: Jmx.Folder, opList: string[], opName: string, op: Core.JMXOperation) {
-      let operationString = Core.operationToString(opName, op.args);
-      // enrich the mbean by indexing the full operation string so we can easily look it up later
-      mbean.mbean.opByString[operationString] = op;
-      opList.push(operationString);
+    private addCanInvokeRequests(aclMBean: string, mbeanName: string, folder: Jmx.Folder,
+      requests: Jolokia.IRequest[], bulkRequest: BulkRequest): void {
+      // request for MBean
+      requests.push({
+        type: 'exec',
+        mbean: aclMBean,
+        operation: 'canInvoke(java.lang.String)',
+        arguments: [mbeanName]
+      });
+      // bulk request for MBean ops
+      if (folder.mbean && folder.mbean.op) {
+        // opByString is later filled in addOperation()
+        folder.mbean.opByString = {};
+        const opList: string[] = [];
+        _.forEach(folder.mbean.op, (op: Core.JMXOperation, opName: string) => {
+          if (_.isArray(op)) {
+            // overloaded ops
+            _.forEach(op, (op) => this.addOperation(folder, opList, opName, op));
+          } else {
+            // single op
+            this.addOperation(folder, opList, opName, op);
+          }
+        });
+        if (!_.isEmpty(opList)) {
+          bulkRequest[mbeanName] = opList;
+        }
+      }
     }
 
-    private addCanInvokeToClass(mbean: any, canInvoke: boolean): void {
-      let toAdd = canInvoke ? "can-invoke" : "cant-invoke";
-      mbean['class'] = this.stripClasses(mbean['class']);
-      mbean['class'] = this.addClass(mbean['class'], toAdd);
+    private addOperation(folder: Jmx.Folder, opList: string[], opName: string, op: Core.JMXOperation): void {
+      const opString = Core.operationToString(opName, op.args);
+      // enrich the mbean by indexing the full operation string so we can easily look it up later
+      folder.mbean.opByString[opString] = op;
+      opList.push(opString);
+    }
+
+    private applyCanInvoke(mbeans: MBeans, response: Jolokia.IResponse): void {
+      const mbean = response.request.arguments[0];
+      if (mbean && _.isString(mbean)) {
+        // single request
+        const canInvoke = response.value;
+        mbeans[mbean].mbean.canInvoke = response.value;
+        this.addCanInvokeToClass(mbeans[mbean], canInvoke);
+      } else {
+        // batch request
+        const bulkResponse: BulkResponse = response.value;
+        log.debug('Batch canInvoke response:', bulkResponse);
+        _.forEach(bulkResponse, (ops: Operations, mbeanName: string) => {
+          _.forEach(ops, (op: Operation, opName: string) => {
+            mbeans[mbeanName].mbean.opByString[opName]['canInvoke'] = op.CanInvoke;
+          });
+        });
+      }
+    }
+
+    private addCanInvokeToClass(mbean: Jmx.Folder, canInvoke: boolean): void {
+      const toAdd = canInvoke ? "can-invoke" : "cant-invoke";
+      mbean.class = this.addClass(this.stripClasses(mbean.class), toAdd);
       if (!canInvoke) {
         // change the tree node icon to lock here
         mbean.icon = 'fa fa-lock';

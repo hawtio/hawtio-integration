@@ -90,7 +90,7 @@ namespace Jmx {
     private jolokiaList(callback, flags): void {
       let listMethod = this.jolokiaStatus.listMethod;
       switch (listMethod) {
-        case JVM.JolokiaListMethod.LIST_WITH_RBAC:
+        case JVM.JolokiaListMethod.LIST_OPTIMISED:
           log.debug("Invoking Jolokia list mbean in RBAC mode");
           flags.maxDepth = 9;
           this.jolokia.execute(this.jolokiaStatus.listMBean, "list()", Core.onSuccess(callback, flags));
@@ -743,8 +743,8 @@ namespace Jmx {
       if (!selection) {
         return true;
       }
-      let selectionFolder = selection as Folder;
-      let mbean = selectionFolder.mbean;
+      const selectionFolder = selection as Folder;
+      const mbean = selectionFolder.mbean;
       if (!mbean) {
         return true;
       }
@@ -753,27 +753,37 @@ namespace Jmx {
         canInvoke = mbean.canInvoke;
       }
       if (canInvoke && methods && methods.length > 0) {
-        let opsByString = mbean['opByString'];
-        let ops = mbean['op'];
+        const opsByString = mbean.opByString;
+        const ops = mbean.op;
         if (opsByString && ops) {
-          methods.forEach((method) => {
-            if (!canInvoke) {
-              return;
-            }
-            let op = null;
-            if (_.endsWith(method, ')')) {
-              op = opsByString[method];
-            } else {
-              op = ops[method];
-            }
-            if (!op) {
-              log.debug("Could not find method:", method, " to check permissions, skipping");
-              return;
-            }
-            canInvoke = this.resolveCanInvoke(op);
-          });
+          canInvoke = this.resolveCanInvokeInOps(ops, opsByString, methods);
         }
       }
+      return canInvoke;
+    }
+
+    /**
+     * Returns true only if all relevant operations can be invoked.
+     */
+    private resolveCanInvokeInOps(ops: Core.JMXOperations, opsByString: { [name: string]: any; },
+      methods: string[]): boolean {
+      let canInvoke = true;
+      methods.forEach((method) => {
+        if (!canInvoke) {
+          return;
+        }
+        let op = null;
+        if (_.endsWith(method, ')')) {
+          op = opsByString[method];
+        } else {
+          op = ops[method];
+        }
+        if (!op) {
+          log.debug("Could not find method:", method, "to check permissions, skipping");
+          return;
+        }
+        canInvoke = this.resolveCanInvoke(op);
+      });
       return canInvoke;
     }
 
