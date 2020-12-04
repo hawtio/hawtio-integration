@@ -18,15 +18,15 @@ namespace RBAC {
      * Process JMX tree and attach RBAC info (canInvoke) to it in advance.
      *
      * Matrix of supported RBAC Mbeans per platform:
-     * +-------------------------+-----------+--------------+---------------+
-     * |        Platform         | ACL MBean | RBACRegistry | RBACDecorator |
-     * +-------------------------+-----------+--------------+---------------+
-     * | Karaf                   | o         | o            | o             |
-     * | WildFly                 | x (dummy) | o            | x             |
-     * | Spring Boot             | x (dummy) | o            | x             |
-     * | Artemis                 | o         | o            | x             |
-     * | Jolokia (no hawtio.war) | x         | x            | x             |
-     * +-------------------------+-----------+--------------+---------------+
+     * +-------------------------+-----------+--------------+---------------+-------------------+
+     * |        Platform         | ACL MBean | RBACRegistry | RBACDecorator |  Process method   |
+     * +-------------------------+-----------+--------------+---------------+-------------------+
+     * | Karaf                   | o         | o            | o             | processWithRBAC() |
+     * | WildFly                 | x (dummy) | o            | x             | processGeneral()  |
+     * | Spring Boot             | x (dummy) | o            | x             | processGeneral()  |
+     * | Artemis                 | o         | o            | x             | processGeneral()  |
+     * | Jolokia (no hawtio.war) | x         | x            | x             | processGeneral()  |
+     * +-------------------------+-----------+--------------+---------------+-------------------+
      *
      * Object names for the RBAC MBeans:
      * - ACL MBean:     "*:type=security,area=jmx,*"
