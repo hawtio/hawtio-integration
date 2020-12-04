@@ -5,8 +5,13 @@ namespace Jmx {
 
   export class OperationsService {
 
-    constructor(private $q: ng.IQService, private jolokia: Jolokia.IJolokia, private jolokiaUrl: string,
-      private workspace: Jmx.Workspace, private treeService: TreeService, private rbacACLMBean: ng.IPromise<string>) {
+    constructor(
+      private $q: ng.IQService,
+      private jolokia: Jolokia.IJolokia,
+      private jolokiaUrl: string,
+      private workspace: Jmx.Workspace,
+      private treeService: TreeService,
+      private rbacACLMBean: ng.IPromise<string>) {
       'ngInject';
     }
 
