@@ -14,6 +14,25 @@ namespace RBAC {
       private rbacTasks: RBACTasks) {
     }
 
+    /**
+     * Process JMX tree and attach RBAC info (canInvoke) to it in advance.
+     *
+     * Matrix of supported RBAC Mbeans per platform:
+     * +-------------------------+-----------+--------------+---------------+
+     * |        Platform         | ACL MBean | RBACRegistry | RBACDecorator |
+     * +-------------------------+-----------+--------------+---------------+
+     * | Karaf                   | o         | o            | o             |
+     * | WildFly                 | x (dummy) | o            | x             |
+     * | Spring Boot             | x (dummy) | o            | x             |
+     * | Artemis                 | o         | o            | x             |
+     * | Jolokia (no hawtio.war) | x         | x            | x             |
+     * +-------------------------+-----------+--------------+---------------+
+     *
+     * Object names for the RBAC MBeans:
+     * - ACL MBean:     "*:type=security,area=jmx,*"
+     * - RBACRegistry:  "hawtio:type=security,name=RBACRegistry"
+     * - RBACDecorator: "hawtio:type=security,area=jolokia,name=RBACDecorator"
+     */
     process(tree: Jmx.Folder): void {
       log.debug("Processing tree", tree);
       this.rbacTasks.getACLMBean().then((aclMBean) => {
