@@ -224,13 +224,8 @@
         <td>{{aRecording.time | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
         <td ng-if="!!aRecording.file"><a href="file://{{aRecording.file}}">{{aRecording.file}}</a></td>
         <td ng-if="aRecording.canDownload">
-          <button class="recorderButton btn"
-                  title="Download recording"
-                  ng-class="raisedButton"
-                  tooltip="Dump {{jfrSettings.name}} to disk"
-                  ng-click="downloadRecording(aRecording.number)">
-            <i class="pficon-save fa-1x"></i>
-          </button>
+          <a href="{{aRecording.downloadLink}}" class="pficon-save fa-1x" target="_blank" download="recording{{aRecording.number}}.jfr">
+          </a>
         </td>
       </tr>
     </table>

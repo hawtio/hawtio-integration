@@ -72,6 +72,7 @@ namespace Diagnostics {
     file: string;
     time: number;
     canDownload: boolean;
+    downloadLink: string;
   }
 
   export interface RecordingFromJfrBean {
@@ -115,7 +116,7 @@ namespace Diagnostics {
   
   
   export function DiagnosticsJfrController($scope: JfrControllerScope, $location: ng.ILocationService,
-    workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, localStorage: Storage, diagnosticsService: DiagnosticsService) {
+    workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, localStorage: Storage, diagnosticsService: DiagnosticsService, jolokiaUrl:string) {
       'ngInject';
       
       //common definitions / setup
@@ -255,7 +256,8 @@ namespace Diagnostics {
               size: lastRecording.size + " b",
               file: null,
               time: lastRecording.stopTime,
-              canDownload: true});
+              canDownload: true,
+              downloadLink: jolokiaUrl + "/exec/jdk.management.jfr:type=FlightRecorder/downloadRecording(long)/" + lastRecording.id});
           }
         }
         if(lastRecording) {
@@ -311,7 +313,8 @@ namespace Diagnostics {
                 size: matches[2],
                 file: matches[3],
                 time: Date.now(),
-                canDownload : false
+                canDownload : false,
+                downloadLink : null
               };
               Diagnostics.log.debug("data: "
                 + recordingData);
@@ -420,7 +423,7 @@ namespace Diagnostics {
         Diagnostics.log.debug("Diagnostic Operation "
           + operation + " was successful" + response.value);
         if (response.request.operation.indexOf("jfrCheck") > -1) {
-          render(response);
+//          render(response);
         } else {
           if (callback) {
             callback(response.value);
