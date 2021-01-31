@@ -50,8 +50,7 @@
           <div class="casetteLabel">
             {{jfrStatus}}
             <div class="notLabel">
-              <div class="wrapCog"
-                   ng-class="{'spinning': isRunning}">
+              <div class="wrapCog">
                 <svg role="img"
                      aria-label="cassette wheel"
                      xmlns="http://www.w3.org/2000/svg"
@@ -99,7 +98,6 @@
                 </svg>
               </div>
               <div class="wrapCog"
-                   ng-class="{'spinning': isRunning}"
                    id="rightCogWrapper">
                 <svg role="img"
                      aria-label="cassette wheel"
@@ -204,7 +202,8 @@
           <div simple-form
                name="jfrForm"
                data="formConfig"
-               entity="jfrSettings"></div>
+               entity="jfrSettings">
+              </div>
 
         </dd>
       </dl>
