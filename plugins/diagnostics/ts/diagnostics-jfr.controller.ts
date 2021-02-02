@@ -29,6 +29,34 @@ namespace Diagnostics {
     ];
   }
 
+  function updateSettingsFromCurrent(scopeSettings: JfrSettings, currentConfig: Map<string, string>, currentRecordingNumber: number): void {
+    scopeSettings.dumpOnExit = currentConfig['dumpOnExit'] === "true";
+    scopeSettings.filename = null;
+    scopeSettings.name = currentConfig['name']
+    scopeSettings.recordingNumber = "" + currentRecordingNumber;
+    if (currentConfig['duration'] != "0") {
+      scopeSettings.limitType = "duration";
+      scopeSettings.limitValue = currentConfig['duration'];
+    }
+    if (currentConfig['maxSize'] != "0") {
+      scopeSettings.limitType = "maxsize";
+      scopeSettings.limitValue = currentConfig['maxSize'];
+    }
+  }
+
+  function settingsToJfrOptions(settings: JfrSettings) {
+    var options = {
+      "name": "" + settings.name,
+      "dumpOnExit": "" + settings.dumpOnExit
+    }
+    if (settings.limitType === "duration") {
+      options['duration'] = settings.limitValue;
+    } else if (settings.limitType === "maxsize") {
+      options['maxSize'] = settings.limitValue;
+    }
+    return options;
+  }
+
   export interface JfrSettings {
     limitType: string;
     limitValue: string;
@@ -36,6 +64,7 @@ namespace Diagnostics {
     dumpOnExit: boolean;
     name: string;
     filename: string;
+    configuration: string;
   }
 
   export interface Recording {
@@ -43,6 +72,24 @@ namespace Diagnostics {
     size: string;
     file: string;
     time: number;
+    canDownload: boolean;
+    downloadLink: string;
+  }
+
+  export interface RecordingFromJfrBean {
+    destination: string;
+    maxSize: number;
+    duration: number;
+    size: number;
+    maxAge: number;
+    toDisk: boolean;
+    name: string;
+    startTime: number;
+    stopTime: number;
+    id: number;
+    state: string;
+    dumpOnExit: boolean;
+    settings: Map<string, string>;
   }
 
   export interface JfrControllerScope extends ng.IScope {
@@ -65,26 +112,31 @@ namespace Diagnostics {
     jcmd: string;
     closeMessageForGood: (key: string) => void;
     isMessageVisible: (key: string) => boolean;
+    configurations: Array<string>;
   }
 
+
   export function DiagnosticsJfrController($scope: JfrControllerScope, $location: ng.ILocationService,
-    workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, localStorage: Storage, diagnosticsService: DiagnosticsService) {
+    workspace: Jmx.Workspace, jolokia: Jolokia.IJolokia, localStorage: Storage, diagnosticsService: DiagnosticsService, jolokiaUrl: string) {
     'ngInject';
 
-    $scope.forms = {};
-    $scope.pid = diagnosticsService.findMyPid($scope.pageTitle);
-    $scope.recordings = [];
-    $scope.settingsVisible = false;
-
+    //common definitions / setup
     $scope.jfrSettings = {
       limitType: 'unlimited',
       limitValue: '',
       name: '',
       dumpOnExit: true,
       recordingNumber: '',
-      filename: ''
+      filename: '',
+      configuration: 'default'
     };
-
+    $scope.forms = {};
+    $scope.recordings = [];
+    $scope.settingsVisible = false;
+    $scope.toggleSettingsVisible = () => {
+      $scope.settingsVisible = !$scope.settingsVisible;
+      Core.$apply($scope);
+    };
     $scope.formConfig = <Forms.FormConfiguration>{
       properties: <Forms.FormProperties>{
         name: <Forms.FormElement>{
@@ -120,162 +172,265 @@ namespace Diagnostics {
         },
       }
     };
+    const jfrMBean = diagnosticsService.flightRecorderMBean();
+    if (jfrMBean) {
+      configureScopeForJfr($scope);
+    } else {
+      configureScopeForDiagnosticCommand($scope);
+    }
 
-    $scope.unlock = () => {
-      executeDiagnosticFunction('vmUnlockCommercialFeatures()', 'VM.unlock_commercial_features', [], null);
-    };
 
-    $scope.startRecording = () => {
-      if ($scope.isRecording) {//this means that there is a stopped recording, clear state before starting the next
-        $scope.jfrSettings.name = null;
-        $scope.jfrSettings.filename = null;
+    //Use Flight Recorder MBean for controlling flight recorder loosely inspired by: 
+    //https://github.com/openjdk/jmc7/blob/master/application/org.openjdk.jmc.rjmx.services.jfr/src/main/java/org/openjdk/jmc/rjmx/services/jfr/internal/FlightRecorderServiceV2.java
+    function configureScopeForJfr(scope: JfrControllerScope) {
+      var currentRecordingNumber = -1;
+      //these are not not neccesary for jfr
+      scope.unlock = () => { };
+      scope.isMessageVisible = (key) => { return false };
+      scope.closeMessageForGood = (key) => { };
+      //figure out data
+      scope.jfrEnabled = true;
+      scope.configurations=jolokia.getAttribute(jfrMBean, "Configurations").map(conf => {return conf.name})
+      log.info(scope.configurations)
+      scope.formConfig.properties["configuration"]=<Forms.FormElement>{
+        type: "java.lang.String",
+        tooltip: "Configuration for recordings",
+        enum: scope.configurations
       }
-      executeDiagnosticFunction('jfrStart([Ljava.lang.String;)', 'JFR.start', [buildStartParams($scope.jfrSettings)], null);
-    };
+      figureOutRecordingsAndSettings(null);
 
-    $scope.dumpRecording = () => {
+      scope.startRecording = () => {
+        jolokia.execute(jfrMBean, "setRecordingOptions", currentRecordingNumber, settingsToJfrOptions(scope.jfrSettings), {});
+        jolokia.execute(jfrMBean, "setPredefinedConfiguration", currentRecordingNumber, scope.jfrSettings.configuration)
+        jolokia.execute(jfrMBean, "startRecording", currentRecordingNumber);
+        scope.isRecording = true;
+        figureOutRecordingsAndSettings(null)
+      };
 
-      executeDiagnosticFunction('jfrDump([Ljava.lang.String;)', 'JFR.dump',
-        [buildDumpParams($scope.jfrSettings)], (response) => {
+      scope.stopRecording = () => {
+        jolokia.execute(jfrMBean, "stopRecording", currentRecordingNumber);
+        figureOutRecordingsAndSettings(null);
+      };
+      scope.dumpRecording = () => {
+        jolokia.execute(jfrMBean, "takeSnapshot")
+        figureOutRecordingsAndSettings(null)
+      };
 
-          const matches = splitResponse(response);
-          Diagnostics.log.debug("response: " + response
-            + " split: " + matches + "split2: "
-            + matches);
-          if (matches) {
-            const recordingData = {
-              number: matches[1],
-              size: matches[2],
-              file: matches[3],
-              time: Date.now()
-            };
-            Diagnostics.log.debug("data: "
-              + recordingData);
-            addRecording(recordingData, $scope.recordings);
+
+
+      Core.register(jolokia, $scope, [{
+        type: 'read',
+        attribute: 'Recordings',
+        mbean: jfrMBean
+      }], Core.onSuccess(watchCallback));
+
+      function watchCallback(response: any) {
+        figureOutRecordingsAndSettings(response.value);
+      }
+
+
+      function figureOutRecordingsAndSettings(existingRecordings: RecordingFromJfrBean[]) {
+        if (existingRecordings == null) {
+          existingRecordings = jolokia.getAttribute(jfrMBean, "Recordings");
+        }
+        scope.recordings = [];
+        var lastRecording: RecordingFromJfrBean;
+        for (let index = 0; index < existingRecordings.length; index++) {
+          lastRecording = existingRecordings[index];
+          if (lastRecording.state === "STOPPED") {
+            scope.recordings.push({
+              number: "" + lastRecording.id,
+              size: lastRecording.size + " b",
+              file: null,
+              time: lastRecording.stopTime,
+              canDownload: true,
+              downloadLink: jolokiaUrl + "/exec/jdk.management.jfr:type=FlightRecorder/downloadRecording(long)/" + lastRecording.id
+            });
           }
-
-        });
-
-
-    };
-    $scope.closeMessageForGood = (key: string) => {
-      localStorage[key] = "false";
-    };
-
-    $scope.isMessageVisible = (key: string) => {
-      return localStorage[key] !== "false";
-    };
-
-    $scope.stopRecording = () => {
-      const name = $scope.jfrSettings.name;
-      $scope.jfrSettings.filename = '';
-      $scope.jfrSettings.name = '';
-      executeDiagnosticFunction('jfrStop([Ljava.lang.String;)', 'JFR.stop',
-        ['name="' + name + '"'], null);
-    };
-
-    $scope.toggleSettingsVisible = () => {
-      $scope.settingsVisible = !$scope.settingsVisible;
-      Core.$apply($scope);
-    };
-
-    Core.register(jolokia, $scope, [{
-      type: 'exec',
-      operation: 'jfrCheck([Ljava.lang.String;)',
-      mbean: 'com.sun.management:type=DiagnosticCommand',
-      arguments: ['']
-    }], Core.onSuccess(render));
-
-
-    function render(response) {
-      let statusString = response.value;
-      $scope.jfrEnabled = statusString.indexOf("not enabled") == -1;
-      $scope.isRunning = statusString.indexOf("(running)") > -1;
-      $scope.isRecording = $scope.isRunning || statusString.indexOf("(stopped)") > -1;
-      if ((statusString.indexOf("Use JFR.") > -1 || statusString
-        .indexOf("Use VM.") > -1)
-        && $scope.pid) {
-        statusString = statusString.replace("Use ",
-          "Use command line: jcmd " + $scope.pid + " ");
-      }
-      $scope.jfrStatus = statusString;
-      if ($scope.isRecording) {
-        let regex = /recording=(\d+) name="(.+?)"/g;
-        if ($scope.isRunning) { //if there are several recordings (some stopped), make sure we parse the running one
-          regex = /recording=(\d+) name="(.+?)".+?\(running\)/g;
         }
-
-        const parsed = regex.exec(statusString);
-        $scope.jfrSettings.recordingNumber = parsed[1];
-        $scope.jfrSettings.name = parsed[2];
-        const parsedFilename = statusString.match(/filename="(.+)"/);
-        if (parsedFilename && parsedFilename[1]) {
-          $scope.jfrSettings.filename = parsedFilename[1];
-        } else {
-          $scope.jfrSettings.filename = 'recording' + parsed[1] + '.jfr';
+        if (lastRecording) {
+          if (lastRecording.state === "RUNNING") {
+            scope.isRecording = true;
+            scope.isRunning = true;
+          } else {
+            scope.isRunning = false;
+            scope.isRecording = false;
+          }
+          scope.jfrStatus = "Recording " + lastRecording.id + " name: " + lastRecording.name + " (" + lastRecording.state + ")"
         }
-
+        if (!lastRecording || lastRecording.state === "STOPPED") {
+          currentRecordingNumber = jolokia.execute(jfrMBean, "newRecording");
+        }
+        else {
+          currentRecordingNumber = lastRecording.id;
+        }
+        updateSettingsFromCurrent(scope.jfrSettings, jolokia.execute(jfrMBean, "getRecordingOptions", currentRecordingNumber), currentRecordingNumber);
+        Core.$apply(scope);
       }
-      Core.$apply($scope);
     }
 
-    function addRecording(recording: Recording, recordings: Array<Recording>) {
-      for (let i = 0; i < recordings.length; i++) {
-        if (recordings[i].file === recording.file) {
-          recordings[i] = recording;
-          return;
-        }
-      }
-      recordings.push(recording);
-    }
+    function configureScopeForDiagnosticCommand(scope: JfrControllerScope) {
+      scope.pid = findMyPid();
 
-    function showArguments(arguments: Array<any>) {
-      let result = '';
-      let first = true;
-      for (let i = 0; i < arguments.length; i++) {
-        if (first) {
-          first = false;
-        } else {
-          result += ',';
-        }
-        result += arguments[i];
-      }
-      return result;
-    }
+      scope.unlock = () => {
+        executeDiagnosticFunction('vmUnlockCommercialFeatures()', 'VM.unlock_commercial_features', [], null);
+      };
 
-    function executeDiagnosticFunction(operation: string, jcmd: string, arguments, callback) {
-      Diagnostics.log.debug(Date.now() + " Invoking operation "
-        + operation + " with arguments" + arguments + " settings: " + JSON.stringify($scope.jfrSettings));
-      $scope.jcmd = 'jcmd ' + $scope.pid + ' ' + jcmd + ' ' + showArguments(arguments);
-      jolokia.request([{
-        type: "exec",
-        operation: operation,
-        mbean: 'com.sun.management:type=DiagnosticCommand',
-        arguments: arguments
-      }, {
+      scope.startRecording = () => {
+        if (scope.isRecording) {//this means that there is a stopped recording, clear state before starting the next
+          scope.jfrSettings.name = null;
+          scope.jfrSettings.filename = null;
+        }
+        executeDiagnosticFunction('jfrStart([Ljava.lang.String;)', 'JFR.start', [buildStartParams(scope.jfrSettings)], null);
+      };
+
+      scope.dumpRecording = () => {
+
+        executeDiagnosticFunction('jfrDump([Ljava.lang.String;)', 'JFR.dump',
+          [buildDumpParams(scope.jfrSettings)], (response) => {
+            const matches = splitResponse(response);
+            Diagnostics.log.debug("response: " + response
+              + " split: " + matches + "split2: "
+              + matches);
+            if (matches) {
+              const recordingData = {
+                number: matches[1],
+                size: matches[2],
+                file: matches[3],
+                time: Date.now(),
+                canDownload: false,
+                downloadLink: null
+              };
+              Diagnostics.log.debug("data: "
+                + recordingData);
+              addRecording(recordingData, scope.recordings);
+            }
+          });
+      };
+      scope.closeMessageForGood = (key: string) => {
+        localStorage[key] = "false";
+      };
+
+      scope.isMessageVisible = (key: string) => {
+        return localStorage[key] !== "false";
+      };
+
+      scope.stopRecording = () => {
+        const name = scope.jfrSettings.name;
+        scope.jfrSettings.filename = '';
+        scope.jfrSettings.name = '';
+        executeDiagnosticFunction('jfrStop([Ljava.lang.String;)', 'JFR.stop',
+          ['name="' + name + '"'], null);
+      };
+
+      Core.register(jolokia, $scope, [{
         type: 'exec',
         operation: 'jfrCheck([Ljava.lang.String;)',
         mbean: 'com.sun.management:type=DiagnosticCommand',
         arguments: ['']
-      }], Core.onSuccess(function (response) {
-        Diagnostics.log.debug("Diagnostic Operation "
-          + operation + " was successful" + response.value);
-        if (response.request.operation.indexOf("jfrCheck") > -1) {
-          render(response);
-        } else {
-          if (callback) {
-            callback(response.value);
-          }
-          Core.$apply($scope);
-        }
-      }, {
-        error: function (response) {
-          Diagnostics.log.warn("Diagnostic Operation "
-            + operation + " failed", response);
-        }
-      }));
-    }
+      }], Core.onSuccess(render));
 
+      function render(response) {
+        let statusString = response.value;
+        $scope.jfrEnabled = statusString.indexOf("not enabled") == -1;
+        $scope.isRunning = statusString.indexOf("(running)") > -1;
+        $scope.isRecording = $scope.isRunning || statusString.indexOf("(stopped)") > -1;
+        if ((statusString.indexOf("Use JFR.") > -1 || statusString
+          .indexOf("Use VM.") > -1)
+          && $scope.pid) {
+          statusString = statusString.replace("Use ",
+            "Use command line: jcmd " + $scope.pid + " ");
+        }
+        $scope.jfrStatus = statusString;
+        if ($scope.isRecording) {
+          let regex = /ecording.(\d+):* name="*(.+?)"*/g;
+          if ($scope.isRunning) { //if there are several recordings (some stopped), make sure we parse the running one
+            regex = /ecording.(\d+):* name="*(.+?)"* \(running\)/g;
+          }
+
+          const parsed = regex.exec(statusString);
+          $scope.jfrSettings.recordingNumber = parsed[1];
+          $scope.jfrSettings.name = parsed[2];
+          const parsedFilename = statusString.match(/filename="(.+)"/);
+          if (parsedFilename && parsedFilename[1]) {
+            $scope.jfrSettings.filename = parsedFilename[1];
+          } else {
+            $scope.jfrSettings.filename = 'recording' + parsed[1] + '.jfr';
+          }
+
+        }
+        Core.$apply($scope);
+      }
+
+      function addRecording(recording: Recording, recordings: Array<Recording>) {
+        for (let i = 0; i < recordings.length; i++) {
+          if (recordings[i].file === recording.file) {
+            recordings[i] = recording;
+            return;
+          }
+        }
+        recordings.push(recording);
+      }
+
+      function showArguments(arguments: Array<any>) {
+        let result = '';
+        let first = true;
+        for (let i = 0; i < arguments.length; i++) {
+          if (first) {
+            first = false;
+          } else {
+            result += ',';
+          }
+          result += arguments[i];
+        }
+        return result;
+      }
+
+      function executeDiagnosticFunction(operation: string, jcmd: string, arguments, callback) {
+        Diagnostics.log.debug(Date.now() + " Invoking operation "
+          + operation + " with arguments" + arguments + " settings: " + JSON.stringify($scope.jfrSettings));
+        $scope.jcmd = 'jcmd ' + $scope.pid + ' ' + jcmd + ' ' + showArguments(arguments);
+        jolokia.request([{
+          type: "exec",
+          operation: operation,
+          mbean: 'com.sun.management:type=DiagnosticCommand',
+          arguments: arguments
+        }, {
+          type: 'exec',
+          operation: 'jfrCheck([Ljava.lang.String;)',
+          mbean: 'com.sun.management:type=DiagnosticCommand',
+          arguments: ['']
+        }], Core.onSuccess(function (response) {
+          Diagnostics.log.debug("Diagnostic Operation "
+            + operation + " was successful" + response.value);
+          if (response.request.operation.indexOf("jfrCheck") > -1) {
+            render(response);
+          } else {
+            if (callback) {
+              callback(response.value);
+            }
+            Core.$apply($scope);
+          }
+        }, {
+          error: function (response) {
+            Diagnostics.log.warn("Diagnostic Operation "
+              + operation + " failed", response);
+          }
+        }));
+      }
+      function findMyPid() {
+        //snatch PID from window title
+        const name = jolokia.getAttribute('java.lang:type=Runtime', 'Name');
+        const regex = /(\d+)@/g;
+        const pid = regex.exec(name);
+        if (pid && pid[1]) {
+          return pid[1];
+        } else {
+          return null;
+        }
+      }
+
+    }
   }
 
 }
