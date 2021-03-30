@@ -130,7 +130,7 @@ namespace UI {
       $scope.$watch('show', function() {
         if ($scope.show) {
           setTimeout(function() {
-            $scope.body = $element.find('.modal-body');
+            $scope.body = $('.hawtio-ui-confirm-dialog .modal-body');
             $scope.body.html($compile($scope.clone.html())($scope.$parent));
             Core.$apply($scope);
           }, 50);
