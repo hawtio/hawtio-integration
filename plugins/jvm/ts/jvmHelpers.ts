@@ -100,9 +100,15 @@ namespace JVM {
     //must save to local storage, to be picked up by new tab
     saveConnection(clone);
     const $window: ng.IWindowService = HawtioCore.injector.get<ng.IWindowService>('$window');
-    let url = (clone.view || '/') + '?con=' + clone.name;
-    url = url.replace(/\?/g, "&");
-    url = url.replace(/&/, "?");
+    var url
+    if(clone.view) {
+      url = clone.view  + '?con=' + clone.name;
+      url = url.replace(/\?/g, "&");
+      url = url.replace(/&/, "?");
+  
+    } else {
+      url = URI('').search({ con: clone.name }).toString()
+    }
     const newWindow = $window.open(url, clone.name);
     newWindow['con'] = clone.name;
     newWindow['userDetails'] = {

@@ -21,7 +21,7 @@ namespace JVM {
       for (let key in agents) {
         const agent = agents[key];
         if (agent.url && !agent.secured) {
-          const dedicatedJolokia = createJolokia(agent.url, agent.username, agent.password);
+          const dedicatedJolokia = createJolokia(Core.useProxyIfExternal(agent.url), agent.username, agent.password);
           agent.startTime = dedicatedJolokia.getAttribute('java.lang:type=Runtime', 'StartTime');
           if (!$scope.hasName(agent)) {//only look for command if agent vm is not known
             agent.command = dedicatedJolokia.getAttribute('java.lang:type=Runtime', 'SystemProperties', 'sun.java.command');
