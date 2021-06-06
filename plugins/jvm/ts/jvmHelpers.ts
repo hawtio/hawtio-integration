@@ -100,22 +100,24 @@ namespace JVM {
     //must save to local storage, to be picked up by new tab
     saveConnection(clone);
     const $window: ng.IWindowService = HawtioCore.injector.get<ng.IWindowService>('$window');
-    var url
-    if(clone.view) {
-      url = clone.view  + '?con=' + clone.name;
-      url = url.replace(/\?/g, "&");
-      url = url.replace(/&/, "?");
-  
-    } else {
-      url = URI('').search({ con: clone.name }).toString()
-    }
-    const newWindow = $window.open(url, clone.name);
+    const newWindow = $window.open(urlToDiscoveredAgent(clone), clone.name);
     newWindow['con'] = clone.name;
     newWindow['userDetails'] = {
       username: clone.userName,
       password: clone.password,
       loginDetails: {}
     };
+  }
+
+  function urlToDiscoveredAgent(clone: any): string {
+    if (clone.view) {
+      let url = clone.view + '?con=' + clone.name;
+      url = url.replace(/\?/g, "&");
+      url = url.replace(/&/, "?");
+      return url
+    } else {
+      return URI('').search({ con: clone.name }).toString();
+    }
   }
 
   export function saveConnection(options: ConnectOptions) {
