@@ -318,7 +318,10 @@ namespace Jmx {
       let paths = [];
       let typeName: string = null;
       let serviceName: string = null;
-      mbeanName.split(',').forEach((prop) => {
+      let propRegex = new RegExp('(([^=,]+)=(\\\\"[^"]+\\\\"|\\\\\'[^\']+\\\\\'|"[^"]+"|\'[^\']+\'|[^,]+))|([^=,]+)', 'g');
+      let propMatch;
+      while ((propMatch = propRegex.exec(mbeanName)) !== null) {
+        let prop = propMatch[0];
         // do not use split('=') as it splits wrong when there is a space in the mbean name
         let kv = this.splitMBeanProperty(prop);
         let propKey = kv[0];
@@ -346,7 +349,7 @@ namespace Jmx {
         } else {
           paths.push({ key: lowerKey, value: propValue });
         }
-      });
+      }
 
       Core.reorderPathsIfRequired(domainFolder.text, paths);
 
