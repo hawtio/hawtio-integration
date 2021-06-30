@@ -7,6 +7,7 @@ namespace Quartz {
     AllJobDetails: { [key: string]: Job };
     AllTriggers: Trigger[];
     SchedulerName: string;
+    JobGroupNames: string[];
   }
 
 }
