@@ -77,15 +77,20 @@ namespace Quartz {
       this.onTriggersUpdated();
 
       this.jobs = [];
-      // grab state for all triggers which requires to call a JMX operation per trigger
-      this.triggers.forEach(trigger => {
-        let job = scheduler.AllJobDetails[trigger.jobName];
-        if (job) {
-          job = job[trigger.group];
-          if (job) {
-            // unique id of jobs
-            job.id = job.name + "/" + job.group;
-            this.jobs.push(job);
+
+      scheduler.JobGroupNames.forEach(groupName => {
+        // ES5 compatible loop with additional check for own property
+        for (let jobName in scheduler.AllJobDetails) {
+          if (scheduler.AllJobDetails.hasOwnProperty(jobName)) {
+            let job = scheduler.AllJobDetails[jobName];
+            if (job) {
+              job = job[groupName];
+              if (job) {
+                // unique id of jobs
+                job.id = job.name + "/" + job.group;
+                this.jobs.push(job);
+              }
+            }
           }
         }
       });
