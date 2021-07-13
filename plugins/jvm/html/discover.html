@@ -3,7 +3,7 @@
   <h1>Discover</h1>
 
   <p ng-if="discovering">Please wait, discovering agents...</p>
-  
+
   <div ng-if="!discovering">
     <p ng-show="agents.length === 0">
       No agents discovered.
@@ -60,7 +60,7 @@
                 trigger="manual"
                 placement="auto"
                 data-title="Please enter your username and password">
-              <i ng-show="agent.url" class="fa-4x pficon-running" tooltip="Connect to process"></i>
+              <i ng-show="agent.url" class="fa-4x pficon-on-running" tooltip="Connect to process"></i>
             </div>
           </div>
 
