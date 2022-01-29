@@ -61,6 +61,7 @@ div[ng-controller="JVM.DiscoveryController"] ul.discovery .remoteAgent {
   .serverInfo {
     float: left;
     clear: none;
+
     &.logo {
       margin: 20px 20px 0 0;
       width: 135px;
@@ -80,5 +81,12 @@ div[ng-controller="JVM.DiscoveryController"] ul.discovery .remoteAgent {
       width: 100%;
       text-align: right;
     }
+
+    .vendor span:empty::after,
+    .product span:empty::after,
+    .version span:empty::after {
+      content: "unknown"
+    }
+
   }
 }

@@ -24,9 +24,9 @@
         <li ng-repeat="agent in jvmDiscovery.agents track by $index" ng-show="filterMatches(agent)">
           <div class="remoteAgent">
             <div class="logo serverInfo" style='background-image: url("{{getLogo(agent)}}")'>
-              <div class="vendor"><strong>Vendor:&nbsp;</strong><span ng-show="agent.server_vendor">{{agent.server_vendor}}</span></div>
-              <div class="product"><strong>Product:&nbsp;</strong><span ng-show="agent.server_product">{{agent.server_product}}</span></div>
-              <div class="version"><strong>Version:&nbsp;</strong><span ng-show="agent.server_version">{{agent.server_version}}</span></div>
+              <div class="vendor"><strong>Vendor:&nbsp;</strong><span>{{agent.server_vendor}}</span></div>
+              <div class="product"><strong>Product:&nbsp;</strong><span>{{agent.server_product}}</span></div>
+              <div class="version"><strong>Version:&nbsp;</strong><span>{{agent.server_version}}</span></div>
             </div>
             <div class="detail">
               <div class="agentInfo">
