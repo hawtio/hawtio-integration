@@ -23,12 +23,6 @@
 
 }
 
-.discovery > li > div:first-child > img {
-  vertical-align: middle;
-  width: 128px;
-  max-height: 128px;
-}
-
 .jvm-reset-connections-alert {
   margin-top: 20px;
 }
@@ -43,4 +37,48 @@
 
 .jvm-title-popover:active:focus {
   outline: none;
+}
+
+
+div[ng-controller="JVM.DiscoveryController"] ul.discovery .remoteAgent {
+  clear: both;
+  display: inline-block;
+  height: 190px;
+
+  .detail {
+    clear: none;
+    display: inline-block;
+    height: 190px;
+    float: left;
+    border-left: 1px solid #bbb;
+    padding: 0px 0px 10px 20px;
+
+    .action-group {
+      margin-top: 10px;
+    }
+  }
+
+  .serverInfo {
+    float: left;
+    clear: none;
+    &.logo {
+      margin: 20px 20px 0px 0px;
+      width: 135px;
+      background-repeat: no-repeat;
+      background-size: 85px 85px;
+      background-position: top right;
+      padding-top: 90px;
+    }
+
+    .vendor,
+    .product,
+    .version {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      width: 100%;
+      text-align: right;
+    }
+  }
 }

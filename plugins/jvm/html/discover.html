@@ -7,88 +7,69 @@
     <p ng-show="agents.length === 0">
       No agents discovered.
     </p>
-    <div ng-show="agents.length > 0">
+    <div>
       <div class="row toolbar-pf">
         <div class="col-sm-12">
-          <form class="toolbar-pf-actions">
+          <div class="toolbar-pf-actions">
             <div class="form-group">
-              <input type="text" class="form-control" ng-model="filter" placeholder="Filter..." autocomplete="off">
+              <input autocomplete="off" class="form-control" ng-model="jvmDiscovery.filter" placeholder="Filter..." type="text"/>
             </div>
             <div class="form-group">
-              <button class="btn btn-default" ng-click="fetch()" title="Refresh"><i class="fa fa-refresh"></i> Refresh</button>
+              <button class="btn btn-default" ng-click="fetch()" title="Refresh" type="button"><i class="fa fa-refresh"></i>&nbsp;Refresh</button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
       <ul class="discovery zebra-list">
-        <li ng-repeat="agent in agents track by $index" ng-show="filterMatches(agent)">
-
-          <div class="inline-block">
-            <img ng-src="{{getLogo(agent)}}">
-          </div>
-
-          <div class="inline-block">
-            <p ng-hide="!hasName(agent)">
-            <span class="strong"
-                  ng-show="agent.server_vendor">
-              {{agent.server_vendor}} {{_.startCase(agent.server_product)}} {{agent.server_version}}
-            </span>
-            </p>
-          <span ng-class="getAgentIdClass(agent)">
-            <strong ng-show="hasName(agent)">Agent ID: </strong>{{agent.agent_id}}<br/>
-            <strong ng-show="hasName(agent)">Agent Version: </strong><span ng-hide="hasName(agent)"> Version: </span>{{agent.agent_version}}</span><br/>
-            <strong ng-show="hasName(agent)">Agent Description: </strong><span
-              ng-hide="hasName(agent)"> Description: {{agent.agent_description}}</span><br/>
-                <div ng-hide="!agent.startTime"><strong>JVM Started: </strong>{{agent.startTime | date: 'yyyy-MM-dd HH:mm:ss'}}</div>
-                <div ng-hide="!agent.command"><strong>Java Command: </strong>{{agent.command}}</div>
-
-            <p ng-hide="!agent.url"><strong>Agent URL: </strong><a ng-href="{{agent.url}}"
-                                                                  target="_blank">{{agent.url}}</a>
-            </p>
-          </div>
-
-          <div class="inline-block lock" ng-show="agent.secured">
-            <i class="fa-4x pficon-locked" title="A valid username and password will be required to connect"></i>
-          </div>
-
-          <div class="inline-block" ng-hide="!agent.url">
-            <div class="connect-button"
-                ng-click="gotoServer($event, agent)"
-                hawtio-template-popover
-                content="authPrompt"
-                trigger="manual"
-                placement="auto"
-                data-title="Please enter your username and password">
-              <i ng-show="agent.url" class="fa-4x pficon-on-running" tooltip="Connect to process"></i>
+        <li ng-repeat="agent in jvmDiscovery.agents track by $index" ng-show="filterMatches(agent)">
+          <div class="remoteAgent">
+            <div class="logo serverInfo" style='background-image: url("{{getLogo(agent)}}")'>
+              <div class="vendor"><strong>Vendor:&nbsp;</strong><span ng-show="agent.server_vendor">{{agent.server_vendor}}</span></div>
+              <div class="product"><strong>Product:&nbsp;</strong><span ng-show="agent.server_product">{{agent.server_product}}</span></div>
+              <div class="version"><strong>Version:&nbsp;</strong><span ng-show="agent.server_version">{{agent.server_version}}</span></div>
+            </div>
+            <div class="detail">
+              <div class="agentInfo">
+                <h3>Agent info<span ng-hide="!agent.agent_description">&nbsp;|&nbsp;{{agent.agent_description}}</span></h3>
+                <div><strong>ID:&nbsp;</strong>{{agent.agent_id}}</div>
+                <div><strong>Version:&nbsp;</strong>{{agent.agent_version}}</div>
+                <div ng-hide="!agent.startTime"><strong>JVM&nbsp;Started:&nbsp;</strong><span>{{agent.startTime | date: 'yyyy-MM-dd HH:mm:ss'}}</span></div>
+                <div ng-hide="!agent.command"><strong>Java Command:&nbsp;</strong><span>{{agent.command}}</span></div>
+                <div><strong>Agent URL:&nbsp;</strong><span ng-hide="!agent.url">{{agent.url}}</span></div>
+              </div>
+              <div class="action-group">
+                <button
+                  class="btn btn-default"
+                  content="authPrompt"
+                  data-title="Please enter your username and password"
+                  hawtio-template-popover
+                  ng-click="gotoServer($event, agent)"
+                  placement="auto"
+                  title="Connect to remote agent"
+                  trigger="manual"
+                ><i class="fa fa-play"></i>&nbsp;Connect
+                  <span class="inline-block lock" ng-show="agent.secured">&nbsp;
+                  <i class="pficon-locked" title="A valid username and password will be required to connect"></i>
+                </span>
+                </button>
+                <a class="btn btn-default" href="{{agent.url}}" target="_blank" title="Open remote agent URL">
+                  <i class="fa fa-external-link"></i>&nbsp;Open agent URL
+                </a>
+              </div>
             </div>
           </div>
-
         </li>
       </ul>
     </div>
   </div>
-
-  <script type="text/ng-template" id="authPrompt">
+  <script id="authPrompt" type="text/ng-template">
     <div class="auth-form">
       <form name="authForm">
-        <input type="text"
-                class="input-sm"
-                placeholder="Username..."
-                ng-model="agent.username"
-                required>
-        <input type="password"
-                class="input-sm"
-                placeholder="Password..."
-                ng-model="agent.password"
-                required>
-        <button ng-disabled="!authForm.$valid"
-                ng-click="connectWithCredentials($event, agent)"
-                class="btn btn-success">
-          <i class="fa fa-share"></i> Connect
-        </button>
-        <button class="btn" ng-click="closePopover($event)"><i class="fa fa-remove"></i></button>
+        <input type="text" class="input-sm" placeholder="Username..." name="agentUserName" ng-model="agent.username" required>
+        <input type="password" class="input-sm" placeholder="Password..." ng-model="agent.password" name="agentPassword" required>
+        <button ng-disabled="!authForm.$valid" ng-click="connectWithCredentials($event, agent)" class="btn btn-success"><i class="fa fa-share"></i>&nbsp;Connect</button>
+        <button type="button" class="btn" ng-click="closePopover($event)"><i class="fa fa-remove"></i></button>
       </form>
     </div>
   </script>
-
 </div>

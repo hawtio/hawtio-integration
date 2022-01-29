@@ -4,28 +4,31 @@ namespace JVM {
 
   _module.controller("JVM.DiscoveryController", ["$scope", "localStorage", "jolokia", ($scope, localStorage, jolokia) => {
 
-    $scope.discovering = true;
-    $scope.agents = <any>undefined;
+    $scope.jvmDiscovery = {
+      discovering : true,
+      responseJson : undefined,
+      agents : <any>undefined,
+      selectedAgent: undefined,
+      filter: undefined
+    };
 
-    $scope.$watch('agents', (newValue, oldValue) => {
+    $scope.$watch('jvmDiscovery.agents', (newValue, oldValue) => {
       if (newValue !== oldValue) {
-        $scope.selectedAgent = _.find($scope.agents, a => a['selected']);
+        $scope.jvmDiscovery.selectedAgent = _.find($scope.jvmDiscovery.agents, a => a['selected']);
       }
     }, true);
 
     $scope.closePopover = ($event) => {
-      (<any>$)($event.currentTarget).parents('.popover').prev().popover('hide');
+      (<any>$)($event.currentTarget).parents('.popover').hide();
     };
 
     function getMoreJvmDetails(agents) {
       for (let key in agents) {
         const agent = agents[key];
         if (agent.url && !agent.secured) {
-          const dedicatedJolokia = createJolokia(Core.useProxyIfExternal(agent.url), agent.username, agent.password);
+          const dedicatedJolokia = createJolokia(agent.url, agent.username, agent.password);
           agent.startTime = dedicatedJolokia.getAttribute('java.lang:type=Runtime', 'StartTime');
-          if (!$scope.hasName(agent)) {//only look for command if agent vm is not known
-            agent.command = dedicatedJolokia.getAttribute('java.lang:type=Runtime', 'SystemProperties', 'sun.java.command');
-          }
+          agent.command = dedicatedJolokia.getAttribute('java.lang:type=Runtime', 'SystemProperties', 'sun.java.command');
         }
       }
     }
@@ -62,19 +65,19 @@ namespace JVM {
     };
 
     $scope.getLogo = (agent) => {
-      if (agent.server_product) {
+      if (JVM.logoRegistry[agent.server_product]) {
         return JVM.logoRegistry[agent.server_product];
       }
       return JVM.logoRegistry['generic'];
     };
 
     $scope.filterMatches = (agent) => {
-      if (Core.isBlank($scope.filter)) {
+      if (Core.isBlank($scope.jvmDiscovery.filter)) {
         return true;
       } else {
-        const needle = $scope.filter.toLowerCase();
+        const needle = $scope.jvmDiscovery.filter.toLowerCase();
         const haystack = angular.toJson(agent).toLowerCase();
-        return haystack.indexOf(needle) !== 0;
+        return haystack.indexOf(needle) > -1;
       }
     };
 
@@ -90,20 +93,20 @@ namespace JVM {
     };
 
     $scope.render = (response) => {
-      $scope.discovering = false;
+      $scope.jvmDiscovery.discovering = false;
       if (response) {
         const responseJson = angular.toJson(response, true);
-        if ($scope.responseJson !== responseJson) {
-          $scope.responseJson = responseJson;
-          $scope.agents = response;
-          getMoreJvmDetails($scope.agents);
+        if ($scope.jvmDiscovery.responseJson !== responseJson) {
+          $scope.jvmDiscovery.responseJson = responseJson;
+          $scope.jvmDiscovery.agents = response;
+          getMoreJvmDetails($scope.jvmDiscovery.agents);
         }
       }
       Core.$apply($scope);
     };
 
     $scope.fetch = () => {
-      $scope.discovering = true;
+      $scope.jvmDiscovery.discovering = true;
       // use 10 sec timeout
       jolokia.execute('jolokia:type=Discovery', 'lookupAgentsWithTimeout(int)', 10 * 1000, Core.onSuccess($scope.render));
     };

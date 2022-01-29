@@ -7,8 +7,11 @@ namespace JVM {
   export const connectionSettingsKey = 'jvmConnect';
   export const logoPath = 'img/icons/jvm/';
   export const logoRegistry = {
-    'jetty': logoPath + 'jetty-logo-80x22.png',
-    'tomcat': logoPath + 'tomcat-logo.gif',
+    'jetty': logoPath + 'jetty-logo.svg',
+    'tomcat': logoPath + 'tomcat-logo.svg',
+    'camel': logoPath + 'camel-logo.svg',
+    'spring-boot': logoPath + 'spring-logo.svg',
+    'java': logoPath + 'java-logo.svg',
     'generic': logoPath + 'java-logo.svg'
   };
   export const proxyEnabledPath = 'proxy/enabled';
