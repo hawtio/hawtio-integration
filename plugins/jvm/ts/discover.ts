@@ -26,7 +26,7 @@ namespace JVM {
       for (let key in agents) {
         const agent = agents[key];
         if (agent.url && !agent.secured) {
-          const dedicatedJolokia = createJolokia(agent.url, agent.username, agent.password);
+          const dedicatedJolokia = createJolokia(Core.useProxyIfExternal(agent.url), agent.username, agent.password);
           agent.startTime = dedicatedJolokia.getAttribute('java.lang:type=Runtime', 'StartTime');
           agent.command = dedicatedJolokia.getAttribute('java.lang:type=Runtime', 'SystemProperties', 'sun.java.command');
         }
