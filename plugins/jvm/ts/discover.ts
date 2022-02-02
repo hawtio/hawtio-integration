@@ -22,11 +22,25 @@ namespace JVM {
       (<any>$)($event.currentTarget).parents('.popover').hide();
     };
 
+
+    /**
+     * Transform urlString to a Jolokia proxy url
+     * @param urlString
+     */
+    function toJolokiaProxyUrl(urlString) {
+      const agentURL = new URL(urlString);
+      const scheme = agentURL.protocol.replace(':', '');
+      let proxyUrl = `proxy/${scheme}/${agentURL.hostname}/${agentURL.port}${agentURL.pathname}`;
+      proxyUrl = Core.trimTrailing(proxyUrl, "/");
+      proxyUrl = Core.url(proxyUrl);
+      return proxyUrl;
+    }
+
     function getMoreJvmDetails(agents) {
       for (let key in agents) {
         const agent = agents[key];
         if (agent.url && !agent.secured) {
-          const dedicatedJolokia = createJolokia(Core.useProxyIfExternal(agent.url), agent.username, agent.password);
+          const dedicatedJolokia = createJolokia(toJolokiaProxyUrl(agent.url), agent.username, agent.password);
           agent.startTime = dedicatedJolokia.getAttribute('java.lang:type=Runtime', 'StartTime');
           agent.command = dedicatedJolokia.getAttribute('java.lang:type=Runtime', 'SystemProperties', 'sun.java.command');
         }
