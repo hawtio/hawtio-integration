@@ -28,10 +28,10 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@^4.15.0":
-  version "4.15.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.15.0.tgz#a837459b45b494f22be55222f7f35bdff79c9535"
-  integrity sha512-YAwFhrL1FFJORLQFrqQrAf1aLp3tGeu3BIQaS2IlHX7NnZEXy2Hd4yN6rHdcJ86ULc081/BQMhNz7NKgr6MSsg==
+"@hawtio/core@^4.16.0":
+  version "4.16.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.0.tgz#d5ede27b007a4758281b418a842c476f8deb8d2c"
+  integrity sha512-CuroKgjn4QdTt0An5rQ06dhnlJEA+f8C91nfcgrJVo0eXNj4kOcEGSErHo6BQDGD8PSM9G+72d53RdOulw3XEg==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "^2.0.0"
@@ -1028,7 +1028,7 @@ buildmail@4.0.1:
     nodemailer-shared "1.1.0"
     punycode "1.4.1"
 
-bytes@1, bytes@2.4.0, bytes@3.1.0, bytes@3.1.1:
+bytes@1, bytes@2.4.0, bytes@3.1.0, bytes@3.1.2:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-2.4.0.tgz#7d97196f9d5baf7f6935e25985549edd2a6c2339"
   integrity sha1-fZcZb51br39pNeJZhVSe3SpsIzk=
@@ -4746,7 +4746,7 @@ qjobs@^1.1.4:
   resolved "https://registry.yarnpkg.com/qjobs/-/qjobs-1.2.0.tgz#c45e9c61800bd087ef88d7e256423bdd49e5d071"
   integrity sha512-8YOJEHtxpySA3fFDyCRxA+UUV+fA+rTWnuWvylOK/NCjhY+b4ocCtmu8TtsWb+mYeU+GCHf/S66KZF/AsteKHg==
 
-qs@6.4.0, qs@6.7.0, qs@6.9.6, qs@^6.4.0, qs@~6.2.0, qs@~6.4.0, qs@~6.5.1, qs@~6.5.2:
+qs@6.4.0, qs@6.7.0, qs@6.9.7, qs@^6.4.0, qs@~6.2.0, qs@~6.4.0, qs@~6.5.1, qs@~6.5.2:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
   integrity sha1-E+JtKK1rD/qpExLNO/cI7TUecjM=
@@ -4765,7 +4765,7 @@ range-parser@1.2.0, range-parser@^1.2.0, range-parser@~1.2.0, range-parser@~1.2.
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.0.tgz#f49be6b487894ddc40dcc94a322f611092e00d5e"
   integrity sha1-9JvmtIeJTdxA3MlKMi9hEJLgDV4=
 
-raw-body@2.2.0, raw-body@2.4.0, raw-body@2.4.2, raw-body@^2.2.0, raw-body@~1.1.0, raw-body@~2.2.0:
+raw-body@2.2.0, raw-body@2.4.0, raw-body@2.4.3, raw-body@^2.2.0, raw-body@~1.1.0, raw-body@~2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/raw-body/-/raw-body-2.2.0.tgz#994976cf6a5096a41162840492f0bdc5d6e7fb96"
   integrity sha1-mUl2z2pQlqQRYoQEkvC9xdbn+5Y=
