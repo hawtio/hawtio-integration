@@ -1,6 +1,6 @@
 # hawtio-integration
 
-[![CircleCI](https://circleci.com/gh/hawtio/hawtio-integration.svg?style=svg)](https://circleci.com/gh/hawtio/hawtio-integration)
+[![Test](https://github.com/hawtio/hawtio-integration/actions/workflows/test.yml/badge.svg)](https://github.com/hawtio/hawtio-integration/blob/main/.github/workflows/test.yml)
 
 This project provides ActiveMQ, Camel, Karaf and Spring Boot plugins for hawtio.
 
