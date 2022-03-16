@@ -1,5 +1,5 @@
 /// <reference path="operation.ts"/>
-/// <reference path="../../../rbac/ts/models.ts"/>
+/// <reference path="../../../rbac/models.ts"/>
 
 namespace Jmx {
 

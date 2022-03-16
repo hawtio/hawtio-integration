@@ -1,4 +1,4 @@
-/// <reference path="../../jmx/ts/workspace.ts"/>
+/// <reference path="../jmx/ts/workspace.ts"/>
 
 namespace RBAC {
 
