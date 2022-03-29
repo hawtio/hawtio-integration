@@ -4,6 +4,7 @@
 describe("SpringBootService", () => {
 
   const healthTab = new Nav.HawtioTab('Health', '/spring-boot/health');
+  const infoTab = new Nav.HawtioTab('Info', '/spring-boot/info');
   const loggersTab = new Nav.HawtioTab('Loggers', '/spring-boot/loggers');
   const traceTab = new Nav.HawtioTab('Trace', '/spring-boot/trace');
 
@@ -24,13 +25,14 @@ describe("SpringBootService", () => {
       const tabs = springBootService.getTabs();
       // then
       expect(tabs[0]).toEqual(healthTab);
-      expect(tabs[1]).toEqual(loggersTab);
-      expect(tabs[2]).toEqual(traceTab);
+      expect(tabs[1]).toEqual(infoTab);
+      expect(tabs[2]).toEqual(loggersTab);
+      expect(tabs[3]).toEqual(traceTab);
     });
 
     it("should return two tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(true, false, false, false, true, true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(true, true,false, false, false, false, true, true);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -40,7 +42,7 @@ describe("SpringBootService", () => {
 
     it("should return one tab", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, true, true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false,false, false, true, true);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -49,7 +51,7 @@ describe("SpringBootService", () => {
 
     it("should return zero tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, false, false);
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, false, false,false, false);
       // when
       const tabs = springBootService.getTabs();
       // then

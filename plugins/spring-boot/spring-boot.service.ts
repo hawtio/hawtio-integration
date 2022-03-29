@@ -11,6 +11,9 @@ namespace SpringBoot {
       if (this.hasEndpoint('healthEndpoint') || this.hasEndpoint('Health')) {
         tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
       }
+      if (this.hasEndpoint('infoEndpoint') || this.hasEndpoint('Info')) {
+        tabs.push(new Nav.HawtioTab('Info', '/spring-boot/info'));
+      }
       if (this.hasEndpoint('loggersEndpoint') || this.hasEndpoint('Loggers')) {
         tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
       }
