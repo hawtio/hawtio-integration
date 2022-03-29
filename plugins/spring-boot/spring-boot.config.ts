@@ -6,8 +6,10 @@ namespace SpringBoot {
     'ngInject';
     $routeProvider
       .when('/spring-boot/health', {template: '<spring-boot-health></spring-boot-health>'})
+      .when('/spring-boot/info', {template: '<spring-boot-info></spring-boot-info>'})
       .when('/spring-boot/trace', {template: '<spring-boot-trace></spring-boot-trace>'})
       .when('/spring-boot/loggers', {template: '<spring-boot-loggers></spring-boot-loggers>'});
+
     }
 
   export function configureLayout(workspace: Jmx.Workspace, springBootService: SpringBootService,
