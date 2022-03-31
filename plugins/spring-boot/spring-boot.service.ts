@@ -8,16 +8,16 @@ namespace SpringBoot {
 
     getTabs(): Nav.HawtioTab[] {
       const tabs = [];
-      if (this.hasEndpoint('healthEndpoint') || this.hasEndpoint('Health')) {
+      if (this.hasEndpoint('Health')) {
         tabs.push(new Nav.HawtioTab('Health', '/spring-boot/health'));
       }
       if (this.hasEndpoint('Info')) {
         tabs.push(new Nav.HawtioTab('Info', '/spring-boot/info'));
       }
-      if (this.hasEndpoint('loggersEndpoint') || this.hasEndpoint('Loggers')) {
+      if (this.hasEndpoint('Loggers')) {
         tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
       }
-      if (this.hasEndpoint('traceEndpoint') || this.hasEndpoint('Httptrace')) {
+      if (this.hasEndpoint('Httptrace')) {
         tabs.push(new Nav.HawtioTab('Trace', '/spring-boot/trace'));
       }
       return tabs;
