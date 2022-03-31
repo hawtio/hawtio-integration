@@ -11,7 +11,7 @@ namespace SpringBoot {
 
     getHealth(): ng.IPromise<Health> {
       log.debug('Fetch health data');
-      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['healthEndpoint', 'Health'], ['getData', 'health'])
+      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['Health'], ['getData', 'health'])
       return this.jolokiaService.execute(mbean.objectName, mbean.operation)
         .then(response => {
           const details = response.details ? response.details : response;
