@@ -63,7 +63,7 @@ describe("SpringBootService", () => {
 
     it("should return zero tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false);
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false,false);
       // when
       const tabs = springBootService.getTabs();
       // then

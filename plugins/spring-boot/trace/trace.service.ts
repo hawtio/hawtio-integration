@@ -10,7 +10,7 @@ namespace SpringBoot {
     }
 
     getTraces(): ng.IPromise<Trace[]> {
-      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['Httptrace'], ['getData', 'traces'])
+      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['traceEndpoint', 'Httptrace'], ['getData', 'traces'])
       return this.jolokiaService.execute(mbean.objectName, mbean.operation)
         .then(response => {
           const data = response.traces ? response.traces : response;

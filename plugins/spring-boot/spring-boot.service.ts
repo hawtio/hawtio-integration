@@ -17,7 +17,7 @@ namespace SpringBoot {
       if (this.hasEndpoint('Loggers')) {
         tabs.push(new Nav.HawtioTab('Loggers', '/spring-boot/loggers'));
       }
-      if (this.hasEndpoint('Httptrace')) {
+      if (this.hasEndpoint('traceEndpoint') ||this.hasEndpoint('Httptrace')) {
         tabs.push(new Nav.HawtioTab('Trace', '/spring-boot/trace'));
       }
       return tabs;
