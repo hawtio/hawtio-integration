@@ -20,7 +20,7 @@ describe("SpringBootService", () => {
 
     it("should return all tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(true, false, true, false, true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(true,true,true,true);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -30,9 +30,21 @@ describe("SpringBootService", () => {
       expect(tabs[3]).toEqual(traceTab);
     });
 
+    it("should return three tabs", () => {
+      // given
+      workspace.treeContainsDomainAndProperties.and.returnValues(true, false, false, true, false, true);
+      // when
+      const tabs = springBootService.getTabs();
+      // then
+      expect(tabs[0]).toEqual(healthTab);
+      expect(tabs[1]).toEqual(loggersTab);
+      expect(tabs[2]).toEqual(traceTab);
+    });
+
+
     it("should return two tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(true, true,false, false, false, false, true, true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(true, false, false, false, true);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -42,7 +54,7 @@ describe("SpringBootService", () => {
 
     it("should return one tab", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false,false, false, true, true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, false, false, true);
       // when
       const tabs = springBootService.getTabs();
       // then
