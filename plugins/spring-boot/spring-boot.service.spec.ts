@@ -32,7 +32,7 @@ describe("SpringBootService", () => {
 
     it("should return three tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(true, false, false, true, false, true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(true, false, true, true);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -44,7 +44,7 @@ describe("SpringBootService", () => {
 
     it("should return two tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(true, false, false, false, true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(true, false, false, true);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -54,7 +54,7 @@ describe("SpringBootService", () => {
 
     it("should return one tab", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, false, false, true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, true);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -63,7 +63,7 @@ describe("SpringBootService", () => {
 
     it("should return zero tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, false, false, false, false);
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -115,7 +115,7 @@ describe("SpringBootService", () => {
 
     it("should return true when spring boot endpoints enabled", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, true, true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, true);
       // when
       const isValid = springBootService.isValid();
       // then
