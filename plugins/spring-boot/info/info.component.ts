@@ -4,8 +4,8 @@
 namespace SpringBoot {
 
   export class InfoController {
-    readonly reloadDelay = 20000;
-    reloadTask: ng.IPromise<any>;
+    private readonly reloadDelay = 20000;
+    private reloadTask: ng.IPromise<any>;
     info: Info;
 
     constructor(private $interval: ng.IIntervalService, private infoService: InfoService) {
@@ -27,9 +27,7 @@ namespace SpringBoot {
 
     loadData() {
       this.infoService.getInfo()
-        .then(info => {
-          this.info = info
-        });
+        .then(info => this.info = info);
 
     }
 
@@ -46,21 +44,20 @@ namespace SpringBoot {
       <div class="spring-boot-info-main">
         <h1>Info</h1>
         <table class="table table-striped table-bordered table-hover">
-            <thead>
-              <th> Attribute </th>
-              <th> Value </th>
-            </thead>
+          <thead>
+            <th>Property</th>
+            <th>Value</th>
+          </thead>
           <tbody>
-            <tr ng-repeat = "item in $ctrl.info.global">
-              <td> {{item[0]}} </td>
-              <td> {{item[1]}} </td>
+            <tr ng-repeat="item in $ctrl.info.items">
+              <td>{{ item.key }}</td>
+              <td>{{ item.value }}</td>
             </tr>
           </tbody>
         </table>
       </div>
-
     `,
     controller: InfoController
-  }
+  };
 
 }

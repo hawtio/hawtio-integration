@@ -20,7 +20,7 @@ describe("SpringBootService", () => {
 
     it("should return all tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(true,true,true,true);
+      workspace.treeContainsDomainAndProperties.and.returnValues(true, true, true, true);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -63,7 +63,7 @@ describe("SpringBootService", () => {
 
     it("should return zero tabs", () => {
       // given
-      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, false, false,false, false);
+      workspace.treeContainsDomainAndProperties.and.returnValues(false, false, false, false, false, false, false, false);
       // when
       const tabs = springBootService.getTabs();
       // then
@@ -89,7 +89,7 @@ describe("SpringBootService", () => {
       // when
       const endpointMBean: SpringBoot.EndpointMBean = springBootService.getEndpointMBean(['healthEndpoint', 'Health', 'healthz'], ['getHealth', 'health']);
       // then
-      expect(endpointMBean).toEqual({objectName: 'Health', operation: 'getHealth'});
+      expect(endpointMBean).toEqual({ objectName: 'Health', operation: 'getHealth' });
     });
 
     it("should return null for no matching endpoint operation", () => {
