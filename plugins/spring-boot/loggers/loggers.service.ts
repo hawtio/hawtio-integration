@@ -10,7 +10,7 @@ namespace SpringBoot {
     }
 
     getLoggerConfiguration(): ng.IPromise<LoggerConfiguration> {
-      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['loggersEndpoint', 'Loggers'], ['getLoggers', 'loggers'])
+      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['Loggers'], ['loggers'])
       return this.jolokiaService.execute(mbean.objectName, mbean.operation)
         .then(data => {
           let loggers: Logger[] = [];
@@ -34,7 +34,7 @@ namespace SpringBoot {
     }
 
     setLoggerLevel(logger: Logger): ng.IPromise<void> {
-      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['loggersEndpoint', 'Loggers'], ['setLogLevel', 'configureLogLevel'])
+      const mbean: EndpointMBean = this.springBootService.getEndpointMBean(['Loggers'], ['configureLogLevel'])
       return this.jolokiaService.execute(mbean.objectName, mbean.operation, logger.name, logger.configuredLevel);
     }
   }
