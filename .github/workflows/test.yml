@@ -10,6 +10,7 @@ on:
   push:
     branches:
       - main
+      - 4.x-camel2
     paths-ignore:
       - "**.md"
 
