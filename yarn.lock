@@ -28,10 +28,10 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@^4.16.0":
-  version "4.16.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.0.tgz#d5ede27b007a4758281b418a842c476f8deb8d2c"
-  integrity sha512-CuroKgjn4QdTt0An5rQ06dhnlJEA+f8C91nfcgrJVo0eXNj4kOcEGSErHo6BQDGD8PSM9G+72d53RdOulw3XEg==
+"@hawtio/core@^4.16.1":
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.1.tgz#f92675e9aebd1a38135d97b64a09beef311ada76"
+  integrity sha512-B3dfGHiPQKyBdXQLigoDV6GVsaNJsC2SGU1bieOplefQzt/FhXq4zPZ5TY3seXDFa6p1cIlmEvwUmdiDVsA6wA==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "^2.0.0"
@@ -600,10 +600,10 @@ ansi-red@^0.1.1:
   dependencies:
     ansi-wrap "0.1.0"
 
-ansi-regex@2.1.1, ansi-regex@^2.0.0, ansi-regex@^3.0.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-2.1.1.tgz#c3b33ab5ee360d86e0e628f0468ae7ef27d654df"
-  integrity sha1-w7M6te42DYbg5ijwRorn7yfWVN8=
+ansi-regex@4.1.1, ansi-regex@^2.0.0, ansi-regex@^3.0.0:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-4.1.1.tgz#164daac87ab2d6f6db3a29875e2d1766582dabed"
+  integrity sha512-ILlv4k/3f6vfQ4OoP2AGvirOktlQ98ZEL1k9FaQjxa3L1abBgbuTDAdPOpvbGncC0BTVQrl+OM8xZGK6tWXt7g==
 
 ansi-styles@2.2.1, ansi-styles@^2.2.1, ansi-styles@^3.2.1:
   version "2.2.1"

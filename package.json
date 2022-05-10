@@ -15,7 +15,7 @@
     "prepack": "gulp version"
   },
   "dependencies": {
-    "@hawtio/core": "^4.16.0",
+    "@hawtio/core": "^4.16.1",
     "@types/angular-cookies": "^1.4.5",
     "@types/angular-mocks": "~1.7.0",
     "@types/angular-ui-bootstrap": "~0.13.46",
@@ -127,7 +127,7 @@
     "semver": "4.3.6",
     "vinyl-fs": "0.3.14",
     "strip-ansi": "3.0.1",
-    "ansi-regex": "2.1.1",
+    "ansi-regex": "4.1.1",
     "replace-ext": "0.0.1",
     "through2": "2.0.3",
     "vinyl": "2.1.0",
