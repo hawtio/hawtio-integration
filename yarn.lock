@@ -28,10 +28,10 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@^4.16.0":
-  version "4.16.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.0.tgz#d5ede27b007a4758281b418a842c476f8deb8d2c"
-  integrity sha512-CuroKgjn4QdTt0An5rQ06dhnlJEA+f8C91nfcgrJVo0eXNj4kOcEGSErHo6BQDGD8PSM9G+72d53RdOulw3XEg==
+"@hawtio/core@^4.16.1":
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.1.tgz#f92675e9aebd1a38135d97b64a09beef311ada76"
+  integrity sha512-B3dfGHiPQKyBdXQLigoDV6GVsaNJsC2SGU1bieOplefQzt/FhXq4zPZ5TY3seXDFa6p1cIlmEvwUmdiDVsA6wA==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "^2.0.0"
