@@ -1,10 +1,9 @@
 namespace Runtime {
 
   export class ThreadDumpModalController {
-    resolve: {dumpedThreads: string};
+    resolve: {dumpedThreads: Thread[]};
 
     get dumpedThreads() {
-      console.log(this.resolve.dumpedThreads);
       return this.resolve.dumpedThreads;
     }
   }
@@ -16,9 +15,17 @@ namespace Runtime {
     },
     template: `
 
-<h1> Thread Dump </h1>
-$ctrl.dumpThreads
-
+    <div class="modal-header">
+    <button type="button" class="close" aria-label="Close" ng-click="$ctrl.close()">
+      <span class="pficon pficon-close" aria-hidden="true"></span>
+    </button>
+    <h4 class="modal-title">Thread Dump</h4>
+  </div>
+  <div class="modal-body">
+  <code>
+  <pre>{{$ctrl.dumpedThreads}}</pre>
+  </code>
+  </div>
     `,
     controller: ThreadDumpModalController
   };

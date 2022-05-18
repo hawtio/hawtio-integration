@@ -189,11 +189,10 @@ namespace Runtime {
     performThreadDump(): void{
       this.threadsService.dumpThreads().then(threads => {
         this.dumpedThreads = threads;
-        console.log(this.dumpedThreads);
         this.$uibModal.open({
           component: 'threadDumpModal',
           size: 'lg',
-          resolve: { dumpedThreads: threads }
+          resolve: { dumpedThreads:() => threads }
         });
 
        });
