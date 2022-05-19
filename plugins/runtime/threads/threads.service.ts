@@ -40,14 +40,12 @@ namespace Runtime {
       return this.jolokiaService.setAttribute('java.lang:type=Threading', 'ThreadContentionMonitoringEnabled', false);
     }
     dumpThreads():angular.IPromise<Thread[]>  {
-      let stack_traces = "";
      return this.jolokiaService.execute('java.lang:type=Threading','dumpAllThreads(boolean, boolean)',true,true)
       .then(threads => {
         threads.forEach(thread => {
           thread.threadState = ThreadsService.STATE_LABELS[thread.threadState];
           thread.waitedTime = thread.waitedTime > 0 ? Core.humanizeMilliseconds(thread.waitedTime) : '';
           thread.blockedTime = thread.blockedTime > 0 ? Core.humanizeMilliseconds(thread.blockedTime) : '';
-          stack_traces+=JSON.stringify(thread.stackTrace)
         });
         return threads;
     });
