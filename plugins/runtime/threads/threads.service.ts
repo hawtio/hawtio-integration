@@ -39,7 +39,7 @@ namespace Runtime {
     disableThreadContentionMonitoring(): angular.IPromise<void> {
       return this.jolokiaService.setAttribute('java.lang:type=Threading', 'ThreadContentionMonitoringEnabled', false);
     }
-    dumpThreads():angular.IPromise<string>  {
+    dumpThreads():angular.IPromise<Thread[]>  {
       let stack_traces = "";
      return this.jolokiaService.execute('java.lang:type=Threading','dumpAllThreads(boolean, boolean)',true,true)
       .then(threads => {
@@ -49,7 +49,7 @@ namespace Runtime {
           thread.blockedTime = thread.blockedTime > 0 ? Core.humanizeMilliseconds(thread.blockedTime) : '';
           stack_traces+=JSON.stringify(thread.stackTrace)
         });
-        return stack_traces;
+        return threads;
     });
     }
   }

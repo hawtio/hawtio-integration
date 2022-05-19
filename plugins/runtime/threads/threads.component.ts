@@ -14,7 +14,7 @@ namespace Runtime {
 
     allThreads: Thread[];
     filteredThreads: Thread[];
-    dumpedThreads : string;
+    dumpedThreads : Thread[];
     threadContentionMonitoringEnabled: boolean;
     isDumpEnabled :boolean;
     intervalId;
