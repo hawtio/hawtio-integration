@@ -1,7 +1,7 @@
 namespace Runtime {
 
   export class ThreadDumpModalController {
-    resolve: {dumpedThreads: Thread[]};
+    resolve: {dumpedThreads: string};
 
     get dumpedThreads() {
       return this.resolve.dumpedThreads;
