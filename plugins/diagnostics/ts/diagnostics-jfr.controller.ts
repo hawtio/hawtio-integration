@@ -238,14 +238,32 @@ namespace Diagnostics {
         for (let index = 0; index < existingRecordings.length; index++) {
           lastRecording = existingRecordings[index];
           if (lastRecording.state === "STOPPED") {
-            scope.recordings.push({
-              number: "" + lastRecording.id,
-              size: lastRecording.size + " b",
-              file: null,
-              time: lastRecording.stopTime,
-              canDownload: true,
-              downloadLink: jolokiaUrl + "/exec/jdk.management.jfr:type=FlightRecorder/downloadRecording(long)/" + lastRecording.id
-            });
+            if (jolokiaUrl.match("/actuator/hawtio/jolokia") != null) {
+              //We now know that we are in a spring boot context for this recording/connection.
+              // Because there is some issue with downloading in this case, we will just include
+              // the file path identically as in the instance where there are
+              // no MBeans available (when running configureScopeForDiagnosticCommand)
+              // Due to the different ways of storing the recordings in Mbean and non-Mbean contexts, we have to store the file if the download is going to fail.
+              // It would be much better to fix this on the backend...
+              const filename = lastRecording.id + ".jfr"
+              scope.recordings.push({
+                number: "" + lastRecording.id,
+                size: lastRecording.size + " b",
+                file: filename,
+                time: lastRecording.stopTime,
+                canDownload: true,
+                downloadLink: jolokiaUrl + "/exec/jdk.management.jfr:type=FlightRecorder/copyTo(long,java.lang.String)/" + lastRecording.id+"/"+filename
+              });
+            } else {
+              scope.recordings.push({
+                number: "" + lastRecording.id,
+                size: lastRecording.size + " b",
+                file: null,
+                time: lastRecording.stopTime,
+                canDownload: true,
+                downloadLink: jolokiaUrl + "/exec/jdk.management.jfr:type=FlightRecorder/downloadRecording(long)/" + lastRecording.id
+              });
+            }
           }
         }
         if (lastRecording) {
