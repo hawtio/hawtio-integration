@@ -187,6 +187,7 @@ namespace Runtime {
       this.toolbarActions[0] = this.enableThreadContentionMonitoringAction;
       this.$interval.cancel(this.intervalId);
     }
+
     performThreadDump(): void {
       this.threadsService.dumpThreads().then(threads => {
         this.dumpedThreads = threads;
@@ -198,6 +199,7 @@ namespace Runtime {
 
       });
     }
+
     showThreadDumpView() {
       this.toolbarActions[1] = this.thereadDumpAction;
       this.$interval.cancel(this.intervalId);
