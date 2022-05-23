@@ -21,9 +21,7 @@ namespace Runtime {
         <h4 class="modal-title">Thread Dump</h4>
       </div>
       <div class="modal-body">
-        <code>
-            <pre>{{$ctrl.dumpedThreads}}</pre>
-        </code>
+          <pre>{{$ctrl.dumpedThreads}}</pre>
       </div>
     `,
     controller: ThreadDumpModalController

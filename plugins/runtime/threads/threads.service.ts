@@ -50,15 +50,22 @@ namespace Runtime {
             thread.blockedTime = thread.blockedTime > 0 ? Core.humanizeMilliseconds(thread.blockedTime) : '';
           });
           for (let i = 0; i < threads.length; i++) {
-            let tinfo = "";
-            let isdaemon = threads[i].daemon == true ? " daemon" : "";
-            tinfo += '"' + threads[i].threadName + '"' + " tid=" + threads[i].threadId.toString() + " prio=" + threads[i].priority.toString() + isdaemon + " java.lang.Thread.State:" + threads[i].threadState + "\n";
+            let threadName = threads[i].threadName;
+            let threadId = threads[i].threadId.toString();
+            let threadPriority = threads[i].priority.toString();
+            let isDaemonThread = threads[i].daemon == true ? "daemon" : "";
+            let threadState = threads[i].threadState;
+            let threadInfo = `"${threadName}" tid=${threadId} prio=${threadPriority} ${isDaemonThread} java.lang.Thread.State:${threadState}\n`;
             for (let j = 0; j < threads[i].stackTrace.length; j++) {
+              let className = threads[i].stackTrace[j].className;
+              let methodName = threads[i].stackTrace[j].methodName;
+              let fileName = threads[i].stackTrace[j].fileName;
               let isNativeMethod = threads[i].stackTrace[j].nativeMethod == true ? "(Native)" : "";
               let isLineNoPositive = threads[i].stackTrace[j].lineNumber > 0 ? ":" + threads[i].stackTrace[j].lineNumber.toString() : "";
-              tinfo += "   " + "at " + threads[i].stackTrace[j].className + "." + threads[i].stackTrace[j].methodName + "(" + threads[i].stackTrace[j].fileName + isLineNoPositive + ")" + isNativeMethod + "\n";
+              let TraceJ = `   at ${className}.${methodName}(${fileName}${isLineNoPositive})${isNativeMethod}\n`;
+              threadInfo += TraceJ;
             }
-            dumpedThreads += tinfo + "\n";
+            dumpedThreads += threadInfo + "\n";
           }
           return dumpedThreads
         });
