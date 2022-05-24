@@ -50,20 +50,20 @@ namespace Runtime {
             thread.blockedTime = thread.blockedTime > 0 ? Core.humanizeMilliseconds(thread.blockedTime) : '';
           });
           for (let i = 0; i < threads.length; i++) {
-            let threadName = Core.escapeHtml(threads[i].threadName);
-            let threadId = Core.escapeHtml(threads[i].threadId.toString());
-            let threadPriority = Core.escapeHtml(threads[i].priority.toString());
-            let isDaemonThread = threads[i].daemon == true ? Core.escapeHtml("daemon") : Core.escapeHtml("");
-            let threadState = Core.escapeHtml(threads[i].threadState);
+            const threadName = Core.escapeHtml(threads[i].threadName);
+            const threadId = threads[i].threadId.toString();
+            const threadPriority = threads[i].priority.toString();
+            const isDaemonThread = threads[i].daemon == true ? "daemon" : "";
+            const threadState = threads[i].threadState;
             let threadInfo = `"${threadName}" tid=${threadId} prio=${threadPriority} ${isDaemonThread} java.lang.Thread.State:${threadState}\n`;
             for (let j = 0; j < threads[i].stackTrace.length; j++) {
-              let className = Core.escapeHtml(threads[i].stackTrace[j].className);
-              let methodName = Core.escapeHtml(threads[i].stackTrace[j].methodName);
-              let fileName = Core.escapeHtml(threads[i].stackTrace[j].fileName);
-              let isNativeMethod = threads[i].stackTrace[j].nativeMethod == true ? Core.escapeHtml("(Native)") : Core.escapeHtml("");
-              let isLineNoPositive = threads[i].stackTrace[j].lineNumber > 0 ? Core.escapeHtml(":" + threads[i].stackTrace[j].lineNumber.toString()) : Core.escapeHtml("");
-              let TraceJ = `   at ${className}.${methodName}(${fileName}${isLineNoPositive})${isNativeMethod}\n`;
-              threadInfo += TraceJ;
+              const className = threads[i].stackTrace[j].className;
+              const methodName = threads[i].stackTrace[j].methodName;
+              const fileName = threads[i].stackTrace[j].fileName;
+              const isNativeMethod = threads[i].stackTrace[j].nativeMethod == true ? "(Native)" : "";
+              const isLineNoPositive = threads[i].stackTrace[j].lineNumber > 0 ? ":" + threads[i].stackTrace[j].lineNumber.toString() : "";
+              const traceJ = `   at ${className}.${methodName}(${fileName}${isLineNoPositive})${isNativeMethod}\n`;
+              threadInfo += traceJ;
             }
             dumpedThreads += threadInfo + "\n";
           }
