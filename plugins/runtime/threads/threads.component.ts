@@ -202,7 +202,6 @@ namespace Runtime {
 
     showThreadDumpView() {
       this.toolbarActions[1] = this.thereadDumpAction;
-      this.$interval.cancel(this.intervalId);
     }
 
   }

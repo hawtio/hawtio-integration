@@ -51,7 +51,7 @@ namespace Runtime {
           });
           for (let i = 0; i < threads.length; i++) {
             const threadName = Core.escapeHtml(threads[i].threadName);
-            const threadId = threads[i].threadId.toString();
+            const threadId = threads[i].threadId;
             const threadPriority = threads[i].priority.toString();
             const isDaemonThread = threads[i].daemon == true ? "daemon" : "";
             const threadState = threads[i].threadState;
@@ -61,7 +61,7 @@ namespace Runtime {
               const methodName = threads[i].stackTrace[j].methodName;
               const fileName = threads[i].stackTrace[j].fileName;
               const isNativeMethod = threads[i].stackTrace[j].nativeMethod == true ? "(Native)" : "";
-              const isLineNoPositive = threads[i].stackTrace[j].lineNumber > 0 ? ":" + threads[i].stackTrace[j].lineNumber.toString() : "";
+              const isLineNoPositive = threads[i].stackTrace[j].lineNumber > 0 ? ":" + threads[i].stackTrace[j].lineNumber : "";
               const traceJ = `   at ${className}.${methodName}(${fileName}${isLineNoPositive})${isNativeMethod}\n`;
               threadInfo += traceJ;
             }
