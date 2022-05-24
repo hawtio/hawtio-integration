@@ -50,18 +50,18 @@ namespace Runtime {
             thread.blockedTime = thread.blockedTime > 0 ? Core.humanizeMilliseconds(thread.blockedTime) : '';
           });
           for (let i = 0; i < threads.length; i++) {
-            let threadName = threads[i].threadName;
-            let threadId = threads[i].threadId.toString();
-            let threadPriority = threads[i].priority.toString();
-            let isDaemonThread = threads[i].daemon == true ? "daemon" : "";
-            let threadState = threads[i].threadState;
+            let threadName = Core.escapeHtml(threads[i].threadName);
+            let threadId = Core.escapeHtml(threads[i].threadId.toString());
+            let threadPriority = Core.escapeHtml(threads[i].priority.toString());
+            let isDaemonThread = threads[i].daemon == true ? Core.escapeHtml("daemon") : Core.escapeHtml("");
+            let threadState = Core.escapeHtml(threads[i].threadState);
             let threadInfo = `"${threadName}" tid=${threadId} prio=${threadPriority} ${isDaemonThread} java.lang.Thread.State:${threadState}\n`;
             for (let j = 0; j < threads[i].stackTrace.length; j++) {
-              let className = threads[i].stackTrace[j].className;
-              let methodName = threads[i].stackTrace[j].methodName;
-              let fileName = threads[i].stackTrace[j].fileName;
-              let isNativeMethod = threads[i].stackTrace[j].nativeMethod == true ? "(Native)" : "";
-              let isLineNoPositive = threads[i].stackTrace[j].lineNumber > 0 ? ":" + threads[i].stackTrace[j].lineNumber.toString() : "";
+              let className = Core.escapeHtml(threads[i].stackTrace[j].className);
+              let methodName = Core.escapeHtml(threads[i].stackTrace[j].methodName);
+              let fileName = Core.escapeHtml(threads[i].stackTrace[j].fileName);
+              let isNativeMethod = threads[i].stackTrace[j].nativeMethod == true ? Core.escapeHtml("(Native)") : Core.escapeHtml("");
+              let isLineNoPositive = threads[i].stackTrace[j].lineNumber > 0 ? Core.escapeHtml(":" + threads[i].stackTrace[j].lineNumber.toString()) : Core.escapeHtml("");
               let TraceJ = `   at ${className}.${methodName}(${fileName}${isLineNoPositive})${isNativeMethod}\n`;
               threadInfo += TraceJ;
             }
