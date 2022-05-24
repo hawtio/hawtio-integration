@@ -2,6 +2,7 @@ namespace Runtime {
 
   export class Thread {
     blockedCount: number;
+    daemon: boolean;
     blockedTime: string;
     inNative: boolean;
     lockInfo: object;
@@ -15,6 +16,7 @@ namespace Runtime {
     threadState: string;
     waitedCount: number;
     waitedTime: string;
+    priority: number;
   }
 
 }

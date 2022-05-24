@@ -1,6 +1,7 @@
 /// <reference path="./thread.ts"/>
 /// <reference path="./threads.service.ts"/>
 
+
 namespace Runtime {
 
   export class ThreadsController {
@@ -14,9 +15,12 @@ namespace Runtime {
 
     allThreads: Thread[];
     filteredThreads: Thread[];
+    dumpedThreads: string;
     threadContentionMonitoringEnabled: boolean;
+    isDumpEnabled: boolean;
     intervalId;
-    toolbarActions = [];
+    toolbarActions = [
+    ];
 
     enableThreadContentionMonitoringAction = {
       name: 'Enable thread contention monitoring',
@@ -28,12 +32,19 @@ namespace Runtime {
       actionFn: () => this.disableThreadContentionMonitoring()
     }
 
+
+
+    thereadDumpAction = {
+      name: 'Thread Dump',
+      actionFn: () => this.performThreadDump()
+    }
+
     toolbarConfig = {
       filterConfig: {
         fields: [
           {
             id: 'state',
-            title:  'State',
+            title: 'State',
             placeholder: 'Filter by state...',
             filterType: 'select',
             filterValues: ['Blocked', 'New', 'Runnable', 'Terminated', 'Timed waiting', 'Waiting']
@@ -108,7 +119,7 @@ namespace Runtime {
           this.$uibModal.open({
             component: 'threadModal',
             size: 'lg',
-            resolve: {thread: thread}
+            resolve: { thread: thread }
           });
         }
       }
@@ -117,11 +128,12 @@ namespace Runtime {
     constructor(private $interval: ng.IIntervalService, private $uibModal: angular.ui.bootstrap.IModalService,
       private threadsService: ThreadsService) {
       'ngInject';
-    }   
+    }
 
     $onInit() {
       this.showThreadContentionMonitoringView();
       this.loadThreads();
+      this.showThreadDumpView();
     }
 
     $onDestroy() {
@@ -132,7 +144,7 @@ namespace Runtime {
 
     showThreadContentionMonitoringView() {
       this.threadsService.isThreadContentionMonitoringEnabled()
-        .then(enabled => enabled 
+        .then(enabled => enabled
           ? this.showThreadContentionMonitoringEnabledView()
           : this.showThreadContentionMonitoringDisabledView());
     }
@@ -142,6 +154,7 @@ namespace Runtime {
         this.allThreads = threads;
         this.applyFilters(this.toolbarConfig.filterConfig.appliedFilters);
       });
+
     }
 
     applyFilters(filters: any[]) {
@@ -157,7 +170,7 @@ namespace Runtime {
       this.threadsService.enableThreadContentionMonitoring()
         .then(() => this.showThreadContentionMonitoringEnabledView());
     }
-    
+
     showThreadContentionMonitoringEnabledView() {
       this.threadContentionMonitoringEnabled = true;
       this.toolbarActions[0] = this.disableThreadContentionMonitoringAction;
@@ -167,19 +180,37 @@ namespace Runtime {
     disableThreadContentionMonitoring(): void {
       this.threadsService.disableThreadContentionMonitoring()
         .then(() => this.showThreadContentionMonitoringDisabledView());
-      }
-      
+    }
+
     showThreadContentionMonitoringDisabledView() {
       this.threadContentionMonitoringEnabled = false;
       this.toolbarActions[0] = this.enableThreadContentionMonitoringAction;
       this.$interval.cancel(this.intervalId);
     }
+
+    performThreadDump(): void {
+      this.threadsService.dumpThreads().then(threads => {
+        this.dumpedThreads = threads;
+        this.$uibModal.open({
+          component: 'threadDumpModal',
+          size: 'lg',
+          resolve: { dumpedThreads: () => threads }
+        });
+
+      });
+    }
+
+    showThreadDumpView() {
+      this.toolbarActions[1] = this.thereadDumpAction;
+    }
+
   }
 
   export const threadsComponent: angular.IComponentOptions = {
     template: `
       <div class="table-view">
         <h1>Threads</h1>
+
         <pf-toolbar config="$ctrl.toolbarConfig"></pf-toolbar>
         <pf-table-view class="runtime-threads-table"
                        config="$ctrl.tableConfig"
