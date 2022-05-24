@@ -1,7 +1,7 @@
 namespace Runtime {
 
   export class ThreadDumpModalController {
-    resolve: { dumpedThreads: string };
+    resolve: { dumpedThreads: string; };
 
     get dumpedThreads() {
       return this.resolve.dumpedThreads;
@@ -21,7 +21,7 @@ namespace Runtime {
         <h4 class="modal-title">Thread Dump</h4>
       </div>
       <div class="modal-body">
-          <pre>{{$ctrl.dumpedThreads}}</pre>
+        <pre>{{$ctrl.dumpedThreads}}</pre>
       </div>
     `,
     controller: ThreadDumpModalController

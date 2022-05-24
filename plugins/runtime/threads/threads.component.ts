@@ -1,7 +1,6 @@
 /// <reference path="./thread.ts"/>
 /// <reference path="./threads.service.ts"/>
 
-
 namespace Runtime {
 
   export class ThreadsController {
@@ -15,29 +14,25 @@ namespace Runtime {
 
     allThreads: Thread[];
     filteredThreads: Thread[];
-    dumpedThreads: string;
     threadContentionMonitoringEnabled: boolean;
-    isDumpEnabled: boolean;
-    intervalId;
+    intervalId: any;
     toolbarActions = [
     ];
 
     enableThreadContentionMonitoringAction = {
       name: 'Enable thread contention monitoring',
       actionFn: () => this.enableThreadContentionMonitoring()
-    }
+    };
 
     disableThreadContentionMonitoringAction = {
       name: 'Disable thread contention monitoring',
       actionFn: () => this.disableThreadContentionMonitoring()
-    }
+    };
 
-
-
-    thereadDumpAction = {
+    threadDumpAction = {
       name: 'Thread Dump',
       actionFn: () => this.performThreadDump()
-    }
+    };
 
     toolbarConfig = {
       filterConfig: {
@@ -132,8 +127,8 @@ namespace Runtime {
 
     $onInit() {
       this.showThreadContentionMonitoringView();
-      this.loadThreads();
       this.showThreadDumpView();
+      this.loadThreads();
     }
 
     $onDestroy() {
@@ -190,18 +185,16 @@ namespace Runtime {
 
     performThreadDump(): void {
       this.threadsService.dumpThreads().then(threads => {
-        this.dumpedThreads = threads;
         this.$uibModal.open({
           component: 'threadDumpModal',
           size: 'lg',
           resolve: { dumpedThreads: () => threads }
         });
-
       });
     }
 
     showThreadDumpView() {
-      this.toolbarActions[1] = this.thereadDumpAction;
+      this.toolbarActions[1] = this.threadDumpAction;
     }
 
   }
@@ -222,6 +215,6 @@ namespace Runtime {
       </div>
     `,
     controller: ThreadsController
-  }
+  };
 
 }
