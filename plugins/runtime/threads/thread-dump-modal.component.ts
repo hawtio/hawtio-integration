@@ -23,7 +23,7 @@ namespace Runtime {
       <div class="modal-body">
         <div class="row">
           <div class="col-md-12">
-            <pre style="height:80vh">{{$ctrl.dumpedThreads}}</pre>
+              <pre class = "thread-dump-modal-output" >{{$ctrl.dumpedThreads}}</pre>
           </div>
         </div>
       </div>
