@@ -30,7 +30,7 @@ namespace Runtime {
     };
 
     threadDumpAction = {
-      name: 'Thread Dump',
+      name: 'Thread dump',
       actionFn: () => this.performThreadDump()
     };
 
