@@ -162,9 +162,8 @@ namespace Logs {
                 <tr ng-repeat="logEntry in $ctrl.filteredLogs">
                   <td>{{logEntry | logDateFilter}}</td>
                   <td class="{{logEntry.levelClass}}">{{logEntry.level}}</td>
-                  <td ng-switch="logEntry.hasLogSourceHref">
-                    <a href="" ng-switch-when="true" ng-click="$ctrl.openLogModal(logEntry)">{{logEntry.logger}}</a>
-                    <span ng-switch-default>{{logEntry.logger}}</span>
+                  <td>
+                    <a href="" ng-click="$ctrl.openLogModal(logEntry)">{{logEntry.logger}}</a>
                   </td>
                   <td ng-bind-html="logEntry.sanitizedMessage | highlight:$ctrl.messageSearchText"></td>
                 </tr>
