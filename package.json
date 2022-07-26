@@ -15,7 +15,7 @@
     "prepack": "gulp version"
   },
   "dependencies": {
-    "@hawtio/core": "^4.16.1",
+    "@hawtio/core": "^4.16.3",
     "@types/angular-cookies": "^1.4.5",
     "@types/angular-mocks": "~1.7.0",
     "@types/angular-ui-bootstrap": "~0.13.46",
@@ -81,7 +81,7 @@
     "yargs": "8.0.2",
     "bootstrap-select": "1.12.4",
     "datatables.net": "1.10.15",
-    "moment": "2.18.1",
+    "moment": "2.29.4",
     "nopt": "3.0.6",
     "lru-cache": "4.1.1",
     "minimist": "1.2.0",
