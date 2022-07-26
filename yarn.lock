@@ -28,10 +28,10 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@^4.16.2":
-  version "4.16.2"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.2.tgz#e2f7ae435a75b73998b84a59eb9e0ecfe9cda119"
-  integrity sha512-8ZJcDGUl3lfkdwF8Mkqc/sPkhERB9O1Gbz57oxuSiSWvWtxSLVABJHVXYUZWSmV83R6ZWGoSZE6VwxalRlKkzg==
+"@hawtio/core@^4.16.3":
+  version "4.16.3"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.3.tgz#11b2fc8b88577854eca1c14fe00c9848b89b431e"
+  integrity sha512-NpnhoJkeNgly/cGr47HrYTNvpAT769Au5Sxjs2TQDLjWMAkL+MWiNAzpQDDTChkPMafkvxQgw7yz9xxC2w5YuA==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "^2.0.0"
@@ -3929,10 +3929,10 @@ moment-timezone@^0.4.0, moment-timezone@^0.4.1:
   dependencies:
     moment ">= 2.6.0"
 
-moment@2.18.1, "moment@>= 2.6.0", moment@^2.10, moment@^2.19.1, moment@~2.24.0:
-  version "2.18.1"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
-  integrity sha1-w2GT3Tzhwu7SrbfIAtu8d6gbHA8=
+moment@2.29.4, "moment@>= 2.6.0", moment@^2.10, moment@^2.19.1, moment@~2.24.0:
+  version "2.29.4"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
+  integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
 ms@2.0.0, ms@2.1.1, ms@^2.1.1:
   version "2.0.0"
