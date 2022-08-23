@@ -182,7 +182,7 @@
     "js-logger": "1.4.1",
     "jquery": "2.2.4",
     "lodash": "4.17.21",
-    "urijs": "1.19.0",
+    "urijs": "1.19.9",
     "@types/lodash": "4.14.91",
     "mkdirp": "0.5.1",
     "caseless": "0.12.0",
