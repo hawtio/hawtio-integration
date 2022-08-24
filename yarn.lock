@@ -28,10 +28,10 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@^4.16.3":
-  version "4.16.3"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.3.tgz#11b2fc8b88577854eca1c14fe00c9848b89b431e"
-  integrity sha512-NpnhoJkeNgly/cGr47HrYTNvpAT769Au5Sxjs2TQDLjWMAkL+MWiNAzpQDDTChkPMafkvxQgw7yz9xxC2w5YuA==
+"@hawtio/core@^4.16.4":
+  version "4.16.4"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.4.tgz#f13ebfa72c30ebe9a08e45a49491b9ad0b93e111"
+  integrity sha512-Qz2+nP41+1W4MzrRsy+SEADVNvFcLZ2Nek7dmAdGq2B6X8wR1Jp83NPbWkjx9RX29KsoLhuHAld8PumtW4G46g==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "^2.0.0"
@@ -46,16 +46,16 @@
     angular-patternfly "^5.0.0"
     angular-route "^1.7.7"
     jquery "2.2.4"
-    js-logger "1.4.1"
+    js-logger "^1.6.0"
     lodash "~4.17.21"
     marked "0.6.1"
     typescript "^3.0.3"
-    urijs "1.19.0"
+    urijs "^1.19.9"
 
-"@hawtio/node-backend@^4.0.0":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@hawtio/node-backend/-/node-backend-4.1.2.tgz#36647fc000d2262c2d5a9193fff4b4f4c3114611"
-  integrity sha512-N235JnY3MSqMMpl61XOOqmlcDXaXefNeKvIm8+8I04WT3gWHEXR4Iz8HB4x+1T+WzwfSPJUR95k3xTqSS9Ko6w==
+"@hawtio/node-backend@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@hawtio/node-backend/-/node-backend-4.1.4.tgz#fabb95078bc8156cf9122187160e267d45d2738a"
+  integrity sha512-bq5frQlUDDSxyzKTL2EfSE4PbSRijFT4Vhugz8Vdc1mLRJ46BO16lmbkIgNWPmu1isz4uCoeE/sR0ZmBqMNNsg==
   dependencies:
     "@types/node" "^10.0.0"
     body-parser "^1.18.0"
@@ -69,7 +69,7 @@
     request "^2.81.0"
     tiny-lr "^1.0.5"
     underscore.string "^3.3.4"
-    urijs "^1.18.10"
+    urijs "^1.19.9"
 
 "@patternfly/patternfly@^2.0.0":
   version "2.71.3"
@@ -5861,10 +5861,10 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-urijs@1.19.0, urijs@^1.18.10:
-  version "1.19.0"
-  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.0.tgz#d8aa284d0e7469703a6988ad045c4cbfdf08ada0"
-  integrity sha512-Qs2odXn0hST5VSPVjpi73CMqtbAoanahaqWBujGU+IyMrMqpWcIhDewxQRhCkmqYxuyvICDcSuLdv2O7ncWBGw==
+urijs@^1.19.9:
+  version "1.19.9"
+  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.9.tgz#3b15844835de3732866d420768c16f24be7d3e65"
+  integrity sha512-v0V+v5F3NQFt6TX0GpA2NKyrpythDJI+PHRo66sUIDP/U6cXbm6NqLVcXylQGwiwW5VYNj+OAei3EU0ALj9AWg==
 
 urix@^0.1.0:
   version "0.1.0"

@@ -15,7 +15,7 @@
     "prepack": "gulp version"
   },
   "dependencies": {
-    "@hawtio/core": "^4.16.3",
+    "@hawtio/core": "^4.16.4",
     "@types/angular-cookies": "^1.4.5",
     "@types/angular-mocks": "~1.7.0",
     "@types/angular-ui-bootstrap": "~0.13.46",
@@ -38,7 +38,7 @@
     "patternfly-bootstrap-treeview": "~2.1.0"
   },
   "devDependencies": {
-    "@hawtio/node-backend": "^4.0.0",
+    "@hawtio/node-backend": "^4.1.4",
     "@types/dagre-layout": "0.8.0",
     "@types/jasmine": "^4.0.1",
     "angular-mocks": "~1.7.0",
@@ -182,7 +182,6 @@
     "js-logger": "1.4.1",
     "jquery": "2.2.4",
     "lodash": "4.17.21",
-    "urijs": "1.19.9",
     "@types/lodash": "4.14.91",
     "mkdirp": "0.5.1",
     "caseless": "0.12.0",
