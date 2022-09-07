@@ -109,10 +109,10 @@
   resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.7.0.tgz#3dd8d3b2d3b7ce2cca51b9fc3691b48b638eb468"
   integrity sha512-zneUmi5I6oSkGBqkRP9rxbWX1mi6Yj7gNV+WNffmJLf8x4cnV0MGqXFNSP90NZ1kRRLCOdKBf9RIVD1TMg4aog==
 
-"@types/bootstrap@3.3.36":
-  version "3.3.36"
-  resolved "https://registry.yarnpkg.com/@types/bootstrap/-/bootstrap-3.3.36.tgz#5ca0b81655427398fe7c8728bccdc395069093d0"
-  integrity sha512-Ox4QismJMkIIEx800Potvor1PCFg/VldUkmWBARw33mcJejLfXsRjQowdwr20tOzq73+YxrD40kcHbjWDgOwMA==
+"@types/bootstrap@^3.3.36":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@types/bootstrap/-/bootstrap-3.4.0.tgz#7e74a2421b3984ce53ab459e979a99a78dd802c6"
+  integrity sha512-LS05hVAAsX86qbHg7W+ydwBlNHrVCoFw6wEP3/uW4eYmRXl08bWmPeN/+onM+8qZTFfDgUlG/OItJI8SW972oQ==
   dependencies:
     "@types/jquery" "*"
 
@@ -951,10 +951,10 @@ bootstrap-touchspin@~3.1.1:
   resolved "https://registry.yarnpkg.com/bootstrap-touchspin/-/bootstrap-touchspin-3.1.1.tgz#9779deac72aaf577e5e762b8512c747c871d9597"
   integrity sha1-l3nerHKq9Xfl52K4USx0fIcdlZc=
 
-bootstrap@3.4.1, bootstrap@^3.3, bootstrap@^3.4.1, bootstrap@~3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.4.1.tgz#c3a347d419e289ad11f4033e3c4132b87c081d72"
-  integrity sha512-yN5oZVmRCwe5aKwzRj6736nSmKDX7pLYwsXiCj/EYmo16hODaBiT4En5btW/jhBF/seV+XMx3aYwukYC3A49DA==
+bootstrap@3.4.1, bootstrap@5.2.0, bootstrap@^3.3, bootstrap@^3.4.1, bootstrap@^5.2.0, bootstrap@~3.4.1:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.2.0.tgz#838727fb60f1630db370fe57c63cbcf2962bb3d3"
+  integrity sha512-qlnS9GL6YZE6Wnef46GxGv1UpGGzAwO0aPL1yOjzDIJpeApeMvqV24iL+pjr2kU4dduoBA9fINKWKgMToobx9A==
 
 brace-expansion@^1.0.0, brace-expansion@^1.1.7:
   version "1.1.11"
