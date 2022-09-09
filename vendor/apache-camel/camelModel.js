@@ -1,4 +1,4 @@
-var _apacheCamelModelVersion = '3.18.0';
+var _apacheCamelModelVersion = '3.18.2';
 
 var _apacheCamelModel ={
   "definitions": {
@@ -14142,6 +14142,14 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "namespace": {
+          "kind": "element",
+          "type": "array",
+          "description": "Injects the XML Namespaces of prefix - uri mappings",
+          "title": "Namespace",
+          "required": false,
+          "deprecated": false
+        },
         "trim": {
           "kind": "attribute",
           "type": "boolean",
@@ -14200,6 +14208,14 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "namespace": {
+          "kind": "element",
+          "type": "array",
+          "description": "Injects the XML Namespaces of prefix - uri mappings",
+          "title": "Namespace",
+          "required": false,
+          "deprecated": false
+        },
         "trim": {
           "kind": "attribute",
           "type": "boolean",
@@ -14248,6 +14264,14 @@ var _apacheCamelModel ={
           "type": "integer",
           "description": "To group N parts together",
           "title": "Group",
+          "required": false,
+          "deprecated": false
+        },
+        "namespace": {
+          "kind": "element",
+          "type": "array",
+          "description": "Injects the XML Namespaces of prefix - uri mappings",
+          "title": "Namespace",
           "required": false,
           "deprecated": false
         },
