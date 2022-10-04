@@ -1,4 +1,4 @@
-var _apacheCamelModelVersion = '3.18.2';
+var _apacheCamelModelVersion = '3.19.0';
 
 var _apacheCamelModel ={
   "definitions": {
@@ -22,7 +22,7 @@ var _apacheCamelModel ={
           "title": "Expression",
           "description": "The chosen language",
           "required": true,
-          "enum": [ "constant", "csimple", "datasonnet", "exchangeProperty", "groovy", "header", "hl7terser", "joor", "jq", "jsonpath", "language", "method", "mvel", "ognl", "ref", "simple", "spel", "tokenize", "xpath", "xquery", "xtokenize" ]
+          "enum": [ "constant", "csimple", "datasonnet", "exchangeProperty", "groovy", "header", "hl7terser", "joor", "jq", "jsonpath", "language", "method", "mvel", "ognl", "python", "ref", "simple", "spel", "tokenize", "xpath", "xquery", "xtokenize" ]
         }
       }
     },
@@ -4488,6 +4488,15 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "throwExceptionWhenHalfOpenOrOpenState": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "Whether to throw io.github.resilience4j.circuitbreaker.CallNotPermittedException when the call is rejected due circuit breaker is half open or open.",
+          "title": "Throw Exception When Half Open Or Open State",
+          "required": false,
+          "deprecated": false
+        },
         "slidingWindowSize": {
           "kind": "attribute",
           "type": "integer",
@@ -7881,6 +7890,14 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "routeId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the id of the route",
+          "title": "Route Id",
+          "required": false,
+          "deprecated": false
+        },
         "id": {
           "kind": "attribute",
           "type": "string",
@@ -8012,6 +8029,14 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "routeId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the id of the route",
+          "title": "Route Id",
+          "required": false,
+          "deprecated": false
+        },
         "id": {
           "kind": "attribute",
           "type": "string",
@@ -8140,6 +8165,14 @@ var _apacheCamelModel ={
           "defaultValue": "false",
           "description": "Marks this rest operation as deprecated in OpenApi documentation.",
           "title": "Deprecated",
+          "required": false,
+          "deprecated": false
+        },
+        "routeId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the id of the route",
+          "title": "Route Id",
           "required": false,
           "deprecated": false
         },
@@ -8514,6 +8547,14 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "routeId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the id of the route",
+          "title": "Route Id",
+          "required": false,
+          "deprecated": false
+        },
         "id": {
           "kind": "attribute",
           "type": "string",
@@ -8645,6 +8686,14 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "routeId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the id of the route",
+          "title": "Route Id",
+          "required": false,
+          "deprecated": false
+        },
         "id": {
           "kind": "attribute",
           "type": "string",
@@ -8773,6 +8822,14 @@ var _apacheCamelModel ={
           "defaultValue": "false",
           "description": "Marks this rest operation as deprecated in OpenApi documentation.",
           "title": "Deprecated",
+          "required": false,
+          "deprecated": false
+        },
+        "routeId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the id of the route",
+          "title": "Route Id",
           "required": false,
           "deprecated": false
         },
@@ -9309,6 +9366,15 @@ var _apacheCamelModel ={
           "defaultValue": "false",
           "description": "Whether to enable CORS headers in the HTTP response. The default value is false.",
           "title": "Enable C O R S",
+          "required": false,
+          "deprecated": false
+        },
+        "inlineRoutes": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "false",
+          "description": "Inline routes in rest-dsl which are linked using direct endpoints. By default, each service in Rest DSL is an individual route, meaning that you would have at least two routes per service (rest-dsl, and the route linked from rest-dsl). Enabling this allows Camel to optimize and inline this as a single route, however this requires to use direct endpoints, which must be unique per service. This option is default false.",
+          "title": "Inline Routes",
           "required": false,
           "deprecated": false
         },
@@ -13801,6 +13867,40 @@ var _apacheCamelModel ={
       "group": "language,java",
       "icon": "generic24.png",
       "description": "Evaluates an OGNL expression (Apache Commons OGNL).",
+      "properties": {
+        "expression": {
+          "kind": "value",
+          "type": "string",
+          "description": "The expression value in your chosen language syntax",
+          "title": "Expression",
+          "required": true,
+          "deprecated": false
+        },
+        "trim": {
+          "kind": "attribute",
+          "type": "boolean",
+          "defaultValue": "true",
+          "description": "Whether to trim the value to remove leading and trailing whitespaces and line breaks",
+          "title": "Trim",
+          "required": false,
+          "deprecated": false
+        },
+        "id": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the id of this node",
+          "title": "Id",
+          "required": false,
+          "deprecated": false
+        }
+      }
+    },
+    "python": {
+      "type": "object",
+      "title": "Python",
+      "group": "language,python",
+      "icon": "generic24.png",
+      "description": "Evaluates a Python expression.",
       "properties": {
         "expression": {
           "kind": "value",
