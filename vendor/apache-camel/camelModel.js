@@ -1,4 +1,4 @@
-var _apacheCamelModelVersion = '3.20.0';
+var _apacheCamelModelVersion = '3.20.1';
 
 var _apacheCamelModel ={
   "definitions": {
@@ -5086,6 +5086,30 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "nodePrefixId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets a prefix to use for all node ids (not route id).",
+          "title": "Node Prefix Id",
+          "required": false,
+          "deprecated": false
+        },
+        "routeConfigurationId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "The route configuration id or pattern this route should use for configuration. Multiple id\/pattern can be separated by comma.",
+          "title": "Route Configuration Id",
+          "required": false,
+          "deprecated": false
+        },
+        "precondition": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "The predicate of the precondition in simple language to evaluate in order to determine if this route should be included or not.",
+          "title": "Precondition",
+          "required": false,
+          "deprecated": false
+        },
         "streamCache": {
           "kind": "attribute",
           "type": "string",
@@ -5105,7 +5129,6 @@ var _apacheCamelModel ={
         "messageHistory": {
           "kind": "attribute",
           "type": "string",
-          "defaultValue": "true",
           "description": "Whether message history is enabled on this route.",
           "title": "Message History",
           "required": false,
@@ -7899,6 +7922,26 @@ var _apacheCamelModel ={
         }
       }
     },
+    "value": {
+      "type": "object",
+      "title": "Value",
+      "group": "configuration",
+      "icon": "generic24.png",
+      "description": "A single value",
+      "acceptInput": "false",
+      "acceptOutput": "false",
+      "nextSiblingAddedAsChild": "false",
+      "properties": {
+        "value": {
+          "kind": "value",
+          "type": "string",
+          "description": "Property value",
+          "title": "Value",
+          "required": true,
+          "deprecated": false
+        }
+      }
+    },
     "weighted": {
       "type": "object",
       "title": "Weighted",
@@ -9037,19 +9080,11 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
-        "value": {
+        "allowableValues": {
           "kind": "element",
           "type": "array",
           "description": "Sets the parameter list of allowable values (enum).",
-          "title": "Value",
-          "required": false,
-          "deprecated": false
-        },
-        "examples": {
-          "kind": "element",
-          "type": "array",
-          "description": "Sets the parameter examples.",
-          "title": "Examples",
+          "title": "Allowable Values",
           "required": false,
           "deprecated": false
         },
@@ -9561,11 +9596,11 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
-        "value": {
+        "allowableValues": {
           "kind": "element",
           "type": "array",
           "description": "Sets the parameter list of allowable values.",
-          "title": "Value",
+          "title": "Allowable Values",
           "required": false,
           "deprecated": false
         },
@@ -11196,12 +11231,52 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "fhirContext": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "To use a custom fhir context. Reference to object of type ca.uhn.fhir.context.FhirContext",
+          "title": "Fhir Context",
+          "required": false,
+          "deprecated": false
+        },
         "prettyPrint": {
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "false",
           "description": "Sets the pretty print flag, meaning that the parser will encode resources with human-readable spacing and newlines between elements instead of condensing output as much as possible.",
           "title": "Pretty Print",
+          "required": false,
+          "deprecated": false
+        },
+        "parserErrorHandler": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Registers an error handler which will be invoked when any parse errors are found. Reference to object of type ca.uhn.fhir.parser.IParserErrorHandler",
+          "title": "Parser Error Handler",
+          "required": false,
+          "deprecated": false
+        },
+        "parserOptions": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the parser options object which will be used to supply default options to newly created parsers. Reference to object of type ca.uhn.fhir.context.ParserOptions.",
+          "title": "Parser Options",
+          "required": false,
+          "deprecated": false
+        },
+        "preferTypes": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "If set (FQN class names), when parsing resources the parser will try to use the given types when possible, in the order that they are provided (from highest to lowest priority). For example, if a custom type which declares to implement the Patient resource is passed in here, and the parser is parsing a Bundle containing a Patient resource, the parser will use the given custom type. Multiple class names can be separated by comma.",
+          "title": "Prefer Types",
+          "required": false,
+          "deprecated": false
+        },
+        "forceResourceId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "When encoding, force this resource ID to be encoded as the resource ID. Reference to object of type org.hl7.fhir.instance.model.api.IIdType",
+          "title": "Force Resource Id",
           "required": false,
           "deprecated": false
         },
@@ -11233,16 +11308,16 @@ var _apacheCamelModel ={
         },
         "encodeElements": {
           "kind": "attribute",
-          "type": "object",
-          "description": "If provided, specifies the elements which should be encoded, to the exclusion of all others. Valid values for this field would include: Patient - Encode patient and all its children Patient.name - Encode only the patient's name Patient.name.family - Encode only the patient's family name .text - Encode the text element on any resource (only the very first position may contain a wildcard) .(mandatory) - This is a special case which causes any mandatory fields (min 0) to be encoded",
+          "type": "string",
+          "description": "If provided, specifies the elements which should be encoded, to the exclusion of all others. Multiple elements can be separated by comma when using String parameter. Valid values for this field would include: Patient - Encode patient and all its children Patient.name - Encode only the patient's name Patient.name.family - Encode only the patient's family name .text - Encode the text element on any resource (only the very first position may contain a wildcard) .(mandatory) - This is a special case which causes any mandatory fields (min 0) to be encoded",
           "title": "Encode Elements",
           "required": false,
           "deprecated": false
         },
         "dontEncodeElements": {
           "kind": "attribute",
-          "type": "object",
-          "description": "If provided, specifies the elements which should NOT be encoded. Valid values for this field would include: Patient - Don't encode patient and all its children Patient.name - Don't encode the patient's name Patient.name.family - Don't encode the patient's family name .text - Don't encode the text element on any resource (only the very first position may contain a wildcard) DSTU2 note: Note that values including meta, such as Patient.meta will work for DSTU2 parsers, but values with subelements on meta such as Patient.meta.lastUpdated will only work in DSTU3 mode.",
+          "type": "string",
+          "description": "If provided, specifies the elements which should NOT be encoded. Multiple elements can be separated by comma when using String parameter. Valid values for this field would include: Patient - Don't encode patient and all its children Patient.name - Don't encode the patient's name Patient.name.family - Don't encode the patient's family name .text - Don't encode the text element on any resource (only the very first position may contain a wildcard) DSTU2 note: Note that values including meta, such as Patient.meta will work for DSTU2 parsers, but values with subelements on meta such as Patient.meta.lastUpdated will only work in DSTU3 mode.",
           "title": "Dont Encode Elements",
           "required": false,
           "deprecated": false
@@ -11285,8 +11360,8 @@ var _apacheCamelModel ={
         },
         "dontStripVersionsFromReferencesAtPaths": {
           "kind": "attribute",
-          "type": "array",
-          "description": "If supplied value(s), any resource references at the specified paths will have their resource versions encoded instead of being automatically stripped during the encoding process. This setting has no effect on the parsing process. This method provides a finer-grained level of control than setStripVersionsFromReferences(String) and any paths specified by this method will be encoded even if setStripVersionsFromReferences(String) has been set to true (which is the default)",
+          "type": "string",
+          "description": "If supplied value(s), any resource references at the specified paths will have their resource versions encoded instead of being automatically stripped during the encoding process. This setting has no effect on the parsing process. Multiple elements can be separated by comma when using String parameter. This method provides a finer-grained level of control than setStripVersionsFromReferences(String) and any paths specified by this method will be encoded even if setStripVersionsFromReferences(String) has been set to true (which is the default)",
           "title": "Dont Strip Versions From References At Paths",
           "required": false,
           "deprecated": false
@@ -11327,12 +11402,52 @@ var _apacheCamelModel ={
           "required": false,
           "deprecated": false
         },
+        "fhirContext": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "To use a custom fhir context. Reference to object of type ca.uhn.fhir.context.FhirContext",
+          "title": "Fhir Context",
+          "required": false,
+          "deprecated": false
+        },
         "prettyPrint": {
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "false",
           "description": "Sets the pretty print flag, meaning that the parser will encode resources with human-readable spacing and newlines between elements instead of condensing output as much as possible.",
           "title": "Pretty Print",
+          "required": false,
+          "deprecated": false
+        },
+        "parserErrorHandler": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Registers an error handler which will be invoked when any parse errors are found. Reference to object of type ca.uhn.fhir.parser.IParserErrorHandler",
+          "title": "Parser Error Handler",
+          "required": false,
+          "deprecated": false
+        },
+        "parserOptions": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "Sets the parser options object which will be used to supply default options to newly created parsers. Reference to object of type ca.uhn.fhir.context.ParserOptions.",
+          "title": "Parser Options",
+          "required": false,
+          "deprecated": false
+        },
+        "preferTypes": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "If set (FQN class names), when parsing resources the parser will try to use the given types when possible, in the order that they are provided (from highest to lowest priority). For example, if a custom type which declares to implement the Patient resource is passed in here, and the parser is parsing a Bundle containing a Patient resource, the parser will use the given custom type. Multiple class names can be separated by comma.",
+          "title": "Prefer Types",
+          "required": false,
+          "deprecated": false
+        },
+        "forceResourceId": {
+          "kind": "attribute",
+          "type": "string",
+          "description": "When encoding, force this resource ID to be encoded as the resource ID. Reference to object of type org.hl7.fhir.instance.model.api.IIdType",
+          "title": "Force Resource Id",
           "required": false,
           "deprecated": false
         },
@@ -11364,16 +11479,16 @@ var _apacheCamelModel ={
         },
         "encodeElements": {
           "kind": "attribute",
-          "type": "object",
-          "description": "If provided, specifies the elements which should be encoded, to the exclusion of all others. Valid values for this field would include: Patient - Encode patient and all its children Patient.name - Encode only the patient's name Patient.name.family - Encode only the patient's family name .text - Encode the text element on any resource (only the very first position may contain a wildcard) .(mandatory) - This is a special case which causes any mandatory fields (min 0) to be encoded",
+          "type": "string",
+          "description": "If provided, specifies the elements which should be encoded, to the exclusion of all others. Multiple elements can be separated by comma when using String parameter. Valid values for this field would include: Patient - Encode patient and all its children Patient.name - Encode only the patient's name Patient.name.family - Encode only the patient's family name .text - Encode the text element on any resource (only the very first position may contain a wildcard) .(mandatory) - This is a special case which causes any mandatory fields (min 0) to be encoded",
           "title": "Encode Elements",
           "required": false,
           "deprecated": false
         },
         "dontEncodeElements": {
           "kind": "attribute",
-          "type": "object",
-          "description": "If provided, specifies the elements which should NOT be encoded. Valid values for this field would include: Patient - Don't encode patient and all its children Patient.name - Don't encode the patient's name Patient.name.family - Don't encode the patient's family name .text - Don't encode the text element on any resource (only the very first position may contain a wildcard) DSTU2 note: Note that values including meta, such as Patient.meta will work for DSTU2 parsers, but values with subelements on meta such as Patient.meta.lastUpdated will only work in DSTU3 mode.",
+          "type": "string",
+          "description": "If provided, specifies the elements which should NOT be encoded. Multiple elements can be separated by comma when using String parameter. Valid values for this field would include: Patient - Don't encode patient and all its children Patient.name - Don't encode the patient's name Patient.name.family - Don't encode the patient's family name .text - Don't encode the text element on any resource (only the very first position may contain a wildcard) DSTU2 note: Note that values including meta, such as Patient.meta will work for DSTU2 parsers, but values with subelements on meta such as Patient.meta.lastUpdated will only work in DSTU3 mode.",
           "title": "Dont Encode Elements",
           "required": false,
           "deprecated": false
@@ -11416,8 +11531,8 @@ var _apacheCamelModel ={
         },
         "dontStripVersionsFromReferencesAtPaths": {
           "kind": "attribute",
-          "type": "array",
-          "description": "If supplied value(s), any resource references at the specified paths will have their resource versions encoded instead of being automatically stripped during the encoding process. This setting has no effect on the parsing process. This method provides a finer-grained level of control than setStripVersionsFromReferences(String) and any paths specified by this method will be encoded even if setStripVersionsFromReferences(String) has been set to true (which is the default)",
+          "type": "string",
+          "description": "If supplied value(s), any resource references at the specified paths will have their resource versions encoded instead of being automatically stripped during the encoding process. This setting has no effect on the parsing process. Multiple elements can be separated by comma when using String parameter. This method provides a finer-grained level of control than setStripVersionsFromReferences(String) and any paths specified by this method will be encoded even if setStripVersionsFromReferences(String) has been set to true (which is the default)",
           "title": "Dont Strip Versions From References At Paths",
           "required": false,
           "deprecated": false
@@ -12200,7 +12315,7 @@ var _apacheCamelModel ={
         "dataFormatTypes": {
           "kind": "attribute",
           "type": "string",
-          "description": "The classes to take into account for the marshalling",
+          "description": "The classes to take into account for the marshalling. Multiple classes can be separated by comma.",
           "title": "Data Format Types",
           "required": false,
           "deprecated": false
@@ -12208,7 +12323,7 @@ var _apacheCamelModel ={
         "mainFormatType": {
           "kind": "attribute",
           "type": "string",
-          "description": "The classes to take into account while unmarshalling",
+          "description": "The class to take into account while unmarshalling.",
           "title": "Main Format Type",
           "required": false,
           "deprecated": false
