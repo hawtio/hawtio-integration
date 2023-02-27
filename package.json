@@ -296,6 +296,7 @@
     "toidentifier": "1.0.1",
     "has-symbols": "1.0.2",
     "on-finished": "2.3.0",
-    "destroy": "1.0.4"
+    "destroy": "1.0.4",
+    "content-type": "1.0.5"
   }
 }
