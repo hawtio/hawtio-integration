@@ -18,7 +18,7 @@ namespace Jmx {
     content: string;
     title?: string;
     isValid?(workspace: Workspace, perspectiveId?: string): any;
-    isActive?(worksace: Workspace): boolean;
+    isActive?(workspace: Workspace): boolean;
     href(): any;
   }
 
