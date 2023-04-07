@@ -28,10 +28,10 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@^4.16.4":
-  version "4.16.4"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.4.tgz#f13ebfa72c30ebe9a08e45a49491b9ad0b93e111"
-  integrity sha512-Qz2+nP41+1W4MzrRsy+SEADVNvFcLZ2Nek7dmAdGq2B6X8wR1Jp83NPbWkjx9RX29KsoLhuHAld8PumtW4G46g==
+"@hawtio/core@^4.16.5":
+  version "4.16.5"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.16.5.tgz#425588b7936b178ff288afa7ac4a2f5ab0563bf0"
+  integrity sha512-sMUGG4hBBBZloRIYjnVoVy433U9poYJY4dZR8UHN5rCB6FvCuYXop5NCUDAqiMwn8fhMQAu4kErSx4+pF0ELWg==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "^2.0.0"
@@ -2983,10 +2983,10 @@ is-buffer@^1.1.5:
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
   integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
 
-is-core-module@^2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.9.0.tgz#e1c34429cd51c6dd9e09e0799e396e27b19a9c69"
-  integrity sha512-+5FPy5PnwmO3lvfMb0AsoPaBG+5KHUI0wYFXOtYPnVVVspTFUuMZNfNaNVRt3FZadstu2c8x23vykRW/NBoU6A==
+is-core-module@^2.11.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.11.0.tgz#ad4cb3e3863e814523c96f3f58d26cc570ff0144"
+  integrity sha512-RRjxlvLDkD1YJwDbroBHMb+cukurkDWNyHx7D3oNB5x9rb5ogcksMC5wHCadcXoo67gVr/+3GFySh3134zi6rw==
   dependencies:
     has "^1.0.3"
 
