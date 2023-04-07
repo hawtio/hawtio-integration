@@ -1,4 +1,4 @@
-var _apacheCamelModelVersion = '3.20.1';
+var _apacheCamelModelVersion = '3.20.3';
 
 var _apacheCamelModel ={
   "definitions": {
@@ -7669,7 +7669,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "false",
-          "description": "Ignore the invalidate endpoint exception when try to create a producer with that endpoint",
+          "description": "Whether to ignore invalid endpoint URIs and skip sending the message.",
           "title": "Ignore Invalid Endpoint",
           "required": false,
           "deprecated": false
@@ -8151,7 +8151,7 @@ var _apacheCamelModel ={
           "kind": "attribute",
           "type": "boolean",
           "defaultValue": "false",
-          "description": "Ignore the invalidate endpoint exception when try to create a producer with that endpoint",
+          "description": "Whether to ignore invalid endpoint URIs and skip sending the message.",
           "title": "Ignore Invalid Endpoint",
           "required": false,
           "deprecated": false
@@ -9085,6 +9085,14 @@ var _apacheCamelModel ={
           "type": "array",
           "description": "Sets the parameter list of allowable values (enum).",
           "title": "Allowable Values",
+          "required": false,
+          "deprecated": false
+        },
+        "examples": {
+          "kind": "element",
+          "type": "array",
+          "description": "Sets the parameter examples.",
+          "title": "Examples",
           "required": false,
           "deprecated": false
         },
@@ -15403,9 +15411,18 @@ var _apacheCamelModel ={
       "icon": "generic24.png",
       "description": "Tokenize XML payloads.",
       "properties": {
+        "expression": {
+          "kind": "value",
+          "type": "string",
+          "description": "The expression value in your chosen language syntax",
+          "title": "Expression",
+          "required": true,
+          "deprecated": false
+        },
         "mode": {
           "kind": "attribute",
           "type": "enum",
+          "defaultValue": "i",
           "enum": [ "i", "w", "u", "t" ],
           "description": "The extraction mode. The available extraction modes are: i - injecting the contextual namespace bindings into the extracted token (default) w - wrapping the extracted token in its ancestor context u - unwrapping the extracted token to its child content t - extracting the text content of the specified element",
           "title": "Mode",
