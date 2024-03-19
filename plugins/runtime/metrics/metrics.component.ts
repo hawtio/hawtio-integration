@@ -47,14 +47,14 @@ namespace Runtime {
           let filterNumeric = this.$filter('number');
           let cpuLoad = filterNumeric(metrics.SystemCpuLoad * 100, 2);
           let loadAverage = filterNumeric(metrics.SystemLoadAverage, 2);
+          let memFree = this.formatBytes(metrics.FreePhysicalMemorySize);
           let memTotal = this.formatBytes(metrics.TotalPhysicalMemorySize);
-          let memUsed = this.formatBytes(metrics.TotalPhysicalMemorySize - metrics.FreePhysicalMemorySize);
           updateType = MetricType.SYSTEM;
 
           updates.push(this.metricsService.createMetric('Available processors', metrics.AvailableProcessors));
           updates.push(this.metricsService.createMetric('CPU load', cpuLoad, '%'));
           updates.push(this.metricsService.createMetric('Load average', loadAverage));
-          updates.push(this.metricsService.createUtilizationMetric('Memory used', memUsed[0], memTotal[0], memUsed[1]));
+          updates.push(this.metricsService.createUtilizationMetric('Free memory', memFree[0], memTotal[0], memFree[1]));
           updates.push(this.metricsService.createUtilizationMetric('File descriptors used', metrics.OpenFileDescriptorCount, metrics.MaxFileDescriptorCount));
           break;
         case 'java.lang:type=ClassLoading':
