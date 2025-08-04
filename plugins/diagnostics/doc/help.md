@@ -6,10 +6,6 @@ The Diagnostics plugin provides diagnostic information about the JVM via the JVM
 
 The Java Flight Recorder can be used to record diagnostics from a running Java process.  
 
-#### Unlock
-
-Commercial features must be enabled in order to use the flight recorder. The padlock will be locked and no operations are available if commercial options are not enabled. Click the padlock to unlock and enable flight recordings. Note: Running commercial options on a production system requires a valid license.
-
 #### Start
 
 Starts a recording. 
